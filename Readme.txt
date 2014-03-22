@@ -22,63 +22,81 @@ CLISP, ALLEGRO, CFFI, ASDF and QuickLisp can be compiled on.  There is nothing b
 ut pure Lisp, and OpenCV C++ and C in the whole project. 
 
 
-  If you have gotten LisP-CV to work on another system and would like to add the install instructions to this 
-tutorial just send me an e-mail at wnetai@gmail.com with the install instructions included. They will be added 
-to this file and you will be given credit for your addition unless you decline.
+  If you have gotten LisP-CV to work on another system and would like to add the
+install instructions to this tutorial just send me an e-mail at wnetai@gmail.com 
+with the install instructions included. They will be added to this file and you 
+will be given credit for your addition unless you decline.
 
 
-  If you would like to contribute a function to this project, you will need to first find out if the C wrapper for 
-it is available. Don't worry over 550 C wrappers are available and they can be found in the opencv_generated.cpp, 
-excluded_functions.cpp, mat.cpp, point.cpp ,rect.cpp, scalar.cpp, and size.cpp files. The location of those files 
-and their corresponding .hpp files can be found in the installation section of this file. If there is no C wrapper 
-available and you are familiar with C and C++ feel free to write one, but, if you do, try to do it similarly to the 
-C wrappers already in the aforementioned .cpp files. They C wrappers are going to be included in the main OpenCV 
-repository soon and that is the way they work best with the OpenCV's current development build. If you have a valid 
-point as to how a C wrapper you write, that doesn't fit into the style of what's already there, would be better (more 
-functionality, more speed) feel free to email me wnetai@gmail.com with a writeup of your conclusions. I'm assisting 
-in developing the C wrappers so I can present your case to the others involved. Keep in mind that the C wrappers are 
-still being developed so always be checking the LisP-CV repository for the latest versions. I will be keeping those 
-wrappers up to date. Keep in mind though my version of the opencv_generated.cpp, excluded_functions.cpp, mat.cpp, 
-point.cpp, rect.cpp, scalar.cpp, and size.cpp files have all the same functions as the main C wrapper repository at: 
+  If you would like to contribute a function to this project, you will need to f-
+irst find out if the C wrapper for it is available. Don't worry over 550 C wrapp-
+ers are available and they can be found in the opencv_generated.cpp, excluded_fu-
+nctions.cpp, mat.cpp, point.cpp ,rect.cpp, scalar.cpp, and size.cpp files. The l-
+ocation of those files and their corresponding .hpp files can be found in the in-
+stallation section of this file. If there is no C wrapper available and you are 
+familiar with C and C++ feel free to write one, but, if you do, try to do it sim-
+ilarly to the C wrappers already in the aforementioned .cpp files. They C wrappe-
+rs are going to be included in the main OpenCV repository soon and that is the w-
+ay they work best with the OpenCV's current development build. If you have a val-
+id point as to how a C wrapper you write, that doesn't fit into the style of wha-
+t's already there, would be better (more functionality, more speed) feel free to 
+email me wnetai@gmail.com with a writeup of your conclusions. I'm assisting in d-
+eveloping the C wrappers so I can present your case to the others involved. Keep 
+in mind that the C wrappers are still being developed so always be checking the 
+LisP-CV repository for the latest versions. I will be keeping those wrappers up 
+to date. Keep in mind though my version of the opencv_generated.cpp, excluded_fu-
+nctions.cpp, mat.cpp, point.cpp, rect.cpp, scalar.cpp, and size.cpp files have a-
+ll the same functions as the main C wrapper repository at: 
 
 
 https://github.com/arjuncomar/opencv_contrib 
 
 
-there are a few more as well. This is primarily for testing purposes, as the C wrapper module matures those differences 
-will be ironed out.  If you run into a Lisp function that doesn't work suddenly after compiling the latest .cpp files in 
-lisp-cv-master/src, and it worked before, a change in the C wrappers might be the reason. To circumvent that situation 
-always install my full build(all of the .lisp, .cpp and .hpp files) because I will always make sure it is in good working 
+there are a few more as well. This is primarily for testing purposes, as the C w-
+rapper module matures those differences will be ironed out.  If you run into a L-
+isp function that doesn't work suddenly after compiling the latest .cpp files in 
+lisp-cv-master/src, and it worked before, a change in the C wrappers might be th-
+e reason. To circumvent that situation always install my full build (all of the 
+.lisp, .cpp and .hpp files) because I will always make sure it's in good working 
 order. 
 
 
 
 
-  I write a code example and documentation for each function I add to the library, so it is very well documented. In the 
-lisp-cv-master/examples/examples.lisp folder there are over 2400 lines of code examples and documentation. So, unlike some 
-other Lisp libraries, you WILL be able to EASILY figure out how to use it. If you would like to contribute a Lisp function 
-I ask that you also write an example of how to use it. It doesn't have to be a large example it only has to show what the 
-function does and give an idea how it is used in the most basic way. The code should be commented good enough so that anyone 
-with basic Lisp knowledge could get a basic idea of the usage of it. You do not need to write any documentation for it, however, 
-I will do that and as far as adding constants, I will do that as well. You will be given credit for all your contributions in 
-the contributions.lisp file in the root directory unless you decline. Just, let me know how you would like to be referenced in 
-that file i.e name/username/email/phone# or if you decline reference.
+  I write a code example and documentation for each function I add to the librar-
+y, so it is very well documented. In the lisp-cv-master/examples/examples.lisp f-
+older there are over 2400 lines of code examples and documentation. So, unlike s-
+ome other Lisp libraries, you WILL be able to EASILY figure out how to use it. I-
+f you would like to contribute a Lisp function I ask that you also write an exam-
+ple of how to use it. It doesn't have to be a large example it only has to show 
+what the function does and give an idea how it is used in the most basic way. Th-
+e code should be commented good enough so that anyone with basic Lisp knowledge 
+could get a basic idea of the usage of it. You do not need to write any document-
+ation for it, however, I will do that and as far as adding constants, I will do 
+that as well. You will be given credit for all your contributions in the contrib-
+utions.lisp file in the root directory unless you decline. Just, let me know how 
+you would like to be referenced in that file i.e name/username/email/phone# or i-
+f you decline reference.
 
 
-See lisp-cv-master/examples/examples.lisp for an example of the examples I already included.
+See lisp-cv-master/examples/examples.lisp for an example of the examples I alrea-
+dy included.
 
 
-  To add contributions just Fork my repository at https://github.com/W-Net-AI/lisp-cv and send me a Pull Request.
+To add contributions just Fork my repository at:
+
+https://github.com/W-Net-AI/lisp-cv and send me a Pull Request.
+
 or send them to me in an e-mail at wnetai@gmail.com. 
-
 
 
 
 INSTALLATION:
 
-  To use LisP-CV you will need to first install GitHub member arjuncomar's  OpenCV 3.0.0 dev. pull of 
-Itseez/OpenCV(the original OpenCV). Then you will need to install Emacs, SBCL, SLIME and QuickLisp,
-and then finally LisP-CV and all of the required .so files.
+  To use LisP-CV you will need to first install GitHub member arjuncomar's  Open-
+CV 3.0.0 dev. pull of Itseez/OpenCV(the original OpenCV). Then you will need to 
+install Emacs, SBCL, SLIME and QuickLisp, and then finally LisP-CV and all of th-
+e required .so files.
 
 
 
@@ -96,8 +114,8 @@ http://miloq.blogspot.com/2012/12/install-opencv-ubuntu-linux.html
 
 
 
-When you are following the instructions at the above link to install, if you get this 
-error when trying to test OpenCV:
+When you are following the instructions at the above link to install, if you get
+this error when trying to test OpenCV:
 
 
 g++: error: rt: No such file or directory
