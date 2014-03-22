@@ -361,14 +361,15 @@ Feel free to e-mail at me wnetai@gmail.com for any of the following reasons:
 *If you have gotten LisP-CV to work on a system other than specified at the top 
 of this page* (Remember to include how you got it done!)
 
-*Comments*
-
 *If you have a function and example that you would like to add*
 
 *If you would like add a code sample in the examples(something you made with LisP
 -CV)*
 
 *If you would like to add some other unspecified addition to the library*
+
+*Comments*
+
 
 
 
