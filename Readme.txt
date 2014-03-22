@@ -1,8 +1,9 @@
 Welcome to my LisP-CV repository, My name is Joe BiMedina.
 
 
-Tested on Ubuntu - all versions 12.04 and up - using SBCL and CLISP, ALLEGRO CL
+Tested on Ubuntu - all versions 12.04 and up - using SBCL and CLISP and ALLEGRO CL
 
+--------------------------------------------------------------------------------
 
 INTRODUCTION:
 
@@ -61,8 +62,6 @@ e reason. To circumvent that situation always install my full build (all of the
 order. 
 
 
-
-
   I write a code example and documentation for each function I add to the librar-
 y, so it is very well documented. In the lisp-cv-master/examples/examples.lisp f-
 older there are over 2400 lines of code examples and documentation. So, unlike s-
@@ -78,10 +77,8 @@ utions.lisp file in the root directory unless you decline. Just, let me know how
 you would like to be referenced in that file i.e name/username/email/phone# or i-
 f you decline reference.
 
-
 See lisp-cv-master/examples/examples.lisp for an example of the examples I alrea-
 dy included.
-
 
 To add contributions just Fork my repository at:
 
@@ -89,7 +86,7 @@ https://github.com/W-Net-AI/lisp-cv and send me a Pull Request.
 
 or send them to me in an e-mail at wnetai@gmail.com. 
 
-
+--------------------------------------------------------------------------------
 
 INSTALLATION:
 
@@ -98,32 +95,24 @@ CV 3.0.0 dev. pull of Itseez/OpenCV(the original OpenCV). Then you will need to
 install Emacs, SBCL, SLIME and QuickLisp, and then finally LisP-CV and all of th-
 e required .so files.
 
-
-
 To install arjuncomrs OpenCV go to this link:
 
 https://github.com/arjuncomar/opencv
 
 and download it by clicking the "Download ZIP" button on right side of page.
 
-
-
 Then go to this link and follow the instructions, verbatim, to install OpenCV.
 
 http://miloq.blogspot.com/2012/12/install-opencv-ubuntu-linux.html
 
-
-
 When you are following the instructions at the above link to install, if you get
 this error when trying to test OpenCV:
-
 
 g++: error: rt: No such file or directory
 g++: error: pthread: No such file or directory
 g++: error: m: No such file or directory
 g++: error: dl: No such file or directory
 g++: error: tbb: No such file or directory
-
 
 To fix it run:
 
@@ -166,18 +155,14 @@ After it loads, run:
 That’ll download the rest of the system and get it set up for you. Quicklisp will
 install by default in ~/quicklisp.
 
-
 Finally, run:
-
 
 (ql:add-to-init-file) 
 
 Press Enter.
 
-
 That will add Quicklisp to your SBCL init file so that anytime you run SBCL Quick-
 lisp will be loaded and ready to go. 
-
 
 Now, go to terminal and type emacs, to start Emacs. When Emacs starts, if everyt-
 hing went as planned, you should see the word "Polling" at the bottom of the win-
@@ -189,14 +174,12 @@ CL-USER>
 If Emacs stays stuck on "Polling", first verify you hace a .sbclrc file in your 
 home directory(~/) and that it contains the following text:
 
-
 ;;; The following lines added by ql:add-to-init-file:
 #-quicklisp
 (let ((quicklisp-init (merge-pathnames "quicklisp/setup.lisp"
                                        (user-homedir-pathname))))
   (when (probe-file quicklisp-init)
     (load quicklisp-init)))
-
 
 If it doesn't or there is no file there, repeat the steps starting from "To inst-
 all QuickLisp:" and review any error messages to debug.
@@ -219,7 +202,6 @@ ieee-floats-20140211-git
 You can remove the ieee-floats-20140211-git directory now if you like and it wil-
 l be effectively uninstalled.
 
-
 Now to install LisP-CV!
 
 Note #1: I will make a Makefile or script to install LisP-CV as library progress-
@@ -234,15 +216,11 @@ apper for OpenCV and to pay hommage to the fact the name Lisp was derived from i
 ts method of operation, "List Processing". The name with the capitalized 'L', 'P',
 'C' and 'V' appears nowhere in the uncommented source code.
 
-
 Let's get started.
-
 
 From this link download Lisp-CV:
 
-
 https://github.com/W-Net-AI/LisP-CV
-
 
 Extract the:
 
@@ -274,7 +252,6 @@ Place all of .hpp files in the /include folder of the lisp-cv-master directory i
 
 backing up first, then overwriting the originals.
 
-
 Go to the two directores you placed the .cpp files from the src/ folder and run:
 
 g++ -Wall -shared -fPIC -o <filename>.so <filename>.cpp
@@ -282,28 +259,19 @@ g++ -Wall -shared -fPIC -o <filename>.so <filename>.cpp
 (where <filename> stands in for one of each of the .cpp filenames) on each of the .cpp files from the src/ folder, 
 that you place in the directory.
 
-
 Then take each one of those .so files you created and place in /usr/local/lib.
-
-
 
 Now start Emacs and run:
 
-
 (ql:quickload "cffi")
-
 
 To install CFFI, which LisP-CV depends on, plus it's dependencies.
 
-
 Then run :
-
 
 (ql:quickload "asdf")
 
-
 To install ASDF, a LisP-CV dependency.
-
 
 Run:
 
@@ -316,25 +284,19 @@ and add this to the top of your ~/.sbclrc file.
  (dolist (dir (directory "/home/w/quicklisp/dists/quicklisp/software/*/"))
  (pushnew dir asdf:*central-registry* :test #'equal))
 
-
 Open Emacs and run this at the REPL:
-
 
 (asdf:operate 'asdf:load-op :lisp-cv)
 
 LisP-CV will load.
 
-
 Then run this at the REPL
 
 (in-package #:lisp-cv)
 
-
 Your REPL will change to look like this:
 
-
 LISP-CV>
-
 
 Now you are all finished!
 
@@ -357,6 +319,7 @@ Run this at the REPL to test:
     (destroy-window window-name)
     (foreign-free window-name)))
 
+
 and then this:
 
 
@@ -365,7 +328,40 @@ and then this:
 
 If all went as planned an empty window should open up.
 
+--------------------------------------------------------------------------------
 
+TUTORIAL:
+
+
+You can learn to use this library by looking at the examples in:
+
+lisp-cv-master/examples/examples.lisp.
+
+If you want to know if a function has been wrapped and is available, do a search 
+for the C++ function name in the examples.lisp folder. All functions are documen-
+ted and all have the C++ function declaration above the Lisp one.
+
+You can also learn how to use the library by comparing the OpenCV C++ tutorials 
+at this link:
+
+http://opencv-srf.blogspot.com/2011/09/capturing-images-videos.html
+
+to the CAP-FILE and CAP-CAM examples in examples.lisp.
+
+All the constants are as so:
+
+If a constant in OpenCV's C++ interface is WINDOW_AUTOSIZE
+
+The Lisp version is +window-autosize+
+
+If a constant in OpenCV's C++ interface is CV_8UC3, it's Lisp version is +8UC3+
+
+I always add the plus signs to both ends,  I always change the underscores to da-
+shes and I always remove the "CV_", no exceptions.
+
+--------------------------------------------------------------------------------
+
+FINALLY:
 
 Feel free to e-mail at me wnetai@gmail.com for any of the following reasons:
 
@@ -376,43 +372,18 @@ Feel free to e-mail at me wnetai@gmail.com for any of the following reasons:
 
 *Request for features*
 
-*If you have gotten LisP-CV to work on a system other than specified at the top of this page*
-(Remember to include how you got it done!)
+*If you have gotten LisP-CV to work on a system other than specified at the top 
+of this page* (Remember to include how you got it done!)
 
 *Comments*
 
 *If you have a function and example that you would like to add*
 
-*If you would like add a code sample in the examples(something you made with LisP-CV)*
+*If you would like add a code sample in the examples(something you made with LisP
+-CV)*
 
 *If you would like to add some other unspecified addition to the library*
 
-
-TUTORIAL:
-
-
-You can learn to use this library by looking at the examples in the lisp-cv-master/examples/examples.lisp.
-
-If you want to know if a function has been wrapped and is available, do a search for the C++ function name 
-in the examples.lisp folder. All functions are documented and all have the C++ function declaration above the 
-Lisp function declaration.
-
-You can also learn how to use the library by comparing the OpenCV C++ tutorials at this link:
-
-http://opencv-srf.blogspot.com/2011/09/capturing-images-videos.html
-
-to the CAP-FILE and CAP-CAM examples in examples.lisp.
-
-
-
-All the constants are as so:
-
-
-If a constant in OpenCV's C++ interface is WINDOW_AUTOSIZE, it's Lisp version is +window-autosize+
-
-If a constant in OpenCV's C++ interface is CV_8UC3, it's Lisp version is +8UC3+
-
-I always add the plus signs to either end,  I always change the underscores to dashes and I always remove the "CV_"
 
 
 
