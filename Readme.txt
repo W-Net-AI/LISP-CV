@@ -153,7 +153,7 @@ To install QuickLisp:
 
 go to http://beta.quicklisp.org/quicklisp.lisp to download the quicklisp.lisp file
 
-Place in ~/.emacs.d/
+Place it in ~/.emacs.d/
 
 Next, run sbcl, in Terminal, and type in the following:
 
@@ -222,14 +222,17 @@ l be effectively uninstalled.
 
 Now to install LisP-CV!
 
-Note #1: I will make a Makefile or script to install LisP-CV as library progresses but for now this install tutorial 
-is made people who want to work on the project.  So all steps to install must be done by hand so you get familiar how 
-the library works...don't worry though it's easy.  If you do end up helping on the project you might want to make a 
-script to speed up some of the processes defined below.
+Note #1: I will make a Makefile or script to install LisP-CV as library progress-
+es but for now this install tutorial is made people who want to work on the proj-
+ect.  So all steps to install must be done by hand so you get familiar how the l-
+ibrary works...don't worry though it's easy.  If you do end up helping on the pr-
+oject you might want to make a script to speed up some of the processes defined 
+below.
 
-Note #2: "LisP-CV" is a decorative name made to signify that is a Common Lisp wrapper for OpenCV and to pay hommage to
-the fact the name Lisp was derived from its method of operation, "List Processing". The name with the capitalized 'L', 
-'P', 'C' and 'V' appears nowhere in the uncommented source code.
+Note #2: "LisP-CV" is a decorative name made to signify that is a Common Lisp wr-
+apper for OpenCV and to pay hommage to the fact the name Lisp was derived from i-
+ts method of operation, "List Processing". The name with the capitalized 'L', 'P',
+'C' and 'V' appears nowhere in the uncommented source code.
 
 
 Let's get started.
@@ -241,25 +244,28 @@ From this link download Lisp-CV:
 https://github.com/W-Net-AI/LisP-CV
 
 
-Extract the ~/Downloads/lisp-cv-master.zip file to ~/quicklisp/dists/quicklisp/software
+Extract the:
 
+~/Downloads/lisp-cv-master.zip file 
 
+to:
 
-Place the opencv_geenerated.cpp file in the /src folder of the lisp-cv-master directory in the following directory 
-on your machine:
+ ~/quicklisp/dists/quicklisp/software
+
+Place the opencv_geenerated.cpp file in the /src folder of the lisp-cv-master di-
+rectory in the following directory on your machine:
 
 <directory-where-you-installed-opencv>/opencv-master/build/modules/c/src/
 
 backing up first, then overwriting the original opencv_generate.cpp.
 
 
-
-Place all of the other the .cpp files in the /src folder of the lisp-cv-master directory in the following directory:
+Place all of the other the .cpp files in the /src folder of the lisp-cv-master d-
+irectory in the following directory:
 
 <directory-where-you-installed-opencv>/opencv-master/modules/c/src/
 
 backing up first, then overwriting the originals.
-
 
 
 Place all of .hpp files in the /include folder of the lisp-cv-master directory in the following directory:
@@ -267,8 +273,6 @@ Place all of .hpp files in the /include folder of the lisp-cv-master directory i
 /usr/local/include/opencv2/c/
 
 backing up first, then overwriting the originals.
-
-
 
 
 Go to the two directores you placed the .cpp files from the src/ folder and run:
