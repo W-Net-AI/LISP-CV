@@ -326,7 +326,8 @@ lisp-cv-master/examples/examples.lisp.
 
 If you want to know if a function has been wrapped and is available, do a search 
 for the C++ function name in the examples.lisp folder. All functions are documen-
-ted and all have the C++ function declaration above the Lisp one.
+ted and all have the C++ function declaration above the C function declaration 
+above the Lisp one.
 
 You can also learn how to use the library by comparing the OpenCV C++ tutorials 
 at this link:
