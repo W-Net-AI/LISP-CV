@@ -228,6 +228,9 @@ Add this to the top of your ~/.sbclrc file.
 
 
 
+ll
+
+
 
 
 
