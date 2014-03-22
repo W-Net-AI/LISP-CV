@@ -133,11 +133,6 @@
   (t (:default "size")))
 (use-foreign-library size)
 
-(define-foreign-library opencv-glue
-  (:darwin "opencv-glue.dylib")
-  (:unix "/usr/local/lib/opencv-glue.so")
-  (t (:default "opencv-glue")))
-(use-foreign-library opencv-glue)
 
 (define-foreign-library excluded_functions
   (:darwin "excluded_functions.dylib")
