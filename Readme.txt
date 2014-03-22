@@ -6,7 +6,6 @@ Tested on Ubuntu - all versions 12.04 and up - using SBCL and CLISP and ALLEGRO 
 --------------------------------------------------------------------------------
 
 INTRODUCTION:
-
  
  LisP-CV is a Lisp wrapper for OpenCV's C++ interface, not the C interface. The
 Lisp wrapper wraps around C wrappers which wrap around the OpenCV C++ functions. 
