@@ -134,29 +134,19 @@ In the file that opens, put a "-l" without quotes in front of the single occuren
 rt, pthread, m , dl, tbb
 
 
-
 Now to install Emacs, SBCL, SLIME, QuickLisp:
-
 
 To install Emacs run:
 
-
 sudo apt-get install emacs24
-
-
 
 To install SBCL run:  
 
-
 sudo apt-get install sbcl
-
-
 
 To install SLIME run:
 
-
 sudo apt-get install slime
-
 
 
 To install QuickLisp:
@@ -165,22 +155,16 @@ go to http://beta.quicklisp.org/quicklisp.lisp to download the quicklisp.lisp fi
 
 Place in ~/.emacs.d/
 
-
-
 Next, run sbcl, in Terminal, and type in the following:
-
 
 (load "~/.emacs.d/quicklisp.lisp")
 
-
 After it loads, run:
 
-	
 (quicklisp-quickstart:install)
 
-
-That’ll download the rest of the system and get it set up for you. Quicklisp will install by default in 
-~/quicklisp.
+That’ll download the rest of the system and get it set up for you. Quicklisp will
+install by default in ~/quicklisp.
 
 
 Finally, run:
@@ -191,21 +175,19 @@ Finally, run:
 Press Enter.
 
 
-That will add Quicklisp to your SBCL init file so that anytime you run SBCL Quicklisp will be loaded and 
-ready to go. 
+That will add Quicklisp to your SBCL init file so that anytime you run SBCL Quick-
+lisp will be loaded and ready to go. 
 
 
-Now, go to terminal and type emacs, to start Emacs. When Emacs starts, if everything went as planned, you 
-should see the word "Polling" at the bottom of the window for a few seconds and the a cool little 
-text animation and then a prompt that looks like this:
-
+Now, go to terminal and type emacs, to start Emacs. When Emacs starts, if everyt-
+hing went as planned, you should see the word "Polling" at the bottom of the win-
+dow for a few seconds and the a cool little text animation and then a prompt tha-
+t looks like this:
 
 CL-USER>
 
-
-If Emacs stays stuck on "Polling", first verify you hace a .sbclrc file in your home directory(~/)
-and that it contains the following text:
-
+If Emacs stays stuck on "Polling", first verify you hace a .sbclrc file in your 
+home directory(~/) and that it contains the following text:
 
 
 ;;; The following lines added by ql:add-to-init-file:
@@ -216,23 +198,26 @@ and that it contains the following text:
     (load quicklisp-init)))
 
 
+If it doesn't or there is no file there, repeat the steps starting from "To inst-
+all QuickLisp:" and review any error messages to debug.
 
-If it doesn't or there is no file there, repeat the steps starting from "To install QuickLisp:" and review 
-any error messages to debug.
-
-
-Now in Emacs, at the CL-USER> prompt (it's correct name is the REPL(Read Eval Print Loop), enter the below command 
-to test out your QuickLisp installation and also create the ~/quicklisp/dists/quicklisp/software/ directory we will 
-use in a later step:
+Now in Emacs, at the CL-USER> prompt (it's correct name is the REPL(Read Eval Pr-
+int Loop), enter the below command to test out your QuickLisp installation and a-
+lso create the ~/quicklisp/dists/quicklisp/software/ directory we will use in a 
+later step:
 
 (ql:quickload "ieee-floats")
 
-If QuickLisp is installed correctly you should have this folder in your ~/quicklisp/dists/quicklisp/software/
+If QuickLisp is installed correctly you should have this folder in your 
+
+~/quicklisp/dists/quicklisp/software/
+
 directory.
 
 ieee-floats-20140211-git
 
-You can remove the ieee-floats-20140211-git directory now if you like and it will be effectively uninstalled.
+You can remove the ieee-floats-20140211-git directory now if you like and it wil-
+l be effectively uninstalled.
 
 
 Now to install LisP-CV!
