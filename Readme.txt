@@ -13,7 +13,6 @@ Lisp wrapper wraps around C wrappers which wrap around the OpenCV C++ functions.
 Due to the speediness of C and C++, the speed of the C++ functions compared to t-
 he C wappers for them is almost identical.
 
-
   This install tutorial is made for people wanting to help work on the project. 
 Thus no build file is included so you'll have to install everything manually. Do-
 n't worry it's easy. This is intended so you can familiarize yourself with how e-
@@ -22,12 +21,10 @@ ntu versions 12.04 through 14.04. It should work on any system that OpenCV, SBCL
 CLISP, ALLEGRO, CFFI, ASDF and QuickLisp can be compiled on.  There is nothing b-
 ut pure Lisp, and OpenCV C++ and C in the whole project. 
 
-
   If you have gotten LisP-CV to work on another system and would like to add the
 install instructions to this tutorial just send me an e-mail at wnetai@gmail.com 
 with the install instructions included. They will be added to this file and you 
 will be given credit for your addition unless you decline.
-
 
   If you would like to contribute a function to this project, you will need to f-
 irst find out if the C wrapper for it is available. Don't worry over 550 C wrapp-
@@ -49,9 +46,7 @@ to date. Keep in mind though my version of the opencv_generated.cpp, excluded_fu
 nctions.cpp, mat.cpp, point.cpp, rect.cpp, scalar.cpp, and size.cpp files have a-
 ll the same functions as the main C wrapper repository at: 
 
-
 https://github.com/arjuncomar/opencv_contrib 
-
 
 there are a few more as well. This is primarily for testing purposes, as the C w-
 rapper module matures those differences will be ironed out.  If you run into a L-
@@ -60,7 +55,6 @@ lisp-cv-master/src, and it worked before, a change in the C wrappers might be th
 e reason. To circumvent that situation always install my full build (all of the 
 .lisp, .cpp and .hpp files) because I will always make sure it's in good working 
 order. 
-
 
   I write a code example and documentation for each function I add to the librar-
 y, so it is very well documented. In the lisp-cv-master/examples/examples.lisp f-
@@ -122,7 +116,6 @@ In the file that opens, put a "-l" without quotes in front of the single occuren
 
 rt, pthread, m , dl, tbb
 
-
 Now to install Emacs, SBCL, SLIME, QuickLisp:
 
 To install Emacs run:
@@ -136,7 +129,6 @@ sudo apt-get install sbcl
 To install SLIME run:
 
 sudo apt-get install slime
-
 
 To install QuickLisp:
 
@@ -237,14 +229,12 @@ rectory in the following directory on your machine:
 
 backing up first, then overwriting the original opencv_generate.cpp.
 
-
 Place all of the other the .cpp files in the /src folder of the lisp-cv-master d-
 irectory in the following directory:
 
 <directory-where-you-installed-opencv>/opencv-master/modules/c/src/
 
 backing up first, then overwriting the originals.
-
 
 Place all of .hpp files in the /include folder of the lisp-cv-master directory in the following directory:
 
@@ -300,7 +290,6 @@ LISP-CV>
 
 Now you are all finished!
 
-
 Run this at the REPL to test:
 
 
@@ -331,7 +320,6 @@ If all went as planned an empty window should open up.
 --------------------------------------------------------------------------------
 
 TUTORIAL:
-
 
 You can learn to use this library by looking at the examples in:
 
@@ -364,7 +352,6 @@ shes and I always remove the "CV_", no exceptions.
 FINALLY:
 
 Feel free to e-mail at me wnetai@gmail.com for any of the following reasons:
-
 
 *Bug reports*
 
