@@ -99,7 +99,7 @@
 
 ;; On new 3.0.0 OpenCV build
 ;; cd /home/w/Documents/opencv-master/modules/c/src
-;; g++ -Wall -shared -fPIC -o opencv-glue.so opencv-glue.cpp
+;; g++ -Wall -shared -fPIC -o point.so point.cpp
 (define-foreign-library point
   (:darwin "point.dylib")
   (:unix "/usr/local/lib/point.so")

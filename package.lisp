@@ -87,7 +87,7 @@
    #:+64fc2+ 
    #:+64fc3+ 
    #:+64fc4+
-   #:+cv-mat-magic-val+
+
    #:<<
    #:>>
    #:at-char
@@ -163,6 +163,7 @@
    #:total
    #:x
    #:y
+
    #:ipl-image
    #:+ipl-depth-1u+
    #:+ipl-depth-8u+
@@ -185,6 +186,8 @@
 ;; core - Operations on Arrays
 
    #:abs-diff
+
+   #:+C+
    #:+cmp-eq+ 
    #:+cmp-gt+ 
    #:+cmp-ge+ 
@@ -208,7 +211,9 @@
    #:+decomp-cholesky+ 
    #:+decomp-qr+ 
    #:+decomp-normal+
-   #:+C+
+ 
+   #:in-range-s
+
    #:+l1+
    #:+l2+
    #:+norm-inf+

@@ -636,6 +636,15 @@
   (src2 (:pointer mat))
   (dest (:pointer mat)))
  
+;; void inRange(InputArray src, InputArray lowerb, InputArray upperb, OutputArray dst)
+;; void cv_inRangeS(Mat* src, Scalar* lowerb, Scalar* upperb, Mat* dst)
+(defcfun ("cv_inRangeS" in-range-s) :void
+  "Checks if array elements lie between the elements of two other arrays."
+  (src (:pointer mat))
+  (lowerb (:pointer scalar))
+  (upperb (:pointer scalar))
+  (dst :pointer mat))
+
 
 ;;; Drawing Functions
 

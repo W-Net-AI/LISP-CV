@@ -2478,3 +2478,165 @@ Common Lisp: (DOT (SELF (:POINTER POINT)) (OTHER (:POINTER POINT))) => :INT
 	    (dot p1 p2) )))
 
 
+IN-RANGE
+
+Checks if array elements lie between the elements of two other arrays.
+
+C++: void inRange(InputArray src, InputArray lowerb, InputArray upperb, OutputArray dst)
+
+Common Lisp: (IN-RANGE-S (SRC (:POINTER MAT)) (LOWERB (:POINTER SCALAR)) (UPPERB (:POINTER SCALAR)) (DEST (:POINTER MAT)) => :VOID
+
+
+    Parameters:	
+
+        SRC – first input array.
+
+        LOWERB – A scalar.
+
+        UPPERB – A scalar.
+
+        DEST – output array of the same size as SRC and +8U+ type.
+
+
+All the arrays must have the same type, except the destination, and the same size (or ROI size).
+
+
+(defun in-range-s-example (&optional (camera-index *camera-index*) 
+			     (width 640)
+			     (height 480))
+
+  (with-capture (cap (cap-cam camera-index))
+    (let ((window-name-1 (foreign-alloc 
+			  :string :initial-element 
+			  "Original camera feed - IN-RANGE-S Example"))
+	  (window-name-2 (foreign-alloc 
+			  :string :initial-element 
+			  "Only red objects - IN-RANGE-S Example"))
+	  (img-hsv 0)
+	  (img-thresh 0)
+	  (src 0))
+      (if (not (cap-is-open cap)) 
+	  (return-from in-range-s-example 
+	    (format t "Cannot open the video camera")))
+      (cap-set cap +cap-prop-frame-width+ width)
+      (cap-set cap +cap-prop-frame-height+ height)
+      (format t "Frame Size : ~ax~a~%~%" 
+	      (cap-get cap +cap-prop-frame-width+)
+	      (cap-get cap +cap-prop-frame-height+))
+      (named-window window-name-1 +window-normal+)
+      (named-window window-name-2 +window-normal+)
+      (move-window window-name-1 464 175)
+      (move-window window-name-2 915 175)
+       ;; Iterate through each frames of the video
+      (do* ((frame 0)
+	    (lower-hsv (scalar 170 160 60))
+	    (upper-hsv (scalar 180 2556 256)))
+           ;; Wait 33mS - If 'esc' is pressed, break the loop
+	   ((plusp (wait-key *millis-per-frame*)) 
+	    (format t "Key is pressed by user"))
+	(setf frame (mat))
+	(cap-read cap frame)
+	(setf src (clone frame))
+	(setf img-hsv (mat))
+	(setf img-thresh (mat))
+     ;; Smooth the original image using Gaussian kernel
+	(gaussian-blur src src (size 5 5) 0.0d0 0.0d0)
+     ;; Change the color format from BGR to HSV
+	(cvt-color src img-hsv +bgr2hsv+)
+     ;; Threshold the HSV image and create a binary image
+	(in-range-s img-hsv lower-hsv upper-hsv img-thresh)
+     ;; Smooth the binary image using Gaussian kernel
+	(gaussian-blur img-thresh img-thresh (size 5 5) 0.0d0 0.0d0)
+	(imshow window-name-1 src)
+	(imshow window-name-2 img-thresh)
+     ;; Clean up used images
+	(del img-hsv) (del img-thresh) (del frame) (del src))
+      (destroy-window window-name-1)
+      (destroy-window window-name-2)
+      (foreign-free window-name-1)
+      (foreign-free window-name-2))))
+
+
+GAUSSIAN-BLUR
+
+Blurs an image using a Gaussian filter.
+
+C++: void GaussianBlur(InputArray src, OutputArray dst, Size ksize, double sigmaX, double sigmaY=0,
+     int borderType=BORDER_DEFAULT )                   
+
+Commom Lisp: (GAUSSIAN-BLUR (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) (KSIZE (:POINTER SIZE)) (SIG
+              MA-X :DOUBLE) &OPTIONAL ((SIGMA-Y :DOUBLE) 0) ((BORDER-TYPE :INT) +BORDER-DEFAULT+))
+
+    Parameters:	
+
+        SRC – input image; the image can have any number of channels, which are processed independe-
+              ntly, but the depth should be +8U+, +16U+, +16S+, +32F+ or +64F+.
+
+        DST – output image of the same size and type as SRC.
+
+        KSIZE – Gaussian kernel size KSIZE width and KSIZE height can differ but they both must be 
+                positive and odd. Or, they can be zero’s and then they are computed from sigma.
+
+        SIGMAX – Gaussian kernel standard deviation in X direction.
+
+        SIGMAY – Gaussian kernel standard deviation in Y direction; if SIGMAY is zero, it is set to 
+                 be equal to SIGMAX, if both sigmas are zeros, they are computed from KSIZE width a-
+                 nd KSIZE height , respectively (see (GET-GAUSSIAN-KERNEL) for details); to fully c-
+                 ontrol the result regardless of possible future modifications of all this semantics, 
+                 it is recommended To specify all of KSIZE, SIGMA-X, AND SIGMA-Y.
+
+        BORDER-TYPE – pixel extrapolation method (see (BORDER-INTERPOLATE) for details).
+
+
+The function convolves the source image with the specified Gaussian kernel. In-place filtering is s-
+upported.
+
+See also:
+
+(SEP-FILTER-2D), FILTER-2D), (BLUR), (BOX-FILTER), (BILATERAL-FILTER), (MEDIAN-BLUR)
+
+
+(defun gaussian-blur-example (&optional (camera-index *camera-index*) 
+				(width 640)
+				(height 480))
+  "In this example the function GAUSSIAN-BLUR is used 
+   to blur an image using a Gaussian filter. The orig-
+   inal image FRAME and the blurred image SRC are sho-
+   wn in separate windows."
+  (with-capture (cap (cap-cam camera-index))
+    (let ((window-name-1 (foreign-alloc 
+			  :string :initial-element 
+			  "Original - GAUSSIAN-BLUR Example"))
+	  (window-name-2 (foreign-alloc 
+			  :string :initial-element 
+			  "Blurred output - GAUSSIAN-BLUR Example"))
+	  (src 0))
+      (if (not (cap-is-open cap)) 
+	  (return-from gaussian-blur-example 
+	    (format t "Cannot open the video camera")))
+      (cap-set cap +cap-prop-frame-width+ width)
+      (cap-set cap +cap-prop-frame-height+ height)
+      (format t "Frame Size : ~ax~a~%~%" 
+	      (cap-get cap +cap-prop-frame-width+)
+	      (cap-get cap +cap-prop-frame-height+))
+      (named-window window-name-1 +window-normal+)
+      (named-window window-name-2 +window-normal+)
+      (move-window window-name-1 464 175)
+      (move-window window-name-2 915 175)
+      (do* ((frame 0))
+	   ((plusp (wait-key *millis-per-frame*)) 
+	    (format t "Key is pressed by user"))
+	(setf frame (mat))
+	(cap-read cap frame)
+	(setf src (clone frame))
+	(gaussian-blur src src (size 19 19) 0.0d0 0.0d0)
+	(imshow window-name-1 frame)
+	(imshow window-name-2 src)
+	(del frame) (del src))
+      (destroy-window window-name-1)
+      (destroy-window window-name-2)
+      (foreign-free window-name-1)
+      (foreign-free window-name-2))))
+
+
+
