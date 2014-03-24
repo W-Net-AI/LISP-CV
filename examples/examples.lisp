@@ -30,15 +30,11 @@ If window was created with OpenGL support, IMSHOW also support ogl::Buffer , ogl
 
 (defun imshow-example (filename)
 
-  "Opens the image FILENAME and shows it in a Extracts a diagonal from a matrix, or creates a diagonal matrix.
-   window with IMSHOW."
+  "Opens the image FILENAME and shows it 
+   in a window with IMSHOW."
 
-  (let* ((filename (foreign-alloc 
-		    :string :initial-element filename))
-	 (image (imread filename 1))
-	 (window-name (foreign-alloc 
-		       :string :initial-element 
-		       "IMSHOW Example")))
+  (let* ((image (imread filename 1))
+	 (window-name "IMSHOW Example"))
     (if (cffi:null-pointer-p image) 
 	(return-from imshow-example 
 	  (format t "Image not loaded")))
@@ -46,9 +42,7 @@ If window was created with OpenGL support, IMSHOW also support ogl::Buffer , ogl
     (move-window window-name 720 175)
     (imshow window-name image)
     (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name)
-    (foreign-free filename)
-    (foreign-free window-name)))
+    (destroy-window window-name)))
 
 
 IMREAD
@@ -129,12 +123,8 @@ In the case of color images, the decoded images will have the channels stored in
   "Open the image FILENAME with IMREAD 
    and show it in a window."
 
-  (let* ((filename (foreign-alloc 
-		    :string :initial-element filename))
-	 (image (imread filename 1))
-	 (window-name (foreign-alloc 
-		       :string :initial-element 
-		       "IMREAD Example")))
+  (let* ((image (imread filename 1))
+	 (window-name "IMREAD Example"))
     (if (cffi:null-pointer-p image) 
 	(return-from imread-example 
 	  (format t "Image not loaded")))
@@ -142,9 +132,7 @@ In the case of color images, the decoded images will have the channels stored in
     (move-window window-name 720 175)
     (imshow window-name image)
     (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name)
-    (foreign-free filename)
-    (foreign-free window-name)))
+    (destroy-window window-name)))
 
 
 NAMED-WINDOW
@@ -204,13 +192,10 @@ By default, (= FLAGS (LOGIOR +WINDOW-AUTOSIZE+  +WINDOW-KEEPRATIO+  +GUI-EXPANDE
    will close when it is selected and any key is pr-
    essed."
 
-  (let* ((window-name (foreign-alloc 
-		       :string :initial-element 
-		       "NAMED-WINDOW Example")))
+  (let* ((window-name "NAMED-WINDOW Example"))
     (named-window window-name +window-normal+)
     (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name)
-    (foreign-free window-name)))
+    (destroy-window window-name)))
 
 
 DESTROY-WINDOW
@@ -232,13 +217,10 @@ The function DESTROY-WINDOW destroys the window with the given name.
    by DESTROY-WINDOW when it is active and
    any key is pressed."
 
-  (let* ((window-name (foreign-alloc 
-		       :string :initial-element 
-		       "DESTROY-WINDOW Example")))
+  (let* ((window-name "DESTROY-WINDOW Example"))
     (named-window window-name +window-normal+)
     (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name)
-    (foreign-free window-name)))
+    (destroy-window window-name)))
 
 
 MOVE-WINDOW
@@ -264,14 +246,11 @@ Common Lisp: (MOVE-WINDOW (WINNAME (:POINTER STRING*)) (X :INT) (Y :INT))
    to move the window to (x, y) position 
    (720, 175)."
 
-  (let* ((window-name (foreign-alloc 
-		       :string :initial-element 
-		       "MOVE-WINDOW Example")))
+  (let* ((window-name "MOVE-WINDOW Example")))
     (named-window window-name +window-normal+)
     (move-window window-name 720 175)
     (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name)
-    (foreign-free window-name)))
+    (destroy-window window-name))
 
 
 WAIT-KEY
@@ -284,11 +263,11 @@ Ccommon Lisp: (WAIT-KEY &OPTIONAL ((DELAY :INT) 0))
 
     Parameters:	DELAY - Delay in milliseconds. 0 is the special value that means “forever”.
 
-The function WAIT-KEY waits for a key event infinitely (when \texttt{delay}\leq 0 TODO GP) or for d-
-elay milliseconds, when it is positive. Since the OS has a minimum time between switching threads, 
-the function will not wait exactly delay ms, it will wait at least delay ms, depending on what else
-is running on your computer at that time. It returns the code of the pressed key or -1 if no key wa-
-s pressed before the specified time had elapsed.
+The function WAIT-KEY waits for a key event infinitely when (<= DELAY 0), for DELAY milliseconds wh-
+en it is positive. Since the OS has a minimum time between switching threads, the function will not 
+wait exactly delay ms, it will wait at least delay ms, depending on what else is running on your co-
+mputer at that time. It returns the code of the pressed key or -1 if no key was pressed before the 
+specified time had elapsed.
 
 Note
 
@@ -312,14 +291,11 @@ f there are several HighGUI windows, any of them can be active.
    must be active before the key press will 
    be detected."
 
-  (let* ((window-name (foreign-alloc 
-		       :string :initial-element 
-		       "WAIT-KEY Example")))
+  (let* ((window-name "WAIT-KEY Example"))
     (named-window window-name +window-normal+)
     (move-window window-name 720 175)
     (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name)
-    (foreign-free window-name)))
+    (destroy-window window-name)))
 
 
 CAP-GET
@@ -379,7 +355,8 @@ Note: When querying a property that is not supported by the backend used by the 
 value 0 is returned.
 
 
-(defun cap-get-example (&optional (camera-index *camera-index*) 
+((defun cap-get-example (&optional 
+                          (camera-index *camera-index*) 
 			  (width *default-width*)
 			  (height *default-height*))
 
@@ -387,9 +364,7 @@ value 0 is returned.
    with the function CAP-GET and prints it."
 
   (with-capture (cap (cap-cam camera-index))
-    (let ((window-name (foreign-alloc 
-			:string :initial-element 
-			"CAP-GET Example")))
+    (let ((window-name "CAP-GET Example"))
       (if (not (cap-is-open cap)) 
 	  (return-from cap-get-example 
 	    (format t "Cannot open the video camera")))
@@ -406,8 +381,7 @@ value 0 is returned.
 	(setf frame (mat))
 	(cap-read cap frame)
 	(imshow window-name frame))
-      (destroy-window window-name)
-      (foreign-free window-name))))
+      (destroy-window window-name))))
 
 
 CAP-SET
@@ -466,17 +440,17 @@ Common Lisp: (CAP-SET (SELF (:POINTER VIDEO-CAPTURE)) (PROP-ID :INT) (VALUE :DOU
   
                  VALUE - Value of the property.
 
-
-(defun cap-set-example (&optional (camera-index *camera-index*))
+             
+(defun cap-set-example (&optional 
+                          (camera-index 
+                           *camera-index*))
 
   "Changes the brightness level of the camera feed 
    with the function CAP-SET and then prints the b-
    rightness level."
 
   (with-capture (cap (cap-cam camera-index))
-    (let ((window-name (foreign-alloc 
-			:string :initial-element 
-			"CAP-SET Example")))
+    (let ((window-name "CAP-SET Example"))
       (if (not (cap-is-open cap)) 
 	  (return-from cap-set-example 
 	    (format t "Cannot open the video camera")))
@@ -491,8 +465,7 @@ Common Lisp: (CAP-SET (SELF (:POINTER VIDEO-CAPTURE)) (PROP-ID :INT) (VALUE :DOU
 	(setf frame (mat))
 	(cap-read cap frame)
 	(imshow window-name frame))
-      (destroy-window window-name)
-      (foreign-free window-name))))
+      (destroy-window window-name))))
 
 
 CAP-READ
@@ -516,16 +489,16 @@ f no frames has been grabbed (camera has been disconnected, or there are no more
 le), the methods return false and the functions return NULL pointer.
 
 
-(defun cap-read-example (&optional (camera-index *camera-index*))
+(defun cap-read-example (&optional 
+                           (camera-index 
+                            *camera-index*))
 
   "Grabs, decodes and returns the next video frame 
    with the function CAP-READ and then shows it in 
    a window with the function IMSHOW."
 
   (with-capture (cap (cap-cam camera-index))
-    (let ((window-name (foreign-alloc 
-			:string :initial-element 
-			"CAP-READ Example")))
+    (let ((window-name "CAP-READ Example"))
       (if (not (cap-is-open cap)) 
 	  (return-from cap-read-example 
 	    (format t "Cannot open the video camera")))
@@ -537,8 +510,7 @@ le), the methods return false and the functions return NULL pointer.
 	(setf frame (mat))
 	(cap-read cap frame)
 	(imshow window-name frame))
-      (destroy-window window-name)
-      (foreign-free window-name))))
+      (destroy-window window-name))))
 
 
 CAP-RELEASE
@@ -556,7 +528,9 @@ Parameters:
          SELF - The VIDEO-CAPTURE structure.
 
 
-(defun cap-release-example (&optional (camera-index *camera-index*))
+(defun cap-release-example (&optional 
+                              (camera-index 
+                               *camera-index*))
 
   "In order: First the function CAPTURE-FROM-CAM allocates and 
    initializes the structure for reading a video stream from t-
@@ -570,9 +544,7 @@ Parameters:
    e called automatically. See WITH-CAPTURE EXAMPLE for usage."
   
   (let ((cap (cap-cam camera-index))
-	(window-name (foreign-alloc 
-		      :string :initial-element 
-		      "CAP-RELEASE Example")))
+	(window-name "CAP-RELEASE Example"))
     (if (not (cap-is-open cap)) 
 	(return-from cap-release-example 
 	  (format t "Cannot open the video camera")))
@@ -585,8 +557,7 @@ Parameters:
       (cap-read cap frame)
       (imshow window-name frame))
     (cap-release cap)
-    (destroy-window window-name)
-    (foreign-free window-name)))
+    (destroy-window window-name)))
 
 
 WITH-CAPTURE
@@ -606,8 +577,8 @@ Parameters:
          BODY - The body of the code to be executed once the video file or capturing device is open.
 
 
-
-(defun with-capture-example (&optional (camera-index *camera-index*))
+(defun with-capture-example (&optional 
+			       (camera-index *camera-index*))
 
   "WITH-CAPTURE is a macro that basically ensures 
    CAP-RELEASE gets called on all captures. CAP-R-
@@ -620,9 +591,7 @@ Parameters:
    g WITH-CAPTURE."
 
   (with-capture (cap (cap-cam camera-index))
-    (let ((window-name (foreign-alloc 
-			:string :initial-element 
-			"WITH-CAPTURE Example")))
+    (let ((window-name "WITH-CAPTURE Example"))
       (if (not (cap-is-open cap)) 
 	  (return-from with-capture-example 
 	    (format t "Cannot open the video camera")))
@@ -633,9 +602,7 @@ Parameters:
 	(setf frame (mat))
 	(cap-read cap frame)
 	(imshow window-name frame))
-      (destroy-window window-name)
-      (foreign-free window-name))))
-
+      (destroy-window window-name))))
 
 
 CAP-IS-OPEN
@@ -653,7 +620,9 @@ Parameters:
 If the previous call to VIDEO-CAPTURE constructor or CAP-IS-OPEN succeeded, the method returns true.
 
 
-(defun cap-is-open-example (&optional (camera-index *camera-index*))
+(defun cap-is-open-example (&optional 
+                              (camera-index 
+                               *camera-index*))
 
   "If the previous call to VIDEO-CAPTURE constructor (i/e, 
    (CAP-CAM CAMERA-INDEX) in the below example) or the fu-
@@ -665,9 +634,7 @@ If the previous call to VIDEO-CAPTURE constructor or CAP-IS-OPEN succeeded, the 
    out."
 
   (with-capture (cap (cap-cam camera-index)) 
-    (let ((window-name (foreign-alloc 
-			:string :initial-element 
-			"CAP-IS-OPEN Example")))
+    (let ((window-name "CAP-IS-OPEN Example"))
       (if (not (princ (cap-is-open cap))) 
 	  (return-from cap-is-open-example 
 	    (format t "Cannot open the video camera")))
@@ -680,9 +647,7 @@ If the previous call to VIDEO-CAPTURE constructor or CAP-IS-OPEN succeeded, the 
 	(cap-read cap frame)
 	(imshow window-name frame))
       (cap-release cap)
-      (destroy-window window-name)
-      (foreign-free window-name))))
-
+      (destroy-window window-name))))
 
 
 ABSDIFF
@@ -727,10 +692,12 @@ n the case of overflow.
 
 See also:
 
-(ABS) todo maybe add this function
+(ABS) todo add this function
 
 
-(defun absdiff-example (&optional (camera-index *camera-index*) 
+(defun absdiff-example (&optional 
+			  (camera-index 
+			   *camera-index*) 
 			  (width *default-width*)
 			  (height *default-height*))
 
@@ -741,9 +708,7 @@ See also:
 
   (with-capture (cap (cap-cam camera-index))
     (let ((scalar (mat-value 1 1 +64f+ (scalar 128 128 128)))
-	  (window-name (foreign-alloc 
-			:string :initial-element 
-			"ABSDIFF Example")))
+	  (window-name "ABSDIFF Example"))
       (if (not (cap-is-open cap)) 
 	  (return-from absdiff-example 
 	    (format t "Cannot open the video camera")))
@@ -758,8 +723,7 @@ See also:
 	(cap-read cap frame)
 	(absdiff frame scalar frame)
 	(imshow window-name frame))
-      (destroy-window window-name)
-      (foreign-free window-name))))
+      (destroy-window window-name))))
 
 
 SCALAR
@@ -1220,37 +1184,30 @@ The method returns a matrix element type. This is an identifier compatible with 
 system, like CV_16SC3(+16SC3+ in Common Lisp) or 16-bit signed 3-channel array, and so on.
 
 
-(defun cv-type-example ()
+((defun mat-type-example ()
 
-  "This function uses CV-TYPE to find 
-   the type of MAT-ONE and MAT-TWO. S-
-   hows MAT-ONE and MAT-TWO in a wind-
-   ow so you can see what they look l-
-   ike."
+  "This function uses MAT-TYPE to find 
+   the type of MAT-ONE and MAT-TWO. Sh-
+   ows MAT-ONE and MAT-TWO in a window 
+   so you can see what they look like."
 
   (let* ((mat-one (mat-zeros 1 2 +8u+))
 	 (mat-two (mat-zeros 2 4 +8u+))
-	 (window-name-1 (foreign-alloc 
-			 :string :initial-element 
-			 "MAT-ONE - CV-TYPE Example"))
-         (window-name-2 (foreign-alloc 
-			 :string :initial-element 
-			 "MAT-TWO - CV-TYPE Example")))
+	 (window-name-1 "MAT-ONE - MAT-TYPE Example")
+	 (window-name-2 "MAT-TWO - MAT-TYPE Example"))
     (named-window window-name-1 +window-normal+)
     (named-window window-name-2 +window-normal+)
     (move-window window-name-1 464 175)
     (move-window window-name-2 915 175)
     (format t "MAT-ONE type is ~a(+32f+). It is a Single Precision Floating Point Matrix.~%" 
-	    (cv-type mat-one))
+	    (mat-type mat-one))
     (format t "~%MAT-TWO type is ~a(+64f+). It is a Double Precision Floating Point Matrix." 
-	    (cv-type mat-two))
+	    (mat-type mat-two))
     (imshow window-name-1 mat-one)
     (imshow window-name-2 mat-two)
     (loop while (not (= (wait-key 0) 27)))
     (destroy-window window-name-1)
-    (destroy-window window-name-2)
-    (foreign-free window-name-1)
-    (foreign-free window-name-2)))
+    (destroy-window window-name-2)))
 
 
 CAP-CAM
@@ -1265,7 +1222,9 @@ Common Lisp: (CAP-CAM (DEVICE :INT))
                  e camera connected, just pass 0.
 
 
-(defun cap-cam-example (&optional (camera-index *camera-index*))
+(defun cap-cam-example (&optional 
+			  (camera-index 
+			   *camera-index*))
 
   "This function use CAP-CAM to open a video 
    capturing device (i.e. a camera index). If th-
@@ -1273,9 +1232,7 @@ Common Lisp: (CAP-CAM (DEVICE :INT))
    (the default value of *camera-index*)."
 
   (with-capture (cap (cap-cam camera-index))
-    (let ((window-name (foreign-alloc 
-			:string :initial-element 
-			"CAP-CAM Example")))
+    (let ((window-name "CAP-CAM Example"))
       (if (not (cap-is-open cap)) 
 	  (return-from cap-cam-example 
 	    (format t "Cannot open the video camera")))
@@ -1286,8 +1243,7 @@ Common Lisp: (CAP-CAM (DEVICE :INT))
 	(setf frame (mat))
 	(cap-read cap frame)
 	(imshow window-name frame))
-      (destroy-window window-name)
-      (foreign-free window-name))))
+      (destroy-window window-name))))
 
 
 CAP-FILE
@@ -1307,12 +1263,8 @@ Common Lisp: (CAP-FILE (FILENAME (:POINTER STRING*)))
   "This function use CAP-FILE to open a video 
    file supplied by the parameter FILENAME."
 
-  (setf filename (foreign-alloc :string :initial-element 
-				filename))
   (with-capture (cap (cap-file filename))
-    (let ((window-name (foreign-alloc 
-			:string :initial-element 
-			"CAP-FILE Example")))
+    (let ((window-name "CAP-FILE Example"))
       (if (not (cap-is-open cap)) 
 	  (return-from cap-file-example 
 	    (format t "Cannot open the video camera")))
@@ -1323,10 +1275,7 @@ Common Lisp: (CAP-FILE (FILENAME (:POINTER STRING*)))
 	(setf frame (mat))
 	(cap-read cap frame)
 	(imshow window-name frame))
-      (destroy-window window-name)
-      (foreign-free filename)
-      (foreign-free window-name))))
-
+      (destroy-window window-name))))
 
 
 AT
@@ -1437,6 +1386,30 @@ Common Lisp: (CIRCLE (IMG (:POINTER MAT)) (CENTER (:POINTER POINT)) (RADIUS :INT
 
 The function circle draws a simple or filled circle with a given center and radius.
 
+CIRCLE-EXAMPLE:
+
+(defparameter x 40)
+(defparameter y 40)
+(defparameter point 0)
+(defparameter the-right-wall 600)
+(defparameter the-left-wall 40)
+(defparameter the-ceiling 40)
+(defparameter the-floor 440)
+(defparameter rate 10)
+(defparameter right-wall-switch 0)
+(defparameter left-wall-switch 0)
+(defparameter ceiling-switch 0)
+(defparameter floor-switch 0)
+
+(defun report ()
+  (format t "x = ~a~%" x)
+  (format t "y = ~a~%" y)
+  (format t "right-wall-switch = ~a~%" right-wall-switch)
+  (format t "left-wall-switch = ~a~%" left-wall-switch)
+  (format t "ceiling-switch = ~a~%" ceiling-switch)
+  (format t "floor-switch = ~a~%" floor-switch))
+
+
 
 (defparameter x 40)
 (defparameter y 40)
@@ -1467,9 +1440,7 @@ The function circle draws a simple or filled circle with a given center and radi
    ounce around the room."
 
   (with-capture (cap (cap-cam camera-index))
-    (let* ((window-name (foreign-alloc 
-			 :string :initial-element 
-			 "CICRLE Example"))
+    (let* ((window-name "CICRLE Example")
 	   (color (scalar 0 0 255)))
       (if (not (cap-is-open cap)) 
 	  (return-from circle-example 
@@ -1504,8 +1475,7 @@ The function circle draws a simple or filled circle with a given center and radi
 	(if (< x (+ 40 rate)) (setf right-wall-switch 0))
 	(if (< y (+ 40 rate)) (setf floor-switch 0))
 	(report))
-      (destroy-window window-name)
-      (foreign-free window-name))))
+      (destroy-window window-name))))
 
 
 MAT-ZEROS
@@ -1553,16 +1523,12 @@ wise, the existing matrix A is filled with zeros.
    dow for verification."
 
   (let* ((mat (mat-zeros 3 3 +8u+))
-	 (window-name (foreign-alloc 
-		       :string :initial-element 
-		       "MAT - MAT-ZEROS Example")))
+	 (window-name "MAT - MAT-ZEROS Example"))
     (named-window window-name +window-normal+)
     (move-window window-name 720 175)
     (imshow window-name mat)
     (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name)
-    (foreign-free window-name)))
-
+    (destroy-window window-name)))
 
 
 Mat::ones
@@ -1611,19 +1577,16 @@ izer.
    dow."
 
   (let* ((mat (mat-ones 4 4 +8u+))
-	 (window-name (foreign-alloc 
-		       :string :initial-element 
-		       "MAT - MAT-ONES Example")))
+	 (window-name "MAT - MAT-ONES Example"))
     (named-window window-name +window-normal+)
     (move-window window-name 720 175)
     (imshow window-name mat)
     (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name)
-    (foreign-free window-name)))
+    (destroy-window window-name)))
 
 
 MAT-EYE
-todo figure out if I do all of these
+
 Returns an identity matrix of the specified size and type.
 
 C++: static MatExpr Mat::eye(int rows, int cols, int type)
@@ -1649,27 +1612,67 @@ Common Lisp: (MAT-EYE-1 (S (:POINTER SIZE)) (TYPE :INT)) => (:POINTER MAT)
 The method returns a Matlab-style identity matrix initializer, similarly to (MAT-ZEROS). Similarly 
 to (MAT-ONES), you can use a scale operation to create a scaled identity matrix efficiently:
 
-// make a 4x4 diagonal matrix with 0.1's on the diagonal.
-Mat A = Mat::eye(4, 4, CV_32F)*0.1;
+;; Make a 4x4 diagonal matrix with 0.1's on the diagonal.
+
+(DEFPARAMETER A (MAT-SCALE (<< (MAT-EYE-RC 4 4 +32F+)) 0.1D0))
 
 
 (defun mat-eye-example ()
 
-  "In this example the function MAT-EYE 
-   is used to create a 3x3 identity mat-
-   ri(MAT). MAT is then shown in a wind-
-   ow."
+  "This example introduces the functions MAT-EYE-RC 
+   and MAT-EYE-S. Both identity matrix functions ar-
+   e the same, except that MAT-EYE-RC has row,colum-
+   n parameters, and MAT-EYE-S has a size parameter.  
+   Both are used to create identical 3x3 identity m-
+   atrices of unsigned-char type, IDENTITY-MAT-1 an-
+   d IDENTITY-MAT-2, which are shown in a window. 
 
-  (let* ((mat (mat-eye 3 3 +8u+))
-	 (window-name (foreign-alloc 
-		       :string :initial-element 
-		       "MAT - MAT-EYE Example")))
-    (named-window window-name +window-normal+)
-    (move-window window-name 720 175)
-    (imshow window-name mat)
+   Then an identity matrix, IDENTITY-MAT-3 is creat-
+   ed and using the function MAT-SCALE is scaled by 
+   0.1 . Then both the pre-scaled version and the s-
+   caled version are shown in window. This allows y-
+   ou to see the fact that, because they are of typ-
+   e +32F+(single-float) matrices, their elements a-
+   re shown as colors, not numbers, unlike the matr-
+   ices in the top 2 windows. So an identity matrix 
+   which has a diagonal that is all ones, it's diag-
+   onal would be represented as pure white. An iden-
+   tity matrix whose diagonal is all 0.1, it's diag-
+   onal would be represented as a dark, dark grey V-
+   ery close to black...A colored boolean.
+
+   Note: The PROMOTE(<<) function was needed in the 
+   MAT-SCALE function to cooerce IDENTITY-MAT-3 to 
+   MAT-EXPR from MAT type for the scaling operation. 
+   The FORCE(>>) function is used in IMSHOW to coer-
+   ce SCALED-IDENTITY-MAT-3 back to MAT."
+
+  (let* ((identity-mat-1 (mat-eye-rc 3 3 +8u+))
+         (identity-mat-2 (mat-eye-s (size 3 3) +8u+))
+         (identity-mat-3 (mat-eye-rc 4 4 +32f+))
+	 (scaled-identity-mat-3 (mat-scale (<< identity-mat-3) 0.1d0))
+	 (window-name-1 "IDENTITY-MAT-1 - MAT-EYE Example")
+         (window-name-2 "IDENTITY-MAT-2 - MAT-EYE Example")
+	 (window-name-3 "IDENTITY-MAT-3 - MAT-EYE Example")
+         (window-name-4 "SCALED-IDENTITY-MAT-3 - MAT-EYE Example"))
+    (named-window window-name-1 +window-normal+)
+    (named-window window-name-2 +window-normal+)
+    (named-window window-name-3 +window-normal+)
+    (named-window window-name-4 +window-normal+)
+
+    (move-window window-name-1 485 98)
+    (move-window window-name-2 894 98)
+    (move-window window-name-3 485 444)
+    (move-window window-name-4 894 444)
+    (imshow window-name-1 identity-mat-1)
+    (imshow window-name-2 identity-mat-2)
+    (imshow window-name-3 identity-mat-3)
+    (imshow window-name-4  (>> scaled-identity-mat-3))
     (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name)
-    (foreign-free window-name)))
+    (destroy-window window-name-1)
+    (destroy-window window-name-2)
+    (destroy-window window-name-3)
+    (destroy-window window-name-4)))
 
 
 GET-TICK-COUNT
@@ -1823,16 +1826,13 @@ nction >> is an identical shorthand version of the FORCE function supplied for e
    before it can be shown in a window with IMSHOW."
 
   (let* ((mat (mat-ones 3 3 +8u+))
-         (out (mat-expr+ mat mat))
-	 (window-name (foreign-alloc 
-		       :string :initial-element 
-		       "FORCE Example")))
+         (out (add mat mat))
+	 (window-name "FORCE Example"))
     (named-window window-name +window-normal+)
     (move-window window-name 720 175)
     (imshow window-name  (>> out))
     (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name)
-    (foreign-free window-name)))
+    (destroy-window window-name)))
 
 
 PROMOTE
@@ -1872,16 +1872,12 @@ FORCE to use the result in a function that only accepts a MAT as input i.e. IMSH
   (let* ((mat (mat-ones 3 3 +8u+))
          (s 5.0d0)
          (out (mat-expr-s (<< mat) s))
-	 (window-name (foreign-alloc 
-		       :string :initial-element 
-		       "PROMOTE Example")))
+	 (window-name "PROMOTE Example"))
     (named-window window-name +window-normal+)
     (move-window window-name 720 175)
     (imshow window-name  (>> out))
     (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name)
-    (foreign-free window-name)))
-
+    (destroy-window window-name)))
 
 
 MAT-EXPR-S
@@ -1917,15 +1913,12 @@ ore doing the computation. You can then convert back to (:POINTER MAT) with the 
   (let* ((mat (mat-ones 4 4 +8u+))
          (s 7.0d0)
          (result (mat-expr-s (<< mat) s))
-	 (window-name (foreign-alloc 
-		       :string :initial-element 
-		       "MAT-EXPR-S Example")))
+	 (window-name "MAT-EXPR-S Example"))
     (named-window window-name +window-normal+)
     (move-window window-name 720 175)
     (imshow window-name  (>> result))
     (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name)
-    (foreign-free window-name)))
+    (destroy-window window-name)))
 
 
 MAT-TYPED-0
@@ -1949,16 +1942,13 @@ Common Lisp: (MAT-TYPED-0) (ROWS :INT) (COLS :INT) (TYPE :INT)) => (:POINTER MAT
    created and the empty matrix is shown in a 
    window."
 
-  (let* ((mat (mat-typed-0 4 4 +32f+))
-	 (window-name (foreign-alloc 
-		       :string :initial-element 
-		       "MAT-TYPED-0 Example")))
+  (let* ((mat (mat-typed-0 4 4 +32s+))
+	 (window-name "MAT-TYPED-0 Example"))
     (named-window window-name +window-normal+)
     (move-window window-name 720 175)
     (imshow window-name mat)
     (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name)
-    (foreign-free window-name)))
+    (destroy-window window-name)))
 
          
 DIAG
@@ -2178,7 +2168,6 @@ functions.
       (princ #\Newline))))
 
 
-
 DIV
 
 Divides matrix M1 by matrix M2.
@@ -2235,7 +2224,6 @@ ns.
       (princ #\Newline))))
 
 
-
 VIDEO-WRITER
 
 VIDEO-WRITER constructors
@@ -2268,15 +2256,12 @@ The constructors/functions initialize video writers. On Linux FFMPEG is used to 
 ndows FFMPEG or VFW is used; on MacOSX QTKit is used.
 
 
-(defun video-writer-example (&optional (camera-index *camera-index*))
+(defun video-writer-example (filename &optional 
+					(camera-index *camera-index*))
 
   (with-capture (cap (cap-cam camera-index)) ; Open the video camera no. 0
-    (let* ((filename (foreign-alloc 
-		      :string :initial-element 
-		      "/home/w/my-video.avi"))
-	   (window-name (foreign-alloc 
-			 :string :initial-element 
-			 "VIDEO-WRITER Example"))
+    (let* ((filename filename)
+	   (window-name "VIDEO-WRITER Example")
 
 			    ; Get the width of frames of the video
 	   (dwidth (rational (cap-get cap +cap-prop-frame-width+)))
@@ -2284,7 +2269,7 @@ ndows FFMPEG or VFW is used; on MacOSX QTKit is used.
 			     ; Get the width of frames of the video
 	   (dheight (rational (cap-get cap +cap-prop-frame-height+)))
 
-					; Initialize the VideoWriter object 
+			  ; Initialize the VideoWriter object 
 	   (o-video-writer (video-writer filename 1196444237 ; todo
 					 20.0d0 (size 640 480) 1))) 
       
@@ -2297,14 +2282,15 @@ ndows FFMPEG or VFW is used; on MacOSX QTKit is used.
 	  (return-from video-writer-example 
 	    (format t "ERROR: Failed to write the video"))) 
 
-      ;; Print video width and height
+    ;; Print video width and height
       (format t "Frame Size : ~ax~a~%~%" dwidth dheight)
 
       (named-window window-name +window-normal+) ; Create a window
       (move-window window-name 720 175)
       (do* ((frame 0))
 
-           ; Wait for 'esc' key press for 30ms. If 'esc' key is pressed, break loop
+	          ; Wait for 'esc' key press for 30ms. 
+                  ; If 'esc' key is pressed, break loop
 	   ((plusp (wait-key *millis-per-frame*)) 
 	    (format t "Key is pressed by user"))
 	(setf frame (mat))
@@ -2318,9 +2304,7 @@ ndows FFMPEG or VFW is used; on MacOSX QTKit is used.
 	(video-writer-write o-video-writer frame) ; Write the frame into the file
 
 	(imshow window-name frame)) ; Show the frame in window
-      (destroy-window window-name)
-      (foreign-free window-name)
-      (foreign-free filename))))
+      (destroy-window window-name))))
 
 
 SIZE
@@ -2380,16 +2364,11 @@ Common Lisp: (VIDEO-WRITER-IS-OPEN (SELF (:POINTER VIDEO-WRITER)))
 (defun video-writer-is-open-example (filename &optional (camera-index *camera-index*))
 
   (with-capture (cap (cap-cam camera-index)) ; Open the video camera no. 0
-    (let* ((filename (foreign-alloc 
-		      :string :initial-element 
-		      filename))
-			 ; Initialize the VideoWriter object 
+    (let* (; Initialize the VideoWriter object 
 	   (o-video-writer (video-writer filename 1196444237 ; todo
 					 20.0d0 (size 640 480) 1)))
       (format t "If VIDEO-WRITER is open a T will be displayed, else NIL: ~a"
-	      (video-writer-is-open o-video-writer))
-      (foreign-free filename))))
-
+	      (video-writer-is-open o-video-writer)))))
 
 
 VIDEO-WRITER-WRITE
@@ -2414,13 +2393,9 @@ e as has been specified when opening the video writer.
 					      (camera-index *camera-index*))
 
   (with-capture (cap (cap-cam camera-index)) 
-    (let* ((filename (foreign-alloc 
-		      :string :initial-element filename))
-	   (window-name (foreign-alloc 
-			 :string :initial-element 
-			 "VIDEO-WRITER-WRITE Example"))
+    (let* ((window-name "VIDEO-WRITER-WRITE Example")
 	   (o-video-writer (video-writer filename 1196444237 
-					 20.0d0 (size 640 480) 1))) 
+					 20.0d0 (size 640 480) 1)))
       (if (not (cap-is-open cap)) 
 	  (return-from video-writer-write-example 
 	    (format t "ERROR: Cannot open the video file")))
@@ -2436,9 +2411,7 @@ e as has been specified when opening the video writer.
 	(cap-read cap frame) 
 	(video-writer-write o-video-writer frame) 
 	(imshow window-name frame))
-      (destroy-window window-name)
-      (foreign-free window-name)
-      (foreign-free filename))))
+      (destroy-window window-name))))
 
 
 MAT-CLONE
@@ -2548,28 +2521,6 @@ The function returns a header, corresponding to a specified rectangle of the inp
 words, it allows the user to treat a rectangular part of input array as a stand-alone array. ROI is
 taken into account by the function so the sub-array of ROI is actually extracted. The function ROI 
 returns a pointer to the resultant sub-array header.
-
-
-(defparameter x 100)
-(defparameter y 100)
-(defparameter region-of-interest 0)
-(defparameter the-right-wall 540)
-(defparameter the-left-wall 100)
-(defparameter the-ceiling 100)
-(defparameter the-floor 380)
-(defparameter rate 10)
-(defparameter right-wall-switch 0)
-(defparameter left-wall-switch 0)
-(defparameter ceiling-switch 0)
-(defparameter floor-switch 0)
-
-(defun report ()
-  (format t "x = ~a~%" x)
-  (format t "y = ~a~%" y)
-  (format t "right-wall-switch = ~a~%" right-wall-switch)
-  (format t "left-wall-switch = ~a~%" left-wall-switch)
-  (format t "ceiling-switch = ~a~%" ceiling-switch)
-  (format t "floor-switch = ~a~%" floor-switch))
 
 
 (defun roi-example (&optional (camera-index *camera-index*))
@@ -2844,12 +2795,8 @@ See also:
    inal image FRAME and the blurred image SRC are sho-
    wn in separate windows."
   (with-capture (cap (cap-cam camera-index))
-    (let ((window-name-1 (foreign-alloc 
-			  :string :initial-element 
-			  "Original - GAUSSIAN-BLUR Example"))
-	  (window-name-2 (foreign-alloc 
-			  :string :initial-element 
-			  "Blurred output - GAUSSIAN-BLUR Example"))
+    (let ((window-name-1 "Original - GAUSSIAN-BLUR Example")
+	  (window-name-2 "Blurred output - GAUSSIAN-BLUR Example")
 	  (src 0))
       (if (not (cap-is-open cap)) 
 	  (return-from gaussian-blur-example 
@@ -2874,10 +2821,7 @@ See also:
 	(imshow window-name-2 src)
 	(del frame) (del src))
       (destroy-window window-name-1)
-      (destroy-window window-name-2)
-      (foreign-free window-name-1)
-      (foreign-free window-name-2))))
-
+      (destroy-window window-name-2))))
 
 
 CVT-COLOR

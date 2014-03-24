@@ -11,34 +11,44 @@
 
 ;; void destroyWindow(const string& winname)
 ;; void cv_destroyWindow((:pointer string*) winname)
-(defcfun ("cv_destroyWindow" destroy-window) :void
+(defcfun ("cv_destroyWindow" %destroy-window) :void
   "Destroys a window."
   (winname (:pointer string*)))
 
+(defun destroy-window (winname)
+  "Destroys a window."
+  (%destroy-window (foreign-alloc :string :initial-element winname)))
+
 ;; void imshow(const string& winname, InputArray mat)
 ;; void cv_imshow(String* winname, Mat* mat)
-(defcfun ("cv_imshow" imshow) :void
-  "Displays an image in the specified window."
+(defcfun ("cv_imshow" %imshow) :void
   (winname (:pointer string*))
   (mat (:pointer mat)))
 
+(defun imshow (winname mat)
+  "Displays an image in the specified window."
+  (%imshow (foreign-alloc :string :initial-element winname) mat))
+
 ;; void moveWindow(const string& winname, int x, int y)
 ;; void cv_moveWindow((:pointer string*) winname, int x, int y)
-(defcfun ("cv_moveWindow" move-window) :void
-  "Moves window to the specified position"
+(defcfun ("cv_moveWindow" %move-window) :void
   (winname (:pointer string*))
   (x :int)
   (y :int))
 
+(defun move-window (winname x y)
+  "Moves window to the specified position"
+  (%move-window (foreign-alloc :string :initial-element winname) x y))
+
 ;; void namedWindow(const string& winname, int flags=WINDOW_AUTOSIZE)
 ;; void cv_namedWindow((:pointer string*) winname, int flags)
 (cffi:defcfun ("cv_namedWindow" %named-window) :void
-  (winname :pointer)
+  (winname (:pointer string*))
   (flags :int))
 
-(defun named-window (winname &optional (flags +window-autosize+))
+(defun named-window (winname flags)
   "Creates a window."
-  (%named-window winname flags))
+  (%named-window (foreign-alloc :string :initial-element winname) flags))
 
 ;; int waitKey(int delay=0)
 ;; int cv_waitKey(int delay)
@@ -61,13 +71,17 @@
 
 ;; VideoCapture::VideoCapture(const string& filename)
 ;; VideoCapture* cv_create_VideoCapture1(String* filename) {
-(defcfun ("cv_create_VideoCapture1" cap-file) (:pointer video-capture)
+(defcfun ("cv_create_VideoCapture1" %cap-file) (:pointer video-capture)
   (filename (:pointer string*)))
+
+(defun cap-file (filename)
+  "VideoCapture constructor."
+  (%cap-file (foreign-alloc :string :initial-element filename)))
 
 ;; double VideoCapture::get(int propId)
 ;; double cv_VideoCapture_get(VideoCapture* self, int propId)
  (cffi:defcfun ("cv_VideoCapture_get" cap-get) :double
-  "Returns the specified VideoCapture property"
+  "Returns the specified VideoCapture property."
   (self (:pointer video-capture))
   (prop-id :int))
 
@@ -99,15 +113,11 @@
    (%cap-set self prop-id (coerce value 'double-float)))
 
 ;; Mat imread(const string& filename, int flags=1)
-;; mat cv_imread((:pointer string*) filename, int flags)
-
-(defcfun ("cv_imread" %imread) (:pointer mat)
-  (filename (:pointer string*))
+;; mat cv_imread2 (const char* filename, int flags)
+(defcfun ("cv_imread" imread) (:pointer mat)
+  (filename :string)
   (flags :int))
 
-(defun imread (filename &optional (flags +load-image-color+))
-  "Loads an image from a file."
-  (%imread filename flags))
 
 ;; VideoWriter::VideoWriter(const string& filename, int fourcc, double fps, Size frameSize, bool isColor) 
 ;; VideoWriter* cv_create_VideoWriter5(String* filename, int fourcc, double fps, Size* frameSize, bool isColor)
@@ -120,7 +130,7 @@
 
 (defun video-writer (filename fourcc fps frame-size &optional (is-color t))
   "VIDEO-WRITER constructor"
-  (%video-writer filename fourcc fps frame-size is-color))
+  (%video-writer (foreign-alloc :string :initial-element filename) fourcc fps frame-size is-color))
 
 ;; VideoWriter* cv_create_VideoWriter() 
 (defcfun ("cv_create_VideoWriter" video-writer-init) (:pointer video-writer)

@@ -401,11 +401,6 @@
 (defcfun ("cv_Mat_cols" cols) :int
   (self (:pointer mat)))
 
-;; Mat* force(MatExpr* expr)
-(defcfun ("force" force) (:pointer mat)
-  "Coerces a (:POINTER MAT-EXPR) to a (:POINTER MAT)."
-  (expr (:pointer mat-expr)))
-
 ;; Mat::Mat(int rows, int cols, int type, void* data) 
 ;; Mat* cv_create_Mat_with_data(int rows, int cols, int type, void* data) ;todo...no step param
 (defcfun ("cv_create_Mat_with_data" mat-data) (:pointer mat)
@@ -413,6 +408,10 @@
   (cols :int)
   (type :int)
   (data :pointer))
+
+;; void operator delete  ( void* ptr );
+(defcfun ("cv_delete_Mat" del) :void
+  (ptr :pointer))
 
 ;; Mat Mat::diag(int d=0 ) const
 ;; Mat* cv_Mat_diag_d(Mat* self, int d)
@@ -438,6 +437,11 @@
   (self (:pointer point))
   (other (:pointer point)))
 
+;; Mat* force(MatExpr* expr)
+(defcfun ("force" force) (:pointer mat)
+  "Coerces a (:POINTER MAT-EXPR) to a (:POINTER MAT)."
+  (expr (:pointer mat-expr)))
+
 ;; Mat::Mat()
 ;; Mat* cv_create_Mat()
 (defcfun ("cv_create_Mat" mat) (:pointer mat)
@@ -456,7 +460,7 @@
 
 ;; static MatExpr Mat::eye(int rows, int cols, int type) 
 ;; Mat* cv_create_identity(int rows, int cols, int type)
-(defcfun ("cv_create_identity" mat-eye-0) (:pointer mat)
+(defcfun ("cv_create_identity" mat-eye-rc) (:pointer mat)
   "Returns an identity matrix of the specified size and type."
   (rows :int)
   (cols :int)
@@ -464,7 +468,7 @@
 
 ;; static MatExpr Mat::eye(Size size, int type)
 ;; Mat* cv_create_sized_identity(Size* s, int type)
-(defcfun ("cv_create_sized_identity" mat-eye-1)  (:pointer mat)
+(defcfun ("cv_create_sized_identity" mat-eye-s)  (:pointer mat)
   "Returns an identity matrix of the specified size and type."
   (s (:pointer size))
   (type :int))
@@ -476,10 +480,12 @@
   (cols :int)
   (type :int))
 
-;; MatExpr* promote(Mat* m) 
-(defcfun ("promote" promote) (:pointer mat-expr)
-  "Converts a (:POINTER MAT) to a (:POINTER MAT-EXPR)."
-  (m (:pointer mat)))
+;; MatExpr *
+;; MatExpr* cv_Mat_scale(MatExpr* m, double alpha)
+(defcfun ("cv_Mat_scale" mat-scale) (:pointer mat) 
+  "Finds the product of a Mat and a scalar."
+  (self (:pointer mat))
+  (alpha :double))
 
 ;; int Mat::type() const 
 ;; int cv_Mat_type(Mat* self) 
@@ -653,6 +659,11 @@
 (defcfun ("cv_Point3i_getZ" point3i-z) :int
   "Retrieves z coordinate of a point3i"
   (self (:pointer point3i)))
+
+;; MatExpr* promote(Mat* m) 
+(defcfun ("promote" promote) (:pointer mat-expr)
+  "Converts a (:POINTER MAT) to a (:POINTER MAT-EXPR)."
+  (m (:pointer mat)))
 
 ;; Rect_(_Tp _x, _Tp _y, _Tp _width, _Tp _height)
 ;; Rect* cv_create_Rect4(int x, int y, int width, int height) 
