@@ -98,19 +98,11 @@
    #:at-uchar
    #:at-ushort
    #:at-scalar
-   #:at-point
-   #:at-point
-   #:at-point
-   #:at-point
-   #:at-point
-   #:at-point
-   #:at-point
-   #:at-point
-   #:at-3d
-   #:at-2f
-   #:at-3d
-   #:at-3f
-   #:at-3i
+   #:at-point2d
+   #:at-point2f
+   #:at-point3d
+   #:at-point3f
+   #:at-point3i
    #:at-vec2b
    #:at-vec2d
    #:at-vec2f
@@ -147,6 +139,24 @@
    #:mul
    #:point
    #:point-init
+   #:point2d
+   #:point2d-x
+   #:point2d-y
+   #:point2f
+   #:point2f-x
+   #:point2f-y
+   #:point3d
+   #:point3d-x
+   #:point3d-y
+   #:point3d-z
+   #:point3f
+   #:point3f-x
+   #:point3f-y
+   #:point3f-z
+   #:point3i
+   #:point3i-x
+   #:point3i-y
+   #:point3i-z
    #:promote
    #:rect
    #:rect-init

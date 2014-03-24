@@ -906,7 +906,7 @@ POINT
 
 POINT constructor.
 
-C++: Point_();
+C++: Point_()
 
 Common Lisp: (POINT-INIT) => (:POINTER POINT)
 
@@ -916,11 +916,11 @@ Common Lisp:  (POINT (X :INT) (Y :INT)) => (:POINTER POINT)
 
 C++: _Tp x, y;
 
-Common Lisp: (X (SELF (:POINTER POINT))) => :INT
+Common Lisp: (POINT-X (SELF (:POINTER POINT))) => :INT
 
 C++: _Tp x, y;
 
-Common Lisp: (Y (SELF (:POINTER POINT))) => :INT
+Common Lisp: (POINT-Y (SELF (:POINTER POINT))) => :INT
 
 
     Parameters:	
@@ -932,7 +932,8 @@ Common Lisp: (Y (SELF (:POINTER POINT))) => :INT
         Y -	y-coordinate of the point.
 
 
-2D point with integer coordinates (usually zero-based).
+POINT creates a 2D point with integer coordinates (usually zero-based). Functions POINT-X and  POINT-Y are used to extract the x,y coordinates of a point.
+
 
 
 (defun point-example (x y)
@@ -941,15 +942,254 @@ Common Lisp: (Y (SELF (:POINTER POINT))) => :INT
    function POINT-INIT. Then creates a po-
    int with the function POINT. Finally, 
    lists the x,y coordinates with the POI-
-   NT functions X and Y."
+   NT functions POINT-X and POINT-Y."
 
   (let* ((initialized-point (point-init))
 	 (point (point x y)))
     (format t "Pointer to initialized point: ~a~%~%" 
 	    initialized-point)
     (format t "POINT (x, y) = (~a, ~a)~%" 
-	    (x point)
-	    (y point))))
+	    (point-x point)
+	    (point-y point))))
+
+
+POINT2D
+
+POINT2D constructor.
+
+
+C++: typedef Point_<double> Point2d
+
+Common Lisp:  (POINT2D (X :INT) (Y :INT)) => (:POINTER POINT2D)
+
+C++: _Tp x, y
+
+Common Lisp: (POINT2D-X (SELF (:POINTER POINT2D))) => :DOUBLE
+
+C++: _Tp x, y
+
+Common Lisp: (POINT2D-Y (SELF (:POINTER POINT2D))) => :DOUBLE
+
+
+    Parameters:	
+
+        SELF - A POINT2D construct.
+
+        X - x-coordinate of the point.
+
+        Y -	y-coordinate of the point.
+
+
+POINT2D creates a 2D point with double-float coordinates (usually zero-based). Functions POINT2D-X 
+and  POINT2D-Y are used to extract the x,y coordinates of the point.
+
+
+(defun point2d-example (x y)
+
+  "Creates a point2d with the function 
+   POINT2D. Then, lists the x,y coordi-
+   nates with the POINT2D functions PO-
+   INT2D-X and POINT2D-Y."
+
+  (let* ((point2d (point2d x y)))
+    (format t "Pointer to POINT2D: ~a~%~%" 
+	    point2d)
+    (format t "POINT2D (x, y) = (~a, ~a)~%" 
+	    (point2d-x point2d)
+	    (point2d-y point2d))))
+
+
+POINT2F
+
+POINT2F constructor.
+
+
+C++: typedef Point_<float> Point2f
+
+Common Lisp:  (POINT2F (X :INT) (Y :INT)) => (:POINTER POINT2F)
+
+C++: _Tp x, y
+
+Common Lisp: (POINT2F-X (SELF (:POINTER POINT2F))) => :INT
+
+C++: _Tp x, y
+
+Common Lisp: (POINT2F-Y (SELF (:POINTER POINT2F))) => :INT
+
+
+    Parameters:	
+
+        SELF - A POINT2F construct.
+
+        X - x-coordinate of the point.
+
+        Y -	y-coordinate of the point.
+
+
+POINT2F creates a 2D point with float coordinates (usually zero-based). Functions POINT2F-X and POI-
+NT2F-Y are used to extract the x,y coordinates the point.
+
+
+(defun point2f-example (x y)
+
+  "Creates a point2f with the function 
+   POINT2f. Then, lists the x,y coordi-
+   nates with the POINT2F functions PO-
+   INT2F-X and POINT2F-Y."
+
+  (let* ((point2f (point2f x y)))
+    (format t "Pointer to POINT2F: ~a~%~%" 
+	    point2f)
+    (format t "POINT2F (x, y) = (~a, ~a)~%" 
+	    (point2f-x point2f)
+	    (point2f-y point2f))))
+
+
+POINT3I
+
+POINT3I constructor.
+
+
+C++: typedef Point3_<int> Point3i;
+
+Common Lisp:  (POINT3I (X :INT) (Y :INT) (Z :INT)) => (:POINTER POINT3I)
+
+C++: _Tp x, y, z
+
+Common Lisp: (POINT3I-X (SELF (:POINTER POINT3I))) => :INT
+
+C++: _Tp x, y, z
+
+Common Lisp: (POINT3I-Y (SELF (:POINTER POINT3I))) => :INT
+
+
+    Parameters:	
+
+        SELF - A POINT3I construct.
+
+        X - x-coordinate of the point.
+
+        Y -	y-coordinate of the point.
+        
+        Z - Z-coordinate of the point.
+
+
+POINT3I creates a 3D point with integer coordinates (usually zero-based). Functions POINT3I-X, POIN-
+T3I-Y and POINT3I-Z are used to extract the x,y,Z coordinates of the point.
+
+
+(defun point3i-example (x y z)
+
+  "Creates a point3i with the function 
+   POINT3I. Then, lists the x,y,z coor-
+   dinates with the POINT3I functions 
+   POINT3I-X, POINT3I-Y and POINT3I-Z."
+
+  (let* ((point3i (point3i x y z)))
+    (format t "Pointer to POINT3I: ~a~%~%" 
+	    point3d)
+    (format t "POINT3I (x, y, z) = (~a, ~a, ~a)~%" 
+	    (point3i-x point3i)
+	    (point3i-y point3i)
+            (point3i-z point3i))))
+
+
+POINT3D
+
+POINT3D constructor.
+
+
+C++: typedef Point3_<double> Point3d
+
+Common Lisp:  (POINT3D (X :INT) (Y :INT) (Z :INT)) => (:POINTER POINT3D)
+
+C++: _Tp x, y, z
+
+Common Lisp: (POINT3D-X (SELF (:POINTER POINT3D))) => :DOUBLE
+
+C++: _Tp x, y, z
+
+Common Lisp: (POINT3D-Y (SELF (:POINTER POINT3D))) => :DOUBLE
+
+
+    Parameters:	
+
+        SELF - A POINT3D construct.
+
+        X - x-coordinate of the point.
+
+        Y -	y-coordinate of the point.
+        
+        Z - Z-coordinate of the point.
+
+
+POINT3D creates a 3D point with double-float coordinates (usually zero-based). Functions POINT3D-X, 
+POINT3D-Y AND POINT3D-Z are used to extract the x,y,Z coordinates the point.
+
+
+(defun point3d-example (x y z)
+
+  "Creates a point3d with the function 
+   POINT3D. Then, lists the x,y,z coor-
+   dinates with the POINT3D functions 
+   POINT3D-X, POINT3D-Y and POINT3D-Z."
+
+  (let* ((point3d (point3d x y z)))
+    (format t "Pointer to POINT3D: ~a~%~%" 
+	    point3d)
+    (format t "POINT3D (x, y, z) = (~a, ~a, ~a)~%" 
+	    (point3d-x point3d)
+	    (point3d-y point3d)
+            (point3d-z point3d))))
+
+
+POINT3F
+
+POINT3F constructor.
+
+
+C++: typedef Point3_<float> Point3f
+
+Common Lisp:  (POINT3F (X :INT) (Y :INT) (Z :INT)) => (:POINTER POINT3F)
+
+C++: _Tp x, y, z
+
+Common Lisp: (POINT3F-X (SELF (:POINTER POINT3F))) => :FLOAT
+
+C++: _Tp x, y, z
+
+Common Lisp: (POINT3F-Y (SELF (:POINTER POINT))) => :FLOAT
+
+
+    Parameters:	
+
+        SELF - A POINT3F construct.
+
+        X - x-coordinate of the point.
+
+        Y -	y-coordinate of the point.
+        
+        Z - Z-coordinate of the point.
+
+
+POINT3F creates a 3D point with float coordinates (usually zero-based). Functions POINT3F-X, POINT3-
+F-Y AND POINT3F-Z are used to extract the x,y,Z coordinates the point.
+
+
+(defun point3f-example (x y z)
+
+  "Creates a point3f with the function 
+   POINT3F. Then, lists the x,y,z coor-
+   dinates with the POINT3F functions 
+   POINT3F-X, POINT3F-Y and POINT3F-Z."
+
+  (let* ((point3f (point3f x y z)))
+    (format t "Pointer to POINT3F: ~a~%~%" 
+	    point3f)
+    (format t "POINT3F (x, y, z) = (~a, ~a, ~a)~%" 
+	    (point3f-x point3f)
+	    (point3f-y point3f)
+            (point3f-z point3f))))
 
 
 EMPTY
@@ -2638,5 +2878,232 @@ See also:
       (foreign-free window-name-1)
       (foreign-free window-name-2))))
 
+
+
+CVT-COLOR
+
+Converts an image from one color space to another.
+
+C++: void cvtColor(InputArray src, OutputArray dst, int code, int dstCn=0 )
+
+Common Lisp: (CVT-COLOR (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) (CODE :INT) ((DEST-CN :INT) 0))
+
+
+    Parameters:	
+
+        SRC – input image: 8-bit unsigned, 16-bit unsigned ( +16UC...+ ), or single-precision float-
+              ing-point.
+
+        DST – output image of the same size and depth as src.
+
+        CODE – color space conversion code (see the description below).
+
+        DEST-CN – number of channels in the destination image; if the parameter is 0, the number of
+                  the channels is derived automatically from src and code .
+
+The function converts an input image from one color space to another. In case of a transformation t-
+o-from RGB color space, the order of the channels should be specified explicitly (RGB or BGR). Note
+that the default color format in OpenCV is often referred to as RGB but it is actually BGR (the byt-
+es are reversed). So the first byte in a standard (24-bit) color image will be an 8-bit Blue compon-
+ent, the second byte will be Green, and the third byte will be Red. The fourth, fifth, and sixth by-
+tes would then be the second pixel (Blue, then Green, then Red), and so on.
+
+
+The conventional ranges for R, G, and B channel values are:
+
+    0 to 255 for +8U+ images
+
+    0 to 65535 for +16U+ images
+
+    0 to 1 for +32F+ images
+
+In case of linear transformations, the range does not matter. But in case of a non-linear transform-
+ation, an input RGB image should be normalized to the proper value range to get the correct results, 
+for example, for RGB -> L*u*v* transformation. For example, if you have a 32-bit floating-point ima-
+ge directly converted from an 8-bit image without any scaling, then it will have the 0..255 value r-
+ange instead of 0..1 assumed by the function. So, before calling CVT-COLOR , you need first to scal-
+e the image down:
+
+(LET ((img (/ 1 255)))
+  (CVT-COLOR IMG IMG +BGR2LUV))
+
+If you use cvtColor with 8-bit images, the conversion will have some information lost. For many applications, this will not be noticeable but it is recommended to use 32-bit images in applications that need the full range of colors or that convert an image before an operation and then convert back.
+
+The function can do the following transformations:
+
+    RGB \leftrightarrow GRAY ( CV_BGR2GRAY, CV_RGB2GRAY, CV_GRAY2BGR, CV_GRAY2RGB ) Transformations within RGB space like adding/removing the alpha channel, reversing the channel order, conversion to/from 16-bit RGB color (R5:G6:B5 or R5:G5:B5), as well as conversion to/from grayscale using:
+
+    \text{RGB[A] to Gray:} \quad Y \leftarrow 0.299 \cdot R + 0.587 \cdot G + 0.114 \cdot B
+
+    and
+
+    \text{Gray to RGB[A]:} \quad R \leftarrow Y, G \leftarrow Y, B \leftarrow Y, A \leftarrow 0
+
+    The conversion from a RGB image to gray is done with:
+
+    cvtColor(src, bwsrc, CV_RGB2GRAY);
+
+    More advanced channel reordering can also be done with mixChannels() .
+
+    RGB \leftrightarrow CIE XYZ.Rec 709 with D65 white point ( CV_BGR2XYZ, CV_RGB2XYZ, CV_XYZ2BGR, CV_XYZ2RGB ):
+
+    \begin{bmatrix} X \\ Y \\ Z \end{bmatrix} \leftarrow \begin{bmatrix} 0.412453 & 0.357580 & 0.180423 \\ 0.212671 & 0.715160 & 0.072169 \\ 0.019334 & 0.119193 & 0.950227 \end{bmatrix} \cdot \begin{bmatrix} R \\ G \\ B \end{bmatrix}
+
+    \begin{bmatrix} R \\ G \\ B \end{bmatrix} \leftarrow \begin{bmatrix} 3.240479 & -1.53715 & -0.498535 \\ -0.969256 & 1.875991 & 0.041556 \\ 0.055648 & -0.204043 & 1.057311 \end{bmatrix} \cdot \begin{bmatrix} X \\ Y \\ Z \end{bmatrix}
+
+    X, Y and Z cover the whole value range (in case of floating-point images, Z may exceed 1).
+
+    RGB \leftrightarrow YCrCb JPEG (or YCC) ( CV_BGR2YCrCb, CV_RGB2YCrCb, CV_YCrCb2BGR, CV_YCrCb2RGB )
+
+    Y \leftarrow 0.299 \cdot R + 0.587 \cdot G + 0.114 \cdot B
+
+    Cr \leftarrow (R-Y) \cdot 0.713 + delta
+
+    Cb \leftarrow (B-Y) \cdot 0.564 + delta
+
+    R \leftarrow Y + 1.403 \cdot (Cr - delta)
+
+    G \leftarrow Y - 0.714 \cdot (Cr - delta) - 0.344 \cdot (Cb - delta)
+
+    B \leftarrow Y + 1.773 \cdot (Cb - delta)
+
+    where
+
+    delta = \left \{ \begin{array}{l l} 128 & \mbox{for 8-bit images} \\ 32768 & \mbox{for 16-bit images} \\ 0.5 & \mbox{for floating-point images} \end{array} \right .
+
+    Y, Cr, and Cb cover the whole value range.
+
+    RGB \leftrightarrow HSV ( CV_BGR2HSV, CV_RGB2HSV, CV_HSV2BGR, CV_HSV2RGB )
+
+        In case of 8-bit and 16-bit images, R, G, and B are converted to the floating-point format and scaled to fit the 0 to 1 range.
+
+    V \leftarrow max(R,G,B)
+
+    S \leftarrow \fork{\frac{V-min(R,G,B)}{V}}{if $V \neq 0$}{0}{otherwise}
+
+    H \leftarrow \forkthree{{60(G - B)}/{(V-min(R,G,B))}}{if $V=R$}{{120+60(B - R)}/{(V-min(R,G,B))}}{if $V=G$}{{240+60(R - G)}/{(V-min(R,G,B))}}{if $V=B$}
+
+    If H<0 then H \leftarrow H+360 . On output 0 \leq V \leq 1, 0 \leq S \leq 1, 0 \leq H \leq 360 .
+
+    The values are then converted to the destination data type:
+
+        8-bit images
+
+            V \leftarrow 255 V, S \leftarrow 255 S, H \leftarrow H/2 \text{(to fit to 0 to 255)}
+
+        16-bit images (currently not supported)
+
+            V <- 65535 V, S <- 65535 S, H <- H
+
+        32-bit images
+
+            H, S, and V are left as is
+
+    RGB \leftrightarrow HLS ( CV_BGR2HLS, CV_RGB2HLS, CV_HLS2BGR, CV_HLS2RGB ).
+
+        In case of 8-bit and 16-bit images, R, G, and B are converted to the floating-point format and scaled to fit the 0 to 1 range.
+
+    V_{max} \leftarrow {max}(R,G,B)
+
+    V_{min} \leftarrow {min}(R,G,B)
+
+    L \leftarrow \frac{V_{max} + V_{min}}{2}
+
+    S \leftarrow \fork { \frac{V_{max} - V_{min}}{V_{max} + V_{min}} }{if $L < 0.5$ } { \frac{V_{max} - V_{min}}{2 - (V_{max} + V_{min})} }{if $L \ge 0.5$ }
+
+    H \leftarrow \forkthree {{60(G - B)}/{S}}{if $V_{max}=R$ } {{120+60(B - R)}/{S}}{if $V_{max}=G$ } {{240+60(R - G)}/{S}}{if $V_{max}=B$ }
+
+    If H<0 then H \leftarrow H+360 . On output 0 \leq L \leq 1, 0 \leq S \leq 1, 0 \leq H \leq 360 .
+
+    The values are then converted to the destination data type:
+
+        8-bit images
+
+            V \leftarrow 255 \cdot V, S \leftarrow 255 \cdot S, H \leftarrow H/2 \; \text{(to fit to 0 to 255)}
+
+        16-bit images (currently not supported)
+
+            V <- 65535 \cdot V, S <- 65535 \cdot S, H <- H
+
+        32-bit images
+
+            H, S, V are left as is
+
+    RGB \leftrightarrow CIE L*a*b* ( CV_BGR2Lab, CV_RGB2Lab, CV_Lab2BGR, CV_Lab2RGB ).
+
+        In case of 8-bit and 16-bit images, R, G, and B are converted to the floating-point format and scaled to fit the 0 to 1 range.
+
+    \vecthree{X}{Y}{Z} \leftarrow \vecthreethree{0.412453}{0.357580}{0.180423}{0.212671}{0.715160}{0.072169}{0.019334}{0.119193}{0.950227} \cdot \vecthree{R}{G}{B}
+
+    X \leftarrow X/X_n, \text{where} X_n = 0.950456
+
+    Z \leftarrow Z/Z_n, \text{where} Z_n = 1.088754
+
+    L \leftarrow \fork{116*Y^{1/3}-16}{for $Y>0.008856$}{903.3*Y}{for $Y \le 0.008856$}
+
+    a \leftarrow 500 (f(X)-f(Y)) + delta
+
+    b \leftarrow 200 (f(Y)-f(Z)) + delta
+
+    where
+
+    f(t)= \fork{t^{1/3}}{for $t>0.008856$}{7.787 t+16/116}{for $t\leq 0.008856$}
+
+    and
+
+    delta = \fork{128}{for 8-bit images}{0}{for floating-point images}
+
+    This outputs 0 \leq L \leq 100, -127 \leq a \leq 127, -127 \leq b \leq 127 . The values are then converted to the destination data type:
+
+        8-bit images
+
+            L \leftarrow L*255/100, \; a \leftarrow a + 128, \; b \leftarrow b + 128
+
+        16-bit images
+
+            (currently not supported)
+
+        32-bit images
+
+            L, a, and b are left as is
+
+    RGB \leftrightarrow CIE L*u*v* ( CV_BGR2Luv, CV_RGB2Luv, CV_Luv2BGR, CV_Luv2RGB ).
+
+        In case of 8-bit and 16-bit images, R, G, and B are converted to the floating-point format and scaled to fit 0 to 1 range.
+
+    \vecthree{X}{Y}{Z} \leftarrow \vecthreethree{0.412453}{0.357580}{0.180423}{0.212671}{0.715160}{0.072169}{0.019334}{0.119193}{0.950227} \cdot \vecthree{R}{G}{B}
+
+    L \leftarrow \fork{116 Y^{1/3}}{for $Y>0.008856$}{903.3 Y}{for $Y\leq 0.008856$}
+
+    u' \leftarrow 4*X/(X + 15*Y + 3 Z)
+
+    v' \leftarrow 9*Y/(X + 15*Y + 3 Z)
+
+    u \leftarrow 13*L*(u' - u_n) \quad \text{where} \quad u_n=0.19793943
+
+    v \leftarrow 13*L*(v' - v_n) \quad \text{where} \quad v_n=0.46831096
+
+    This outputs 0 \leq L \leq 100, -134 \leq u \leq 220, -140 \leq v \leq 122 .
+
+    The values are then converted to the destination data type:
+
+        8-bit images
+
+            L \leftarrow 255/100 L, \; u \leftarrow 255/354 (u + 134), \; v \leftarrow 255/256 (v + 140)
+
+        16-bit images
+
+            (currently not supported)
+
+        32-bit images
+
+            L, u, and v are left as is
+
+    The above formulae for converting RGB to/from various color spaces have been taken from multiple sources on the web, primarily from the Charles Poynton site http://www.poynton.com/ColorFAQ.html
+
+    Bayer \rightarrow RGB ( CV_BayerBG2BGR, CV_BayerGB2BGR, CV_BayerRG2BGR, CV_BayerGR2BGR, CV_BayerBG2RGB, CV_BayerGB2RGB, CV_BayerRG2RGB, CV_BayerGR2RGB ). The Bayer pattern is widely used in CCD and CMOS cameras. It enables you to get color pictures from a single plane where R,G, and B pixels (sensors of a particular component) are interleaved as follows:
+    ../../../_images/bayer.png
+
+    The output RGB components of a pixel are interpolated from 1, 2, or 4 neighbors of the pixel having the same color. There are several modifications of the above pattern that can be achieved by shifting the pattern one pixel left and/or one pixel up. The two letters C_1 and C_2 in the conversion constants CV_Bayer C_1 C_2 2BGR and CV_Bayer C_1 C_2 2RGB indicate the particular pattern type. These are components from the second row, second and third columns, respectively. For example, the above pattern has a very popular “BG” type.
 
 

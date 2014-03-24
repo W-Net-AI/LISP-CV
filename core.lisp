@@ -176,21 +176,21 @@
   (j :int))
 
 ;; int cv_Mat_at_double(Mat* self, int row, int col);
-(defcfun ("cv_Mat_at_double1" at-double) :pointer
+(defcfun ("cv_Mat_at_double0" at-double) :double
   "Returns a reference to a DOUBLE array element."
   (self (:pointer mat))
   (i :int)
   (j :int))
 
 ;; float cv_Mat_at_float(Mat* self, int row, int col);
-(defcfun ("cv_Mat_at_float1" at-float) :pointer
+(defcfun ("cv_Mat_at_float0" at-float) :float
   "Returns a reference to a FLOAT array element."
   (self (:pointer mat))
   (i :int)
   (j :int))
 
 ;; int cv_Mat_at_int(Mat* self, int row, int col);
-(defcfun ("cv_Mat_at_int1" at-int) :pointer
+(defcfun ("cv_Mat_at_int0" at-int) :int
   "Returns a reference to a INT array element."
   (self (:pointer mat))
   (i :int)
@@ -525,6 +525,135 @@
   (x :int)
   (y :int))
 
+;; _Tp x, y
+;; int cv_Point_getX(Point* self) 
+(defcfun ("cv_Point_getX" point-x) :int 
+  "Retrieves X coordinate of a point"
+  (self (:pointer point)))
+
+;; _Tp x, y
+;; int cv_Point_getY(Point* self)
+(defcfun ("cv_Point_getY" point-y) :int 
+  "Retrieves y coordinate of a point"
+  (self (:pointer point)))
+
+;; typedef Point_<double> Point2d
+;; Point2d* cv_create_Point2d(double x, double y) {
+(defcfun ("cv_create_Point2d" point2d) (:pointer point2d) 
+  "Point2d constructor"
+  (x :double)
+  (y :double))
+
+
+;; _Tp x, y;
+;; double cv_Point2d_getX(Point2d* self) 
+(defcfun ("cv_Point2d_getX" point2d-x) :double
+  "Retrieves x coordinate of a point2d"
+  (self (:pointer point2d)))
+
+;; _Tp x, y;
+;; double cv_Point2d_getY(Point2d* self) 
+(defcfun ("cv_Point2d_getY" point2d-y) :double
+  "Retrieves y coordinate of a point2d"
+  (self (:pointer point2d)))
+
+
+;; typedef Point_<float> Point2f
+;; Point2f* cv_create_Point2f(float x, float y) {
+(defcfun ("cv_create_Point2f" point2f) (:pointer point2f) 
+  "Point2f constructor"
+  (x :float)
+  (y :float))
+
+;; _Tp x, y;
+;; float cv_Point2f_getX(Point2f* self) 
+(defcfun ("cv_Point2f_getX" point2f-x) :float
+  "Retrieves x coordinate of a point2f"
+  (self (:pointer point2f)))
+
+;; _Tp x, y;
+;; float cv_Point2f_getY(Point2f* self) 
+(defcfun ("cv_Point2f_getY" point2f-y) :float
+  "Retrieves y coordinate of a point2f"
+  (self (:pointer point2f)))
+
+;; typedef Point3_<double> Point3d
+;; Point3d* cv_create_Point3d(double x, double y, double z) 
+(defcfun ("cv_create_Point3d" point3d) (:pointer point3d) 
+  "Point3d constructor"
+  (x :double)
+  (y :double)
+  (z :double))
+
+;; _Tp x, y, z
+;; double cv_Point3d_getX(Point3d* self) 
+(defcfun ("cv_Point3d_getX" point3d-x) :double
+  "Retrieves x coordinate of a point3d"
+  (self (:pointer point3d)))
+
+;; _Tp x, y, z
+;; double cv_Point3d_getY(Point3d* self) 
+(defcfun ("cv_Point3d_getY" point3d-y) :double
+  "Retrieves y coordinate of a point3d"
+  (self (:pointer point3d)))
+
+;; _Tp x, y, z
+;; double cv_Point3d_getZ(Point3d* self) 
+(defcfun ("cv_Point3d_getZ" point3d-z) :double
+  "Retrieves z coordinate of a point3d"
+  (self (:pointer point3d)))
+   
+;; Point3f* cv_create_Point3f(float x, float y, float z) {
+(defcfun ("cv_create_Point3f" point3f) (:pointer point3f) 
+  "Point3f constructor"
+  (x :float)
+  (y :float)
+  (z :float))
+
+;; _Tp x, y, z
+;; float cv_Point3f_getX(Point3f* self) 
+(defcfun ("cv_Point3f_getX" point3f-x) :float
+  "Retrieves x coordinate of a point3f"
+  (self (:pointer point3f)))
+
+;; _Tp x, y, z
+;; float cv_Point3f_getY(Point3f* self) 
+(defcfun ("cv_Point3f_getY" point3f-y) :float
+  "Retrieves y coordinate of a point3f"
+  (self (:pointer point3f)))
+
+;; _Tp x, y, z
+;; float cv_Point3f_getZ(Point3f* self) 
+(defcfun ("cv_Point3f_getZ" point3f-z) :float
+  "Retrieves z coordinate of a point3f"
+  (self (:pointer point3f)))
+   
+
+;; Point3i* cv_create_Point3i(int x, int y, int z) 
+(defcfun ("cv_create_Point3i" point3i) (:pointer point3i) 
+  "Poin3i constructor"
+  (x :int)
+  (y :int)
+  (z :int))
+
+;; _Tp x, y, z
+;; int cv_Point3i_getX(Point3i* self) 
+(defcfun ("cv_Point3i_getX" point3i-x) :int 
+  "Retrieves y coordinate of a point3i"
+  (self (:pointer point3i)))
+
+;; _Tp x, y, z
+;; int cv_Point3i_getY(Point3i* self) 
+(defcfun ("cv_Point3i_getY" point3i-y) :int
+  "Retrieves y coordinate of a point3i"
+  (self (:pointer point3i)))
+
+;; _Tp x, y, z
+;; int cv_Point3i_getZ(Point3i* self) 
+(defcfun ("cv_Point3i_getZ" point3i-z) :int
+  "Retrieves z coordinate of a point3i"
+  (self (:pointer point3i)))
+
 ;; Rect_(_Tp _x, _Tp _y, _Tp _width, _Tp _height)
 ;; Rect* cv_create_Rect4(int x, int y, int width, int height) 
 (defcfun ("cv_create_Rect4" rect) (:pointer rect) 
@@ -614,17 +743,7 @@
   "Returns the total number of array elements."
   (self (:pointer mat)))
 
-;; _Tp x, y
-;; int cv_Point_getX(Point* self) 
-(defcfun ("cv_Point_getX" x) :int 
-  "Retrieves X coordinate of a point"
-  (self (:pointer point)))
 
-;; _Tp x, y
-;; int cv_Point_getY(Point* self)
-(defcfun ("cv_Point_getY" y) :int 
-  "Retrieves y coordinate of a point"
-  (self (:pointer point)))
 
 ;;; Operations on Arrays
 
