@@ -326,8 +326,12 @@ lisp-cv-master/examples/examples.lisp.
 
 If you want to know if a function has been wrapped and is available, do a search 
 for the C++ function name in the examples.lisp folder. All functions are documen-
-ted and all have the C++ function declaration above the C function declaration 
-above the Lisp one.
+ted and all have the C++ function declaration above the C function declaration a-
+bove the Lisp one. Some function names aren't well defined but you can do a sear-
+ch for the class names i.e To find the Lisp equivelant of the Matrix Expressions 
+"*" , "/", "+" or "-" operators just do a search for MatExpr  in the examples.li-
+sp file. I'll be making a function to simplify this very soon.
+
 
 You can also learn how to use the library by comparing the OpenCV C++ tutorials 
 at this link:
