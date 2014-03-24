@@ -329,7 +329,7 @@ for the C++ function name in the examples.lisp folder. All functions are documen
 ted and all have the C++ function declaration above the C function declaration a-
 bove the Lisp one. Some function names aren't well defined but you can do a sear-
 ch for the class names i.e To find the Lisp equivelant of the Matrix Expressions 
-"*" , "/", "+" or "-" operators just do a search for MatExpr  in the examples.li-
+"*" , "/", "+" or "-" operators just do a search for MatExpr in the examples.li-
 sp file. I'll be making a function to simplify this very soon.
 
 
