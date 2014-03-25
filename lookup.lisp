@@ -5,15 +5,15 @@
 (in-package :lisp-cv)
 ;; TODO - This file in process - not functional
 ;; Creates hash-table used to lookup and print the corresponding lisp function name for a C++ function
-(defparameter lookup  '((Mat`::at . at) (c . 3) (in-range . inRange)))
 
+(defparameter l  '((c .3) (inRange . (|in-range| . |cv_inRange|))))
 
 
 (defun lookup (name language) 
   (if (eq language 'lisp)
-      (setf name (car (assoc name lookup)))
-      (if (eq language 'C++) 
-	  (setf name (cdr (assoc name lookup))))) 
+      (setf name (cadr (assoc name l)))
+      (if (eq language 'c) 
+	  (setf name (cddr (assoc name l))))) 
 name)
 
 

@@ -123,15 +123,20 @@
    #:clone
    #:div
    #:dot
+   #:dot2d
+   #:dot2f
+   #:dot3d
+   #:dot3f
+   #:dot3i
    #:force
-   #:mat-cols
+   #:cols
    #:mat-diag
    #:mat-expr-t
    #:mat-expr-s
    #:mat-eye-0
    #:mat-eye-1
    #:mat-ones
-   #:mat-rows
+   #:rows
    #:mat-value
    #:mat-type
    #:mat-typed-0
@@ -555,6 +560,8 @@
    #:+dist-mask-3+
    #:+dist-mask-5+
    #:+dist-mask-precise+ 
+
+   #:cvt-color
    
 ;; imgproc - Histograms
 

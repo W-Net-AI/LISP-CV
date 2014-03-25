@@ -5,6 +5,13 @@
 (in-package :lisp-cv)
 
 
+;; VideoCapture*
+(defctype video-capture :pointer)
+
+;; VideoWriter*
+(defctype video-writer :pointer)
+
+
 ;;; Types and structures
 
 ;;; User Interface

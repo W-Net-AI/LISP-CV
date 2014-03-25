@@ -489,4 +489,11 @@
   (+tm-ccorr+ 2) 
   (+tm-ccorr-normed+ 3)
   (+tm-ccoeff+ 4)
-  (+tm-ccoeff-normed+ 5))
+  (+tm-ccoeff-normed+ 5)
+
+;;; features2d
+
+  (+default+ 0)
+  (+draw-over-outimg+ 1)
+  (+not-draw-single-points+ 2)
+  (+draw-rich-keypoints+ 4))

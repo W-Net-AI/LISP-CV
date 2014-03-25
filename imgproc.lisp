@@ -1,6 +1,6 @@
 ;;;; -*- mode: lisp; indent-tabs: nil -*-
 ;;;; imgproc.lisp
-;;;; OpenCV bindings for SBCL
+;;;; OpenCV bindings
 ;;;; Image processing
 (in-package :lisp-cv)
 

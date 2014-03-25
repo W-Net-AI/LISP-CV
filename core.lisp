@@ -1,6 +1,6 @@
 ;;;; -*- mode: lisp; indent-tabs: nil -*-
 ;;;; core.lisp
-;;;; OpenCV bindings for SBCL
+;;;; OpenCV bindings
 ;;;; Core functionality
 (in-package :lisp-cv)
 
@@ -49,9 +49,6 @@
 
 
 ;;; Basic Structures
-
-;; BFMatcher*
-(defctype bf-matcher :pointer)
 
 ;; CvSVM*
 (defctype svm :pointer)
@@ -140,14 +137,12 @@
 ;; Vec4s*
 (defctype vec4s :pointer)
 
+;; vector_char*
+(defctype vector-char :pointer)
+
 ;; vector_int*
 (defctype vector-int :pointer)
 
-;; VideoCapture*
-(defctype video-capture :pointer)
-
-;; VideoWriter*
-(defctype video-writer :pointer)
 
 
 ;; MatExpr* promote(Mat* m) 
@@ -393,7 +388,7 @@
 
 ;; Mat Mat::clone() const
 ;; Mat* cv_Mat_clone(Mat* self) 
-(defcfun ("cv_Mat_clone" clone) (:pointer mat)
+(defcfun ("cv_Mat_clone" mat-clone) (:pointer mat)
   "Creates a full copy of the array and the underlying data."
   (self (:pointer mat)))
 
@@ -433,9 +428,44 @@
 ;; _Tp dot(const Point_& pt) const;
 ;; int cv_Point_dot(Point* self, Point* other) 
 (defcfun ("cv_Point_dot" dot) :int 
-  "Dot product computed in double-precision arithmetics."
+  "Finds the dot product of a point."
   (self (:pointer point))
   (other (:pointer point)))
+
+;; _Tp dot(const Point_& pt) const;
+;; double cv_Point2d_dot(Point2d* self, Point2d* other) 
+(defcfun ("cv_Point2d_dot" dot2d) :double
+  "Finds the dot product of a point2d."
+  (self (:pointer point2d))
+  (other (:pointer point2d)))
+
+;; _Tp dot(const Point_& pt) const;
+;; float cv_Point2f_dot(Point2f* self, Point2f* other)
+(defcfun ("cv_Point2f_dot" dot2f) :float
+  "Finds the dot product of a point2f."
+  (self (:pointer point2f))
+  (other (:pointer point2f)))
+
+;; _Tp dot(const Point3_& pt) const;
+;; double cv_Point3d_dot(Point3d* self, Point3d* other)
+(defcfun ("cv_Point3d_dot" dot3d) :double 
+  "Finds the dot product of a point3d."
+  (self (:pointer point3d))
+  (other (:pointer point3d)))
+
+;; _Tp dot(const Point3_& pt) const;
+;; float cv_Point3f_dot(Point3f* self, Point3f* other)
+(defcfun ("cv_Point3f_dot" dot3f) :float 
+  "Finds the dot product of a point3f."
+  (self (:pointer point3f))
+  (other (:pointer point3f)))
+
+;; _Tp dot(const Point3_& pt) const;
+;; int cv_Point3i_dot(Point3i* self, Point3i* other)
+(defcfun ("cv_Point3i_dot" dot3i) :int 
+  "Finds the dot product of a point3i."
+  (self (:pointer point3i))
+  (other (:pointer point3i)))
 
 ;; Mat* force(MatExpr* expr)
 (defcfun ("force" force) (:pointer mat)
@@ -448,7 +478,7 @@
   "MAT constructor")
 
 ;; MatExpr* cv_Mat_scale(MatExpr* m, double alpha)
-(defcfun ("cv_Mat_scale" mat-expr-s) (:pointer mat-expr)
+(defcfun ("cv_Mat_scale" scale) (:pointer mat-expr)
   (m (:pointer mat-expr))
   (alpha :double))
 
@@ -482,9 +512,9 @@
 
 ;; MatExpr *
 ;; MatExpr* cv_Mat_scale(MatExpr* m, double alpha)
-(defcfun ("cv_Mat_scale" mat-scale) (:pointer mat) 
+(defcfun ("cv_Mat_scale" mat-scale) (:pointer mat-expr) 
   "Finds the product of a Mat and a scalar."
-  (self (:pointer mat))
+  (self (:pointer mat-expr))
   (alpha :double))
 
 ;; int Mat::type() const 
@@ -807,5 +837,3 @@
 ;; double cv_getTickFrequency()
 (defcfun ("cv_getTickFrequency" get-tick-frequency)  :double
   "Returns the number of ticks per second.")
-
-

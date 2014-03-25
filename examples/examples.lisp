@@ -139,9 +139,9 @@ NAMED-WINDOW
 
 Creates a window.
 
-C++: void namedWindow(const string& winname, int flags=WINDOW_AUTOSIZE )
+C++: void namedWindow(const string& winname, int flags=WINDOW_AUTOSIZE)
 
-Common Lisp: (NAMED-WINDOW (WINNAME (:POINTER STRING*)) &OPTIONAL ((FLAGS :INT) +WINDOW-AUTOSIZE+))
+Common Lisp: (NAMED-WINDOW (WINNAME (:POINTER STRING*)) &OPTIONAL ((FLAGS :INT) +WINDOW-AUTOSIZE+)) => :VOID
 
     Parameters:	
 
@@ -519,7 +519,7 @@ Closes video file or capturing device.
 
 C++: void VideoCapture::release()
 
-Common Lisp: (CAP-RELEASE (SELF (:POINTER VIDEO-CAPTURE)))
+Common Lisp: (CAP-RELEASE (SELF (:POINTER VIDEO-CAPTURE))) => :VOID
 
 The methods are automatically called by subsequent (CAP-OPEN) and by VIDEO-CAPTURE destructor.
 
@@ -1614,7 +1614,7 @@ to (MAT-ONES), you can use a scale operation to create a scaled identity matrix 
 
 ;; Make a 4x4 diagonal matrix with 0.1's on the diagonal.
 
-(DEFPARAMETER A (MAT-SCALE (<< (MAT-EYE-RC 4 4 +32F+)) 0.1D0))
+(DEFPARAMETER A (SCALE (<< (MAT-EYE-RC 4 4 +32F+)) 0.1D0))
 
 
 (defun mat-eye-example ()
@@ -1628,7 +1628,7 @@ to (MAT-ONES), you can use a scale operation to create a scaled identity matrix 
    d IDENTITY-MAT-2, which are shown in a window. 
 
    Then an identity matrix, IDENTITY-MAT-3 is creat-
-   ed and using the function MAT-SCALE is scaled by 
+   ed and using the function SCALE is scaled by 
    0.1 . Then both the pre-scaled version and the s-
    caled version are shown in window. This allows y-
    ou to see the fact that, because they are of typ-
@@ -1642,7 +1642,7 @@ to (MAT-ONES), you can use a scale operation to create a scaled identity matrix 
    ery close to black...A colored boolean.
 
    Note: The PROMOTE(<<) function was needed in the 
-   MAT-SCALE function to cooerce IDENTITY-MAT-3 to 
+   SCALE function to cooerce IDENTITY-MAT-3 to 
    MAT-EXPR from MAT type for the scaling operation. 
    The FORCE(>>) function is used in IMSHOW to coer-
    ce SCALED-IDENTITY-MAT-3 back to MAT."
@@ -1650,7 +1650,7 @@ to (MAT-ONES), you can use a scale operation to create a scaled identity matrix 
   (let* ((identity-mat-1 (mat-eye-rc 3 3 +8u+))
          (identity-mat-2 (mat-eye-s (size 3 3) +8u+))
          (identity-mat-3 (mat-eye-rc 4 4 +32f+))
-	 (scaled-identity-mat-3 (mat-scale (<< identity-mat-3) 0.1d0))
+	 (scaled-identity-mat-3 (scale (<< identity-mat-3) 0.1d0))
 	 (window-name-1 "IDENTITY-MAT-1 - MAT-EYE Example")
          (window-name-2 "IDENTITY-MAT-2 - MAT-EYE Example")
 	 (window-name-3 "IDENTITY-MAT-3 - MAT-EYE Example")
@@ -1775,25 +1775,7 @@ a part of more complex matrix expressions or can be assigned to a matrix.
         SELF - Input matrix
 
 
-(defun mat-expr-t-example ()
-
-  "Computes (A + lambda*I)^t * (A + lamda*I)
-   and shows the result in a window."
-
-  (let* ((a (mat-typed-0 3 3 +32f+))
-	 (l 3.0d0)
-	 (a1 (mat-expr-s (mat-expr+ a (mat-eye-1 
-				       (size-mat a) (mat-type a))) l))
-	 (c (mat-expr* (>> (mat-expr-t (>> a1))) (>> a1)))
-	 (window-name (foreign-alloc 
-		       :string :initial-element 
-		       "MAT-EXPR-T Example")))
-    (named-window window-name +window-normal+)
-    (move-window window-name 720 175)
-    (imshow window-name (>> c))
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name)
-    (foreign-free window-name)))
+; todo - finish example
 
 
 FORCE
@@ -1862,61 +1844,20 @@ FORCE to use the result in a function that only accepts a MAT as input i.e. IMSH
    n of the function PROMOTE << is then used to coer-
    ce MAT to a (:POINTER MAT-EXPR) type so it can th-
    en be multiplied by the scalar S with the functio-
-   n MAT-EXPR-S. This is necessary since MAT-EXPR-S 
-   only accepts (:POINTER MAT-EXPR) types as it's in-
-   put. The output of MAT-EXPR-S(OUT) is then coerce-
-   d back to (:POINTER MAT) with the function FORCE 
-   for the opposite reason so it can then be shown i-
-   n a window with IMSHOW."
+   n SCALE. This is necessary since SCALE only accep-
+   ts (:POINTER MAT-EXPR) types as it's input. The o-
+   utput of SCALE(OUT) is then coerced back to (:POI-
+   NTER MAT) with the function FORCE for the opposit-
+   e reason so it can then be shown in a window with 
+   IMSHOW."
 
   (let* ((mat (mat-ones 3 3 +8u+))
          (s 5.0d0)
-         (out (mat-expr-s (<< mat) s))
+         (out (scale (<< mat) s))
 	 (window-name "PROMOTE Example"))
     (named-window window-name +window-normal+)
     (move-window window-name 720 175)
     (imshow window-name  (>> out))
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name)))
-
-
-MAT-EXPR-S
-
-Multiplies a matrix by a scalar.
-
-Common Lisp: (MAT-EXPR-S (SELF (:POINTER MAT-EXPR)) (ALPHA :DOUBLE)) => (:POINTER MAT-EXPR)
-
-The function MAT-EXPR-S multiplies a matrix by a scalar. Keep in mind MAT-EXPR-S will only accept a
-(:POINTER MAT-EXPR) type as input so you if your attempting to multiply a matrix with (:POINTER MAT)
-as its type you will first need to convert it to a (:POINTER MAT) with the PROMOTE function(<<) bef-
-ore doing the computation. You can then convert back to (:POINTER MAT) with the function FORCE. 
-
-    Parameters:	
-
-        SELF - The input matrix.
-
-        ALPHA - A scalar of type double-float.
-
-
-(defun mat-expr-s-example ()
-
-  "In this example a matrix filled with ones(MAT) is 
-   multiplied by a scalar S with the function MAT-EX-
-   PR. When using MAT-EXPR-S to multiply a matrix wi-
-   th a (:POINTER MAT) type by a scalar, you need to 
-   first use the PROMOTE function or << to convert t-
-   o a (:POINTER-MAT-EXPR) type. Then use the functi-
-   on FORCE or >> to convert back to (:POINTER MAT) 
-   if needed. The resultant matrix RESULT is then sh-
-   own in a window"
-
-  (let* ((mat (mat-ones 4 4 +8u+))
-         (s 7.0d0)
-         (result (mat-expr-s (<< mat) s))
-	 (window-name "MAT-EXPR-S Example"))
-    (named-window window-name +window-normal+)
-    (move-window window-name 720 175)
-    (imshow window-name  (>> result))
     (loop while (not (= (wait-key 0) 27)))
     (destroy-window window-name)))
 
@@ -2000,18 +1941,18 @@ single-column matrix. Similarly to (ROW) and (COL) , this is an O(1) operation.
       (princ #\Newline))))
 
 
-MAT-EXPR*
+MUL
 
 Finds the product of two matrices.
 
 C++: MatExpr *
 
-Common Lisp: (MAT-EXPR* (M1 (:POINTER MAT)) (M2 (:POINTER MAT))) => (:POINTER MAT-EXPR)
+Common Lisp: (MUL (M1 (:POINTER MAT)) (M2 (:POINTER MAT))) => (:POINTER MAT-EXPR)
 
 
     Parameters:	
 
-        M1 – A single float or double float matrix.
+        M1 - A single float or double float matrix.
 
         M2 - A single float or double float matrix.
 
@@ -2414,7 +2355,7 @@ e as has been specified when opening the video writer.
       (destroy-window window-name))))
 
 
-MAT-CLONE
+CLONE
 
 Creates a full copy of the array and the underlying data.
 
@@ -2523,6 +2464,28 @@ taken into account by the function so the sub-array of ROI is actually extracted
 returns a pointer to the resultant sub-array header.
 
 
+(defparameter x 100)
+(defparameter y 100)
+(defparameter region-of-interest 0)
+(defparameter the-right-wall 540)
+(defparameter the-left-wall 100)
+(defparameter the-ceiling 100)
+(defparameter the-floor 380)
+(defparameter rate 10)
+(defparameter right-wall-switch 0)
+(defparameter left-wall-switch 0)
+(defparameter ceiling-switch 0)
+(defparameter floor-switch 0)
+
+(defun report ()
+  (format t "x = ~a~%" x)
+  (format t "y = ~a~%" y)
+  (format t "right-wall-switch = ~a~%" right-wall-switch)
+  (format t "left-wall-switch = ~a~%" left-wall-switch)
+  (format t "ceiling-switch = ~a~%" ceiling-switch)
+  (format t "floor-switch = ~a~%" floor-switch))
+
+
 (defun roi-example (&optional (camera-index *camera-index*))
 
   "A slight variation on my circle-example. here I use a bit of 
@@ -2531,9 +2494,7 @@ returns a pointer to the resultant sub-array header.
    a way to make it easy to understand."
 
   (with-capture (cap (cap-cam camera-index))
-    (let* ((window-name (foreign-alloc 
-			 :string :initial-element 
-			 "ROI Example")))
+    (let* ((window-name "ROI Example"))
       (if (not (cap-is-open cap)) 
 	  (return-from roi-example 
 	    (format t "Cannot open the video camera")))
@@ -2567,8 +2528,7 @@ returns a pointer to the resultant sub-array header.
 	(if (< x (+ 100 rate)) (setf right-wall-switch 0))
 	(if (< y (+ 100 rate)) (setf floor-switch 0))
 	(report))
-      (destroy-window window-name)
-      (foreign-free window-name))))
+      (destroy-window window-name))))
 
 
 RECT
@@ -2645,9 +2605,21 @@ DOT
 
 Dot product computed in double-precision arithmetics.
 
-;; _Tp dot(const Point_& pt) const;
+C++:  _Tp dot(const Point_& pt) const;
 
 Common Lisp: (DOT (SELF (:POINTER POINT)) (OTHER (:POINTER POINT))) => :INT
+
+Common Lisp: (DOT2F (SELF (:POINTER POINT2F)) (OTHER (:POINTER POINT2F))) => :FLOAT
+
+Common Lisp: (DOT2D (SELF (:POINTER POINT2D)) (OTHER (:POINTER POINT2D))) => :DOUBLE
+
+C++"  _Tp dot(const Point3_& pt) const;
+
+Common Lisp: (DOT3I (SELF (:POINTER POINT3I)) (OTHER (:POINTER POINT3I))) => :INT
+
+Common Lisp: (DOT3F (SELF (:POINTER POINT3F)) (OTHER (:POINTER POINT3F))) => :FLOAT
+
+Common Lisp: (DOT3D (SELF (:POINTER POINT)) (OTHER (:POINTER POINT))) => :INT
 
 
     Parameters:	
@@ -2667,6 +2639,61 @@ Common Lisp: (DOT (SELF (:POINTER POINT)) (OTHER (:POINTER POINT))) => :INT
 	 (p2 (point 3 4)))
     (format t "The dot product of P1 and P2 = ~a~%~%"  
 	    (dot p1 p2) )))
+
+(defun dot2f-example ()
+
+  "This example uses the function DOT to 
+   find the dot product of 2 point2f con-
+   structs P1 and P2."
+
+  (let* ((p1 (point2f 1.0f0 2.0f0))
+	 (p2 (point2f 3.0f0 4.0f0)))
+    (format t "The dot product of P1 and P2 = ~a~%~%"  
+	    (dot2f p1 p2) )))
+
+(defun dot2d-example ()
+
+  "This example uses the function DOT to 
+   find the dot product of 2 point2d con-
+   structs P1 and P2."
+
+  (let* ((p1 (point2d 1.0d0 2.0d0))
+	 (p2 (point2d 3.0d0 4.0d0)))
+    (format t "The dot product of P1 and P2 = ~a~%~%"  
+	    (dot2d p1 p2) )))
+
+(defun dot3i-example ()
+
+  "This example uses the function DOT to 
+   find the dot product of 2 point3i con-
+   structs P1 and P2."
+
+  (let* ((p1 (point3i 1 2 3))
+	 (p2 (point3i 4 5 6)))
+    (format t "The dot product of P1 and P2 = ~a~%~%"  
+	    (dot3i p1 p2) )))
+
+(defun dot3f-example ()
+
+  "This example uses the function DOT to 
+   find the dot product of 2 point3f con-
+   structs P1 and P2."
+
+  (let* ((p1 (point3f 7.0f0 8.0f0 9.0f0))
+	 (p2 (point3f 10.0f0 11.0f0 12.0f0)))
+    (format t "The dot product of P1 and P2 = ~a~%~%"  
+	    (dot3f p1 p2) )))
+
+(defun dot3d-example ()
+
+  "This example uses the function DOT to 
+   find the dot product of 2 point3d con-
+   structs P1 and P2."
+
+  (let* ((p1 (point3d 13.0d0 14.0d0 15.0d0))
+	 (p2 (point3d 16.0d0 17.0d0 18.0d0)))
+    (format t "The dot product of P1 and P2 = ~a~%~%"  
+	    (dot3d p1 p2))))
 
 
 IN-RANGE
@@ -2697,12 +2724,8 @@ All the arrays must have the same type, except the destination, and the same siz
 			     (height 480))
 
   (with-capture (cap (cap-cam camera-index))
-    (let ((window-name-1 (foreign-alloc 
-			  :string :initial-element 
-			  "Original camera feed - IN-RANGE-S Example"))
-	  (window-name-2 (foreign-alloc 
-			  :string :initial-element 
-			  "Only red objects - IN-RANGE-S Example"))
+    (let ((window-name-1 "Original camera feed - IN-RANGE-S Example")
+	  (window-name-2 "Only red objects - IN-RANGE-S Example")
 	  (img-hsv 0)
 	  (img-thresh 0)
 	  (src 0))
@@ -2718,7 +2741,7 @@ All the arrays must have the same type, except the destination, and the same siz
       (named-window window-name-2 +window-normal+)
       (move-window window-name-1 464 175)
       (move-window window-name-2 915 175)
-       ;; Iterate through each frames of the video
+      ;; Iterate through each frames of the video
       (do* ((frame 0)
 	    (lower-hsv (scalar 170 160 60))
 	    (upper-hsv (scalar 180 2556 256)))
@@ -2730,22 +2753,20 @@ All the arrays must have the same type, except the destination, and the same siz
 	(setf src (clone frame))
 	(setf img-hsv (mat))
 	(setf img-thresh (mat))
-     ;; Smooth the original image using Gaussian kernel
+	;; Smooth the original image using Gaussian kernel
 	(gaussian-blur src src (size 5 5) 0.0d0 0.0d0)
-     ;; Change the color format from BGR to HSV
+	;; Change the color format from BGR to HSV
 	(cvt-color src img-hsv +bgr2hsv+)
-     ;; Threshold the HSV image and create a binary image
+	;; Threshold the HSV image and create a binary image
 	(in-range-s img-hsv lower-hsv upper-hsv img-thresh)
-     ;; Smooth the binary image using Gaussian kernel
+	;; Smooth the binary image using Gaussian kernel
 	(gaussian-blur img-thresh img-thresh (size 5 5) 0.0d0 0.0d0)
 	(imshow window-name-1 src)
 	(imshow window-name-2 img-thresh)
-     ;; Clean up used images
+	;; Clean up used images
 	(del img-hsv) (del img-thresh) (del frame) (del src))
       (destroy-window window-name-1)
-      (destroy-window window-name-2)
-      (foreign-free window-name-1)
-      (foreign-free window-name-2))))
+      (destroy-window window-name-2))))
 
 
 GAUSSIAN-BLUR
@@ -2845,6 +2866,7 @@ Common Lisp: (CVT-COLOR (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) (CODE :INT) (
         DEST-CN – number of channels in the destination image; if the parameter is 0, the number of
                   the channels is derived automatically from src and code .
 
+
 The function converts an input image from one color space to another. In case of a transformation t-
 o-from RGB color space, the order of the channels should be specified explicitly (RGB or BGR). Note
 that the default color format in OpenCV is often referred to as RGB but it is actually BGR (the byt-
@@ -2868,186 +2890,220 @@ ge directly converted from an 8-bit image without any scaling, then it will have
 ange instead of 0..1 assumed by the function. So, before calling CVT-COLOR , you need first to scal-
 e the image down:
 
-(LET ((img (/ 1 255)))
+(LET ((img (/ 1 255)))todo
   (CVT-COLOR IMG IMG +BGR2LUV))
 
-If you use cvtColor with 8-bit images, the conversion will have some information lost. For many applications, this will not be noticeable but it is recommended to use 32-bit images in applications that need the full range of colors or that convert an image before an operation and then convert back.
+If you use CVT-COLOR with 8-bit images, the conversion will have some information lost. For many ap-
+plications, this will not be noticeable but it is recommended to use 32-bit images in applications 
+that need the full range of colors or that convert an image before an operation and then convert back.
 
 The function can do the following transformations:
 
-    RGB \leftrightarrow GRAY ( CV_BGR2GRAY, CV_RGB2GRAY, CV_GRAY2BGR, CV_GRAY2RGB ) Transformations within RGB space like adding/removing the alpha channel, reversing the channel order, conversion to/from 16-bit RGB color (R5:G6:B5 or R5:G5:B5), as well as conversion to/from grayscale using:
 
-    \text{RGB[A] to Gray:} \quad Y \leftarrow 0.299 \cdot R + 0.587 \cdot G + 0.114 \cdot B
+        ***RGB <-> GRAY (+BGR2GRAY+, +RGB2GRAY+, +GRAY2BGR+, +GRAY2RGB+)*** 
 
-    and
+Transformations within RGB space like adding/removing the alpha channel, reversing the channel orde-
+r, conversion to/from 16-bit RGB color (R5:G6:B5 or R5:G5:B5), as well as conversion to/from graysc-
+ale. The conversion from a RGB image to gray is done with:
 
-    \text{Gray to RGB[A]:} \quad R \leftarrow Y, G \leftarrow Y, B \leftarrow Y, A \leftarrow 0
 
-    The conversion from a RGB image to gray is done with:
+(CVT-COLOR SRC BWSRC +RGB2GRAY+)
 
-    cvtColor(src, bwsrc, CV_RGB2GRAY);
+More advanced channel reordering can also be done with (MIX-CHANNELS).
 
-    More advanced channel reordering can also be done with mixChannels() .
 
-    RGB \leftrightarrow CIE XYZ.Rec 709 with D65 white point ( CV_BGR2XYZ, CV_RGB2XYZ, CV_XYZ2BGR, CV_XYZ2RGB ):
+For more info on the CVT-COLOR types below. See OpenCV's cvtColor Documentation at: 
 
-    \begin{bmatrix} X \\ Y \\ Z \end{bmatrix} \leftarrow \begin{bmatrix} 0.412453 & 0.357580 & 0.180423 \\ 0.212671 & 0.715160 & 0.072169 \\ 0.019334 & 0.119193 & 0.950227 \end{bmatrix} \cdot \begin{bmatrix} R \\ G \\ B \end{bmatrix}
 
-    \begin{bmatrix} R \\ G \\ B \end{bmatrix} \leftarrow \begin{bmatrix} 3.240479 & -1.53715 & -0.498535 \\ -0.969256 & 1.875991 & 0.041556 \\ 0.055648 & -0.204043 & 1.057311 \end{bmatrix} \cdot \begin{bmatrix} X \\ Y \\ Z \end{bmatrix}
+http://docs.opencv.org/modules/imgproc/doc/miscellaneous_transformations.html?highlight=cvtcolor#cv.CvtColor
 
-    X, Y and Z cover the whole value range (in case of floating-point images, Z may exceed 1).
 
-    RGB \leftrightarrow YCrCb JPEG (or YCC) ( CV_BGR2YCrCb, CV_RGB2YCrCb, CV_YCrCb2BGR, CV_YCrCb2RGB )
+Thank you to Wikipedia for the information on Color Spaces provided below:
 
-    Y \leftarrow 0.299 \cdot R + 0.587 \cdot G + 0.114 \cdot B
 
-    Cr \leftarrow (R-Y) \cdot 0.713 + delta
+        ***RGB <-> CIE XYZ.REC 709 WITH D65 WHITE POINT (+BGR2XYZ+, +RGB2XYZ+, +XYZ2BGR+, +XYZ2RGB+)***
 
-    Cb \leftarrow (B-Y) \cdot 0.564 + delta
 
-    R \leftarrow Y + 1.403 \cdot (Cr - delta)
+   Meaning of X, Y, and Z:
 
-    G \leftarrow Y - 0.714 \cdot (Cr - delta) - 0.344 \cdot (Cb - delta)
+ A comparison between a typical normalised M cone's spectral sensitivity and the CIE 1931 luminosity
+function for a standard observer in photopic vision
 
-    B \leftarrow Y + 1.773 \cdot (Cb - delta)
+ When judging the relative luminance (brightness) of different colours in well-lit situations, human-
+s tend to perceive light within the green parts of the spectrum as brighter than red or blue light 
+of equal power. The luminosity function that describes the perceived brightnesses of different wave-
+lengths is thus roughly analogous to the spectral sensitivity of M cones.
 
-    where
+ The CIE model capitalises on this fact by defining Y as luminance. Z is quasi-equal to blue stimul-
+ation, or the S cone response, and X is a mix (a linear combination) of cone response curves chosen 
+to be nonnegative. The XYZ tristimulus values are thus analogous to, but not equal to, the LMS cone 
+responses of the human eye. Defining Y as luminance has the useful result that for any given Y valu-
+e, the XZ plane will contain all possible chromaticities at that luminance.
 
-    delta = \left \{ \begin{array}{l l} 128 & \mbox{for 8-bit images} \\ 32768 & \mbox{for 16-bit images} \\ 0.5 & \mbox{for floating-point images} \end{array} \right .
 
-    Y, Cr, and Cb cover the whole value range.
+        ***RGB <-> YCRCB JPEG (OR YCC) (+BGR2YCRCB+, +RGB2YCRCB+, +YCRCB2BGR+, +YCRCB2RGB+)***
 
-    RGB \leftrightarrow HSV ( CV_BGR2HSV, CV_RGB2HSV, CV_HSV2BGR, CV_HSV2RGB )
 
-        In case of 8-bit and 16-bit images, R, G, and B are converted to the floating-point format and scaled to fit the 0 to 1 range.
+ YCbCr, Y′CbCr, or Y Pb/Cb Pr/Cr, also written as YCBCR or Y′CBCR, is a family of color spaces used 
+as a part of the color image pipeline in video and digital photography systems. Y′ is the luma comp-
+onent and CB and CR are the blue-difference and red-difference chroma components. Y′ (with prime) i-
+s distinguished from Y, which is luminance, meaning that light intensity is nonlinearly encoded bas-
+ed on gamma corrected RGB primaries.
 
-    V \leftarrow max(R,G,B)
+ Y′CbCr is not an absolute color space; rather, it is a way of encoding RGB information. The actual 
+color displayed depends on the actual RGB primaries used to display the signal. Therefore a value e-
+xpressed as Y′CbCr is predictable only if standard RGB primary chromaticities are used.
 
-    S \leftarrow \fork{\frac{V-min(R,G,B)}{V}}{if $V \neq 0$}{0}{otherwise}
 
-    H \leftarrow \forkthree{{60(G - B)}/{(V-min(R,G,B))}}{if $V=R$}{{120+60(B - R)}/{(V-min(R,G,B))}}{if $V=G$}{{240+60(R - G)}/{(V-min(R,G,B))}}{if $V=B$}
+        ***RGB <-> HSV (+BGR2HSV+, +RGB2HSV+, +HSV2BGR+, +HSV2RGB+)***
 
-    If H<0 then H \leftarrow H+360 . On output 0 \leq V \leq 1, 0 \leq S \leq 1, 0 \leq H \leq 360 .
+        ***RGB <-> HLS (+BGR2HLS+, +RGB2HLS+, +HLS2BGR+, +HLS2RGB+)***
 
-    The values are then converted to the destination data type:
 
-        8-bit images
+ HSL and HSV are the two most common cylindrical-coordinate representations of points in an RGB colo-
+r model. The two representations rearrange the geometry of RGB in an attempt to be more intuitive a-
+nd perceptually relevant than the cartesian (cube) representation. Developed in the 1970s for compu-
+ter graphics applications, HSL and HSV are used today in color pickers, in image editing software, 
+and less commonly in image analysis and computer vision.
 
-            V \leftarrow 255 V, S \leftarrow 255 S, H \leftarrow H/2 \text{(to fit to 0 to 255)}
 
-        16-bit images (currently not supported)
+        ***RGB <-> CIE L*A*B* (+BGR2LAB+, +RGB2LAB+, +LAB2BGR+, +LAB2RGB+)***
 
-            V <- 65535 V, S <- 65535 S, H <- H
 
-        32-bit images
+ A Lab color space is a color-opponent space with dimension L for lightness and a and b for the colo-
+r-opponent dimensions, based on nonlinearly compressed CIE XYZ color space coordinates.
 
-            H, S, and V are left as is
+ The dimensions of the Hunter 1948 L, a, b color space are L, a, and b.[1][2] However, Lab is now mo-
+re often used as an informal abbreviation for the CIE 1976 (L*, a*, b*) color space (or CIELAB). Th-
+e difference between Hunter and CIE color coordinates is that the CIE coordinates are based on a cu-
+be root transformation of the color data, while the Hunter coordinates are based on a square root t-
+ransformation.
 
-    RGB \leftrightarrow HLS ( CV_BGR2HLS, CV_RGB2HLS, CV_HLS2BGR, CV_HLS2RGB ).
 
-        In case of 8-bit and 16-bit images, R, G, and B are converted to the floating-point format and scaled to fit the 0 to 1 range.
+        ***RGB <-> CIE L*U*V* (+BGR2LUV+, +RGB2LUV+, +LUV2BGR+, +LUV2RGB+)***
 
-    V_{max} \leftarrow {max}(R,G,B)
 
-    V_{min} \leftarrow {min}(R,G,B)
+ In colorimetry, the CIE 1976 (L*, u*, v*) color space, commonly known by its abbreviation CIELUV, 
+is a color space adopted by the International Commission on Illumination (CIE) in 1976, as a simple-
+to-compute transformation of the 1931 CIE XYZ color space, but which attempted perceptual uniformit-
+y. It is extensively used for applications such as computer graphics which deal with colored lights-
+. Although additive mixtures of different colored lights will fall on a line in CIELUV's uniform ch-
+romaticity diagram (dubbed the CIE 1976 UCS), such additive mixtures will not, contrary to popular 
+belief, fall along a line in the CIELUV color space unless the mixtures are constant in lightness.
 
-    L \leftarrow \frac{V_{max} + V_{min}}{2}
 
-    S \leftarrow \fork { \frac{V_{max} - V_{min}}{V_{max} + V_{min}} }{if $L < 0.5$ } { \frac{V_{max} - V_{min}}{2 - (V_{max} + V_{min})} }{if $L \ge 0.5$ }
+        ***BAYER <-> RGB (+BAYERBG2BGR+, +BAYERGB2BGR+, +BAYERRG2BGR+, +BAYERGR2BGR+
+                         +BAYERBG2RGB+, +BAYERGB2RGB+, +BAYERRG2RGB+, +BAYERGR2RGB+)***
 
-    H \leftarrow \forkthree {{60(G - B)}/{S}}{if $V_{max}=R$ } {{120+60(B - R)}/{S}}{if $V_{max}=G$ } {{240+60(R - G)}/{S}}{if $V_{max}=B$ }
 
-    If H<0 then H \leftarrow H+360 . On output 0 \leq L \leq 1, 0 \leq S \leq 1, 0 \leq H \leq 360 .
+ A Bayer filter mosaic is a color filter array (CFA) for arranging RGB color filters on a square gr-
+id of photosensors. Its particular arrangement of color filters is used in most single-chip digital 
+image sensors used in digital cameras, camcorders, and scanners to create a color image. The filter 
+pattern is 50% green, 25% red and 25% blue, hence is also called RGBG,[1][2] GRGB,[3] or RGGB.[4]
+
+
+(defun cvt-color-example (&optional (camera-index *camera-index*) 
+			    (width 640)
+			    (height 480))
+
+  "In this example, the function CVT-COLOR converts 
+   the camera output to 4 different color spaces an-
+   d shows the results in four windows. See the CVT-
+   COLOR documentation:
+
+   LISP-CV-MASTER/EXAMPLES/EXAMPLES.LISP 
+
+   for more information on these color spaces."
+
+  (with-capture (cap (cap-cam camera-index))
+    (let ((window-name-1 "+BGR2HSV+ - CVT-COLOR Example")
+	  (window-name-2 "+BGR2XYZ+ - CVT-COLOR Example")
+	  (window-name-3 "+BGR2GRAY+ - CVT-COLOR Example")
+	  (window-name-4 "+BGR2HLS+ - CVT-COLOR Example")
+	  (src1 0)
+	  (src2 0)
+	  (src3 0))
+      (if (not (cap-is-open cap)) 
+	  (return-from cvt-color-example 
+	    (format t "Cannot open the video camera")))
+      (cap-set cap +cap-prop-frame-width+ width)
+      (cap-set cap +cap-prop-frame-height+ height)
+      (format t "Frame Size : ~ax~a~%~%" 
+	      (cap-get cap +cap-prop-frame-width+)
+	      (cap-get cap +cap-prop-frame-height+))
+      (named-window window-name-1 +window-normal+)
+      (named-window window-name-2 +window-normal+)
+      (named-window window-name-3 +window-normal+)
+      (named-window window-name-4 +window-normal+)
+      (move-window window-name-1 485 98)
+      (move-window window-name-2 894 98)
+      (move-window window-name-3 485 444)
+      (move-window window-name-4 894 444)
+      (do* ((frame 0))
+	   ((plusp (wait-key *millis-per-frame*)) 
+	    (format t "Key is pressed by user"))
+	(setf frame (mat))
+	(cap-read cap frame)
+	(setf src1 (clone frame))
+	(setf src2 (clone frame))
+	(setf src3 (clone frame))
+	(cvt-color frame frame +BGR2HSV+)
+	(cvt-color src1 src1 +BGR2XYZ+)
+	(cvt-color src2 src2 +BGR2GRAY+)
+	(cvt-color src3 src3 +BGR2HLS+)
+	(imshow window-name-1 frame)
+	(imshow window-name-2 src1)
+	(imshow window-name-3 src2)
+	(imshow window-name-4  src3)
+	(del frame) (del src1) (del src2) (del src3))
+      (destroy-window window-name-1)
+      (destroy-window window-name-2)
+      (destroy-window window-name-3)
+      (destroy-window window-name-4))))
+
+
+SCALE
+
+Finds the product a matrix and a scalar..
+
+C++: MatExpr *
+
+Common Lisp: (SCALE (SELF (:POINTER MAT-EXPR)) (ALPHA :DOUBLE)) => (:POINTER MAT-EXPR)
+
+
+    Parameters:	
+
+        SELF - A single float or double float matrix.
+
+        ALPHA - A scalar of type double-float. 
+
+
+This is the primary function used in this library for multiplication by and division by scalar. See 
+SCALE-EXAMPLE for an example of division by scalar. You may need to coerce the rerturn value of 
+SCALE, a scaled matrix, back to type (:POINTER MAT) with the function (FORCE), (or the shorthan-
+d version (>>)) to use in other functions. Also matrices of (:POINTER MAT) type must be coerced to 
+(:POINTER MAT-EXPR) type, with the function PROMOTE(<<), before passing to SCALE.
+
+
+(defun scale-example ()
+
+  "In this example a +32F+(float) matrix is 
+   created and filled with data. Then, usin-
+   g SCALE, each element of the matrix 
+   is divided by the scalar 10. Finally the 
+   matrix is printed."
+
+  (let* ((data (foreign-alloc :float :initial-contents 
+			      '(1.0f0 2.0f0 3.0f0 4.0f0 5.0f0 
+                                6.0f0 7.0f0 8.0f0 9.0f0)))
+	 (mat (mat-data 3 3 +32f+ data))
+	 (scaled-mat (scale (<< mat) (/ 1d0 10d0))))
+    (dotimes (i 3)
+      (dotimes (j 3)
+	(format t "~a" (at-float (>> scaled-mat) i j))
+	(princ #\Space))
+      (princ #\Newline))))
 
-    The values are then converted to the destination data type:
 
-        8-bit images
-
-            V \leftarrow 255 \cdot V, S \leftarrow 255 \cdot S, H \leftarrow H/2 \; \text{(to fit to 0 to 255)}
-
-        16-bit images (currently not supported)
-
-            V <- 65535 \cdot V, S <- 65535 \cdot S, H <- H
-
-        32-bit images
-
-            H, S, V are left as is
-
-    RGB \leftrightarrow CIE L*a*b* ( CV_BGR2Lab, CV_RGB2Lab, CV_Lab2BGR, CV_Lab2RGB ).
-
-        In case of 8-bit and 16-bit images, R, G, and B are converted to the floating-point format and scaled to fit the 0 to 1 range.
-
-    \vecthree{X}{Y}{Z} \leftarrow \vecthreethree{0.412453}{0.357580}{0.180423}{0.212671}{0.715160}{0.072169}{0.019334}{0.119193}{0.950227} \cdot \vecthree{R}{G}{B}
-
-    X \leftarrow X/X_n, \text{where} X_n = 0.950456
-
-    Z \leftarrow Z/Z_n, \text{where} Z_n = 1.088754
-
-    L \leftarrow \fork{116*Y^{1/3}-16}{for $Y>0.008856$}{903.3*Y}{for $Y \le 0.008856$}
-
-    a \leftarrow 500 (f(X)-f(Y)) + delta
-
-    b \leftarrow 200 (f(Y)-f(Z)) + delta
-
-    where
-
-    f(t)= \fork{t^{1/3}}{for $t>0.008856$}{7.787 t+16/116}{for $t\leq 0.008856$}
-
-    and
-
-    delta = \fork{128}{for 8-bit images}{0}{for floating-point images}
-
-    This outputs 0 \leq L \leq 100, -127 \leq a \leq 127, -127 \leq b \leq 127 . The values are then converted to the destination data type:
-
-        8-bit images
-
-            L \leftarrow L*255/100, \; a \leftarrow a + 128, \; b \leftarrow b + 128
-
-        16-bit images
-
-            (currently not supported)
-
-        32-bit images
-
-            L, a, and b are left as is
-
-    RGB \leftrightarrow CIE L*u*v* ( CV_BGR2Luv, CV_RGB2Luv, CV_Luv2BGR, CV_Luv2RGB ).
-
-        In case of 8-bit and 16-bit images, R, G, and B are converted to the floating-point format and scaled to fit 0 to 1 range.
-
-    \vecthree{X}{Y}{Z} \leftarrow \vecthreethree{0.412453}{0.357580}{0.180423}{0.212671}{0.715160}{0.072169}{0.019334}{0.119193}{0.950227} \cdot \vecthree{R}{G}{B}
-
-    L \leftarrow \fork{116 Y^{1/3}}{for $Y>0.008856$}{903.3 Y}{for $Y\leq 0.008856$}
-
-    u' \leftarrow 4*X/(X + 15*Y + 3 Z)
-
-    v' \leftarrow 9*Y/(X + 15*Y + 3 Z)
-
-    u \leftarrow 13*L*(u' - u_n) \quad \text{where} \quad u_n=0.19793943
-
-    v \leftarrow 13*L*(v' - v_n) \quad \text{where} \quad v_n=0.46831096
-
-    This outputs 0 \leq L \leq 100, -134 \leq u \leq 220, -140 \leq v \leq 122 .
-
-    The values are then converted to the destination data type:
-
-        8-bit images
-
-            L \leftarrow 255/100 L, \; u \leftarrow 255/354 (u + 134), \; v \leftarrow 255/256 (v + 140)
-
-        16-bit images
-
-            (currently not supported)
-
-        32-bit images
-
-            L, u, and v are left as is
-
-    The above formulae for converting RGB to/from various color spaces have been taken from multiple sources on the web, primarily from the Charles Poynton site http://www.poynton.com/ColorFAQ.html
-
-    Bayer \rightarrow RGB ( CV_BayerBG2BGR, CV_BayerGB2BGR, CV_BayerRG2BGR, CV_BayerGR2BGR, CV_BayerBG2RGB, CV_BayerGB2RGB, CV_BayerRG2RGB, CV_BayerGR2RGB ). The Bayer pattern is widely used in CCD and CMOS cameras. It enables you to get color pictures from a single plane where R,G, and B pixels (sensors of a particular component) are interleaved as follows:
-    ../../../_images/bayer.png
-
-    The output RGB components of a pixel are interpolated from 1, 2, or 4 neighbors of the pixel having the same color. There are several modifications of the above pattern that can be achieved by shifting the pattern one pixel left and/or one pixel up. The two letters C_1 and C_2 in the conversion constants CV_Bayer C_1 C_2 2BGR and CV_Bayer C_1 C_2 2RGB indicate the particular pattern type. These are components from the second row, second and third columns, respectively. For example, the above pattern has a very popular “BG” type.
 
 
