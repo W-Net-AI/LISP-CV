@@ -8,7 +8,10 @@ using namespace std;
 using namespace flann;
 using namespace cvflann;
 extern "C" {
-void cv_inRange(Mat* src, Mat* lowerb, Mat* upperb, Mat* dst);
 void cv_inRangeS(Mat* src, Scalar* lowerb, Scalar* upperb, Mat* dst);
-void cv_inRangeI(InputArray* src, InputArray* lowerb, InputArray* upperb, OutputArray* dst);
+int cv_createTrackbar(const char* trackbarname, const char* winname, int* value, int count, TrackbarCallback onChange, void* userdata);
+void cv_setMouseCallback(const char* winname, MouseCallback onMouse, void* userdata);
+void cv_delete_Mat(void* ptr);
+void cv_delete_BFMatcher(void* ptr);
+void cv_delete_BRISK(void* ptr);
 )

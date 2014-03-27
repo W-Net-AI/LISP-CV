@@ -15,7 +15,6 @@ extern "C" {
         return self->y;
     }
     int cv_Point_dot(Point* self, Point* other) {
-     cout << "testingggg" << "test";
         return self->dot(*other);
     }
     Point2f* cv_create_Point2f(float x, float y) {

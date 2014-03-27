@@ -18,6 +18,12 @@
 #include <opencv2/c/mat.hpp>
 
 extern "C" {
+void cv_Mat_convertTo(Mat* self,Mat* m, int rtype, double alpha, double beta) {
+    self->convertTo(*m, rtype, alpha, beta);
+}
+MatExpr* cv_Mat_div_S(Mat* m1, int m2) {
+    return new MatExpr(*m1 / m2);
+}
 Mat* cv_Mat_get_ROI(Mat* self, Rect* roi) {
     return new Mat(*self, *roi);
 }

@@ -19,7 +19,7 @@
 
 extern "C" {
 
-Scalar* cv_create_Scalar(double val0, double val1=0, double val2=0, double val3=0)
+Scalar* cv_create_Scalar(double val0, double val1, double val2, double val3)
 {
     return new Scalar(val0, val1, val2, val3);
 }

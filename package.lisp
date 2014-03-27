@@ -23,13 +23,15 @@
 
 ;; Live code editing
 
+   #:continuable
    #:update-swank
 
 ;; Extra OpenCV constants
 
    #:+max-dim+
 
-   ;; C Constants
+
+;; C Constants
 
    ;; C Integer Limits
    #:+char-bit+
@@ -49,9 +51,52 @@
    #:+long-max+
    #:+ulong-max+
 
-;; Extra OpenCV constants
 
-   #:+max-dim+
+
+;; DEFCTYPE's
+
+   #:bf-matcher
+   #:brisk
+   #:descriptor-matcher
+   #:feature-2d
+   #:feature-detector
+   #:mat
+   #:mat-expr
+   #:point
+   #:point2d
+   #:point2f
+   #:point3d
+   #:point3f
+   #:point3i
+   #:rect
+   #:scalar
+   #:size
+   #:string*
+   #:svm
+   #:svm-params
+   #:vec2b
+   #:vec2d
+   #:vec2f
+   #:vec2i
+   #:vec2s
+   #:vec3b
+   #:vec3d
+   #:vec3f
+   #:vec3i
+   #:vec3s
+   #:vec4b
+   #:vec4d
+   #:vec4f
+   #:vec4i
+   #:vec4s
+   #:vector-char
+   #:vector-dmatch
+   #:vector-int
+   #:vector-keypoint
+
+
+
+
 
 ;; core - Basic Structures
 
@@ -121,6 +166,7 @@
    #:add
    #:br
    #:clone
+   #:del-mat
    #:div
    #:dot
    #:dot2d
@@ -585,10 +631,28 @@
    #:+cvtimg-flip+
    #:+cvtimage-swap-rb+
    #:convert-image
+   #:create-trackbar
    #:destroy-all-windows
    #:destroy-window
+   #:+event-mousemove+ 
+   #:+event-lbuttondown+ 
+   #:+event-rbuttondown+ 
+   #:+event-mbuttondown+ 
+   #:+event-lbuttonup+ 
+   #:+event-rbuttonup+ 
+   #:+event-mbuttonup+ 
+   #:+event-lbuttondblclk+ 
+   #:+event-rbuttondblclk+ 
+   #:+event-mbuttondblclk+ 
+   #:+event-flag-lbutton+ 
+   #:+event-flag-rbutton+ 
+   #:+event-flag-mbutton+ 
+   #:+event-flag-ctrlkey+ 
+   #:+event-flag-shiftkey+ 
+   #:+event-flag-altkey+ 
    #:imshow
    #:move-window
+   #:set-mouse-callback
    #:+window-normal+
    #:+window-autosize+
    #:named-window
@@ -647,6 +711,37 @@
    #:+wnd-prop-fullscreen+
    #:+wnd-prop-autosize+ 
    #:+wnd-prop-aspectratio+
+
+
+;; features2d - Feature Detection and Description
+
+   #:brisk
+
+;; features2d - Common Interfaces of Feature Detectors
+
+   #:feat-detector-create
+   #:feat-detector-detect
+
+;; features2d - Common Interfaces of Descriptor Extractors
+
+   #:feat-2d-compute
+
+
+;; features2d - Common Interfaces of Descriptor Matchers
+
+   #:bf-matcher
+   #:del-bfmatcher
+   #:delete-brisk
+   #:descrip-matcher-create 
+   #:descrip-matcher-match
+
+;;; Drawing Function of Keypoints and Matches
+
+   #:+default+
+   #:+draw-over-outimg+
+   #:+not-draw-single-points+
+   #:+draw-rich-keypoints+
+   #:draw-matches
 
 ))
 

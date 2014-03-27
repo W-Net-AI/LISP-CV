@@ -82,15 +82,15 @@
 (use-foreign-library videostab)
 
 ;; On new 3.0.0 OpenCV build and 154 lisp-cv-master
-;; cd /home/w/quicklisp/dists/quicklisp/software/lisp-cv-master/opencv_generated
+;; cd ~/Documents/opencv-master/build/modules/c/src
 ;; g++ -Wall -shared -fPIC -o opencv_generated.so opencv_generated.cpp
 (define-foreign-library opencv_c
     (:unix "/usr/local/lib/opencv_generated.so"))
 (use-foreign-library opencv_c)
 
 ;; On new 3.0.0 OpenCV build
-;; cd /home/w/Documents/opencv-master/modules/c/src
-;; g++ -Wall -shared -fPIC -o opencv-glue.so opencv-glue.cpp
+;; cd ~/Documents/opencv-master/modules/c/src
+;; g++ -Wall -shared -fPIC -o mat.so mat.cpp
 (define-foreign-library mat
   (:darwin "mat.dylib")
   (:unix "/usr/local/lib/mat.so")
@@ -98,7 +98,7 @@
 (use-foreign-library mat)
 
 ;; On new 3.0.0 OpenCV build
-;; cd /home/w/Documents/opencv-master/modules/c/src
+;; cd ~/Documents/opencv-master/modules/c/src
 ;; g++ -Wall -shared -fPIC -o point.so point.cpp
 (define-foreign-library point
   (:darwin "point.dylib")
@@ -107,8 +107,8 @@
 (use-foreign-library point)
 
 ;; On new 3.0.0 OpenCV build
-;; cd /home/w/Documents/opencv-master/modules/c/src
-;; g++ -Wall -shared -fPIC -o opencv-glue.so opencv-glue.cpp
+;; cd ~/Documents/opencv-master/modules/c/src
+;; g++ -Wall -shared -fPIC -o rect.so rect.cpp
 (define-foreign-library rect
   (:darwin "rect.dylib")
   (:unix "/usr/local/lib/rect.so")
@@ -116,8 +116,8 @@
 (use-foreign-library rect)
 
 ;; On new 3.0.0 OpenCV build
-;; cd /home/w/Documents/opencv-master/modules/c/src
-;; g++ -Wall -shared -fPIC -o opencv-glue.so opencv-glue.cpp
+;; cd ~/Documents/opencv-master/modules/c/src
+;; g++ -Wall -shared -fPIC -o scalar.so scalar.cpp
 (define-foreign-library scalar
   (:darwin "scalar.dylib")
   (:unix "/usr/local/lib/scalar.so")
@@ -125,21 +125,29 @@
 (use-foreign-library scalar)
 
 ;; On new 3.0.0 OpenCV build
-;; cd /home/w/Documents/opencv-master/modules/c/src
-;; g++ -Wall -shared -fPIC -o opencv-glue.so size.cpp
+;; cd ~/Documents/opencv-master/modules/c/src
+;; g++ -Wall -shared -fPIC -o size.so size.cpp
 (define-foreign-library size
   (:darwin "size.dylib")
   (:unix "/usr/local/lib/size.so")
   (t (:default "size")))
 (use-foreign-library size)
 
-
+;; cd ~/Documents/opencv-master/modules/c/src
+;; g++ -Wall -shared -fPIC -o excluded_functions.so excluded_functions.cpp
 (define-foreign-library excluded_functions
   (:darwin "excluded_functions.dylib")
   (:unix "/usr/local/lib/excluded_functions.so")
   (t (:default "excluded_functions")))
 (use-foreign-library excluded_functions)
 
+;; cd ~/Documents/opencv-master/modules/c/src
+;; g++ -Wall -shared -fPIC -o interop.so interop.cpp
+(define-foreign-library interop
+  (:darwin "interop.dylib")
+  (:unix "/usr/local/lib/interop.so")
+  (t (:default "interop")))
+(use-foreign-library interop)
 
 ;;; General macros and functions
 (defmacro defanonenum (&body enums)

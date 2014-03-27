@@ -1,3 +1,9 @@
+;;;; -*- mode: lisp; indent-tabs: nil -*-
+;;;; examples.lisp
+;;;; Documentation and Examples:
+
+
+
 IMSHOW
 
 Displays an image in the specified window.
@@ -390,7 +396,7 @@ Sets a property in the VIDEO-CAPTURE
 
 C++: bool VideoCapture::set(int propId, double value)
 
-Common Lisp: (CAP-SET (SELF (:POINTER VIDEO-CAPTURE)) (PROP-ID :INT) (VALUE :DOUBLE))
+Common Lisp: (CAP-SET (SELF (:POINTER VIDEO-CAPTURE)) (PROP-ID :INT) (VALUE :DOUBLE)) => :BOOLEAN
 
     Parameters:	SELF - The VIDEO-CAPTURE structure.
 
@@ -823,11 +829,13 @@ ROWS
 
 Returns number or rows in MAT.
 
-Common Lisp:  (ROWS (SELF (:POINTER MAT)))
+C++: int rows, cols
+
+Common Lisp: (ROWS (SELF (:POINTER MAT))) => :INT
 
     Parameters:	
 
-        SELF - A matrix(MAT).
+        SELF - A MAT construct.
 
 
 The function ROWS finds the number of rows in a matrix or -1 when the array has more than 2 dimensi-
@@ -846,7 +854,9 @@ COLS
 
 Returns number or cols in MAT.
 
-Common Lisp:  (COLS (SELF (:POINTER MAT)))
+C++: int rows, cols
+
+Common Lisp:  (COLS (SELF (:POINTER MAT))) => :INT
 
     Parameters:	
 
@@ -1165,7 +1175,7 @@ C++: bool Mat::empty() const
 Common Lisp: (EMPTY (SELF (:POINTER MAT)))
 
 The method returns true if (TOTAL) is 0 or if Mat::data todo is NIL. Because of pop_back() todo an-
-d resize()todo methods (equal (TOTAL M) 0) does not imply that M.data == NULL todo.
+d resize()todo methods (equal (TOTAL M) 0) <- tododoes not imply that M.data == NULL todo.
 
 
 CV-TYPE
@@ -1905,7 +1915,7 @@ C++: static Mat Mat::diag(const Mat& d)
 
     Parameters:	
 
-        D –
+        D -
 
         Single-column matrix that forms a diagonal matrix or index of the diagonal, with the follow-
         ing values:
@@ -1945,7 +1955,7 @@ MUL
 
 Finds the product of two matrices.
 
-C++: MatExpr *
+C++: MatExpr * operator
 
 Common Lisp: (MUL (M1 (:POINTER MAT)) (M2 (:POINTER MAT))) => (:POINTER MAT-EXPR)
 
@@ -2005,14 +2015,14 @@ ADD
 
 Adds two matrices.
 
-C++: MatExpr +
+C++: MatExpr + operator
 
 Common Lisp: (ADD (M1 (:POINTER MAT)) (M2 (:POINTER MAT))) => (:POINTER MAT-EXPR)
 
 
     Parameters:	
 
-        M1 – A matrix.
+        M1 - A matrix.
 
         M2 - A matrix.
 
@@ -2059,14 +2069,14 @@ SUB
 
 Subtracts matrix M1 from matrix M2
 
-C++: MatExpr -
+C++: MatExpr - operator
 
 Common Lisp: (SUB (M1 (:POINTER MAT)) (M2 (:POINTER MAT))) => (:POINTER MAT-EXPR)
 
 
     Parameters:	
 
-        M1 – A matrix.
+        M1 - A matrix.
 
         M2 - A matrix.
 
@@ -2113,14 +2123,14 @@ DIV
 
 Divides matrix M1 by matrix M2.
 
-C++: MatExpr /
+C++: MatExpr / operator
 
 Common Lisp: (DIV (M1 (:POINTER MAT)) (M2 (:POINTER MAT))) => (:POINTER MAT-EXPR)
 
 
     Parameters:	
 
-        M1 – A matrix.
+        M1 - A matrix.
 
         M2 - A matrix.
 
@@ -2707,16 +2717,17 @@ Common Lisp: (IN-RANGE-S (SRC (:POINTER MAT)) (LOWERB (:POINTER SCALAR)) (UPPERB
 
     Parameters:	
 
-        SRC – first input array.
+        SRC - first input array.
 
-        LOWERB – A scalar.
+        LOWERB - A scalar.
 
-        UPPERB – A scalar.
+        UPPERB - A scalar.
 
-        DEST – output array of the same size as SRC and +8U+ type.
+        DEST - output array of the same size as SRC and +8U+ type.
 
 
 All the arrays must have the same type, except the destination, and the same size (or ROI size).
+
 
 
 (defun in-range-s-example (&optional (camera-index *camera-index*) 
@@ -2764,7 +2775,8 @@ All the arrays must have the same type, except the destination, and the same siz
 	(imshow window-name-1 src)
 	(imshow window-name-2 img-thresh)
 	;; Clean up used images
-	(del img-hsv) (del img-thresh) (del frame) (del src))
+	(del-mat img-hsv) (del-mat img-thresh) 
+	(del-mat frame) (del-mat src))
       (destroy-window window-name-1)
       (destroy-window window-name-2))))
 
@@ -2781,23 +2793,23 @@ Commom Lisp: (GAUSSIAN-BLUR (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) (KSIZE (:
 
     Parameters:	
 
-        SRC – input image; the image can have any number of channels, which are processed independe-
+        SRC - input image; the image can have any number of channels, which are processed independe-
               ntly, but the depth should be +8U+, +16U+, +16S+, +32F+ or +64F+.
 
-        DST – output image of the same size and type as SRC.
+        DST - output image of the same size and type as SRC.
 
-        KSIZE – Gaussian kernel size KSIZE width and KSIZE height can differ but they both must be 
+        KSIZE - Gaussian kernel size KSIZE width and KSIZE height can differ but they both must be 
                 positive and odd. Or, they can be zero’s and then they are computed from sigma.
 
-        SIGMAX – Gaussian kernel standard deviation in X direction.
+        SIGMAX - Gaussian kernel standard deviation in X direction.
 
-        SIGMAY – Gaussian kernel standard deviation in Y direction; if SIGMAY is zero, it is set to 
+        SIGMAY - Gaussian kernel standard deviation in Y direction; if SIGMAY is zero, it is set to 
                  be equal to SIGMAX, if both sigmas are zeros, they are computed from KSIZE width a-
                  nd KSIZE height , respectively (see (GET-GAUSSIAN-KERNEL) for details); to fully c-
                  ontrol the result regardless of possible future modifications of all this semantics, 
                  it is recommended To specify all of KSIZE, SIGMA-X, AND SIGMA-Y.
 
-        BORDER-TYPE – pixel extrapolation method (see (BORDER-INTERPOLATE) for details).
+        BORDER-TYPE - pixel extrapolation method (see (BORDER-INTERPOLATE) for details).
 
 
 The function convolves the source image with the specified Gaussian kernel. In-place filtering is s-
@@ -2840,7 +2852,7 @@ See also:
 	(gaussian-blur src src (size 19 19) 0.0d0 0.0d0)
 	(imshow window-name-1 frame)
 	(imshow window-name-2 src)
-	(del frame) (del src))
+	(del-mat frame) (del-mat src))
       (destroy-window window-name-1)
       (destroy-window window-name-2))))
 
@@ -2856,14 +2868,14 @@ Common Lisp: (CVT-COLOR (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) (CODE :INT) (
 
     Parameters:	
 
-        SRC – input image: 8-bit unsigned, 16-bit unsigned ( +16UC...+ ), or single-precision float-
+        SRC - input image: 8-bit unsigned, 16-bit unsigned ( +16UC...+ ), or single-precision float-
               ing-point.
 
-        DST – output image of the same size and depth as src.
+        DST - output image of the same size and depth as src.
 
-        CODE – color space conversion code (see the description below).
+        CODE - color space conversion code (see the description below).
 
-        DEST-CN – number of channels in the destination image; if the parameter is 0, the number of
+        DEST-CN - number of channels in the destination image; if the parameter is 0, the number of
                   the channels is derived automatically from src and code .
 
 
@@ -3055,7 +3067,8 @@ pattern is 50% green, 25% red and 25% blue, hence is also called RGBG,[1][2] GRG
 	(imshow window-name-2 src1)
 	(imshow window-name-3 src2)
 	(imshow window-name-4  src3)
-	(del frame) (del src1) (del src2) (del src3))
+	(del-mat frame) (del-mat src1) 
+	(del-mat src2) (del-mat src3))
       (destroy-window window-name-1)
       (destroy-window window-name-2)
       (destroy-window window-name-3)
@@ -3066,7 +3079,7 @@ SCALE
 
 Finds the product a matrix and a scalar..
 
-C++: MatExpr *
+C++: MatExpr * operator
 
 Common Lisp: (SCALE (SELF (:POINTER MAT-EXPR)) (ALPHA :DOUBLE)) => (:POINTER MAT-EXPR)
 
@@ -3105,5 +3118,861 @@ d version (>>)) to use in other functions. Also matrices of (:POINTER MAT) type 
       (princ #\Newline))))
 
 
+DRAW-MATCHES
 
+Draws the found matches of keypoints from two images.
+
+C++: void drawMatches(const Mat& img1, const vector<KeyPoint>& keypoints1, const Mat& img2, const vector<KeyPoint>& keypoints2, const vector<DMatch>& matches1to2, Mat& outImg, const Scalar& matchColor=Scalar::all(-1), const Scalar& singlePointColor=Scalar::all(-1), const vector<char>& matchesMask=vector<char>(), int flags=DrawMatchesFlags::DEFAULT )
+
+Common Lisp: (DRAW-MATCHES (IMG1 (:POINTER MAT)) (KEYPOINTS1 (:POINTER KEYPOINT)) (IMG2 (:POINTER MAT)) (KEYPOINTS2 (:POINTER KEYPOINT)) (MATCHES1TO2 (:POINTER VECTOR-DMATCH)) (OUTIMG (:POINTER MAT)) (MATCH-COLOR (:POINTER SCALAR)) (SINGLE-POINT-COLOR (:POINTER SCALAR)) &OPTIONAL ((MATCHES-MASK (:POINTER VECTOR-CHAR)) (VECTOR-CHAR)) ((FLAGS :INT) +DEFAULT+))
+
+C++: void drawMatches(const Mat& img1, const vector<KeyPoint>& keypoints1, const Mat& img2, const vector<KeyPoint>& keypoints2, const vector<vector<DMatch>>& matches1to2, Mat& outImg, const Scalar& matchColor=Scalar::all(-1), const Scalar& singlePointColor=Scalar::all(-1), const vector<vector<char>>& matchesMask=vector<vector<char> >(), int flags=DrawMatchesFlags::DEFAULT )
+
+    Parameters:	
+
+        IMG1 - First source image.
+
+        KEYPOINTS1 - Keypoints from the first source image.
+
+        IMG2 - Second source image.
+
+        KEYPOINTS2 - Keypoints from the second source image.
+
+        MATCHES1TO2 - Matches from the first image to the second one, which means that keypoints1[i]
+                      has a corresponding point in keypoints2[matches[i]].
+
+        OUT-IMG - Output image. Its content depends on the flags value defining what is drawn in th-
+                  e output image. See possible flags bit values below.
+
+        MATCH-COLOR - Color of matches (lines and connected keypoints). If (EQUAL MATCH-COLOR (SCALAR-ALL -1)) 
+                      the color is generated randomly.
+
+        SINGLE-POINT-COLOR - Color of single keypoints (circles), which means that keypoints do not 
+                             have the matches. If (EQUAL SINGLE-POINT-COLOR (SCALAR-ALL -1)) , the 
+                             color is generated randomly.
+
+        MATCHES-MASK - Mask determining which matches are drawn. If the mask is empty, all matches are drawn.
+
+        FLAGS - Flags setting drawing features. Possible flags bit values are defined below.
+
+This function draws matches of keypoints from two images in the output image. Match is a line conne-
+cting two keypoints (circles). The FLAGS parameters are defined as follows:
+
+        +DEFAULT+ = 0 - Output image matrix will be created (MAT-CREATE), i.e. existing memory of o-
+                        utput image may be reused. Two source images, matches, and single keypoints 
+                        will be drawn. For each keypoint, only the center point will be drawn (with-
+                        out a circle around the keypoint with the keypoint size and orientation).
+
+        +DRAW-OVER-OUTIMG+ = 1 - Output image matrix will not be created (using MAT-CREATE). Matche-
+                                 s will be drawn on existing content of output image.
+
+        +NOT-DRAW-SINGLE-POINTS = 2 - Single keypoints will not be drawn.
+
+        +DRAW-RICH-KEYPOINTS+ = 4 - For each keypoint, the circle around keypoint with keypoint siz-
+                                    e and orientation wilL be drawn.
+
+
+
+(defun draw-matches-example (filename-1 filename-2) 
+
+  "I use this example to show examples of the parameters of DRAW-MATCHES.
+   See the documentation in EXAMPLES.LISP for more details on these para-
+   meters. Each window is labeled, first, with the color used to define g-
+   ood matches between images, the MATCH-COLOR parameter. Secondly the co-
+   lor used to mark empty keypoints or non-matches, the SINGLE-POINT-COLOR 
+   parameter. Finally, each window is labeled with the name of the flag u-
+   sed to set  drawing features for that particular window, for example:
+ 
+      RED * WHITE * +NOT-DRAW-SINGLE-POINTS+
+    
+    Try using the box.png and box_in_scene.png images located inside the
+    LISP-CV-MASTER/IMAGES directory to get a clearer understanding of th-
+    is example the first time you run it."
+
+  ;; the object you want to track - 
+  (let* ((object (imread filename-1 +load-image-grayscale+))
+	 ;; the image the object is a part of
+	 (image (imread filename-2 +load-image-grayscale+)) 
+	 (keypoints-a (vector-keypoint))
+	 (keypoints-b (vector-keypoint))
+	 (descriptors-a (mat))
+	 (descriptors-b (mat))
+         ;; Set brisk parameters
+	 (thresh 60)
+	 (octaves 4)
+	 (pattern-scale 2.0f0)
+         ;; declare a variable BRISKD of the type (:POINTER BRISK)
+	 (briskd (brisk thresh octaves pattern-scale))
+         ;; declare matcher
+	 (matcher (bf-matcher))
+
+	 (matches (vector-dmatch))
+	 (all-matches (mat))
+	 (window-name-1 "RANDOM * RANDOM * +DEFAULT+")
+	 (window-name-2 "BLACK * WHITE * +DRAW-RICH-KEYPOINTS+")
+	 (window-name-3 "RED * WHITE * +NOT-DRAW-SINGLE-POINTS+")
+	 (window-name-4 "WHITE * RANDOM * +DRAW-RICH-KEYPOINTS+"))
+    (if (cffi:null-pointer-p (or object image)) 
+	(return-from draw-matches-example 
+	  (format t "Image not loaded")))
+    (named-window window-name-1 +window-normal+)
+    (named-window window-name-2 +window-normal+)
+    (named-window window-name-3 +window-normal+)
+    (named-window window-name-4 +window-normal+)
+    (move-window window-name-1 485 98)
+    (move-window window-name-2 894 98)
+    (move-window window-name-3 485 444)
+    (move-window window-name-4 894 444)
+    ;; create a feature detector
+    (feat-detector-create briskd "SimpleBlob")
+    ;; detect keypoints in OBJECT
+    (feat-detector-detect briskd object keypoints-a)
+    ;; Compute the descriptors for a set of keypoints detected in object
+    (feat-2d-compute briskd object keypoints-a descriptors-a)
+    ;; detect keypoints in IMAGE
+    (feat-detector-detect briskd image keypoints-b)
+    ;; Compute the descriptors for a set of keypoints detected in IMAGE
+    (feat-2d-compute briskd image keypoints-b descriptors-b)
+    ;; find the best match for each descriptor
+    (descrip-matcher-match matcher descriptors-a descriptors-b matches)
+    ;; draw the found matches
+    (draw-matches object keypoints-a image keypoints-b matches all-matches 
+		  (scalar-all -1) (scalar-all -1) (vector-char) 
+		  +default+)
+    ;; show the matches in a window 
+    (imshow window-name-1 all-matches)
+    ;; draw the found matches
+    (draw-matches object keypoints-a image keypoints-b matches all-matches 
+		  (scalar 0 0 0) (scalar 255 255 255) (vector-char) 
+		  +draw-rich-keypoints+)
+    ;; show the matches in a window 
+    (imshow window-name-2 all-matches)
+    ;; draw the found matches
+    (draw-matches object keypoints-a image keypoints-b matches all-matches 
+		  (scalar 0 0 255) (scalar 255 255 2555) (vector-char) 
+		  +not-draw-single-points+)
+    ;; show the matches in a window 
+    (imshow window-name-3 all-matches)
+    ;; draw the found matches
+    (draw-matches object keypoints-a image keypoints-b matches all-matches 
+		  (scalar-all 255) (scalar-all -1) (vector-char) 
+		  +draw-rich-keypoints+)
+    ;; show the matches in a window 
+    (imshow window-name-4 all-matches)
+    (loop while (not (= (wait-key 0) 27)))
+    (destroy-window window-name-1)
+    (destroy-window window-name-2)
+    (destroy-window window-name-3)
+    (destroy-window window-name-4)))
+
+
+
+BRISK
+
+The BRISK constructor
+
+C++: BRISK::BRISK(int thresh=30, int octaves=3, float patternScale=1.0f)
+
+Common Lisp: (BRISK &OPTIONAL ((THRESH :INT) 30) ((OCTAVES :INT) 3) ((PATTERN-SCALE :FLOAT) 1.0F0) => (:POINTER BRISK)
+
+    Parameters:	
+
+        THRESH – FAST/AGAST detection threshold score.
+
+        OCTAVES – detection octaves. Use 0 to do single scale.
+
+        PATTERN-SCALE – apply this scale to the pattern used for sampling the neighbourhood of a keypoint.
+
+BRISK is a construct implementing the BRISK keypoint detector and descriptor extractor, described in [LCS11]:
+
+http://docs.opencv.org/modules/features2d/doc/feature_detection_and_description.html?highlight=brisk#lcs11
+
+
+(defun brisk-example (filename-1 filename-2)
+
+  "Don't let this example make you nervous it's basically 12 
+   FEAT-DETECT-CREATE-EXAMPLES, stacked, in one. Here I'm ba-
+   sically just showing, in a quick easy to see fashion, how 
+   the THRESH, OUTPUT and PATTERN-SCALE parameters of the fu-
+   nction BRISK affect it's output. Each of the 12 windows h-
+   as the function call used to set those parameters printed 
+   on the titlebar, so you don't have to look through the co-
+   de to get the effect of this example. For example, if you 
+   see this on the titlebar: (BRISK 0 0 0.0f0) Then you know 
+   that the BRISK parameter set for that window are: 
+
+       THRESH = 0, OCTAVES  = 0, PATTERN-SCALE = 0.0f0.
+
+   Note: Try using the box.png and the box_in_scene.png from
+   the LISP-CV-MASTER/IMAGES directory to get a better under-
+   standing of this example the first time you run it. And, 
+   just be aware, this example takes a few seconds to start."
+
+  ;; read some images in grayscale:   The object you want to track
+  (let* ((gray-a (imread filename-1 +load-image-grayscale+))
+	 ;; The image the object is a part of
+	 (gray-b (imread filename-2 +load-image-grayscale+)) 
+	 (keypoints-a-1 (vector-keypoint))
+	 (keypoints-b-1 (vector-keypoint))
+	 (descriptors-a-1 (mat))
+	 (descriptors-b-1 (mat))
+	 (keypoints-a-2 (vector-keypoint))
+	 (keypoints-b-2 (vector-keypoint))
+	 (descriptors-a-2 (mat))
+	 (descriptors-b-2 (mat))
+	 (keypoints-a-3 (vector-keypoint))
+	 (keypoints-b-3 (vector-keypoint))
+	 (descriptors-a-3 (mat))
+	 (descriptors-b-3 (mat))
+	 (keypoints-a-4 (vector-keypoint))
+	 (keypoints-b-4 (vector-keypoint))
+	 (descriptors-a-4 (mat))
+	 (descriptors-b-4 (mat))
+	 (keypoints-a-5 (vector-keypoint))
+	 (keypoints-b-5 (vector-keypoint))
+	 (descriptors-a-5 (mat))
+	 (descriptors-b-5 (mat))
+	 (keypoints-a-6 (vector-keypoint))
+	 (keypoints-b-6 (vector-keypoint))
+	 (descriptors-a-6 (mat))
+	 (descriptors-b-6 (mat))
+	 (keypoints-a-7 (vector-keypoint))
+	 (keypoints-b-7 (vector-keypoint))
+	 (descriptors-a-7 (mat))
+	 (descriptors-b-7 (mat))
+	 (keypoints-a-8 (vector-keypoint))
+	 (keypoints-b-8 (vector-keypoint))
+	 (descriptors-a-8 (mat))
+	 (descriptors-b-8 (mat))
+	 (keypoints-a-9 (vector-keypoint))
+	 (keypoints-b-9 (vector-keypoint))
+	 (descriptors-a-9 (mat))
+	 (descriptors-b-9 (mat))
+	 (keypoints-a-10 (vector-keypoint))
+	 (keypoints-b-10 (vector-keypoint))
+	 (descriptors-a-10 (mat))
+	 (descriptors-b-10 (mat))
+	 (keypoints-a-11 (vector-keypoint))
+	 (keypoints-b-11 (vector-keypoint))
+	 (descriptors-a-11 (mat))
+	 (descriptors-b-11 (mat))
+	 (keypoints-a-12 (vector-keypoint))
+	 (keypoints-b-12 (vector-keypoint))
+	 (descriptors-a-12 (mat))
+	 (descriptors-b-12 (mat))
+         ;; declare variables BRISKA through BRISKK of the type 
+         ;; (:POINTER BRISK) and set brisk parameters
+         (briska (brisk 0 0 0.0f0))
+	 (briskb (brisk 60 0 0.0f0))
+	 (briskc (brisk 120 0 0.0f0))
+	 (briskd (brisk 180 0 0.0f0))
+	 (briske (brisk 0 4 1.0f0))
+	 (briskf (brisk 60 4 1.0f0))
+	 (briskg (brisk 120 4 1.0f0))
+	 (briskh (brisk 180 4 1.0f0))
+	 (briski (brisk 0 8 2.0f0))
+	 (briskj (brisk 60 8 2.0f0))
+	 (briskk (brisk 120 8 2.0f0))
+	 (briskl (brisk 180 8 2.0f0))
+         ;; declare matchers
+	 (matcher-1 (bf-matcher))
+	 (matcher-2 (bf-matcher))
+	 (matcher-3 (bf-matcher))
+	 (matcher-4 (bf-matcher))
+	 (matcher-5 (bf-matcher))
+	 (matcher-6 (bf-matcher))
+	 (matcher-7 (bf-matcher))
+	 (matcher-8 (bf-matcher))
+	 (matcher-9 (bf-matcher))
+	 (matcher-10 (bf-matcher))
+         (matcher-11 (bf-matcher))
+         (matcher-12 (bf-matcher))
+	 (matches-1 (vector-dmatch))
+	 (matches-2 (vector-dmatch))
+	 (matches-3 (vector-dmatch))
+	 (matches-4 (vector-dmatch))
+	 (matches-5 (vector-dmatch))
+	 (matches-6 (vector-dmatch))
+	 (matches-7 (vector-dmatch))
+	 (matches-8 (vector-dmatch))
+	 (matches-9 (vector-dmatch))
+	 (matches-10 (vector-dmatch))
+	 (matches-11 (vector-dmatch))
+	 (matches-12 (vector-dmatch))
+	 (all-matches-1 (mat))
+	 (all-matches-2 (mat))
+	 (all-matches-3 (mat))
+	 (all-matches-4 (mat))
+	 (all-matches-5 (mat))
+	 (all-matches-6 (mat))
+	 (all-matches-7 (mat))
+	 (all-matches-8 (mat))
+	 (all-matches-9 (mat))
+	 (all-matches-10 (mat))
+	 (all-matches-11 (mat))
+	 (all-matches-12 (mat))
+	 (window-name-1 "(BRISK 0 0 0.0f0) - BRISK Example")
+	 (window-name-2 "(BRISK 60 0 0.0f0) - BRISK Example")
+	 (window-name-3 "(BRISK 120 0 0.0f0) - BRISK Example")
+	 (window-name-4 "(BRISK 180 0 0.0f0) - BRISK Example")
+	 (window-name-5 "(BRISK 0 4 1.0f0) - BRISK Example")
+	 (window-name-6 "(BRISK 60 4 1.0f0) - BRISK Example")
+	 (window-name-7 "(BRISK 120 4 1.0f0) - BRISK Example")
+	 (window-name-8 "(BRISK 180 4 1.0f0) - BRISK Example")
+	 (window-name-9 "(BRISK 0 8 2.0f0) - BRISK Example")
+	 (window-name-10 "(BRISK 60 8 2.0f0) - BRISK Example")
+	 (window-name-11 "(BRISK 120 8 2.0f0) - BRISK Example")
+	 (window-name-12 "(BRISK 180 8 2.0f0) - BRISK Example"))
+    (if (cffi:null-pointer-p (or gray-a gray-b)) 
+	(return-from brisk-example 
+	  (format t "Image not loaded")))
+    ;; create a feature detector
+    (feat-detector-create briska "BRISK")
+    ;; detect keypoints in the image GRAY-A
+    (feat-detector-detect briska gray-a keypoints-a-1)
+    ;; Compute the descriptors for a set of keypoints detected in GRAY-A
+    (feat-2d-compute briska gray-a keypoints-a-1 descriptors-a-1)
+    ;; detect keypoints in the image GRAY-B
+    (feat-detector-detect briska gray-b keypoints-b-1)
+    ;; Compute the descriptors for a set of keypoints detected in GRAY-B
+    (feat-2d-compute briska gray-b keypoints-b-1 descriptors-b-1)
+    ;; find the best match for each descriptor
+    (descrip-matcher-match matcher-1 descriptors-a-1 descriptors-b-1 matches-1)
+    (named-window window-name-1 +window-normal+)
+    ;; draw the found matches
+    (draw-matches gray-a keypoints-a-1 gray-b keypoints-b-1 matches-1 all-matches-1 
+		  (scalar-all -1) (scalar-all -1) (vector-char) 
+		  +default+)
+    ;; show the matches in a window 
+    (imshow window-name-1 all-matches-1)
+    (del-bf-matcher matcher-1)
+    (del-brisk briska)
+    ;; create a feature detector
+    (feat-detector-create briskb "BRISK")
+    ;; detect keypoints in the image GRAY-A
+    (feat-detector-detect briskb gray-a keypoints-a-2)
+    ;; Compute the descriptors for a set of keypoints detected in GRAY-A
+    (feat-2d-compute briskb gray-a keypoints-a-2 descriptors-a-2)
+    ;; detect keypoints in the image GRAY-B
+    (feat-detector-detect briskb gray-b keypoints-b-2)
+    ;; Compute the descriptors for a set of keypoints detected in GRAY-B
+    (feat-2d-compute briskb gray-b keypoints-b-2 descriptors-b-2)
+    ;; find the best match for each descriptor
+    (descrip-matcher-match matcher-2 descriptors-a-2 descriptors-b-2 matches-2)
+    (named-window window-name-2 +window-normal+)
+    ;; draw the found matches
+    (draw-matches gray-a keypoints-a-2 gray-b keypoints-b-2 matches-2 all-matches-2 
+		  (scalar-all -1) (scalar-all -1) (vector-char) 
+		  +default+)
+    ;; show the matches in a window 
+    (imshow window-name-2 all-matches-2)
+    (del-bf-matcher matcher-2)
+    (del-brisk briskb)
+    ;; create a feature detector
+    (feat-detector-create briskc "BRISK")
+    ;; detect keypoints in the image GRAY-A
+    (feat-detector-detect briskc gray-a keypoints-a-3)
+    ;; Compute the descriptors for a set of keypoints detected in GRAY-A
+    (feat-2d-compute briskc gray-a keypoints-a-3 descriptors-a-3)
+    ;; detect keypoints in the image GRAY-B
+    (feat-detector-detect briskc gray-b keypoints-b-3)
+    ;; Compute the descriptors for a set of keypoints detected in GRAY-B
+    (feat-2d-compute briskc gray-b keypoints-b-3 descriptors-b-3)
+    ;; find the best match for each descriptor
+    (descrip-matcher-match matcher-3 descriptors-a-3 descriptors-b-3 matches-3)
+    (named-window window-name-3 +window-normal+)
+    ;; draw the found matches
+    (draw-matches gray-a keypoints-a-3 gray-b keypoints-b-3 matches-3 all-matches-3 
+		  (scalar-all -1) (scalar-all -1) (vector-char) 
+		  +default+)
+    ;; show the matches in a window 
+    (imshow window-name-3 all-matches-3)
+    (del-bf-matcher matcher-3)
+    (del-brisk briskc)
+    ;; create a feature detector
+    (feat-detector-create briskd "BRISK")
+    ;; detect keypoints in the image GRAY-A
+    (feat-detector-detect briskd gray-a keypoints-a-4)
+    ;; Compute the descriptors for a set of keypoints detected in GRAY-A
+    (feat-2d-compute briskd gray-a keypoints-a-4 descriptors-a-4)
+    ;; detect keypoints in the image GRAY-B
+    (feat-detector-detect briskd gray-b keypoints-b-4)
+    ;; Compute the descriptors for a set of keypoints detected in GRAY-B
+    (feat-2d-compute briskd gray-b keypoints-b-4 descriptors-b-4)
+    ;; find the best match for each descriptor
+    (descrip-matcher-match matcher-4 descriptors-a-4 descriptors-b-4 matches-4)
+    (named-window window-name-4 +window-normal+)
+    ;; draw the found matches
+    (draw-matches gray-a keypoints-a-4 gray-b keypoints-b-4 matches-4 all-matches-4 
+		  (scalar-all -1) (scalar-all -1) (vector-char) 
+		  +default+)
+    ;; show the matches in a window 
+    (imshow window-name-4 all-matches-4)
+    (del-bf-matcher matcher-4)
+    (del-brisk briskd)
+    ;; create a feature detector
+    (feat-detector-create briske "BRISK")
+    ;; detect keypoints in the image GRAY-A
+    (feat-detector-detect briske gray-a keypoints-a-5)
+    ;; Compute the descriptors for a set of keypoints detected in GRAY-A
+    (feat-2d-compute briske gray-a keypoints-a-5 descriptors-a-5)
+    ;; detect keypoints in the image GRAY-B
+    (feat-detector-detect briske gray-b keypoints-b-5)
+    ;; Compute the descriptors for a set of keypoints detected in GRAY-B
+    (feat-2d-compute briske gray-b keypoints-b-5 descriptors-b-5)
+    ;; find the best match for each descriptor
+    (descrip-matcher-match matcher-5 descriptors-a-5 descriptors-b-5 matches-5)
+    (named-window window-name-5 +window-normal+)
+    ;; draw the found matches
+    (draw-matches gray-a keypoints-a-5 gray-b keypoints-b-5 matches-5 all-matches-5 
+		  (scalar-all -1) (scalar-all -1) (vector-char) 
+		  +default+)
+    ;; show the matches in a window 
+    (imshow window-name-5 all-matches-5)
+    (del-bf-matcher matcher-5)
+    (del-brisk briske)
+    ;; create a feature detector
+    (feat-detector-create briskf "BRISK")
+    ;; detect keypoints in the image GRAY-A
+    (feat-detector-detect briskf gray-a keypoints-a-6)
+    ;; Compute the descriptors for a set of keypoints detected in GRAY-A
+    (feat-2d-compute briskf gray-a keypoints-a-6 descriptors-a-6)
+    ;; detect keypoints in the image GRAY-B
+    (feat-detector-detect briskf gray-b keypoints-b-6)
+    ;; Compute the descriptors for a set of keypoints detected in GRAY-B
+    (feat-2d-compute briskf gray-b keypoints-b-6 descriptors-b-6)
+    ;; find the best match for each descriptor
+    (descrip-matcher-match matcher-6 descriptors-a-6 descriptors-b-6 matches-6)
+    (named-window window-name-6 +window-normal+)
+    ;; draw the found matches
+    (draw-matches gray-a keypoints-a-6 gray-b keypoints-b-6 matches-6 all-matches-6 
+		  (scalar-all -1) (scalar-all -1) (vector-char) 
+		  +default+)
+    ;; show the matches in a window 
+    (imshow window-name-6 all-matches-6)
+    (del-bf-matcher matcher-6)
+    (del-brisk briskf) 
+    ;; create a feature detector
+    (feat-detector-create briskg "BRISK")
+    ;; detect keypoints in the image GRAY-A
+    (feat-detector-detect briskg gray-a keypoints-a-7)
+    ;; Compute the descriptors for a set of keypoints detected in GRAY-A
+    (feat-2d-compute briskg gray-a keypoints-a-7 descriptors-a-7)
+    ;; detect keypoints in the image GRAY-B
+    (feat-detector-detect briskg gray-b keypoints-b-7)
+    ;; Compute the descriptors for a set of keypoints detected in GRAY-B
+    (feat-2d-compute briskg gray-b keypoints-b-7 descriptors-b-7)
+    ;; find the best match for each descriptor
+    (descrip-matcher-match matcher-7 descriptors-a-7 descriptors-b-7 matches-7)
+    (named-window window-name-7 +window-normal+)
+    ;; draw the found matches
+    (draw-matches gray-a keypoints-a-7 gray-b keypoints-b-7 matches-7 all-matches-7 
+		  (scalar-all -1) (scalar-all -1) (vector-char) 
+		  +default+)
+    ;; show the matches in a window 
+    (imshow window-name-7 all-matches-7)
+    (del-bf-matcher matcher-7)
+    (del-brisk briskg)
+    ;; create a feature detector
+    (feat-detector-create briskh "BRISK")
+    ;; detect keypoints in the image GRAY-A
+    (feat-detector-detect briskh gray-a keypoints-a-8)
+    ;; Compute the descriptors for a set of keypoints detected in GRAY-A
+    (feat-2d-compute briskh gray-a keypoints-a-8 descriptors-a-8)
+    ;; detect keypoints in the image GRAY-B
+    (feat-detector-detect briskh gray-b keypoints-b-8)
+    ;; Compute the descriptors for a set of keypoints detected in GRAY-B
+    (feat-2d-compute briskh gray-b keypoints-b-8 descriptors-b-8)
+    ;; find the best match for each descriptor
+    (descrip-matcher-match matcher-8 descriptors-a-8 descriptors-b-8 matches-8)
+    (named-window window-name-8 +window-normal+)
+    ;; draw the found matches
+    (draw-matches gray-a keypoints-a-8 gray-b keypoints-b-8 matches-8 all-matches-8 
+		  (scalar-all -1) (scalar-all -1) (vector-char) 
+		  +default+)
+    ;; show the matches in a window 
+    (imshow window-name-8 all-matches-8)
+    (del-bf-matcher matcher-8)
+    (del-brisk briskh)
+    ;; create a feature detector
+    (feat-detector-create briski "BRISK")
+    ;; detect keypoints in the image GRAY-A
+    (feat-detector-detect briski gray-a keypoints-a-9)
+    ;; Compute the descriptors for a set of keypoints detected in GRAY-A
+    (feat-2d-compute briski gray-a keypoints-a-9 descriptors-a-9)
+    ;; detect keypoints in the image GRAY-B
+    (feat-detector-detect briski gray-b keypoints-b-9)
+    ;; Compute the descriptors for a set of keypoints detected in GRAY-B
+    (feat-2d-compute briski gray-b keypoints-b-9 descriptors-b-9)
+    ;; find the best match for each descriptor
+    (descrip-matcher-match matcher-9 descriptors-a-9 descriptors-b-9 matches-9)
+    (named-window window-name-9 +window-normal+)
+    ;; draw the found matches
+    (draw-matches gray-a keypoints-a-9 gray-b keypoints-b-9 matches-9 all-matches-9 
+		  (scalar-all -1) (scalar-all -1) (vector-char) 
+		  +default+)
+    ;; show the matches in a window 
+    (imshow window-name-9 all-matches-9)
+    (del-bf-matcher matcher-9)
+    (del-brisk briski)
+    ;; create a feature detector
+    (feat-detector-create briskj "BRISK")
+    ;; detect keypoints in the image GRAY-A
+    (feat-detector-detect briskj gray-a keypoints-a-10)
+    ;; Compute the descriptors for a set of keypoints detected in GRAY-A
+    (feat-2d-compute briskj gray-a keypoints-a-10 descriptors-a-10)
+    ;; detect keypoints in the image GRAY-B
+    (feat-detector-detect briskj gray-b keypoints-b-10)
+    ;; Compute the descriptors for a set of keypoints detected in GRAY-B
+    (feat-2d-compute briskj gray-b keypoints-b-10 descriptors-b-10)
+    ;; find the best match for each descriptor
+    (descrip-matcher-match matcher-10 descriptors-a-10 descriptors-b-10 matches-10)
+    (named-window window-name-10 +window-normal+)
+    ;; draw the found matches
+    (draw-matches gray-a keypoints-a-10 gray-b keypoints-b-10 matches-10 all-matches-10 
+		  (scalar-all -1) (scalar-all -1) (vector-char) 
+		  +default+)
+    ;; show the matches in a window 
+    (imshow window-name-10 all-matches-10)
+    (del-bf-matcher matcher-10)
+    (del-brisk briskj)
+    ;; create a feature detector
+    (feat-detector-create briskk "BRISK")
+    ;; detect keypoints in the image GRAY-A
+    (feat-detector-detect briskk gray-a keypoints-a-11)
+    ;; Compute the descriptors for a set of keypoints detected in GRAY-A
+    (feat-2d-compute briskk gray-a keypoints-a-11 descriptors-a-11)
+    ;; detect keypoints in the image GRAY-B
+    (feat-detector-detect briskk gray-b keypoints-b-11)
+    ;; Compute the descriptors for a set of keypoints detected in GRAY-B
+    (feat-2d-compute briskk gray-b keypoints-b-11 descriptors-b-11)
+    ;; find the best match for each descriptor
+    (descrip-matcher-match matcher-11 descriptors-a-11 descriptors-b-11 matches-11)
+    (named-window window-name-11 +window-normal+)
+    ;; draw the found matches
+    (draw-matches gray-a keypoints-a-11 gray-b keypoints-b-11 matches-11 all-matches-11 
+		  (scalar-all -1) (scalar-all -1) (vector-char) 
+		  +default+)
+    ;; show the matches in a window 
+    (imshow window-name-11 all-matches-11)
+    (del-bf-matcher matcher-11)
+    (del-brisk briskk)
+    ;; create a feature detector
+    (feat-detector-create briskl "BRISK")
+    ;; detect keypoints in the image GRAY-A
+    (feat-detector-detect briskl gray-a keypoints-a-12)
+    ;; Compute the descriptors for a set of keypoints detected in GRAY-A
+    (feat-2d-compute briskl gray-a keypoints-a-12 descriptors-a-12)
+    ;; detect keypoints in the image GRAY-B
+    (feat-detector-detect briskl gray-b keypoints-b-12)
+    ;; Compute the descriptors for a set of keypoints detected in GRAY-B
+    (feat-2d-compute briskl gray-b keypoints-b-12 descriptors-b-12)
+    ;; find the best match for each descriptor
+    (descrip-matcher-match matcher-12 descriptors-a-12 descriptors-b-12 matches-12)
+    (named-window window-name-12 +window-normal+)
+    ;; draw the found matches
+    (draw-matches gray-a keypoints-a-12 gray-b keypoints-b-12 matches-12 all-matches-12 
+		  (scalar-all -1) (scalar-all -1) (vector-char) 
+		  +default+)
+    ;; show the matches in a window 
+    (imshow window-name-12 all-matches-12)
+    (del-bf-matcher matcher-12)
+    (del-brisk briskl)
+    (move-window window-name-1 88 0)
+    (move-window window-name-2 538 0)
+    (move-window window-name-3 988 0)
+    (move-window window-name-4 1438 0)
+    (move-window window-name-5 88 368)
+    (move-window window-name-6 538 368)
+    (move-window window-name-7 988 368)
+    (move-window window-name-8 1438 368)
+    (move-window window-name-9 88 708)
+    (move-window window-name-10 538 708)
+    (move-window window-name-11 988 708)
+    (move-window window-name-12 1438 708)
+    (loop while (not (= (wait-key 0) 27)))
+    (destroy-window window-name-1)
+    (destroy-window window-name-2)
+    (destroy-window window-name-3)
+    (destroy-window window-name-4)
+    (destroy-window window-name-5)
+    (destroy-window window-name-6)
+    (destroy-window window-name-7)
+    (destroy-window window-name-8)
+    (destroy-window window-name-9)
+    (destroy-window window-name-10)
+    (destroy-window window-name-11)
+    (destroy-window window-name-12)))
+
+
+
+FEAT-DETECT-CREATE
+
+Creates a feature detector by its name.
+
+C++: Ptr<FeatureDetector> FeatureDetector::create(const string& detectorType)
+
+Common Lisp: (FEAT-DETECTOR-CREATE (SELF (:POINTER FEATURE-DETECTOR)) (DETECTOR-TYPE :STRING)) => (:POINTER FEATURE-DETECTOR) 
+
+
+    Parameters:	
+
+        SELF - A pointer to a BRISK construct
+
+        DETECTOR-TYPE – Feature detector type.
+
+The following detector types are supported:
+
+    "FAST" – FastFeatureDetector
+    "STAR" – StarFeatureDetector
+    "SIFT" – SIFT (nonfree module)
+    "SURF" – SURF (nonfree module)
+    "ORB" – ORB
+    "BRISK" – BRISK
+    "MSER" – MSER
+    "GFTT" – GoodFeaturesToTrackDetector
+    "HARRIS" – GoodFeaturesToTrackDetector with Harris detector enabled
+    "Dense" – DenseFeatureDetector
+    "SimpleBlob" – SimpleBlobDetector
+
+Also a combined format is supported: feature detector adapter name ( "Grid" – GridAdaptedFeatureDetector, "Pyramid" – PyramidAdaptedFeatureDetector ) + feature detector name (see above), for example: "GridFAST", "PyramidSTAR" .
+
+
+(defun feat-detect-create-example (filename-1 filename-2) 
+
+  "Try using the box.png and the box_in_scene.png from
+   the LISP-CV-MASTER/IMAGES directory to get a better 
+   understanding of this example the first time you ru-
+   n it."
+
+  ;; read some images in grayscale -> The object you want to track
+  (let* ((gray-a (imread filename-1 +load-image-grayscale+))
+	 ;; The image the object is a part of
+	 (gray-b (imread filename-2 +load-image-grayscale+)) 
+	 (keypoints-a (vector-keypoint))
+	 (keypoints-b (vector-keypoint))
+	 (descriptors-a (mat))
+	 (descriptors-b (mat))
+         ;; set brisk parameters
+	 (thresh 60)
+	 (octaves 4)
+	 (pattern-scale 2.0f0)
+         ;; declare a variable BRISKD of the type (:POINTER BRISK)
+	 (briskd (brisk thresh octaves pattern-scale))
+         ;; declare matcher
+	 (matcher (bf-matcher))
+	 (matches (vector-dmatch))
+	 (all-matches (mat))
+	 (window-name "All Matches - FEAT-DETECT-CREATE Example"))
+    (if (cffi:null-pointer-p (or gray-a gray-b)) 
+	(return-from feat-detect-create-example 
+	  (format t "Image not loaded")))
+    ;; create a feature detector
+    (feat-detector-create briskd "STAR")
+    ;; detect keypoints in the image GRAY-A
+    (feat-detector-detect briskd gray-a keypoints-a)
+    ;; Compute the descriptors for a set of keypoints detected in GRAY-A
+    (feat-2d-compute briskd gray-a keypoints-a descriptors-a)
+    ;; detect keypoints in the image GRAY-B
+    (feat-detector-detect briskd gray-b keypoints-b)
+    ;; Compute the descriptors for a set of keypoints detected in GRAY-B
+    (feat-2d-compute briskd gray-b keypoints-b descriptors-b)
+    ;; find the best match for each descriptor
+    (descrip-matcher-match matcher descriptors-a descriptors-b matches)
+    (named-window window-name +window-normal+)
+    (move-window window-name 720 175)
+    ;; draw the found matches
+    (draw-matches gray-a keypoints-a gray-b keypoints-b matches all-matches 
+		  (scalar-all -1) (scalar-all -1) (vector-char) 
+		  +not-draw-single-points+)
+    ;; show the matches in a window 
+    (imshow window-name all-matches)
+    (loop while (not (= (wait-key 0) 27)))
+    (destroy-window window-name)))
+
+
+
+CREATE-TRACKBAR
+
+Creates a trackbar and attaches it to the specified window.
+
+C++: int createTrackbar(const string& trackbarname, const string& winname, int* value, int count, TrackbarCallback onChange=0, void* userdata=0)
+
+Common Lisp:  (CREATE-TRACKBAR (TRACKBARNAME :STRING) (WINNAME :STRING) (VALUE :POINTER) (COUNT :INT) &OPTIONAL ((ON-CHANGE (:POINTER TRACKBAR-CALLBACK)) (NULL-POINTER)) ((USERDATA :POINTER) (NULL-POINTER))) => :INT
+
+    
+    Parameters:	
+
+        TRACKBARNAME – Name of the created trackbar.
+
+        WINNAME – Name of the window that will be used as a parent of the created trackbar.
+
+        VALUE – Optional pointer to an integer variable whose value reflects the position of the sl-
+                ider. Upon creation, the slider position is defined by this variable.
+
+        COUNT – Maximal position of the slider. The minimal position is always 0.
+
+        ON-CHANGE – Pointer to the function to be called every time the slider changes position. Th-
+                    is function should be prototyped as void Foo(int,void*); , where the first para-
+                    meter is the trackbar position and the second parameter is the user data (see t-
+                    he next parameter). If the callback is the NULL pointer, no callbacks are calle-
+                    d, but only value is updated.
+
+        userdata – User data that is passed as is to the callback. It can be used to handle trackba-
+                   r events without using global variables.
+
+
+The function CREATE-TRACKBAR creates a trackbar (a slider or range control) with the specified name
+and range, assigns a variable value to be a position synchronized with the trackbar and specifies t-
+he callback function onChange to be called on the trackbar position change. The created trackbar is 
+displayed in the specified window winname.
+
+Note: [Qt Backend Only] winname can be empty (or NULL) if the trackbar should be attached to the control panel.
+
+
+
+
+;; a callback function called by the CREATE-TRACKBAR
+;; ON-CHANGE parameter...a HELLO-WORLD function.
+(defcallback hello-world-brightness :void ((pos :int) (ptr :pointer))
+  (format t "Hello World!~%~%~a~a~%~%" (mem-aref ptr :string 0) pos))
+
+;; another HELLO-WORLD callback function
+(defcallback hello-world-contrast :void ((pos :int) (ptr :pointer))
+  (format t "Hello World!~%~%~a~a~%~%" (mem-aref ptr :string 0) pos))
+
+
+
+(defun create-trackbar-example (filename)
+  ;; read in image supplied by filename parameter
+  (let ((src (imread filename 1))
+
+	(window-name "Adjust brightness and contrast by moving the sliders.")
+
+        ;; allocate two :int pointers that trackbar can adjust
+	(slider-1-value (foreign-alloc :int 
+				       :initial-contents '(50)))
+	(slider-2-value (foreign-alloc :int 
+				       :initial-contents '(50))))
+    (if (cffi:null-pointer-p src) 
+	(return-from create-trackbar-example
+	  (format t "Image not loaded")))
+    (named-window window-name 1)
+    (move-window window-name 720 175)
+    (do* ((dest 0)
+	  (brightness 0)
+	  (contrast 0)
+	  ;; data to be passed to HELLO-WORLD-BRIGHTNESS callback function
+	  (userdata-1 (foreign-alloc :string :initial-element "Brightness =  "))
+	  ;; data to be passed to HELLO-WORLD-CONTRAST callback function
+	  (userdata-2 (foreign-alloc :string :initial-element "Contrast = ")))
+	 ((plusp (wait-key *millis-per-frame*)) 
+	  (format t "Key is pressed by user"))
+      ;; Clone the source image to dest
+      (setf dest (clone src))
+      ;; create Trackbar with name, 'Brightness'
+      (create-trackbar "Brightness" window-name slider-1-value 100
+		       ;; pointer to a callback function to be called every 
+                       ;; time the trackbar slider changes position 
+		       (callback hello-world-brightness) 
+		       ;; user data that is passed to 
+                       ;; the callback function           
+		       userdata-1)
+      ;; create trackbar with name, 'Contrast'
+      (create-trackbar  "Contrast" window-name slider-2-value 100
+			;; again,a callback function pointer 
+			(callback hello-world-contrast) 
+			;; user data
+			userdata-2)
+      ;; when the top trackbar is moved, adjust brightness variable
+      (setf brightness (- (mem-ref slider-1-value :int) 50))
+      ;; when the bottom Trackbar is moved, adjust contrast variable
+      (setf contrast (/ (mem-ref slider-2-value :int) 50))
+      ;; apply brightness and contrast settings to the destination image
+      (convert-to src dest -1 (coerce contrast 'double-float)  
+		  (coerce brightness 'double-float))
+      ;; show adjusted image in a window
+      (imshow window-name dest)
+      ;; clen up used memory
+      (del-mat dest))
+    (destroy-window window-name)))
+
+
+
+SET-MOUSE-CALLBACK
+
+Sets mouse handler for the specified window
+
+C++: void setMouseCallback(const string& winname, MouseCallback onMouse, void* userdata=0 )
+
+Common Lisp: (SET-MOUSE-CALLBACK (WINNAME :STRING) (ON-MOUSE (:POINTER MOUSE-CALLBACK) (USERDATA :VOID))) => :VOID
+
+    Parameters:	
+
+        WINNAME – Window name
+
+        ONMOUSE – Mouse callback. See example below for how to use the callback.
+
+        USERDATA – The optional parameter passed to the callback.
+
+
+
+
+(defcallback call-back-func :void ((event :int)(x :int)(y :int)
+                                   (flags :int)(userdata :pointer))
+  ;; This callback function is called by the SET-MOUSE CALLBACK function
+  ;; in the example below. The mouse handler created by SET-MOUSE CALLBACK
+  ;; captures movements made by the mouse along with 3 different keypresses.
+  ;; They are then processed in this function.
+
+  (format t "Recieved ~a~%~%" (mem-aref userdata :string))
+
+  (if (= event +event-mousemove+)
+      (format t "Mouse move over the window (~a, ~a)~%~%" x y))
+  (if (= event +event-lbuttondown+)
+      (format t "Left button of the mouse down (~a, ~a)~%~%" x y))
+  (if (= event +event-rbuttondown+)
+      (format t "Right button of the mouse down (~a, ~a)~%~%" x y))
+  (if (= event +event-mbuttondown+)
+      (format t "Middle button of the mouse down (~a, ~a)~%~%" x y))
+  (if (= event +event-lbuttonup+)
+      (format t "Left button of the mouse up (~a, ~a)~%~%" x y))
+  (if (= event +event-rbuttonup+)
+      (format t "Right button of the mouse up (~a, ~a)~%~%" x y))
+  (if (= event +event-mbuttonup+)
+      (format t "Middle button of the mouse up (~a, ~a)~%~%" x y))
+  (if (= flags +event-lbuttondblclk+)
+      (format t "Left button double-click flag triggered (~a, ~a)~%~%" x y))
+  (if (= flags +event-rbuttondblclk+)
+      (format t "Right button double-click flag triggered (~a, ~a)~%~%" x y))
+  (if (= flags +event-mbuttondblclk+)
+      (format t "Middle button double-click flag triggered (~a, ~a)~%~%" x y))
+  (if (= flags (+ +event-flag-ctrlkey+ +event-flag-lbutton+))
+      (format t "Left mouse button is clicked while pressing CTRL key (~a, ~a)~%~%" x y))
+  (if (= flags (+ +event-flag-shiftkey+ +event-flag-rbutton+))
+      (format t "Right mouse button is clicked while pressing SHIFT key (~a, ~a)~%~%" x y))
+  (if (= flags (+ +event-flag-altkey+ +event-mousemove+))
+      (format t "Mouse is moved over the window while pressing ALT key  (~a, ~a)~%~%" x y )))
+
+
+(defun set-mouse-callback-example (filename)
+  ;; load image
+  (let ((src (imread filename 1))
+	(window-name "SET-MOUSE-CALLBACK Example")
+	;; Declare a userdata parameter 
+	(userdata (foreign-alloc :string 
+				 :initial-element "USERDATA output")))
+    (if (cffi:null-pointer-p src) 
+	(return-from set-mouse-callback-example
+	  (format t "Image not loaded")))
+    (named-window window-name 1)
+    (move-window window-name 720 175)
+    ;; Sets mouse handler for the window, which passes a 
+    ;; constant stream of mouse and mouse button positional 
+    ;; data to the function above.  Also passes the contents 
+    ;; of USERDATA to the above function.
+    (set-mouse-callback window-name (callback call-back-func) userdata)
+    (imshow window-name src)
+    (loop while (not (= (wait-key 0) 27)))
+    (destroy-window window-name)))
 

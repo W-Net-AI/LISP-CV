@@ -7,7 +7,6 @@
 
 
 
-
 ;; Default parameters
 
 (defvar *camera-index* 0)
@@ -15,6 +14,8 @@
 (defvar *default-height* 480)
 (defvar *frames-per-second* 30)
 (defvar *millis-per-frame* (round (/ 1000 *frames-per-second*)))
+
+
 
 ;; Change default parameters
 
@@ -29,6 +30,7 @@
 	   (format t "*camera-index* = ~a~%" *camera-index*))
 	   (if fps (format t "*frames-per-second* = ~a~%" fps)
 	       (format t "*frames-per-second* = ~a~%" *frames-per-second*)))
+
 
 
 ;; Live code editing
@@ -48,101 +50,23 @@
 	(swank::handle-requests connection t)))))
 
 
+;; Interop
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_char* std_create_vectorc() 
+(defcfun ("std_create_vectorc" vector-char) (:pointer vector-char))
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_KeyPoint* std_create_vectork() 
+(defcfun ("std_create_vectork" vector-keypoint) (:pointer vector-keypoint))
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_DMatch* std_create_vectordm() 
+(defcfun ("std_create_vectordm" vector-dmatch) (:pointer vector-dmatch))
+
+
+
 ;;; Basic Structures
-
-;; CvSVM*
-(defctype svm :pointer)
-
-;; CvSVMParams*
-(defctype svm-params :pointer)
-
-;; Mat*
-(defctype mat :pointer)
-
-;; MatExpr*
-(defctype mat-expr :pointer)
-
-;; Point*
-(defctype point :pointer)
-
-;; Point2d*
-(defctype point2d :pointer)
-
-;; Point2f*
-(defctype point2f :pointer)
-
-;; Point3d*
-(defctype point3d :pointer)
-
-;; Point3f*
-(defctype point3f :pointer)
-
-;; Point3i*
-(defctype point3i :pointer)
-
-;; Scalar*
-(defctype scalar :pointer)
-
-;; Rect*
-(defctype rect :pointer)
-
-;; Size*
-(defctype size :pointer)
-
-;; String*
-(defctype string* :pointer)
-
-;; Vec2b*
-(defctype vec2b :pointer)
-
-;; Vec2d*
-(defctype vec2d :pointer)
-
-;; Vec2f*
-(defctype vec2f :pointer)
-
-;; Vec2i*
-(defctype vec2i :pointer)
-
-;; Vec2s*
-(defctype vec2s :pointer)
-
-;; Vec3b*
-(defctype vec3b :pointer)
-
-;; Vec3d*
-(defctype vec3d :pointer)
-
-;; Vec3f*
-(defctype vec3f :pointer)
-
-;; Vec3i*
-(defctype vec3i :pointer)
- 
-;; Vec3s*
-(defctype vec3s :pointer)
-
-;; Vec4b*
-(defctype vec4b :pointer)
-
-;; Vec4d*
-(defctype vec4d :pointer)
-
-;; Vec4f*
-(defctype vec4f :pointer)
-
-;; Vec4i*
-(defctype vec4i :pointer)
-
-;; Vec4s*
-(defctype vec4s :pointer)
-
-;; vector_char*
-(defctype vector-char :pointer)
-
-;; vector_int*
-(defctype vector-int :pointer)
-
 
 
 ;; MatExpr* promote(Mat* m) 
@@ -157,7 +81,7 @@
    This is a shorthand version of the FORCE function."
   (expr (:pointer mat-expr)))
 
-;; MatExpr +
+;; MatExpr + operator
 ;; MatExpr* cv_Mat_add(Mat* m1, Mat* m2)
 (defcfun ("cv_Mat_add" add) (:pointer mat-expr)
   (m1 (:pointer mat))
@@ -388,7 +312,7 @@
 
 ;; Mat Mat::clone() const
 ;; Mat* cv_Mat_clone(Mat* self) 
-(defcfun ("cv_Mat_clone" mat-clone) (:pointer mat)
+(defcfun ("cv_Mat_clone" clone) (:pointer mat)
   "Creates a full copy of the array and the underlying data."
   (self (:pointer mat)))
 
@@ -396,16 +320,22 @@
 (defcfun ("cv_Mat_cols" cols) :int
   (self (:pointer mat)))
 
-;; Mat::Mat(int rows, int cols, int type, void* data) 
-;; Mat* cv_create_Mat_with_data(int rows, int cols, int type, void* data) ;todo...no step param
-(defcfun ("cv_create_Mat_with_data" mat-data) (:pointer mat)
-  (rows :int)
-  (cols :int)
-  (type :int)
-  (data :pointer))
+;; void Mat::convertTo(OutputArray m, int rtype, double alpha=1, double beta=0 ) const
+;; void cv_Mat_convertTo(Mat* self,Mat* m, int rtype, double alpha, double beta)
+(defcfun ("cv_Mat_convertTo" %convert-to) :int
+  (self (:pointer mat))
+  (m (:pointer mat))
+  (rtype :int)
+  (alpha :double)
+  (beta :double))
 
-;; void operator delete  ( void* ptr );
-(defcfun ("cv_delete_Mat" del) :void
+(defun convert-to (self m rtype &optional (alpha 1.0d0) (beta 0.0d0))
+  "Converts an array to another data type with optional scaling."
+  (%convert-to self m rtype alpha beta))
+
+;; void operator delete  ( void* ptr )
+;; void cv_delete_Mat(void* ptr)
+(defcfun ("cv_delete_Mat" del-mat) :void
   (ptr :pointer))
 
 ;; Mat Mat::diag(int d=0 ) const
@@ -419,7 +349,7 @@
   "Extracts a diagonal from a matrix."
    (%diag self d))
 
-;; MatExpr /
+;; MatExpr / operator
 ;; MatExpr* cv_Mat_div(Mat* m1, Mat* m2)
 (defcfun ("cv_Mat_div" div) (:pointer mat-expr)
   (m1 (:pointer mat))
@@ -477,10 +407,13 @@
 (defcfun ("cv_create_Mat" mat) (:pointer mat)
   "MAT constructor")
 
-;; MatExpr* cv_Mat_scale(MatExpr* m, double alpha)
-(defcfun ("cv_Mat_scale" scale) (:pointer mat-expr)
-  (m (:pointer mat-expr))
-  (alpha :double))
+;; Mat::Mat(int rows, int cols, int type, void* data) 
+;; Mat* cv_create_Mat_with_data(int rows, int cols, int type, void* data) ;todo...no step param
+(defcfun ("cv_create_Mat_with_data" mat-data) (:pointer mat)
+  (rows :int)
+  (cols :int)
+  (type :int)
+  (data :pointer))
 
 ;; Mat::t
 ;; MatExpr* cv_Mat_transpose_mat(Mat* self) 
@@ -510,11 +443,10 @@
   (cols :int)
   (type :int))
 
-;; MatExpr *
+;; MatExpr * operator
 ;; MatExpr* cv_Mat_scale(MatExpr* m, double alpha)
-(defcfun ("cv_Mat_scale" mat-scale) (:pointer mat-expr) 
-  "Finds the product of a Mat and a scalar."
-  (self (:pointer mat-expr))
+(defcfun ("cv_Mat_scale" scale) (:pointer mat-expr)
+  (m (:pointer mat-expr))
   (alpha :double))
 
 ;; int Mat::type() const 
@@ -545,7 +477,7 @@
   (cols :int)
   (type :int))
 
-;; MatExpr *
+;; MatExpr * operator
 ;; MatExpr* cv_Mat_mult(Mat* m1, Mat* m2)
 (defcfun ("cv_Mat_mult" mul) (:pointer mat-expr)
   (m1 (:pointer mat))
@@ -760,7 +692,7 @@
   "Gets the width of a (:POINTER SIZE)"
   (self (:pointer size)))
 
-;; MatExpr -
+;; MatExpr - operator
 ;; MatExpr* cv_Mat_sub(Mat* m1, Mat* m2)
 (defcfun ("cv_Mat_sub" sub) (:pointer mat-expr)
   (m1 (:pointer mat))

@@ -5,16 +5,25 @@
 (in-package :lisp-cv)
 
 
-;; VideoCapture*
-(defctype video-capture :pointer)
-
-;; VideoWriter*
-(defctype video-writer :pointer)
 
 
 ;;; Types and structures
 
 ;;; User Interface
+
+;; int createTrackbar(const string& trackbarname, const string& winname, int* value, int count, TrackbarCallback onChange=0, void* userdata=0)
+;; int cv_createTrackbar(String* trackbarname, String* winname, int* value, int count, TrackbarCallback* onChange, void* userdata)
+(defcfun ("cv_createTrackbar" %create-trackbar) :int
+  (trackbarname :string)
+  (winname :string)
+  (value :pointer)
+  (count :int)
+  (on-change (:pointer trackbar-callback))
+  (userdata :pointer))
+
+(defun create-trackbar (trackbarname winname value count &optional (on-change (null-pointer)) (userdata (null-pointer)))
+  "Creates a trackbar and attaches it to the specified window."
+  (%create-trackbar trackbarname winname value count on-change userdata))
 
 ;; void destroyWindow(const string& winname)
 ;; void cv_destroyWindow((:pointer string*) winname)
@@ -56,6 +65,17 @@
 (defun named-window (winname flags)
   "Creates a window."
   (%named-window (foreign-alloc :string :initial-element winname) flags))
+
+;; void setMouseCallback(const string& winname, MouseCallback onMouse, void* userdata=0)
+;;void cv_setMouseCallback(const char* winname, MouseCallback onMouse, void* userdata)
+(defcfun ("cv_setMouseCallback" %set-mouse-callback) :void
+  (winname :string)
+  (on-mouse (:pointer mouse-callback))
+  (userdata :pointer))
+
+(defun set-mouse-callback (winname on-mouse &optional (userdata (null-pointer)))
+  "Sets mouse handler for the specified window."
+  (%set-mouse-callback winname on-mouse userdata))
 
 ;; int waitKey(int delay=0)
 ;; int cv_waitKey(int delay)
@@ -121,7 +141,7 @@
 
 ;; Mat imread(const string& filename, int flags=1)
 ;; mat cv_imread2 (const char* filename, int flags)
-(defcfun ("cv_imread" imread) (:pointer mat)
+(defcfun ("cv_imread2" imread) (:pointer mat)
   (filename :string)
   (flags :int))
 

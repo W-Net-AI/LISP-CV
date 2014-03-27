@@ -18,6 +18,8 @@
 #include <opencv2/c/opencv_generated.hpp>
 
 extern "C" {
+void cv_Mat_convertTo(Mat* self,Mat* m, int rtype, double alpha, double beta);
+MatExpr* cv_Mat_div_S(Mat* m1, int m2);
 Mat* cv_Mat_get_ROI(Mat* self, Rect* roi);
 MatExpr* cv_Mat_div(Mat* m1, Mat* m2);
 Mat* cv_create_sized_identity (Size* s, int type);

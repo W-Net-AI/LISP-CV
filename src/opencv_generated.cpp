@@ -3,8 +3,14 @@ using namespace cv;
 using namespace std;
 using namespace flann;
 using namespace cvflann;
-extern "C" {
 
+extern "C" {
+FeatureDetector* cv_FeatureDetector_create2(FeatureDetector* self, const char* detectorType) {
+	return &*self->create(detectorType);
+}
+Mat* cv_imread2(const char* filename, int flags) {
+	return new Mat(imread(filename, flags));
+}
 const float* cv_CvSVM_get_support_vector(SVM* self, int i) {
    return self->get_support_vector(i);
 }
@@ -1033,6 +1039,9 @@ void cv_imshow(String* winname, Mat* mat) {
 }
 bool cv_imwrite(String* filename, Mat* img, vector_int* params) {
 	return cv::imwrite(*filename, *img, *params);
+}
+void cv_inRange(Mat* src, Mat* lowerb, Mat* upperb, Mat* dst) {
+	cv::inRange(*src, *lowerb, *upperb, *dst);
 }
 Mat* cv_initCameraMatrix2D(vector_Mat* objectPoints, vector_Mat* imagePoints, Size* imageSize, double aspectRatio) {
 	return new Mat(cv::initCameraMatrix2D(*objectPoints, *imagePoints, *imageSize, aspectRatio));
