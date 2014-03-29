@@ -10,7 +10,7 @@
 ;; BFMatcher*
 (defctype bf-matcher :pointer)
 
-;; Brisk*
+;; BRISK*
 (defctype brisk :pointer)
 
 ;; DescriptorMatcher*
@@ -55,11 +55,17 @@
 ;; Rect*
 (defctype rect :pointer)
 
+;; RNG*
+(defctype rng :pointer)
+
 ;; Size*
 (defctype size :pointer)
 
 ;; String*
 (defctype string* :pointer)
+
+;; SURF*
+(defctype surf :pointer)
 
 ;; CvSVM*
 (defctype svm :pointer)
@@ -121,11 +127,20 @@
 ;; vector_DMatch*
 (defctype vector-dmatch :pointer)
 
+;; vector_float*
+(defctype vector-float :pointer)
+
 ;; vector_int*
 (defctype vector-int :pointer)
 
 ;; vector_KeyPoint*
 (defctype vector-keypoint :pointer)
+
+;; vector_Mat*
+(defctype vector-mat :pointer)
+
+;; vector_Point2f*
+(defctype vector-point2f :pointer)
 
 ;; VideoCapture*
 (defctype video-capture :pointer)

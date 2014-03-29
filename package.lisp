@@ -166,6 +166,8 @@
    #:add
    #:br
    #:clone
+   #:cols
+   #:data
    #:del-mat
    #:div
    #:dot
@@ -174,15 +176,14 @@
    #:dot3d
    #:dot3f
    #:dot3i
+   #:empty
    #:force
-   #:cols
    #:mat-diag
    #:mat-expr-t
    #:mat-expr-s
    #:mat-eye-0
    #:mat-eye-1
    #:mat-ones
-   #:rows
    #:mat-value
    #:mat-type
    #:mat-typed-0
@@ -212,12 +213,14 @@
    #:rect
    #:rect-init
    #:roi
+   #:rows
    #:scalar
    #:scalar-all
    #:size
-   #:size-mat
+   #:mat-size
    #:size-width
    #:size-height
+   #:step*
    #:sub
    #:sz
    #:tl
@@ -735,7 +738,7 @@
    #:descrip-matcher-create 
    #:descrip-matcher-match
 
-;;; Drawing Function of Keypoints and Matches
+;;; features2d - Drawing Function of Keypoints and Matches
 
    #:+default+
    #:+draw-over-outimg+
@@ -743,5 +746,10 @@
    #:+draw-rich-keypoints+
    #:draw-matches
 
+
+;;; nonfree - Feature Detection and Description
+
+   #:surf0
+   #:surf5
 ))
 

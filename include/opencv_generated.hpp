@@ -8,8 +8,9 @@ using namespace std;
 using namespace flann;
 using namespace cvflann;
 extern "C" {
-FeatureDetector* cv_FeatureDetector_create1(FeatureDetector* self, String* detectorType); 
-Mat* cv_imread2(const char* filename, int flags);
+double cv_RNG_uniform_double(RNG* self, double a, double b);
+RNG* cv_create_RNG();
+RNG* cv_create_RNG_state(uint64 state);
 const float* cv_CvSVM_get_support_vector(SVM* self, int i);
 Vec3b* cv_create_Vec3b(int val1, int val2, int val3);
 CvSVMParams* cv_create_SVMParams(); 

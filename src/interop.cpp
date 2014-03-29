@@ -2,10 +2,53 @@
 
 typedef string String;
 
+
 extern "C" {
+
+vector_Mat* std_create_vectorm() {
+    return new vector<Mat>;
+}
+
+vector_Mat* std_carrayTovectorm(Mat* a, size_t len) {
+    vector<Mat>* v = new vector<Mat>;
+    for(size_t i = 0; i < len; i++) 
+        v->push_back(a[i]);
+    return v;
+}
+
+Mat* std_vectormToCArray(vector_Mat* s) {
+    return s->data();
+}
+
+
+vector_Point2f* std_create_vectorp2f() {
+    return new vector<Point2f>;
+}
+
+vector_Point2f* std_carrayTovectorp2f(Point2f* a, size_t len) {
+    vector<Point2f>* v = new vector<Point2f>;
+    for(size_t i = 0; i < len; i++) 
+        v->push_back(a[i]);
+    return v;
+}
+
+Point2f* std_vectorp2fToCArray(vector_Point2f* s) {
+    return s->data();
+}
 
 vector_char* std_create_vectorc() {
     return new vector<char>;
+}
+
+vector_char* std_carrayTovectorc(char* a, size_t len) {
+    vector<char>* v = new vector<char>;
+    for(size_t i = 0; i < len; i++) 
+        v->push_back(a[i]);
+    return v;
+}
+
+char* std_vectorcToCArray(vector_char* s) {
+    return s->data();
 }
 
 vector_KeyPoint* std_create_vectork() {

@@ -3,16 +3,28 @@
 #include <opencv2/c/opencv_generated.hpp>
 
 using namespace std;
-
+typedef vector<char> vector_char;
+typedef vector<double> vector_double;
 typedef vector<int> vector_int;
 typedef vector<float> vector_float;
-typedef vector<double> vector_double;
-typedef vector<char> vector_char;
-typedef vector<KeyPoint> vector_KeyPoint;
 typedef vector<DMatch> vector_DMatch;
+typedef vector<KeyPoint> vector_KeyPoint;
+typedef vector<Point2f> vector_Point2f;
+typedef vector<Mat> vector_Mat;
+
+
+
 
 extern "C" {
+vector_Mat* std_create_vectorm();
+vector_Mat* std_carrayTovectorm(Mat* a, size_t len);
+Mat* std_vectormToCArray(vector_Mat* s);
+Point2f* std_vectorp2fToCArray(vector_Point2f* s);
+vector_Point2f* std_carrayTovectorp2f(Point2f* a, size_t len);
+vector_Point2f* std_create_vectorp2f();
 vector_char* std_create_vectorc();
+vector_char* std_carrayTovectorc(char* a, size_t len);
+char* std_vectorcToCArray(vector_char* s);
 vector_KeyPoint* std_create_vectork() ;
 vector_DMatch* std_create_vectordm();
 string* std_create_string();

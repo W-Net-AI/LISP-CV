@@ -18,15 +18,30 @@
 #include <opencv2/c/mat.hpp>
 
 extern "C" {
+Mat* cv_create_Mat_as_vectort(vector_Point2f* vec, bool copyData) {
+    return new Mat(*vec, copyData);
+}
+
+uchar* cv_Mat_get_Data(Mat* self) {
+    return self->data;
+}
+
+size_t cv_Mat_get_Step(Mat* self) {
+    return self->step;
+}
+
 void cv_Mat_convertTo(Mat* self,Mat* m, int rtype, double alpha, double beta) {
     self->convertTo(*m, rtype, alpha, beta);
 }
+
 MatExpr* cv_Mat_div_S(Mat* m1, int m2) {
     return new MatExpr(*m1 / m2);
 }
+
 Mat* cv_Mat_get_ROI(Mat* self, Rect* roi) {
     return new Mat(*self, *roi);
 }
+
 MatExpr* cv_Mat_div(Mat* m1, Mat* m2) {
     return new MatExpr(*m1 / *m2);
 }

@@ -21,4 +21,5 @@
 	           (:file "imgproc" :depends-on ("package" "lisp-cv" "constants" "types"))
 	           (:file "highgui" :depends-on ("package" "lisp-cv" "constants" "types"))
                (:file "features2d" :depends-on ("package" "lisp-cv" "constants" "types"))
-               (:file "macros" :depends-on ("package" "lisp-cv" "constants" "core" "highgui" "imgproc" "features2d" "types"))))
+               (:file "nonfree" :depends-on ("package" "lisp-cv" "constants" "types"))
+               (:file "macros" :depends-on ("package" "lisp-cv" "constants" "core" "highgui" "imgproc" "features2d" "nonfree" "types"))))

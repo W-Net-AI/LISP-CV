@@ -4,13 +4,21 @@ using namespace std;
 using namespace flann;
 using namespace cvflann;
 
+
 extern "C" {
-FeatureDetector* cv_FeatureDetector_create2(FeatureDetector* self, const char* detectorType) {
-	return &*self->create(detectorType);
+
+double cv_RNG_uniform_double(RNG* self, double a, double b) {
+    return self->uniform(a, b);
 }
-Mat* cv_imread2(const char* filename, int flags) {
-	return new Mat(imread(filename, flags));
+
+RNG* cv_create_RNG() {
+    return new RNG();
 }
+
+RNG* cv_create_RNG_state(uint64 state) {
+    return new RNG(state);
+}
+
 const float* cv_CvSVM_get_support_vector(SVM* self, int i) {
    return self->get_support_vector(i);
 }

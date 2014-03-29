@@ -1,7 +1,7 @@
 ;;;; -*- mode: lisp; indent-tabs: nil -*-
 ;;;; core.lisp
 ;;;; OpenCV bindings
-;;;; Core functionality
+;;;; The Core Functionality
 (in-package :lisp-cv)
 
 
@@ -50,11 +50,18 @@
 	(swank::handle-requests connection t)))))
 
 
-;; Interop
 
-;; template < class T, class Alloc = allocator<T> > class vector
-;; vector_char* std_create_vectorc() 
-(defcfun ("std_create_vectorc" vector-char) (:pointer vector-char))
+;; Interop - String*
+
+;; string* std_cstringToString(char* s, size_t len) 
+(defcfun ("std_cstringToString" c-string-to-string*) (:pointer string*) 
+  "test"
+  (s :string)
+  (len :unsigned-int))
+
+
+;; Interop - vector<typename>*
+
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_KeyPoint* std_create_vectork() 
@@ -64,10 +71,149 @@
 ;; vector_DMatch* std_create_vectordm() 
 (defcfun ("std_create_vectordm" vector-dmatch) (:pointer vector-dmatch))
 
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_char* std_create_vectorf() 
+(defcfun ("std_create_vectorf" %vector-float) (:pointer vector-float))
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_float* std_carrayTovectorf(float* a, size_t len)
+(defcfun ("std_carrayTovectorf" %c-arr-to-vector-float) (:pointer vector-float)
+  (a :pointer)
+  (len :unsigned-int))
+
+(defun c-arr-to-vector-float (a len)
+  (%c-arr-to-vector-float (foreign-alloc :float :initial-contents a) len))
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; float* std_vectorfToCArray(vector_float* s) {
+(defcfun ("std_vectorfToCArray" %vector-float-to-c-array) :pointer 
+  (s (:pointer vector-float)))
+
+(defun vector-float (&rest args)              
+(if (eq (first args) nil) (return-from vector-float (%vector-float))
+
+(if  (listp (first args))
+  (return-from vector-float (c-arr-to-vector-float (first args) (second args)))
+
+(if (pointerp (first args))
+(return-from vector-float (%vector-float-to-c-array (first args)))))))
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_char* std_create_vectorc() 
+(defcfun ("std_create_vectorc" %vector-char) (:pointer vector-char))
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_char* std_carrayTovectorc(char* a, size_t len)
+(defcfun ("std_carrayTovectorc" %c-arr-to-vector-char) (:pointer vector-char)
+  (a :pointer)
+  (len :unsigned-int))
+
+(defun c-arr-to-vector-char (a len)
+  (%c-arr-to-vector-char (foreign-alloc :char :initial-contents a) len))
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; char* std_vectorcToCArray(vector_char* s) 
+(defcfun ("std_vectorcToCArray" %vector-char-to-c-array) :pointer 
+  (s (:pointer vector-char)))
+
+(defun vector-char (&rest args)              
+(if (eq (first args) nil) (return-from vector-char (%vector-char))
+
+(if  (listp (first args))
+  (return-from vector-char (c-arr-to-vector-char (first args) (second args)))
+
+(if (pointerp (first args))
+(return-from vector-char (%vector-char-to-c-array (first args)))))))
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_int* std_create_vector() 
+(defcfun ("std_create_vector" %vector-int) (:pointer vector-int))
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_int* std_carrayTovector(int* a, size_t len)
+(defcfun ("std_carrayTovector" %c-arr-to-vector-int) (:pointer vector-int)
+  (a :pointer)
+  (len :unsigned-int))
+
+(defun c-arr-to-vector-int (a len)
+  (%c-arr-to-vector-float (foreign-alloc :int :initial-contents a) len))
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; int* std_vectorfToCArray(vector_int* s) {
+(defcfun ("std_vectorfToCArray" %vector-int-to-c-array) :pointer 
+  (s (:pointer vector-int)))
+
+(defun vector-int (&rest args)              
+(if (eq (first args) nil) (return-from vector-int (%vector-int))
+
+(if  (listp (first args))
+  (return-from vector-int (c-arr-to-vector-int (first args) (second args)))
+
+(if (pointerp (first args))
+(return-from vector-int (%vector-int-to-c-array (first args)))))))
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_Point2f* std_create_vectorp2f() 
+(defcfun ("std_create_vectorp2f" %vector-point2f) (:pointer vector-point2f))
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_Point2f* std_carrayTovectorp2f(Point2f* a, size_t len)
+(defcfun ("std_carrayTovectorp2f" %c-arr-to-vector-point2f) (:pointer vector-point2f)
+  (a :pointer)
+  (len :unsigned-int))
+
+(defun c-arr-to-vector-point2f (a len)
+  (%c-arr-to-vector-point2f (foreign-alloc :pointer :initial-contents a) len))
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; Point2f* std_vectorp2fToCArray(vector_Point2f* s)
+(defcfun ("std_vectorp2fToCArray" %vector-point2f-to-c-array) (:pointer vector-point2f)
+  (a (:pointer vector-Point2f)))
+
+(defun vector-point2f (&rest args)              
+(if (eq (first args) nil) (return-from vector-point2f (%vector-point2f))
+
+(if  (listp (first args))
+  (return-from vector-point2f (c-arr-to-vector-point2f (first args) (second args)))
+
+(if (pointerp (first args))
+(return-from vector-point2f (%vector-point2f-to-c-array (first args)))))))
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_Mat* std_create_vectorm()
+(defcfun ("std_create_vectorm" %vector-mat) (:pointer vector-mat))
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_Mat* std_carrayTovectorm(Mat* a, size_t len)
+(defcfun ("std_carrayTovectorm" %c-arr-to-vector-mat) (:pointer vector-mat)
+  (a :pointer)
+  (len :unsigned-int))
+
+(defun c-arr-to-vector-mat (a len)
+  (%c-arr-to-vector-mat (foreign-alloc :pointer :initial-contents a) len))
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; Mat* std_vectormToCArray(vector_Mat* s)
+(defcfun ("std_vectormToCArray" %vector-mat-to-c-array) :pointer 
+  (s (:pointer vector-mat)))
+
+(defun vector-mat (&rest args)              
+(if (eq (first args) nil) (return-from vector-mat (%vector-mat))
+
+(if  (listp (first args))
+  (return-from vector-mat (c-arr-to-vector-mat (first args) (second args)))
+
+(if (pointerp (first args))
+(return-from vector-mat (%vector-mat-to-c-array (first args)))))))
 
 
 ;;; Basic Structures
 
+
+;; size_t cv_Mat_get_Step(Mat* self) 
+(defcfun ("cv_Mat_get_Step" step*) :unsigned-int
+  "Used to compute address of a matrix element"
+  (self (:pointer mat)))
 
 ;; MatExpr* promote(Mat* m) 
 (defcfun ("promote" <<) (:pointer mat-expr)
@@ -130,7 +276,7 @@
   (j :int))
 
 ;; uchar cv_Mat_at_uchar(Mat* self, int row, int col);
-(defcfun ("cv_Mat_at_uchar1" at-uchar) :pointer
+(defcfun ("cv_Mat_at_uchar0" at-uchar) :uchar
   "Returns a reference to a UCHAR array element."
   (self (:pointer mat))
   (i :int)
@@ -333,6 +479,12 @@
   "Converts an array to another data type with optional scaling."
   (%convert-to self m rtype alpha beta))
 
+;; uchar* data
+;; uchar* cv_Mat_get_Data(Mat* self)
+(defcfun ("cv_Mat_get_Data" data) :pointer
+  "Pointer to the data."
+  (self (:pointer mat)))
+
 ;; void operator delete  ( void* ptr )
 ;; void cv_delete_Mat(void* ptr)
 (defcfun ("cv_delete_Mat" del-mat) :void
@@ -397,6 +549,12 @@
   (self (:pointer point3i))
   (other (:pointer point3i)))
 
+;; bool Mat::empty() const
+;; int cv_Mat_empty(Mat* self) 
+(defcfun ("cv_Mat_empty" empty) :boolean
+  "Returns true if the array has no elements."
+  (self (:pointer mat)))
+
 ;; Mat* force(MatExpr* expr)
 (defcfun ("force" force) (:pointer mat)
   "Coerces a (:POINTER MAT-EXPR) to a (:POINTER MAT)."
@@ -408,7 +566,7 @@
   "MAT constructor")
 
 ;; Mat::Mat(int rows, int cols, int type, void* data) 
-;; Mat* cv_create_Mat_with_data(int rows, int cols, int type, void* data) ;todo...no step param
+;; Mat* cv_create_Mat_with_data(int rows, int cols, int type, void* data)
 (defcfun ("cv_create_Mat_with_data" mat-data) (:pointer mat)
   (rows :int)
   (cols :int)
@@ -684,7 +842,7 @@
 
 ;; Size Mat::size() const
 ;; Size* cv_Mat_size(Mat* self)
-(defcfun ("cv_Mat_size" size-mat) (:pointer size)
+(defcfun ("cv_Mat_size" mat-size) (:pointer size)
   (self (:pointer mat)))
 
 ;; int cv_Size_width(Size* self) 

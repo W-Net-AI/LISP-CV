@@ -5,17 +5,17 @@
 (in-package :lisp-cv)
 
 
-
-
 ;;; Types and structures
+
+
 
 ;;; User Interface
 
 ;; int createTrackbar(const string& trackbarname, const string& winname, int* value, int count, TrackbarCallback onChange=0, void* userdata=0)
 ;; int cv_createTrackbar(String* trackbarname, String* winname, int* value, int count, TrackbarCallback* onChange, void* userdata)
 (defcfun ("cv_createTrackbar" %create-trackbar) :int
-  (trackbarname :string)
-  (winname :string)
+  (trackbarname (:pointer string*))
+  (winname (:pointer string*))
   (value :pointer)
   (count :int)
   (on-change (:pointer trackbar-callback))
@@ -23,7 +23,7 @@
 
 (defun create-trackbar (trackbarname winname value count &optional (on-change (null-pointer)) (userdata (null-pointer)))
   "Creates a trackbar and attaches it to the specified window."
-  (%create-trackbar trackbarname winname value count on-change userdata))
+  (%create-trackbar (foreign-alloc :string :initial-element trackbarname) (foreign-alloc :string :initial-element winname) value count on-change userdata))
 
 ;; void destroyWindow(const string& winname)
 ;; void cv_destroyWindow((:pointer string*) winname)
@@ -75,7 +75,7 @@
 
 (defun set-mouse-callback (winname on-mouse &optional (userdata (null-pointer)))
   "Sets mouse handler for the specified window."
-  (%set-mouse-callback winname on-mouse userdata))
+  (%set-mouse-callback (foreign-alloc :string :initial-element winname) on-mouse userdata))
 
 ;; int waitKey(int delay=0)
 ;; int cv_waitKey(int delay)
@@ -140,11 +140,13 @@
    (%cap-set self prop-id (coerce value 'double-float)))
 
 ;; Mat imread(const string& filename, int flags=1)
-;; mat cv_imread2 (const char* filename, int flags)
-(defcfun ("cv_imread2" imread) (:pointer mat)
-  (filename :string)
+;; mat cv_imread (const char* filename, int flags)
+(defcfun ("cv_imread" %imread) (:pointer mat)
+  (filename (:pointer string*))
   (flags :int))
 
+(defun imread (filename &optional (flags 1))
+   (%imread (c-string-to-string* filename (length filename)) flags))
 
 ;; VideoWriter::VideoWriter(const string& filename, int fourcc, double fps, Size frameSize, bool isColor) 
 ;; VideoWriter* cv_create_VideoWriter5(String* filename, int fourcc, double fps, Size* frameSize, bool isColor)

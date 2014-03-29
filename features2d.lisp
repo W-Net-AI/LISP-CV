@@ -94,7 +94,7 @@
 
 (defun descrip-matcher-create (self descriptor-matcher-type)
   "Creates a descriptor matcher of a given type with the default parameters (using default constructor)."
-   (%descrip-matcher-create self (foreign-alloc :string :initial-element descriptor-matcher-type)))
+   (%descrip-matcher-create self (foreign-alloc :string :initial-element descriptorf-matcher-type)))
 
 
 ;; void DescriptorMatcher::match(const Mat& queryDescriptors, const Mat& trainDescriptors, 
@@ -135,7 +135,7 @@
   (matches-mask (:pointer vector-char))
   (flags :int))
 
-(defun draw-matches (img1 keypoints1 img2 keypoints2 matches1to2 outimg match-color single-point-color &optional (matches-mask (:pointer vector-char)) (flags +default+))
+(defun draw-matches (img1 keypoints1 img2 keypoints2 matches1to2 outimg &optional (match-color (scalar-all -1)) (single-point-color (scalar-all -1)) (matches-mask (vector-char)) (flags +default+))
   "Draws the found matches of keypoints from two images."
    (%draw-matches img1 keypoints1 img2 keypoints2 matches1to2 outimg match-color single-point-color matches-mask flags))
 

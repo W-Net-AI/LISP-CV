@@ -18,6 +18,9 @@
 #include <opencv2/c/opencv_generated.hpp>
 
 extern "C" {
+Mat* cv_create_Mat_as_vectort(vector_Point2f* vec, bool copyData);
+size_t cv_Mat_get_Step(Mat* self);
+uchar* cv_Mat_get_Data(Mat* self);
 void cv_Mat_convertTo(Mat* self,Mat* m, int rtype, double alpha, double beta);
 MatExpr* cv_Mat_div_S(Mat* m1, int m2);
 Mat* cv_Mat_get_ROI(Mat* self, Rect* roi);
