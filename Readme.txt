@@ -3,6 +3,9 @@ Welcome to my LisP-CV repository, My name is Joe BiMedina.
 
 Tested on Ubuntu - all versions 12.04 and up - using SBCL and CLISP and ALLEGRO CL
 
+Warning: This library still in process. Some functions may not work as expected 
+but most functions are fully tested and well documented.
+
 --------------------------------------------------------------------------------
 
 INTRODUCTION:
