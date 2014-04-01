@@ -218,8 +218,8 @@
    #:scalar-all
    #:size
    #:mat-size
-   #:size-width
-   #:size-height
+   #:width
+   #:height
    #:step*
    #:sub
    #:sz
@@ -295,6 +295,15 @@
 
    #:+aa+
    #:circle
+   #:+font-hershey-simplex+
+   #:+font-hershey-plain+
+   #:+font-hershey-duplex+
+   #:+font-hershey-complex+
+   #:+font-hershey-triplex+
+   #:+font-hershey-complex-small+
+   #:+font-hershey-script-simplex+
+   #:+font-hershey-script-complex+
+   #:+font-italic+ 
 
 ;; core - Utility and System Functions and Macros
 

@@ -9,6 +9,8 @@ using namespace flann;
 using namespace cvflann;
 extern "C" {
 double cv_RNG_uniform_double(RNG* self, double a, double b);
+float cv_RNG_uniform_float(RNG* self, float a, float b);
+int cv_RNG_uniform_int(RNG* self, int a, int b);
 RNG* cv_create_RNG();
 RNG* cv_create_RNG_state(uint64 state);
 const float* cv_CvSVM_get_support_vector(SVM* self, int i);

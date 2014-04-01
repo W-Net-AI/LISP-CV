@@ -2,7 +2,7 @@
 
 extern "C" {
 
-    Point* cv_create_Point() {
+    Point* &cv_create_Point() {
     return new Point;
     }
     Point* cv_create_Point2(int x, int y) {

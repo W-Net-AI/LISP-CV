@@ -2,6 +2,7 @@
 ;;;; imgproc.lisp
 ;;;; OpenCV bindings
 ;;;; Image Processing
+
 (in-package :lisp-cv)
 
 

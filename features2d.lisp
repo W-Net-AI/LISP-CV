@@ -2,6 +2,7 @@
 ;;;; features2d.lisp
 ;;;; OpenCV bindings
 ;;;; 2D Features Framework
+
 (in-package :lisp-cv)
 
 ;;; Extra functions
@@ -94,7 +95,7 @@
 
 (defun descrip-matcher-create (self descriptor-matcher-type)
   "Creates a descriptor matcher of a given type with the default parameters (using default constructor)."
-   (%descrip-matcher-create self (foreign-alloc :string :initial-element descriptorf-matcher-type)))
+   (%descrip-matcher-create self (foreign-alloc :string :initial-element descriptor-matcher-type)))
 
 
 ;; void DescriptorMatcher::match(const Mat& queryDescriptors, const Mat& trainDescriptors, 

@@ -7,7 +7,7 @@
 
 ;; DEFPARAMETER macro (to make REPL testing easier)
 
-(defmacro dp (var val)
+(defmacro d (var val)
   `(defparameter ,var ,val))
 
 
@@ -57,3 +57,8 @@
    `(foreign-type-size ,val) 
 
    `(foreign-type-size '(:struct ,val))))
+
+
+;; Time Macro used to time your functions - see examples.lisp for usage
+
+  (defmacro $ (form &optional (count-form 1000000)) `(time (dotimes (_ ,count-form) ((lambda () ,form)))))

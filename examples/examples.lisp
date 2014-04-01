@@ -229,6 +229,62 @@ The function DESTROY-WINDOW destroys the window with the given name.
     (destroy-window window-name)))
 
 
+
+DESTROY-ALL-WINDOWS
+
+Destroys all of the HighGUI windows.
+
+C++: void destroyAllWindows()
+
+Common Lisp: (DESTROY-ALL-WINDOWS) => :VOID
+
+
+The function DESTROY-ALL-WINDOWS destroys all of the opened HighGUI windows.
+
+
+(defun destroy-all-windows-example ()
+
+  "In this example we create 12 windows and DESTROY THEM!!!"
+
+  (let* ((window-name-arr 
+	  (make-array 12 :initial-contents 
+
+		      (list
+		       "WINDOW 1 - DESTROY-ALL-WINDOWS Example"
+		       "WINDOW 2 - DESTROY-ALL-WINDOWS Example"
+		       "WINDOW 3 - DESTROY-ALL-WINDOWS Example"
+		       "WINDOW 4 - DESTROY-ALL-WINDOWS Example"
+		       "WINDOW 5 - DESTROY-ALL-WINDOWS Example"
+		       "WINDOW 6 - DESTROY-ALL-WINDOWS Example"
+		       "WINDOW 7 - DESTROY-ALL-WINDOWS Example"
+		       "WINDOW 8 - DESTROY-ALL-WINDOWS Example"
+		       "WINDOW 9 - DESTROY-ALL-WINDOWS Example"
+		       "WINDOW 10 - DESTROY-ALL-WINDOWS Example"
+		       "WINDOW 11 - DESTROY-ALL-WINDOWS Example"
+		       "WINDOW 12 - DESTROY-ALL-WINDOWS Example"))))
+
+    ;; Create 12 windows to DESTROY!!!
+    (dotimes (i 12)
+      (named-window (aref window-name-arr i) +window-normal+))
+    ;; Move the windows to specific coordinates.
+    (move-window (aref window-name-arr 0) 88 0)
+    (move-window (aref window-name-arr 1) 538 0)
+    (move-window (aref window-name-arr 2) 988 0)
+    (move-window (aref window-name-arr 3) 1438 0)
+    (move-window (aref window-name-arr 4) 88 368)
+    (move-window (aref window-name-arr 5) 538 368)
+    (move-window (aref window-name-arr 6) 988 368)
+    (move-window (aref window-name-arr 7) 1438 368)
+    (move-window (aref window-name-arr 8) 88 708)
+    (move-window (aref window-name-arr 9) 538 708)
+    (move-window (aref window-name-arr 10) 988 708)
+    (move-window (aref window-name-arr 11) 1438 708)
+    ;; When you press the escape key, you will...
+    ;; DESTROY 12 WINDOWS!!!
+    (loop while (not (= (wait-key 0) 27)))
+    (destroy-all-windows)))
+
+
 MOVE-WINDOW
 
 Moves window to the specified position
@@ -882,7 +938,7 @@ POINT constructor.
 
 C++: Point_()
 
-Common Lisp: (POINT-INIT) => (:POINTER POINT)
+Common Lisp: (POINT) => (:POINTER POINT)
 
 C++: Point_(_Tp _x, _Tp _y)
 
@@ -912,13 +968,13 @@ POINT creates a 2D point with integer coordinates (usually zero-based). Function
 
 (defun point-example (x y)
 
-  "Initializes a POINT construct with the 
-   function POINT-INIT. Then creates a po-
-   int with the function POINT. Finally, 
-   lists the x,y coordinates with the POI-
-   NT functions POINT-X and POINT-Y."
+  "In this example we create an unitialized 
+   POINT with the function POINT. Then crea-
+   tes a point with the function POINT. Fin-
+   ally, lists the x,y coordinates with the 
+   POINT functions POINT-X and POINT-Y."
 
-  (let* ((initialized-point (point-init))
+  (let* ((initialized-point (point))
 	 (point (point x y)))
     (format t "Pointer to initialized point: ~a~%~%" 
 	    initialized-point)
@@ -959,7 +1015,22 @@ and  POINT2D-Y are used to extract the x,y coordinates of the point.
 
 
 (defun point2d-example (x y)
-
+ ;; create 12 windows to show the output images in
+    (dotimes (i 12)
+      (named-window (aref window-name-arr i) +window-normal+))
+    ;; move the windows to specific coordinates
+    (move-window (aref window-name-arr 0) 88 0)
+    (move-window (aref window-name-arr 1) 538 0)
+    (move-window (aref window-name-arr 2) 988 0)
+    (move-window (aref window-name-arr 3) 1438 0)
+    (move-window (aref window-name-arr 4) 88 368)
+    (move-window (aref window-name-arr 5) 538 368)
+    (move-window (aref window-name-arr 6) 988 368)
+    (move-window (aref window-name-arr 7) 1438 368)
+    (move-window (aref window-name-arr 8) 88 708)
+    (move-window (aref window-name-arr 9) 538 708)
+    (move-window (aref window-name-arr 10) 988 708)
+    (move-window (aref window-name-arr 11) 1438 708)
   "Creates a point2d with the function 
    POINT2D. Then, lists the x,y coordi-
    nates with the POINT2D functions PO-
@@ -1615,11 +1686,11 @@ Returns an identity matrix of the specified size and type.
 
 C++: static MatExpr Mat::eye(int rows, int cols, int type)
 
-Common Lisp: (MAT-EYE-0 (ROWS :INT) (COLS :INT) (TYPE :INT)) => (:POINTER MAT)
+Common Lisp: (MAT-EYE (ROWS :INT) (COLS :INT) (TYPE :INT)) => (:POINTER MAT)
 
 C++: static MatExpr Mat::eye(Size size, int type)
 
-Common Lisp: (MAT-EYE-1 (S (:POINTER SIZE)) (TYPE :INT)) => (:POINTER MAT)
+Common Lisp: (MAT-EYE (S (:POINTER SIZE)) (TYPE :INT)) => (:POINTER MAT)
 
 
     Parameters:	
@@ -1638,20 +1709,20 @@ to (MAT-ONES), you can use a scale operation to create a scaled identity matrix 
 
 ;; Make a 4x4 diagonal matrix with 0.1's on the diagonal.
 
-(DEFPARAMETER A (SCALE (<< (MAT-EYE-RC 4 4 +32F+)) 0.1D0))
+(DEFPARAMETER A (SCALE (<< (MAT-EYE 4 4 +32F+)) 0.1D0))
 
 
 (defun mat-eye-example ()
 
-  "This example introduces the functions MAT-EYE-RC 
-   and MAT-EYE-S. Both identity matrix functions ar-
-   e the same, except that MAT-EYE-RC has row,colum-
-   n parameters, and MAT-EYE-S has a size parameter.  
-   Both are used to create identical 3x3 identity m-
-   atrices of unsigned-char type, IDENTITY-MAT-1 an-
-   d IDENTITY-MAT-2, which are shown in a window. 
+  "This example introduces the functions MAT-EYE a-
+   nd MAT-EYE. Both identity matrix functions are 
+   the same, except that MAT-EYE has row,column pa-
+   rameters, and MAT-EYE has a size parameters.  B-
+   oth are used to create identical 3x3 identity m-
+   atrices of unsigned-char type, IDENTITY-MAT-1 a-
+   nd IDENTITY-MAT-2, which are shown in a window. 
 
-   Then an identity matrix, IDENTITY-MAT-3 is creat-
+   Next an identity matrix, IDENTITY-MAT-3 is creat-
    ed and using the function SCALE is scaled by 
    0.1 . Then both the pre-scaled version and the s-
    caled version are shown in window. This allows y-
@@ -1671,9 +1742,9 @@ to (MAT-ONES), you can use a scale operation to create a scaled identity matrix 
    The FORCE(>>) function is used in IMSHOW to coer-
    ce SCALED-IDENTITY-MAT-3 back to MAT."
 
-  (let* ((identity-mat-1 (mat-eye-rc 3 3 +8u+))
-         (identity-mat-2 (mat-eye-s (size 3 3) +8u+))
-         (identity-mat-3 (mat-eye-rc 4 4 +32f+))
+  (let* ((identity-mat-1 (mat-eye 3 3 +8u+))
+         (identity-mat-2 (mat-eye (size 3 3) +8u+))
+         (identity-mat-3 (mat-eye 4 4 +32f+))
 	 (scaled-identity-mat-3 (scale (<< identity-mat-3) 0.1d0))
 	 (window-name-1 "IDENTITY-MAT-1 - MAT-EYE Example")
          (window-name-2 "IDENTITY-MAT-2 - MAT-EYE Example")
@@ -2195,7 +2266,7 @@ VIDEO-WRITER constructors
 
 C++: VideoWriter::VideoWriter()
 
-Common Lisp: (VIDEO-WRITER-INIT)
+Common Lisp: (VIDEO-WRITER0)
 
 C++: VideoWriter::VideoWriter(const string& filename, int fourcc, double fps, Size frameSize, bool isColor=true)
 
@@ -2284,11 +2355,11 @@ Common Lisp: (SIZE (WIDTH :INT) (HEIGHT :INT)) => (:POINTER SIZE)
 
 C++: _Tp width, height
 
-Common Lisp: (SIZE-WIDTH (SELF (:POINTER SIZE))) => :INT
+Common Lisp: (WIDTH (SELF (:POINTER SIZE))) => :INT
 
 C++: _Tp width, height
 
-Common Lisp: (SIZE-HEIGHT (SELF (:POINTER SIZE))) => :INT
+Common Lisp: (HEIGHT (SELF (:POINTER SIZE))) => :INT
 
 
     Parameters:	
@@ -2302,9 +2373,9 @@ Common Lisp: (SIZE-HEIGHT (SELF (:POINTER SIZE))) => :INT
 
 The function SIZE stores size values.
 
-The function SIZE-WIDTH Finds the width of a SIZE construct.
+The function WIDTH Finds the width of a SIZE construct.
 
-The function SIZE-HEIGHT Finds the height of a SIZE construct.
+The function HEIGHT Finds the height of a SIZE construct.
 
 
 (defun size-example ()
@@ -2313,8 +2384,8 @@ The function SIZE-HEIGHT Finds the height of a SIZE construct.
    and prints them"
 
   (let* ((size (size 640 480)))
-    (format t "Width = ~a~%" (size-width size))
-    (format t "Height = ~a" (size-height size))))
+    (format t "Width = ~a~%" (width size))
+    (format t "Height = ~a" (height size))))
 
 
 VIDEO-WRITER-IS-OPEN
@@ -3291,11 +3362,11 @@ Common Lisp: (BRISK &OPTIONAL ((THRESH :INT) 30) ((OCTAVES :INT) 3) ((PATTERN-SC
 
     Parameters:	
 
-        THRESH – FAST/AGAST detection threshold score.
+        THRESH - FAST/AGAST detection threshold score.
 
-        OCTAVES – detection octaves. Use 0 to do single scale.
+        OCTAVES - detection octaves. Use 0 to do single scale.
 
-        PATTERN-SCALE – apply this scale to the pattern used for sampling the neighbourhood of a keypoint.
+        PATTERN-SCALE - apply this scale to the pattern used for sampling the neighbourhood of a keypoint.
 
 BRISK is a construct implementing the BRISK keypoint detector and descriptor extractor, described in [LCS11]:
 
@@ -3456,23 +3527,23 @@ Common Lisp: (FEAT-DETECTOR-CREATE (SELF (:POINTER FEATURE-DETECTOR)) (DETECTOR-
 
         SELF - A pointer to a BRISK construct
 
-        DETECTOR-TYPE – Feature detector type.
+        DETECTOR-TYPE - Feature detector type.
 
 The following detector types are supported:
 
-    "FAST" – FastFeatureDetector
-    "STAR" – StarFeatureDetector
-    "SIFT" – SIFT (nonfree module)
-    "SURF" – SURF (nonfree module)
-    "ORB" – ORB
-    "BRISK" – BRISK
-    "MSER" – MSER
-    "GFTT" – GoodFeaturesToTrackDetector
-    "HARRIS" – GoodFeaturesToTrackDetector with Harris detector enabled
-    "Dense" – DenseFeatureDetector
-    "SimpleBlob" – SimpleBlobDetector
+    "FAST" - FastFeatureDetector
+    "STAR" - StarFeatureDetector
+    "SIFT" - SIFT (nonfree module)
+    "SURF" - SURF (nonfree module)
+    "ORB" - ORB
+    "BRISK" - BRISK
+    "MSER" - MSER
+    "GFTT" - GoodFeaturesToTrackDetector
+    "HARRIS" - GoodFeaturesToTrackDetector with Harris detector enabled
+    "Dense" - DenseFeatureDetector
+    "SimpleBlob" - SimpleBlobDetector
 
-Also a combined format is supported: feature detector adapter name ( "Grid" – GridAdaptedFeatureDetector, "Pyramid" – PyramidAdaptedFeatureDetector ) + feature detector name (see above), for example: "GridFAST", "PyramidSTAR" .
+Also a combined format is supported: feature detector adapter name ( "Grid" - GridAdaptedFeatureDetector, "Pyramid" - PyramidAdaptedFeatureDetector ) + feature detector name (see above), for example: "GridFAST", "PyramidSTAR" .
 
 
 (defun feat-detect-create-example (filename-1 filename-2) 
@@ -3544,16 +3615,16 @@ Common Lisp: (SURF5 (HESSIAN-THRESHOLD :DOUBLE) &OPTIONAL ((N-OCTAVES :INT) 4)
 
     Parameters:	
 
-        HESSIAN-THRESHOLD – Threshold for hessian keypoint detector used in SURF.
+        HESSIAN-THRESHOLD - Threshold for hessian keypoint detector used in SURF.
 
-        N-OCTAVES – Number of pyramid octaves the keypoint detector will use.
+        N-OCTAVES - Number of pyramid octaves the keypoint detector will use.
 
-        N-OCTAVE-LAYERS – Number of octave layers within each octave.
+        N-OCTAVE-LAYERS - Number of octave layers within each octave.
 
-        EXTENDED – Extended descriptor flag (t - use extended 128-element descriptors; nil - u-
+        EXTENDED - Extended descriptor flag (t - use extended 128-element descriptors; nil - u-
                    se 64-element descriptors).
 
-        UPRIGHT – Up-right or rotated features flag (t - do not compute orientation of features; 
+        UPRIGHT - Up-right or rotated features flag (t - do not compute orientation of features; 
                   nil - compute orientation).
 
 
@@ -3611,22 +3682,22 @@ Common Lisp:  (CREATE-TRACKBAR (TRACKBARNAME :STRING) (WINNAME :STRING) (VALUE :
     
     Parameters:	
 
-        TRACKBARNAME – Name of the created trackbar.
+        TRACKBARNAME - Name of the created trackbar.
 
-        WINNAME – Name of the window that will be used as a parent of the created trackbar.
+        WINNAME - Name of the window that will be used as a parent of the created trackbar.
 
-        VALUE – Optional pointer to an integer variable whose value reflects the position of the sl-
+        VALUE - Optional pointer to an integer variable whose value reflects the position of the sl-
                 ider. Upon creation, the slider position is defined by this variable.
 
-        COUNT – Maximal position of the slider. The minimal position is always 0.
+        COUNT - Maximal position of the slider. The minimal position is always 0.
 
-        ON-CHANGE – Pointer to the function to be called every time the slider changes position. Th-
+        ON-CHANGE - Pointer to the function to be called every time the slider changes position. Th-
                     is function should be prototyped as void Foo(int,void*); , where the first para-
                     meter is the trackbar position and the second parameter is the user data (see t-
                     he next parameter). If the callback is the NULL pointer, no callbacks are calle-
                     d, but only value is updated.
 
-        userdata – User data that is passed as is to the callback. It can be used to handle trackba-
+        userdata - User data that is passed as is to the callback. It can be used to handle trackba-
                    r events without using global variables.
 
 
@@ -3712,15 +3783,15 @@ Sets mouse handler for the specified window
 
 C++: void setMouseCallback(const string& winname, MouseCallback onMouse, void* userdata=0 )
 
-Common Lisp: (SET-MOUSE-CALLBACK (WINNAME :STRING) (ON-MOUSE (:POINTER MOUSE-CALLBACK) (USERDATA :VOID))) => :VOID
+Common Lisp: (SET-MOUSE-CALLBACK (WINNAME :STRING) (ON-MOUSE (:POINTER MOUSE-CALLBACK)) (USERDATA :VOID)) => :VOID
 
     Parameters:	
 
-        WINNAME – Window name
+        WINNAME - Window name
 
-        ONMOUSE – Mouse callback. See example below for how to use the callback.
+        ONMOUSE - Mouse callback. See example below for how to use the callback.
 
-        USERDATA – The optional parameter passed to the callback.
+        USERDATA - The optional parameter passed to the callback.
 
 
 
@@ -3774,10 +3845,10 @@ Common Lisp: (SET-MOUSE-CALLBACK (WINNAME :STRING) (ON-MOUSE (:POINTER MOUSE-CAL
 	  (format t "Image not loaded")))
     (named-window window-name 1)
     (move-window window-name 720 175)
-    ;; Sets mouse handler for the window, which passes a 
-    ;; constant stream of mouse and mouse button positional 
-    ;; data to the function above.  Also passes the contents 
-    ;; of USERDATA to the above function.
+    ;; Set mouse handler for the window, which passes a constant 
+    ;; stream of mouse and mouse button positional data to the f-
+    ;; unction above.  Also passes the contents of USERDATA to t-
+    ;; he above function CALL-BACK-FUNC.
     (set-mouse-callback window-name (callback call-back-func) userdata)
     (imshow window-name src)
     (loop while (not (= (wait-key 0) 27)))
@@ -3791,7 +3862,7 @@ Pointer to MAT data.
 
 C++: uchar* data
 
-Common Lisp: (DATA (SELF (:POINTER MAT))) => :POINTER
+Common Lisp: (DATA (SELF (:POINTER MAT)) ) => :POINTER
 
     Parameters:	
 
@@ -3894,5 +3965,310 @@ tion is named STEP*, because the name STEP conflicts with a Lisp Macro.
     (imshow window-name img)
     (loop while (not (= (wait-key 0) 27)))
     (destroy-window window-name)))
+
+
+
+$
+
+Time how long a function takes to complete n iterations.
+
+
+Common Lisp: ($ FORM &optional (COUNT-FORM 1000000) ) => RESULT*
+
+    Parameters:	
+
+        FORM - From the Common Lisp HyperSpec:
+               1. any object meant to be evaluated. 2. a symbol, a compound form, or a self-evaluat-
+               ing object. 3. (for an operator, as in ``<<operator>> form'') a compound form having 
+               that operator as its first element. ``A quote form is a constant form.''
+
+        COUNT-FORM - The number of iterations of FORM you would like to calculate.
+
+This is useful, if you have just written a function and would like to time the seconds it takes to 
+complete n iterations, because all you have to do is go back one in the REPL history and add a $ and 
+
+Example:
+
+LISP-CV> ($  (sleep 1) 5)
+
+Evaluation took:
+  5.0000 seconds of real time
+  0.004951 seconds of total run time (0.003775 user, 0.001176 system)
+  0.10% CPU
+  12,501,013,695 processor cycles
+  33,008 bytes consed
+  
+NIL
+
+
+UNIFORM
+
+Returns the next random number sampled from the uniform distribution.
+
+C++: int RNG::uniform(int a, int b)
+
+Common Lisp: (UNIFORM (RNG (:POINTER RNG)) (A :DOUBLE) (B :DOUBLE)) => :DOUBLE
+
+C++: float RNG::uniform(float a, float b)
+
+Common Lisp: (UNIFORM (RNG (:POINTER RNG)) (A :FLOAT) (B :FLOAT)) => :FLOAT
+
+C++: double RNG::uniform(double a, double b)
+
+Common Lisp: (UNIFORM (RNG (:POINTER RNG)) (A :INT) (B :INT)) => :INT
+
+
+    Parameters:	
+
+        RNG - An RNG construct
+
+        A - lower inclusive boundary of the returned random numbers.
+
+        B - upper non-inclusive boundary of the returned random numbers.
+
+The methods transform the state using the MWC algorithm and return the next uniformly-distributed r-
+andom number of the specified type, deduced from the input parameter type, from the range (a, b) . 
+There is a nuance illustrated by the following example:
+
+
+(defparameter rng (rng))
+
+;; always produces 0
+(defparameter a (uniform rng 0 1))
+
+;; produces double from (0, 1)
+(defparameter a1 (uniform rng 0d0 1d0))
+
+;; produces float from (0, 1)
+(defparameter b (uniform-f rng 0.0f0 1.0f0))
+
+;; may cause compiler error because of ambiguity:
+(defparameter d (uniform rng 0 .999999))
+
+
+RNG
+
+The constructors
+
+C++: RNG::RNG()
+
+Common Lisp: (RNG)
+
+C++: RNG::RNG(uint64 state)
+
+
+    Parameters:	
+
+        STATE – 64-bit value used to initialize the RNG.
+
+
+These are the RNG constructors. The first form sets the state to some pre-defined value, equal to 
+2**32-1 in the current implementation. The second form sets the state to the specified value. If 
+you passed STATE = 0 , the constructor uses the above default value instead to avoid the singular 
+random number sequence, consisting of all zeros.
+
+
+
+VECTOR
+
+Bindings for the C++ VECTOR class.
+
+C++: template < class T, class Alloc = allocator<T> > class vector; // generic template
+
+Common Lisp: See description.
+
+
+    Parameters:	
+
+       See description.
+
+
+The bindings for the C++ vector class, so far, are:
+
+
+Common Lisp:                      
+-------------        
+
+VECTOR-CHAR(vector<char>)
+
+VECTOR-DMATCH(vector<DMatch>)      
+
+VECTOR-FLOAT(vector<float>)
+
+VECTOR-INT(vector<int>)
+
+VECTOR-KEYPOINT(vector<KeyPoint>)
+
+VECTOR-POINT2F(vector<Point2f>)
+
+
+
+Description:
+
+
+Vectors with numbers as elements, VECTOR-CHAR, VECTOR-FLOAT and VECTOR-INT operate as follows: 
+(I use VECTOR-FLOAT as an example of the 3 vectors).
+
+
+
+If you would like to created an unititialized vector, you evaluate:
+
+
+
+LISP-CV> (VECTOR-FLOAT)
+
+
+#.(SB-SYS:INT-SAP #X7FFFDC000F40) <--- Output is an uninitialized pointer to a float vector.
+
+
+
+If you would like to created an initialized vector, you evaluate:
+
+
+
+LISP-CV> (VECTOR-FLOAT '(1f0 2f0 3f0)) 
+
+
+#.(SB-SYS:INT-SAP #X7FFFDC000F80) <--- Output is an initialized pointer to a float vector.
+
+
+
+The functionality to retrieve data from an initialized vector is built into the vector function. So
+to retrieve data from a vector you evaluate as follows(vector elements are zero-based):
+
+
+
+LISP-CV> (DEFPARAMETER A (VECTOR-FLOAT '(1f0 2f0 3f0))) <--- Create an initialized vector A.
+
+A
+
+LISP-CV> (VECTOR-FLOAT A) <--- Access the 0th element of A.
+
+1.0
+
+LISP-CV> (VECTOR-FLOAT A 1) <---Access the 1st element of A.
+
+2.0
+
+LISP-CV> (VECTOR-FLOAT A 2) <---Access the 2nd element of A.
+
+3.0
+
+
+
+Vectors with, pointers to vectors with numbers, as their elements, VECTOR-DMATCH, VECTOR-KEYPOINT a-
+nd VECTOR-POINT2F operate as follows:(I use VECTOR-POINT2F as an example of the three vectors.)
+
+
+
+If you would like to created an uninitialized vector, you evaluate:
+
+
+LISP-CV> (VECTOR-POINT2F)
+
+
+#.(SB-SYS:INT-SAP #X7FFFDC001120) <--- Output is an uninitialized pointer to a POINT2F vector.
+
+
+
+If you would like to created an initialized vector, you evaluate:
+
+
+LISP-CV> (VECTOR-POINT2F (LIST (POINT2F 1F0 2F0) (POINT2F 3F0 4F0)))
+
+
+#.(SB-SYS:INT-SAP #X7FFFDC0011C0) <--- Output is an initialized pointer to a POINT2F vector.
+
+
+
+The functionality to retrieve data from an initialized vector with pointers to vectors with numbers, 
+as their elements is built into the vector function. So to retrieve data from this type of vector 
+you evaluate as follows(vector elements are zero-based):
+
+
+LISP-CV> (DEFPARAMETER A (VECTOR-POINT2F 
+			  (LIST (POINT2F 1F0 2F0) (POINT2F 3F0 4F0)))) <--- Create an initialized vector A.
+
+A
+
+LISP-CV> (VECTOR-POINT2F A 0 0) <--- Access the 0th element of the 0th POINT2F in vector A.
+
+1.0
+
+LISP-CV> (VECTOR-POINT2F A 0 1) <--- Access the 1st element of the 0th POINT2F in vector A.
+
+2.0
+
+LISP-CV> (VECTOR-POINT2F A 1 0) <--- Access the 0th element of the 1st POINT2F in vector A.
+
+3.0
+
+LISP-CV> (VECTOR-POINT2F A 1 1) <--- Access the 1st element of the 1st POINT2F in vector A.
+
+4.0
+
+
+
+ASSGN-VAL
+
+Assign a scalar value to a matrix.
+
+C++: MatExpr = operator
+
+Common Lisp: (ASSGN-VAL (SELF (:POINTER MAT)) (S (:POINTER SCALAR))) => (:POINTER MAT)
+
+    Parameters:	
+
+        SELF - A matrix
+
+        S - A scalar.
+
+
+Use the function SCALAR-ALL, as the S parameter value, to set each matrix element to the same value
+for example: (SCALAR-ALL -1) will assign -1 to every element of the matrix. Use the function SCALAR 
+to assign a specific color value to each element of the matrix i.e. (SCALAR 0 255 0) will set every 
+matrix element to green. This is useful when you need to add/subtract a certain color value from an 
+image. The matrix you assign the scalar value to will be overwritten by the operation, there is no 
+need to access the return value of ASSGN-VAL to complete the operation,
+
+
+(defun assgn-val-example (filename)
+
+  (let* ((window-name-1 "IMAGE - ASSGN-VAL Example")
+         (window-name-2 "MAT - ASSGN-VAL Example")
+	 (image (imread filename 1))
+         ;; Create a matrix to fill with a scalar 
+         ;; value defined below
+         (mat (mat-ones 640 480 +8uc3+))
+         (scalar (scalar 255 0 0))
+         (result 0))
+    (named-window window-name-1 +window-normal+)
+    (named-window window-name-2 +window-normal+)	
+    (move-window window-name-1 464 175)
+    (move-window window-name-2 915 175)
+    ;; Set all elements of MAT to the value defined 
+    ;; by SCALAR.
+    (assgn-val mat scalar)
+    ;; Print IMAGE type. It is important to know this
+    ;; Before subtracting a matrix from an Image. You 
+    ;; must set the matrix size and type to be the sa-
+    ;; me as the image
+    (format t "IMAGE type = ~a(+8UC3+)" (mat-type image))
+    ;; Subtract MAT from IMAGE
+    (setf result (sub image mat))
+    ;; Show results
+    (imshow window-name-1 image)
+    (imshow window-name-2 (>> result))
+    (loop while (not (= (wait-key 0) 27)))
+    (destroy-all-windows)))
+
+
+
+
+
+
+
+
+
 
 

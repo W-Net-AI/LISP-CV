@@ -2,6 +2,7 @@
 ;;;; nonfree.lisp
 ;;;; OpenCV bindings
 ;;;; Non-free functionality
+
 (in-package :lisp-cv)
 
 

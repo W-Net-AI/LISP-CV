@@ -20,6 +20,9 @@ Mat* std_vectormToCArray(vector_Mat* s) {
     return s->data();
 }
 
+size_t std_vectorm_length(vector_Mat* self) {
+    return self->size();
+}
 
 vector_Point2f* std_create_vectorp2f() {
     return new vector<Point2f>;
@@ -36,11 +39,15 @@ Point2f* std_vectorp2fToCArray(vector_Point2f* s) {
     return s->data();
 }
 
+size_t std_vectorp2f_length(vector_Point2f* self) {
+    return self->size();
+}
+
 vector_char* std_create_vectorc() {
     return new vector<char>;
 }
 
-vector_char* std_carrayTovectorc(char* a, size_t len) {
+vector_char* *std_carrayTovectorc(char* a, size_t len) {
     vector<char>* v = new vector<char>;
     for(size_t i = 0; i < len; i++) 
         v->push_back(a[i]);
@@ -51,12 +58,45 @@ char* std_vectorcToCArray(vector_char* s) {
     return s->data();
 }
 
-vector_KeyPoint* std_create_vectork() {
+size_t std_vectorc_length(vector_char* self) {
+    return self->size();
+}
+
+vector_KeyPoint* std_create_vectorkp() {
     return new vector<KeyPoint>;
+}
+
+vector_KeyPoint* std_carrayTovectorkp(KeyPoint* a, size_t len) {
+    vector<KeyPoint>* v = new vector<KeyPoint>;
+    for(size_t i = 0; i < len; i++) 
+        v->push_back(a[i]);
+    return v;
+}
+
+KeyPoint* std_vectorkpToCArray(vector_KeyPoint* s) {
+    return s->data();
+}
+
+size_t std_vectorkp_length(vector_KeyPoint* self) {
+    return self->size();
 }
 
 vector_DMatch* std_create_vectordm() {
     return new vector<DMatch>;
+}
+
+vector_DMatch* std_carrayTovectordm(DMatch* a, size_t len) {
+    vector<DMatch>* v = new vector<DMatch>;
+    for(size_t i = 0; i < len; i++) 
+        v->push_back(a[i]);
+    return v;
+}
+
+DMatch* std_vectordmToCArray(vector_DMatch* s) {
+    return s->data();
+}
+size_t std_vectordm_length(vector_DMatch* self) {
+    return self->size();
 }
 
 string* std_create_string() {
