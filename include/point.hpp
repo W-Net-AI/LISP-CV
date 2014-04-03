@@ -18,8 +18,7 @@
 #include <opencv2/c/opencv_generated.hpp>
 
 extern "C" {
-    Point* &cv_create_Point();
-    Point* cv_create_Point2(int x, int y);
+    Point* cv_create_Point(int x, int y);
     int cv_Point_getX(Point* self);
     int cv_Point_getY(Point* self);
     int cv_Point_dot(Point* self, Point* other);

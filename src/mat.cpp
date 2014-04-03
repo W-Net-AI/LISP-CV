@@ -46,6 +46,10 @@ MatExpr* cv_Mat_div(Mat* m1, Mat* m2) {
     return new MatExpr(*m1 / *m2);
 }
 
+Mat* cv_create_sized_Mat(Size* s, int type) {
+    return new Mat(Mat::ey(*s, type));
+}
+
 Mat* cv_create_sized_identity(Size* s, int type) {
     return new Mat(Mat::eye(*s, type));
 }

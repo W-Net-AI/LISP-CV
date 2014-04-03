@@ -3,6 +3,393 @@
 ;;;; Documentation and Examples:
 
 
+====================================================CORE=============================================
+
+
+BASIC STRUCTURES
+----------------
+
+
+COPY-TO
+
+Copies the matrix to another one.
+
+C++: void Mat::copyTo(OutputArray m) const
+
+Common Lisp: (COPY-TO (SELF (:POINTER MAT)) (M (:POINTER MAT))) => :VOID
+
+C++: void Mat::copyTo(OutputArray m, InputArray mask) const
+
+Common Lisp: (COPY-TO (SELF (:POINTER MAT)) (M (:POINTER MAT)) (MASK (:POINTER MAT))) => :VOID
+
+    Parameters:	
+
+        SELF - A matrix.         
+
+        M - Destination matrix. If it does not have a proper size or type before the operation, it 
+            is reallocated.
+
+        MASK - Operation mask. Its non-zero elements indicate which matrix elements need to be copied.
+
+
+The method copies the matrix data to another matrix. Before copying the data, the method invokes:
+
+(CREATE (MAT-SIZE THIS) (MAT-TYPE THIS))
+
+So that the destination matrix is reallocated if needed. While (COPY-TO M M) works flawlessly, the 
+function does not handle the case of a partial overlap between the source and the destination matri-
+ces. When the operation mask is specified, and the (CREATE) call shown above reallocated the matrix, 
+the newly allocated matrix is initialized with all zeros before copying the data.
+
+
+
+(defun copy-to-example ()
+  ;; initialize data for matrices
+  (let* ((data (alloc :int '(10 20 30 40)))
+         ;; initialize MAT-1 with DATA.
+         (mat-1 (mat-data 2 2 +32s+ data))
+         ;; initialize MAT-2, a second, 
+         ;; identical matrix
+         (mat-2 (mat-data 2 2 +32s+ data))
+         ;; create empty matrices M-1 and M-2
+         (m-1 (mat))
+	 (m-2 (mat))
+         ;; create a mask for MAT-2 copy operation,
+         ;; an identity matrix. its non-zero eleme-
+         ;; nts indicate which matrix elements nee-
+         ;; d to be copied.
+         (mask (mat-eye 2 2 +8u+)))
+    ;; copy data from MAT-1 to M.
+    (copy-to mat-1 m-1)
+    ;; print contents of MAT-1.
+    (format t "MAT-1 =~%~%")
+    (dotimes (i (rows mat-1))
+      (dotimes (j (cols mat-1))
+	(format t "~a" (at-int mat-1 i j))
+	(princ #\Space))
+      (princ #\Newline))
+    (format t "~%")
+    ;; print contents of of M-1.
+    (format t "M-1 =~%~%")
+    (dotimes (i (rows m-1))
+      (dotimes (j (cols m-1))
+	(format t "~a" (at-int m-1 i j))
+	(princ #\Space))
+      (princ #\Newline))
+    (format t "~%")
+    ;; copy data from MAT-2 to M using mask.
+    (copy-to mat-2 m-2 mask)
+    ;; print contents of MAT-2.
+    (format t "MAT-2 =~%~%")
+    (dotimes (i (rows mat-2))
+      (dotimes (j (cols mat-2))
+	(format t "~a" (at-int mat-2 i j))
+	(princ #\Space))
+      (princ #\Newline))
+    (format t "~%")
+    ;; print contents of MASK.
+    (format t "MASK =~%~%")
+    (dotimes (i (rows mask))
+      (dotimes (j (cols mask))
+	(format t "~a" (at-uchar mask i j))
+	(princ #\Space))
+      (princ #\Newline))
+    (format t "~%")
+    ;; print contents of of M-2.
+    (format t "M-2 =~%~%")
+    (dotimes (i (rows m-2))
+      (dotimes (j (cols m-2))
+	(format t "~a" (at-int m-2 i j))
+	(princ #\Space))
+      (princ #\Newline))
+    (format t "~%~%")))
+
+
+PROMOTE 
+
+Coverts a MAT to MAT-EXPR
+
+Common Lisp: (PROMOTE (SELF (:POINTER MAT))) => (:POINTER MAT-EXPR)
+
+Common Lisp: (<< (SELF (:POINTER MAT))) => (:POINTER MAT-EXPR)
+
+The function PROMOTE converts a functions return from (:POINTER MAT) to (:POINTER MAT-EXPR).  This 
+is useful if you would like to do math computation on a matrix with a (:POINTER MAT) type using a 
+super fast Matrix Expressions(MAT-EXPR) function. Matrix Expressions functions will only accept a
+(:POINTER MAT-EXPR) type as input.  You can then convert back to (:POINTER MAT) with the function
+FORCE to use the result in a function that only accepts a MAT as input i.e. IMSHOW. The function 
+<< is an identical shorthand version of the PROMOTE function supplied for ease of use. 
+
+   Parameters:	
+
+        SELF - A MAT pointer.
+
+
+(defun promote-example ()
+
+  "In this example a matrix filled with ones(MAT) is 
+   created. PROMOTE or actually the shorthand versio-
+   n of the function PROMOTE << is then used to coer-
+   ce MAT to a (:POINTER MAT-EXPR) type so it can th-
+   en be multiplied by the scalar S with the functio-
+   n SCALE. This is necessary since SCALE only accep-
+   ts (:POINTER MAT-EXPR) types as it's input. The o-
+   utput of SCALE(OUT) is then coerced back to (:POI-
+   NTER MAT) with the function FORCE for the opposit-
+   e reason so it can then be shown in a window with 
+   IMSHOW."
+
+  (let* ((mat (mat-ones 3 3 +8u+))
+         (s 5.0d0)
+         (out (scale (<< mat) s))
+	 (window-name "PROMOTE Example"))
+    (named-window window-name +window-normal+)
+    (move-window window-name 720 175)
+    (imshow window-name  (>> out))
+    (loop while (not (= (wait-key 0) 27)))
+    (destroy-window window-name)))
+
+
+
+Drawing Functions
+-----------------
+
+
+RECTANGLE
+
+Draws a simple, thick, or filled up-right rectangle.
+
+C++: void rectangle(Mat& img, Point pt1, Point pt2, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
+
+Common Lisp: (RECTANGLE (IMG (:POINTER MAT)) (PT1 (:POINTER POINT)) (PT2 (:POINTER POINT)) (COLOR (:POINTER SCALAR)) &OPTIONAL ((THICKNESS :INT) 1) ((LINE-TYPE :INT) 8) ((SHIFT :INT) 0)) => :VOID
+:
+
+    Parameters:	
+
+        ParameTERS:	
+
+              IMG – Image.
+
+              PT1 – First point of the line segment.
+
+              PT2 – Second point of the line segment.
+
+              COLOR – Rectangle color or brightness (grayscale image).
+
+              THICKNESS – Thickness of lines that make up the rectangle. 
+                          Negative values, like +FILLED+ (-1) , mean that 
+                          the function has to draw a filled rectangle.
+
+              LINE-TYPE – Type of the line:
+
+                      8 (or omitted) - 8-connected line.
+
+                      4 - 4-connected line.
+
+                      +AA+ - antialiased line.
+
+              SHIFT – Number of fractional bits in the point coordinates.
+
+
+The function rectangle draws a rectangle outline or a filled rectangle whose two opposite corners 
+are PT1 and PT2.
+
+
+(defun random-color (rng &optional (icolor 0))
+  (setf icolor rng)
+  (return-from random-color (scalar (uniform rng 0 255) 
+				    (uniform rng 0 255) (uniform rng 0 255))))
+
+(defun rectangle-example ()
+
+  (let* ((window-name "RECTANGLE Example")
+	 (window-width 640)
+	 (window-height 480)
+	 ;; Initialize random number generator
+	 (rng (rng #xFFFFFFFF))
+	 ;; Create a black background
+	 (mat (mat-zeros window-width window-height +8uc3+)))
+    ;; Create a window
+    (named-window window-name +window-normal+)
+    ;; Set window to fullscreen
+    (set-window-property window-name +wnd-prop-fullscreen+ 
+			 +window-fullscreen+)
+    (if (equal 1.0d0 (get-window-property window-name +wnd-prop-fullscreen+)) 
+	(set-window-property window-name +wnd-prop-aspectratio+ 
+			     +window-freeratio+))
+    ;; Set line type and thickness
+    (do* ((line-type +aa+)
+          (thickness (uniform rng -3 10))
+	  ;; Initialize rectangle position variables
+          (x-1 (/ (* window-width -1) 2))
+	  (x-2 (/ (* window-width 3) 2))
+          (y-1 (/ (* window-width -1) 2))
+          (y-2 (/ (* window-width 3) 2))
+          (pt1 0)
+	  (pt2 0))
+	 ((plusp (wait-key 1)) 
+	  (format t "Key is pressed by user"))
+      ;; Print randomly colored rectangles to screen
+      (setf pt1 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
+      (setf pt2 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
+      (rectangle mat pt1 pt2 (random-color rng) thickness line-type)
+      ;; Show result in window
+      (imshow window-name mat))
+    (destroy-window window-name)))
+
+
+TYPES AND STRUCTURES
+--------------------
+
+
+
+USER INTERFACE
+--------------
+
+
+
+QT NEW FUNCTIONS
+----------------
+
+
+GET-WINDOW-PROPERTY
+
+Provides parameters of a window.
+
+C++: double getWindowProperty(const string& winname, int prop_id)
+
+Common Lisp: (GET-WINDOW-PROPERTY (WINNAME (:pOINTER STRING*)) (PROP-ID) :INT) => :DOUBLE
+
+
+          Parameters:	
+
+              WINNAME - Name of the window.
+
+              PROP-ID -
+
+              Window property to retrieve. The following operation flags are available:
+
+
+                     +WND-PROP-FULLSCREEN+ Change if the window is fullscreen (+WINDOW-NORMAL+ or 
+                                           +WINDOW-FULLSCREEN+).
+
+                     +WND-PROP-AUTOSIZE+ Change if the window is resizable (+WINDOW-NORMAL+ or 
+                                         +WINDOW-AUTOSIZE+).
+
+                     +WND-PROP-ASPECTRATIO+ Change if the aspect ratio of the image is preserved,
+                                            (+WINDOW-FREERATIO+ or +WINDOW-KEEPRATIO+).
+
+
+
+Note: See (SET-WINDOW-PROPERTY) to know the meaning of the returned values.
+
+
+The function GET-WINDOW-PROPERTY returns properties of a window.
+
+
+(defun get-window-property-example (filename)
+
+  ;; Read in image
+  (let* ((image (imread filename 1))
+	 (window-name "GET-WINDOW-PROPERTY Example"))
+    (if (empty image) 
+	(return-from get-window-property-example 
+	  (format t "Image not loaded")))
+    ;; Create window
+    (named-window window-name +window-normal+)
+    ;; Set window to fullscreen
+    (set-window-property window-name +wnd-prop-fullscreen+ 
+			 +window-fullscreen+)
+    ;; If aspect ratio is not stretched, set to stretched
+    (if (equal 1.0d0 (get-window-property window-name +wnd-prop-fullscreen+)) 
+	(set-window-property window-name +wnd-prop-aspectratio+ 
+			     +window-freeratio+))
+    ;; Show image
+    (imshow window-name image)
+    (loop while (not (= (wait-key 0) 27)))
+    (destroy-window window-name)))
+
+
+
+SET-WINDOW-PROPERTY
+
+
+Changes parameters of a window dynamically.
+
+
+C++: void setWindowProperty(const string& winname, int prop_id, double prop_value)
+
+Common Lisp: (SET-WINDOW-PROPERTY (WINNAME (:POINTER STRING*)) (PROP-ID :INT) (PROP-VALUE :DOUBLE)) => :VOID
+
+
+    Parameters:	
+
+        WINNAME - Name of the window.
+
+        PROP-ID -
+
+           Window property to edit. The following operation flags are available:
+
+
+               +WND-PROP-FULLSCREEN+ Change if the window is fullscreen (+WINDOW-NORMAL+ or 
+                                     +WINDOW-FULLSCREEN+).
+
+               +WND-PROP-AUTOSIZE+ Change if the window is resizable (+WINDOW-NORMAL+ or 
+                                   +WINDOW-AUTOSIZE+).
+
+               +WND-PROP-ASPECTRATIO+ Change if the aspect ratio of the image is preserved,
+                                      (+WINDOW-FREERATIO+ or +WINDOW-KEEPRATIO+).
+
+        PROP-VALUE -
+
+           New value of the window property. the following operation flags are available:
+
+
+               +WINDOW-NORMAL+ Change the window to normal size or make the window resizable.
+
+               +WINDOW-AUTOSIZE+ Constrain the size by the displayed image. the window is not resizable.
+
+               +WINDOW-FULLSCREEN+ Change the window to fullscreen.
+
+               +WINDOW-FREERATIO+ Make the window resizable without any ratio constraints.
+
+               +WINDOW-KEEPRATIO+ Make the window resizable, but preserve the proportions of the di-
+                                  splayed image.
+
+
+
+The function SET-WINDOW-PROPERTY enables changing properties of a window.
+
+
+(defun set-window-property-example (filename)
+  ;; Read in image
+  (let* ((image (imread filename 1))
+	 (window-name "SET-WINDOW-PROPERTY Example"))
+    (if (empty image) 
+	(return-from set-window-property-example 
+	  (format t "Image not loaded")))
+    ;; Create window
+    (named-window window-name +window-normal+)
+    ;; Set window to fullscreen
+    (set-window-property window-name +wnd-prop-fullscreen+ 
+			 +window-fullscreen+)
+    ;; Show image
+    (imshow window-name image)
+    (loop while (not (= (wait-key 0) 27)))
+    (destroy-window window-name)))
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 IMSHOW
 
@@ -160,7 +547,26 @@ Common Lisp: (NAMED-WINDOW (WINNAME (:POINTER STRING*)) &OPTIONAL ((FLAGS :INT) 
             +WINDOW-NORMAL+ If this is set, the user can resize the window (no constraint).
 
             +WINDOW-AUTOSIZE+ If this is set, the window size is automatically adjusted to fit the 
-                              displayed image (see (IMSHOW) ), and you cannot change the window siz-
+                              displayed image (see (IMSHOW) ), and you cannot change Mat::copyTo
+
+Copies the matrix to another one.
+
+C++: void Mat::copyTo(OutputArray m) const
+
+C++: void Mat::copyTo(OutputArray m, InputArray mask) const
+    Parameters:	
+
+        m – Destination matrix. If it does not have a proper size or type before the operation, it is reallocated.
+        mask – Operation mask. Its non-zero elements indicate which matrix elements need to be copied.
+
+The method copies the matrix data to another matrix. Before copying the data, the method invokes
+
+m.create(this->size(), this->type);
+
+so that the destination matrix is reallocated if needed. While m.copyTo(m); works flawlessly, the function does not handle the case of a partial overlap between the source and the destination matrices.
+
+When the operation mask is specified, and the Mat::create call shown above reallocated the matrix, the newly allocated matrix is initialized with all zeros before copying the data.
+the window siz-
                               e manually.
 
             +WINDOW-OPENGL+ If this is set, the window will be created with OpenGL support.
@@ -244,7 +650,48 @@ The function DESTROY-ALL-WINDOWS destroys all of the opened HighGUI windows.
 
 (defun destroy-all-windows-example ()
 
-  "In this example we create 12 windows and DESTROY THEM!!!"
+  "In this example we create
+(defun random-color (rng &optional (icolor 0))
+  (setf icolor rng)
+  (return-from random-color (scalar (uniform rng 0 255) 
+				    (uniform rng 0 255) (uniform rng 0 255))))
+
+(defun rectangle-example ()
+
+  (let* ((window-name "RECTANGLE Example")
+	 (window-width 640)
+	 (window-height 480)
+	 ;; Initialize random number generator
+	 (rng (rng #xFFFFFFFF))
+	 ;; Create a black background
+	 (mat (mat-zeros window-width window-height +8uc3+)))
+    ;; Create a window
+    (named-window window-name +window-normal+)
+    ;; Set window to fullscreen
+    (set-window-property window-name +wnd-prop-fullscreen+ 
+			 +window-fullscreen+)
+    (if (equal 1.0d0 (get-window-property window-name +wnd-prop-fullscreen+)) 
+	(set-window-property window-name +wnd-prop-aspectratio+ 
+			     +window-freeratio+))
+    ;; Set line type and thickness
+    (do* ((line-type +aa+)
+          (thickness (uniform rng -3 10))
+	  ;; Initialize rectangle position variables
+          (x-1 (/ (* window-width -1) 2))
+	  (x-2 (/ (* window-width 3) 2))
+          (y-1 (/ (* window-width -1) 2))
+          (y-2 (/ (* window-width 3) 2))
+          (pt1 0)
+	  (pt2 0))
+	 ((plusp (wait-key 1)) 
+	  (format t "Key is pressed by user"))
+      ;; Print randomly colored rectangles to screen
+      (setf pt1 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
+      (setf pt2 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
+      (rectangle mat pt1 pt2 (random-color rng) thickness line-type)
+      ;; Show result in window
+      (imshow window-name mat))
+    (destroy-window window-name))) 12 windows and DESTROY THEM!!!"
 
   (let* ((window-name-arr 
 	  (make-array 12 :initial-contents 
@@ -709,7 +1156,7 @@ If the previous call to VIDEO-CAPTURE constructor or CAP-IS-OPEN succeeded, the 
 	(cap-read cap frame)
 	(imshow window-name frame))
       (cap-release cap)
-      (destroy-window window-name))))
+      (destroy-window window-name))))indicate
 
 
 ABSDIFF
@@ -819,7 +1266,48 @@ ly VAL1 is required, the rest are optional.
 	 (scalar-4 (scalar 1 2 3 4)))
     (format t "SCALAR-1 element 0 = ~a~%" (mem-aref scalar-1 :double 0))
     (dotimes (n 2)
-      (format t "~%SCALAR-2 element ~a = ~a~%" n (mem-aref scalar-2 :double n)))
+      (format t "~%SCALAR-2
+(defun random-color (rng &optional (icolor 0))
+  (setf icolor rng)
+  (return-from random-color (scalar (uniform rng 0 255) 
+				    (uniform rng 0 255) (uniform rng 0 255))))
+
+(defun rectangle-example ()
+
+  (let* ((window-name "RECTANGLE Example")
+	 (window-width 640)
+	 (window-height 480)
+	 ;; Initialize random number generator
+	 (rng (rng #xFFFFFFFF))
+	 ;; Create a black background
+	 (mat (mat-zeros window-width window-height +8uc3+)))
+    ;; Create a window
+    (named-window window-name +window-normal+)
+    ;; Set window to fullscreen
+    (set-window-property window-name +wnd-prop-fullscreen+ 
+			 +window-fullscreen+)
+    (if (equal 1.0d0 (get-window-property window-name +wnd-prop-fullscreen+)) 
+	(set-window-property window-name +wnd-prop-aspectratio+ 
+			     +window-freeratio+))
+    ;; Set line type and thickness
+    (do* ((line-type +aa+)
+          (thickness (uniform rng -3 10))
+	  ;; Initialize rectangle position variables
+          (x-1 (/ (* window-width -1) 2))
+	  (x-2 (/ (* window-width 3) 2))
+          (y-1 (/ (* window-width -1) 2))
+          (y-2 (/ (* window-width 3) 2))
+          (pt1 0)
+	  (pt2 0))
+	 ((plusp (wait-key 1)) 
+	  (format t "Key is pressed by user"))
+      ;; Print randomly colored rectangles to screen
+      (setf pt1 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
+      (setf pt2 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
+      (rectangle mat pt1 pt2 (random-color rng) thickness line-type)
+      ;; Show result in window
+      (imshow window-name mat))
+    (destroy-window window-name))) element ~a = ~a~%" n (mem-aref scalar-2 :double n)))
     (dotimes (n 3)
       (format t "~%SCALAR-3 element ~a = ~a~%" n (mem-aref scalar-3 :double n)))
     (dotimes (n 4)
@@ -852,7 +1340,11 @@ ugh 3, are initialized with one value(VAL0123).
       (format t "~%SCALAR element ~a = ~a~%" n 
 	      (mem-aref scalar :double n)))))
 
+;;; Types and structures
 
+
+
+;;; User Interface
 MAT-SIZE
 
 Returns pointer to a matrix size.
@@ -1294,7 +1786,48 @@ system, like CV_16SC3(+16SC3+ in Common Lisp) or 16-bit signed 3-channel array, 
     (named-window window-name-2 +window-normal+)
     (move-window window-name-1 464 175)
     (move-window window-name-2 915 175)
-    (format t "MAT-ONE type is ~a(+32f+). It is a Single Precision Floating Point Matrix.~%" 
+    (format t "MAT-ONE type
+(defun random-color (rng &optional (icolor 0))
+  (setf icolor rng)
+  (return-from random-color (scalar (uniform rng 0 255) 
+				    (uniform rng 0 255) (uniform rng 0 255))))
+
+(defun rectangle-example ()
+
+  (let* ((window-name "RECTANGLE Example")
+	 (window-width 640)
+	 (window-height 480)
+	 ;; Initialize random number generator
+	 (rng (rng #xFFFFFFFF))
+	 ;; Create a black background
+	 (mat (mat-zeros window-width window-height +8uc3+)))
+    ;; Create a window
+    (named-window window-name +window-normal+)
+    ;; Set window to fullscreen
+    (set-window-property window-name +wnd-prop-fullscreen+ 
+			 +window-fullscreen+)
+    (if (equal 1.0d0 (get-window-property window-name +wnd-prop-fullscreen+)) 
+	(set-window-property window-name +wnd-prop-aspectratio+ 
+			     +window-freeratio+))
+    ;; Set line type and thickness
+    (do* ((line-type +aa+)
+          (thickness (uniform rng -3 10))
+	  ;; Initialize rectangle position variables
+          (x-1 (/ (* window-width -1) 2))
+	  (x-2 (/ (* window-width 3) 2))
+          (y-1 (/ (* window-width -1) 2))
+          (y-2 (/ (* window-width 3) 2))
+          (pt1 0)
+	  (pt2 0))
+	 ((plusp (wait-key 1)) 
+	  (format t "Key is pressed by user"))
+      ;; Print randomly colored rectangles to screen
+      (setf pt1 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
+      (setf pt2 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
+      (rectangle mat pt1 pt2 (random-color rng) thickness line-type)
+      ;; Show result in window
+      (imshow window-name mat))
+    (destroy-window window-name))) is ~a(+32f+). It is a Single Precision Floating Point Matrix.~%" 
 	    (mat-type mat-one))
     (format t "~%MAT-TWO type is ~a(+64f+). It is a Double Precision Floating Point Matrix." 
 	    (mat-type mat-two))
@@ -1326,7 +1859,11 @@ Common Lisp: (CAP-CAM (DEVICE :INT))
    ere is a single camera connected, just pass 0
    (the default value of *camera-index*)."
 
-  (with-capture (cap (cap-cam camera-index))
+  (with-capture (cap (ca;;; Types and structures
+
+
+
+;;; User Interfacep-cam camera-index))
     (let ((window-name "CAP-CAM Example"))
       (if (not (cap-is-open cap)) 
 	  (return-from cap-cam-example 
@@ -1424,7 +1961,7 @@ The example below initializes a Hilbert matrix:
 
 (defun at-example ()
   (let ((h (mat-typed-0 5 5 +64f+)))
-    (dotimes (i (rows h))
+    (dotimes (i (rows h))indicate
       (dotimes (j (cols h))
 	(at-double+ h i j (/ 1.0d0 (+ i j 1)))
 	(princ (at-double h i j))
@@ -1563,7 +2100,11 @@ CIRCLE-EXAMPLE:
 			      (format t "floor has been touched~%") 
 			      (setf floor-switch 1))) 
 	(if (= y the-ceiling) (progn 
-				(format t "ceiling has been touched~%") 
+				(format t;;; Types and structures
+
+
+
+;;; User Interface "ceiling has been touched~%") 
 				(setf ceiling-switch 1))) 
 	(if (and (< x the-right-wall) (= right-wall-switch 0)) (incf x rate) (decf x rate))
 	(if (and (< y the-floor) (= floor-switch 0)) (incf y rate) (decf y rate))
@@ -1819,7 +2360,48 @@ C++: double getTickFrequency()
 
 Common Lisp: (GET-TICK-FREQUENCY) => :DOUBLE
 
-The function returns the number of ticks per second. That is, the following code computes the execu-
+The function returns the nu
+(defun random-color (rng &optional (icolor 0))
+  (setf icolor rng)
+  (return-from random-color (scalar (uniform rng 0 255) 
+				    (uniform rng 0 255) (uniform rng 0 255))))
+
+(defun rectangle-example ()
+
+  (let* ((window-name "RECTANGLE Example")
+	 (window-width 640)
+	 (window-height 480)
+	 ;; Initialize random number generator
+	 (rng (rng #xFFFFFFFF))
+	 ;; Create a black background
+	 (mat (mat-zeros window-width window-height +8uc3+)))
+    ;; Create a window
+    (named-window window-name +window-normal+)
+    ;; Set window to fullscreen
+    (set-window-property window-name +wnd-prop-fullscreen+ 
+			 +window-fullscreen+)
+    (if (equal 1.0d0 (get-window-property window-name +wnd-prop-fullscreen+)) 
+	(set-window-property window-name +wnd-prop-aspectratio+ 
+			     +window-freeratio+))
+    ;; Set line type and thickness
+    (do* ((line-type +aa+)
+          (thickness (uniform rng -3 10))
+	  ;; Initialize rectangle position variables
+          (x-1 (/ (* window-width -1) 2))
+	  (x-2 (/ (* window-width 3) 2))
+          (y-1 (/ (* window-width -1) 2))
+          (y-2 (/ (* window-width 3) 2))
+          (pt1 0)
+	  (pt2 0))
+	 ((plusp (wait-key 1)) 
+	  (format t "Key is pressed by user"))
+      ;; Print randomly colored rectangles to screen
+      (setf pt1 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
+      (setf pt2 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
+      (rectangle mat pt1 pt2 (random-color rng) thickness line-type)
+      ;; Show result in window
+      (imshow window-name mat))
+    (destroy-window window-name)))mber of ticks per second. That is, the following code computes the execu-
 tion time in seconds:
 
 
@@ -1911,50 +2493,6 @@ nction >> is an identical shorthand version of the FORCE function supplied for e
     (loop while (not (= (wait-key 0) 27)))
     (destroy-window window-name)))
 
-
-PROMOTE
-
-Coverts a MAT to MAT-EXPR
-
-Common Lisp: (PROMOTE (SELF (:POINTER MAT))) => (:POINTER MAT-EXPR)
-
-Common Lisp: (<< (SELF (:POINTER MAT))) => (:POINTER MAT-EXPR)
-
-The function PROMOTE converts a functions return from (:POINTER MAT) to (:POINTER MAT-EXPR).  This 
-is useful if you would like to do math computation on a matrix with a (:POINTER MAT) type using a 
-super fast Matrix Expressions(MAT-EXPR) function. Matrix Expressions functions will only accept a
-(:POINTER MAT-EXPR) type as input.  You can then convert back to (:POINTER MAT) with the function
-FORCE to use the result in a function that only accepts a MAT as input i.e. IMSHOW. The function 
-<< is an identical shorthand version of the PROMOTE function supplied for ease of use. 
-
-   Parameters:	
-
-        SELF - A MAT pointer.
-
-
-(defun promote-example ()
-
-  "In this example a matrix filled with ones(MAT) is 
-   created. PROMOTE or actually the shorthand versio-
-   n of the function PROMOTE << is then used to coer-
-   ce MAT to a (:POINTER MAT-EXPR) type so it can th-
-   en be multiplied by the scalar S with the functio-
-   n SCALE. This is necessary since SCALE only accep-
-   ts (:POINTER MAT-EXPR) types as it's input. The o-
-   utput of SCALE(OUT) is then coerced back to (:POI-
-   NTER MAT) with the function FORCE for the opposit-
-   e reason so it can then be shown in a window with 
-   IMSHOW."
-
-  (let* ((mat (mat-ones 3 3 +8u+))
-         (s 5.0d0)
-         (out (scale (<< mat) s))
-	 (window-name "PROMOTE Example"))
-    (named-window window-name +window-normal+)
-    (move-window window-name 720 175)
-    (imshow window-name  (>> out))
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name)))
 
 
 MAT-TYPED-0
@@ -2181,7 +2719,48 @@ functions.
   (let* ((m1-data (foreign-alloc :uint :initial-contents 
 				 '(53 62 85 64 23 97 52 16 12)))
 	 (m2-data (foreign-alloc :uint :initial-contents 
-				 '(64 22 64 15 11 17 42 16 88)))
+				 '(64 22 64
+(defun random-color (rng &optional (icolor 0))
+  (setf icolor rng)
+  (return-from random-color (scalar (uniform rng 0 255) 
+				    (uniform rng 0 255) (uniform rng 0 255))))
+
+(defun rectangle-example ()
+
+  (let* ((window-name "RECTANGLE Example")
+	 (window-width 640)
+	 (window-height 480)
+	 ;; Initialize random number generator
+	 (rng (rng #xFFFFFFFF))
+	 ;; Create a black background
+	 (mat (mat-zeros window-width window-height +8uc3+)))
+    ;; Create a window
+    (named-window window-name +window-normal+)
+    ;; Set window to fullscreen
+    (set-window-property window-name +wnd-prop-fullscreen+ 
+			 +window-fullscreen+)
+    (if (equal 1.0d0 (get-window-property window-name +wnd-prop-fullscreen+)) 
+	(set-window-property window-name +wnd-prop-aspectratio+ 
+			     +window-freeratio+))
+    ;; Set line type and thickness
+    (do* ((line-type +aa+)
+          (thickness (uniform rng -3 10))
+	  ;; Initialize rectangle position variables
+          (x-1 (/ (* window-width -1) 2))
+	  (x-2 (/ (* window-width 3) 2))
+          (y-1 (/ (* window-width -1) 2))
+          (y-2 (/ (* window-width 3) 2))
+          (pt1 0)
+	  (pt2 0))
+	 ((plusp (wait-key 1)) 
+	  (format t "Key is pressed by user"))
+      ;; Print randomly colored rectangles to screen
+      (setf pt1 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
+      (setf pt2 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
+      (rectangle mat pt1 pt2 (random-color rng) thickness line-type)
+      ;; Show result in window
+      (imshow window-name mat))
+    (destroy-window window-name))) 15 11 17 42 16 88)))
 	 (m1 (mat-data 3 3 +32s+ m1-data))
          (m2 (mat-data 3 3 +32s+ m2-data))
          (result (sub m1 m2)))
@@ -2198,7 +2777,7 @@ functions.
       (princ #\Newline))
     (format t "~%~%")
     (dotimes (i 3)
-      (dotimes (j 3)
+      (dotimes (j 3)indicate
 	(format t "~a" (at-int (>> result) i j))
 	(princ #\Space))
       (princ #\Newline))))
@@ -2411,7 +2990,7 @@ VIDEO-WRITER-WRITE
 
 Writes the next video frame
 
-C++: VideoWriter& VideoWriter::operator<<(const Mat& image)
+C++: VideoWriter& VideoWriter::operator<<(const Mat& indicateimage)
 
 Common Lisp: (VIDEO-WRITER-WRITE (SELF (:POINTER VIDEO-WRITER)) (IMAGE (:POINTER MAT)))
 
@@ -2607,7 +3186,7 @@ returns a pointer to the resultant sub-array header.
         (setf frame (roi frame region-of-interest))
 	(imshow window-name frame)
 	(if (= x the-right-wall) (progn 
-				   (format t "right wall has been touched~%") 
+				   (format t "right wall has been toucindicatehed~%") 
 				   (setf right-wall-switch 1)))    
 	(if (= x the-left-wall) (progn
 				  (format t "left wall has been touched~%") 
@@ -2664,7 +3243,48 @@ The function RECT stores coordinates of a rectangle.
 
 The function TL retrieves the top-left corner of the rectangle.
 
-The function BR retrieves the bottom-right corner of the rectangle.
+The function BR retrieves t
+(defun random-color (rng &optional (icolor 0))
+  (setf icolor rng)
+  (return-from random-color (scalar (uniform rng 0 255) 
+				    (uniform rng 0 255) (uniform rng 0 255))))
+
+(defun rectangle-example ()
+
+  (let* ((window-name "RECTANGLE Example")
+	 (window-width 640)
+	 (window-height 480)
+	 ;; Initialize random number generator
+	 (rng (rng #xFFFFFFFF))
+	 ;; Create a black background
+	 (mat (mat-zeros window-width window-height +8uc3+)))
+    ;; Create a window
+    (named-window window-name +window-normal+)
+    ;; Set window to fullscreen
+    (set-window-property window-name +wnd-prop-fullscreen+ 
+			 +window-fullscreen+)
+    (if (equal 1.0d0 (get-window-property window-name +wnd-prop-fullscreen+)) 
+	(set-window-property window-name +wnd-prop-aspectratio+ 
+			     +window-freeratio+))
+    ;; Set line type and thickness
+    (do* ((line-type +aa+)
+          (thickness (uniform rng -3 10))
+	  ;; Initialize rectangle position variables
+          (x-1 (/ (* window-width -1) 2))
+	  (x-2 (/ (* window-width 3) 2))
+          (y-1 (/ (* window-width -1) 2))
+          (y-2 (/ (* window-width 3) 2))
+          (pt1 0)
+	  (pt2 0))
+	 ((plusp (wait-key 1)) 
+	  (format t "Key is pressed by user"))
+      ;; Print randomly colored rectangles to screen
+      (setf pt1 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
+      (setf pt2 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
+      (rectangle mat pt1 pt2 (random-color rng) thickness line-type)
+      ;; Show result in window
+      (imshow window-name mat))
+    (destroy-window window-name)))he bottom-right corner of the rectangle.
 
 The function SZ retrieves the size (width, height) of the rectangle.
 
@@ -2712,7 +3332,7 @@ C++"  _Tp dot(const Point3_& pt) const;
 
 Common Lisp: (DOT3I (SELF (:POINTER POINT3I)) (OTHER (:POINTER POINT3I))) => :INT
 
-Common Lisp: (DOT3F (SELF (:POINTER POINT3F)) (OTHER (:POINTER POINT3F))) => :FLOAT
+Common Lisp: (DOT3F (SELF (:POINTERRead POINT3F)) (OTHER (:POINTER POINT3F))) => :FLOAT
 
 Common Lisp: (DOT3D (SELF (:POINTER POINT)) (OTHER (:POINTER POINT))) => :INT
 
@@ -2782,7 +3402,7 @@ Common Lisp: (DOT3D (SELF (:POINTER POINT)) (OTHER (:POINTER POINT))) => :INT
 (defun dot3d-example ()
 
   "This example uses the function DOT to 
-   find the dot product of 2 point3d con-
+   find the dot product of 2 po;;; Basic Structuresint3d con-
    structs P1 and P2."
 
   (let* ((p1 (point3d 13.0d0 14.0d0 15.0d0))
@@ -3067,6 +3687,47 @@ and less commonly in image analysis and computer vision.
         ***RGB <-> CIE L*A*B* (+BGR2LAB+, +RGB2LAB+, +LAB2BGR+, +LAB2RGB+)***
 
 
+(defun random-color (rng &optional (icolor 0))
+  (setf icolor rng)
+  (return-from random-color (scalar (uniform rng 0 255) 
+				    (uniform rng 0 255) (uniform rng 0 255))))
+
+(defun rectangle-example ()
+
+  (let* ((window-name "RECTANGLE Example")
+	 (window-width 640)
+	 (window-height 480)
+	 ;; Initialize random number generator
+	 (rng (rng #xFFFFFFFF))
+	 ;; Create a black background
+	 (mat (mat-zeros window-width window-height +8uc3+)))
+    ;; Create a window
+    (named-window window-name +window-normal+)
+    ;; Set window to fullscreen
+    (set-window-property window-name +wnd-prop-fullscreen+ 
+			 +window-fullscreen+)
+    (if (equal 1.0d0 (get-window-property window-name +wnd-prop-fullscreen+)) 
+	(set-window-property window-name +wnd-prop-aspectratio+ 
+			     +window-freeratio+))
+    ;; Set line type and thickness
+    (do* ((line-type +aa+)
+          (thickness (uniform rng -3 10))
+	  ;; Initialize rectangle position variables
+          (x-1 (/ (* window-width -1) 2))
+	  (x-2 (/ (* window-width 3) 2))
+          (y-1 (/ (* window-width -1) 2))
+          (y-2 (/ (* window-width 3) 2))
+          (pt1 0)
+	  (pt2 0))
+	 ((plusp (wait-key 1)) 
+	  (format t "Key is pressed by user"))
+      ;; Print randomly colored rectangles to screen
+      (setf pt1 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
+      (setf pt2 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
+      (rectangle mat pt1 pt2 (random-color rng) thickness line-type)
+      ;; Show result in window
+      (imshow window-name mat))
+    (destroy-window window-name)))
  A Lab color space is a color-opponent space with dimension L for lightness and a and b for the colo-
 r-opponent dimensions, based on nonlinearly compressed CIE XYZ color space coordinates.
 
@@ -3080,7 +3741,7 @@ ransformation.
         ***RGB <-> CIE L*U*V* (+BGR2LUV+, +RGB2LUV+, +LUV2BGR+, +LUV2RGB+)***
 
 
- In colorimetry, the CIE 1976 (L*, u*, v*) color space, commonly known by its abbreviation CIELUV, 
+ In colorimetry, the CIE 1976 (L*, Readu*, v*) color space, commonly known by its abbreviation CIELUV, 
 is a color space adopted by the International Commission on Illumination (CIE) in 1976, as a simple-
 to-compute transformation of the 1931 CIE XYZ color space, but which attempted perceptual uniformit-
 y. It is extensively used for applications such as computer graphics which deal with colored lights-
@@ -3210,7 +3871,7 @@ Draws the found matches of keypoints from two images.
 C++: void drawMatches(const Mat& img1, const vector<KeyPoint>& keypoints1, const Mat& img2, const vector<KeyPoint>& keypoints2, const vector<DMatch>& matches1to2, Mat& outImg, const Scalar& matchColor=Scalar::all(-1), const Scalar& singlePointColor=Scalar::all(-1), const vector<char>& matchesMask=vector<char>(), int flags=DrawMatchesFlags::DEFAULT )
 
 Common Lisp: (DRAW-MATCHES (IMG1 (:POINTER MAT)) (KEYPOINTS1 (:POINTER KEYPOINT)) (IMG2 (:POINTER MAT)) (KEYPOINTS2 (:POINTER KEYPOINT)) (MATCHES1TO2 (:POINTER VECTOR-DMATCH)) (OUTIMG (:POINTER MAT)) (MATCH-COLOR (:POINTER SCALAR)) (SINGLE-POINT-COLOR (:POINTER SCALAR)) &OPTIONAL ((MATCHES-MASK (:POINTER VECTOR-CHAR)) (VECTOR-CHAR)) ((FLAGS :INT) +DEFAULT+))
-
+indicate
 C++: void drawMatches(const Mat& img1, const vector<KeyPoint>& keypoints1, const Mat& img2, const vector<KeyPoint>& keypoints2, const vector<vector<DMatch>>& matches1to2, Mat& outImg, const Scalar& matchColor=Scalar::all(-1), const Scalar& singlePointColor=Scalar::all(-1), const vector<vector<char>>& matchesMask=vector<vector<char> >(), int flags=DrawMatchesFlags::DEFAULT )
 
     Parameters:	
@@ -3268,7 +3929,11 @@ cting two keypoints (circles). The FLAGS parameters are defined as follows:
    parameter. Finally, each window is labeled with the name of the flag u-
    sed to set  drawing features for that particular window, for example:
  
-      RED * WHITE * +NOT-DRAW-SINGLE-POINTS+
+      RED * WHITE * +NOT-;;; Types and structures
+
+
+
+;;; User InterfaceDRAW-SINGLE-POINTS+
     
     Try using the box.png and box_in_scene.png images located inside the
     LISP-CV-MASTER/IMAGES directory to get a clearer understanding of th-
@@ -3455,7 +4120,7 @@ http://docs.opencv.org/modules/features2d/doc/feature_detection_and_description.
     (move-window (aref window-name-arr 3) 1438 0)
     (move-window (aref window-name-arr 4) 88 368)
     (move-window (aref window-name-arr 5) 538 368)
-    (move-window (aref window-name-arr 6) 988 368)
+    (move-window (aref window-name-arr 6) 988 368)indicate
     (move-window (aref window-name-arr 7) 1438 368)
     (move-window (aref window-name-arr 8) 88 708)
     (move-window (aref window-name-arr 9) 538 708)
@@ -3578,7 +4243,48 @@ Also a combined format is supported: feature detector adapter name ( "Grid" - Gr
     ;; create a feature detector
     (feat-detector-create briskd "STAR")
     ;; detect keypoints in the image GRAY-A
-    (feat-detector-detect briskd gray-a keypoints-a)
+    (feat-detector-detect
+(defun random-color (rng &optional (icolor 0))
+  (setf icolor rng)
+  (return-from random-color (scalar (uniform rng 0 255) 
+				    (uniform rng 0 255) (uniform rng 0 255))))
+
+(defun rectangle-example ()
+
+  (let* ((window-name "RECTANGLE Example")
+	 (window-width 640)
+	 (window-height 480)
+	 ;; Initialize random number generator
+	 (rng (rng #xFFFFFFFF))
+	 ;; Create a black background
+	 (mat (mat-zeros window-width window-height +8uc3+)))
+    ;; Create a window
+    (named-window window-name +window-normal+)
+    ;; Set window to fullscreen
+    (set-window-property window-name +wnd-prop-fullscreen+ 
+			 +window-fullscreen+)
+    (if (equal 1.0d0 (get-window-property window-name +wnd-prop-fullscreen+)) 
+	(set-window-property window-name +wnd-prop-aspectratio+ 
+			     +window-freeratio+))
+    ;; Set line type and thickness
+    (do* ((line-type +aa+)
+          (thickness (uniform rng -3 10))
+	  ;; Initialize rectangle position variables
+          (x-1 (/ (* window-width -1) 2))
+	  (x-2 (/ (* window-width 3) 2))
+          (y-1 (/ (* window-width -1) 2))
+          (y-2 (/ (* window-width 3) 2))
+          (pt1 0)
+	  (pt2 0))
+	 ((plusp (wait-key 1)) 
+	  (format t "Key is pressed by user"))
+      ;; Print randomly colored rectangles to screen
+      (setf pt1 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
+      (setf pt2 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
+      (rectangle mat pt1 pt2 (random-color rng) thickness line-type)
+      ;; Show result in window
+      (imshow window-name mat))
+    (destroy-window window-name))) briskd gray-a keypoints-a)
     ;; Compute the descriptors for a set of keypoints detected in GRAY-A
     (feat-2d-compute briskd gray-a keypoints-a descriptors-a)
     ;; detect keypoints in the image GRAY-B
@@ -3667,7 +4373,11 @@ Common Lisp: (SURF5 (HESSIAN-THRESHOLD :DOUBLE) &OPTIONAL ((N-OCTAVES :INT) 4)
     (draw-matches img-1 keypoints-1 img-2 keypoints-2 matches img-matches)
     ;;-- Show detected matches
     (imshow window-name img-matches)
-    (loop while (not (= (wait-key 0) 27)))
+    (loop while (not (= ;;; Types and structures
+
+
+
+;;; User Interface(wait-key 0) 27)))
     (destroy-window window-name)))
 
 
@@ -3813,7 +4523,7 @@ Common Lisp: (SET-MOUSE-CALLBACK (WINNAME :STRING) (ON-MOUSE (:POINTER MOUSE-CAL
       (format t "Right button of the mouse down (~a, ~a)~%~%" x y))
   (if (= event +event-mbuttondown+)
       (format t "Middle button of the mouse down (~a, ~a)~%~%" x y))
-  (if (= event +event-lbuttonup+)
+  (if (= event +event-lbuttonup+)Read
       (format t "Left button of the mouse up (~a, ~a)~%~%" x y))
   (if (= event +event-rbuttonup+)
       (format t "Right button of the mouse up (~a, ~a)~%~%" x y))
@@ -4033,7 +4743,7 @@ There is a nuance illustrated by the following example:
 
 (defparameter rng (rng))
 
-;; always produces 0
+;; always produce;;; Basic Structuress 0
 (defparameter a (uniform rng 0 1))
 
 ;; produces double from (0, 1)
@@ -4059,7 +4769,7 @@ C++: RNG::RNG(uint64 state)
 
     Parameters:	
 
-        STATE – 64-bit value used to initialize the RNG.
+        STATE - 64-bit value used to initialize the RNG.
 
 
 These are the RNG constructors. The first form sets the state to some pre-defined value, equal to 
@@ -4264,11 +4974,233 @@ need to access the return value of ASSGN-VAL to complete the operation,
 
 
 
+PUT-TEXTindicate
+
+Draws a text string.
+
+C++: void putText(Mat& img, const string& text, Point org, int fontFace, double fontScale, Scalar color, int thickness=1, int lineType=8, bool bottomLeftOrigin=false )
+
+Common Lisp: (PUT-TEXT (IMG (:POINTER MAT)) (TEXT (:POINTER STRING*)) (ORG (:POINTER POINT)) (FONT-FACE :INT) (FONT-SCALE :DOUBLE)  
+             (COLOR (:POINTER SCALAR)) (THICKNESS :INT) (LINE-TYPE :INT) (BOTTOM-LEFT-ORIGN :BOOLEAN)) => :VOID
+ 
+    Parameters:	
+
+        IMG - Image.
+
+        TEXT - Text string to be drawn.
+
+        ORG - Bottom-left corner of the text string in the image.
+
+        FONT-FACE - Font type. One of: +FONT-HERSHEY-SIMPLEX+ 
+
+                                       +FONT-HERSHEY-PLAIN+ 
+
+                                       +FONT-HERSHEY-DUPLEX+ 
+
+                                       +FONT-HERSHEY-COMPLEX+ 
+
+                                        FONT_HERSHEY_ITALIC
+
+                                       +FONT-HERSHEY-COMPLEX-SMALL+ 
+
+                                       +FONT-HERSHEY-SCRIPT-SIMPLEX+ 
+ 
+                                       +FONT-HERSHEY-SCRIPT-COMPLEX+ 
+
+where each of the font id’s can be combined with +FONT-ITALIC+ to get the slanted letters.
+
+        FONT-SCALE - Font scale factor that is multiplied by the font-specific base size.
+
+        COLOR- Text color.
+
+        THICKNESS - Thickness of the lines used to draw a text.
+
+        LINE-TYPE - Line type. See the line for details.
+
+        BOTTOM-LEFT-ORIGIN - When true, the image data origin is at the bottom-left corner. Otherwi-
+                             se, it is at the top-left corner.
+
+The function PUT-TEXT renders the specified text string in the image. Symbols that cannot be render-
+ed using the specified font are replaced by question marks. See (GET-TEXT-SIZE) for a text renderin-
+g code example.
+
+
+(defun random-color (rng &optional (icolor 0))
+  (setf icolor rng)
+  (return-from random-color (scalar (uniform rng 0 255) 
+				    (uniform rng 0 255) (uniform rng 0 255))))
+
+(defun put-text-example ()
+
+  (let* ((window-name "PUT-TEXT Example")
+	 (window-width 1280)
+	 (window-height 1024)
+	 ;; Initialize random number generator
+	 (rng (rng #xFFFFFFFF))
+	 ;; Create a black background
+	 (mat (mat-zeros window-width window-height +8uc3+)))
+    ;; Create a window
+    (named-window window-name +window-normal+)
+    ;; Set window to fullscreen
+    (set-window-property window-name +wnd-prop-fullscreen+ 
+			 +window-fullscreen+)
+    (if (equal 1.0d0 (get-window-property window-name +wnd-prop-fullscreen+)) 
+	(set-window-property window-name +wnd-prop-aspectratio+ 
+			     +window-freeratio+))
+    ;; Set line type
+    (do* ((line-type +aa+)
+	  (i 0)
+          (iterations 0)
+          (scale 10.40d0)
+	  ;; Initialize text position variables
+	  (org 0)
+          (x-1 0)
+	  (x-2 0)
+          (y 0))
+	 ((plusp (wait-key 1)) 
+	  (format t "Key is pressed by user"))
+      ;; Were doing multiple prints of text to screen per loop here
+      (dotimes (n iterations) 
+	;; Set the texts location to random values
+	(setf org (point (uniform rng x-1 x-2) y))
+        ;; Print text
+	(put-text mat "LisP-CV" org +font-hershey-complex-small+
+		  scale  (random-color rng) (uniform rng 5 50) line-type))
+      (incf i)
+      (if (< y (+ window-height 358)) (incf y 2) (setf y 0))
+      (if (< iterations 4) (incf iterations 1) (setf iterations 1))
+      ;; Show result in window
+      (imshow window-name mat))
+    (destroy-window window-name)))
+
+
+LINE
+
+Draws a line segment connecting two points.
+
+C++: void line(Mat& img, Point pt1, Point pt2, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
+
+Common Lisp: (LINE (IMG (:POINTER MAT)) (PT1 (:POINTER POINT)) (PT2 (:POINTER POINT)) (COLOR (:POINTER SCALAR)) &OPTIONAL 
+((THICKNESS :INT) 1) ((LINE-TYPE :INT) 8) ((SHIFT :INT) 0)) => :VOID
+
+    Parameters:	
+
+              IMG - Image.
+
+              PT1 - First point of the line segment.
+
+              PT2 - Second point of the line segment.
+
+              COLOR - Line color.
+
+              THICKNESS - Line thickness.
+
+              LINE-TYPE - Type of the line:
+
+                       8 (or omitted) - 8-connected line.
+
+                       4 - 4-connected line.
+
+                       +AA+ - antialiased line.
+
+              SHIFT - Number of fractional bits in the point coordinates.
 
 
 
+The function line draws the line segment between pt1 and pt2 points in the image. The line is clipp-
+ed by the image boundaries. For non-antialiased lines with integer coordinates, the 8-connected or 
+4-connected Bresenham algorithm is used. Thick lines are drawn with rounding endings. Antialiased l-
+ines are drawn using Gaussian filtering. To specify the color of the line, you may also use the mac-
+ros RGB - (RGB R G B) and BGR - (BGR B G R).
+
+
+(defun line-example ()
+
+  (let ((window-name "LINE Example")
+        ;; Initialize random number generator
+	(rng (rng #xFFFFFFFF))
+	;; Create a black background
+	(mat (mat-zeros 640 480 +8uc3+)))
+    ;; Create a window
+    (named-window window-name +window-normal+)
+    ;; Set window to fullscreen
+    (set-window-property window-name +wnd-prop-fullscreen+ 
+			 +window-fullscreen+)
+    (if (equal 1.0d0 (get-window-property window-name +wnd-prop-fullscreen+)) 
+	(set-window-property window-name +wnd-prop-aspectratio+ 
+			     +window-freeratio+))
+    ;; Set line type and thickness
+    (do* ((line-type +aa+)
+	  (thickness 1)
+	  (pt1 0)
+	  (pt2 0)
+          (x-1 -450)
+	  (x-2 1350)
+	  (y-1 -450)
+	  (y-2 1350))
+	 ((plusp (wait-key 1)) 
+	  (format t "Key is pressed by user"))
+      ;; Set the lines points to random values
+      (setf pt1 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))    
+      (setf pt2 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
+      ;; Draw a line
+      (line mat pt1 pt2 (bgr 255 0 0) thickness line-type)
+      ;; Show output
+      (imshow window-name mat))
+    (destroy-window window-name)))
 
 
 
+ALLOC
+
+Macro for CFFI::FOREIGN-ALLOC
+
+CFFI: — Function: foreign-alloc type &key initial-element initial-contents (count 1) null-terminated-p ⇒ pointer
+
+Common Lisp: (ALLOC TYPE VALUE) => :POINTER
 
 
+    Parameters:	
+
+        TYPE - A CFFI type
+
+        VALUE - A number or a sequence - Stand-in for the INITIAL-ELEMENT and INITIAL-CONTENTS para-
+                meter of FOREIGN-ALLOC
+
+
+The ALLOC function allocates enough memory to hold count objects of type TYPE and returns a pointer 
+to the newly allocated memory. The CFFI::FOREIGN-ALLOC COUNT and NULL-TERMINATED-P parameters are o-
+mitted in this macro for simplicity. When COUNT is omitted and VALUE is specified, COUNT will defau-
+lt to (LENGTH VALUE). This function is used in interfacing with the C bindings for the C++ OpenCV i-
+nterface that this library wraps.
+
+See the CFFI documentation for FOREIGN-ALLOC for more information on this useful function:
+http://common-lisp.net/project/cffi/manual/cffi-manual.html#foreign_002dalloc
+
+
+Example:
+
+
+LISP-CV> (DEFPARAMETER A (ALLOC :DOUBLE 8.0D0))
+
+A
+
+LISP-CV> (MEM-AREF A :DOUBLE)
+
+8.0d0
+
+LISP-CV> (DEFPARAMETER B (ALLOC :INT '(1 2 3)))
+
+B
+
+LISP-CV> (MEM-AREF B :INT)
+
+1
+
+LISP-CV> (MEM-AREF B :INT 1)
+
+2
+
+LISP-CV> (MEM-AREF B :INT 2)
+
+3

@@ -118,7 +118,7 @@
 
 
 ;; int cv_Mat_at_int(Mat* self, int row, int col);
-(defcfun ("cv_Mat_at_int1" at-int) :pointer
+(defcfun ("cv_Mat_at_int0" at-int) :int
   "Returns a reference to a INT array element."
   (self (:pointer mat))
   (i :int)
@@ -134,7 +134,7 @@
 
 
 ;; uint cv_Mat_at_uint(Mat* self, int row, int col);
-(defcfun ("cv_Mat_at_uint1" at-uint) :pointer
+(defcfun ("cv_Mat_at_uint0" at-uint) :uint
   "Returns a reference to a UINT array element."
   (self (:pointer mat))
   (i :int)
@@ -346,6 +346,27 @@
   (self (:pointer mat))
   (i :int)
   (j :int))
+
+
+;; void Mat::copyTo(OutputArray m) const
+;; void cv_Mat_copyTo(Mat* self, Mat* m)
+(defcfun ("cv_Mat_copyTo" copy-to2) :void
+  (self (:pointer mat))
+  (m (:pointer mat)))
+
+
+;; void Mat::copyTo(OutputArray m, InputArray mask) const
+;; void cv_Mat_copyTo_masked(Mat* self, Mat* m, Mat* mask)
+(defcfun ("cv_Mat_copyTo_masked" copy-to3) :void
+  (self (:pointer mat))
+  (m (:pointer mat))
+  (mask (:pointer mat)))
+
+
+(defun copy-to (&optional (mat nil) (m nil) (mask nil))
+  (cond ((eq mask nil)
+	 (copy-to2 mat m))
+	(t (copy-to3 mat m mask))))
 
 
 ;; Mat Mat::clone() const
@@ -928,6 +949,18 @@
 
 ;;; Drawing Functions
 
+;; BGR value constructor macro 
+
+(defmacro bgr (b g r)
+  "BGR value constructor macro"
+  `(scalar ,b ,g ,r))
+
+;; RGB value constructor macro 
+
+(defmacro rgb (r g b)
+  "BGR value constructor macro"
+  `(scalar ,b ,g ,r))
+
 
 ;; void circle(Mat& img, Point center, int radius, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
 ;; void cv_circle(Mat* img, Point* center, int radius, Scalar* color, int thickness, int lineType, int shift) 
@@ -944,6 +977,87 @@
 (defun circle (img center radius color &optional (thickness 1) (line-type 8) (shift 0))
   "Draws a circle."
   (%circle img center radius color thickness line-type shift))
+
+
+;; void ellipse(Mat& img, Point center, Size axes, double angle, double startAngle, double endAngle, const Scalar& color, 
+;; int thickness=1, int lineType=8, int shift=0)
+;; void cv_ellipse(Mat* img, Point* center, Size* axes, double angle, double startAngle, double endAngle, Scalar* color, 
+;; int thickness, int lineType, int shift)
+(defcfun ("cv_ellipse" %ellipse) :void
+  (img (:pointer mat))
+  (center (:pointer point))
+  (axes (:pointer size))
+  (angle :double)
+  (start-angle :double)
+  (end-angel :double)
+  (color (:pointer scalar))
+  (thickness :int) 
+  (line-type :int) 
+  (shift :int))
+
+
+(defun ellipse (img center axes angle start-angle end-angle color &optional (thickness 1) (line-type 8) (shift 0))
+  "Draws a simple or thick elliptic arc or fills an ellipse sector."
+  (%ellipse img center axes angle start-angle end-angle color thickness line-type shift))
+
+
+
+;; void line(Mat& img, Point pt1, Point pt2, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
+;; void cv_line(Mat* img, Point* pt1, Point* pt2, Scalar* color, int thickness, int lineType, int shift) 
+(defcfun ("cv_line" %line) :void
+  (img (:pointer mat))
+  (pt1 (:pointer point))
+  (pt2 (:pointer point))
+  (color (:pointer scalar))
+  (thickness :int) 
+  (line-type :int) 
+  (shift :int))
+
+
+(defun line (img pt1 pt2 color &optional (thickness 1) (line-type 8) (shift 0))
+  "Draws a line segment connecting two points."
+  (%line img pt1 pt2 color thickness line-type shift))
+
+
+;; void putText(Mat& img, const string& text, Point org, int fontFace, double fontScale, Scalar color, int thickness=1, int lineType=8, 
+;; bool bottomLeftOrigin=false)
+;; void cv_putText(Mat* img, String* text, Point* org, int fontFace, double fontScale, Scalar* color, int thickness, int lineType, 
+;; bool bottomLeftOrigin)
+
+
+(defcfun ("cv_putText" %put-text) :void
+  (img (:pointer mat))
+  (text (:pointer string*))
+  (org (:pointer point))
+  (font-face :int)
+  (font-scale :double)
+  (color (:pointer scalar)) 
+  (thickness :int) 
+  (line-type :int)
+  (bottom-left-orign :boolean))
+
+
+(defun put-text (img text org font-face font-scale color &optional (thickness 1) (line-type 8) (bottom-left-origin nil))
+  "Draws a text string."
+  (%put-text img (foreign-alloc :string :initial-element text) org font-face font-scale color thickness line-type bottom-left-origin))
+
+
+;; void rectangle(Mat& img, Point pt1, Point pt2, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
+;; void cv_rectangle(Mat* img, Point* pt1, Point* pt2, Scalar* color, int thickness, int lineType, int shift)
+(defcfun ("cv_rectangle" %rectangle) :void
+  (img (:pointer mat))
+  (pt1 (:pointer point))
+  (pt2 (:pointer point))
+  (color (:pointer scalar))
+  (thickness :int) 
+  (line-type :int) 
+  (shift :int))
+
+
+(defun rectangle (img pt1 pt2 color &optional (thickness 1) (line-type 8) (shift 0))
+  "Draws a simple, thick, or filled up-right rectangle."
+  (%rectangle img pt1 pt2 color thickness line-type shift))
+
 
 
 ;;; Utility and System Functions and Macros

@@ -79,7 +79,7 @@
 	      (flags :int))
 
 
-(defun named-window (winname flags)
+(defun named-window (winname &optional (flags +window-autosize+))
   "Creates a window."
   (%named-window (foreign-alloc :string :initial-element winname) flags))
 
@@ -177,7 +177,7 @@
 
 
 (defun imread (filename &optional (flags 1))
-  (%imread (c-string-to-string* filename (length filename)) flags))
+  (%imread (foreign-alloc :string :initial-element filename) flags))
 
 
 ;; VideoWriter::VideoWriter(const string& filename, int fourcc, double fps, Size frameSize, bool isColor) 
@@ -224,3 +224,27 @@
 
 
 ;;; Qt New Functions
+
+;; double cv_getWindowProperty(String* winname, int prop_id) 
+(defcfun ("cv_getWindowProperty" %get-window-property) :double
+  (winname (:pointer string*))
+  (prop-id :int))
+
+
+(defun get-window-property (winname prop-id)
+  "Provides parameters of a window."
+  (%get-window-property (foreign-alloc :string :initial-element winname) prop-id))
+
+
+;; void setWindowProperty(const string& winname, int prop_id, double prop_value)
+;; void cv_setWindowProperty(String* winname, int prop_id, double prop_value)
+(defcfun ("cv_setWindowProperty" %set-window-property) :void
+  (winname (:pointer string*))
+  (prop-id :int)
+  (prop-value :double))
+
+
+(defun set-window-property (winname prop-id prop-value)
+  "Changes parameters of a window dynamically."
+  (%set-window-property  (foreign-alloc :string :initial-element winname) prop-id (coerce prop-value 'double-float)))
+

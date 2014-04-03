@@ -3,41 +3,7 @@ using namespace cv;
 using namespace std;
 using namespace flann;
 using namespace cvflann;
-
-
 extern "C" {
-
-
-RNG* cv_create_RNG() {
-    return new RNG();
-}
-
-double cv_RNG_uniform_double(RNG* self, double a, double b) {
-    return self->uniform(a, b);
-}
-
-float cv_RNG_uniform_float(RNG* self, float a, float b) {
-    return self->uniform(a, b);
-}
-
-int cv_RNG_uniform_int(RNG* self, int a, int b) {
-    return self->uniform(a, b);
-}
-
-
-RNG* cv_create_RNG_state(uint64 state) {
-    return new RNG(state);
-}
-
-const float* cv_CvSVM_get_support_vector(SVM* self, int i) {
-   return self->get_support_vector(i);
-}
-Vec3b* cv_create_Vec3b(int val1, int val2, int val3) {
-   return new Vec3b (val1, val2, val3);
-}
-CvSVMParams* cv_create_SVMParams() {
-    return new CvSVMParams();
-}
 BFMatcher* cv_create_BFMatcher(int normType, bool crossCheck) {
 	return new BFMatcher(normType, crossCheck);
 }
@@ -1050,7 +1016,7 @@ bool cv_imencode(String* ext, Mat* img, vector_uchar* buf, vector_int* params) {
 	return cv::imencode(*ext, *img, *buf, *params);
 }
 Mat* cv_imread(String* filename, int flags) {
-	return new Mat(imread(*filename, flags));
+	return new Mat(cv::imread(*filename, flags));
 }
 void cv_imshow(String* winname, Mat* mat) {
 	cv::imshow(*winname, *mat);

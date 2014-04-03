@@ -1,11 +1,7 @@
 #include <opencv2/c/point.hpp>
 
 extern "C" {
-
-    Point* &cv_create_Point() {
-    return new Point;
-    }
-    Point* cv_create_Point2(int x, int y) {
+    Point* cv_create_Point(int x, int y) {
         return new Point(x, y);
     }
     int cv_Point_getX(Point* self) {

@@ -1,6 +1,7 @@
 ;;; -*- mode: lisp; indent-tabs: nil -*-
 
 (defpackage :lisp-cv
+  (:nicknames #:lisp-cv #:lcv)
   (:use #:common-lisp #:cffi)
   (:export 
 
@@ -33,7 +34,7 @@
 
 ;; C Constants
 
-   ;; C Integer Limits
+;; C Integer Limits
    #:+char-bit+
    #:+schar-min+
    #:+schar-max+
@@ -91,6 +92,7 @@
    #:vec4s
    #:vector-char
    #:vector-dmatch
+   #:vector-float
    #:vector-int
    #:vector-keypoint
 
@@ -167,6 +169,7 @@
    #:br
    #:clone
    #:cols
+   #:copy-to
    #:data
    #:del-mat
    #:div
@@ -181,8 +184,7 @@
    #:mat-diag
    #:mat-expr-t
    #:mat-expr-s
-   #:mat-eye-0
-   #:mat-eye-1
+   #:mat-eye
    #:mat-ones
    #:mat-value
    #:mat-type
@@ -304,6 +306,9 @@
    #:+font-hershey-script-simplex+
    #:+font-hershey-script-complex+
    #:+font-italic+ 
+   #:line
+   #:ellipse
+   #:put-text
 
 ;; core - Utility and System Functions and Macros
 
@@ -723,6 +728,8 @@
    #:+wnd-prop-fullscreen+
    #:+wnd-prop-autosize+ 
    #:+wnd-prop-aspectratio+
+   #:get-window-property
+   #:set-window-property
 
 
 ;; features2d - Feature Detection and Description

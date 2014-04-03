@@ -12,6 +12,7 @@
 
 
 ;;sizeof macro
+
 (defmacro size-of (val)
   (if
    (or (equal val :char)               ; = 1 - same as C
@@ -59,6 +60,16 @@
    `(foreign-type-size '(:struct ,val))))
 
 
+
 ;; Time Macro used to time your functions - see examples.lisp for usage
 
   (defmacro $ (form &optional (count-form 1000000)) `(time (dotimes (_ ,count-form) ((lambda () ,form)))))
+
+
+
+;; Macro for FOREIGN-ALLOC 
+
+(defmacro alloc (&optional type value)
+       (cond ((listp value)
+	      `(foreign-alloc ,type ,:initial-contents ,value))
+	     (t `(foreign-alloc ,type ,:initial-element ,value))))
