@@ -44,9 +44,8 @@
 ;function does not handle the case of a partial overlap between the source and the destination matri-
 ;ces. When the operation mask is specified, and the (CREATE) call shown above reallocated the matrix
 ;, the newly allocated matrix is initialized with all zeros before copying the data.
-;
-;
-;
+
+
 (defun copy-to-example ()
   ;; initialize data for matrices
   (let* ((data (alloc :int '(10 20 30 40)))
@@ -107,8 +106,8 @@
 	(princ #\Space))
       (princ #\Newline))
     (format t "~%~%")))
-;
-;
+
+
 ;====================================================CORE=============================================
 ;
 ;
@@ -156,15 +155,18 @@
     (imshow window-name  (>> out))
     (loop while (not (= (wait-key 0) 27)))
     (destroy-window window-name)))
-;
-;
-;====================================================CORE=============================================
+
+
+
+
+;====================================================CORE===========================================
 ;
 ;Drawing Functions
-;=====================================================================================================
+;
+;====================================================CORE===========================================
 ;
 ;BGR
-;====
+;
 ;
 ;A macro for SCALAR organized as BGR(BLUE, GREEN, RED) color values.
 ;
@@ -192,98 +194,98 @@
 (CIRCLE IMAGE POINT RADIUS (BRG 255 0 0) +FILLED+ +AA+ 0)
 ;
 ;
-
-
-
-ELLIPSE
-
-Draws a simple or thick elliptic arc or fills an ellipse sector.
-
-C++: void ellipse(Mat& img, Point center, Size axes, double angle, double startAngle, double endAngle, const Scalar& color, 
-     int thickness=1, int lineType=8, int shift=0)
-
-Common Lisp: (ELLIPSE (IMG (:POINTER MAT)) (CENTER (:POINTER POINT)) (AXES (:POINTER SIZE)) (ANGLE :DOUBLE) (START-ANGLE :DOUBLE)
-             (END-ANGEL :DOUBLE) (COLOR (:POINTER SCALAR)) (THICKNESS :INT) (LINE-TYPE :INT) (SHIFT :INT)) => :VOID
-
-C++: void ellipse(Mat& img, const RotatedRect& box, const Scalar& color, int thickness=1, int lineType=8)
-
-
-
-    Parameters:	
-
-        IMG - Image.
-
-        CENTER - Center of the ellipse.
-
-        AXES - Half of the size of the ellipse main axes.
-
-        AMGLE - Ellipse rotation angle in degrees.
-
-        START-AMGLE - Starting angle of the elliptic arc in degrees.
-
-        END-ANGLE - Ending angle of the elliptic arc in degrees.
-
-        BOX - Alternative ellipse representation via ROTATED-RECT. This means that the function dra-
-              ws an ellipse inscribed in the rotated rectangle.
-
-        COLOR - Ellipse color.
-
-        THICKNESS - Thickness of the ellipse arc outline, if positive. Otherwise, this indicates th-
-                    at a filled ellipse sector is to be drawn.
-
-        LINE-TYPE - Type of the ellipse boundary. See the (LINE) description.
-
-        SHIFT - Number of fractional bits in the coordinates of the center and values of axes.
-
-
-The functions ELLIPSE with less parameters draws an ellipse outline, a filled ellipse, an elliptic 
-arc, or a filled ellipse sector. A piecewise-linear curve is used to approximate the elliptic arc b-
-oundary. If you need more control of the ellipse rendering, you can retrieve the curve using the fu-
-nction (ELLIPSE-2-POLY) and then render it with the function (POLYLINES) or fill it with the functi-
-on (FILL-POLY) . If you use the first variant of the function and want to draw the whole ellipse, n-
-ot an arc, pass (EQ START-ANGLE 0) and (END-ANGLE 360). The figure below explains the meaning of th-
-e parameters.
-
-
-
-LINE
-
-Draws a line segment connecting two points.
-
-C++: void line(Mat& img, Point pt1, Point pt2, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
-
-Common Lisp: (LINE (IMG (:POINTER MAT)) (PT1 (:POINTER POINT)) (PT2 (:POINTER POINT)) (COLOR (:POINTER SCALAR)) &OPTIONAL 
-((THICKNESS :INT) 1) ((LINE-TYPE :INT) 8) ((SHIFT :INT) 0)) => :VOID
-
-    Parameters:	
-
-              IMG - Image.
-
-              PT1 - First point of the line segment.
-
-              PT2 - Second point of the line segment.
-
-              COLOR - Line color.
-
-              THICKNESS - Line thickness.
-
-              LINE-TYPE - Type of the line:
-
-                       8 (or omitted) - 8-connected line.
-
-                       4 - 4-connected line.
-
-                       +AA+ - antialiased line.
-
-              SHIFT - Number of fractional bits in the point coordinates.
-
-
-
-The function line draws the line segment between pt1 and pt2 points in the image. The line is clipp-
-ed by the image boundaries. For non-antialiased lines with integer coordinates, the 8-connected or 
-4-connected Bresenham algorithm is used. Thick lines are drawn with rounding endings. Antialiased l-
-ines are drawn using Gaussian filtering. To specify the color of the line, you may also use the mac-
-ros RGB - (RGB R G B) and BGR - (BGR B G R).
+;====================================================CORE===========================================
+;
+;
+;ELLIPSE
+;
+;Draws a simple or thick elliptic arc or fills an ellipse sector.
+;
+;C++: void ellipse(Mat& img, Point center, Size axes, double angle, double startAngle, double endAngle, const Scalar& color, 
+;     int thickness=1, int lineType=8, int shift=0)
+;
+;Common Lisp: (ELLIPSE (IMG (:POINTER MAT)) (CENTER (:POINTER POINT)) (AXES (:POINTER SIZE)) (ANGLE :DOUBLE) (START-ANGLE :DOUBLE)
+;             (END-ANGEL :DOUBLE) (COLOR (:POINTER SCALAR)) (THICKNESS :INT) (LINE-TYPE :INT) (SHIFT :INT)) => :VOID
+;
+;C++: void ellipse(Mat& img, const RotatedRect& box, const Scalar& color, int thickness=1, int lineType=8)
+;
+;
+;
+;    Parameters:	
+;
+;        IMG - Image.
+;
+;        CENTER - Center of the ellipse.
+;
+;        AXES - Half of the size of the ellipse main axes.
+;
+;        AMGLE - Ellipse rotation angle in degrees.
+;
+;        START-AMGLE - Starting angle of the elliptic arc in degrees.
+;
+;        END-ANGLE - Ending angle of the elliptic arc in degrees.
+;
+;        BOX - Alternative ellipse representation via ROTATED-RECT. This means that the function dra-
+;              ws an ellipse inscribed in the rotated rectangle.
+;
+;        COLOR - Ellipse color.
+;
+;        THICKNESS - Thickness of the ellipse arc outline, if positive. Otherwise, this indicates th-
+;                    at a filled ellipse sector is to be drawn.
+;
+;        LINE-TYPE - Type of the ellipse boundary. See the (LINE) description.
+;
+;        SHIFT - Number of fractional bits in the coordinates of the center and values of axes.
+;
+;
+;The functions ELLIPSE with less parameters draws an ellipse outline, a filled ellipse, an elliptic 
+;arc, or a filled ellipse sector. A piecewise-linear curve is used to approximate the elliptic arc b-
+;oundary. If you need more control of the ellipse rendering, you can retrieve the curve using the fu-
+;nction (ELLIPSE-2-POLY) and then render it with the function (POLYLINES) or fill it with the functi-
+;on (FILL-POLY) . If you use the first variant of the function and want to draw the whole ellipse, n-
+;ot an arc, pass (EQ START-ANGLE 0) and (END-ANGLE 360).
+;
+;
+;====================================================CORE============================================
+;
+;LINE
+;
+;Draws a line segment connecting two points.
+;
+;C++: void line(Mat& img, Point pt1, Point pt2, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
+;
+;Common Lisp: (LINE (IMG (:POINTER MAT)) (PT1 (:POINTER POINT)) (PT2 (:POINTER POINT)) (COLOR (:POINTER SCALAR)) &OPTIONAL 
+;((THICKNESS :INT) 1) ((LINE-TYPE :INT) 8) ((SHIFT :INT) 0)) => :VOID
+;
+;    Parameters:	
+;
+;              IMG - Image.
+;
+;              PT1 - First point of the line segment.
+;
+;              PT2 - Second point of the line segment.
+;
+;              COLOR - Line color.
+;
+;              THICKNESS - Line thickness.
+;
+;              LINE-TYPE - Type of the line:
+;
+;                       8 (or omitted) - 8-connected line.
+;
+;                       4 - 4-connected line.
+;
+;                       +AA+ - antialiased line.
+;
+;              SHIFT - Number of fractional bits in the point coordinates.
+;
+;
+;
+;The function line draws the line segment between pt1 and pt2 points in the image. The line is clipp-
+;ed by the image boundaries. For non-antialiased lines with integer coordinates, the 8-connected or 
+;4-connected Bresenham algorithm is used. Thick lines are drawn with rounding endings. Antialiased l-
+;ines are drawn using Gaussian filtering. To specify the color of the line, you may also use the mac-
+;ros RGB - (RGB R G B) and BGR - (BGR B G R).
 
 
 (defun line-example ()
@@ -322,59 +324,62 @@ ros RGB - (RGB R G B) and BGR - (BGR B G R).
     (destroy-window window-name)))
 
 
+;====================================================CORE============================================
+;
+;PUT-TEXT
+;
+;Draws a text string.
+;
+;C++: void putText(Mat& img, const string& text, Point org, int fontFace, double fontScale, Scalar color, int thickness=1, 
+;     int lineType=8, bool bottomLeftOrigin=false )
+;
+;Common Lisp: (PUT-TEXT (IMG (:POINTER MAT)) (TEXT (:POINTER STRING*)) (ORG (:POINTER POINT)) (FONT-FACE :INT) (FONT-SCALE :DOUBLE)  
+;             (COLOR (:POINTER SCALAR)) (THICKNESS :INT) (LINE-TYPE :INT) (BOTTOM-LEFT-ORIGN :BOOLEAN)) => :VOID
+; 
+;    Parameters:	
+;
+;        IMG - Image.
+;
+;        TEXT - Text string to be drawn.
+;
+;        ORG - Bottom-left corner of the text string in the image.
+;
+;        FONT-FACE - Font type. One of: +FONT-HERSHEY-SIMPLEX+ 
+;
+;                                       +FONT-HERSHEY-PLAIN+ 
+;
+;                                       +FONT-HERSHEY-DUPLEX+ 
+;
+;                                       +FONT-HERSHEY-COMPLEX+ 
+;
+;                                        FONT_HERSHEY_ITALIC
+;
+;                                       +FONT-HERSHEY-COMPLEX-SMALL+ 
+;
+;                                       +FONT-HERSHEY-SCRIPT-SIMPLEX+ 
+; 
+;                                       +FONT-HERSHEY-SCRIPT-COMPLEX+ 
+;
+;
+;where each of the font id’s can be combined with +FONT-ITALIC+ to get the slanted letters.
+;
+;
+;        FONT-SCALE - Font scale factor that is multiplied by the font-specific base size.
+;
+;        COLOR- Text color.
+;
+;        THICKNESS - Thickness of the lines used to draw a text.
+;
+;        LINE-TYPE - Line type. See the line for details.
+;
+;        BOTTOM-LEFT-ORIGIN - When true, the image data origin is at the bottom-left corner. Otherwi-
+;                             se, it is at the top-left corner.
+;
+;
+;The function PUT-TEXT renders the specified text string in the image. Symbols that cannot be render-
+;ed using the specified font are replaced by question marks. See (GET-TEXT-SIZE) for a text renderin-
+;g code example.
 
-PUT-TEXT
-
-Draws a text string.
-
-C++: void putText(Mat& img, const string& text, Point org, int fontFace, double fontScale, Scalar color, int thickness=1, int lineType=8, bool bottomLeftOrigin=false )
-
-Common Lisp: (PUT-TEXT (IMG (:POINTER MAT)) (TEXT (:POINTER STRING*)) (ORG (:POINTER POINT)) (FONT-FACE :INT) (FONT-SCALE :DOUBLE)  
-             (COLOR (:POINTER SCALAR)) (THICKNESS :INT) (LINE-TYPE :INT) (BOTTOM-LEFT-ORIGN :BOOLEAN)) => :VOID
- 
-    Parameters:	
-
-        IMG - Image.
-
-        TEXT - Text string to be drawn.
-
-        ORG - Bottom-left corner of the text string in the image.
-
-        FONT-FACE - Font type. One of: +FONT-HERSHEY-SIMPLEX+ 
-
-                                       +FONT-HERSHEY-PLAIN+ 
-
-                                       +FONT-HERSHEY-DUPLEX+ 
-
-                                       +FONT-HERSHEY-COMPLEX+ 
-
-                                        FONT_HERSHEY_ITALIC
-
-                                       +FONT-HERSHEY-COMPLEX-SMALL+ 
-
-                                       +FONT-HERSHEY-SCRIPT-SIMPLEX+ 
- 
-                                       +FONT-HERSHEY-SCRIPT-COMPLEX+ 
-
-
-where each of the font id’s can be combined with +FONT-ITALIC+ to get the slanted letters.
-
-
-        FONT-SCALE - Font scale factor that is multiplied by the font-specific base size.
-
-        COLOR- Text color.
-
-        THICKNESS - Thickness of the lines used to draw a text.
-
-        LINE-TYPE - Line type. See the line for details.
-
-        BOTTOM-LEFT-ORIGIN - When true, the image data origin is at the bottom-left corner. Otherwi-
-                             se, it is at the top-left corner.
-
-
-The function PUT-TEXT renders the specified text string in the image. Symbols that cannot be render-
-ed using the specified font are replaced by question marks. See (GET-TEXT-SIZE) for a text renderin-
-g code example.
 
 
 (defun random-color (rng &optional (icolor 0))
@@ -426,6 +431,7 @@ g code example.
     (destroy-window window-name)))
 
 
+;====================================================CORE=============================================
 ;
 ;RECTANGLE
 ;
@@ -441,7 +447,7 @@ g code example.
 ;
 ;    Parameters:	
 ;
-;        ParameTERS:	
+;        Parameters:	
 ;
 ;              IMG - Image.
 ;
@@ -466,11 +472,10 @@ g code example.
 ;              SHIFT - Number of fractional bits in the point coordinates.
 ;
 ;
-;The function rectangle draws a rectangle outline or a filled rectangle whose two opposite corners 
-;are PT1 and PT2.
-;
-;
-;
+;The function rectangle draws a rectangle outline or a filled rectangle whose two opposite corners a-
+;re PT1 and PT2.
+
+
 (defun random-color (rng &optional (icolor 0))
   (setf icolor rng)
   (return-from random-color (scalar (uniform rng 0 255) 
@@ -512,9 +517,9 @@ g code example.
       ;; Show result in window
       (imshow window-name mat))
     (destroy-window window-name)))
-;
-;
-;
+
+
+;====================================================CORE=============================================
 ;
 ;RGB
 ;
@@ -4700,43 +4705,6 @@ Common Lisp:  (CREATE-TRACKBAR (TRACKBARNAME :STRING) (WINNAME :STRING) (VALUE :
     Parameters:	
 
         TRACKBARNAME - Name of the created trackb
-ellipse
-
-Draws a simple or thick elliptic arc or fills an ellipse sector.
-
-C++: void ellipse(Mat& img, Point center, Size axes, double angle, double startAngle, double endAngle, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
-
-C++: void ellipse(Mat& img, const RotatedRect& box, const Scalar& color, int thickness=1, int lineType=8)
-
-Python: cv2.ellipse(img, center, axes, angle, startAngle, endAngle, color[, thickness[, lineType[, shift]]]) → None
-
-Python: cv2.ellipse(img, box, color[, thickness[, lineType]]) → None
-
-C: void cvEllipse(CvArr* img, CvPoint center, CvSize axes, double angle, double start_angle, double end_angle, CvScalar color, int thickness=1, int line_type=8, int shift=0 )
-
-Python: cv.Ellipse(img, center, axes, angle, start_angle, end_angle, color, thickness=1, lineType=8, shift=0) → None
-
-C: void cvEllipseBox(CvArr* img, CvBox2D box, CvScalar color, int thickness=1, int line_type=8, int shift=0 )
-
-Python: cv.EllipseBox(img, box, color, thickness=1, lineType=8, shift=0) → None
-    Parameters:	
-
-        img - Image.
-        center - Center of the ellipse.
-        axes - Half of the size of the ellipse main axes.
-        angle - Ellipse rotation angle in degrees.
-        startAngle - Starting angle of the elliptic arc in degrees.
-        endAngle - Ending angle of the elliptic arc in degrees.
-        box - Alternative ellipse representation via RotatedRect or CvBox2D. This means that the function draws an ellipse inscribed in the rotated rectangle.
-        color - Ellipse color.
-        thickness - Thickness of the ellipse arc outline, if positive. Otherwise, this indicates that a filled ellipse sector is to be drawn.
-        lineType - Type of the ellipse boundary. See the line() description.
-        shift - Number of fractional bits in the coordinates of the center and values of axes.
-
-The functions ellipse with less parameters draw an ellipse outline, a filled ellipse, an elliptic arc, or a filled ellipse sector. A piecewise-linear curve is used to approximate the elliptic arc boundary. If you need more control of the ellipse rendering, you can retrieve the curve using ellipse2Poly() and then render it with polylines() or fill it with fillPoly() . If you use the first variant of the function and want to draw the whole ellipse, not an arc, pass startAngle=0 and endAngle=360 . The figure below explains the meaning of the parameters.
-
-Figure 1. Parameters of Elliptic Arc
-../../../_images/ellipse.png ar.
 
         WINNAME - Name of the window that will be used as a parent of the created trackbar.
 
@@ -4983,43 +4951,6 @@ Common Lisp: (STEP (SELF (:POINTER MAT))) => :UNSIGNED-INT
     Parameters:	
 
         SELF  a pointer to matrix(MAT construc
-ellipse
-
-Draws a simple or thick elliptic arc or fills an ellipse sector.
-
-C++: void ellipse(Mat& img, Point center, Size axes, double angle, double startAngle, double endAngle, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
-
-C++: void ellipse(Mat& img, const RotatedRect& box, const Scalar& color, int thickness=1, int lineType=8)
-
-Python: cv2.ellipse(img, center, axes, angle, startAngle, endAngle, color[, thickness[, lineType[, shift]]]) → None
-
-Python: cv2.ellipse(img, box, color[, thickness[, lineType]]) → None
-
-C: void cvEllipse(CvArr* img, CvPoint center, CvSize axes, double angle, double start_angle, double end_angle, CvScalar color, int thickness=1, int line_type=8, int shift=0 )
-
-Python: cv.Ellipse(img, center, axes, angle, start_angle, end_angle, color, thickness=1, lineType=8, shift=0) → None
-
-C: void cvEllipseBox(CvArr* img, CvBox2D box, CvScalar color, int thickness=1, int line_type=8, int shift=0 )
-
-Python: cv.EllipseBox(img, box, color, thickness=1, lineType=8, shift=0) → None
-    Parameters:	
-
-        img - Image.
-        center - Center of the ellipse.
-        axes - Half of the size of the ellipse main axes.
-        angle - Ellipse rotation angle in degrees.
-        startAngle - Starting angle of the elliptic arc in degrees.
-        endAngle - Ending angle of the elliptic arc in degrees.
-        box - Alternative ellipse representation via RotatedRect or CvBox2D. This means that the function draws an ellipse inscribed in the rotated rectangle.
-        color - Ellipse color.
-        thickness - Thickness of the ellipse arc outline, if positive. Otherwise, this indicates that a filled ellipse sector is to be drawn.
-        lineType - Type of the ellipse boundary. See the line() description.
-        shift - Number of fractional bits in the coordinates of the center and values of axes.
-
-The functions ellipse with less parameters draw an ellipse outline, a filled ellipse, an elliptic arc, or a filled ellipse sector. A piecewise-linear curve is used to approximate the elliptic arc boundary. If you need more control of the ellipse rendering, you can retrieve the curve using ellipse2Poly() and then render it with polylines() or fill it with fillPoly() . If you use the first variant of the function and want to draw the whole ellipse, not an arc, pass startAngle=0 and endAngle=360 . The figure below explains the meaning of the parameters.
-
-Figure 1. Parameters of Elliptic Arc
-../../../_images/ellipse.png t)
 
 
 This function is used to compute the address of a matrix element. The image step gives you the dist-
