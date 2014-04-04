@@ -110,7 +110,6 @@
 
 ;====================================================CORE=============================================
 ;
-;
 ;PROMOTE 
 ;
 ;Coverts a MAT to MAT-EXPR
@@ -130,8 +129,9 @@
 ;   Parameters:	
 ;
 ;        SELF - A MAT pointer.
-;
-;
+
+
+
 (defun promote-example ()
 
   "In this example a matrix filled with ones(MAT) is 
@@ -159,7 +159,7 @@
 
 
 
-;====================================================CORE===========================================
+;====================================================CORE======================================================================
 ;
 ;Drawing Functions
 ;
@@ -186,10 +186,10 @@
 ;BGR is the default color space in LisP-CV
 ;
 ;
-;Usage:
+;Example:
 ;
 ;
-; Here BGR supplies a blue color value. 
+;Here BGR supplies a blue color value. 
 ;
 (CIRCLE IMAGE POINT RADIUS (BRG 255 0 0) +FILLED+ +AA+ 0)
 ;
@@ -244,8 +244,59 @@
 ;nction (ELLIPSE-2-POLY) and then render it with the function (POLYLINES) or fill it with the functi-
 ;on (FILL-POLY) . If you use the first variant of the function and want to draw the whole ellipse, n-
 ;ot an arc, pass (EQ START-ANGLE 0) and (END-ANGLE 360).
-;
-;
+
+
+Example:
+
+
+(defun random-color (rng &optional (icolor 0))
+  (setf icolor rng)
+  (return-from random-color (scalar (uniform rng 0 255) 
+				    (uniform rng 0 255) (uniform rng 0 255))))
+
+
+(defun ellipse-example ()
+
+  (let ((window-name "ELLIPSE Example")
+					;Initialize random number generator
+	(rng (rng #xFFFFFFFF))
+	;;Declare MAT
+	(mat 0))
+    ;;Create a window
+    (named-window window-name +window-normal+)
+    ;; Set window to fullscreen
+    (set-window-property window-name +wnd-prop-fullscreen+ 
+			 +window-fullscreen+)
+    (if (equal 1.0d0 (get-window-property window-name +wnd-prop-fullscreen+)) 
+	(set-window-property window-name +wnd-prop-aspectratio+ 
+			     +window-freeratio+))
+    ;;Initialize line type and thickness
+    (do* ((line-type +aa+)
+	  (thickness -1)
+	  ;;Initialize value for the ellipse center
+	  (center (point 240 300))
+	  ;;Initialize value equaling to half of the ellipse main 
+          ;;axes
+	  (axes 0)
+	  ;;Initialize values for the ellipse rotation angle(in degrees)
+          (angle (coerce (uniform rng 0 180) 'double-float)))
+	 ((plusp (wait-key 1)) 
+	  (format t "Key is pressed by user"))
+      ;;Create a black background using MAT-ZEROS
+      (setf mat (mat-zeros 640 480 +8uc3+))
+      (dotimes (n 1)
+	;;Set the ellipse axes to random values
+	(setf axes (size (uniform rng 0 240) (uniform rng 0 240)))
+	;;Draw multiple ellipses with varied parameters
+	(ellipse mat center axes angle 0.0d0 (coerce (uniform rng 0 360) 'double-float)
+		 (random-color rng) (uniform rng thickness 9) line-type))
+      (sleep .14)
+      ;; Show output
+      (imshow window-name mat)
+      (del-mat mat))
+    (destroy-window window-name)))
+
+
 ;====================================================CORE============================================
 ;
 ;LINE
@@ -286,6 +337,9 @@
 ;4-connected Bresenham algorithm is used. Thick lines are drawn with rounding endings. Antialiased l-
 ;ines are drawn using Gaussian filtering. To specify the color of the line, you may also use the mac-
 ;ros RGB - (RGB R G B) and BGR - (BGR B G R).
+
+
+Example:
 
 
 (defun line-example ()
@@ -540,7 +594,7 @@
 ;A creative reversal of the default BGR color space in LisP-CV. Values are put into the RGB macro in
 ;Red, Green, Blue, order, but are ultimately entered into the recieving function as BGR. This macro 
 ;is designed for ease of use.
-
+;
 ;
 ;Usage:
 ;
@@ -2877,13 +2931,13 @@ single-column matrix. Similarly to (ROW) and (COL) , this is an O(1) operation.
    pecified matrix diagonal. The new matrix 
    is represented as a single-column matrix."
 
-  (let* ((data (foreign-alloc :int :initial-contents 
-			      '(1 2 3 4 5 6 7 8 9)))
+  (let* ((data (alloc :int '(1 2 3 4 5 6 7 8 9)))
 	 (mat (mat-data 3 3 +32s+ data))
 	 (diag (diag mat 0)))
     (dotimes (i 3)
       (format t "~a" (at-int diag i 0))
-      (princ #\Newline))))
+      (princ #\Newline))
+    (free data)))
 
 
 MUL
