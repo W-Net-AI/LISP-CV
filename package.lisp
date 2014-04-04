@@ -20,7 +20,7 @@
 
 ;; DEFPARAMETER macro
 
-   #:dp
+   #:d
 
 ;; Live code editing
 

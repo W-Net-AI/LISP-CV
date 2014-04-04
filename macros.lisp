@@ -73,3 +73,8 @@
        (cond ((listp value)
 	      `(foreign-alloc ,type ,:initial-contents ,value))
 	     (t `(foreign-alloc ,type ,:initial-element ,value))))
+
+;; Macro for FOREIGN-FREE
+
+(defmacro free (ptr)
+  `(foreign-free ,ptr))
