@@ -190,7 +190,7 @@ ieee-floats-20140211-git
 You can remove the ieee-floats-20140211-git directory now if you like and it wil-
 l be effectively uninstalled.
 
-Now to install LisP-CV!
+Now to install LisP-CV!!!
 
 Note #1: I will make a Makefile or script to install LisP-CV as library progress-
 es but for now this install tutorial is made people who want to work on the proj-
