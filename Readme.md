@@ -68,7 +68,7 @@ could get a basic idea of the usage of it. You do not need to write any document
 I will do that and as far as adding constants, I will do that as well. You will be given credit for 
 all your contributions in the contributions.lisp file in the root directory unless you decline. 
 Just, let me know how you would like to be referenced in that file i.e name/username/email/phone# or 
-ify ou decline reference.
+if you decline reference.
 
 See lisp-cv-master/examples/examples.lisp for an example of the examples I already included.
 
