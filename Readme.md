@@ -59,7 +59,7 @@ order.
 
   I write a code example and documentation for each function I add to the library, so 
 it is very well documented. In the lisp-cv-master/examples/examples.lisp folder there 
-are over 2400 lines of code examples and documentation. So, unlike some other Lisp libraries, 
+are over 5400 lines of code examples and documentation. So, unlike some other Lisp libraries, 
 you WILL be able to EASILY figure out how to use it. If you would like to contribute a Lisp 
 function I ask that you also write an example of how to use it. It doesn't have to be a large 
 example it only has to show what the function does and give an idea how it is used in the most 
@@ -68,7 +68,7 @@ could get a basic idea of the usage of it. You do not need to write any document
 I will do that and as far as adding constants, I will do that as well. You will be given credit for 
 all your contributions in the contributions.lisp file in the root directory unless you decline. 
 Just, let me know how you would like to be referenced in that file i.e name/username/email/phone# or 
-ifyou decline reference.
+ify ou decline reference.
 
 See lisp-cv-master/examples/examples.lisp for an example of the examples I already included.
 
@@ -82,9 +82,9 @@ or send them to me in an e-mail at wnetai@gmail.com.
 
 INSTALLATION:
 
-  To use LisP-CV you will need to first install GitHub member arjuncomar's  Open-CV 3.0.0 dev. pull of Itseez/OpenCV(the original OpenCV). Then you will need to 
-install Emacs, SBCL, SLIME and QuickLisp, and then finally LisP-CV and all of th-
-e required .so files.
+  To use LisP-CV you will need to first install GitHub member arjuncomar's  Open-CV 3.0.0 dev. 
+pull of Itseez/OpenCV(the original OpenCV). Then you will need to install Emacs, SBCL, SLIME and 
+QuickLisp, and then finally LisP-CV and all of the required .so files.
 
 To install arjuncomrs OpenCV go to this link:
 
@@ -150,17 +150,16 @@ Finally, run:
 
 Press Enter.
 
-That will add Quicklisp to your SBCL init file so that anytime you run SBCL Quick-
-lisp will be loaded and ready to go. 
+That will add Quicklisp to your SBCL init file so that anytime you run SBCL Quicklisp 
+will be loaded and ready to go. 
 
-Now, go to terminal and type emacs, to start Emacs. When Emacs starts, if everyt-
-hing went as planned, you should see the word "Polling" at the bottom of the win-
-dow for a few seconds and the a cool little text animation and then a prompt tha-
-t looks like this:
+Now, go to terminal and type emacs, to start Emacs. When Emacs starts, if everything 
+went as planned, you should see the word "Polling" at the bottom of the window for a 
+few seconds and the a cool little text animation and then a prompt that looks like this:
 
 CL-USER>
 
-If Emacs stays stuck on "Polling", first verify you hace a .sbclrc file in your 
+If Emacs stays stuck on "Polling", first verify you have a .sbclrc file in your 
 home directory(~/) and that it contains the following text:
 
 ;;; The following lines added by ql:add-to-init-file:
@@ -219,15 +218,15 @@ to:
 
  ~/quicklisp/dists/quicklisp/software
 
-Place the opencv_geenerated.cpp file in the /src folder of the lisp-cv-master di-
-rectory in the following directory on your machine:
+Place the opencv_geenerated.cpp file in the /src folder of the lisp-cv-master directory 
+in the following directory on your machine:
 
 <directory-where-you-installed-opencv>/opencv-master/build/modules/c/src/
 
 backing up first, then overwriting the original opencv_generate.cpp.
 
-Place all of the other the .cpp files in the /src folder of the lisp-cv-master d-
-irectory in the following directory:
+Place all of the other the .cpp files in the /src folder of the lisp-cv-master directory 
+in the following directory:
 
 <directory-where-you-installed-opencv>/opencv-master/modules/c/src/
 
@@ -254,7 +253,7 @@ Now start Emacs and run:
 
 To install CFFI, which LisP-CV depends on, plus it's dependencies.
 
-Then run :
+Then run:
 
 (ql:quickload "asdf")
 
@@ -323,12 +322,12 @@ You can learn to use this library by looking at the examples in:
 lisp-cv-master/examples/examples.lisp.
 
 If you want to know if a function has been wrapped and is available, do a search 
-for the C++ function name in the examples.lisp folder. All functions are documen-
-ted and all have the C++ function declaration above the C function declaration a-
-bove the Lisp one. Some function names aren't well defined but you can do a sear-
-ch for the class names i.e To find the Lisp equivelant of the Matrix Expressions 
-"*" , "/", "+" or "-" operators just do a search for MatExpr in the examples.li-
-sp file. I'll be making a function to simplify this very soon.
+for the C++ function name in the examples.lisp folder. All functions are documented 
+and all have the C++ function declaration above the C function declaration above the 
+Lisp one. Some function names aren't well defined but you can do a search for the class 
+names i.e To find the Lisp equivelant of the Matrix Expressions "*" , "/", "+" or "-" 
+operators just do a search for MatExpr in the examples.lisp file. I'll be making a 
+function to simplify this very soon.
 
 
 You can also learn how to use the library by comparing the OpenCV C++ tutorials 
@@ -337,6 +336,8 @@ at this link:
 http://opencv-srf.blogspot.com/2011/09/capturing-images-videos.html
 
 to the CAP-FILE and CAP-CAM examples in examples.lisp.
+
+
 
 All the constants are as so:
 
@@ -348,6 +349,7 @@ If a constant in OpenCV's C++ interface is CV_8UC3, it's Lisp version is +8UC3+
 
 I always add the plus signs to both ends,  I always change the underscores to da-
 shes and I always remove the "CV_", no exceptions.
+
 
 --------------------------------------------------------------------------------
 
@@ -366,8 +368,7 @@ of this page* (Remember to include how you got it done!)
 
 *If you have a function and example that you would like to add*
 
-*If you would like add a code sample in the examples(something you made with LisP
--CV)*
+*If you would like add a code sample in the examples(something you made with LisP-CV)*
 
 *If you would like to add some other unspecified addition to the library*
 
