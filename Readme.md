@@ -16,12 +16,7 @@ Due to the speediness of C and C++, the speed of the C++ functions compared to t
 he C wappers for them is almost identical.
 
   This install tutorial is made for people wanting to help work on the project. 
-Thus no build file is included so you'll have to install everything manually. Do
-n't worry it's easy. This is intended so you can familiarize yourself with how e
-verything is put together. As stated previously, LisP-CV is known to work on Ubu
-ntu versions 12.04 through 14.04. It should work on any system that OpenCV, SBCL, 
-CLISP, ALLEGRO, CFFI, ASDF and QuickLisp can be compiled on.  There is nothing b-
-ut pure Lisp, and OpenCV C++ and C in the whole project. 
+Thus no build file is included so you'll have to install everything manually. Don't worry it's easy. This is intended so you can familiarize yourself with how everything is put together. As stated previously, LisP-CV is known to work on Ubuntu versions 12.04 through 14.04. It should work on any system that OpenCV, SBCL CLISP, ALLEGRO, CFFI, ASDF and QuickLisp can be compiled on.  There is nothing but pure Lisp, and OpenCV C++ and C in the whole project. 
 
   If you have gotten LisP-CV to work on another system and would like to add the
 install instructions to this tutorial just send me an e-mail at wnetai@gmail.com 
