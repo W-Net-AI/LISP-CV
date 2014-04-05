@@ -12,13 +12,13 @@ INTRODUCTION:
  
  LisP-CV is a Lisp wrapper for OpenCV's C++ interface, not the C interface. The
 Lisp wrapper wraps around C wrappers which wrap around the OpenCV C++ functions. 
-Due to the speediness of C and C++, the speed of the C++ functions compared to t-
+Due to the speediness of C and C++, the speed of the C++ functions compared to t
 he C wappers for them is almost identical.
 
   This install tutorial is made for people wanting to help work on the project. 
-Thus no build file is included so you'll have to install everything manually. Do-
-n't worry it's easy. This is intended so you can familiarize yourself with how e-
-verything is put together. As stated previously, LisP-CV is known to work on Ubu-
+Thus no build file is included so you'll have to install everything manually. Do
+n't worry it's easy. This is intended so you can familiarize yourself with how e
+verything is put together. As stated previously, LisP-CV is known to work on Ubu
 ntu versions 12.04 through 14.04. It should work on any system that OpenCV, SBCL, 
 CLISP, ALLEGRO, CFFI, ASDF and QuickLisp can be compiled on.  There is nothing b-
 ut pure Lisp, and OpenCV C++ and C in the whole project. 
