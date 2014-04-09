@@ -177,7 +177,7 @@
 
 
 (defun imread (filename &optional (flags 1))
-  (%imread (foreign-alloc :string :initial-element filename) flags))
+  (%imread (c-string-to-string* filename (length filename)) flags))
 
 
 ;; VideoWriter::VideoWriter(const string& filename, int fourcc, double fps, Size frameSize, bool isColor) 

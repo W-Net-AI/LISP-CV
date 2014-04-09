@@ -175,6 +175,40 @@
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_Point* std_create_vectorp() 
+(defcfun ("std_create_vectorp" %vector-point) (:pointer vector-point))
+
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_Point* std_carrayTovectorp(Point* a, size_t len)
+(defcfun ("std_carrayTovectorp" %c-arr-to-vector-point) (:pointer vector-point)
+  (a :pointer)
+  (len :unsigned-int))
+
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; Point2f* std_vectorpToCArray(vector_Point* s) 
+(defcfun ("std_vectorpToCArray" %vector-point-to-c-array) :pointer 
+  (s (:pointer vector-point)))
+
+
+(let ((previous nil))
+  (defun c-arr-to-vector-point (a)
+    (unless (equal a (car previous))
+      (setf previous (cons a (foreign-alloc :pointer :initial-contents a))))
+    (%c-arr-to-vector-point (cdr previous) (length a))))
+
+
+(defun vector-point (&optional arg (n nil) (i nil))
+	   (cond ((eq arg nil) (return-from vector-point (%vector-point)))
+		 ((listp arg)
+		  (return-from vector-point (c-arr-to-vector-point arg)))
+		 ((and (pointerp arg) n (not i)) (mem-aref (%vector-point-to-c-array arg) :pointer n))
+		 ((and (pointerp arg) n i) (mem-aref (mem-aref (%vector-point-to-c-array arg) :pointer n) :float i))
+		 (t nil)))
+
+
+;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_Point2f* std_create_vectorp2f() 
 (defcfun ("std_create_vectorp2f" %vector-point2f) (:pointer vector-point2f))
 

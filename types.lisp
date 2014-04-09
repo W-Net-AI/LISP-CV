@@ -59,8 +59,14 @@
 ;; RNG*
 (defctype rng :pointer)
 
+;; RotatedRect*
+(defctype rotated-rect :pointer)
+
 ;; Size*
 (defctype size :pointer)
+
+;; Size2f*
+(defctype size2f :pointer)
 
 ;; String*
 (defctype string* :pointer)
@@ -139,6 +145,9 @@
 
 ;; vector_Mat*
 (defctype vector-mat :pointer)
+
+;; vector_Point*
+(defctype vector-point :pointer)
 
 ;; vector_Point2f*
 (defctype vector-point2f :pointer)

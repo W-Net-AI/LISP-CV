@@ -78,3 +78,10 @@
 
 (defmacro free (ptr)
   `(foreign-free ,ptr))
+
+;; Macro for MEM-AREF
+
+ (defmacro ? (ptr type &optional (index 0))
+       (cond (type
+	      `(mem-aref ,ptr ,type , index))
+	     (t nil)))

@@ -94,6 +94,8 @@
    #:vector-dmatch
    #:vector-float
    #:vector-int
+   #:vector-point
+   #:vector-point2f
    #:vector-keypoint
 
 
@@ -137,36 +139,11 @@
 
    #:<<
    #:>>
-   #:at-char
-   #:at-double
-   #:at-float
-   #:at-int
-   #:at-short
-   #:at-uchar
-   #:at-ushort
-   #:at-scalar
-   #:at-point2d
-   #:at-point2f
-   #:at-point3d
-   #:at-point3f
-   #:at-point3i
-   #:at-vec2b
-   #:at-vec2d
-   #:at-vec2f
-   #:at-vec2i
-   #:at-vec2s
-   #:at-vec3b
-   #:at-vec3d
-   #:at-vec3f
-   #:at-vec3i
-   #:at-vec3s
-   #:at-vec4b
-   #:at-vec4d
-   #:at-vec4f
-   #:at-vec4i
-   #:at-vec4s
+   #:area
+   #:area2f
    #:add
    #:br
+   #:channels
    #:clone
    #:cols
    #:copy-to
@@ -181,6 +158,9 @@
    #:dot3i
    #:empty
    #:force
+   #:height
+   #:height2f
+   #:is-continuous
    #:mat-diag
    #:mat-expr-t
    #:mat-expr-s
@@ -188,7 +168,7 @@
    #:mat-ones
    #:mat-value
    #:mat-type
-   #:mat-typed-0
+   #:mat-typed
    #:mat-zeros
    #:mul
    #:point
@@ -212,16 +192,19 @@
    #:point3i-y
    #:point3i-z
    #:promote
+   #:ptr
    #:rect
    #:rect-init
+   #:reshape
    #:roi
    #:rows
    #:scalar
    #:scalar-all
    #:size
+   #:size2f
    #:mat-size
    #:width
-   #:height
+   #:width2f
    #:step*
    #:sub
    #:sz
@@ -282,6 +265,9 @@
 
    #:+l1+
    #:+l2+
+
+   #:mean
+
    #:+norm-inf+
    #:+norm-l1+
    #:+norm-l2+
@@ -294,9 +280,9 @@
    #:+relative-l2+
 
 ;; core - Drawing Functions
-
    #:+aa+
    #:circle
+
    #:+font-hershey-simplex+
    #:+font-hershey-plain+
    #:+font-hershey-duplex+
@@ -306,8 +292,10 @@
    #:+font-hershey-script-simplex+
    #:+font-hershey-script-complex+
    #:+font-italic+ 
+
    #:line
    #:ellipse
+   #:get-text
    #:put-text
 
 ;; core - Utility and System Functions and Macros

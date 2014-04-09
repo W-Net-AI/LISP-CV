@@ -1,4 +1,4 @@
-Welcome to my LisP-CV repository, My name is Joe BiMedina.
+Welcome to my Lisp-Cv repository, My name is Joe BiMedina.
 
 
 Tested on Ubuntu - all versions 12.04 and up - using SBCL and CLISP and ALLEGRO CL
@@ -10,7 +10,7 @@ but most functions are fully tested and well documented.
 
 INTRODUCTION:
  
- LisP-CV is a Lisp wrapper for OpenCV's C++ interface, not the C interface. The
+ Lisp-Cv is a Lisp wrapper for OpenCV's C++ interface, not the C interface. The
 Lisp wrapper wraps around C wrappers which wrap around the OpenCV C++ functions. 
 Due to the speediness of C and C++, the speed of the C++ functions compared to 
 the C wappers for them is almost identical.
@@ -18,12 +18,12 @@ the C wappers for them is almost identical.
   This install tutorial is made for people wanting to help work on the project. 
 Thus no build file is included so you'll have to install everything manually. 
 Don't worry it's easy. This is intended so you can familiarize yourself with how 
-everything is put together. As stated previously, LisP-CV is known to work on 
+everything is put together. As stated previously, Lisp-Cv is known to work on 
 Ubuntu versions 12.04 through 14.04. It should work on any system that OpenCV, 
 SBCL CLISP, ALLEGRO, CFFI, ASDF and QuickLisp can be compiled on.  There is 
 nothing but pure Lisp, and OpenCV C++ and C in the whole project. 
 
-  If you have gotten LisP-CV to work on another system and would like to add the
+  If you have gotten Lisp-Cv to work on another system and would like to add the
 install instructions to this tutorial just send me an e-mail at wnetai@gmail.com 
 with the install instructions included. They will be added to this file and you 
 will be given credit for your addition unless you decline.
@@ -42,7 +42,7 @@ already there, would be better (more functionality, more speed) feel free to
 email me wnetai@gmail.com with a writeup of your conclusions. I'm assisting in developing 
 the C wrappers so I can present your case to the others involved. Keep in mind that the 
 C wrappers are still being developed so always be checking the 
-LisP-CV repository for the latest versions. I will be keeping those wrappers up 
+Lisp-Cv repository for the latest versions. I will be keeping those wrappers up 
 to date. Keep in mind though my version of the opencv_generated.cpp, excluded_functions.cpp, 
 mat.cpp, point.cpp, rect.cpp, scalar.cpp, and size.cpp files have all the same functions as 
 the main C wrapper repository at: 
@@ -82,9 +82,9 @@ or send them to me in an e-mail at wnetai@gmail.com.
 
 INSTALLATION:
 
-  To use LisP-CV you will need to first install GitHub member arjuncomar's  Open-CV 3.0.0 dev. 
+  To use Lisp-Cv you will need to first install GitHub member arjuncomar's  Open-CV 3.0.0 dev. 
 pull of Itseez/OpenCV(the original OpenCV). Then you will need to install Emacs, SBCL, SLIME and 
-QuickLisp, and then finally LisP-CV and all of the required .so files.
+QuickLisp, and then finally Lisp-Cv and all of the required .so files.
 
 To install arjuncomrs OpenCV go to this link:
 
@@ -190,16 +190,16 @@ ieee-floats-20140211-git
 You can remove the ieee-floats-20140211-git directory now if you like and it wil-
 l be effectively uninstalled.
 
-Now to install LisP-CV!!!
+Now to install Lisp-Cv!!!
 
-Note #1: I will make a Makefile or script to install LisP-CV as library progress-
+Note #1: I will make a Makefile or script to install Lisp-Cv as library progress-
 es but for now this install tutorial is made people who want to work on the proj-
 ect.  So all steps to install must be done by hand so you get familiar how the l-
 ibrary works...don't worry though it's easy.  If you do end up helping on the pr-
 oject you might want to make a script to speed up some of the processes defined 
 below.
 
-Note #2: "LisP-CV" is a decorative name made to signify that is a Common Lisp wr-
+Note #2: "Lisp-Cv" is a decorative name made to signify that is a Common Lisp wr-
 apper for OpenCV and to pay hommage to the fact the name Lisp was derived from i-
 ts method of operation, "List Processing". The name with the capitalized 'L', 'P',
 'C' and 'V' appears nowhere in the uncommented source code.
@@ -208,7 +208,7 @@ Let's get started.
 
 From this link download Lisp-CV:
 
-https://github.com/W-Net-AI/LisP-CV
+https://github.com/W-Net-AI/Lisp-Cv
 
 Extract the:
 
@@ -251,13 +251,13 @@ Now start Emacs and run:
 
 (ql:quickload "cffi")
 
-To install CFFI, which LisP-CV depends on, plus it's dependencies.
+To install CFFI, which Lisp-Cv depends on, plus it's dependencies.
 
 Then run:
 
 (ql:quickload "asdf")
 
-To install ASDF, a LisP-CV dependency.
+To install ASDF, a Lisp-Cv dependency.
 
 Run:
 
@@ -274,7 +274,7 @@ Open Emacs and run this at the REPL:
 
 (asdf:operate 'asdf:load-op :lisp-cv)
 
-LisP-CV will load.
+Lisp-Cv will load.
 
 Then run this at the REPL
 
@@ -363,12 +363,12 @@ Feel free to e-mail at me wnetai@gmail.com for any of the following reasons:
 
 *Request for features*
 
-*If you have gotten LisP-CV to work on a system other than specified at the top 
+*If you have gotten Lisp-Cv to work on a system other than specified at the top 
 of this page* (Remember to include how you got it done!)
 
 *If you have a function and example that you would like to add*
 
-*If you would like add a code sample in the examples(something you made with LisP-CV)*
+*If you would like add a code sample in the examples(something you made with Lisp-Cv)*
 
 *If you would like to add some other unspecified addition to the library*
 

@@ -21,6 +21,11 @@ vector_Mat* std_carrayTovectorm(Mat* a, size_t len);
 Mat* std_vectormToCArray(vector_Mat* s);
 size_t std_vectorm_length(vector_Mat* self);
 
+vector_Point* std_create_vectorp();
+vector_Point* std_carrayTovectorp(Point* a, size_t len);
+Point* std_vectorpToCArray(vector_Point* s);
+size_t std_vectorp_length(vector_Point* self);
+
 Point2f* std_vectorp2fToCArray(vector_Point2f* s);
 vector_Point2f* std_carrayTovectorp2f(Point2f* a, size_t len);
 vector_Point2f* std_create_vectorp2f();
@@ -41,7 +46,7 @@ string* std_cstringToString(char* s, size_t len);
 const char*  std_stringToCString(string* s);
 size_t std_vectorc_length(vector_char* self);
 
-vector_char* *std_create_vectorc();
+vector_char* std_create_vectorc();
 vector_char* std_carrayTovectorc(char* a, size_t len);
 char* std_vectorcToCArray(vector_char* s);
 size_t std_vectorc_length(vector_char* self);

@@ -149,6 +149,14 @@
   (t (:default "interop")))
 (use-foreign-library interop)
 
+;; cd ~/Documents/opencv-master/modules/c/src
+;; g++ -Wall -shared -fPIC -o extra_functions.so extra_functions.cpp
+(define-foreign-library extra_functions
+  (:darwin "extra_functions.dylib")
+  (:unix "/usr/local/lib/extra_functions.so")
+  (t (:default "extra_functions")))
+(use-foreign-library extra_functions)
+
 ;;; General macros and functions
 (defmacro defanonenum (&body enums)
   "Converts anonymous enums to Lisp constants."

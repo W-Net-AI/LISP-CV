@@ -24,6 +24,25 @@ size_t std_vectorm_length(vector_Mat* self) {
     return self->size();
 }
 
+vector_Point* std_create_vectorp() {
+    return new vector<Point>;
+}
+
+vector_Point* std_carrayTovectorp(Point* a, size_t len) {
+    vector<Point>* v = new vector<Point>;
+    for(size_t i = 0; i < len; i++) 
+        v->push_back(a[i]);
+    return v;
+}
+
+Point* std_vectorpToCArray(vector_Point* s) {
+    return s->data();
+}
+
+size_t std_vectorp_length(vector_Point* self) {
+    return self->size();
+}
+
 vector_Point2f* std_create_vectorp2f() {
     return new vector<Point2f>;
 }
@@ -47,7 +66,7 @@ vector_char* std_create_vectorc() {
     return new vector<char>;
 }
 
-vector_char* *std_carrayTovectorc(char* a, size_t len) {
+vector_char* std_carrayTovectorc(char* a, size_t len) {
     vector<char>* v = new vector<char>;
     for(size_t i = 0; i < len; i++) 
         v->push_back(a[i]);

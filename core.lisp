@@ -5,7 +5,12 @@
 
 (in-package :lisp-cv)
 
-
+; Point* cv_Mat_at_Point(Mat* self, int row, int col);
+(defcfun ("cv_Mat_at_Point0" at-point) (:pointer point)
+  "Returns a reference to a POINT array element."
+  (self (:pointer mat))
+  (i :int)
+  (j :int)) 
 
 ;; Default parameters
 
@@ -86,251 +91,30 @@
   (m2 (:pointer mat)))
 
 
+;; _Tp area() const
+;; int cv_Size_area(Size* self)
+(defcfun ("cv_Size_area" area) :int
+  "Gets the area of a SIZE construct"
+  (self (:pointer size)))
+
+
+;; _Tp area() const
+;; float cv_Size2f_area(Size2f* self) 
+(defcfun ("cv_Size2f_area" area2f) :float
+  "Gets the area of a SIZE2F construct"
+  (self (:pointer size2f)))
+
+
  ;; Mat* cv_Mat_assignVal(Mat* self, Scalar* s)
 (defcfun ("cv_Mat_assignVal" assgn-val) (:pointer mat)
   "Assign a scalar value to a matrix."
   (self (:pointer mat))
   (s (:pointer scalar)))
 
-
-;; char cv_Mat_at_char(Mat* self, int row, int col);
-(defcfun ("cv_Mat_at_char1" at-char) :pointer
-  "Returns a reference to a CHAR array element."
-  (self (:pointer mat))
-  (i :int)
-  (j :int))
-
-
-;; int cv_Mat_at_double(Mat* self, int row, int col);
-(defcfun ("cv_Mat_at_double0" at-double) :double
-  "Returns a reference to a DOUBLE array element."
-  (self (:pointer mat))
-  (i :int)
-  (j :int))
-
-
-;; float cv_Mat_at_float(Mat* self, int row, int col);
-(defcfun ("cv_Mat_at_float0" at-float) :float
-  "Returns a reference to a FLOAT array element."
-  (self (:pointer mat))
-  (i :int)
-  (j :int))
-
-
-;; int cv_Mat_at_int(Mat* self, int row, int col);
-(defcfun ("cv_Mat_at_int0" at-int) :int
-  "Returns a reference to a INT array element."
-  (self (:pointer mat))
-  (i :int)
-  (j :int))
-
-
-;; short cv_Mat_at_short(Mat* self, int row, int col);
-(defcfun ("cv_Mat_at_short1" at-short) :pointer
-  "Returns a reference to a SHORT array element."
-  (self (:pointer mat))
-  (i :int)
-  (j :int))
-
-
-;; uint cv_Mat_at_uint(Mat* self, int row, int col);
-(defcfun ("cv_Mat_at_uint0" at-uint) :uint
-  "Returns a reference to a UINT array element."
-  (self (:pointer mat))
-  (i :int)
-  (j :int))
-
-
-;; uchar cv_Mat_at_uchar(Mat* self, int row, int col);
-(defcfun ("cv_Mat_at_uchar0" at-uchar) :uchar
-  "Returns a reference to a UCHAR array element."
-  (self (:pointer mat))
-  (i :int)
-  (j :int))
-
-
-;; ushort cv_Mat_at_ushort(Mat* self, int row, int col);
-(defcfun ("cv_Mat_at_ushort1" at-ushort) :pointer
-  "Returns a reference to a USHORT array element."
-  (self (:pointer mat))
-  (i :int)
-  (j :int))
-
-
-;; Scalar* cv_Mat_at_Scalar(Mat* self, int row, int col);
-(defcfun ("cv_Mat_at_Scalar" at-scalar) (:pointer scalar)
-  "Returns a reference to a SCALAR array element."
-  (self (:pointer mat))
-  (i :int)
-  (j :int))
-
-
-;; Point* cv_Mat_at_Point(Mat* self, int row, int col);
-(defcfun ("cv_Mat_at_Point" at-point) (:pointer point)
-  "Returns a reference to a POINT array element."
-  (self (:pointer mat))
-  (i :int)
-  (j :int))
-
-
-;; Point2d* cv_Mat_at_Point2d(Mat* self, int row, int col);
-(defcfun ("cv_Mat_at_Point2d" at-point2d) (:pointer point2d)
-  "Returns a reference to a POINT2D array element."
-  (self (:pointer mat))
-  (i :int)
-  (j :int))
-
-
-;; Point2f* cv_Mat_at_Point2f(Mat* self, int row, int col);
-(defcfun ("cv_Mat_at_Point2f" at-point2f) (:pointer point2f)
-  "Returns a reference to a POINT2F array element."
-  (self (:pointer mat))
-  (i :int)
-  (j :int))
-
-
-;; Point3d* cv_Mat_at_Point3d(Mat* self, int row, int col);
-(defcfun ("cv_Mat_at_Point3d" at-point3d) (:pointer point3d)
-  "Returns a reference to a POINT3D array element."
-  (self (:pointer mat))
-  (i :int)
-  (j :int))
-
-
-;; Point3f* cv_Mat_at_Point3f(Mat* self, int row, int col);
-(defcfun ("cv_Mat_at_Point3f" at-point3f) (:pointer point3f)
-  "Returns a reference to a POINT3F array element."
-  (self (:pointer mat))
-  (i :int)
-  (j :int))
-
-
-;; Point3i* cv_Mat_at_Point3i(Mat* self, int row, int col);
-(defcfun ("cv_Mat_at_Point3i" at-point3i) (:pointer point3i)
-  "Returns a reference to a POINT3I array element."
-  (self (:pointer mat))
-  (i :int)
-  (j :int))
-
-
-;; Vec2b* cv_Mat_at_Vec2b(Mat* self, int row, int col);
-(defcfun ("cv_Mat_at_Vec2b" at-vec2b) (:pointer vec2b)
-  "Returns a reference to a VEC2B array element."
-  (self (:pointer mat))
-  (i :int)
-  (j :int))
-
-
-;; Vec2d cv_Mat_at_Vec2d(Mat* self, int row, int col);
-(defcfun ("cv_Mat_at_Vec2d" at-vec2d) (:pointer vec2d)
-  "Returns a reference to a VEC2D array element."
-  (self (:pointer mat))
-  (i :int)
-  (j :int))
-
-
-;; Vec2f* cv_Mat_at_Vec2f(Mat* self, int row, int col);
-(defcfun ("cv_Mat_at_Vec2f" at-vec2f) (:pointer vec2f)
-  "Returns a reference to a VEC2F array element."
-  (self (:pointer mat))
-  (i :int)
-  (j :int))
-
-
-;; Vec2i* cv_Mat_at_Vec2i(Mat* self, int row, int col);
-(defcfun ("cv_Mat_at_Vec2i" at-vec2i) (:pointer vec2i)
-  "Returns a reference to a VEC2I array element."
-  (self (:pointer mat))
-  (i :int)
-  (j :int))
-
-
-;; Vec2s* cv_Mat_at_Vec2s(Mat* self, int row, int col);
-(defcfun ("cv_Mat_at_Vec2s" at-vec2s) (:pointer vec2s)
-  "Returns a reference to a VEC2S array element."
-  (self (:pointer mat))
-  (i :int)
-  (j :int))
-
-
-;; Vec2w* cv_Mat_at_Vec2w(Mat* self, int row, int col);
-(defcfun ("cv_Mat_at_Vec2w" at-vec2w) (:pointer vec2s)
-  "Returns a reference to a VEC2S array element."
-  (self (:pointer mat))
-  (i :int)
-  (j :int))
-
-
-;; Vec3b* cv_Mat_at_Vec3b(Mat* self, int row, int col);
-(defcfun ("cv_Mat_at_Vec3b0" at-vec3b) (:pointer vec3b)
-  "Returns a reference to a VEC3B array element."
-  (self (:pointer mat))
-  (i :int)
-  (j :int))
-
-
-;; Vec3d* cv_Mat_at_Vec3d(Mat* self, int row, int col);
-(defcfun ("cv_Mat_at_Vec3d" at-vec3d) (:pointer vec3d)
-  "Returns a reference to a VEC3D array element."
-  (self (:pointer mat))
-  (i :int)
-  (j :int))
-
-
-;; Vec3f* cv_Mat_at_Vec3f(Mat* self, int row, int col);
-(defcfun ("cv_Mat_at_Vec3f" at-vec3f) (:pointer vec3f)
-  "Returns a reference to a VEC3F array element."
-  (self (:pointer mat))
-  (i :int)
-  (j :int))
-
-
-;; Vec3i* cv_Mat_at_Vec3i(Mat* self, int row, int col);
-(defcfun ("cv_Mat_at_Vec3i" at-vec3i) (:pointer vec3i)
-  "Returns a reference to a VEC3I array element."
-  (self (:pointer mat))
-  (i :int)
-  (j :int))
-
-
-;; Vec3s* cv_Mat_at_Vec3s(Mat* self, int row, int col);
-(defcfun ("cv_Mat_at_Vec3s" at-vec3s) (:pointer vec3s)
-  "Returns a reference to a VEC3S array element."
-  (self (:pointer mat))
-  (i :int)
-  (j :int))
-
-
-;; Vec4b* cv_Mat_at_Vec4b(Mat* self, int row, int col);
-(defcfun ("cv_Mat_at_Vec4b" at-vec4b) (:pointer vec4b)
-  "Returns a reference to a VEC4B array element."
-  (self (:pointer mat))
-  (i :int)
-  (j :int))
-
-
-;; Vec4d* cv_Mat_at_Vec4d(Mat* self, int row, int col);
-(defcfun ("cv_Mat_at_Vec4d" at-vec4d) (:pointer vec4d)
-  "Returns a reference to a VEC4D array element."
-  (self (:pointer mat))
-  (i :int)
-  (j :int))
-
-
-;; Vec4f* cv_Mat_at_Vec4f(Mat* self, int row, int col);
-(defcfun ("cv_Mat_at_Vec4f" at-vec4f) (:pointer vec4f)
-  "Returns a reference to a VEC4F array element."
-  (self (:pointer mat))
-  (i :int)
-  (j :int))
-
-
-;; Vec4i cv_Mat_at_Vec4i(Mat* self, int row, int col);
-(defcfun ("cv_Mat_at_Vec4i" at-vec4i) (:pointer vec4i)
-  "Returns a reference to a VEC4I array element."
-  (self (:pointer mat))
-  (i :int)
-  (j :int))
+;; uchar* ptr(int i0=0)
+;; uchar* cv_Mat_ptr_index(Mat* self, int i)
+(defmacro at (&optional self i j type)
+	       `(mem-aref (%ptr ,self ,i) ,type ,j))
 
 
 ;; Point_<_Tp> br() const;
@@ -340,12 +124,9 @@
   (self (:pointer rect)))
 
 
-;; Vec4s cv_Mat_at_Vec4s(Mat* self, int row, int col);
-(defcfun ("cv_Mat_at_Vec4s" at-vec4s) (:pointer vec4s)
-  "Returns a reference to a VEC4S array element."
-  (self (:pointer mat))
-  (i :int)
-  (j :int))
+;; int cv_Mat_channels(Mat* self)
+(defcfun ("cv_Mat_channels" channels) :int
+  (self (:pointer mat)))
 
 
 ;; void Mat::copyTo(OutputArray m) const
@@ -416,7 +197,6 @@
   (self (:pointer mat))
   (d :int))
 
-
 (defun diag (self &optional (d 0))
   "Extracts a diagonal from a matrix."
   (%diag self d))
@@ -431,7 +211,7 @@
 
 ;; _Tp dot(const Point_& pt) const;
 ;; int cv_Point_dot(Point* self, Point* other) 
-(defcfun ("cv_Point_dot" dot) :int 
+(defcfun ("cv_Point_dot2i" dot) :int 
   "Finds the dot product of a point."
   (self (:pointer point))
   (other (:pointer point)))
@@ -459,6 +239,12 @@
   "Finds the dot product of a point3d."
   (self (:pointer point3d))
   (other (:pointer point3d)))
+
+
+;; bool Mat::isContinuous() const
+;; bool cv_Mat_isContinuous(Mat* self) 
+(defcfun ("cv_Mat_isContinuous" is-continuous) :boolean
+  (self (:pointer mat)))
 
 
 ;; _Tp dot(const Point3_& pt) const;
@@ -490,10 +276,18 @@
   (expr (:pointer mat-expr)))
 
 
-;; int cv_Size_height(Size* self) 
-(defcfun ("cv_Size_height" height) :int
-  "Gets the height of a (:POINTER SIZE)"
+;; _Tp width, height
+;; double cv_Size_height(Size* self) 
+(defcfun ("cv_Size_height" height) :double
+  "Gets the height of a SIZE construct"
   (self (:pointer size)))
+
+
+;; _Tp width, height
+;; float cv_Size2f_height(Size* self) 
+(defcfun ("cv_Size2f_height" height2f) :float
+  "Gets the height of a (:POINTER SIZE2F)"
+  (self (:pointer size2f)))
 
 
 ;; Mat::Mat()
@@ -571,7 +365,7 @@
 
 ;; Mat::Mat(int rows, int cols, int type)
 ;; Mat* cv_create_Mat_typed(int rows, int cols, int type)
-(defcfun ("cv_create_Mat_typed" mat-typed-0)  (:pointer mat)
+(defcfun ("cv_create_Mat_typed" mat-typed)  (:pointer mat)
   "MAT constructor with a row, column and type parameter."
   (rows :int)
   (cols :int)
@@ -600,20 +394,20 @@
   (m1 (:pointer mat))
   (m2 (:pointer mat)))
 
-
-;; Point* cv_create_Point(int x, int y) 
-(defcfun ("cv_create_Point" point0) (:pointer point)
+;; Point_();
+;; Point2##t * cv_create_Point2##t ( tn x,  tn y)
+(defcfun ("cv_create_Point2i" point0) (:pointer point)
   "Point constructor")
 
-
-;; Point* cv_create_Point(int x, int y) 
-(defcfun ("cv_create_Point2" point2) (:pointer point)
+;; Point_(_Tp _x, _Tp _y);
+;; Point2##t * cv_create_Point2##t ( tn x,  tn y) 
+(defcfun ("cv_create_Point2i" point2) (:pointer point)
   "Point constructor"
   (x :int)
   (y :int))
 
 
-(defun point (&optional (x nil) (y nil))
+(defun point (&optional x y)
 	   (cond ((eq (or x y) nil)
 		  (point0))
 		 ((and x y)
@@ -623,24 +417,38 @@
 
 ;; _Tp x, y
 ;; int cv_Point_getX(Point* self) 
-(defcfun ("cv_Point_getX" point-x) :int 
+(defcfun ("cv_Point2i_getX" point-x) :int 
   "Retrieves X coordinate of a point"
   (self (:pointer point)))
 
 
 ;; _Tp x, y
 ;; int cv_Point_getY(Point* self)
-(defcfun ("cv_Point_getY" point-y) :int 
+(defcfun ("cv_Point2i_getY" point-y) :int 
   "Retrieves y coordinate of a point"
   (self (:pointer point)))
 
 
 ;; typedef Point_<double> Point2d
-;; Point2d* cv_create_Point2d(double x, double y) {
-(defcfun ("cv_create_Point2d" point2d) (:pointer point2d) 
+;; Point2##t * cv_create_Point2##t ( tn x,  tn y) 
+(defcfun ("cv_create_Point2d" point2d0) (:pointer point2d) 
+  "Point2d constructor")
+
+
+;; typedef Point_<double> Point2d
+;; Point2##t * cv_create_Point2##t ( tn x,  tn y)  
+(defcfun ("cv_create_Point2d" point2d2) (:pointer point2d) 
   "Point2d constructor"
   (x :double)
   (y :double))
+
+
+(defun point2d (&optional x y)
+	   (cond ((eq (or x y) nil)
+		  (point2d0))
+		 ((and x y)
+		  (point2d2 x y))
+		 (t nil)))
 
 
 ;; _Tp x, y;
@@ -657,12 +465,27 @@
   (self (:pointer point2d)))
 
 
+;; typedef Point_<float> Point2f;
+;; tn cv_Point2##t##_getX( Point2##t * self) {
+(defcfun ("cv_create_Point2f" point2f0) (:pointer point2f) 
+  "Point2f constructor")
+
+
+
 ;; typedef Point_<float> Point2f
-;; Point2f* cv_create_Point2f(float x, float y) {
-(defcfun ("cv_create_Point2f" point2f) (:pointer point2f) 
+;; Point2##t * cv_create_Point2##t ( tn x,  tn y)  {
+(defcfun ("cv_create_Point2f" point2f2) (:pointer point2f) 
   "Point2f constructor"
   (x :float)
   (y :float))
+
+
+(defun point2f (&optional x y)
+	   (cond ((eq (or x y) nil)
+		  (point2f0))
+		 ((and x y)
+		  (point2f2 x y))
+		 (t nil)))
 
 
 ;; _Tp x, y;
@@ -680,12 +503,26 @@
 
 
 ;; typedef Point3_<double> Point3d
-;; Point3d* cv_create_Point3d(double x, double y, double z) 
-(defcfun ("cv_create_Point3d" point3d) (:pointer point3d) 
+;; Point3##t * cv_create_Point3##t ( tn x,  tn y,  tn z) 
+(defcfun ("cv_create_Point3d" point3d0) (:pointer point3d) 
+  "Point3d constructotr")
+
+
+;; typedef Point3_<double> Point3d
+;; Point3##t * cv_create_Point3##t ( tn x,  tn y,  tn z) 
+(defcfun ("cv_create_Point3d" point3d2) (:pointer point3d) 
   "Point3d constructor"
   (x :double)
   (y :double)
   (z :double))
+
+
+(defun point3d (&optional x y z)
+	   (cond ((eq (or x y) nil)
+		  (point3d0))
+		 ((and x y)
+		  (point3d2 x y z))
+		 (t nil)))
 
 
 ;; _Tp x, y, z
@@ -709,12 +546,27 @@
   (self (:pointer point3d)))
 
 
-;; Point3f* cv_create_Point3f(float x, float y, float z) {
-(defcfun ("cv_create_Point3f" point3f) (:pointer point3f) 
+;; typedef Point3_<double> Point3d
+;; Point3##t * cv_create_Point3##t ( tn x,  tn y,  tn z)  
+(defcfun ("cv_create_Point3f" point3f0) (:pointer point3f) 
+  "Point3f constructor")
+
+
+;; typedef Point3_<double> Point3d
+;; Point3##t * cv_create_Point3##t ( tn x,  tn y,  tn z)  
+(defcfun ("cv_create_Point3f" point3f2) (:pointer point3f) 
   "Point3f constructor"
   (x :float)
   (y :float)
   (z :float))
+
+
+(defun point3f (&optional x y z)
+	   (cond ((eq (or x y) nil)
+		  (point3f0))
+		 ((and x y)
+		  (point3f2 x y z))
+		 (t nil)))
 
 
 ;; _Tp x, y, z
@@ -738,12 +590,27 @@
   (self (:pointer point3f)))
 
 
-;; Point3i* cv_create_Point3i(int x, int y, int z) 
-(defcfun ("cv_create_Point3i" point3i) (:pointer point3i) 
+;; typedef Point3_<double> Point3d
+;; Point3##t * cv_create_Point3##t ( tn x,  tn y,  tn z)  
+(defcfun ("cv_create_Point3i" point3i0) (:pointer point3i) 
+  "Poin3i constructor")
+
+
+;; typedef Point3_<double> Point3d
+;; Point3##t * cv_create_Point3##t ( tn x,  tn y,  tn z)  
+(defcfun ("cv_create_Point3i" point3i2) (:pointer point3i) 
   "Poin3i constructor"
   (x :int)
   (y :int)
   (z :int))
+
+
+(defun point3i (&optional x y z)
+	   (cond ((eq (or x y) nil)
+		  (point3i0))
+		 ((and x y)
+		  (point3i2 x y z))
+		 (t nil)))
 
 
 ;; _Tp x, y, z
@@ -772,6 +639,16 @@
   "Converts a (:POINTER MAT) to a (:POINTER MAT-EXPR)."
   (m (:pointer mat)))
 
+;; uchar* Mat::ptr(int i0=0)
+;; uchar* cv_Mat_ptr_index(Mat* self, int i)
+(defcfun ("cv_Mat_ptr_index" %ptr) :pointer 
+	 (self (:pointer mat))
+	 (i0 :int))
+
+(defun ptr (self &optional (i0 0))
+       "Returns pointer to i0-th submatrix along the dimension #0"
+       (ptr-index self i0))
+
 ;; Rect_();
 ;; Rect* cv_create_Rect() 
 (defcfun ("cv_create_Rect" rect0) (:pointer mat) 
@@ -786,6 +663,34 @@
   (y :int)
   (width :int)
   (height :int))
+
+(defun rect (&optional (x nil) (y nil) (width nil) (height nil))
+	   (cond ((eq (or x y) nil)
+		  (rect0))
+		 ((and x y)
+		  (rect4 x y width height))
+		 (t nil)))
+
+;; Mat Mat::reshape(int cn, int rows=0) const
+;; Mat* cv_Mat_reshape(Mat* self, int cn) 
+(defcfun ("cv_Mat_reshape" %reshape) (:pointer mat)
+  (self (:pointer mat))
+  (cn :int))
+
+;; Mat Mat::reshape(int cn, int rows=0) const
+;; Mat* cv_Mat_reshape_rows(Mat* self, int cn, int rows) 
+(defcfun ("cv_Mat_reshape_rows" reshape-rows) (:pointer mat)
+  (self (:pointer mat))
+  (cn :int)
+  (roms :int))
+
+
+(defun reshape (&optional self cn (rows 0))
+	   (cond ((eq rows 0)
+		  (%reshape self cn))
+		 ((> rows 0)
+		  (reshape-rows self cn rows))
+		 (t nil)))
 
 
 ;; Mat::Mat(const Mat& m, const Rect& roi)
@@ -824,11 +729,50 @@
   (%scalar-all (coerce val0123 'double-float)))
 
 
-;; cv_create_Size2(int width, int height)
-(defcfun ("cv_create_Size2" size) (:pointer size)
+;; Size_()
+;; Size* cv_create_Size() {
+(defcfun ("cv_create_Size" size0) (:pointer size)
+  "Create SIZE construct")
+
+
+;; Size_(_Tp _width, _Tp _height)
+;; cv_create_Size2(double width, double height)
+(defcfun ("cv_create_Size2" size2) (:pointer size)
   "SIZE constructor"
-  (width :int)
-  (height :int))
+  (width :double)
+  (height :double))
+
+
+(defun size (&optional arg1 arg2)
+  (cond ((eq (or arg1 arg2) nil)
+	 (size0))
+	((numberp (or arg1 arg2)) 
+	 (size2 (coerce arg1 'double-float) 
+		(coerce arg2 'double-float)))
+	((pointerp arg1) (mat-size arg1))
+	(t nil)))
+
+
+;; Size_<float>();
+;; Size2f* cv_create_Size2f(float width, float height)
+(defcfun ("cv_create_Size2f" size2f0) (:pointer size2f)
+  "Size2f constructor")
+
+
+;; Size_<float>(float width, float height);
+;; Size2f* cv_create_Size2f(float width, float height)
+(defcfun ("cv_create_Size2f" size2f2) (:pointer size2f)
+  "Size2f constructor"
+	 (width :float)
+	 (height :float))
+
+
+(defun size2f (&optional (width nil) (height nil))
+	   (cond ((eq (or width height) nil)
+		  (size2f0))
+		 ((and width height)
+		  (size2f2 width height))
+		 (t nil)))
 
 
 ;; size_t cv_Mat_get_Step(Mat* self) 
@@ -864,11 +808,18 @@
   "Returns the total number of array elements."
   (self (:pointer mat)))
 
-
-;; int cv_Size_width(Size* self) 
-(defcfun ("cv_Size_width" width) :int
-  "Gets the width of a (:POINTER SIZE)"
+;; _Tp width, height;
+;; double cv_Size_width(Size* self) 
+(defcfun ("cv_Size_width" width) :double
+  "Gets the width of a SIZE construct"
   (self (:pointer size)))
+
+
+;; _Tp width, height
+;; float cv_Size2f_width(Size* self) 
+(defcfun ("cv_Size2f_width" width2f) :float
+  "Gets the width of a (:POINTER SIZE2F)"
+  (self (:pointer size2f)))
 
 
 ;;; Operations on Arrays
@@ -890,6 +841,37 @@
   (lowerb (:pointer scalar))
   (upperb (:pointer scalar))
   (dst :pointer mat))
+
+
+;; Scalar mean(InputArray src, InputArray mask=noArray())
+;; Scalar* cv_mean(Mat* src, Mat* mask)
+(defcfun ("cv_mean" %mean) (:pointer scalar)
+  "Calculates an average (mean) of array elements."
+  (src (:pointer mat))
+  (mask (:pointer mat)))
+
+(defun mean (src &optional (mask (mat)))
+  "Calculates an average (mean) of array elements."
+  (%mean src mask))
+
+
+;; RNG::RNG()
+(defcfun ("cv_create_RNG" %rng) (:pointer rng) 
+  "RNG constructor")
+
+
+;; RNG::RNG(uint64 state)
+;; RNG* cv_create_RNG_state(uint64 state)
+(defcfun ("cv_create_RNG_state" rng-state) (:pointer rng) 
+  "RNG constructor -  sets the RNG state to the specified value."
+  (state :uint64))
+
+
+(defun rng (&optional (state nil))
+  (cond ((eq state nil)
+         (%rng))
+	((integerp state) (rng-state state))
+        (t nil)))
 
 
 ;; double RNG::uniform(double a, double b)
@@ -918,26 +900,6 @@
   (a :int)
   (b :int))
 
-
-;; RNG::RNG()
-(defcfun ("cv_create_RNG" %rng) (:pointer rng) 
-  "RNG constructor")
-
-
-;; RNG::RNG(uint64 state)
-;; RNG* cv_create_RNG_state(uint64 state)
-(defcfun ("cv_create_RNG_state" rng-state) (:pointer rng) 
-  "RNG constructor -  sets the RNG state to the specified value."
-  (state :uint64))
-
-
-(defun rng (&optional (state nil))
-  (cond ((eq state nil)
-         (%rng))
-	((integerp state) (rng-state state))
-        (t nil)))
-
-
 (defun uniform  (rng a b)
   (cond ((or (eq (type-of (and a b)) 'FIXNUM)
 	     (integerp (and a b)))
@@ -950,7 +912,6 @@
 ;;; Drawing Functions
 
 
-
 ;; BGR value constructor macro 
 
 (defmacro bgr (b g r)
@@ -958,13 +919,11 @@
   `(scalar ,b ,g ,r))
 
 
-
 ;; RGB value constructor macro 
 
 (defmacro rgb (r g b)
   "BGR value constructor macro"
   `(scalar ,b ,g ,r))
-
 
 
 ;; void circle(Mat& img, Point center, int radius, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
@@ -983,10 +942,25 @@
   (%circle img center radius color thickness line-type shift))
 
 
+;; void ellipse(Mat& img, const RotatedRect& box, const Scalar& color, int thickness=1, int lineType=8)
+;; void cv_ellipse5(Mat* img, RotatedRect* box, Scalar* color, int thickness, int lineType)
+(defcfun ("cv_ellipse5" %ellipse5) :void
+  (img (:pointer mat))
+  (box (:pointer rotated-rect))
+  (color (:pointer scalar))
+  (thickness :int) 
+  (line-type :int))
 
-;; void ellipse(Mat& img, Point center, Size axes, double angle, double startAngle, double endAngle, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
-;; void cv_ellipse(Mat* img, Point* center, Size* axes, double angle, double startAngle, double endAngle, Scalar* color, int thickness, int lineType, int shift)
-(defcfun ("cv_ellipse" %ellipse) :void
+(defun ellipse5 (img box color &optional (thickness 1) (line-type 8))
+       "Fills an ellipse sector."
+       (%ellipse5 img box color thickness line-type))
+
+
+;; void ellipse(Mat& img, Point center, Size axes, double angle, double startAngle, double endAngle, const Scalar& color, 
+;; int thickness=1, int lineType=8, int shift=0)
+;; void cv_ellipse(Mat* img, Point* center, Size* axes, double angle, double startAngle, double endAngle, Scalar* color, int thickness, 
+;; int lineType, int shift)
+(defcfun ("cv_ellipse" %ellipse10) :void
   (img (:pointer mat))
   (center (:pointer point))
   (axes (:pointer size))
@@ -998,10 +972,30 @@
   (line-type :int) 
   (shift :int))
 
-(defun ellipse (img center axes angle start-angle end-angle color &optional (thickness 1) (line-type 8) (shift 0))
-  "Draws a simple or thick elliptic arc or fills an ellipse sector."
-  (%ellipse img center axes angle start-angle end-angle color thickness line-type shift))
+(defun ellipse10 (img center axes angle start-angle end-angle color &optional (thickness 1) (line-type 8) (shift 0))
+  "Draws a simple or thick elliptic arc."
+  (%ellipse10 img center axes angle start-angle end-angle color thickness line-type shift))
 
+
+(defun ellipse (&rest args)
+  (case (length args)
+    ((3 4 5) (apply #'ellipse5 args))
+    ((7 8 9 10) (apply #'ellipse10 args))
+    (otherwise (error "Wrong number arguments to ellipse (~A)" (length args)))))
+
+
+;; Size getTextSize(const string& text, int fontFace, double fontScale, int thickness, int* baseLine)
+;; Size* cv_getTextSize(String* text, int fontFace, double fontScale, int thickness, int* baseLine)
+(defcfun ("cv_getTextSize" %get-text-size) (:pointer size)
+  (text (:pointer string*))
+  (font-face :int)
+  (font-scale :double)
+  (thickness :int) 
+  (base-line :pointer))
+
+(defun get-text-size (text font-face font-scale thickness base-line)
+  "Calculates the width and height of a text string."
+  (%get-text-size text font-face font-scale thickness base-line))
 
 
 ;; void line(Mat& img, Point pt1, Point pt2, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
@@ -1018,7 +1012,6 @@
 (defun line (img pt1 pt2 color &optional (thickness 1) (line-type 8) (shift 0))
   "Draws a line segment connecting two points."
   (%line img pt1 pt2 color thickness line-type shift))
-
 
 
 ;; void putText(Mat& img, const string& text, Point org, int fontFace, double fontScale, Scalar color, int thickness=1, int lineType=8, 

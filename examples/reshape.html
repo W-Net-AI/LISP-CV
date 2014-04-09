@@ -1,0 +1,505 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head profile="http://gmpg.org/xfn/11">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>RESHAPE | WNET A.I.</title>
+<link rel="pingback" href="http://wnetai.wordpress.com/xmlrpc.php" />
+<meta name="google-site-verification" content="F5HSJIMtavuXVobT_HCDegBcqeKAGsnMhHRge2r_y94" />
+<meta name="msvalidate.01" content="E91BF8EA1B8A8737B331E77A5C23A14C" />
+<link rel="alternate" type="application/rss+xml" title="WNET A.I. &raquo; Feed" href="http://wnetai.wordpress.com/feed/" />
+<link rel="alternate" type="application/rss+xml" title="WNET A.I. &raquo; Comments Feed" href="http://wnetai.wordpress.com/comments/feed/" />
+<script type="text/javascript">
+/* <![CDATA[ */
+function addLoadEvent(func){var oldonload=window.onload;if(typeof window.onload!='function'){window.onload=func;}else{window.onload=function(){oldonload();func();}}}
+/* ]]> */
+</script>
+<link rel='stylesheet' id='open-sans-css'  href='//fonts.googleapis.com/css?family=Open+Sans%3A300italic%2C400italic%2C600italic%2C300%2C400%2C600&#038;subset=latin%2Clatin-ext&#038;ver=3.9-beta3-27857' type='text/css' media='all' />
+<link rel='stylesheet' id='all-css-2' href='http://s1.wp.com/_static/??-eJx9UttWAyEM/CFpqtZ6fPD4LVxSlhYIh7Ct/r3ZrXZre+SJSZiZXABORYVs4+iQwTKD0zwES5lXKeSVZB7glqKdXCmj6x+KaBrmBmlUJY4+ZAYeDdsaSgviBzuKkU49/kBHrMqMxkQpxe0r4n0He4YmHR4MfV5AzzSGw6TCVrQ9qDnq0S/Dyb2lpJZhOyJLFSWfim4TI6ELGiMmofVkqWx/VRMcpMH73togPgxlNKCzq6ivFxMgU5uf6wJ6BYWDVyOq41OPXdFE8gL9/OxL2BM1YlWxUG1qRzXdxj1pIRZS1KECD7pOdX/OnspjxnpewQL/2+KwAR/J6NhzPAXnsZ3/uieadu5mx4/0/vj8tl1vXtfbl/03eXw15A==' type='text/css' media='all' />
+<link rel='stylesheet' id='print-css-2' href='http://s0.wp.com/wp-content/mu-plugins/global-print/global-print.css?m=1387483371g' type='text/css' media='print' />
+<script type='text/javascript' src='http://s2.wp.com/_static/??-eJx9kFEKwjAMQC9kV5zo2Id4lq1mI7NtapNu6Ontx0QcVQiEkEeSF70Ehd7YdAXWU457gvhYUzXxTv8DlMMxdgKVQ/+GDXkBL9olFWwa0bPm1LOJGAQpVwNZS8sWz6MDsThg7kYodB31aEElhpgBL/mqgQrctwH6GaG0bCMKEjpzUxEYn1Dy5vBR/P2wlbq48/7QHk9N09b19AJJfIVE'></script>
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://wnetai.wordpress.com/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://wnetai.wordpress.com/wp-includes/wlwmanifest.xml" /> 
+<link rel='prev' title='GET-TEXT-SIZE' href='http://wnetai.wordpress.com/get-text-size/' />
+<meta name="generator" content="WordPress.com" />
+<link rel='canonical' href='http://wnetai.wordpress.com/reshape/' />
+<link rel='shortlink' href='http://wp.me/P3E9Y7-10c' />
+<link rel="alternate" type="application/json+oembed" href="https://public-api.wordpress.com/oembed/1.0/?format=json&amp;url=http%3A%2F%2Fwnetai.wordpress.com%2Freshape%2F&amp;for=wpcom-auto-discovery" /><link rel="alternate" type="application/xml+oembed" href="https://public-api.wordpress.com/oembed/1.0/?format=xml&amp;url=http%3A%2F%2Fwnetai.wordpress.com%2Freshape%2F&amp;for=wpcom-auto-discovery" />
+<!-- Jetpack Open Graph Tags -->
+<meta property="og:type" content="article" />
+<meta property="og:title" content="RESHAPE" />
+<meta property="og:url" content="http://wnetai.wordpress.com/reshape/" />
+<meta property="og:description" content="======================================================================= Changes the shape and/or the number of channels of a 2D matrix without copying the data. C++: Mat Mat::reshape(int cn, int ro..." />
+<meta property="article:published_time" content="2014-04-09T01:04:52+00:00" />
+<meta property="article:modified_time" content="2014-04-09T01:12:43+00:00" />
+<meta property="article:author" content="http://wnetai.wordpress.com/author/joeish80829-2/" />
+<meta property="og:site_name" content="WNET A.I." />
+<meta property="og:image" content="http://1.gravatar.com/blavatar/dcebe59d8afca988dd05c567ee79faf5?s=200" />
+<meta name="twitter:site" content="@wordpressdotcom" />
+<meta name="twitter:image" content="http://1.gravatar.com/blavatar/dcebe59d8afca988dd05c567ee79faf5?s=240" />
+<meta name="twitter:card" content="summary" />
+<meta property="fb:app_id" content="249643311490" />
+<meta property="article:publisher" content="https://www.facebook.com/WordPresscom" />
+<link rel="shortcut icon" type="image/x-icon" href="http://0.gravatar.com/blavatar/e24844a755720ac17e03700e9e6e2090?s=16" sizes="16x16" />
+<link rel="icon" type="image/x-icon" href="http://0.gravatar.com/blavatar/e24844a755720ac17e03700e9e6e2090?s=16" sizes="16x16" />
+<link rel="apple-touch-icon-precomposed" href="http://1.gravatar.com/blavatar/dcebe59d8afca988dd05c567ee79faf5?s=114" />
+<link rel='openid.server' href='http://wnetai.wordpress.com/?openidserver=1' />
+<link rel='openid.delegate' href='http://wnetai.wordpress.com/' />
+<link rel="search" type="application/opensearchdescription+xml" href="http://wnetai.wordpress.com/osd.xml" title="WNET A.I." />
+<link rel="search" type="application/opensearchdescription+xml" href="http://wordpress.com/opensearch.xml" title="WordPress.com" />
+	<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style>
+		<style type="text/css">
+			.recentcomments a {
+				display: inline !important;
+				padding: 0 !important;
+				margin: 0 !important;
+			}
+
+			table.recentcommentsavatartop img.avatar, table.recentcommentsavatarend img.avatar {
+				border: 0px;
+				margin: 0;
+			}
+
+			table.recentcommentsavatartop a, table.recentcommentsavatarend a {
+				border: 0px !important;
+				background-color: transparent !important;
+			}
+
+			td.recentcommentsavatarend, td.recentcommentsavatartop {
+				padding: 0px 0px 1px 0px;
+				margin: 0px;
+			}
+
+			td.recentcommentstextend {
+				border: none !important;
+				padding: 0px 0px 2px 10px;
+			}
+
+			.rtl td.recentcommentstextend {
+				padding: 0px 10px 2px 0px;
+			}
+
+			td.recentcommentstexttop {
+				border: none !important;
+				padding: 0px 0px 0px 10px;
+			}
+
+			.rtl td.recentcommentstexttop {
+				padding: 0px 10px 0px 0px;
+			}
+		</style>
+		<style type="text/css" media="print">#wpadminbar { display:none; }</style>
+<style type="text/css" media="screen">
+	html { margin-top: 32px !important; }
+	* html body { margin-top: 32px !important; }
+	@media screen and ( max-width: 782px ) {
+		html { margin-top: 46px !important; }
+		* html body { margin-top: 46px !important; }
+	}
+</style>
+<meta name="application-name" content="WNET A.I." /><meta name="msapplication-window" content="width=device-width;height=device-height" /><meta name="msapplication-tooltip" content="Bringing the World Into the Future" /><meta name="msapplication-task" content="name=Edit page;action-uri=http://wnetai.wordpress.com/wp-admin/post.php?post=3856&amp;action=edit;icon-uri=http://s0.wp.com/i/icons/page.ico" /><meta name="msapplication-task" content="name=Write a post;action-uri=http://wnetai.wordpress.com/wp-admin/post-new.php;icon-uri=http://s2.wp.com/i/icons/post.ico" /><meta name="msapplication-task" content="name=Moderate comments;action-uri=http://wnetai.wordpress.com/wp-admin/edit-comments.php?comment_status=moderated;icon-uri=http://s0.wp.com/i/icons/comment.ico" /><meta name="msapplication-task" content="name=Upload new media;action-uri=http://wnetai.wordpress.com/wp-admin/media-new.php;icon-uri=http://s2.wp.com/i/icons/media.ico" /><meta name="msapplication-task" content="name=Blog stats;action-uri=http://wnetai.wordpress.com/wp-admin/index.php?page=stats;icon-uri=http://s1.wp.com/i/icons/stats.ico" /><meta name="title" content="RESHAPE | WNET A.I. on WordPress.com" />
+<meta name="description" content="======================================================================= Changes the shape and/or the number of channels of a 2D matrix without copying the data. C++: Mat Mat::reshape(int cn, int rows=0) const LISP-CV: (RESHAPE (SELF (:POINTER MAT)) (CN :INT) (ROWS :INT)) =&gt; (:POINTER MAT) Parameters: SELF - A matrix. CN - New number of channels. If the parameter is 0, the number of&hellip;" />
+	<style type="text/css">
+				#header h1 {
+			color: #6895ff;
+		}
+		</style>
+	<style type="text/css" id="syntaxhighlighteranchor"></style>
+</head>
+<body class="page page-id-3856 page-template-default logged-in admin-bar no-customize-support flexible-width mp6 highlander-enabled highlander-light">
+<div id="wrap" class="group">
+	<div id="header">
+				<h1><a href="http://wnetai.wordpress.com//">WNET A.I.</a> &nbsp; Bringing the World Into the Future</h1>
+	</div>
+	<div id="nav" class="group">
+				<div id="feed"><a href="http://wnetai.wordpress.com/feed/">RSS Feed</a></div>
+	</div>
+<div id="content">
+
+	<h2 class="entry-title"><a href="http://wnetai.wordpress.com/reshape/" rel="bookmark">RESHAPE</a></h2>
+
+	<div id="post-3856" class="post-3856 page type-page status-publish hentry entry-content">
+		<p><span style="color:#999999;"><strong>=======================================================================</strong></span></p>
+<p><strong>Changes the shape and/or the number of channels of a 2D matrix without copying the data.</strong></p>
+<p><strong><span style="color:#3366ff;">C++: Mat Mat::reshape(int cn, int rows=0) const</span></strong></p>
+<p><strong><span style="color:#3366ff;">LISP-CV: (RESHAPE (SELF (:POINTER MAT)) (CN :INT) (ROWS :INT)) =&gt; (:POINTER MAT)</span></strong></p>
+<p><strong>Parameters:</strong></p>
+<p><strong><span style="color:#ff0000;"><span style="font-size:13px;">SELF</span></span> &#8211; A matrix.</strong></p>
+<p><strong><span style="color:#ff0000;"><span style="font-size:13px;">CN</span></span> &#8211; New number of channels. If the parameter is 0, the number of channels remains the same.</strong></p>
+<p><strong><span style="color:#ff0000;"><span style="font-size:13px;">ROWS</span></span> &#8211; New number of rows. If the parameter is 0, the number of rows remains the same.</strong></p>
+<p><strong>The method makes a new matrix header for <span style="color:#3366ff;">*this</span> elements. The new matrix may have a different size<br />
+and/or different number of channels. Any combination is possible if:</strong></p>
+<p><strong>No extra elements are included into the new matrix and no elements are excluded. Consequently,</strong><br />
+<strong> the product <span style="color:#3366ff;">(* (ROWS) (COLS) (CHANNELS))</span> must stay the same after the transformation.</strong></p>
+<p><strong>No data is copied. That is, this is an O(1) operation. Consequently, if you change the number of</strong><br />
+<strong> rows, or the operation changes the indices of elements row in some other way, the matrix must be</strong><br />
+<strong> continuous. See <span style="color:#3366ff;">(IS-CONTINUOUS)</span>.</strong></p>
+<p><strong><span style="color:#ff0000;"><span style="font-size:16px;">Example:</span></span></strong></p>
+<pre style="font-size:13px;"><strong><span style="color:#3366ff;">(defun reshape-example (filename)
+  ;;Read in image
+  (let* ((img (imread filename 1))
+         ;;Allocate matrix data
+         (data (alloc :uchar '(1 2 3 4 5 6 7 8 9)))
+         ;;Create initialized matrix
+         (mat (mat-data 3 3 +8u+ data))
+         (window-name-1 "3x3 Matrix - RESHAPE Example")
+         (window-name-2 "1x9 Vector - RESHAPE Example")
+	 (window-name-3 "Original image - RESHAPE Example")
+         (window-name-4 "1 channel image - RESHAPE Example"))      
+    (named-window window-name-1 +window-normal+)
+    (named-window window-name-2 +window-normal+)
+    (named-window window-name-3 +window-normal+)
+    (named-window window-name-4 +window-normal+)
+    (move-window window-name-1 485 98)
+    (move-window window-name-2 894 98)
+    (move-window window-name-3 485 444)
+    (move-window window-name-4 894 444)
+    ;;Show original 3x3 matrix
+    (imshow window-name-1 mat)
+    ;;Show 3x3 matrix reshaped to 1x9 
+    (imshow window-name-2 (reshape mat 1 9))
+    ;;Show original image
+    (imshow window-name-3 img)
+    ;;Show 3 channel image reshaped to 1 channel
+    (imshow window-name-4 (reshape img 1))
+    (loop while (not (= (wait-key 0) 27)))
+    (destroy-all-windows)))
+
+</span></strong></pre>
+<p><span style="color:#999999;"><strong><span style="color:#999999;"><strong>=======================================================================</strong></span></strong></span></p>
+			</div>
+
+	<div class="meta">
+		<p>Posted April 8, 2014 by <span class="author vcard"><a class="url fn n" href="http://wnetai.wordpress.com/author/joeish80829-2/" title="View all posts by Joe W. BiMedina">Joe W. BiMedina</a></span><span class="edit"> &mdash; <a class="post-edit-link" href="http://wnetai.wordpress.com/wp-admin/post.php?post=3856&amp;action=edit">Edit</a></span></p>
+	</div>
+
+	
+
+</div><!-- /#content -->
+
+<div id="sidebar">
+	<ul>
+	<li id="blog-stats-2" class="widget widget_blog-stats"><h3 class="widget-title">Blog Stats</h3>		<ul>
+			<li>556 hits</li>
+		</ul>
+		</li><li id="recent-comments-3" class="widget widget_recent_comments"><h3 class="widget-title">Recent Comments</h3></li>	</ul>
+
+</div><!-- /#sidebar -->
+</div><!-- /#wrap -->
+
+<div id="footer" class="group">
+	<div id="top"><a href="#content">Back to top</a></div>
+	<p><a href="http://wordpress.com/?ref=footer">Blog at WordPress.com</a>. <a href="http://theme.wordpress.com/themes/andrea/" title="Learn more about this theme">The Andrea Theme</a>.</p>
+</div>
+
+	<script type="text/javascript">
+	/* <![CDATA[ */
+		jQuery(document).ready( function($) {
+			function doFollowingHover() {
+				$('#wp-admin-bar-follow > a').unbind( '.unfollow' );
+
+				$('#wp-admin-bar-follow > a').bind( 'mouseover.unfollow', function() {
+
+					$(this).html( "Unfollow" ).parent( 'li' ).addClass( 'unfollow' );
+				});
+				$('#wp-admin-bar-follow > a').bind( 'mouseout.unfollow', function() {
+					$(this).html( "Following" ).parent( 'li' ).removeClass( 'unfollow' );
+				});
+			}
+							doFollowingHover();
+			
+			$('#wp-admin-bar-follow > a').click( function( e ) {
+				$('#wp-admin-bar-follow > a').unbind( '.unfollow' );
+
+				e.preventDefault();
+
+				var link = $( this ), li = $( '#wp-admin-bar-follow' ), timeout = 0;
+
+				if ( li.hasClass( 'subscribed' ) ) {
+					li.removeClass( 'subscribed' ).removeClass( 'unfollow' );
+					link.html( "Follow" );
+
+					$('body').append( $( 'div.wpcom-bubble' ).removeClass( 'fadein' ) ).off( 'click.bubble' );
+
+					var action = 'ab_unsubscribe_from_blog';
+				} else {
+					li.addClass( 'subscribed' ).removeClass( 'unfollow' );
+					link.html( "Following" );
+
+						var left = 131 - link.width();
+						li.append( $( 'div.wpcom-bubble' ).css( { left: '-' + left + 'px' } ) );
+						$( 'div.bubble-txt', 'div.wpcom-bubble' ).html( "New posts from this blog will now appear in <a target=\"_blank\" href=\"http:\/\/wordpress.com\/\">your reader<\/a>." );
+
+						$( 'div.wpcom-bubble.action-bubble' ).addClass( 'fadein' );
+
+						setTimeout( function() {
+							$('body').on( 'click.bubble touchstart.bubble', function(e) {
+								if ( !$(e.target).hasClass('wpcom-bubble') && !$(e.target).parents( 'div.wpcom-bubble' ).length )
+									hideBubble();
+							});
+							setTimeout( hideBubble, 10000 );
+						}, 500 );
+
+					var action = 'ab_subscribe_to_blog';
+					$('#wp-admin-bar-follow > a').bind( 'mouseout.shift', function() {
+						doFollowingHover();
+						$(this).unbind( '.shift' );
+					});
+				}
+
+				var nonce = link.attr( 'href' ).split( '_wpnonce=' );
+				nonce = nonce[1];
+
+				$.post( "http:\/\/wnetai.wordpress.com\/wp-admin\/admin-ajax.php", {
+					'action': action,
+					'_wpnonce': nonce,
+					'source': 'admin_bar',
+					'blog_id': 53900451				});
+			});
+		});
+	/* ]]> */
+	</script>
+<script type='text/javascript' src='//0.gravatar.com/js/gprofiles.js?ver=201415x'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var WPGroHo = {"my_hash":"66420f145f6404d2e6c7ea034449b17f"};
+/* ]]> */
+</script>
+<script type='text/javascript' src='http://s2.wp.com/wp-content/mu-plugins/gravatar-hovercards/wpgroho.js?m=1380573781g'></script>
+
+	<script>
+		//initialize and attach hovercards to all gravatars
+		jQuery( document ).ready( function( $ ) {
+			Gravatar.profile_cb = function( hash, id ) {
+				WPGroHo.syncProfileData( hash, id );
+			};
+			Gravatar.my_hash = WPGroHo.my_hash;
+			Gravatar.init( 'body', '#wp-admin-bar-my-account' );
+		});
+	</script>
+
+		<div style="display:none">
+	</div>
+<div id="report-form-window" style="display:none;"></div><script type='text/javascript'>
+/* <![CDATA[ */
+var thickboxL10n = {"next":"Next >","prev":"< Prev","image":"Image","of":"of","close":"Close","noiframes":"This feature requires inline frames. You have iframes disabled or your browser does not support them.","loadingAnimation":"http:\/\/wnetai.wordpress.com\/wp-includes\/js\/thickbox\/loadingAnimation.gif"};
+var thickboxL10n = {"next":"Next >","prev":"< Prev","image":"Image","of":"of","close":"Close","noiframes":"This feature requires inline frames. You have iframes disabled or your browser does not support them.","loadingAnimation":"http:\/\/wnetai.wordpress.com\/wp-includes\/js\/thickbox\/loadingAnimation.gif"};
+/* ]]> */
+</script>
+<script type='text/javascript' src='http://s0.wp.com/_static/??-eJxdjcsOQDAURH9INQhiIb6F24Zbettoi89XC49YzSRnTobvliHBEoR0XDneC43Ehn5NY6bKJTwOwJCX5C8u5IYg7XGjr+snhHkwx1P+vg7MLmFE+vxEDkaz91e5TrdZ0ZRVXTd5rk4E6zpb'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var kissmetrics_api = {"api_key":"39e3e583aca28fab00c85ad9019b51d9f073fc6d","username":"wnetai"};
+var kissmetrics_queries = {"events":[],"properties":[{"Browser_Type":"desktop"}]};
+/* ]]> */
+</script>
+<script type='text/javascript' src='http://s0.wp.com/wp-content/mu-plugins/kissmetrics/kissmetrics.js?m=1391946165g&#038;ver=20130513'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var wpNotesArgs = {"cacheBuster":"20140321","iframeUrl":"https:\/\/widgets.wp.com\/notes\/"};
+/* ]]> */
+</script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var wpcom_tos_report_form = {"ajaxurl":"\/wp-admin\/admin-ajax.php","isLoggedoutUser":"","post_ID":"3856","current_url":"http:\/\/wnetai.wordpress.com\/reshape","report_this_content":"Report this content"};
+/* ]]> */
+</script>
+<script type='text/javascript' src='http://s2.wp.com/_static/??-eJyFjUsOAiEQRC8kQ8ToZBbGs/BpFZzuJjSM1xcTN7LQTSWV9yqln1lF8msLIDqJbhSgiOcCE0aakuz0YDjrH47pi3umClTfGJtU6+8wImwqr+0WSTRxhU92jMikNvPXt6EfKmfLb7myqAKZS1VXLjj2vrzgeX9Yjqd5XoxJLywaXi8='></script>
+<script type="text/javascript">
+// <![CDATA[
+(function() {
+try{
+  if ( window.external &&'msIsSiteMode' in window.external) {
+    if (window.external.msIsSiteMode()) {
+      var jl = document.createElement('script');
+      jl.type='text/javascript';
+      jl.async=true;
+      jl.src='/wp-content/plugins/ie-sitemode/custom-jumplist.php';
+      var s = document.getElementsByTagName('script')[0];
+      s.parentNode.insertBefore(jl, s);
+    }
+  }
+}catch(e){}
+})();
+// ]]>
+</script>	<script type="text/javascript">
+		(function() {
+			var request, b = document.body, c = 'className', cs = 'customize-support', rcs = new RegExp('(^|\\s+)(no-)?'+cs+'(\\s+|$)');
+
+			request = true;
+
+			b[c] = b[c].replace( rcs, ' ' );
+			b[c] += ( window.postMessage && request ? ' ' : ' no-' ) + cs;
+		}());
+	</script>
+			<div id="wpadminbar" class="nojq nojs ltr" role="navigation">
+			<a class="screen-reader-shortcut" href="#wp-toolbar" tabindex="1">Skip to toolbar</a>
+			<div class="quicklinks" id="wp-toolbar" role="navigation" aria-label="Top navigation toolbar." tabindex="0">
+				<ul id="wp-admin-bar-root-default" class="ab-top-menu">
+		<li id="wp-admin-bar-newdash" class="menupop"><a class="ab-item"  aria-haspopup="true" href="http://wordpress.com/"><span class="ab-item" id="newdash-icon">WordPress.com</span></a><div class="ab-sub-wrapper"><ul id="wp-admin-bar-newdash-default" class="ab-submenu">
+		<li id="wp-admin-bar-newdash-new-post"><a class="ab-item"  href="http://wordpress.com/post/">New Post</a>		</li>
+		<li id="wp-admin-bar-newdash-read-blogs"><a class="ab-item"  href="http://wordpress.com/">Reader</a>		</li>
+		<li id="wp-admin-bar-newdash-notifications"><a class="ab-item"  href="http://wordpress.com/notifications/">Notifications</a>		</li>
+		<li id="wp-admin-bar-newdash-my-blogs"><a class="ab-item"  href="http://wordpress.com/my-blogs/">My Blog</a>		</li>
+		<li id="wp-admin-bar-newdash-freshly-pressed"><a class="ab-item"  href="http://wordpress.com/fresh/">Freshly Pressed</a>		</li>
+		<li id="wp-admin-bar-newdash-settings"><a class="ab-item"  href="http://wordpress.com/settings/">Settings</a>		</li></ul></div>		</li>
+		<li id="wp-admin-bar-jumptotop-button-menu"><a class="ab-item"  href="#"><div id="jumptotop"><span class="noticon noticon-top"></span></div></a>		</li>
+		<li id="wp-admin-bar-blog" class="menupop"><a class="ab-item"  aria-haspopup="true" href="http://wnetai.wordpress.com/"><img class="avatar" src="http://1.gravatar.com/blavatar/dcebe59d8afca988dd05c567ee79faf5?s=32" alt="Current blog avatar" width="16" height="16" /> WNET A.I.</a><div class="ab-sub-wrapper"><ul id="wp-admin-bar-blog-default" class="ab-submenu">
+		<li id="wp-admin-bar-dashboard-top"><a class="ab-item"  href="http://wnetai.wordpress.com/wp-admin/">Dashboard</a>		</li>
+		<li id="wp-admin-bar-edit"><a class="ab-item"  href="http://wnetai.wordpress.com/wp-admin/post.php?post=3856&#038;action=edit">Edit</a>		</li>
+		<li id="wp-admin-bar-new-content" class="menupop"><a class="ab-item"  aria-haspopup="true" href="http://wnetai.wordpress.com/wp-admin/post-new.php?post_type=post">New</a><div class="ab-sub-wrapper"><ul id="wp-admin-bar-new-content-default" class="ab-submenu">
+		<li id="wp-admin-bar-new-post"><a class="ab-item"  href="http://wnetai.wordpress.com/wp-admin/post-new.php?post_type=post">Post</a>		</li>
+		<li id="wp-admin-bar-new-page"><a class="ab-item"  href="http://wnetai.wordpress.com/wp-admin/post-new.php?post_type=page">Page</a>		</li>
+		<li id="wp-admin-bar-new-attachment"><a class="ab-item"  href="http://wnetai.wordpress.com/wp-admin/post-new.php?post_type=attachment">Media</a>		</li>
+		<li id="wp-admin-bar-new-link"><a class="ab-item"  href="http://wnetai.wordpress.com/wp-admin/link-add.php">Link</a>		</li></ul></div>		</li>
+		<li id="wp-admin-bar-comments"><a class="ab-item"  href="http://wnetai.wordpress.com/wp-admin/edit-comments.php">Comments <span class="comment-moderation-count">2</span></a>		</li>
+		<li id="wp-admin-bar-customize" class="hide-if-no-customize"><a class="ab-item"  href="http://wnetai.wordpress.com/wp-admin/customize.php?url=http%3A%2F%2Fwnetai.wordpress.com%2Freshape%2F%3Fpreview%3Dtrue%26preview_id%3D3856%26preview_nonce%3D37238aa019">Customize</a>		</li>
+		<li id="wp-admin-bar-widgets"><a class="ab-item"  href="http://wnetai.wordpress.com/wp-admin/widgets.php">Widgets</a>		</li></ul><ul id="wp-admin-bar-blog-secondary" class="ab-sub-secondary ab-submenu">
+		<li id="wp-admin-bar-shortlink"><a class="ab-item"  href="http://wp.me/P3E9Y7-10c">Shortlink http://wp.me/P3E9Y7-10c</a>Shortlink: <input id="adminbar-shortlink-input" value="http://wp.me/P3E9Y7-10c" readonly="readonly" />		</li>
+		<li id="wp-admin-bar-random-post" class="menu-item-random-post"><a class="ab-item"  href="http://wnetai.wordpress.com/?random">Random Post</a>		</li>
+		<li id="wp-admin-bar-theme-andrea"><a class="ab-item"  href="http://theme.wordpress.com/themes/andrea/">Theme: Andrea</a>		</li>
+		<li id="wp-admin-bar-wpcom_report_url"><a class="ab-item"  href="http://en.wordpress.com/complaints/">Report this content</a>		</li></ul></div>		</li>
+		<li id="wp-admin-bar-follow" class="subscribed"><a class="ab-item"  href="http://wordpress.com/read?b=53900451&#038;unsub=1&#038;_wpnonce=f31dbe6719"><span id="admin-bar-unfollow-link">Following</span></a>		</li>
+		<li id="wp-admin-bar-stats"><a class="ab-item"  href="http://wordpress.com/my-stats/"><div><script type='text/javascript'>var src;if(typeof(window.devicePixelRatio)=='undefined'||window.devicePixelRatio<2){src='/wp-includes/charts/admin-bar-hours-scale.php';}else{src='/wp-includes/charts/admin-bar-hours-scale-2x.php';}document.write('<img style=\'vertical-align: baseline\' src=\''+src+'\' alt=\'Stats\' title=\'Showing site views per hour for the last 48 hours. Click for full Site Stats.\' />');</script></div></a>		</li></ul><ul id="wp-admin-bar-top-secondary" class="ab-top-secondary ab-top-menu">
+		<li id="wp-admin-bar-search" class="admin-bar-search"><div class="ab-item ab-empty-item" tabindex="-1"><form id='adminbarsearch' name='adminbarsearch' action='http://en.search.wordpress.com' method='get'>
+				<input class='adminbar-search-input' name='q' id='q' type='text' value='' maxlength='150' tabindex='10' />
+				<input type="hidden" name="site" value="wnetai.wordpress.com" />
+			</form></div>		</li>
+		<li id="wp-admin-bar-my-account" class="menupop with-avatar"><a class="ab-item"  aria-haspopup="true" href="http://wordpress.com/settings/account/"><span class="ab-display-name">Joe</span><img alt='' src='http://0.gravatar.com/avatar/66420f145f6404d2e6c7ea034449b17f?s=32&#038;d=mm&#038;r=G' class='avatar avatar-32' height='32' width='32' /></a><div class="ab-sub-wrapper"><ul id="wp-admin-bar-user-actions" class="ab-submenu">
+		<li id="wp-admin-bar-user-info" class="user-info user-info-item"><a class="ab-item" tabindex="-1" href="#"><a href="http://wordpress.com/settings/account/"><img alt='' src='http://0.gravatar.com/avatar/66420f145f6404d2e6c7ea034449b17f?s=128&#038;d=mm&#038;r=G' class='avatar avatar-128' height='128' width='128' /><span class="display-name">Joe W. BiMedina</span><span class="username">wnetai</span></a></a>		</li>
+		<li id="wp-admin-bar-find-friends" class="user-info-item"><a class="ab-item"  href="http://wordpress.com/find-friends/">Find Friends</a>		</li>
+		<li id="wp-admin-bar-manage-blogs" class="user-info-item"><a class="ab-item"  href="http://wordpress.com/my-blogs/">Manage My Blogs</a>		</li>
+		<li id="wp-admin-bar-help" class="user-info-item"><a class="ab-item"  href="http://en.support.wordpress.com/">Help</a>		</li>
+		<li id="wp-admin-bar-logout" class="user-info-item"><a class="ab-item"  href="http://wordpress.com/wp-login.php?action=logout&#038;redirect_to=http%3A%2F%2Fwordpress.com%2F">Sign Out</a>		</li></ul><ul id="wp-admin-bar-my-sites" class="ab-sub-secondary ab-submenu">
+		<li id="wp-admin-bar-blog-53900451" class="menupop"><a class="ab-item"  aria-haspopup="true" href="http://wnetai.wordpress.com/"><img src="http://1.gravatar.com/blavatar/dcebe59d8afca988dd05c567ee79faf5?s=32&#038;d=http%3A%2F%2Fs2.wp.com%2Fi%2Fwpmini-blue.png" alt="Blavatar" width="16" height="16" />WNET A.I.</a><div class="ab-sub-wrapper"><ul id="wp-admin-bar-blog-53900451-default" class="ab-submenu">
+		<li id="wp-admin-bar-blog-53900451-d"><a class="ab-item"  href="http://wnetai.wordpress.com/wp-admin/">Dashboard</a>		</li>
+		<li id="wp-admin-bar-blog-53900451-n"><a class="ab-item"  href="http://wnetai.wordpress.com/wp-admin/post-new.php">New Post</a>		</li>
+		<li id="wp-admin-bar-blog-53900451-s"><a class="ab-item"  href="http://wordpress.com/my-stats/?blog=53900451">Site Stats</a>		</li>
+		<li id="wp-admin-bar-blog-53900451-c"><a class="ab-item"  href="http://wnetai.wordpress.com/wp-admin/edit-comments.php">Manage Comments</a>		</li>
+		<li id="wp-admin-bar-blog-53900451-v"><a class="ab-item"  href="http://wnetai.wordpress.com">Read Blog</a>		</li></ul></div>		</li></ul></div>		</li>
+		<li id="wp-admin-bar-notes" class="menupop"><div class="ab-item ab-empty-item" ><span id="wpnt-notes-unread-count" class="wpnt-loading wpn-unread">
+						<span class="noticon noticon-comment"></span>
+						</span></div><div id="wpnt-notes-panel" style="display:none" lang="en" dir="ltr"><div class="wpnt-notes-panel-header"><span class="wpnt-notes-header"></span><span class="wpnt-notes-panel-link"></span></div></div>		</li>
+		<li id="wp-admin-bar-ab-new-post"><a class="ab-item"  href="http://wordpress.com/post/">New Post</a>		</li></ul>			</div>
+						<a class="screen-reader-shortcut" href="http://wnetai.wordpress.com/wp-login.php?action=logout&#038;_wpnonce=c48cdc8f6c">Log Out</a>
+					</div>
+
+		
+<script type="text/javascript">
+/* <![CDATA[ */
+var clickDebugLink;
+
+jQuery(document).ready( function($) {
+	var single = false, w = 1000,
+		supe = false;
+
+	$(document.body).load(function(){ $('#wpadminbar img.grav-hashed').removeClass('grav-hashed'); }); // hack to hide the gravatar hovercard
+
+	if ( single && supe )
+		w = 1385;
+	else if ( supe )
+		w = 1200;
+
+	// debug bar extra
+	clickDebugLink = function( parent_id, obj ) {
+
+		$('#'+parent_id).children('div').hide();
+
+		document.getElementById( obj.href.substr( obj.href.indexOf( '#' ) + 1 ) ).style.display = 'block';
+		$( obj.href.substr( obj.href.indexOf( '#' ) ) ).show()
+
+		$(obj).parent().addClass('current').siblings('li').removeClass('current');
+
+		return false;
+	};
+
+	$( '#wpadminbar #wp-admin-bar-shortlink' ).click( function() {
+		$( '#adminbar-shortlink-input' ).select();
+	});
+
+	$( '#wpadminbar #adminbarsearch .adminbar-search-input' ).focus( function() {
+		$( '#wpadminbar #adminbarsearch input' ).addClass( 'search-input-focus' );
+		$( '#wpadminbar #wp-admin-bar-search' ).addClass( 'search-input-focus' );
+	});
+
+	$( '#wpadminbar #adminbarsearch .adminbar-search-input' ).focusout( function() {
+		$( '#wpadminbar #adminbarsearch input.adminbar-search-input' ).removeClass( 'search-input-focus' );
+		$( '#wpadminbar #wp-admin-bar-search' ).removeClass( 'search-input-focus' );
+	});
+
+});
+/* ]]> */
+</script>
+	<div class="wpcom-bubble action-bubble">
+		<div class="bubble-txt"></div>
+	</div>
+	<script type="text/javascript">function hideBubble() { jQuery('body').append( jQuery( 'div.wpcom-bubble' ).removeClass( 'fadein' ) ).off( 'click.bubble touchstart.bubble' ); jQuery(document).off( 'scroll.bubble' ); };</script>
+		<script type="text/javascript">
+	jQuery( '#wp-admin-bar-jumptotop-button-menu a' ).click( function( e ) {
+		e.preventDefault();
+		jQuery( 'html, body' ).animate( { scrollTop: 0 }, 'fast' );
+	} );
+	function hideShowTbJumpToTop() {
+		var total_width = 0;
+		// Calculate total width taken by li's minus our button to see if we it'll
+		// overlap with other toolbar menus.
+		jQuery( '#wp-admin-bar-root-default > li' ).each( function() {
+			var self = jQuery( this );
+			if ( 'wp-admin-bar-jumptotop-button-menu' != self.attr( 'id' ) )
+				total_width += self.width();
+		});
+		if ( jQuery( '#wp-admin-bar-jumptotop-button-menu' ).position()['left'] - total_width < 10 ) {
+			jQuery( '#jumptotop' ).animate( { 'top': '-50px' }, 'fast' );
+		} else if (  jQuery( window ).scrollTop() >= 350 && parseInt( jQuery( '#jumptotop' ).css( 'top' ) ) < 0 ) {
+			if ( jQuery( '#wp-admin-bar-jumptotop-button-menu' ).position()['left'] - total_width < 10 )
+			   return;
+			jQuery( '#jumptotop' ).animate( { 'top': 0 }, 'fast' );
+		} else if (  jQuery( window ).scrollTop() < 1 && parseInt( jQuery( '#jumptotop' ).css( 'top' ) ) >= 0 ) {
+			jQuery( '#jumptotop' ).animate( { 'top': '-50px' }, 'fast' );
+		}
+	}
+	// handle on page load if auto scrolling to a position
+	hideShowTbJumpToTop();
+	// bind to scrolll event
+	var jumpToTopTimer = null;
+	jQuery( window ).scroll( function() {
+		clearTimeout( jumpToTopTimer );
+		jumpToTopTimer = setTimeout( jumpToTopRefresh, 150 );
+	} );
+	var jumpToTopRefresh = function() {
+		hideShowTbJumpToTop();
+	};
+	</script>
+	<script type="text/javascript">
+	var gravityInsightsParams = {
+		type:'content',
+		version:'1.1',
+		super_site_guid:'268fc15296103bd0d639409cab651e35',
+		site_guid:"53900451",
+		section_id:'',
+		subsection_id:''
+	};
+	document.write( unescape( "%3Cscript src='http://cdn.insights.gravity.com/moth-min.js' type='text/javascript'%3E%3C/script%3E" ) );
+</script>
+<script>
+if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
+
+	wpcom_mobile_user_agent_info.init();
+	var mobileStatsQueryString = "";
+	
+	if( false !== wpcom_mobile_user_agent_info.matchedPlatformName )
+		mobileStatsQueryString += "&x_" + 'mobile_platforms' + '=' + wpcom_mobile_user_agent_info.matchedPlatformName;
+	
+	if( false !== wpcom_mobile_user_agent_info.matchedUserAgentName )
+		mobileStatsQueryString += "&x_" + 'mobile_devices' + '=' + wpcom_mobile_user_agent_info.matchedUserAgentName;
+	
+	if( wpcom_mobile_user_agent_info.isIPad() )
+		mobileStatsQueryString += "&x_" + 'ipad_views' + '=' + 'views';
+
+	if( "" != mobileStatsQueryString ) {
+		new Image().src = document.location.protocol + '//stats.wordpress.com/g.gif?v=wpcom-no-pv' + mobileStatsQueryString + '&baba=' + Math.random();
+	}
+	
+}
+</script>
+</body>
+</html>
