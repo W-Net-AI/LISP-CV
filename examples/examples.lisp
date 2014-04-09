@@ -1,49 +1,97 @@
 ;;;; -*- mode: lisp; indent-tabs: nil -*-
 ;;;; examples.lisp
-;;;; Documentation and Examples:
+;;;; Documentation and Examples(In process):
 
 
-;====================================================CORE==========================================
-;
-;
-;BASIC STRUCTURES
-;
-;
-;====================================================CORE==========================================
-;
-;COPY-TO
-;
-;Copies the matrix to another one.
-;
-;
-;C++: void Mat::copyTo(OutputArray m) const
-;
-;Common Lisp: (COPY-TO (SELF (:POINTER MAT)) (M (:POINTER MAT))) => :VOID
-;
-;C++: void Mat::copyTo(OutputArray m, InputArray mask) const
-;
-;Common Lisp: (COPY-TO (SELF (:POINTER MAT)) (M (:POINTER MAT)) (MASK (:POINTER MAT))) => :VOID
-;
-;
-;    Parameters:	
-;
-;        SELF - A matrix.         
-;
-;        M - Destination matrix. If it does not have a proper size or type before the operation, it 
-;            is reallocated.
-;
-;        MASK - Operation mask. Its non-zero elements indicate which matrix elements need to be copi-
-;               ed.
-;
-;
-;The method copies the matrix data to another matrix. Before copying the data, the method invokes:
-;
-;(CREATE (MAT-SIZE THIS) (MAT-TYPE THIS))
-;
-;So that the destination matrix is reallocated if needed. While (COPY-TO M M) works flawlessly, the 
-;function does not handle the case of a partial overlap between the source and the destination matri-
-;ces. When the operation mask is specified, and the (CREATE) call shown above reallocated the matrix
-;, the newly allocated matrix is initialized with all zeros before copying the data.
+
+
+
+BASIC STRUCTURES:
+
+
+CHANNELS
+
+Returns the number of matrix channels.
+
+C++: int Mat::channels() const
+
+LISP-CV: (CHANNELS (SELF (:POINTER MAT))) => :INT
+
+    Parameters:	
+
+        SELF - A matrix.  
+
+The method returns the number of matrix channels.
+
+
+(defun channels-example (filename)
+
+  "All BRG images are 3 channel,(BLUE, GREEN, RED). When 
+   you convert an image to grayscale you also convert it 
+   to a 1 channel image. This example shows that with th-
+   e function CVT-COLOR and the function CHANNELS."
+
+  ;; Read image
+  (let* ((img (imread filename 1))
+	 (window-name-1 "Original image - CHANNELS Example")
+         (window-name-2 "Grayscale image - CHANNELS Example"))
+    (if (eq 1 (channels img)) 
+	(return-from channels-example 
+	  (format t "Must load full color image")))
+    (named-window window-name-1 +window-normal+)
+    (named-window window-name-2 +window-normal+)	
+    (move-window window-name-1 514 175)
+    (move-window window-name-2 966 175)
+    ;;Print the original number of channels of IMG
+    (format t "The number of channels of IMG as is = ~a~%~%" 
+	    (channels img))
+    (imshow window-name-1 img)
+    ;;Convert IMG to a grayscale image
+    (cvt-color img img +bgr2gray+)
+    ;;Print the number of channels of a grayscale IMG
+    (format t "After converting to grayscale the number of channels = ~a~%~%" 
+	    (channels img)) 
+    (imshow window-name-2 img)
+    (loop while (not (= (wait-key 0) 27)))
+    (destroy-all-windows)))
+
+
+
+
+
+COPY-TO
+
+Copies the matrix to another one.
+
+
+C++: void Mat::copyTo(OutputArray m) const
+
+LISP-CV: (COPY-TO (SELF (:POINTER MAT)) (M (:POINTER MAT))) => :VOID
+
+C++: void Mat::copyTo(OutputArray m, InputArray mask) const
+
+LISP-CV: (COPY-TO (SELF (:POINTER MAT)) (M (:POINTER MAT)) (MASK (:POINTER MAT))) => :VOID
+
+
+    Parameters:	
+
+        SELF - A matrix.         
+
+        M - Destination matrix. If it does not have a proper size or type before the operation, it 
+            is reallocated.
+
+        MASK - Operation mask. Its non-zero elements indicate which matrix elements need to be copi-
+               ed.
+
+
+The method copies the matrix data to another matrix. Before copying the data, the method invokes:
+
+(CREATE (MAT-SIZE THIS) (MAT-TYPE THIS))
+
+So that the destination matrix is reallocated if needed. While (COPY-TO M M) works flawlessly, the 
+function does not handle the case of a partial overlap between the source and the destination matri-
+ces. When the operation mask is specified, and the (CREATE) call shown above reallocated the matrix
+, the newly allocated matrix is initialized with all zeros before copying the data.
 
 
 (defun copy-to-example ()
@@ -108,28 +156,92 @@
     (format t "~%~%")))
 
 
-;=======================================================CORE===============================================================
-;
-;PROMOTE 
-;
-;Coverts a MAT to MAT-EXPR
-;
-;Common Lisp: (PROMOTE (SELF (:POINTER MAT))) => (:POINTER MAT-EXPR)
-;
-;Common Lisp: (<< (SELF (:POINTER MAT))) => (:POINTER MAT-EXPR)
-;
-;The function PROMOTE converts a functions return from (:POINTER MAT) to (:POINTER MAT-EXPR). This i-
-;s useful if you would like to do math computation on a matrix with a (:POINTER MAT) type using a su-
-;per fast Matrix Expressions(MAT-EXPR) function. Some Matrix Expressions functions will only accept 
-;a (:POINTER MAT-EXPR) type as input and that is what makes this function necessary.  You can then c-
-;onvert back to (:POINTER MAT) with the function FORCE to use the result in a function that only acc-
-;epts a MAT as input i.e. IMSHOW. The function << is an identical shorthand version of the PROMOTE f-
-;unction supplied for ease of use. 
-;
-;   Parameters:	
-;
-;        SELF - A MAT pointer.
 
+IS-CONTINOUS
+
+Reports whether the matrix is continuous or not.
+
+C++: bool Mat::isContinuous() const
+
+LISP-CV: (IS-CONTINUOUS) => :BOOLEAN
+
+The method returns true if the matrix elements are stored continuously without gaps at the end of 
+each row. Otherwise, it returns false. Obviously, 1x1 or 1xN matrices are always continuous. Matrices 
+created with (CREATE) are always continuous. But if you extract a part of the matrix using (COL),
+(DIAG) , and so on, or constructed a matrix header for externally allocated data, such matrices may 
+no longer have this property.
+
+
+(defun is-continuous-example (filename)
+  (let* (;;Allocate matrix data
+	 (data (alloc :uchar '(1 2 3 4 5 6 7 8 9)))
+	 ;;Create initialized matrix
+	 (mat (mat-data 3 3 +8u+ data))
+         ;;Extract a 2x2 roi of MAT
+	 (mat-roi (roi mat (rect 0 0 2 2)))
+	 ;;Read in image
+	 (img (imread filename 1))
+         ;;Extraxt a 100x100 centered roi of IMG
+	 (roi-size 100)
+	 (x (- (/ (cols img) 2) (/ roi-size 2)))
+	 (y (- (/ (rows img) 2) (/ roi-size 2)))
+	 (img-roi (roi img (rect x y roi-size roi-size)))
+	 (window-name-1 "3x3 Matrix - RESHAPE Example")
+	 (window-name-2 "2x2 roi of MAT - RESHAPE Example")
+	 (window-name-3 "Original image - RESHAPE Example")
+	 (window-name-4 "Centered 100x100 roi of IMG - RESHAPE Example"))      
+    (named-window window-name-1 +window-normal+)
+    (named-window window-name-2 +window-normal+)
+    (named-window window-name-3 +window-normal+)
+    (named-window window-name-4 +window-normal+)
+    (move-window window-name-1 485 98)
+    (move-window window-name-2 894 98)
+    (move-window window-name-3 485 444)
+    (move-window window-name-4 894 444)
+    ;;Show original 3x3 matrix
+    (imshow window-name-1 mat)
+    ;;Show 2x2 roi of MAT
+    (imshow window-name-2 mat-roi)
+    ;;Show original image
+    (imshow window-name-3 img)
+    ;;Show a centered 100x100 roi of image
+    (imshow window-name-4 img-roi)
+    ;;This shows that submats(roi) are intrinsically non-continuous
+    (format t "Are MAT matrix elements stored continuously: ~a~%~%" 
+	    (is-continuous mat))
+    (format t "Are MAT-ROI matrix elements stored continuously: ~a~%~%" 
+	    (is-continuous mat-roi))
+    (format t "Are IMG matrix elements stored continuously: ~a~%~%" 
+	    (is-continuous img))
+    (format t "Are IMG-ROI matrix elements stored continuously: ~a~%~%" 
+	    (is-continuous img-roi))
+    (loop while (not (= (wait-key 0) 27)))
+    (destroy-all-windows)))
+
+
+
+PROMOTE 
+
+Coverts a MAT to MAT-EXPR
+
+LISP-CV: (PROMOTE (SELF (:POINTER MAT))) => (:POINTER MAT-EXPR)
+
+LISP-CV: (<< (SELF (:POINTER MAT))) => (:POINTER MAT-EXPR)
+
+The function PROMOTE converts a functions return from (:POINTER MAT) to (:POINTER MAT-EXPR). This i-
+s useful if you would like to do math computation on a matrix with a (:POINTER MAT) type using a su-
+per fast Matrix Expressions(MAT-EXPR) function. Some Matrix Expressions functions will only accept 
+a (:POINTER MAT-EXPR) type as input and that is what makes this function necessary.  You can then c-
+onvert back to (:POINTER MAT) with the function FORCE to use the result in a function that only acc-
+epts a MAT as input i.e. IMSHOW. The function << is an identical shorthand version of the PROMOTE f-
+unction supplied for ease of use. 
+
+   Parameters:	
+
+        SELF - A MAT pointer.
+
+
+Example:
 
 
 (defun promote-example ()
@@ -158,95 +270,384 @@
 
 
 
-;=======================================================CORE=============================================================
-;
-;Drawing Functions
-;
-;=======================================================CORE=============================================================
-;
-;BGR
-;
-;
-;A macro for SCALAR organized as BGR(BLUE, GREEN, RED) color values.
-;
-;
-;Common Lisp: (BGR B G R) => (:POINTER SCALAR)
-;
-;
-;    Parameters:	
-;
-;        B - The blue color value
-;
-;        G - The green color value
-;
-;        R - The red color value
-;
-;
-;BGR is the default color space in LisP-CV
-;
-;
-;Example:
-;
-;
-;Here BGR supplies a blue color value. 
-;
-(CIRCLE IMAGE POINT RADIUS (BRG 255 0 0) +FILLED+ +AA+ 0)
-;
-;
-;=======================================================CORE=============================================================
-;
-;
-;ELLIPSE
-;
-;Draws a simple or thick elliptic arc or fills an ellipse sector.
-;
-;C++: void ellipse(Mat& img, Point center, Size axes, double angle, double startAngle, double endAngle, const Scalar& color, 
-;     int thickness=1, int lineType=8, int shift=0)
-;
-;Common Lisp: (ELLIPSE (IMG (:POINTER MAT)) (CENTER (:POINTER POINT)) (AXES (:POINTER SIZE)) (ANGLE :DOUBLE) (START-ANGLE :DOUBLE)
-;             (END-ANGEL :DOUBLE) (COLOR (:POINTER SCALAR)) (THICKNESS :INT) (LINE-TYPE :INT) (SHIFT :INT)) => :VOID
-;
-;C++: void ellipse(Mat& img, const RotatedRect& box, const Scalar& color, int thickness=1, int lineType=8)
-;
-;
-;
-;    Parameters:	
-;
-;        IMG - Image.
-;
-;        CENTER - Center of the ellipse.
-;
-;        AXES - Half of the size of the ellipse main axes.
-;
-;        AMGLE - Ellipse rotation angle in degrees.
-;
-;        START-AMGLE - Starting angle of the elliptic arc in degrees.
-;
-;        END-ANGLE - Ending angle of the elliptic arc in degrees.
-;
-;        BOX - Alternative ellipse representation via ROTATED-RECT. This means that the function dra-
-;              ws an ellipse inscribed in the rotated rectangle.
-;
-;        COLOR - Ellipse color.
-;
-;        THICKNESS - Thickness of the ellipse arc outline, if positive. Otherwise, this indicates th-
-;                    at a filled ellipse sector is to be drawn.
-;
-;        LINE-TYPE - Type of the ellipse boundary. See the (LINE) description.
-;
-;        SHIFT - Number of fractional bits in the coordinates of the center and values of axes.
-;
-;
-;The functions ELLIPSE with less parameters draws an ellipse outline, a filled ellipse, an elliptic 
-;arc, or a filled ellipse sector. A piecewise-linear curve is used to approximate the elliptic arc b-
-;oundary. If you need more control of the ellipse rendering, you can retrieve the curve using the fu-
-;nction (ELLIPSE-2-POLY) and then render it with the function (POLYLINES) or fill it with the functi-
-;on (FILL-POLY) . If you use the first variant of the function and want to draw the whole ellipse, n-
-;ot an arc, pass (EQ START-ANGLE 0) and (END-ANGLE 360).
+PTR
+
+Returns a pointer to the specified matrix row.
+
+C++: uchar* Mat::ptr(int i0=0)
+
+LISP-CV: (PTR (SELF (:POINTER MAT)) &OPTIONAL ((I0 :INT) 0)) => :POINTER
+
+    Parameters:	
+
+        SELF - A matrix.
+
+        i0 - A 0-based row index.
+
+
+This function returns a pointer to the specified matrix row.
+
+
+;;Must supply a filename parameter for the image you 
+;;will be using in this example and one for the file 
+;;the image's pixel value will be written it.
+(defun ptr-example (filename-1 filename-2)
+  ;;Read in image
+  (let* ((img (imread filename-1 1))
+	 (window-name-1 "Original image - PTR Example")
+	 (window-name-2 "All white image - PTR Example")
+         ;;Variables used to hold the 
+         ;;BGR image pixel values.
+	 (b 0)
+         (g 0)
+         (r 0)
+	 (p 0))
+    (if (empty img) 
+	(return-from ptr-example 
+	  (format t "Image not loaded")))
+    (named-window window-name-1 +window-normal+)
+    (named-window window-name-2 +window-normal+)
+    (move-window window-name-1 514 175)
+    (move-window window-name-2 966 175)
+    ;;Access the first BGR pixel value 
+    ;;with the function PTR and print it.
+    ;;Note: the '?' is a CFFI:MEM-AREF
+    ;;macro.
+    (setf b (? (ptr img 0) :uchar))
+    (setf g (? (ptr img 0) :uchar 1))
+    (setf r (? (ptr img 0) :uchar 2))
+    (format t "First BGR pixel value = (~a,~a,~a)
+~%~% " b g r)
+    ;;Access the second BGR pixel value 
+    ;;with the function PTR and print it.
+    (setf b (? (ptr img 0) :uchar 3))
+    (setf g (? (ptr img 0) :uchar 4))
+    (setf r (? (ptr img 0) :uchar 5))
+    (format t "Second BGR pixel value = (~a,~a,~a)
+ ~%~%" b g r)
+    ;;Access the third BGR pixel value 
+    ;;with the function PTR and print it.
+    (setf b (? (ptr img 0) :uchar 6))
+    (setf g (? (ptr img 0) :uchar 7))
+    (setf r (? (ptr img 0) :uchar 8))
+    (format t "Third BGR pixel value = (~a,~a,~a)
+ ~%~%" b g r)
+    ;;Access all BGR pixel values with the function PTR 
+    ;;and print them to a file so you can verify the fi-
+    ;;rst 3 BGR values in the file will match the 3 pri-
+    ;;nted here.
+    (with-open-file (str filename-2
+			 :direction :output
+			 :if-exists :supersede
+			 :if-does-not-exist :create)
+      (dotimes (row (rows img))  
+	(dotimes (col (* (cols img) 3))
+	  (setf p (? (ptr img row) :uchar col))
+	  (format str "~a~%" p))))
+    ;;Show original image in a window.
+    (imshow window-name-1 img)
+    ;;Here we set every pixel of IMG to white, the same
+    ;;way we saved every pixel to a file so you can ver-
+    ;;if every pixel was included.
+    (dotimes (row (rows img))  
+      (dotimes (col (* (cols img) 3))
+	(setf (? (ptr img row) :uchar col) 255)
+	(setf p (? (ptr img row) :uchar col))))
+    ;;Show the all white image in a window.
+    (imshow window-name-2 img)
+    (loop while (not (= (wait-key 0) 27)))
+    (destroy-all-windows)))
+
+
+RESHAPE
+
+Changes the shape and/or the number of channels of a 2D matrix without copying the data.
+
+C++: Mat Mat::reshape(int cn, int rows=0) const
+
+LISP-CV: (RESHAPE (SELF (:POINTER MAT)) (CN :INT) (ROWS :INT)) => (:POINTER MAT)
+
+
+    Parameters:	
+
+        SELF - A matrix.       
+
+        CN – New number of channels. If the parameter is 0, the number of channels remains the same.
+
+        ROWS – New number of rows. If the parameter is 0, the number of rows remains the same.
+
+
+The method makes a new matrix header for *this elements. The new matrix may have a different size 
+and/or different number of channels. Any combination is possible if:
+
+
+    No extra elements are included into the new matrix and no elements are excluded. Consequently, 
+    the product (* (ROWS) (COLS) (CHANNELS)) must stay the same after the transformation.
+
+    No data is copied. That is, this is an O(1) operation. Consequently, if you change the number of 
+    rows, or the operation changes the indices of elements row in some other way, the matrix must be 
+    continuous. See (IS-CONTINUOUS).
+
+
+(defun reshape-example (filename)
+  ;;Read in image
+  (let* ((img (imread filename 1))
+         ;;Allocate matrix data
+         (data (alloc :uchar '(1 2 3 4 5 6 7 8 9)))
+         ;;Create initialized matrix
+         (mat (mat-data 3 3 +8u+ data))
+         (window-name-1 "3x3 Matrix - RESHAPE Example")
+         (window-name-2 "1x9 Vector - RESHAPE Example")
+	 (window-name-3 "Original image - RESHAPE Example")
+         (window-name-4 "1 channel image - RESHAPE Example"))      
+    (named-window window-name-1 +window-normal+)
+    (named-window window-name-2 +window-normal+)
+    (named-window window-name-3 +window-normal+)
+    (named-window window-name-4 +window-normal+)
+    (move-window window-name-1 485 98)
+    (move-window window-name-2 894 98)
+    (move-window window-name-3 485 444)
+    (move-window window-name-4 894 444)
+    ;;Show original 3x3 matrix
+    (imshow window-name-1 mat)
+    ;;Show 3x3 matrix reshaped to 1x9 
+    (imshow window-name-2 (reshape mat 1 9))
+    ;;Show original image
+    (imshow window-name-3 img)
+    ;;Show 3 channel image reshaped to 1 channel
+    (imshow window-name-4 (reshape img 1))
+    (loop while (not (= (wait-key 0) 27)))
+    (destroy-all-windows)))
+
+
+
+SIZE
+
+SIZE constructor
+
+C++: Size_(_Tp _width, _Tp _height);
+     typedef Size_<int> Size2i;
+     typedef Size2i Size;
+
+LISP-CV: (SIZE (WIDTH :INT) (HEIGHT :INT)) => (:POINTER SIZE)
+
+C++: _Tp width, height
+
+LISP-CV: (WIDTH (SELF (:POINTER SIZE))) => :INT
+
+C++: _Tp width, height
+
+
+
+
+    Parameters:	
+
+        SELF - A SIZE construct.
+
+        WIDTH - The width of SIZE.
+        
+        HEIGHT - The height of SIZE.
+
+
+The function SIZE creates and also retrieves size values and stores the values in SIZE construct.
+
+The function WIDTH Finds the width of a SIZE construct.
+
+The function HEIGHT Finds the height of a SIZE construct.
+
+
+The function SIZE contains the functionality of both the OpenCV class Size_ and the OpenCV MAT class 
+method size. It can return a pointer to an uninitialized SIZE construct, an initialized SIZE construct 
+holding (WIDTH, HEIGHT) values and also determines the SIZE value of any MAT construct passed to it, When 
+returning a MAT size the columns are listed first and  the rows are listed second(COLS, ROWS). For a tiny
+bit faster matrix size accessor choose the MAT-SIZE Dfunction.
+
+
+(defun size-example ()
+       
+       "In the code below the (COLS, ROWS) values of MAT are 
+   accessed and stored in a SIZE construct. Their value-
+   s are accessed with the WIDTH and HEIGHT functions. 
+   Then an uninitialized and an initialized SIZE constr-
+   uct are created. Their values are also printed."
+   
+   (let* ((mat (mat-value 5 5 +8u+ (scalar 100 100 100)))
+	  (mat-size (size mat))
+          (size-un-init (size))
+          (size (size 640d0 480d0)))
+     ;;The '?' is a macro for CFFI:MEM-AREF
+     (format t "MAT (COLS,ROWS) = (~a ~a)~%" 
+	     (? mat-size :int)
+	     (? mat-size :int 1))
+	     (format t "Pointer to an uninitialized SIZE construct:~a
+               ~%" size-un-init) 
+	       (format t "Width of SIZE = ~a~%" (width size))
+	       (format t "Height of SIZE = ~a" (height size))))
+
+
+
+
+DRAWING FUNCTIONS:
+
+
+GET-TEXT-SIZE
+
+
+Calculates the width and height of a text string.
+
+
+C++: Size getTextSize(const string& text, int fontFace, double fontScale, int thickness, int* baseLine)
+
+LISP-CV:  (GET-TEXT-SIZE (TEXT (:POINTER STRING*)) (FONT-FACE :INT) (FONT-SCALE :DOUBLE) (THICKNESS :INT) (BASE-LINE :POINTER)) 
+           => (:POINTER SIZE)
+
+
+    Parameters:	
+
+        TEXT - Input text string.
+
+        FONT-FACE - Font to use. See (PUT-TEXT) for details.
+
+        FONT-SCALE - Font scale. See (PUT-TEXT) for details.
+
+        THICKNESS - Thickness of lines used to render the text. See (PUT-TEXT) for details.
+
+        BASE-LINE - Output parameter - y-coordinate of the baseline relative to the bottom-most text 
+                    point.
+
+
+The function GET-TEXT-SIZE calculates and returns the size of a box that contains the specified text. 
+That is, the following code renders some text, the tight box surrounding it, and the baseline:
+
+
+(defun get-text-example ()
+  (let* ((window-name "GET-TEXT Example")
+	 (text "Funny text inside the box")
+	 (font-face +font-hershey-script-simplex+)
+	 (font-scale 2d0)
+	 (thickness 3)
+	 (img (mat-value 600 800 +8uc3+ (scalar-all 0)))
+	 (base-line (alloc :int 0))
+	 (text-size 0)
+	 (text-org 0))
+    ;; create a window
+    (named-window window-name +window-normal+)
+    ;; set window to fullscreen with stretched aspect ratio
+    (set-window-property window-name +wnd-prop-fullscreen+ 
+			 +window-fullscreen+)
+    (if (equal 1.0d0 (get-window-property window-name +wnd-prop-fullscreen+)) 
+	(set-window-property window-name +wnd-prop-aspectratio+ 
+			     +window-freeratio+))
+    ;; '?' is a macro for CFFI:MEM-AREF, basically 'base-line += thickness'
+    (setf (? base-line :int) thickness)
+    ;; calculates the width and height of TEXT.
+    (setf text-size (get-text-size text font-face font-scale thickness base-line))
+    ;; center the text
+    (setf text-org (point (round (/ (- (cols img) (width text-size)) 2)) 
+			  (round (/ (- (rows img) (height text-size)) 2))))
+    ;; draw the box
+    (rectangle img (point (point-x text-org) (round 
+					      (+ (point-y text-org) 
+						 (? base-line :int))))
+	       (point (round 
+		       (+ (point-x text-org) (width text-size))) 
+		      (round 
+		       (- (point-y text-org) (height text-size))))
+	       (scalar 0 0 255))
+    ;; ... and the baseline first
+    (line img (point (point-x text-org) (round (+ (point-y text-org) thickness)))
+	  (point (+ (point-x text-org) (round (width text-size))) 
+		 (+ (point-y text-org) thickness))
+	  (scalar 0 0 255))
+    ;; then put the text itself
+    (put-text img text text-org font-face font-scale (scalar-all 255) thickness 8)
+    
+    (imshow window-name img)
+    (loop while (not (= (wait-key 0) 27)))
+    (destroy-window window-name)))
+
+
+
+BGR
+
+
+A macro for SCALAR organized as BGR(BLUE, GREEN, RED) color values.
+
+
+LISP-CV: (BGR B G R) => (:POINTER SCALAR)
+
+
+    Parameters:	
+
+        B - The blue color value
+
+        G - The green color value
+
+        R - The red color value
+
+
+BGR is the default color space in LisP-CV
 
 
 Example:
 
+Here BGR supplies a blue color value. 
+
+CIRCLE IMAGE POINT RADIUS (BRG 255 0 0) +FILLED+ +AA+ 0)
+
+
+
+
+
+ELLIPSE
+
+Draws a simple or thick elliptic arc or fills an ellipse sector.
+
+C++: void ellipse(Mat& img, Point center, Size axes, double angle, double startAngle, double endAngle, const Scalar& color, 
+     int thickness=1, int lineType=8, int shift=0)
+
+LISP-CV: (ELLIPSE (IMG (:POINTER MAT)) (CENTER (:POINTER POINT)) (AXES (:POINTER SIZE)) (ANGLE :DOUBLE) (START-ANGLE :DOUBLE)
+             (END-ANGEL :DOUBLE) (COLOR (:POINTER SCALAR)) (THICKNESS :INT) (LINE-TYPE :INT) (SHIFT :INT)) => :VOID
+
+C++: void ellipse(Mat& img, const RotatedRect& box, const Scalar& color, int thickness=1, int lineType=8)
+
+
+    Parameters:	
+
+        IMG - Image.
+
+        CENTER - Center of the ellipse.
+
+        AXES - Half of the size of the ellipse main axes.
+
+        AMGLE - Ellipse rotation angle in degrees.
+
+        START-AMGLE - Starting angle of the elliptic arc in degrees.
+
+        END-ANGLE - Ending angle of the elliptic arc in degrees.
+
+        BOX - Alternative ellipse representation via ROTATED-RECT. This means that the function dra-
+              ws an ellipse inscribed in the rotated rectangle.
+
+        COLOR - Ellipse color.
+
+        THICKNESS - Thickness of the ellipse arc outline, if positive. Otherwise, this indicates th-
+                    at a filled ellipse sector is to be drawn.
+
+        LINE-TYPE - Type of the ellipse boundary. See the (LINE) description.
+
+        SHIFT - Number of fractional bits in the coordinates of the center and values of axes.
+
+
+The functions ELLIPSE with less parameters draws an ellipse outline, a filled ellipse, an elliptic 
+arc, or a filled ellipse sector. A piecewise-linear curve is used to approximate the elliptic arc b-
+oundary. If you need more control of the ellipse rendering, you can retrieve the curve using the fu-
+nction (ELLIPSE-2-POLY) and then render it with the function (POLYLINES) or fill it with the functi-
+on (FILL-POLY) . If you use the first variant of the function and want to draw the whole ellipse, n-
+ot an arc, pass (EQ START-ANGLE 0) and (END-ANGLE 360).
+
+
+Example:
 
 (defun random-color (rng &optional (icolor 0))
   (setf icolor rng)
@@ -254,9 +655,10 @@ Example:
 				    (uniform rng 0 255) (uniform rng 0 255))))
 
 
-(defun ellipse-example ()
 
-  (let ((window-name "ELLIPSE Example")
+(defun ellipse-example-1 ()
+
+  (let ((window-name "ELLIPSE Example 1")
 					;Initialize random number generator
 	(rng (rng #xFFFFFFFF))
 	;;Declare MAT
@@ -269,7 +671,7 @@ Example:
     (if (equal 1.0d0 (get-window-property window-name +wnd-prop-fullscreen+)) 
 	(set-window-property window-name +wnd-prop-aspectratio+ 
 			     +window-freeratio+))
-    ;;Initialize line type and thickness
+    ;;Initialize line type and thickness variables
     (do* ((line-type +aa+)
 	  (thickness -1)
 	  ;;Initialize value for the ellipse center
@@ -277,18 +679,21 @@ Example:
 	  ;;Initialize value equaling to half of the ellipse main 
           ;;axes
 	  (axes 0)
-	  ;;Initialize values for the ellipse rotation angle(in degrees)
-          (angle (coerce (uniform rng 0 180) 'double-float)))
+	  ;;Initialize value for the ellipse rotation angle
+          (angle 0))
 	 ((plusp (wait-key 1)) 
 	  (format t "Key is pressed by user"))
       ;;Create a black background using MAT-ZEROS
       (setf mat (mat-zeros 640 480 +8uc3+))
       (dotimes (n 1)
 	;;Set the ellipse axes to random values
-	(setf axes (size (uniform rng 0 240) (uniform rng 0 240)))
+	(setf axes (size (coerce (uniform rng 0 240) 'double-float) 
+			 (coerce (uniform rng 0 240) 'double-float)))
+        ;;Set the ellipse angle to random values
+	(setf angle (coerce (uniform rng 0 180) 'double-float))
 	;;Draw multiple ellipses with varied parameters
-	(ellipse mat center axes angle 0.0d0 (coerce (uniform rng 0 360) 'double-float)
-		 (random-color rng) (uniform rng thickness 9) line-type))
+	(ellipse10 mat center axes angle 0.0d0 (coerce (uniform rng 0 360) 'double-float)
+		   (random-color rng) (uniform rng thickness 9) line-type))
       (sleep .14)
       ;; Show output
       (imshow window-name mat)
@@ -296,46 +701,47 @@ Example:
     (destroy-window window-name)))
 
 
-;=======================================================CORE==============================================================
-;
-;LINE
-;
-;Draws a line segment connecting two points.
-;
-;C++: void line(Mat& img, Point pt1, Point pt2, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
-;
-;Common Lisp: (LINE (IMG (:POINTER MAT)) (PT1 (:POINTER POINT)) (PT2 (:POINTER POINT)) (COLOR (:POINTER SCALAR)) &OPTIONAL 
-;((THICKNESS :INT) 1) ((LINE-TYPE :INT) 8) ((SHIFT :INT) 0)) => :VOID
-;
-;    Parameters:	
-;
-;              IMG - Image.
-;
-;              PT1 - First point of the line segment.
-;
-;              PT2 - Second point of the line segment.
-;
-;              COLOR - Line color.
-;
-;              THICKNESS - Line thickness.
-;
-;              LINE-TYPE - Type of the line:
-;
-;                       8 (or omitted) - 8-connected line.
-;
-;                       4 - 4-connected line.
-;
-;                       +AA+ - antialiased line.
-;
-;              SHIFT - Number of fractional bits in the point coordinates.
-;
-;
-;
-;The function line draws the line segment between pt1 and pt2 points in the image. The line is clipp-
-;ed by the image boundaries. For non-antialiased lines with integer coordinates, the 8-connected or 
-;4-connected Bresenham algorithm is used. Thick lines are drawn with rounding endings. Antialiased l-
-;ines are drawn using Gaussian filtering. To specify the color of the line, you may also use the mac-
-;ros RGB - (RGB R G B) and BGR - (BGR B G R).
+
+=
+
+LINE
+
+Draws a line segment connecting two points.
+
+C++: void line(Mat& img, Point pt1, Point pt2, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
+
+LISP-CV: (LINE (IMG (:POINTER MAT)) (PT1 (:POINTER POINT)) (PT2 (:POINTER POINT)) (COLOR (:POINTER SCALAR)) &OPTIONAL 
+((THICKNESS :INT) 1) ((LINE-TYPE :INT) 8) ((SHIFT :INT) 0)) => :VOID
+
+    Parameters:	
+
+              IMG - Image.
+
+              PT1 - First point of the line segment.
+
+              PT2 - Second point of the line segment.
+
+              COLOR - Line color.
+
+              THICKNESS - Line thickness.
+
+              LINE-TYPE - Type of the line:
+
+                       8 (or omitted) - 8-connected line.
+
+                       4 - 4-connected line.
+
+                       +AA+ - antialiased line.
+
+              SHIFT - Number of fractional bits in the point coordinates.
+
+
+
+The function line draws the line segment between pt1 and pt2 points in the image. The line is clipp-
+ed by the image boundaries. For non-antialiased lines with integer coordinates, the 8-connected or 
+4-connected Bresenham algorithm is used. Thick lines are drawn with rounding endings. Antialiased l-
+ines are drawn using Gaussian filtering. To specify the color of the line, you may also use the mac-
+ros RGB - (RGB R G B) and BGR - (BGR B G R).
 
 
 Example:
@@ -377,63 +783,63 @@ Example:
     (destroy-window window-name)))
 
 
-;=======================================================CORE==============================================================
-;
-;PUT-TEXT
-;
-;Draws a text string.
-;
-;C++: void putText(Mat& img, const string& text, Point org, int fontFace, double fontScale, Scalar color, int thickness=1, 
-;     int lineType=8, bool bottomLeftOrigin=false )
-;
-;Common Lisp: (PUT-TEXT (IMG (:POINTER MAT)) (TEXT (:POINTER STRING*)) (ORG (:POINTER POINT)) (FONT-FACE :INT) (FONT-SCALE :DOUBLE)  
-;             (COLOR (:POINTER SCALAR)) (THICKNESS :INT) (LINE-TYPE :INT) (BOTTOM-LEFT-ORIGN :BOOLEAN)) => :VOID
-; 
-;    Parameters:	
-;
-;        IMG - Image.
-;
-;        TEXT - Text string to be drawn.
-;
-;        ORG - Bottom-left corner of the text string in the image.
-;
-;        FONT-FACE - Font type. One of: +FONT-HERSHEY-SIMPLEX+ 
-;
-;                                       +FONT-HERSHEY-PLAIN+ 
-;
-;                                       +FONT-HERSHEY-DUPLEX+ 
-;
-;                                       +FONT-HERSHEY-COMPLEX+ 
-;
-;                                        FONT_HERSHEY_ITALIC
-;
-;                                       +FONT-HERSHEY-COMPLEX-SMALL+ 
-;
-;                                       +FONT-HERSHEY-SCRIPT-SIMPLEX+ 
-; 
-;                                       +FONT-HERSHEY-SCRIPT-COMPLEX+ 
-;
-;
-;where each of the font id’s can be combined with +FONT-ITALIC+ to get the slanted letters.
-;
-;
-;        FONT-SCALE - Font scale factor that is multiplied by the font-specific base size.
-;
-;        COLOR- Text color.
-;
-;        THICKNESS - Thickness of the lines used to draw a text.
-;
-;        LINE-TYPE - Line type. See the line for details.
-;
-;        BOTTOM-LEFT-ORIGIN - When true, the image data origin is at the bottom-left corner. Otherwi-
-;                             se, it is at the top-left corner.
-;
-;
-;The function PUT-TEXT renders the specified text string in the image. Symbols that cannot be render-
-;ed using the specified font are replaced by question marks. See (GET-TEXT-SIZE) for a text renderin-
-;g code example.
+
+PUT-TEXT
+
+Draws a text string.
+
+C++: void putText(Mat& img, const string& text, Point org, int fontFace, double fontScale, Scalar color, int thickness=1, 
+     int lineType=8, bool bottomLeftOrigin=false )
+
+LISP-CV: (PUT-TEXT (IMG (:POINTER MAT)) (TEXT (:POINTER STRING*)) (ORG (:POINTER POINT)) (FONT-FACE :INT) (FONT-SCALE :DOUBLE)  
+             (COLOR (:POINTER SCALAR)) (THICKNESS :INT) (LINE-TYPE :INT) (BOTTOM-LEFT-ORIGN :BOOLEAN)) => :VOID
+ 
+    Parameters:	
+
+        IMG - Image.
+
+        TEXT - Text string to be drawn.
+
+        ORG - Bottom-left corner of the text string in the image.
+
+        FONT-FACE - Font type. One of: +FONT-HERSHEY-SIMPLEX+ 
+
+                                       +FONT-HERSHEY-PLAIN+ 
+
+                                       +FONT-HERSHEY-DUPLEX+ 
+
+                                       +FONT-HERSHEY-COMPLEX+ 
+
+                                        FONT_HERSHEY_ITALIC
+
+                                       +FONT-HERSHEY-COMPLEX-SMALL+ 
+
+                                       +FONT-HERSHEY-SCRIPT-SIMPLEX+ 
+ 
+                                       +FONT-HERSHEY-SCRIPT-COMPLEX+ 
 
 
+where each of the font id’s can be combined with +FONT-ITALIC+ to get the slanted letters.
+
+
+        FONT-SCALE - Font scale factor that is multiplied by the font-specific base size.
+
+        COLOR- Text color.
+
+        THICKNESS - Thickness of the lines used to draw a text.
+
+        LINE-TYPE - Line type. See the line for details.
+
+        BOTTOM-LEFT-ORIGIN - When true, the image data origin is at the bottom-left corner. Otherwi-
+                             se, it is at the top-left corner.
+
+
+The function PUT-TEXT renders the specified text string in the image. Symbols that cannot be render
+ed using the specified font are replaced by question marks. See (GET-TEXT-SIZE) for another text 
+rendering code example.
+
+
+Example:
 
 (defun random-color (rng &optional (icolor 0))
   (setf icolor rng)
@@ -484,50 +890,49 @@ Example:
     (destroy-window window-name)))
 
 
-;=======================================================CORE===============================================================
-;
-;RECTANGLE
-;
-;
-;Draws a simple, thick, or filled up-right rectangle.
-;
-;
-;C++: void rectangle(Mat& img, Point pt1, Point pt2, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
-;
-;Common Lisp: (RECTANGLE (IMG (:POINTER MAT)) (PT1 (:POINTER POINT)) (PT2 (:POINTER POINT)) (COLOR (:POINTER SCALAR)) &OPTIONAL 
-;             ((THICKNESS :INT) 1) ((LINE-TYPE :INT) 8) ((SHIFT :INT) 0)) => :VOID
-;
-;
-;    Parameters:	
-;
-;        Parameters:	
-;
-;              IMG - Image.
-;
-;              PT1 - First point of the line segment.
-;
-;              PT2 - Second point of the line segment.
-;
-;              COLOR - Rectangle color or brightness (grayscale image).
-;
-;              THICKNESS - Thickness of lines that make up the rectangle. 
-;                          Negative values, like +FILLED+ (-1) , mean that 
-;                          the function has to draw a filled rectangle.
-;
-;              LINE-TYPE - Type of the line:
-;
-;                      8 (or omitted) - 8-connected line.
-;
-;                      4 - 4-connected line.
-;
-;                      +AA+ - antialiased line.
-;
-;              SHIFT - Number of fractional bits in the point coordinates.
-;
-;
-;The function rectangle draws a rectangle outline or a filled rectangle whose two opposite corners a-
-;re PT1 and PT2.
 
+RECTANGLE
+
+
+Draws a simple, thick, or filled up-right rectangle.
+
+
+C++: void rectangle(Mat& img, Point pt1, Point pt2, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
+
+LISP-CV: (RECTANGLE (IMG (:POINTER MAT)) (PT1 (:POINTER POINT)) (PT2 (:POINTER POINT)) (COLOR (:POINTER SCALAR)) &OPTIONAL 
+             ((THICKNESS :INT) 1) ((LINE-TYPE :INT) 8) ((SHIFT :INT) 0)) => :VOID
+
+
+    Parameters:	
+
+        Parameters:	
+
+              IMG - Image.
+
+              PT1 - First point of the line segment.
+
+              PT2 - Second point of the line segment.
+
+              COLOR - Rectangle color or brightness (grayscale image).
+
+              THICKNESS - Thickness of lines that make up the rectangle. 
+                          Negative values, like +FILLED+ (-1) , mean that 
+                          the function has to draw a filled rectangle.
+
+              LINE-TYPE - Type of the line:
+
+                      8 (or omitted) - 8-connected line.
+
+                      4 - 4-connected line.
+
+                     +AA+ - antialiased line.
+
+             SHIFT - Number of fractional bits in the point coordinates.
+
+The function rectangle draws a rectangle outline or a filled rectangle whose two opposite corners a-
+re PT1 and PT2.
+
+Example:
 
 (defun random-color (rng &optional (icolor 0))
   (setf icolor rng)
@@ -572,49 +977,49 @@ Example:
     (destroy-window window-name)))
 
 
-;=======================================================CORE===============================================================
-;
-;RGB
-;
-;A macro for SCALAR organized as RGB(RED, GREEN, BLUE) color values.
-;
-;Common Lisp: (RGB R G B) => (:POINTER SCALAR)
-;
-;    Parameters:	
-;
-;
-;        R - The red color value
-;
-;        G - The green color value
-;
-;        B - The blue color value
-;
-;
-;A creative reversal of the default BGR color space in LisP-CV. Values are put into the RGB macro in
-;Red, Green, Blue, order, but are ultimately entered into the recieving function as BGR. This macro 
-;is designed for ease of use.
-;
-;
-;Usage:
-;
-;Here RGB supplies a red color value. 
-;
-(CIRCLE IMAGE POINT RADIUS (RGB 255 0 0) +FILLED+ +AA+ 0) 
-;
-;
-;
-;TYPES AND STRUCTURES
-;--------------------
-;
-;
-;
-;USER INTERFACE
-;--------------
-;
-;
-;
-;QT NEW FUNCTIONS
-;----------------
+==
+
+RGB
+
+A macro for SCALAR organized as RGB(RED, GREEN, BLUE) color values.
+
+LISP-CV: (RGB R G B) => (:POINTER SCALAR)
+
+    Parameters:	
+
+
+        R - The red color value
+
+        G - The green color value
+
+        B - The blue color value
+
+
+A creative reversal of the default BGR color space in LisP-CV. Values are put into the RGB macro in
+Red, Green, Blue, order, but are ultimately entered into the recieving function as BGR. This macro 
+is designed for ease of use.
+
+
+Usage:
+
+Here RGB supplies a red color value. 
+
+CIRCLE IMAGE POINT RADIUS (RGB 255 0 0) +FILLED+ +AA+ 0) 
+
+
+
+TYPES AND STRUCTURES
+--------------------
+
+
+
+USER INTERFACE
+--------------
+
+
+
+QT NEW FUNCTIONS
+----------------
 
 
 GET-WINDOW-PROPERTY
@@ -623,7 +1028,7 @@ Provides parameters of a window.
 
 C++: double getWindowProperty(const string& winname, int prop_id)
 
-Common Lisp: (GET-WINDOW-PROPERTY (WINNAME (:pOINTER STRING*)) (PROP-ID) :INT) => :DOUBLE
+LISP-CV: (GET-WINDOW-PROPERTY (WINNAME (:pOINTER STRING*)) (PROP-ID) :INT) => :DOUBLE
 
 
           Parameters:	
@@ -684,7 +1089,7 @@ Changes parameters of a window dynamically.
 
 C++: void setWindowProperty(const string& winname, int prop_id, double prop_value)
 
-Common Lisp: (SET-WINDOW-PROPERTY (WINNAME (:POINTER STRING*)) (PROP-ID :INT) (PROP-VALUE :DOUBLE)) => :VOID
+LISP-CV: (SET-WINDOW-PROPERTY (WINNAME (:POINTER STRING*)) (PROP-ID :INT) (PROP-VALUE :DOUBLE)) => :VOID
 
 
     Parameters:	
@@ -740,20 +1145,27 @@ The function SET-WINDOW-PROPERTY enables changing properties of a window.
 			 +window-fullscreen+)
     ;; Show image
     (imshow window-name image)
+  "In the code below the (COLS, ROWS) values of MAT are 
+   accessed and stored in a SIZE construct. Their values 
+   are accessed with the WIDTH and HEIGHT functions. The-
+   n an uninitialized and an initialized SIZE construct  
+   are created. Their values are also printed."
+
+  (let* ((mat (mat-value 5 5 +64f+ (scalar 100 100 100)))
+         (mat-size (mat-size mat))
+          (size-un-init)
+          (size (size 640 480)))
+    (format t " The (COLS ROWS) of MAT = (~a ~a)~%"  
+	    (width mat-size)
+	    (height mat-size)
+            (format t "Pointer to an uninitialized SIZE construct:~a~%" 
+size-un-init) 
+(format t "Width of SIZE = ~a~%" (width size))
+    (format t "Height of SIZE = ~a" (height size)))))
+
+
     (loop while (not (= (wait-key 0) 27)))
     (destroy-window window-name)))
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 IMSHOW
@@ -762,7 +1174,7 @@ Displays an image in the specified window.
 
 C++: void imshow(const string& winname, InputArray mat)
 
-Common Lisp: (IMSHOW (WINNAME (:POINTER STRING*)) (MAT (:POINTER MAT))) => :void
+LISP-CV: (IMSHOW (WINNAME (:POINTER STRING*)) (MAT (:POINTER MAT))) => :void
 
     Parameters:	
 
@@ -809,7 +1221,7 @@ Loads an image from a file.
 
 C++: Mat imread(const string& filename, int flags=1)
 
-Common Lisp: (IMREAD (FILENAME (:POINTER STRING*)) &OPTIONAL ((FLAGS :INT) +LOAD-IMAGE-COLOR+)) => (:POINTER MAT)
+LISP-CV: (IMREAD (FILENAME (:POINTER STRING*)) &OPTIONAL ((FLAGS :INT) +LOAD-IMAGE-COLOR+)) => (:POINTER MAT)
 
     Parameters:	
 
@@ -860,13 +1272,13 @@ Note:
 
     The function determines the type of an image by the content, not by the file extension.
 
-    On Microsoft Windows* OS and MacOSX*, the codecs shipped with an W-NET-CL-OPENCV image (libjpeg
-    , libpng, libtiff, and libjasper) are used by default. So, W-NET-CL-OPENCV can always read JPEG-
+    On Microsoft Windows* OS and MacOSX*, the codecs shipped with an LISP-CV image (libjpeg
+    , libpng, libtiff, and libjasper) are used by default. So, LISP-CV can always read JPEG-
     s, PNGs, and TIFFs. On MacOSX, there is also an option to use native MacOSX image readers. But 
     beware that currently these native image loaders give images with different pixel values becaus-
     e of the color management embedded into MacOSX. 
 
-    On Linux*, BSD flavors and other Unix-like open-source operating systems, W-NET-CL-OPENCV looks
+    On Linux*, BSD flavors and other Unix-like open-source operating systems, LISP-CV looks
     for codecs supplied with an OS image. Install the relevant packages (do not forget the developm-
     ent files, for example, “libjpeg-dev”, in Debian* and Ubuntu*) to get the codec support or turn 
     on the OPENCV_BUILD_3RDPARTY_LIBS flag in CMake.
@@ -899,7 +1311,7 @@ Creates a window.
 
 C++: void namedWindow(const string& winname, int flags=WINDOW_AUTOSIZE)
 
-Common Lisp: (NAMED-WINDOW (WINNAME (:POINTER STRING*)) &OPTIONAL ((FLAGS :INT) +WINDOW-AUTOSIZE+)) => :VOID
+LISP-CV: (NAMED-WINDOW (WINNAME (:POINTER STRING*)) &OPTIONAL ((FLAGS :INT) +WINDOW-AUTOSIZE+)) => :VOID
 
     Parameters:	
 
@@ -981,7 +1393,7 @@ Destroys a window.
 
 C++: void destroyWindow(const string& winname)
 
-Common Lisp: (DESTROY-WINDOW (WINNAME (:POINTER STRING*)))
+LISP-CV: (DESTROY-WINDOW (WINNAME (:POINTER STRING*)))
 
     Parameters:	WINNAME - Name of the window to be destroyed.
 
@@ -1007,7 +1419,7 @@ Destroys all of the HighGUI windows.
 
 C++: void destroyAllWindows()
 
-Common Lisp: (DESTROY-ALL-WINDOWS) => :VOID
+LISP-CV: (DESTROY-ALL-WINDOWS) => :VOID
 
 
 The function DESTROY-ALL-WINDOWS destroys all of the opened HighGUI windows.
@@ -1016,47 +1428,7 @@ The function DESTROY-ALL-WINDOWS destroys all of the opened HighGUI windows.
 (defun destroy-all-windows-example ()
 
   "In this example we create
-(defun random-color (rng &optional (icolor 0))
-  (setf icolor rng)
-  (return-from random-color (scalar (uniform rng 0 255) 
-				    (uniform rng 0 255) (uniform rng 0 255))))
-
-(defun rectangle-example ()
-
-  (let* ((window-name "RECTANGLE Example")
-	 (window-width 640)
-	 (window-height 480)
-	 ;; Initialize random number generator
-	 (rng (rng #xFFFFFFFF))
-	 ;; Create a black background
-	 (mat (mat-zeros window-width window-height +8uc3+)))
-    ;; Create a window
-    (named-window window-name +window-normal+)
-    ;; Set window to fullscreen
-    (set-window-property window-name +wnd-prop-fullscreen+ 
-			 +window-fullscreen+)
-    (if (equal 1.0d0 (get-window-property window-name +wnd-prop-fullscreen+)) 
-	(set-window-property window-name +wnd-prop-aspectratio+ 
-			     +window-freeratio+))
-    ;; Set line type and thickness
-    (do* ((line-type +aa+)
-          (thickness (uniform rng -3 10))
-	  ;; Initialize rectangle position variables
-          (x-1 (/ (* window-width -1) 2))
-	  (x-2 (/ (* window-width 3) 2))
-          (y-1 (/ (* window-width -1) 2))
-          (y-2 (/ (* window-width 3) 2))
-          (pt1 0)
-	  (pt2 0))
-	 ((plusp (wait-key 1)) 
-	  (format t "Key is pressed by user"))
-      ;; Print randomly colored rectangles to screen
-      (setf pt1 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
-      (setf pt2 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
-      (rectangle mat pt1 pt2 (random-color rng) thickness line-type)
-      ;; Show result in window
-      (imshow window-name mat))
-    (destroy-window window-name))) 12 windows and DESTROY THEM!!!"
+ 12 windows and DESTROY THEM!!!"
 
   (let* ((window-name-arr 
 	  (make-array 12 :initial-contents 
@@ -1103,7 +1475,7 @@ Moves window to the specified position
 
 C++: void moveWindow(const string& winname, int x, int y)
 
-Common Lisp: (MOVE-WINDOW (WINNAME (:POINTER STRING*)) (X :INT) (Y :INT))
+LISP-CV: (MOVE-WINDOW (WINNAME (:POINTER STRING*)) (X :INT) (Y :INT))
 
     Parameters:	
 
@@ -1133,7 +1505,7 @@ Waits for a pressed key.
 
 C++: int waitKey(int delay=0)
 
-Ccommon Lisp: (WAIT-KEY &OPTIONAL ((DELAY :INT) 0))
+LISP-CV: (WAIT-KEY &OPTIONAL ((DELAY :INT) 0))
 
     Parameters:	DELAY - Delay in milliseconds. 0 is the special value that means “forever”.
 
@@ -1178,7 +1550,7 @@ Returns the specified VIDEO-CAPTURE property
 
 C++: double VideoCapture::get(int propId)
 
-Common Lisp: (CAP-GET (SELF (:POINTER VIDEO-CAPTURE)) (PROP-ID :INT))
+LISP-CV: (CAP-GET (SELF (:POINTER VIDEO-CAPTURE)) (PROP-ID :INT))
 
     Parameters:	SELF - The VIDEO-CAPTURE structure. 
 
@@ -1264,7 +1636,7 @@ Sets a property in the VIDEO-CAPTURE
 
 C++: bool VideoCapture::set(int propId, double value)
 
-Common Lisp: (CAP-SET (SELF (:POINTER VIDEO-CAPTURE)) (PROP-ID :INT) (VALUE :DOUBLE)) => :BOOLEAN
+LISP-CV: (CAP-SET (SELF (:POINTER VIDEO-CAPTURE)) (PROP-ID :INT) (VALUE :DOUBLE)) => :BOOLEAN
 
     Parameters:	SELF - The VIDEO-CAPTURE structure.
 
@@ -1348,7 +1720,7 @@ Grabs, decodes and returns the next video frame.
 
 C++: bool VideoCapture::read(Mat& image)
 
-Common Lisp: (CAP-READ (SELF (:POINTER VIDEO-CAPTURE)) (IMAGE (:POINTER MAT)))
+LISP-CV: (CAP-READ (SELF (:POINTER VIDEO-CAPTURE)) (IMAGE (:POINTER MAT)))
 
 Parameters:	
 
@@ -1364,6 +1736,25 @@ le), the methods return false and the functions return NULL pointer.
 
 
 (defun cap-read-example (&optional 
+  "In the code below the (COLS, ROWS) values of MAT are 
+   accessed and stored in a SIZE construct. Their values 
+   are accessed with the WIDTH and HEIGHT functions. The-
+   n an uninitialized and an initialized SIZE construct  
+   are created. Their values are also printed."
+
+  (let* ((mat (mat-value 5 5 +64f+ (scalar 100 100 100)))
+         (mat-size (mat-size mat))
+          (size-un-init)
+          (size (size 640 480)))
+    (format t " The (COLS ROWS) of MAT = (~a ~a)~%"  
+	    (width mat-size)
+	    (height mat-size)
+            (format t "Pointer to an uninitialized SIZE construct:~a~%" 
+size-un-init) 
+(format t "Width of SIZE = ~a~%" (width size))
+    (format t "Height of SIZE = ~a" (height size)))))
+
+
                            (camera-index 
                             *camera-index*))
 
@@ -1393,7 +1784,7 @@ Closes video file or capturing device.
 
 C++: void VideoCapture::release()
 
-Common Lisp: (CAP-RELEASE (SELF (:POINTER VIDEO-CAPTURE))) => :VOID
+LISP-CV: (CAP-RELEASE (SELF (:POINTER VIDEO-CAPTURE))) => :VOID
 
 The methods are automatically called by subsequent (CAP-OPEN) and by VIDEO-CAPTURE destructor.
 
@@ -1438,7 +1829,7 @@ WITH-CAPTURE
 
 Ensures CAP-RELEASE gets called on captures.
 
-Common Lisp: (WITH-CAPTURE (CAPTURE-VAR CAP)) &BODY BODY)
+LISP-CV: (WITH-CAPTURE (CAPTURE-VAR CAP)) &BODY BODY)
 
 Parameters:	
 
@@ -1485,7 +1876,7 @@ Returns true if video capturing has been initialized already.
 
 C++: bool VideoCapture::isOpened()
 
-Common Lisp: (CAP-IS-OPEN (SELF (:POINTER VIDEO-CAPTURE)))
+LISP-CV: (CAP-IS-OPEN (SELF (:POINTER VIDEO-CAPTURE)))
 
 Parameters:	
 
@@ -1530,7 +1921,7 @@ Calculates the per-element absolute difference between two arrays or between an 
 
 C++: void absdiff(InputArray src1, InputArray src2, OutputArray dst)
 
-Common Lisp: (ABSDIFF (SRC1 (:POINTER MAT)) (SRC2 (:POINTER MAT)) (DEST (:POINTER MAT)))
+LISP-CV: (ABSDIFF (SRC1 (:POINTER MAT)) (SRC2 (:POINTER MAT)) (DEST (:POINTER MAT)))
 
     Parameters:	
 
@@ -1604,7 +1995,7 @@ SCALAR
 
 SCALAR constructor.
 
-Common Lisp:  (SCALAR ((VAL0 :DOUBLE) &OPTIONAL ((VAL1 :DOUBLE) 0) ((VAL2 :DOUBLE) 0) ((VAL3 :DOUBLE) 0)))
+LISP-CV:  (SCALAR ((VAL0 :DOUBLE) &OPTIONAL ((VAL1 :DOUBLE) 0) ((VAL2 :DOUBLE) 0) ((VAL3 :DOUBLE) 0)))
 
     Parameters:	
 
@@ -1632,47 +2023,7 @@ ly VAL1 is required, the rest are optional.
     (format t "SCALAR-1 element 0 = ~a~%" (mem-aref scalar-1 :double 0))
     (dotimes (n 2)
       (format t "~%SCALAR-2
-(defun random-color (rng &optional (icolor 0))
-  (setf icolor rng)
-  (return-from random-color (scalar (uniform rng 0 255) 
-				    (uniform rng 0 255) (uniform rng 0 255))))
-
-(defun rectangle-example ()
-
-  (let* ((window-name "RECTANGLE Example")
-	 (window-width 640)
-	 (window-height 480)
-	 ;; Initialize random number generator
-	 (rng (rng #xFFFFFFFF))
-	 ;; Create a black background
-	 (mat (mat-zeros window-width window-height +8uc3+)))
-    ;; Create a window
-    (named-window window-name +window-normal+)
-    ;; Set window to fullscreen
-    (set-window-property window-name +wnd-prop-fullscreen+ 
-			 +window-fullscreen+)
-    (if (equal 1.0d0 (get-window-property window-name +wnd-prop-fullscreen+)) 
-	(set-window-property window-name +wnd-prop-aspectratio+ 
-			     +window-freeratio+))
-    ;; Set line type and thickness
-    (do* ((line-type +aa+)
-          (thickness (uniform rng -3 10))
-	  ;; Initialize rectangle position variables
-          (x-1 (/ (* window-width -1) 2))
-	  (x-2 (/ (* window-width 3) 2))
-          (y-1 (/ (* window-width -1) 2))
-          (y-2 (/ (* window-width 3) 2))
-          (pt1 0)
-	  (pt2 0))
-	 ((plusp (wait-key 1)) 
-	  (format t "Key is pressed by user"))
-      ;; Print randomly colored rectangles to screen
-      (setf pt1 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
-      (setf pt2 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
-      (rectangle mat pt1 pt2 (random-color rng) thickness line-type)
-      ;; Show result in window
-      (imshow window-name mat))
-    (destroy-window window-name))) element ~a = ~a~%" n (mem-aref scalar-2 :double n)))
+element ~a = ~a~%" n (mem-aref scalar-2 :double n)))
     (dotimes (n 3)
       (format t "~%SCALAR-3 element ~a = ~a~%" n (mem-aref scalar-3 :double n)))
     (dotimes (n 4)
@@ -1683,7 +2034,7 @@ SCALAR-ALL
 
 SCALAR constructor.
 
-Common Lisp:  (SCALAR-ALL (VAL0123 :DOUBLE))
+LISP-CV:  (SCALAR-ALL (VAL0123 :DOUBLE))
 
     Parameters:	
 
@@ -1692,6 +2043,7 @@ Common Lisp:  (SCALAR-ALL (VAL0123 :DOUBLE))
 
 SCALAR-ALL is a SCALAR constructor. Unlike the function SCALAR, All of the 4 scalar values, 0 thro-
 ugh 3, are initialized with one value(VAL0123).
+
 
 (defun scalar-all-example ()
 
@@ -1705,37 +2057,39 @@ ugh 3, are initialized with one value(VAL0123).
       (format t "~%SCALAR element ~a = ~a~%" n 
 	      (mem-aref scalar :double n)))))
 
+
 ;;; Types and structures
 
 
 
 ;;; User Interface
+
+
 MAT-SIZE
 
 Returns pointer to a matrix size.
 
 C++: Size Mat::size() const
 
-Common Lisp: (MAT-SIZE (SELF (:POINTER MAT)))
+LISP-CV: (MAT-SIZE (SELF (:POINTER MAT)))
 
 The function MAT-SIZE returns Size*, a matrix size pointer in which the columns are listed first an-
 d the rows second. When the matrix is more than 2-dimensional, the returned size is (-1 -1).
 
 
 (defun mat-size-example ()
+  
+  "In the code below the (COLS, ROWS) values of MAT are 
+   accessed and stored in a SIZE construct. Their value-
+   s are accessed with the WIDTH and HEIGHT functions."
+  
+  (let* ((mat (mat-value 5 5 +8u+ (scalar 100 100 100)))
+	 (mat-size (size mat)))
+    (format t "MAT (COLS,ROWS) = (~a ~a)~%" 
+	    ;;The '?' is a macro for CFFI:MEM-AREF
+	    (? mat-size :int)
+	    (? mat-size :int 1))))
 
-  "The function MAT-SIZE returns Size*, a matrix size 
-   pointer in which the columns are listed first and 
-   the rows are listed second(COLS ROWS). In the cod-
-   e below the (COLS ROWS) values of MAT which are s-
-   tored in SIZE are accessed with the CFFI function 
-   MEM-AREF."
-
-  (let* ((mat (mat-value 3 7 +64f+ (scalar 100 100 100)))
-         (size (mat-size mat)))
-    (format t " The (COLS ROWS) of MAT = (~a ~a)~%"  
-	    (mem-aref size :int 0)
-	    (mem-aref size :int 1))))
 
 
 ROWS
@@ -1744,7 +2098,7 @@ Returns number or rows in MAT.
 
 C++: int rows, cols
 
-Common Lisp: (ROWS (SELF (:POINTER MAT))) => :INT
+LISP-CV: (ROWS (SELF (:POINTER MAT))) => :INT
 
     Parameters:	
 
@@ -1769,7 +2123,7 @@ Returns number or cols in MAT.
 
 C++: int rows, cols
 
-Common Lisp:  (COLS (SELF (:POINTER MAT))) => :INT
+LISP-CV:  (COLS (SELF (:POINTER MAT))) => :INT
 
     Parameters:	
 
@@ -1795,28 +2149,28 @@ POINT constructor.
 
 C++: Point_()
 
-Common Lisp: (POINT) => (:POINTER POINT)
+LISP-CV: (POINT) => (:POINTER POINT)
 
 C++: Point_(_Tp _x, _Tp _y)
 
-Common Lisp:  (POINT (X :INT) (Y :INT)) => (:POINTER POINT)
+LISP-CV:  (POINT (X :INT) (Y :INT)) => (:POINTER POINT)
 
 C++: _Tp x, y;
 
-Common Lisp: (POINT-X (SELF (:POINTER POINT))) => :INT
+LISP-CV: (POINT-X (SELF (:POINTER POINT))) => :INT
 
 C++: _Tp x, y;
 
-Common Lisp: (POINT-Y (SELF (:POINTER POINT))) => :INT
+LISP-CV: (POINT-Y (SELF (:POINTER POINT))) => :INT
 
 
     Parameters:	
 
         SELF - A POINT construct.
 
-        X - x-coordinate of the point.
+        X - X-coordinate of the point.
 
-        Y -	y-coordinate of the point.
+        Y -	Y-coordinate of the point.
 
 
 POINT creates a 2D point with integer coordinates (usually zero-based). Functions POINT-X and  POINT-Y are used to extract the x,y coordinates of a point.
@@ -1842,20 +2196,21 @@ POINT creates a 2D point with integer coordinates (usually zero-based). Function
 
 POINT2D
 
+
 POINT2D constructor.
 
 
 C++: typedef Point_<double> Point2d
 
-Common Lisp:  (POINT2D (X :INT) (Y :INT)) => (:POINTER POINT2D)
+LISP-CV: (POINT2D (X :INT) (Y :INT)) => (:POINTER POINT2D)
 
 C++: _Tp x, y
 
-Common Lisp: (POINT2D-X (SELF (:POINTER POINT2D))) => :DOUBLE
+LISP-CV: (POINT2D-X (SELF (:POINTER POINT2D))) => :DOUBLE
 
 C++: _Tp x, y
 
-Common Lisp: (POINT2D-Y (SELF (:POINTER POINT2D))) => :DOUBLE
+LISP-CV: (POINT2D-Y (SELF (:POINTER POINT2D))) => :DOUBLE
 
 
     Parameters:	
@@ -1872,30 +2227,17 @@ and  POINT2D-Y are used to extract the x,y coordinates of the point.
 
 
 (defun point2d-example (x y)
- ;; create 12 windows to show the output images in
-    (dotimes (i 12)
-      (named-window (aref window-name-arr i) +window-normal+))
-    ;; move the windows to specific coordinates
-    (move-window (aref window-name-arr 0) 88 0)
-    (move-window (aref window-name-arr 1) 538 0)
-    (move-window (aref window-name-arr 2) 988 0)
-    (move-window (aref window-name-arr 3) 1438 0)
-    (move-window (aref window-name-arr 4) 88 368)
-    (move-window (aref window-name-arr 5) 538 368)
-    (move-window (aref window-name-arr 6) 988 368)
-    (move-window (aref window-name-arr 7) 1438 368)
-    (move-window (aref window-name-arr 8) 88 708)
-    (move-window (aref window-name-arr 9) 538 708)
-    (move-window (aref window-name-arr 10) 988 708)
-    (move-window (aref window-name-arr 11) 1438 708)
-  "Creates a point2d with the function 
-   POINT2D. Then, lists the x,y coordi-
-   nates with the POINT2D functions PO-
+
+  "In this example we create an uninitialized 
+   point2d with the function POINT2D. Then, w-
+   e create an initialized point2d and list t-
+   he x,y,z coordinates with the functions PO-
    INT2D-X and POINT2D-Y."
 
-  (let* ((point2d (point2d x y)))
+  (let* ((point2d-un-init (point2d))
+	 (point2d (point2d x y)))
     (format t "Pointer to POINT2D: ~a~%~%" 
-	    point2d)
+	    point2d-un-init)
     (format t "POINT2D (x, y) = (~a, ~a)~%" 
 	    (point2d-x point2d)
 	    (point2d-y point2d))))
@@ -1908,15 +2250,15 @@ POINT2F constructor.
 
 C++: typedef Point_<float> Point2f
 
-Common Lisp:  (POINT2F (X :INT) (Y :INT)) => (:POINTER POINT2F)
+LISP-CV:  (POINT2F (X :INT) (Y :INT)) => (:POINTER POINT2F)
 
 C++: _Tp x, y
 
-Common Lisp: (POINT2F-X (SELF (:POINTER POINT2F))) => :INT
+LISP-CV: (POINT2F-X (SELF (:POINTER POINT2F))) => :INT
 
 C++: _Tp x, y
 
-Common Lisp: (POINT2F-Y (SELF (:POINTER POINT2F))) => :INT
+LISP-CV: (POINT2F-Y (SELF (:POINTER POINT2F))) => :INT
 
 
     Parameters:	
@@ -1934,17 +2276,20 @@ NT2F-Y are used to extract the x,y coordinates the point.
 
 (defun point2f-example (x y)
 
-  "Creates a point2f with the function 
-   POINT2f. Then, lists the x,y coordi-
-   nates with the POINT2F functions PO-
-   INT2F-X and POINT2F-Y."
+  "In this example we create an uninitialized 
+   point2f with the function POINT2F. Then, w-
+   e create an initialized point2f and list t-
+   he x,y coordinates with the functions POIN-
+   T2F-X and POINT2F-Y."
 
-  (let* ((point2f (point2f x y)))
+  (let* ((point2f-un-init (point2f))
+	 (point2f (point2f x y)))
     (format t "Pointer to POINT2F: ~a~%~%" 
-	    point2f)
+	    point2f-un-init)
     (format t "POINT2F (x, y) = (~a, ~a)~%" 
 	    (point2f-x point2f)
 	    (point2f-y point2f))))
+
 
 
 POINT3I
@@ -1954,15 +2299,15 @@ POINT3I constructor.
 
 C++: typedef Point3_<int> Point3i;
 
-Common Lisp:  (POINT3I (X :INT) (Y :INT) (Z :INT)) => (:POINTER POINT3I)
+LISP-CV:  (POINT3I (X :INT) (Y :INT) (Z :INT)) => (:POINTER POINT3I)
 
 C++: _Tp x, y, z
 
-Common Lisp: (POINT3I-X (SELF (:POINTER POINT3I))) => :INT
+LISP-CV: (POINT3I-X (SELF (:POINTER POINT3I))) => :INT
 
 C++: _Tp x, y, z
 
-Common Lisp: (POINT3I-Y (SELF (:POINTER POINT3I))) => :INT
+LISP-CV: (POINT3I-Y (SELF (:POINTER POINT3I))) => :INT
 
 
     Parameters:	
@@ -1982,18 +2327,21 @@ T3I-Y and POINT3I-Z are used to extract the x,y,Z coordinates of the point.
 
 (defun point3i-example (x y z)
 
-  "Creates a point3i with the function 
-   POINT3I. Then, lists the x,y,z coor-
-   dinates with the POINT3I functions 
-   POINT3I-X, POINT3I-Y and POINT3I-Z."
+  "In this example we create an uninitialized 
+   point3i with the function POINT3I. Then, w-
+   e create an initialized point3i and list t-
+   he x,y,z coordinates with the functions PO-
+   INT3I-X, POINT3I-Y and POINT3I-Z."
 
-  (let* ((point3i (point3i x y z)))
+  (let* ((point3i-un-init (point3i))
+        (point3i (point3i x y z)))
     (format t "Pointer to POINT3I: ~a~%~%" 
-	    point3d)
+	    point3i-un-init)
     (format t "POINT3I (x, y, z) = (~a, ~a, ~a)~%" 
 	    (point3i-x point3i)
 	    (point3i-y point3i)
             (point3i-z point3i))))
+
 
 
 POINT3D
@@ -2003,15 +2351,15 @@ POINT3D constructor.
 
 C++: typedef Point3_<double> Point3d
 
-Common Lisp:  (POINT3D (X :INT) (Y :INT) (Z :INT)) => (:POINTER POINT3D)
+LISP-CV:  (POINT3D (X :INT) (Y :INT) (Z :INT)) => (:POINTER POINT3D)
 
 C++: _Tp x, y, z
 
-Common Lisp: (POINT3D-X (SELF (:POINTER POINT3D))) => :DOUBLE
+LISP-CV: (POINT3D-X (SELF (:POINTER POINT3D))) => :DOUBLE
 
 C++: _Tp x, y, z
 
-Common Lisp: (POINT3D-Y (SELF (:POINTER POINT3D))) => :DOUBLE
+LISP-CV: (POINT3D-Y (SELF (:POINTER POINT3D))) => :DOUBLE
 
 
     Parameters:	
@@ -2031,18 +2379,21 @@ POINT3D-Y AND POINT3D-Z are used to extract the x,y,Z coordinates the point.
 
 (defun point3d-example (x y z)
 
-  "Creates a point3d with the function 
-   POINT3D. Then, lists the x,y,z coor-
-   dinates with the POINT3D functions 
-   POINT3D-X, POINT3D-Y and POINT3D-Z."
+  "In this example we create an uninitialized 
+   point3d with the function POINT3D. Then, w-
+   e create an initialized point3d and list t-
+   he x,y,z coordinates with the functions PO-
+   INT3D-X, POINT3D-Y and POINT3D-Z."
 
-  (let* ((point3d (point3d x y z)))
+  (let* ((point3d-un-init (point3d))
+        (point3d (point3d x y z)))
     (format t "Pointer to POINT3D: ~a~%~%" 
-	    point3d)
+	    point3d-un-init)
     (format t "POINT3D (x, y, z) = (~a, ~a, ~a)~%" 
 	    (point3d-x point3d)
 	    (point3d-y point3d)
             (point3d-z point3d))))
+
 
 
 POINT3F
@@ -2052,15 +2403,15 @@ POINT3F constructor.
 
 C++: typedef Point3_<float> Point3f
 
-Common Lisp:  (POINT3F (X :INT) (Y :INT) (Z :INT)) => (:POINTER POINT3F)
+LISP-CV:  (POINT3F (X :INT) (Y :INT) (Z :INT)) => (:POINTER POINT3F)
 
 C++: _Tp x, y, z
 
-Common Lisp: (POINT3F-X (SELF (:POINTER POINT3F))) => :FLOAT
+LISP-CV: (POINT3F-X (SELF (:POINTER POINT3F))) => :FLOAT
 
 C++: _Tp x, y, z
 
-Common Lisp: (POINT3F-Y (SELF (:POINTER POINT))) => :FLOAT
+LISP-CV: (POINT3F-Y (SELF (:POINTER POINT))) => :FLOAT
 
 
     Parameters:	
@@ -2080,18 +2431,21 @@ F-Y AND POINT3F-Z are used to extract the x,y,Z coordinates the point.
 
 (defun point3f-example (x y z)
 
-  "Creates a point3f with the function 
-   POINT3F. Then, lists the x,y,z coor-
-   dinates with the POINT3F functions 
-   POINT3F-X, POINT3F-Y and POINT3F-Z."
+  "In this example we create an uninitialized 
+   point3f with the function POINT3F. Then, w-
+   e create an initialized point3f and list t-
+   he x,y,z coordinates with the functions PO-
+   INT3F-X, POINT3F-Y and POINT3F-Z."
 
-  (let* ((point3f (point3f x y z)))
+  (let* ((point3f-un-init (point3f))
+        (point3f (point3f x y z)))
     (format t "Pointer to POINT3F: ~a~%~%" 
-	    point3f)
+	    point3f-un-init)
     (format t "POINT3F (x, y, z) = (~a, ~a, ~a)~%" 
 	    (point3f-x point3f)
 	    (point3f-y point3f)
             (point3f-z point3f))))
+
 
 
 EMPTY
@@ -2100,7 +2454,7 @@ Returns true if the array has no elements.
 
 C++: bool Mat::empty() const
 
-Common Lisp: (EMPTY (SELF (:POINTER MAT)))
+LISP-CV: (EMPTY (SELF (:POINTER MAT)))
 
 
 (defun empty-example (filename)
@@ -2113,7 +2467,26 @@ Common Lisp: (EMPTY (SELF (:POINTER MAT)))
     (if (empty image) 
 	(return-from empty-example 
 	  (format t "Image not loaded")))
-    (named-window window-name +window-normal+)
+    (named-window window-name +window-no
+  "In the code below the (COLS, ROWS) values of MAT are 
+   accessed and stored in a SIZE construct. Their values 
+   are accessed with the WIDTH and HEIGHT functions. The-
+   n an uninitialized and an initialized SIZE construct  
+   are created. Their values are also printed."
+
+  (let* ((mat (mat-value 5 5 +64f+ (scalar 100 100 100)))
+         (mat-size (mat-size mat))
+          (size-un-init)
+          (size (size 640 480)))
+    (format t " The (COLS ROWS) of MAT = (~a ~a)~%"  
+	    (width mat-size)
+	    (height mat-size)
+            (format t "Pointer to an uninitialized SIZE construct:~a~%" 
+size-un-init) 
+(format t "Width of SIZE = ~a~%" (width size))
+    (format t "Height of SIZE = ~a" (height size)))))
+
+rmal+)
     (move-window window-name 720 175)
     (imshow window-name image)
     (loop while (not (= (wait-key 0) 27)))
@@ -2126,7 +2499,7 @@ Returns the type of a matrix element.
 
 C++: int Mat::type() const
 
-Common Lisp: (CV-TYPE (SELF (:POINTER MAT)))
+LISP-CV: (CV-TYPE (SELF (:POINTER MAT)))
 
     Parameters:	
 
@@ -2136,78 +2509,25 @@ The method returns a matrix element type. This is an identifier compatible with 
 system, like CV_16SC3(+16SC3+ in Common Lisp) or 16-bit signed 3-channel array, and so on.
 
 
-((defun mat-type-example ()
+(defun mat-type-example ()
 
   "This function uses MAT-TYPE to find 
-   the type of MAT-ONE and MAT-TWO. Sh-
-   ows MAT-ONE and MAT-TWO in a window 
-   so you can see what they look like."
+   the type of MAT-ONE and MAT-TWO."
 
-  (let* ((mat-one (mat-zeros 1 2 +8u+))
-	 (mat-two (mat-zeros 2 4 +8u+))
-	 (window-name-1 "MAT-ONE - MAT-TYPE Example")
-	 (window-name-2 "MAT-TWO - MAT-TYPE Example"))
-    (named-window window-name-1 +window-normal+)
-    (named-window window-name-2 +window-normal+)
-    (move-window window-name-1 464 175)
-    (move-window window-name-2 915 175)
-    (format t "MAT-ONE type
-(defun random-color (rng &optional (icolor 0))
-  (setf icolor rng)
-  (return-from random-color (scalar (uniform rng 0 255) 
-				    (uniform rng 0 255) (uniform rng 0 255))))
-
-(defun rectangle-example ()
-
-  (let* ((window-name "RECTANGLE Example")
-	 (window-width 640)
-	 (window-height 480)
-	 ;; Initialize random number generator
-	 (rng (rng #xFFFFFFFF))
-	 ;; Create a black background
-	 (mat (mat-zeros window-width window-height +8uc3+)))
-    ;; Create a window
-    (named-window window-name +window-normal+)
-    ;; Set window to fullscreen
-    (set-window-property window-name +wnd-prop-fullscreen+ 
-			 +window-fullscreen+)
-    (if (equal 1.0d0 (get-window-property window-name +wnd-prop-fullscreen+)) 
-	(set-window-property window-name +wnd-prop-aspectratio+ 
-			     +window-freeratio+))
-    ;; Set line type and thickness
-    (do* ((line-type +aa+)
-          (thickness (uniform rng -3 10))
-	  ;; Initialize rectangle position variables
-          (x-1 (/ (* window-width -1) 2))
-	  (x-2 (/ (* window-width 3) 2))
-          (y-1 (/ (* window-width -1) 2))
-          (y-2 (/ (* window-width 3) 2))
-          (pt1 0)
-	  (pt2 0))
-	 ((plusp (wait-key 1)) 
-	  (format t "Key is pressed by user"))
-      ;; Print randomly colored rectangles to screen
-      (setf pt1 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
-      (setf pt2 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
-      (rectangle mat pt1 pt2 (random-color rng) thickness line-type)
-      ;; Show result in window
-      (imshow window-name mat))
-    (destroy-window window-name))) is ~a(+32f+). It is a Single Precision Floating Point Matrix.~%" 
+  (let* ((mat-one (mat-zeros 1 2 +32f+))
+	 (mat-two (mat-zeros 2 4 +64f+)))
+    (format t "MAT-ONE type is ~a(+32f+). It is a Single Precision Floating Point Matrix.~%" 
 	    (mat-type mat-one))
     (format t "~%MAT-TWO type is ~a(+64f+). It is a Double Precision Floating Point Matrix." 
-	    (mat-type mat-two))
-    (imshow window-name-1 mat-one)
-    (imshow window-name-2 mat-two)
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name-1)
-    (destroy-window window-name-2)))
+	    (mat-type mat-two))))
+
 
 
 CAP-CAM
 
 C++: VideoCapture::VideoCapture(int device)
 
-Common Lisp: (CAP-CAM (DEVICE :INT))
+LISP-CV: (CAP-CAM (DEVICE :INT))
 
     Parameters:	
 
@@ -2247,7 +2567,7 @@ CAP-FILE
 
 C++: VideoCapture::VideoCapture(const string& filename)
 
-Common Lisp: (CAP-FILE (FILENAME (:POINTER STRING*)))
+LISP-CV: (CAP-FILE (FILENAME (:POINTER STRING*)))
 
     Parameters:	
 
@@ -2285,7 +2605,7 @@ C++: template<typename T> const T& Mat::at(int i) const
 
 C++: template<typename T> T& Mat::at(int i, int j)
 
-Common Lisp: (AT-<TYPE-MAME> (SELF (:POINTER MAT)) (I :INT) (J :INT))
+LISP-CV: (AT-<TYPE-MAME> (SELF (:POINTER MAT)) (I :INT) (J :INT))
 
 C++: template<typename T> const T& Mat::at(int i, int j) const
 
@@ -2325,7 +2645,7 @@ is an M x 1 integer matrix, you can simply write (AT-FLOAT A (+ K 4)) and (AT-IN
 The example below initializes a Hilbert matrix:
 
 (defun at-example ()
-  (let ((h (mat-typed-0 5 5 +64f+)))
+  (let ((h (mat-typed 5 5 +64f+)))
     (dotimes (i (rows h))indicate
       (dotimes (j (cols h))
 	(at-double+ h i j (/ 1.0d0 (+ i j 1)))
@@ -2362,7 +2682,7 @@ Draws a circle.
 
 C++: void circle(Mat& img, Point center, int radius, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
 
-Common Lisp: (CIRCLE (IMG (:POINTER MAT)) (CENTER (:POINTER POINT)) (RADIUS :INT) (COLOR (:POINTER SCALAR)) &OPTIONAL ((THICKNESS :INT) 1) ((LINE-TYPE :INT) 8) ((SHIFT :INT) 0))
+LISP-CV: (CIRCLE (IMG (:POINTER MAT)) (CENTER (:POINTER POINT)) (RADIUS :INT) (COLOR (:POINTER SCALAR)) &OPTIONAL ((THICKNESS :INT) 1) ((LINE-TYPE :INT) 8) ((SHIFT :INT) 0))
 
     Parameters:	
 
@@ -2485,7 +2805,7 @@ Returns a zero array of the specified size and type.
 todo figure out if I do all of these
 C++: static MatExpr Mat::zeros(int rows, int cols, int type)
 
-Common Lisp: (MAT-ZEROS (ROWS :INT) (COLS :INT) (TYPE :INT))
+LISP-CV: (MAT-ZEROS (ROWS :INT) (COLS :INT) (TYPE :INT))
 
 C++: static MatExpr Mat::zeros(Size size, int type)
 
@@ -2538,7 +2858,7 @@ Returns an array of all 1’s of the specified size and type.
 
 C++: static MatExpr Mat::ones(int rows, int cols, int type)
 
-Common Lisp: (MAT-ONES (ROWS :INT) (COLS :INT) (TYPE :INT))
+LISP-CV: (MAT-ONES (ROWS :INT) (COLS :INT) (TYPE :INT))
 
 C++: static MatExpr Mat::ones(Size size, int type)
 
@@ -2592,11 +2912,11 @@ Returns an identity matrix of the specified size and type.
 
 C++: static MatExpr Mat::eye(int rows, int cols, int type)
 
-Common Lisp: (MAT-EYE (ROWS :INT) (COLS :INT) (TYPE :INT)) => (:POINTER MAT)
+LISP-CV: (MAT-EYE (ROWS :INT) (COLS :INT) (TYPE :INT)) => (:POINTER MAT)
 
 C++: static MatExpr Mat::eye(Size size, int type)
 
-Common Lisp: (MAT-EYE (S (:POINTER SIZE)) (TYPE :INT)) => (:POINTER MAT)
+LISP-CV: (MAT-EYE (S (:POINTER SIZE)) (TYPE :INT)) => (:POINTER MAT)
 
 
     Parameters:	
@@ -2660,7 +2980,6 @@ to (MAT-ONES), you can use a scale operation to create a scaled identity matrix 
     (named-window window-name-2 +window-normal+)
     (named-window window-name-3 +window-normal+)
     (named-window window-name-4 +window-normal+)
-
     (move-window window-name-1 485 98)
     (move-window window-name-2 894 98)
     (move-window window-name-3 485 444)
@@ -2682,7 +3001,7 @@ Returns the number of ticks.
 
 C++: int64 getTickCount()
 
-Common Lisp: (GET-TICK-COUNT) => :INT64
+LISP-CV: (GET-TICK-COUNT) => :INT64
 
 The function returns the number of ticks after the certain event (for example, when the machine was
 turned on). It can be used to initialize (RNG) - Random Number Generator - or to measure a function 
@@ -2722,51 +3041,30 @@ GET-TICK-FREQUENCY
 Returns the number of ticks per second.
 
 C++: double getTickFrequency()
+  "In the code below the (COLS, ROWS) values of MAT are 
+   accessed and stored in a SIZE construct. Their values 
+   are accessed with the WIDTH and HEIGHT functions. The-
+   n an uninitialized and an initialized SIZE construct  
+   are created. Their values are also printed."
 
-Common Lisp: (GET-TICK-FREQUENCY) => :DOUBLE
+  (let* ((mat (mat-value 5 5 +64f+ (scalar 100 100 100)))
+         (mat-size (mat-size mat))
+          (size-un-init)
+          (size (size 640 480)))
+    (format t " The (COLS ROWS) of MAT = (~a ~a)~%"  
+	    (width mat-size)
+	    (height mat-size)
+            (format t "Pointer to an uninitialized SIZE construct:~a~%" 
+size-un-init) 
+(format t "Width of SIZE = ~a~%" (width size))
+    (format t "Height of SIZE = ~a" (height size)))))
+
+
+
+LISP-CV: (GET-TICK-FREQUENCY) => :DOUBLE
 
 The function returns the nu
-(defun random-color (rng &optional (icolor 0))
-  (setf icolor rng)
-  (return-from random-color (scalar (uniform rng 0 255) 
-				    (uniform rng 0 255) (uniform rng 0 255))))
-
-(defun rectangle-example ()
-
-  (let* ((window-name "RECTANGLE Example")
-	 (window-width 640)
-	 (window-height 480)
-	 ;; Initialize random number generator
-	 (rng (rng #xFFFFFFFF))
-	 ;; Create a black background
-	 (mat (mat-zeros window-width window-height +8uc3+)))
-    ;; Create a window
-    (named-window window-name +window-normal+)
-    ;; Set window to fullscreen
-    (set-window-property window-name +wnd-prop-fullscreen+ 
-			 +window-fullscreen+)
-    (if (equal 1.0d0 (get-window-property window-name +wnd-prop-fullscreen+)) 
-	(set-window-property window-name +wnd-prop-aspectratio+ 
-			     +window-freeratio+))
-    ;; Set line type and thickness
-    (do* ((line-type +aa+)
-          (thickness (uniform rng -3 10))
-	  ;; Initialize rectangle position variables
-          (x-1 (/ (* window-width -1) 2))
-	  (x-2 (/ (* window-width 3) 2))
-          (y-1 (/ (* window-width -1) 2))
-          (y-2 (/ (* window-width 3) 2))
-          (pt1 0)
-	  (pt2 0))
-	 ((plusp (wait-key 1)) 
-	  (format t "Key is pressed by user"))
-      ;; Print randomly colored rectangles to screen
-      (setf pt1 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
-      (setf pt2 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
-      (rectangle mat pt1 pt2 (random-color rng) thickness line-type)
-      ;; Show result in window
-      (imshow window-name mat))
-    (destroy-window window-name)))mber of ticks per second. That is, the following code computes the execu-
+mber of ticks per second. That is, the following code computes the execu-
 tion time in seconds:
 
 
@@ -2806,7 +3104,7 @@ Transposes a matrix.
 
 C++: MatExpr Mat::t() const
 
-Common Lisp: (MAT-EXPR-T (SELF (:POINTER MAT))) => (:POINTER MAT-EXPR)
+LISP-CV: (MAT-EXPR-T (SELF (:POINTER MAT))) => (:POINTER MAT-EXPR)
 
 The method performs matrix transposition by means of matrix expressions. It does not perform the ac-
 tual transposition but returns a temporary matrix transposition object that can be further used as 
@@ -2824,9 +3122,9 @@ FORCE
 
 Coverts a MAT-EXPR to MAT
 
-Common Lisp: (FORCE (SELF (:POINTER MAT-EXPR))) => (:POINTER MAT)
+LISP-CV: (FORCE (SELF (:POINTER MAT-EXPR))) => (:POINTER MAT)
 
-Common Lisp: (>> (SELF (:POINTER MAT-EXPR))) => (:POINTER MAT)
+LISP-CV: (>> (SELF (:POINTER MAT-EXPR))) => (:POINTER MAT)
 
 The function FORCE converts a functions output from (:POINTER MAT-EXPR) to (:POINTER MAT).  This is 
 useful if you have just done mathematical computation with a Matrix Expressions(MAT-EXPR) function 
@@ -2860,11 +3158,11 @@ nction >> is an identical shorthand version of the FORCE function supplied for e
 
 
 
-MAT-TYPED-0
+mat-typed
 
 Creates an empty matrix of type TYPE.
 
-Common Lisp: (MAT-TYPED-0) (ROWS :INT) (COLS :INT) (TYPE :INT)) => (:POINTER MAT)
+LISP-CV: (mat-typed) (ROWS :INT) (COLS :INT) (TYPE :INT)) => (:POINTER MAT)
 
     Parameters:	
 
@@ -2875,14 +3173,14 @@ Common Lisp: (MAT-TYPED-0) (ROWS :INT) (COLS :INT) (TYPE :INT)) => (:POINTER MAT
         TYPE - The type of the matrix
 
 
-(defun mat-typed-0-example ()
+(defun mat-typed-example ()
 
   "In this example an 8-bit unsigned matrix is 
    created and the empty matrix is shown in a 
    window."
 
-  (let* ((mat (mat-typed-0 4 4 +32s+))
-	 (window-name "MAT-TYPED-0 Example"))
+  (let* ((mat (mat-typed 4 4 +32s+))
+	 (window-name "mat-typed Example"))
     (named-window window-name +window-normal+)
     (move-window window-name 720 175)
     (imshow window-name mat)
@@ -2896,7 +3194,7 @@ Extracts a diagonal from a matrix, or creates a diagonal matrix.
 
 C++: Mat Mat::diag(int d=0 ) const
 
-Common Lisp: (MAT-DIAG (SELF (:POINTER MAT)) (D :INT)) => (:POINTER MAT)
+LISP-CV: (MAT-DIAG (SELF (:POINTER MAT)) (D :INT)) => (:POINTER MAT)
 
 C++: static Mat Mat::diag(const Mat& d)
 
@@ -2945,7 +3243,7 @@ Finds the product of two matrices.
 
 C++: MatExpr * operator
 
-Common Lisp: (MUL (M1 (:POINTER MAT)) (M2 (:POINTER MAT))) => (:POINTER MAT-EXPR)
+LISP-CV: (MUL (M1 (:POINTER MAT)) (M2 (:POINTER MAT))) => (:POINTER MAT-EXPR)
 
 
     Parameters:	
@@ -2962,6 +3260,7 @@ rn value, back to type (:POINTER MAT) with the function (FORCE), (or the shortha
 use in other functions. 
 
 
+
 (defun mul-example ()
 
   "In this example, MUL is used to find 
@@ -2970,32 +3269,32 @@ use in other functions.
    cond matrix(M2) and result(RESULT) a-
    re printed."
 
-  (let* ((m1-data (foreign-alloc :float :initial-contents 
-				 '(1.0f0 2.0f0 3.0f0 4.0f0 5.0f0 
-				   6.0f0 7.0f0 8.0f0 9.0f0)))
-	 (m2-data (foreign-alloc :float :initial-contents 
-				 '(1.0f0 2.0f0 3.0f0 4.0f0 5.0f0 
-				   6.0f0 7.0f0 8.0f0 9.0f0)))
+  (let* ((m1-data (alloc :float '(1.0f0 2.0f0 3.0f0 4.0f0 5.0f0 
+				  6.0f0 7.0f0 8.0f0 9.0f0)))
+	 (m2-data (alloc :float '(1.0f0 2.0f0 3.0f0 4.0f0 5.0f0 
+				  6.0f0 7.0f0 8.0f0 9.0f0)))
 	 (m1 (mat-data 3 3 +32f+ m1-data))
          (m2 (mat-data 3 3 +32f+ m2-data))
          (result (mul m1 m2)))
     (dotimes (i (rows m1))
       (dotimes (j (cols m1))
-	(format t "~a" (at-float m1 i j))
+	(format t "~a" (at m1 i j :float))
 	(princ #\Space))
       (princ #\Newline))
     (format t "~%~%")
     (dotimes (i (rows m2))
       (dotimes (j (cols m2))
-	(format t "~a" (at-float m2 i j))
+	(format t "~a" (at m2 i j :float))
 	(princ #\Space))
       (princ #\Newline))
     (format t "~%~%")
     (dotimes (i 3)
       (dotimes (j 3)
-	(format t "~a" (at-float (>> result) i j))
+	(format t "~a" (at (>> result) i j :float))
 	(princ #\Space))
-      (princ #\Newline))))
+      (princ #\Newline))
+    (free m1-data)
+    (free m2-data)))
 
 
 
@@ -3005,7 +3304,7 @@ Adds two matrices.
 
 C++: MatExpr + operator
 
-Common Lisp: (ADD (M1 (:POINTER MAT)) (M2 (:POINTER MAT))) => (:POINTER MAT-EXPR)
+LISP-CV: (ADD (M1 (:POINTER MAT)) (M2 (:POINTER MAT))) => (:POINTER MAT-EXPR)
 
 
     Parameters:	
@@ -3021,36 +3320,37 @@ f ADD, the return value, back to type (:POINTER MAT) with the function (FORCE), 
 shorthand version (>>)) to use in other functions. 
 
 
+
 (defun add-example ()
 
   "Matrix M1 and M2 are added together with the 
    function ADD. Matrix M1, M2 and RESULT are t-
    hen printed."
 
-  (let* ((m1-data (foreign-alloc :uint :initial-contents 
-				 '(1 2 3 4 5 6 7 8 9)))
-	 (m2-data (foreign-alloc :uint :initial-contents 
-				 '(1 2 3 4 5 6 7 8 9)))
+  (let* ((m1-data (alloc :uint '(1 2 3 4 5 6 7 8 9)))
+	 (m2-data (alloc :uint '(1 2 3 4 5 6 7 8 9)))
 	 (m1 (mat-data 3 3 +32s+ m1-data))
          (m2 (mat-data 3 3 +32s+ m2-data))
          (result (add m1 m2)))
     (dotimes (i (rows m1))
       (dotimes (j (cols m1))
-	(format t "~a" (at-int m1 i j))
+	(format t "~a" (at m1 i j :int))
 	(princ #\Space))
       (princ #\Newline))
     (format t "~%~%")
     (dotimes (i (rows m2))
       (dotimes (j (cols m2))
-	(format t "~a" (at-int m2 i j))
+	(format t "~a" (at m2 i j :int))
 	(princ #\Space))
       (princ #\Newline))
     (format t "~%~%")
     (dotimes (i 3)
       (dotimes (j 3)
-	(format t "~a" (at-int (>> result) i j))
+	(format t "~a" (at (>> result) i j :int))
 	(princ #\Space))
-      (princ #\Newline))))
+      (princ #\Newline))
+    (free m1-data)
+    (free m2-data)))
 
 
 SUB
@@ -3059,7 +3359,7 @@ Subtracts matrix M1 from matrix M2
 
 C++: MatExpr - operator
 
-Common Lisp: (SUB (M1 (:POINTER MAT)) (M2 (:POINTER MAT))) => (:POINTER MAT-EXPR)
+LISP-CV: (SUB (M1 (:POINTER MAT)) (M2 (:POINTER MAT))) => (:POINTER MAT-EXPR)
 
 
     Parameters:	
@@ -3081,71 +3381,30 @@ functions.
    function SUB. Matrix M1, matrix M2 and the resu-
    lt(RESULT) are then printed."
 
-  (let* ((m1-data (foreign-alloc :uint :initial-contents 
-				 '(53 62 85 64 23 97 52 16 12)))
-	 (m2-data (foreign-alloc :uint :initial-contents 
-				 '(64 22 64
-(defun random-color (rng &optional (icolor 0))
-  (setf icolor rng)
-  (return-from random-color (scalar (uniform rng 0 255) 
-				    (uniform rng 0 255) (uniform rng 0 255))))
-
-(defun rectangle-example ()
-
-  (let* ((window-name "RECTANGLE Example")
-	 (window-width 640)
-	 (window-height 480)
-	 ;; Initialize random number generator
-	 (rng (rng #xFFFFFFFF))
-	 ;; Create a black background
-	 (mat (mat-zeros window-width window-height +8uc3+)))
-    ;; Create a window
-    (named-window window-name +window-normal+)
-    ;; Set window to fullscreen
-    (set-window-property window-name +wnd-prop-fullscreen+ 
-			 +window-fullscreen+)
-    (if (equal 1.0d0 (get-window-property window-name +wnd-prop-fullscreen+)) 
-	(set-window-property window-name +wnd-prop-aspectratio+ 
-			     +window-freeratio+))
-    ;; Set line type and thickness
-    (do* ((line-type +aa+)
-          (thickness (uniform rng -3 10))
-	  ;; Initialize rectangle position variables
-          (x-1 (/ (* window-width -1) 2))
-	  (x-2 (/ (* window-width 3) 2))
-          (y-1 (/ (* window-width -1) 2))
-          (y-2 (/ (* window-width 3) 2))
-          (pt1 0)
-	  (pt2 0))
-	 ((plusp (wait-key 1)) 
-	  (format t "Key is pressed by user"))
-      ;; Print randomly colored rectangles to screen
-      (setf pt1 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
-      (setf pt2 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
-      (rectangle mat pt1 pt2 (random-color rng) thickness line-type)
-      ;; Show result in window
-      (imshow window-name mat))
-    (destroy-window window-name))) 15 11 17 42 16 88)))
+  (let* ((m1-data (alloc :uint '(53 62 85 64 23 97 52 16 12)))
+	 (m2-data (alloc :uint '(64 22 64 15 11 17 42 16 88)))
 	 (m1 (mat-data 3 3 +32s+ m1-data))
          (m2 (mat-data 3 3 +32s+ m2-data))
          (result (sub m1 m2)))
     (dotimes (i (rows m1))
       (dotimes (j (cols m1))
-	(format t "~a" (at-int m1 i j))
+	(format t "~a" (at m1 i j :int))
 	(princ #\Space))
       (princ #\Newline))
     (format t "~%~%")
     (dotimes (i (rows m2))
       (dotimes (j (cols m2))
-	(format t "~a" (at-int m2 i j))
+	(format t "~a" (at m2 i j :int))
 	(princ #\Space))
       (princ #\Newline))
     (format t "~%~%")
     (dotimes (i 3)
       (dotimes (j 3)indicate
-	(format t "~a" (at-int (>> result) i j))
-	(princ #\Space))
-      (princ #\Newline))))
+	       (format t "~a" (at (>> result) i j :int))
+	       (princ #\Space))
+      (princ #\Newline))
+    (free m1-data)
+    (free m2-data)))
 
 
 DIV
@@ -3154,7 +3413,7 @@ Divides matrix M1 by matrix M2.
 
 C++: MatExpr / operator
 
-Common Lisp: (DIV (M1 (:POINTER MAT)) (M2 (:POINTER MAT))) => (:POINTER MAT-EXPR)
+LISP-CV: (DIV (M1 (:POINTER MAT)) (M2 (:POINTER MAT))) => (:POINTER MAT-EXPR)
 
 
     Parameters:	
@@ -3176,32 +3435,33 @@ ns.
    Matrix M1, M2 and the result(RESULT) are then pri-
    nted."
 
-  (let* ((m1-data (foreign-alloc :float :initial-contents 
-				 '(53.0f0 62.0f0 85.0f0 64.0f0 23.0f0 
-				   97.0f0 52.0f0 16.0f0 12.0f0)))
-	 (m2-data (foreign-alloc :float :initial-contents 
-				 '(64.0f0 22.0f0 64.0f0 15.0f0 11.0f0 
-				   17.0f0 42.0f0 16.0f0 88.0f0)))
+  (let* ((m1-data (alloc :float '(53.0f0 62.0f0 85.0f0 64.0f0 23.0f0 
+				  97.0f0 52.0f0 16.0f0 12.0f0)))
+	 (m2-data (alloc :float '(64.0f0 22.0f0 64.0f0 15.0f0 11.0f0 
+				  17.0f0 42.0f0 16.0f0 88.0f0)))
 	 (m1 (mat-data 3 3 +32f+ m1-data))
          (m2 (mat-data 3 3 +32f+ m2-data))
          (result (div m1 m2)))
     (dotimes (i (rows m1))
       (dotimes (j (cols m1))
-	(format t "~a" (at-float m1 i j))
+	(format t "~a" (at m1 i j :float))
 	(princ #\Space))
       (princ #\Newline))
     (format t "~%~%")
     (dotimes (i (rows m2))
       (dotimes (j (cols m2))
-	(format t "~a" (at-float m2 i j))
+	(format t "~a" (at m2 i j :float))
 	(princ #\Space))
       (princ #\Newline))
     (format t "~%~%")
     (dotimes (i 3)
       (dotimes (j 3)
-	(format t "~a" (at-float (>> result) i j))
+	(format t "~a" (at (>> result) i j :float))
 	(princ #\Space))
-      (princ #\Newline))))
+      (princ #\Newline))
+    (free m1-data)
+    (free m2-data)))
+
 
 
 VIDEO-WRITER
@@ -3210,11 +3470,11 @@ VIDEO-WRITER constructors
 
 C++: VideoWriter::VideoWriter()
 
-Common Lisp: (VIDEO-WRITER0)
+LISP-CV: (VIDEO-WRITER0)
 
 C++: VideoWriter::VideoWriter(const string& filename, int fourcc, double fps, Size frameSize, bool isColor=true)
 
-Common Lisp: (VIDEO-WRITER (FILENAME (:POINTER STRING*)) (FOURCC :INT) (FPS :DOUBLE) 
+LISP-CV: (VIDEO-WRITER (FILENAME (:POINTER STRING*)) (FOURCC :INT) (FPS :DOUBLE) 
               (FRAME-SIZE (:POINTER SIZE)) ((IS-COLOR :INT) T)) => (:POINTER VIDEO-WRITER)
 
 
@@ -3287,50 +3547,6 @@ ndows FFMPEG or VFW is used; on MacOSX QTKit is used.
       (destroy-window window-name))))
 
 
-SIZE
-
-SIZE constructor
-
-C++: Size_(_Tp _width, _Tp _height);
-     typedef Size_<int> Size2i;
-     typedef Size2i Size;
-
-Common Lisp: (SIZE (WIDTH :INT) (HEIGHT :INT)) => (:POINTER SIZE)
-
-C++: _Tp width, height
-
-Common Lisp: (WIDTH (SELF (:POINTER SIZE))) => :INT
-
-C++: _Tp width, height
-
-Common Lisp: (HEIGHT (SELF (:POINTER SIZE))) => :INT
-
-
-    Parameters:	
-
-        SELF - A SIZE construct.
-
-        WIDTH - The width of SIZE.
-        
-        HEIGHT - The height of SIZE.
-
-
-The function SIZE stores size values.
-
-The function WIDTH Finds the width of a SIZE construct.
-
-The function HEIGHT Finds the height of a SIZE construct.
-
-
-(defun size-example ()
-
-  "Initializes SIZE constructor with values 
-   and prints them"
-
-  (let* ((size (size 640 480)))
-    (format t "Width = ~a~%" (width size))
-    (format t "Height = ~a" (height size))))
-
 
 VIDEO-WRITER-IS-OPEN
 
@@ -3338,7 +3554,7 @@ Returns true if video writer has been successfully initialized.
 
 C++: bool VideoWriter::isOpened()
 
-Common Lisp: (VIDEO-WRITER-IS-OPEN (SELF (:POINTER VIDEO-WRITER)))
+LISP-CV: (VIDEO-WRITER-IS-OPEN (SELF (:POINTER VIDEO-WRITER)))
 
 
 (defun video-writer-is-open-example (filename &optional (camera-index *camera-index*))
@@ -3357,7 +3573,7 @@ Writes the next video frame
 
 C++: VideoWriter& VideoWriter::operator<<(const Mat& indicateimage)
 
-Common Lisp: (VIDEO-WRITER-WRITE (SELF (:POINTER VIDEO-WRITER)) (IMAGE (:POINTER MAT)))
+LISP-CV: (VIDEO-WRITER-WRITE (SELF (:POINTER VIDEO-WRITER)) (IMAGE (:POINTER MAT)))
 
     Parameters:	
 
@@ -3400,7 +3616,7 @@ Creates a full copy of the array and the underlying data.
 
 C++: Mat Mat::clone() const
 
-Common Lisp: (MAT-CLONE (SELF (:POINTER MAT))) => (:POINTER MAT)
+LISP-CV: (MAT-CLONE (SELF (:POINTER MAT))) => (:POINTER MAT)
 
 
     Parameters:	
@@ -3415,23 +3631,21 @@ The method creates a full copy of the array. The original TODO step[] is not tak
 (defun clone-example ()
 
         ; Create data
-  (let* ((m1-data (foreign-alloc :float :initial-contents 
-				 '(53.0f0 62.0f0 85.0f0 64.0f0 23.0f0 
+  (let* ((m1-data (alloc :float '(53.0f0 62.0f0 85.0f0 64.0f0 23.0f0 
 				   97.0f0 52.0f0 16.0f0 12.0f0)))
          ; Create matrix M1 and fill it with data
 	 (m1 (mat-data 3 3 +32f+ m1-data))
          ; Create a clone of matrix M1 called M2
          (m2 (clone m1)))
-    (format t "~%~%")
     ; Print the elements of natrix M2 in a loop
     (dotimes (i (rows m2))
       (dotimes (j (cols m2))
-        ; AT-FLOAT retrieves elements of M2,  MEM-AREF 
-        ; dereferences AT-FLOAT's return, FORMAT print-
-        ; s the elements to the screen 
-	(format t "~a" (mem-aref (at-float m2 i j) :float 0))
+        ; AT retrieves elements of M2, FORMAT 
+        ; prints the elements to the screen 
+	(format t "~a" (at m2 i j :float))
 	(princ #\Space))
-      (princ #\Newline))))
+      (princ #\Newline))
+      (free m1-data)))
 
 
 MAT-STEP1
@@ -3440,7 +3654,7 @@ Returns a normalized step.
 
 C++: size_t Mat::step1(int i=0 ) const
 
-Common Lisp: (STEP1 (SELF (:POINTER MAT))) => :UNSIGNED-INT
+LISP-CV: (STEP1 (SELF (:POINTER MAT))) => :UNSIGNED-INT
 
 The method returns a matrix step divided by (ELEM-SIZE1) . It can be useful to quickly access an ar
 bitrary matrix element.
@@ -3453,7 +3667,7 @@ Returns the total number of array elements.
 
 C++: size_t Mat::total() const
 
-Common Lisp: (TOTAL (SELF (:POINTER MAT))) => :UNSIGNED-INT
+LISP-CV: (TOTAL (SELF (:POINTER MAT))) => :UNSIGNED-INT
 
 
     Parameters:	
@@ -3467,18 +3681,17 @@ e).
 
 (defun total-example ()
 
-  "In this function, TOTAL returns the total 
+   "In this function, TOTAL returns the total 
    number of array elements in MAT1 and MAT2"
 
-  (let* ((data (foreign-alloc :int :initial-contents 
-			      '(1 2 3 4)))
-	 (mat1 (mat-data 2 2 +32s+ data))
-	 (mat2 (mat-typed-0 100 100 +32s+))
-	 (total1 (total mat1))
-	 (total2 (total mat2)))
-    (format t "Total mumber of elements in MAT1 = ~a~%~%" total1)
-    (format t "Total mumber of elements in MAT2 = ~a" total2)))
-
+   (let* ((data (alloc :int '(1 2 3 4)))
+	  (mat1 (mat-data 2 2 +32s+ data))
+	  (mat2 (mat-typed 100 100 +32s+))
+	  (total1 (total mat1))
+	  (total2 (total mat2)))
+     (format t "Total mumber of elements in MAT1 = ~a~%~%" total1)
+     (format t "Total mumber of elements in MAT2 = ~a" total2)
+     (free data)))
 
 
 ROI
@@ -3487,7 +3700,7 @@ Returns matrix header corresponding to the rectangular sub-array of an input mat
 
 C++: Mat::Mat(const Mat& m, const Rect& roi)
 
-Common Lisp: (ROI (SELF (:POINTER MAT)) (ROI (:POINTER RECT))) => (:POINTER MAT)
+LISP-CV: (ROI (SELF (:POINTER MAT)) (ROI (:POINTER RECT))) => (:POINTER MAT)
 
 
     Parameters:	
@@ -3576,19 +3789,19 @@ RECT constructor.
 
 C++: Rect_(_Tp _x, _Tp _y, _Tp _width, _Tp _height);
 
-Common Lisp:  (RECT (X :INT) (Y :INT) (:WIDTH :INT) (HEIGHT :INT)) => (:POINTER RECT)
+LISP-CV:  (RECT (X :INT) (Y :INT) (:WIDTH :INT) (HEIGHT :INT)) => (:POINTER RECT)
 
 C++: Point_<_Tp> tl() const;
 
-Common Lisp: (TL (SELF (:POINTER RECT))) => (:POINTER POINT)
+LISP-CV: (TL (SELF (:POINTER RECT))) => (:POINTER POINT)
 
 C++: Point_<_Tp> br() const;
 
-Common Lisp: (BR (SELF (:POINTER RECT))) => (:POINTER POINT)
+LISP-CV: (BR (SELF (:POINTER RECT))) => (:POINTER POINT)
 
 C++: Size_<_Tp> size() const;
 
-Common Lisp: (SZ (SELF (:POINTER RECT))) => (:POINTER SIZE)
+LISP-CV: (SZ (SELF (:POINTER RECT))) => (:POINTER SIZE)
 
 
     Parameters:	
@@ -3609,47 +3822,7 @@ The function RECT stores coordinates of a rectangle.
 The function TL retrieves the top-left corner of the rectangle.
 
 The function BR retrieves t
-(defun random-color (rng &optional (icolor 0))
-  (setf icolor rng)
-  (return-from random-color (scalar (uniform rng 0 255) 
-				    (uniform rng 0 255) (uniform rng 0 255))))
-
-(defun rectangle-example ()
-
-  (let* ((window-name "RECTANGLE Example")
-	 (window-width 640)
-	 (window-height 480)
-	 ;; Initialize random number generator
-	 (rng (rng #xFFFFFFFF))
-	 ;; Create a black background
-	 (mat (mat-zeros window-width window-height +8uc3+)))
-    ;; Create a window
-    (named-window window-name +window-normal+)
-    ;; Set window to fullscreen
-    (set-window-property window-name +wnd-prop-fullscreen+ 
-			 +window-fullscreen+)
-    (if (equal 1.0d0 (get-window-property window-name +wnd-prop-fullscreen+)) 
-	(set-window-property window-name +wnd-prop-aspectratio+ 
-			     +window-freeratio+))
-    ;; Set line type and thickness
-    (do* ((line-type +aa+)
-          (thickness (uniform rng -3 10))
-	  ;; Initialize rectangle position variables
-          (x-1 (/ (* window-width -1) 2))
-	  (x-2 (/ (* window-width 3) 2))
-          (y-1 (/ (* window-width -1) 2))
-          (y-2 (/ (* window-width 3) 2))
-          (pt1 0)
-	  (pt2 0))
-	 ((plusp (wait-key 1)) 
-	  (format t "Key is pressed by user"))
-      ;; Print randomly colored rectangles to screen
-      (setf pt1 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
-      (setf pt2 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
-      (rectangle mat pt1 pt2 (random-color rng) thickness line-type)
-      ;; Show result in window
-      (imshow window-name mat))
-    (destroy-window window-name)))he bottom-right corner of the rectangle.
+)he bottom-right corner of the rectangle.
 
 The function SZ retrieves the size (width, height) of the rectangle.
 
@@ -3687,19 +3860,19 @@ Dot product computed in double-precision arithmetics.
 
 C++:  _Tp dot(const Point_& pt) const;
 
-Common Lisp: (DOT (SELF (:POINTER POINT)) (OTHER (:POINTER POINT))) => :INT
+LISP-CV: (DOT (SELF (:POINTER POINT)) (OTHER (:POINTER POINT))) => :INT
 
-Common Lisp: (DOT2F (SELF (:POINTER POINT2F)) (OTHER (:POINTER POINT2F))) => :FLOAT
+LISP-CV: (DOT2F (SELF (:POINTER POINT2F)) (OTHER (:POINTER POINT2F))) => :FLOAT
 
-Common Lisp: (DOT2D (SELF (:POINTER POINT2D)) (OTHER (:POINTER POINT2D))) => :DOUBLE
+LISP-CV: (DOT2D (SELF (:POINTER POINT2D)) (OTHER (:POINTER POINT2D))) => :DOUBLE
 
 C++"  _Tp dot(const Point3_& pt) const;
 
-Common Lisp: (DOT3I (SELF (:POINTER POINT3I)) (OTHER (:POINTER POINT3I))) => :INT
+LISP-CV: (DOT3I (SELF (:POINTER POINT3I)) (OTHER (:POINTER POINT3I))) => :INT
 
-Common Lisp: (DOT3F (SELF (:POINTERRead POINT3F)) (OTHER (:POINTER POINT3F))) => :FLOAT
+LISP-CV: (DOT3F (SELF (:POINTERRead POINT3F)) (OTHER (:POINTER POINT3F))) => :FLOAT
 
-Common Lisp: (DOT3D (SELF (:POINTER POINT)) (OTHER (:POINTER POINT))) => :INT
+LISP-CV: (DOT3D (SELF (:POINTER POINT)) (OTHER (:POINTER POINT))) => :INT
 
 
     Parameters:	
@@ -3720,6 +3893,7 @@ Common Lisp: (DOT3D (SELF (:POINTER POINT)) (OTHER (:POINTER POINT))) => :INT
     (format t "The dot product of P1 and P2 = ~a~%~%"  
 	    (dot p1 p2) )))
 
+
 (defun dot2f-example ()
 
   "This example uses the function DOT to 
@@ -3730,6 +3904,7 @@ Common Lisp: (DOT3D (SELF (:POINTER POINT)) (OTHER (:POINTER POINT))) => :INT
 	 (p2 (point2f 3.0f0 4.0f0)))
     (format t "The dot product of P1 and P2 = ~a~%~%"  
 	    (dot2f p1 p2) )))
+
 
 (defun dot2d-example ()
 
@@ -3742,6 +3917,7 @@ Common Lisp: (DOT3D (SELF (:POINTER POINT)) (OTHER (:POINTER POINT))) => :INT
     (format t "The dot product of P1 and P2 = ~a~%~%"  
 	    (dot2d p1 p2) )))
 
+
 (defun dot3i-example ()
 
   "This example uses the function DOT to 
@@ -3752,6 +3928,7 @@ Common Lisp: (DOT3D (SELF (:POINTER POINT)) (OTHER (:POINTER POINT))) => :INT
 	 (p2 (point3i 4 5 6)))
     (format t "The dot product of P1 and P2 = ~a~%~%"  
 	    (dot3i p1 p2) )))
+
 
 (defun dot3f-example ()
 
@@ -3767,7 +3944,7 @@ Common Lisp: (DOT3D (SELF (:POINTER POINT)) (OTHER (:POINTER POINT))) => :INT
 (defun dot3d-example ()
 
   "This example uses the function DOT to 
-   find the dot product of 2 po;;; Basic Structuresint3d con-
+   find the dot product of 2 point3d con-
    structs P1 and P2."
 
   (let* ((p1 (point3d 13.0d0 14.0d0 15.0d0))
@@ -3782,7 +3959,7 @@ Checks if array elements lie between the elements of two other arrays.
 
 C++: void inRange(InputArray src, InputArray lowerb, InputArray upperb, OutputArray dst)
 
-Common Lisp: (IN-RANGE-S (SRC (:POINTER MAT)) (LOWERB (:POINTER SCALAR)) (UPPERB (:POINTER SCALAR)) (DEST (:POINTER MAT)) => :VOID
+LISP-CV: (IN-RANGE-S (SRC (:POINTER MAT)) (LOWERB (:POINTER SCALAR)) (UPPERB (:POINTER SCALAR)) (DEST (:POINTER MAT)) => :VOID
 
 
     Parameters:	
@@ -3794,7 +3971,7 @@ Common Lisp: (IN-RANGE-S (SRC (:POINTER MAT)) (LOWERB (:POINTER SCALAR)) (UPPERB
         UPPERB - A scalar.
 
         DEST - output array of the same size as SRC and +8U+ type.
-MAT-SIZE
+
 
 All the arrays must have the same type, except the destination, and the same size (or ROI size).
 
@@ -3933,7 +4110,7 @@ Converts an image from one color space to another.
 
 C++: void cvtColor(InputArray src, OutputArray dst, int code, int dstCn=0 )
 
-Common Lisp: (CVT-COLOR (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) (CODE :INT) ((DEST-CN :INT) 0))
+LISP-CV: (CVT-COLOR (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) (CODE :INT) ((DEST-CN :INT) 0))
 
 
     Parameters:	
@@ -4052,47 +4229,6 @@ and less commonly in image analysis and computer vision.
         ***RGB <-> CIE L*A*B* (+BGR2LAB+, +RGB2LAB+, +LAB2BGR+, +LAB2RGB+)***
 
 
-(defun random-color (rng &optional (icolor 0))
-  (setf icolor rng)
-  (return-from random-color (scalar (uniform rng 0 255) 
-				    (uniform rng 0 255) (uniform rng 0 255))))
-
-(defun rectangle-example ()
-
-  (let* ((window-name "RECTANGLE Example")
-	 (window-width 640)
-	 (window-height 480)
-	 ;; Initialize random number generator
-	 (rng (rng #xFFFFFFFF))
-	 ;; Create a black background
-	 (mat (mat-zeros window-width window-height +8uc3+)))
-    ;; Create a window
-    (named-window window-name +window-normal+)
-    ;; Set window to fullscreen
-    (set-window-property window-name +wnd-prop-fullscreen+ 
-			 +window-fullscreen+)
-    (if (equal 1.0d0 (get-window-property window-name +wnd-prop-fullscreen+)) 
-	(set-window-property window-name +wnd-prop-aspectratio+ 
-			     +window-freeratio+))
-    ;; Set line type and thickness
-    (do* ((line-type +aa+)
-          (thickness (uniform rng -3 10))
-	  ;; Initialize rectangle position variables
-          (x-1 (/ (* window-width -1) 2))
-	  (x-2 (/ (* window-width 3) 2))
-          (y-1 (/ (* window-width -1) 2))
-          (y-2 (/ (* window-width 3) 2))
-          (pt1 0)
-	  (pt2 0))
-	 ((plusp (wait-key 1)) 
-	  (format t "Key is pressed by user"))
-      ;; Print randomly colored rectangles to screen
-      (setf pt1 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
-      (setf pt2 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
-      (rectangle mat pt1 pt2 (random-color rng) thickness line-type)
-      ;; Show result in window
-      (imshow window-name mat))
-    (destroy-window window-name)))
  A Lab color space is a color-opponent space with dimension L for lightness and a and b for the colo-
 r-opponent dimensions, based on nonlinearly compressed CIE XYZ color space coordinates.
 
@@ -4192,7 +4328,7 @@ Finds the product a matrix and a scalar..
 
 C++: MatExpr * operator
 
-Common Lisp: (SCALE (SELF (:POINTER MAT-EXPR)) (ALPHA :DOUBLE)) => (:POINTER MAT-EXPR)
+LISP-CV: (SCALE (SELF (:POINTER MAT-EXPR)) (ALPHA :DOUBLE)) => (:POINTER MAT-EXPR)
 
 
     Parameters:	
@@ -4217,16 +4353,17 @@ d version (>>)) to use in other functions. Also matrices of (:POINTER MAT) type 
    is divided by the scalar 10. Finally the 
    matrix is printed."
 
-  (let* ((data (foreign-alloc :float :initial-contents 
-			      '(1.0f0 2.0f0 3.0f0 4.0f0 5.0f0 
-                                6.0f0 7.0f0 8.0f0 9.0f0)))
+  (let* ((data (alloc :float '(1.0f0 2.0f0 3.0f0 4.0f0 5.0f0 
+                               6.0f0 7.0f0 8.0f0 9.0f0)))
 	 (mat (mat-data 3 3 +32f+ data))
 	 (scaled-mat (scale (<< mat) (/ 1d0 10d0))))
     (dotimes (i 3)
       (dotimes (j 3)
-	(format t "~a" (at-float (>> scaled-mat) i j))
+	(format t "~a" (at (>> scaled-mat) i j :float))
 	(princ #\Space))
-      (princ #\Newline))))
+      (princ #\Newline))
+    (free data)))
+
 
 
 DRAW-MATCHES
@@ -4235,7 +4372,7 @@ Draws the found matches of keypoints from two images.
 
 C++: void drawMatches(const Mat& img1, const vector<KeyPoint>& keypoints1, const Mat& img2, const vector<KeyPoint>& keypoints2, const vector<DMatch>& matches1to2, Mat& outImg, const Scalar& matchColor=Scalar::all(-1), const Scalar& singlePointColor=Scalar::all(-1), const vector<char>& matchesMask=vector<char>(), int flags=DrawMatchesFlags::DEFAULT )
 
-Common Lisp: (DRAW-MATCHES (IMG1 (:POINTER MAT)) (KEYPOINTS1 (:POINTER KEYPOINT)) (IMG2 (:POINTER MAT)) (KEYPOINTS2 (:POINTER KEYPOINT)) (MATCHES1TO2 (:POINTER VECTOR-DMATCH)) (OUTIMG (:POINTER MAT)) (MATCH-COLOR (:POINTER SCALAR)) (SINGLE-POINT-COLOR (:POINTER SCALAR)) &OPTIONAL ((MATCHES-MASK (:POINTER VECTOR-CHAR)) (VECTOR-CHAR)) ((FLAGS :INT) +DEFAULT+))
+LISP-CV: (DRAW-MATCHES (IMG1 (:POINTER MAT)) (KEYPOINTS1 (:POINTER KEYPOINT)) (IMG2 (:POINTER MAT)) (KEYPOINTS2 (:POINTER KEYPOINT)) (MATCHES1TO2 (:POINTER VECTOR-DMATCH)) (OUTIMG (:POINTER MAT)) (MATCH-COLOR (:POINTER SCALAR)) (SINGLE-POINT-COLOR (:POINTER SCALAR)) &OPTIONAL ((MATCHES-MASK (:POINTER VECTOR-CHAR)) (VECTOR-CHAR)) ((FLAGS :INT) +DEFAULT+))
 indicate
 C++: void drawMatches(const Mat& img1, const vector<KeyPoint>& keypoints1, const Mat& img2, const vector<KeyPoint>& keypoints2, const vector<vector<DMatch>>& matches1to2, Mat& outImg, const Scalar& matchColor=Scalar::all(-1), const Scalar& singlePointColor=Scalar::all(-1), const vector<vector<char>>& matchesMask=vector<vector<char> >(), int flags=DrawMatchesFlags::DEFAULT )
 
@@ -4388,7 +4525,7 @@ The BRISK constructor
 
 C++: BRISK::BRISK(int thresh=30, int octaves=3, float patternScale=1.0f)
 
-Common Lisp: (BRISK &OPTIONAL ((THRESH :INT) 30) ((OCTAVES :INT) 3) ((PATTERN-SCALE :FLOAT) 1.0F0) => (:POINTER BRISK)
+LISP-CV: (BRISK &OPTIONAL ((THRESH :INT) 30) ((OCTAVES :INT) 3) ((PATTERN-SCALE :FLOAT) 1.0F0) => (:POINTER BRISK)
 
     Parameters:	
 
@@ -4550,30 +4687,38 @@ Creates a feature detector by its name.
 
 C++: Ptr<FeatureDetector> FeatureDetector::create(const string& detectorType)
 
-Common Lisp: (FEAT-DETECTOR-CREATE (SELF (:POINTER FEATURE-DETECTOR)) (DETECTOR-TYPE :STRING)) => (:POINTER FEATURE-DETECTOR) 
+LISP-CV: (FEAT-DETECTOR-CREATE (SELF (:POINTER FEATURE-DETECTOR)) (DETECTOR-TYPE :STRING)) => (:POINTER FEATURE-DETECTOR) 
 
 
     Parameters:	
 
         SELF - A pointer to a BRISK construct
 
-        DETECTOR-TYPE - Feature detector type.
+        DETECTOR-TYPE - Feature detector type:
+
 
 The following detector types are supported:
 
-    "FAST" - FastFeatureDetector
-    "STAR" - StarFeatureDetector
+
+    "FAST" - FAST-FEATURE-DETECTOR
+    "STAR" - STAR-FEATURE-DETECTOR
     "SIFT" - SIFT (nonfree module)
     "SURF" - SURF (nonfree module)
     "ORB" - ORB
     "BRISK" - BRISK
     "MSER" - MSER
-    "GFTT" - GoodFeaturesToTrackDetector
-    "HARRIS" - GoodFeaturesToTrackDetector with Harris detector enabled
-    "Dense" - DenseFeatureDetector
-    "SimpleBlob" - SimpleBlobDetector
+    "GFTT" - GOOD-FEATURES-TO-TRACK-DETECTOR
+    "HARRIS" - GOOD-FEATURES-TO-TRACK-DETECTOR with Harris detector enabled
+    "Dense" - DENSE-FEATURE-DETECTOR
+    "SimpleBlob" - SIMPLE-BLOB-DETECTOR
 
-Also a combined format is supported: feature detector adapter name ( "Grid" - GridAdaptedFeatureDetector, "Pyramid" - PyramidAdaptedFeatureDetector ) + feature detector name (see above), for example: "GridFAST", "PyramidSTAR" .
+
+Also a combined format is supported: feature detector adapter name:
+
+           ("GRID" - GRID-ADAPTED-FEATURE-DETECTOR, "PYRAMID" - PYRAMID-ADAPTED-FEATURE-DETECTOR) + 
+
+                                     feature detector name: (see above), for example: "GRIDFAST", "PYRAMIDSTAR".
+
 
 
 (defun feat-detect-create-example (filename-1 filename-2) 
@@ -4608,48 +4753,7 @@ Also a combined format is supported: feature detector adapter name ( "Grid" - Gr
     ;; create a feature detector
     (feat-detector-create briskd "STAR")
     ;; detect keypoints in the image GRAY-A
-    (feat-detector-detect
-(defun random-color (rng &optional (icolor 0))
-  (setf icolor rng)
-  (return-from random-color (scalar (uniform rng 0 255) 
-				    (uniform rng 0 255) (uniform rng 0 255))))
-
-(defun rectangle-example ()
-
-  (let* ((window-name "RECTANGLE Example")
-	 (window-width 640)
-	 (window-height 480)
-	 ;; Initialize random number generator
-	 (rng (rng #xFFFFFFFF))
-	 ;; Create a black background
-	 (mat (mat-zeros window-width window-height +8uc3+)))
-    ;; Create a window
-    (named-window window-name +window-normal+)
-    ;; Set window to fullscreen
-    (set-window-property window-name +wnd-prop-fullscreen+ 
-			 +window-fullscreen+)
-    (if (equal 1.0d0 (get-window-property window-name +wnd-prop-fullscreen+)) 
-	(set-window-property window-name +wnd-prop-aspectratio+ 
-			     +window-freeratio+))
-    ;; Set line type and thickness
-    (do* ((line-type +aa+)
-          (thickness (uniform rng -3 10))
-	  ;; Initialize rectangle position variables
-          (x-1 (/ (* window-width -1) 2))
-	  (x-2 (/ (* window-width 3) 2))
-          (y-1 (/ (* window-width -1) 2))
-          (y-2 (/ (* window-width 3) 2))
-          (pt1 0)
-	  (pt2 0))
-	 ((plusp (wait-key 1)) 
-	  (format t "Key is pressed by user"))
-      ;; Print randomly colored rectangles to screen
-      (setf pt1 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
-      (setf pt2 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
-      (rectangle mat pt1 pt2 (random-color rng) thickness line-type)
-      ;; Show result in window
-      (imshow window-name mat))
-    (destroy-window window-name))) briskd gray-a keypoints-a)
+    (feat-detector-detect briskd gray-a keypoints-a)
     ;; Compute the descriptors for a set of keypoints detected in GRAY-A
     (feat-2d-compute briskd gray-a keypoints-a descriptors-a)
     ;; detect keypoints in the image GRAY-B
@@ -4670,18 +4774,17 @@ Also a combined format is supported: feature detector adapter name ( "Grid" - Gr
     (destroy-window window-name)))
 
 
-
 SURF
 
 The SURF extractor constructors.
 
 C++: SURF::SURF()
 
-Common Lisp: (SURF0) => (:POINTER SURF)
+LISP-CV: (SURF0) => (:POINTER SURF)
 
 C++: SURF::SURF(double hessianThreshold, int nOctaves=4, int nOctaveLayers=2, bool extended=true, bool upright=false )
 
-Common Lisp: (SURF5 (HESSIAN-THRESHOLD :DOUBLE) &OPTIONAL ((N-OCTAVES :INT) 4) 
+LISP-CV: (SURF5 (HESSIAN-THRESHOLD :DOUBLE) &OPTIONAL ((N-OCTAVES :INT) 4) 
                  ((EXTENDED :BOOLEAN) T) ((UPRIGHT :BOOLEAN) NIL)) => (:POINTER SURF)
 
     Parameters:	
@@ -4738,11 +4841,7 @@ Common Lisp: (SURF5 (HESSIAN-THRESHOLD :DOUBLE) &OPTIONAL ((N-OCTAVES :INT) 4)
     (draw-matches img-1 keypoints-1 img-2 keypoints-2 matches img-matches)
     ;;-- Show detected matches
     (imshow window-name img-matches)
-    (loop while (not (= ;;; Types and structures
-
-
-
-;;; User Interface(wait-key 0) 27)))
+    (loop while (not (= (wait-key 0) 27)))
     (destroy-window window-name)))
 
 
@@ -4752,7 +4851,7 @@ Creates a trackbar and attaches it to the specified window.
 
 C++: int createTrackbar(const string& trackbarname, const string& winname, int* value, int count, TrackbarCallback onChange=0, void* userdata=0)
 
-Common Lisp:  (CREATE-TRACKBAR (TRACKBARNAME :STRING) (WINNAME :STRING) (VALUE :POINTER) (COUNT :INT) &OPTIONAL ((ON-CHANGE (:POINTER TRACKBAR-CALLBACK)) (NULL-POINTER)) ((USERDATA :POINTER) (NULL-POINTER))) => :INT
+LISP-CV:  (CREATE-TRACKBAR (TRACKBARNAME :STRING) (WINNAME :STRING) (VALUE :POINTER) (COUNT :INT) &OPTIONAL ((ON-CHANGE (:POINTER TRACKBAR-CALLBACK)) (NULL-POINTER)) ((USERDATA :POINTER) (NULL-POINTER))) => :INT
 
     
     Parameters:	
@@ -4784,30 +4883,30 @@ displayed in the specified window winname.
 Note: [Qt Backend Only] winname can be empty (or NULL) if the trackbar should be attached to the control panel.
 
 
-
+Example:
 
 ;; a callback function called by the CREATE-TRACKBAR
 ;; ON-CHANGE parameter...a HELLO-WORLD function.
+;; '?' is a macro for CFFI:MEM-AREF
 (defcallback hello-world-brightness :void ((pos :int) (ptr :pointer))
-  (format t "Hello World!~%~%~a~a~%~%" (mem-aref ptr :string 0) pos))
+  (format t "Hello World!~%~%~a~a~%~%" (? ptr :string 0) pos))
 
 ;; another HELLO-WORLD callback function
 (defcallback hello-world-contrast :void ((pos :int) (ptr :pointer))
-  (format t "Hello World!~%~%~a~a~%~%" (mem-aref ptr :string 0) pos))
-
+  (format t "Hello World!~%~%~a~a~%~%" (? ptr :string 0) pos))
 
 
 (defun create-trackbar-example (filename)
   ;; read in image supplied by filename parameter
   (let ((src (imread filename 1))
-
 	(window-name "Adjust brightness and contrast by moving the sliders.")
-
         ;; allocate two :int pointers that trackbar can adjust
-	(slider-1-value (foreign-alloc :int 
-				       :initial-contents '(50)))
-	(slider-2-value (foreign-alloc :int 
-				       :initial-contents '(50))))
+	(slider-1-value (alloc :int '(50)))
+	(slider-2-value (alloc :int '(50)))
+	;; data to be passed to HELLO-WORLD-BRIGHTNESS callback function
+	(userdata-1 (alloc :string "Brightness =  "))
+	;; data to be passed to HELLO-WORLD-CONTRAST callback function
+	(userdata-2 (alloc :string "Contrast = ")))
     (if (empty src) 
 	(return-from create-trackbar-example
 	  (format t "Image not loaded")))
@@ -4815,11 +4914,7 @@ Note: [Qt Backend Only] winname can be empty (or NULL) if the trackbar should be
     (move-window window-name 720 175)
     (do* ((dest 0)
 	  (brightness 0)
-	  (contrast 0)
-	  ;; data to be passed to HELLO-WORLD-BRIGHTNESS callback function
-	  (userdata-1 (foreign-alloc :string :initial-element "Brightness =  "))
-	  ;; data to be passed to HELLO-WORLD-CONTRAST callback function
-	  (userdata-2 (foreign-alloc :string :initial-element "Contrast = ")))
+	  (contrast 0))
 	 ((plusp (wait-key *millis-per-frame*)) 
 	  (format t "Key is pressed by user"))
       ;; Clone the source image to dest
@@ -4849,7 +4944,12 @@ Note: [Qt Backend Only] winname can be empty (or NULL) if the trackbar should be
       (imshow window-name dest)
       ;; clen up used memory
       (del-mat dest))
-    (destroy-window window-name)))
+    (destroy-window window-name)
+    (free slider-1-value)
+    (free slider-2-value)
+    (free userdata-1)
+    (free userdata-2)))
+
 
 
 SET-MOUSE-CALLBACK
@@ -4858,7 +4958,8 @@ Sets mouse handler for the specified window
 
 C++: void setMouseCallback(const string& winname, MouseCallback onMouse, void* userdata=0 )
 
-Common Lisp: (SET-MOUSE-CALLBACK (WINNAME :STRING) (ON-MOUSE (:POINTER MOUSE-CALLBACK)) (USERDATA :VOID)) => :VOID
+LISP-CV: (SET-MOUSE-CALLBACK (WINNAME :STRING) (ON-MOUSE (:POINTER MOUSE-CALLBACK)) (USERDATA :VOID)) => :VOID
+
 
     Parameters:	
 
@@ -4867,7 +4968,6 @@ Common Lisp: (SET-MOUSE-CALLBACK (WINNAME :STRING) (ON-MOUSE (:POINTER MOUSE-CAL
         ONMOUSE - Mouse callback. See example below for how to use the callback.
 
         USERDATA - The optional parameter passed to the callback.
-
 
 
 
@@ -4888,17 +4988,17 @@ Common Lisp: (SET-MOUSE-CALLBACK (WINNAME :STRING) (ON-MOUSE (:POINTER MOUSE-CAL
       (format t "Right button of the mouse down (~a, ~a)~%~%" x y))
   (if (= event +event-mbuttondown+)
       (format t "Middle button of the mouse down (~a, ~a)~%~%" x y))
-  (if (= event +event-lbuttonup+)Read
+  (if (= event +event-lbuttonup+)
       (format t "Left button of the mouse up (~a, ~a)~%~%" x y))
   (if (= event +event-rbuttonup+)
       (format t "Right button of the mouse up (~a, ~a)~%~%" x y))
   (if (= event +event-mbuttonup+)
       (format t "Middle button of the mouse up (~a, ~a)~%~%" x y))
-  (if (= flags +event-lbuttondblclk+)
+  (if (= event +event-lbuttondblclk+)
       (format t "Left button double-click flag triggered (~a, ~a)~%~%" x y))
-  (if (= flags +event-rbuttondblclk+)
+  (if (= event +event-rbuttondblclk+)
       (format t "Right button double-click flag triggered (~a, ~a)~%~%" x y))
-  (if (= flags +event-mbuttondblclk+)
+  (if (= event +event-mbuttondblclk+)
       (format t "Middle button double-click flag triggered (~a, ~a)~%~%" x y))
   (if (= flags (+ +event-flag-ctrlkey+ +event-flag-lbutton+))
       (format t "Left mouse button is clicked while pressing CTRL key (~a, ~a)~%~%" x y))
@@ -4913,8 +5013,7 @@ Common Lisp: (SET-MOUSE-CALLBACK (WINNAME :STRING) (ON-MOUSE (:POINTER MOUSE-CAL
   (let ((src (imread filename 1))
 	(window-name "SET-MOUSE-CALLBACK Example")
 	;; Declare a userdata parameter 
-	(userdata (foreign-alloc :string 
-				 :initial-element "USERDATA output")))
+	(userdata (alloc :string "USERDATA output")))
     (if (empty src) 
 	(return-from set-mouse-callback-example
 	  (format t "Image not loaded")))
@@ -4927,7 +5026,8 @@ Common Lisp: (SET-MOUSE-CALLBACK (WINNAME :STRING) (ON-MOUSE (:POINTER MOUSE-CAL
     (set-mouse-callback window-name (callback call-back-func) userdata)
     (imshow window-name src)
     (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name)))
+    (destroy-window window-name)
+    (free userdata)))
 
 
 
@@ -4937,7 +5037,7 @@ Pointer to MAT data.
 
 C++: uchar* data
 
-Common Lisp: (DATA (SELF (:POINTER MAT)) ) => :POINTER
+LISP-CV: (DATA (SELF (:POINTER MAT)) ) => :POINTER
 
     Parameters:	
 
@@ -4958,13 +5058,15 @@ te the address of a matrix element. (COLS) is needed because the matrix can be p
 ix or because there can be some padding space in the end of each row for a proper alignment.
 
 
-(defun data-example (filename)
-  ;; read image
-  (let* ((img (imread filename 1))
-	 ;; variables used to access the data/pixel color values
-         ;; INPUT is a pointer to IMG data
+;;Must supply a filename parameter for the image you 
+;;will be using in this example and one for the file 
+;;the image's pixel value will be written it.
+(defun data-example (filename-1 filename-2)
+  ;;read image
+  (let* ((img (imread filename-1 1)) 
+         ;;INPUT is a pointer to IMG data
 	 (input (data img))
-         ;; variables used to hold the BGR image pixel values
+         ;;variables used to hold the BGR image pixel values
 	 (b 0)
 	 (g 0)
 	 (r 0)
@@ -4974,20 +5076,22 @@ ix or because there can be some padding space in the end of each row for a prope
 	  (format t "Image not loaded")))
     (named-window window-name +window-normal+)
     (move-window window-name 720 175)
-   ;; in a loop access IMG pixel data using the STEP* function
-    (dotimes (i (rows img))
-      (dotimes (j (cols img))
-	(setf b (mem-aref input :uchar 
-			  (+  (* (step* img) j) i )))
-	(setf g (mem-aref input :uchar 
-			  (+ (+  (* (step* img) j) i ) 1)))
-	(setf r (mem-aref input :uchar 
-			  (+ (+  (* (step* img) j) i ) 2)))
-        ;; print the data so you can see this example works.
-        ;; warning: may print alot of data, you may need to 
-        ;; restart your Lisp implementation. Save all your 
-        ;; work befor you run this example.
-	(format t "(~a,~a,~a) " b g r)))
+    ;;In a loop access IMG pixel data using the STEP* 
+    ;;function and print to a file instead of the co-
+    ;;nsole so your implimentation doesn't freeze.
+    (with-open-file (str filename-2
+			 :direction :output
+			 :if-exists :supersede
+			 :if-does-not-exist :create)
+      (dotimes (i (rows img))
+	(dotimes (j (cols img))
+	  (setf b (mem-aref input :uchar 
+			    (+  (* (step* img) i) (* 3 j) )))
+	  (setf g (mem-aref input :uchar 
+			    (+ (+  (* (step* img) i) (* 3 j) ) 1)))
+	  (setf r (mem-aref input :uchar 
+			    (+ (+  (* (step* img) i) (* 3 j) ) 2)))
+	  (format str "(~a,~a,~a)~%" b g r))))
     (imshow window-name img)
     (loop while (not (= (wait-key 0) 27)))
     (destroy-window window-name)))
@@ -4999,7 +5103,7 @@ Used to compute address of a matrix element
 
 C++: MStep step
 
-Common Lisp: (STEP (SELF (:POINTER MAT))) => :UNSIGNED-INT
+LISP-CV: (STEP (SELF (:POINTER MAT))) => :UNSIGNED-INT
 
     Parameters:	
 
@@ -5048,7 +5152,7 @@ $
 Time how long a function takes to complete n iterations.
 
 
-Common Lisp: ($ FORM &optional (COUNT-FORM 1000000) ) => RESULT*
+LISP-CV: ($ FORM &optional (COUNT-FORM 1000000) ) => RESULT*
 
     Parameters:	
 
@@ -5082,15 +5186,15 @@ Returns the next random number sampled from the uniform distribution.
 
 C++: int RNG::uniform(int a, int b)
 
-Common Lisp: (UNIFORM (RNG (:POINTER RNG)) (A :DOUBLE) (B :DOUBLE)) => :DOUBLE
+LISP-CV: (UNIFORM (RNG (:POINTER RNG)) (A :DOUBLE) (B :DOUBLE)) => :DOUBLE
 
 C++: float RNG::uniform(float a, float b)
 
-Common Lisp: (UNIFORM (RNG (:POINTER RNG)) (A :FLOAT) (B :FLOAT)) => :FLOAT
+LISP-CV: (UNIFORM (RNG (:POINTER RNG)) (A :FLOAT) (B :FLOAT)) => :FLOAT
 
 C++: double RNG::uniform(double a, double b)
 
-Common Lisp: (UNIFORM (RNG (:POINTER RNG)) (A :INT) (B :INT)) => :INT
+LISP-CV: (UNIFORM (RNG (:POINTER RNG)) (A :INT) (B :INT)) => :INT
 
 
     Parameters:	
@@ -5108,7 +5212,7 @@ There is a nuance illustrated by the following example:
 
 (defparameter rng (rng))
 
-;; always produce;;; Basic Structuress 0
+;; always produces 0
 (defparameter a (uniform rng 0 1))
 
 ;; produces double from (0, 1)
@@ -5127,7 +5231,7 @@ The constructors
 
 C++: RNG::RNG()
 
-Common Lisp: (RNG)
+LISP-CV: (RNG)
 
 C++: RNG::RNG(uint64 state)
 
@@ -5150,7 +5254,7 @@ Bindings for the C++ VECTOR class.
 
 C++: template < class T, class Alloc = allocator<T> > class vector; // generic template
 
-Common Lisp: See description.
+LISP-CV: See description.
 
 
     Parameters:	
@@ -5161,7 +5265,7 @@ Common Lisp: See description.
 The bindings for the C++ vector class, so far, are:
 
 
-Common Lisp:                      
+LISP-CV:                      
 -------------        
 
 VECTOR-CHAR(vector<char>)
@@ -5290,7 +5394,7 @@ Assign a scalar value to a matrix.
 
 C++: MatExpr = operator
 
-Common Lisp: (ASSGN-VAL (SELF (:POINTER MAT)) (S (:POINTER SCALAR))) => (:POINTER MAT)
+LISP-CV: (ASSGN-VAL (SELF (:POINTER MAT)) (S (:POINTER SCALAR))) => (:POINTER MAT)
 
     Parameters:	
 
@@ -5337,7 +5441,12 @@ need to access the return value of ASSGN-VAL to complete the operation,
     (loop while (not (= (wait-key 0) 27)))
     (destroy-all-windows)))
 
-;==============================================MACROS===============================================
+
+=======================================================MACROS===========================================================
+
+MACROS
+
+=======================================================MACROS===========================================================
 
 ALLOC
 
@@ -5345,7 +5454,7 @@ Macro for CFFI::FOREIGN-ALLOC
 
 CFFI: - Function: foreign-alloc type &key initial-element initial-contents (count 1) null-terminated-p ⇒ pointer
 
-Common Lisp: (ALLOC TYPE VALUE) => :POINTER
+LISP-CV: (ALLOC TYPE VALUE) => :POINTER
 
 
     Parameters:	
@@ -5358,7 +5467,6 @@ Common Lisp: (ALLOC TYPE VALUE) => :POINTER
 
 
 Example:
-
 
 LISP-CV> (DEFPARAMETER A (ALLOC :DOUBLE 8.0D0))
 
@@ -5384,6 +5492,7 @@ LISP-CV> (MEM-AREF B :INT 2)
 
 3
 
+=======================================================MACROS===========================================================
 
 FREE
 
@@ -5391,7 +5500,7 @@ Macro for CFFI::FOREIGN-FREE
 
 CFFI: - foreign-free ptr ⇒ undefined
 
-Common Lisp: (FREE PTR) => undefined
+LISP-CV: (FREE PTR) => undefined
 
 
     Parameters:	
@@ -5401,19 +5510,159 @@ Common Lisp: (FREE PTR) => undefined
 
 Example:
 
-
-LCV> (DEFPARAMETER A (ALLOC :INT 55))
+LISP-CV> (DEFPARAMETER A (ALLOC :INT 55))
 
 A
 
-LCV> (MEM-REF A :INT)
+LISP-CV> (MEM-REF A :INT)
 
 55
 
-LCV> (FREE A)
+LISP-CV> (FREE A)
 
 NIL
 
-LCV> (MEM-REF A :INT)
+LISP-CV> (MEM-REF A :INT)
 
 0
+
+;=======================================================MACROS===========================================================
+
+
+
+
+MEAN
+
+Calculates an average (mean) of array elements.
+
+C++: Scalar mean(InputArray src, InputArray mask=noArray())
+
+Common Lisp: (MEAN (SRC (:POINTER MAT)) &OPTIONAL ((MASK (:POINTER (MAT)) (MAT))))
+
+
+    Parameters:	
+
+        SRC - Input array that should have from 1 to 4 channels so that the result can be stored in SCALAR.
+
+        MASK - Optional operation mask.
+
+The function mean calculates the mean value M of array elements, independently for each channel, and 
+returns it:
+
+Equation:
+
+http://docs.opencv.org/_images/math/ea3b8e251b52d791f7b56ea8ef6e815048274c81.png
+
+When all the mask elements are 0’s, the functions return (SCALAR-ALL 0) .
+
+See also:
+
+(COUNT-NON-ZERO), (MEAN-STD-DEV), (NORM), (MIN-MAX-LOC)
+
+
+Example:
+
+
+(defun mean-example (&optional (camera-index *camera-index*) 
+		       (width *default-width*)
+		       (height *default-height*))
+
+  "Position the rectangle in the window by moving the trackbar 
+   sliders. The rectangle gets its color from the averaging of 
+   the pixels in the region of the rectangle. This averaging is
+   calculated by the function MEAN. For example if you position 
+   the rectangle over some thing red, the rectangle will turn a 
+   shade of red. The rectangle starts at 0,0 X,Y coordinates."
+
+  (with-capture (cap (cap-cam camera-index))
+    (let* ((window-name "IMG - MEAN Example")
+           (n 10)
+           ;;Initialize the rectangle location/
+           ;;dimension variables
+	   (rect-x (alloc :int '(0)))
+	   (rect-y (alloc :int '(0)))
+	   (rect-width (alloc :int (list (round (/ width n)))))
+	   (rect-height (alloc :int (list (round (/ height n))))))      
+      (cap-set cap +cap-prop-frame-width+ width)
+      (cap-set cap +cap-prop-frame-height+ height) 
+      ;;Create fullscreen window
+      (named-window window-name +window-normal+)
+      (set-window-property window-name +wnd-prop-fullscreen+ 
+			   +window-fullscreen+)
+      (move-window window-name 624 100)
+      ;;Initialize other variables
+      (do* ((frame 0)
+            (color 0)
+            (roi 0)
+	    (img 0)
+	    (point-1 0)
+	    (point-2 0))
+	   ((plusp (wait-key *millis-per-frame*)) nil)
+        (setf frame (mat))
+        ;;Set FRAME to a frame of the camera feed
+	(cap-read cap frame)
+        ;;Print rectangle location/dimensions
+	(format t "RECT-X: ~a~%~%" (mem-ref rect-x :int))
+	(format t "RECT-Y: ~a~%~%" (mem-ref rect-y :int))
+	(format t "RECT-WIDTH: ~a~%~%" (mem-ref rect-width :int))
+	(format t "RECT-HEIGHT: ~a~%~%" (mem-ref rect-height :int))
+        ;;Create trackbars to control the rectangle location/dimensions
+       	(create-trackbar "RECT-X" window-name rect-x width)
+	(create-trackbar "RECT-Y" window-name rect-y height)
+	(create-trackbar "RECT-WIDTH" window-name rect-width width)
+	(create-trackbar "RECT-HEIGHT" window-name rect-height height)
+        ;;Instantiate logic for the location/dimensions 
+        ;;of the rectangle based on the trackbar input
+	(if (equal (mem-ref rect-x :int) 0) 
+	    (setf (mem-ref rect-x :int) 1))
+	(if (> (mem-ref rect-x :int) 
+	       (- width (mem-ref rect-width :int))) 
+	    (setf (mem-ref rect-x :int) 
+		  (- width (mem-ref rect-width :int))))
+	(if (equal (mem-ref rect-y :int) 0) 
+	    (setf (mem-ref rect-y :int) 1))
+	(if (> (mem-ref rect-y :int) 
+	       (- height (mem-ref rect-height :int))) 
+	    (setf (mem-ref rect-y :int) 
+		  (- height (mem-ref rect-height :int))))
+	(if (< (mem-ref rect-width :int) 1) 
+	    (setf (mem-ref rect-width :int) 1))
+        (if (< (mem-ref rect-height :int) 1) 
+	    (setf (mem-ref rect-height :int) 1))
+	;;Set region of interest of FRAME to the rectangle 
+	;;location/dimensions we specified
+	(setf roi (rect (mem-ref rect-x :int) (mem-ref rect-y :int)
+			(mem-ref rect-width :int) (mem-ref rect-height :int)))
+        ;;Create an empty matrix
+	(setf img (mat))
+        ;;Make a copy of FRAME, IMG, to use 
+        ;;for the fullscreen camera output
+        (copy-to frame img)
+        ;;Set region of interest of FRAME to ROI. This region of 
+        ;;interest is the where we find the mean of the pixels. 
+	(setf frame (roi frame roi))
+        ;;Set position parameters of the RECTANGLE we will create, 
+        ;;that will be the color of the mean of the pixels in FRAME, 
+        ;;to that of the position of the region of interest of FRAME
+	(setf point-1 (point (mem-ref rect-x :int) 
+                             (mem-ref rect-y :int)))
+	(setf point-2 (point (+ (mem-ref rect-x :int) 
+                                (mem-ref rect-width :int)) 
+			     (+ (mem-ref rect-y :int) 
+                                (mem-ref rect-height :int))))
+        ;;Find mean of FRAME and set to 
+        ;;COLOR parameter of RECTANGLE
+        (setf color (mean frame)) 
+        ;;Create a rectangle the color of 
+        ;;the mean of the pixels it covers
+        (rectangle img point-1 point-2 color +filled+ 4 0)
+    	(imshow window-name img)
+        ;;Clean up used matrices
+	(del-mat img)
+        (del-mat frame))
+      ;;Free memory as program ends
+      (free rect-x)
+      (free rect-y)
+      (free rect-width)
+      (free rect-height)
+      (destroy-all-windows))))
