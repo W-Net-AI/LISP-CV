@@ -372,9 +372,9 @@ LISP-CV: (RESHAPE (SELF (:POINTER MAT)) (CN :INT) (ROWS :INT)) => (:POINTER MAT)
 
         SELF - A matrix.       
 
-        CN – New number of channels. If the parameter is 0, the number of channels remains the same.
+        CN - New number of channels. If the parameter is 0, the number of channels remains the same.
 
-        ROWS – New number of rows. If the parameter is 0, the number of rows remains the same.
+        ROWS - New number of rows. If the parameter is 0, the number of rows remains the same.
 
 
 The method makes a new matrix header for *this elements. The new matrix may have a different size 
@@ -484,6 +484,365 @@ bit faster matrix size accessor choose the MAT-SIZE Dfunction.
 	       (format t "Width of SIZE = ~a~%" (width size))
 	       (format t "Height of SIZE = ~a" (height size))))
 
+
+
+OPERATIONS ON ARRAYS:
+
+
+CONVERT-SCALE-ABS
+
+Scales, calculates absolute values, and converts the result to 8-bit.
+
+C++: void convertScaleAbs(InputArray src, OutputArray dst, double alpha=1, double beta=0)
+
+LISP-CV: (CONVERT-SCALE-ABS  (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) &OPTIONAL ((ALPHA :INT) 1.0D0) ((BETA :INT) 0.0D0)) => :VOID
+
+    Parameters:	
+
+        SRC - input array.
+
+        DEST - output array.
+
+        ALPHA - optional scale factor.
+
+        BETA - optional delta added to the scaled values.
+
+On each element of the input array, the function CONVERT-SCALE-ABS performs three operations sequentially: 
+scaling, taking an absolute value, conversion to an unsigned 8-bit type. In case of multi-channel arrays, 
+the function processes each channel independently. 
+
+
+(defun convert-scale-abs-example (&optional (camera-index *camera-index*) 
+				    (width *default-width*)
+				    (height *default-height*))
+
+  (with-capture (cap (cap-cam camera-index))    
+    (let ((window-name "CONVERT-SCALE-ABS Example")
+	  ;;Create matrix so we can scale it, caclculate its 
+	  ;;absolute value and convert it to 8-bit with fun-
+	  ;;ction CONVERT-SCALE-ABS
+	  (mat (mat-ones 6 4 +32f+)))
+      (cap-set cap +cap-prop-frame-width+ width)
+      (cap-set cap +cap-prop-frame-height+ height)
+      (named-window window-name +window-normal+)
+       (move-window window-name 720 175)
+      ;;Print original type of MAT
+      (format t "MAT type before conversion = ~a(or +32f+)~%~%" (mat-type mat))
+      ;;Print original MAT before conversion
+      (format t "Printing MAT before the conversion~%~%")
+      (dotimes (i (rows mat))
+	(dotimes (j (cols mat))
+	  (format t "~a" (at mat i j :float))
+	  (princ #\Space))
+	(princ #\Newline))
+      ;;Run CONVERT-SCALE-ABS
+      (convert-scale-abs mat mat 2d0 5d0)
+      ;;Print converted MAT type which is 8-bit
+      (format t "~%~%MAT type after conversion = ~a(or +8u+)~%~%" (mat-type mat))
+      ;;Print converted MAT
+      (format t "~%~%Printing MAT after the conversion~%~%")
+      (dotimes (i (rows mat))
+	(dotimes (j (cols mat))
+	  (format t "~a" (at mat i j :float))
+	  (princ #\Space))
+	(princ #\Newline))
+      (do ((frame 0))
+	  ((plusp (wait-key *millis-per-frame*)) 
+	   (format t "Key is pressed by user"))
+	(setf frame (mat))
+	(cap-read cap frame)
+        ;;Run CONVERT-SCALE-ABS on each frame of 
+        ;;camera output just to see what happens
+	(convert-scale-abs frame frame 2d0 5d0)
+        (imshow window-name frame))
+      (destroy-window window-name))))
+
+
+
+FLIP
+
+Flips a 2D array around vertical, horizontal, or both axes.
+
+C++: void flip(InputArray src, OutputArray dst, int flipCode)
+
+LISP-CV: (FLIP (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) (FLIP-CODE :INT)) => :VOID
+
+    Parameters:	
+
+        SRC - Input array.
+
+        DEST - Output array of the same size and type as SRC.
+
+        FLIP-CODE - A flag to specify how to flip the array; 0 means flipping around the x-axis and
+                    positive value (for example, 1) means flipping around y-axis. Negative value 
+                    (for example, -1) means flipping around both axes (see the discussion below for 
+                    the formulas).
+
+The function FLIP flips the array in one of three different ways (row and column indices are 0-based):
+
+\texttt{dst} _{ij} = \left\{ \begin{array}{l l} \texttt{src} _{\texttt{src.rows}-i-1,j} & if\; \texttt{flipCode} = 0 \\ \texttt{src} _{i, \texttt{src.cols} -j-1} & if\; \texttt{flipCode} > 0 \\ \texttt{src} _{ \texttt{src.rows} -i-1, \texttt{src.cols} -j-1} & if\; \texttt{flipCode} < 0 \\ \end{array} \right.
+
+The example scenarios of using the function are the following:
+
+        Vertical flipping of the image (EQ FLIP-CODE 0) to switch between top-left and bottom-left 
+        image origin. This is a typical operation in video processing on Microsoft Windows* OS.
+
+        Horizontal flipping of the image with the subsequent horizontal shift and absolute difference 
+        calculation to check for a vertical-axis symmetry (> FLIP-CODE 0).
+
+        Simultaneous horizontal and vertical flipping of the image with the subsequent shift and absolute 
+        difference calculation to check for a central symmetry (< FLIP-CODE  0).
+
+        Reversing the order of point arrays ((> FLIP-CODE 0) OR (EQ FLIP-CODE 0)).
+
+See also:
+
+(TRANSPOSE) , (REPEAT) , (COMPLETE-SYMM)
+
+
+(defun flip-example (&optional (camera-index *camera-index*))
+  ;;Capture camera feed
+  (with-capture (cap (cap-cam camera-index))
+    ;;Make array of window names
+    (let* ((window-name-arr 
+	    (make-array 6 :initial-contents 
+
+			(list
+                         "Matrix flipped on both axes - FLIP Example"
+			 "Matrix flipped on x-axis - FLIP Example"
+			 "Matrix flipped on y-axis - FLIP Example"
+                         "Camera output flipped on both axes - FLIP Example"
+			 "Camera output flipped on x-axis - FLIP Example"
+			 "Camera output flipped on y-axis - FLIP Example")))
+	   ;;Allocate matrix data
+	   (data (alloc :uchar '(1 2 3 4 5 6 7 8 9)))
+	   ;;Create a data matrix, MAT
+	   (mat (mat-data 3 3 +8u+ data))
+           ;;Create array of MAT clones
+           (mat-clone-arr (make-array 3 :initial-contents 
+				      (list 
+				       (clone mat) (clone mat) (clone mat)))))
+      ;;Create array of windows
+      (dotimes (i 6)
+	(named-window (aref window-name-arr i) +window-normal+))
+      ;;Move windows to specified locations
+      (move-window (aref window-name-arr 0) 288 150)
+      (move-window (aref window-name-arr 1) 738 150)
+      (move-window (aref window-name-arr 2) 1188 150)
+      (move-window (aref window-name-arr 3) 288 518)
+      (move-window (aref window-name-arr 4) 738 518)
+      (move-window (aref window-name-arr 5) 1188 515)
+      ;;Flip the first, second and third MAT clones we created 
+      ;;around the x, y and both axes, respectively
+      (dotimes (i 3)
+	(flip (aref mat-clone-arr i) (aref mat-clone-arr i) (- i 1)))
+      ;;Show the first, second and third 
+      ;;MAT clones in the top windows
+      (dotimes (i 3)
+	(imshow (aref window-name-arr i) (aref mat-clone-arr i)))
+      ;;Initialize variable FRAME to hold camera feed
+      (do ((frame 0)
+	   ;;Initialize array of FRAME clones
+	   (frame-clone-arr (make-array 3 :initial-contents '(0 0 0))))
+	  ((plusp (wait-key *millis-per-frame*)) 
+	   (format t "Key is pressed by user"))
+        ;;Assign camera feed to FRAME
+	(setf frame (mat))
+	(cap-read cap frame)
+        ;;Make 3 frame clones
+	(dotimes (i 3)
+	  (setf (aref frame-clone-arr i) (clone frame)))
+        ;;Flip the first, second and third FRAME clones we 
+        ;;created around the x, y and both axes respectively
+	(dotimes (i 3)
+	  (flip (aref frame-clone-arr i) (aref frame-clone-arr i) (- i 1)))
+        ;;Show all FRAME clones in windows
+	(dotimes (i 3)
+	  (imshow (aref window-name-arr (+ i 3)) (aref frame-clone-arr i)))
+	;;Clean up used memory
+	(dotimes (i 3)
+	  (del-mat (aref frame-clone-arr i))))
+      (destroy-all-windows))))
+
+
+
+MEAN
+
+Calculates an average (mean) of array elements.
+
+C++: Scalar mean(InputArray src, InputArray mask=noArray())
+
+LISP-CV: (MEAN (SRC (:POINTER MAT)) &OPTIONAL ((MASK (:POINTER (MAT)) (MAT)))) => (:POINTER SCALAR)
+
+
+    Parameters:	
+
+        SRC - Input array that should have from 1 to 4 channels so that the result can be stored in SCALAR.
+
+        MASK - Optional operation mask.
+
+The function mean calculates the mean value M of array elements, independently for each channel, and 
+returns it. When all the mask elements are 0’s, the function returns (SCALAR-ALL 0) .
+
+See also:
+
+(COUNT-NON-ZERO), (MEAN-STD-DEV), (NORM), (MIN-MAX-LOC)
+
+
+Example:
+
+
+(defun mean-example (&optional (camera-index *camera-index*) 
+		       (width *default-width*)
+		       (height *default-height*))
+
+  "Position the rectangle in the window by moving the trackbar 
+   sliders. The rectangle gets its color from the averaging of 
+   the pixels in the region of the rectangle. This averaging is
+   calculated by the function MEAN. For example if you position 
+   the rectangle over some thing red, the rectangle will turn a 
+   shade of red. The rectangle starts at 0,0 X,Y coordinates."
+
+  (with-capture (cap (cap-cam camera-index))
+    (let* ((window-name "IMG - MEAN Example")
+           (n 10)
+           ;;Initialize the rectangle location/
+           ;;dimension variables
+	   (rect-x (alloc :int '(0)))
+	   (rect-y (alloc :int '(0)))
+	   (rect-width (alloc :int (list (round (/ width n)))))
+	   (rect-height (alloc :int (list (round (/ height n))))))      
+      (cap-set cap +cap-prop-frame-width+ width)
+      (cap-set cap +cap-prop-frame-height+ height) 
+      ;;Create fullscreen window
+      (named-window window-name +window-normal+)
+      (set-window-property window-name +wnd-prop-fullscreen+ 
+			   +window-fullscreen+)
+      (move-window window-name 624 100)
+      ;;Initialize other variables
+      (do* ((frame 0)
+            (color 0)
+            (roi 0)
+	    (img 0)
+	    (point-1 0)
+	    (point-2 0))
+	   ((plusp (wait-key *millis-per-frame*)) nil)
+        (setf frame (mat))
+        ;;Set FRAME to a frame of the camera feed
+	(cap-read cap frame)
+        ;;Print rectangle location/dimensions
+	(format t "RECT-X: ~a~%~%" (mem-ref rect-x :int))
+	(format t "RECT-Y: ~a~%~%" (mem-ref rect-y :int))
+	(format t "RECT-WIDTH: ~a~%~%" (mem-ref rect-width :int))
+	(format t "RECT-HEIGHT: ~a~%~%" (mem-ref rect-height :int))
+        ;;Create trackbars to control the rectangle location/dimensions
+       	(create-trackbar "RECT-X" window-name rect-x width)
+	(create-trackbar "RECT-Y" window-name rect-y height)
+	(create-trackbar "RECT-WIDTH" window-name rect-width width)
+	(create-trackbar "RECT-HEIGHT" window-name rect-height height)
+        ;;Instantiate logic for the location/dimensions 
+        ;;of the rectangle based on the trackbar input
+	(if (equal (mem-ref rect-x :int) 0) 
+	    (setf (mem-ref rect-x :int) 1))
+	(if (> (mem-ref rect-x :int) 
+	       (- width (mem-ref rect-width :int))) 
+	    (setf (mem-ref rect-x :int) 
+		  (- width (mem-ref rect-width :int))))
+	(if (equal (mem-ref rect-y :int) 0) 
+	    (setf (mem-ref rect-y :int) 1))
+	(if (> (mem-ref rect-y :int) 
+	       (- height (mem-ref rect-height :int))) 
+	    (setf (mem-ref rect-y :int) 
+		  (- height (mem-ref rect-height :int))))
+	(if (< (mem-ref rect-width :int) 1) 
+	    (setf (mem-ref rect-width :int) 1))
+        (if (< (mem-ref rect-height :int) 1) 
+	    (setf (mem-ref rect-height :int) 1))
+	;;Set region of interest of FRAME to the rectangle 
+	;;location/dimensions we specified
+	(setf roi (rect (mem-ref rect-x :int) (mem-ref rect-y :int)
+			(mem-ref rect-width :int) (mem-ref rect-height :int)))
+        ;;Create an empty matrix
+	(setf img (mat))
+        ;;Make a copy of FRAME, IMG, to use 
+        ;;for the fullscreen camera output
+        (copy-to frame img)
+        ;;Set region of interest of FRAME to ROI. This region of 
+        ;;interest is the where we find the mean of the pixels. 
+	(setf frame (roi frame roi))
+        ;;Set position parameters of the RECTANGLE we will create, 
+        ;;that will be the color of the mean of the pixels in FRAME, 
+        ;;to that of the position of the region of interest of FRAME
+	(setf point-1 (point (mem-ref rect-x :int) 
+                             (mem-ref rect-y :int)))
+	(setf point-2 (point (+ (mem-ref rect-x :int) 
+                                (mem-ref rect-width :int)) 
+			     (+ (mem-ref rect-y :int) 
+                                (mem-ref rect-height :int))))
+        ;;Find mean of FRAME and set to 
+        ;;COLOR parameter of RECTANGLE
+        (setf color (mean frame)) 
+        ;;Create a rectangle the color of 
+        ;;the mean of the pixels it covers
+        (rectangle img point-1 point-2 color +filled+ 4 0)
+    	(imshow window-name img)
+        ;;Clean up used matrices
+	(del-mat img)
+        (del-mat frame))
+      ;;Free memory as program ends
+      (free rect-x)
+      (free rect-y)
+      (free rect-width)
+      (free rect-height)
+      (destroy-all-windows))))
+
+
+RANDU
+
+Generates a single uniformly-distributed random number or an array of random numbers.
+
+C++: void randu(InputOutputArray dst, InputArray low, InputArray high)
+
+LISP-CV: (RANDU (DEST (:POINTER MAT)) (LOW (:POINTER SCALAR)) (HIGH (:POINTER SCALAR))) => :VOID
+
+
+    Parameters:	
+
+        DEST - output array of random numbers; the array must be pre-allocated.
+
+        LOW - inclusive lower boundary of the generated random numbers.
+
+        HIGH - exclusive upper boundary of the generated random numbers.
+
+
+This function fills the matrix dst with uniformly-distributed random numbers from the specified range.
+
+See also:
+
+(RNG), (RANDN), (THE-RNG)
+
+
+(defun randu-example ()
+  (let* ((data (alloc :float '(1.0f0 2.0f0 3.0f0 4.0f0 5.0f0 
+			       6.0f0 7.0f0 8.0f0 9.0f0)))
+	 (m (mat-data 3 3 +32f+ data)))
+    (format t "Print matrix M:~%~%")
+    (dotimes (i (rows m))
+      (dotimes (j (cols m))
+	(format t "~a" (at m i j :float))
+	(princ #\Space))
+      (princ #\Newline))
+    (format t "~%")
+    (format t "*Fill matrix M with random values with RANDU*~%~%")
+    (randu m (scalar -100) (scalar 100))
+    (format t "Print matrix M again:~%~%")
+    (dotimes (i 3)
+      (dotimes (j 3)
+	(format t "~a" (at m i j :float))
+	(princ #\Space))
+      (princ #\Newline))
+    (princ #\Space)
+    (free data)))
 
 
 
@@ -1957,7 +2316,7 @@ n the case of overflow.
 
 See also:
 
-(ABS) todo add this function
+(ABS) 
 
 
 (defun absdiff-example (&optional 
@@ -2544,11 +2903,7 @@ LISP-CV: (CAP-CAM (DEVICE :INT))
    ere is a single camera connected, just pass 0
    (the default value of *camera-index*)."
 
-  (with-capture (cap (ca;;; Types and structures
-
-
-
-;;; User Interfacep-cam camera-index))
+  (with-capture (cap (cap-cam camera-index))
     (let ((window-name "CAP-CAM Example"))
       (if (not (cap-is-open cap)) 
 	  (return-from cap-cam-example 
@@ -2785,11 +3140,7 @@ CIRCLE-EXAMPLE:
 			      (format t "floor has been touched~%") 
 			      (setf floor-switch 1))) 
 	(if (= y the-ceiling) (progn 
-				(format t;;; Types and structures
-
-
-
-;;; User Interface "ceiling has been touched~%") 
+				(format t"ceiling has been touched~%") 
 				(setf ceiling-switch 1))) 
 	(if (and (< x the-right-wall) (= right-wall-switch 0)) (incf x rate) (decf x rate))
 	(if (and (< y the-floor) (= floor-switch 0)) (incf y rate) (decf y rate))
@@ -5278,6 +5629,8 @@ VECTOR-INT(vector<int>)
 
 VECTOR-KEYPOINT(vector<KeyPoint>)
 
+VECTOR-POINT(vector<Point>)
+
 VECTOR-POINT2F(vector<Point2f>)
 
 
@@ -5335,8 +5688,9 @@ LISP-CV> (VECTOR-FLOAT A 2) <---Access the 2nd element of A.
 
 
 
-Vectors with, pointers to vectors with numbers, as their elements, VECTOR-DMATCH, VECTOR-KEYPOINT a-
-nd VECTOR-POINT2F operate as follows:(I use VECTOR-POINT2F as an example of the three vectors.)
+Vectors with, pointers to vectors with numbers, as their elements, VECTOR-DMATCH, VECTOR-KEYPOINT,
+VECTOR-POINT, and VECTOR-POINT2F operate as follows:(I use VECTOR-POINT2F as an example of the 
+four vectors.)
 
 
 
@@ -5369,6 +5723,14 @@ LISP-CV> (DEFPARAMETER A (VECTOR-POINT2F
 			  (LIST (POINT2F 1F0 2F0) (POINT2F 3F0 4F0)))) <--- Create an initialized vector A.
 
 A
+
+LISP-CV> (VECTOR-POINT2F A 0) ---> Access the 0th POINT2F in vector A
+
+#.(SB-SYS:INT-SAP #X7FFFD80008C0)
+
+LISP-CV> (VECTOR-POINT2F A 0) ---> Access the 1st POINT2F in vector A
+
+#.(SB-SYS:INT-SAP #X7FFFD80008C0)
 
 LISP-CV> (VECTOR-POINT2F A 0 0) <--- Access the 0th element of the 0th POINT2F in vector A.
 
@@ -5530,139 +5892,3 @@ LISP-CV> (MEM-REF A :INT)
 
 
 
-
-MEAN
-
-Calculates an average (mean) of array elements.
-
-C++: Scalar mean(InputArray src, InputArray mask=noArray())
-
-Common Lisp: (MEAN (SRC (:POINTER MAT)) &OPTIONAL ((MASK (:POINTER (MAT)) (MAT))))
-
-
-    Parameters:	
-
-        SRC - Input array that should have from 1 to 4 channels so that the result can be stored in SCALAR.
-
-        MASK - Optional operation mask.
-
-The function mean calculates the mean value M of array elements, independently for each channel, and 
-returns it:
-
-Equation:
-
-http://docs.opencv.org/_images/math/ea3b8e251b52d791f7b56ea8ef6e815048274c81.png
-
-When all the mask elements are 0’s, the functions return (SCALAR-ALL 0) .
-
-See also:
-
-(COUNT-NON-ZERO), (MEAN-STD-DEV), (NORM), (MIN-MAX-LOC)
-
-
-Example:
-
-
-(defun mean-example (&optional (camera-index *camera-index*) 
-		       (width *default-width*)
-		       (height *default-height*))
-
-  "Position the rectangle in the window by moving the trackbar 
-   sliders. The rectangle gets its color from the averaging of 
-   the pixels in the region of the rectangle. This averaging is
-   calculated by the function MEAN. For example if you position 
-   the rectangle over some thing red, the rectangle will turn a 
-   shade of red. The rectangle starts at 0,0 X,Y coordinates."
-
-  (with-capture (cap (cap-cam camera-index))
-    (let* ((window-name "IMG - MEAN Example")
-           (n 10)
-           ;;Initialize the rectangle location/
-           ;;dimension variables
-	   (rect-x (alloc :int '(0)))
-	   (rect-y (alloc :int '(0)))
-	   (rect-width (alloc :int (list (round (/ width n)))))
-	   (rect-height (alloc :int (list (round (/ height n))))))      
-      (cap-set cap +cap-prop-frame-width+ width)
-      (cap-set cap +cap-prop-frame-height+ height) 
-      ;;Create fullscreen window
-      (named-window window-name +window-normal+)
-      (set-window-property window-name +wnd-prop-fullscreen+ 
-			   +window-fullscreen+)
-      (move-window window-name 624 100)
-      ;;Initialize other variables
-      (do* ((frame 0)
-            (color 0)
-            (roi 0)
-	    (img 0)
-	    (point-1 0)
-	    (point-2 0))
-	   ((plusp (wait-key *millis-per-frame*)) nil)
-        (setf frame (mat))
-        ;;Set FRAME to a frame of the camera feed
-	(cap-read cap frame)
-        ;;Print rectangle location/dimensions
-	(format t "RECT-X: ~a~%~%" (mem-ref rect-x :int))
-	(format t "RECT-Y: ~a~%~%" (mem-ref rect-y :int))
-	(format t "RECT-WIDTH: ~a~%~%" (mem-ref rect-width :int))
-	(format t "RECT-HEIGHT: ~a~%~%" (mem-ref rect-height :int))
-        ;;Create trackbars to control the rectangle location/dimensions
-       	(create-trackbar "RECT-X" window-name rect-x width)
-	(create-trackbar "RECT-Y" window-name rect-y height)
-	(create-trackbar "RECT-WIDTH" window-name rect-width width)
-	(create-trackbar "RECT-HEIGHT" window-name rect-height height)
-        ;;Instantiate logic for the location/dimensions 
-        ;;of the rectangle based on the trackbar input
-	(if (equal (mem-ref rect-x :int) 0) 
-	    (setf (mem-ref rect-x :int) 1))
-	(if (> (mem-ref rect-x :int) 
-	       (- width (mem-ref rect-width :int))) 
-	    (setf (mem-ref rect-x :int) 
-		  (- width (mem-ref rect-width :int))))
-	(if (equal (mem-ref rect-y :int) 0) 
-	    (setf (mem-ref rect-y :int) 1))
-	(if (> (mem-ref rect-y :int) 
-	       (- height (mem-ref rect-height :int))) 
-	    (setf (mem-ref rect-y :int) 
-		  (- height (mem-ref rect-height :int))))
-	(if (< (mem-ref rect-width :int) 1) 
-	    (setf (mem-ref rect-width :int) 1))
-        (if (< (mem-ref rect-height :int) 1) 
-	    (setf (mem-ref rect-height :int) 1))
-	;;Set region of interest of FRAME to the rectangle 
-	;;location/dimensions we specified
-	(setf roi (rect (mem-ref rect-x :int) (mem-ref rect-y :int)
-			(mem-ref rect-width :int) (mem-ref rect-height :int)))
-        ;;Create an empty matrix
-	(setf img (mat))
-        ;;Make a copy of FRAME, IMG, to use 
-        ;;for the fullscreen camera output
-        (copy-to frame img)
-        ;;Set region of interest of FRAME to ROI. This region of 
-        ;;interest is the where we find the mean of the pixels. 
-	(setf frame (roi frame roi))
-        ;;Set position parameters of the RECTANGLE we will create, 
-        ;;that will be the color of the mean of the pixels in FRAME, 
-        ;;to that of the position of the region of interest of FRAME
-	(setf point-1 (point (mem-ref rect-x :int) 
-                             (mem-ref rect-y :int)))
-	(setf point-2 (point (+ (mem-ref rect-x :int) 
-                                (mem-ref rect-width :int)) 
-			     (+ (mem-ref rect-y :int) 
-                                (mem-ref rect-height :int))))
-        ;;Find mean of FRAME and set to 
-        ;;COLOR parameter of RECTANGLE
-        (setf color (mean frame)) 
-        ;;Create a rectangle the color of 
-        ;;the mean of the pixels it covers
-        (rectangle img point-1 point-2 color +filled+ 4 0)
-    	(imshow window-name img)
-        ;;Clean up used matrices
-	(del-mat img)
-        (del-mat frame))
-      ;;Free memory as program ends
-      (free rect-x)
-      (free rect-y)
-      (free rect-width)
-      (free rect-height)
-      (destroy-all-windows))))

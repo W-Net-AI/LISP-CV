@@ -6,7 +6,8 @@ using namespace std;
 using namespace flann;
 using namespace cvflann;
 extern "C" {
-void cv_goodFeaturesToTrack2(Mat* image, InputArray corners, int maxCorners, double qualityLevel, double minDistance, Mat* mask, int blockSize, bool useHarrisDetector, double k);
+void cv_randu2(Mat* dst, Scalar* low, Scalar* high);
+void cv_goodFeaturesToTrack2(Mat* image, vector_Point2f* corners, int maxCorners, double qualityLevel, double minDistance, Mat* mask, int blockSize, bool useHarrisDetector, double k);
 Point* cv_Mat_at_Point0(Mat* self, int i, int j);
 Mat* cv_create_Mat_as_vectort(vector_Point2f* vec, bool copyData);
 uchar* cv_Mat_get_Data(Mat* self); 

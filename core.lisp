@@ -2,6 +2,25 @@
 ;;;; core.lisp
 ;;;; OpenCV bindings
 ;;;; The Core Functionality
+;; Expand the body of a defmfun
+;; Liam Healy 2009-04-13 22:07:13EDT body-expand.lisp
+;; Time-stamp: <2011-10-30 00:35:29EDT body-expand.lisp>
+;;
+;; Copyright 2009, 2010, 2011 Liam M. Healy
+;; Distributed under the terms of the GNU General Public License
+;;
+;; This program is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+;;
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 (in-package :lisp-cv)
 
@@ -833,6 +852,28 @@
   (dest (:pointer mat)))
 
 
+;; void convertScaleAbs(InputArray src, OutputArray dst, double alpha=1, double beta=0)
+;; void cv_convertScaleAbs(Mat* src, Mat* dst, double alpha, double beta)
+(defcfun ("cv_convertScaleAbs" %convert-scale-abs) :void
+  (src (:pointer mat))
+  (dest (:pointer mat))
+  (alpha :double)
+  (beta :double))
+
+(defun convert-scale-abs (src dest &optional (alpha 1d0) (beta 0d0))
+  "Scales, calculates absolute values, and converts the result to 8-bit."
+   (%convert-scale-abs src dest alpha beta))
+
+
+;; void flip(InputArray src, OutputArray dst, int flipCode)
+;; void cv_flip(Mat* src, Mat* dst, int flipCode)
+(defcfun ("cv_flip" flip) :void
+  "Flips a 2D array around vertical, horizontal, or both axes."
+  (src (:pointer mat))
+  (dest (:pointer mat))
+  (flip-code :int))
+
+
 ;; void inRange(InputArray src, InputArray lowerb, InputArray upperb, OutputArray dst)
 ;; void cv_inRangeS(Mat* src, Scalar* lowerb, Scalar* upperb, Mat* dst)
 (defcfun ("cv_inRangeS" in-range-s) :void
@@ -853,6 +894,14 @@
 (defun mean (src &optional (mask (mat)))
   "Calculates an average (mean) of array elements."
   (%mean src mask))
+
+
+;; void randu(InputOutputArray dst, InputArray low, InputArray high)
+;; void cv_randu2(Mat* dst, Scalar* low, Scalar* high)
+(defcfun ("cv_randu2" randu) :void
+  (dest (:pointer mat))
+  (low (:pointer scalar))
+  (high (:pointer scalar)))
 
 
 ;; RNG::RNG()

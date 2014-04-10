@@ -204,7 +204,7 @@
 		 ((listp arg)
 		  (return-from vector-point (c-arr-to-vector-point arg)))
 		 ((and (pointerp arg) n (not i)) (mem-aref (%vector-point-to-c-array arg) :pointer n))
-		 ((and (pointerp arg) n i) (mem-aref (mem-aref (%vector-point-to-c-array arg) :pointer n) :float i))
+		 ((and (pointerp arg) n i) (mem-aref (mem-aref (%vector-point-to-c-array arg) :pointer n) :int i))
 		 (t nil)))
 
 

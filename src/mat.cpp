@@ -128,7 +128,7 @@ size_t cv_Mat_total(Mat* self) {
     return self->total();
 }
 
-bool cv_Mat_isContinuous(Mat* self) {
+fbool cv_Mat_isContinuous(Mat* self) {
     return self->isContinuous();
 }
 

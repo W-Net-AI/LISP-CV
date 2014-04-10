@@ -146,6 +146,7 @@
    #:channels
    #:clone
    #:cols
+   #:convert-scale-abs
    #:copy-to
    #:data
    #:del-mat
@@ -193,6 +194,7 @@
    #:point3i-z
    #:promote
    #:ptr
+   #:randu
    #:rect
    #:rect-init
    #:reshape
@@ -261,6 +263,7 @@
    #:+decomp-qr+ 
    #:+decomp-normal+
  
+   #:flip
    #:in-range-s
 
    #:+l1+
