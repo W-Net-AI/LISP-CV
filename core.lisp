@@ -878,6 +878,20 @@
   (%mean src mask))
 
 
+;; void multiply(InputArray src1, InputArray src2, OutputArray dst, double scale=1, int dtype=-1 )
+;; void cv_multiply(Mat* src1, Mat* src2, Mat* dst, double scale, int dtype)
+(defcfun ("cv_multiply" %multiply) :void
+  (src1 (:pointer mat))
+  (src2 (:pointer mat))
+  (dest (:pointer mat))
+  (scale :double)
+  (dtype :int))
+
+(defun multiply (src1 src2 dest &optional (scale 1.0d0) (dtype -1))
+  "Calculates the per-element scaled product of two arrays."
+   (%multiply src1 src2 dest scale dtype))
+
+
 ;; void randu(InputOutputArray dst, InputArray low, InputArray high)
 ;; void cv_randu2(Mat* dst, Scalar* low, Scalar* high)
 (defcfun ("cv_randu2" randu) :void

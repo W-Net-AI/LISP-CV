@@ -270,7 +270,7 @@
    #:+l2+
 
    #:mean
-
+   #:multiply
    #:+norm-inf+
    #:+norm-l1+
    #:+norm-l2+

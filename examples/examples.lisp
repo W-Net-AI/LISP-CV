@@ -797,6 +797,95 @@ Example:
       (destroy-all-windows))))
 
 
+
+MULTIPLY
+
+Calculates the per-element scaled product of two arrays.
+
+C++: void multiply(InputArray src1, InputArray src2, OutputArray dst, double scale=1, int dtype=-1 )
+
+LISP-CV: (MULTIPLY (SRC1 (:POINTER MAT)) (SRC2 (:POINTER MAT)) (DEST (:POINTER MAT)) (SCALE :DOUBLE) (DTYPE :INT)) => :VOID
+
+
+    Parameters:	
+
+        SRC1 - First input array.
+
+        SRC2 - Second input array of the same size and the same type as SRC1.
+
+        DEST - Output array of the same size and type as SRC1.
+
+        SCALE - Optional scale factor.
+  
+        DTYPE - Destination matrix type.
+
+
+The function multiply calculates the per-element product of two arrays. There is also a Matrix 
+Expressions (MAT-EXPR) variant of this function. See (MUL). For a not-per-element 
+matrix product, see (GEMM).
+
+Note:
+
+Saturation is not applied when the output array has the depth +32S+. You may even get result of an 
+incorrect sign in the case of overflow.
+
+See also:
+
+(ADD), (SUBTRACT), (DIVIDE), MAT-EXPR, (SCALE-ADD), (ADD-WEIGHTED), (ACCUMULATE), (ACCUMULATE-PRODUCT), 
+(ACCUMULATE-SQUARE), (CONVERT-TO)
+
+
+(defun multiply-example ()
+  ;;Allocate int, double float and unsigned char matrix data
+  (let* ((int-data (alloc :int '(1 2 3 4 5 6 7 8 9)))
+	 (double-data (alloc :double '(1d0 2d0 3d0 4d0 5d0 6d0 7d0 8d0 9d0)))
+	 (uchar-data (alloc :uchar '(1 2 3 4 5 6 7 8 9)))
+	 ;;Create 2 identical src matrices and 
+	 ;;1 dest matrix for each data type
+	 (int-mat-1 (mat-data 3 3 +32s+ int-data))
+         (int-mat-2 (mat-data 3 3 +32s+ int-data))
+         (dest1 (mat))
+	 (double-mat-1 (mat-data 3 3 +64f+ double-data))
+         (double-mat-2 (mat-data 3 3 +64f+ double-data))
+         (dest2 (mat))
+	 (uchar-mat-1 (mat-data 3 3 +8u+ uchar-data))
+         (uchar-mat-2 (mat-data 3 3 +8u+ uchar-data))
+         (dest3 (mat)))
+    ;;Multiply int matrix by identical matrix using 
+    ;;a default dtype(destination type) parameter
+    (multiply int-mat-1 int-mat-2 dest1 1d0 -1)
+    ;;Multiply double float matrix by identical matrix using 
+    ;;a dtype parameter of 6(+64F+) or double float type
+    (multiply double-mat-1 double-mat-2 dest2 1d0 6)
+    ;;Multiply uchar matrix by identical matrix using 
+    ;;a default dtype parameter and a scalar, 2d0
+    (multiply uchar-mat-1 uchar-mat-2 dest3 2d0 -1)
+    ;;Print results
+    (format t "~%")
+    (dotimes (i (rows dest1))
+      (dotimes (j (cols dest1))
+	(format t "~a" (at dest1 i j :int))
+	(princ #\Space))
+      (princ #\Newline))
+    (format t "~%~%")
+    (dotimes (i (rows dest2))
+      (dotimes (j (cols dest2))
+	(format t "~a" (at dest2 i j :double))
+	(princ #\Space))
+      (princ #\Newline))
+    (format t "~%~%")
+    (dotimes (i (rows dest3))
+      (dotimes (j (cols dest3))
+	(format t "~a" (at dest3 i j :uchar))
+	(princ #\Space))
+      (princ #\Newline))
+    (format t "~%")
+    ;;Clean up used memory
+    (free int-data)
+    (free double-data)
+    (free uchar-data)))
+
+
 RANDU
 
 Generates a single uniformly-distributed random number or an array of random numbers.
@@ -5810,7 +5899,56 @@ MACROS
 
 =======================================================MACROS===========================================================
 
-ALLOC
+ALLOC(defun multiply-example ()
+  ;;Allocate int, double float and unsigned char matrix data
+  (let* ((int-data (alloc :int '(1 2 3 4 5 6 7 8 9)))
+	 (double-data (alloc :double '(1d0 2d0 3d0 4d0 5d0 6d0 7d0 8d0 9d0)))
+	 (uchar-data (alloc :uchar '(1 2 3 4 5 6 7 8 9)))
+	 ;;Create 2 identical src matrices and 
+	 ;;1 dest matrix for each data type
+	 (int-mat-1 (mat-data 3 3 +32s+ int-data))
+         (int-mat-2 (mat-data 3 3 +32s+ int-data))
+         (dest1 (mat))
+	 (double-mat-1 (mat-data 3 3 +64f+ double-data))
+         (double-mat-2 (mat-data 3 3 +64f+ double-data))
+         (dest2 (mat))
+	 (uchar-mat-1 (mat-data 3 3 +8u+ uchar-data))
+         (uchar-mat-2 (mat-data 3 3 +8u+ uchar-data))
+         (dest3 (mat)))
+    ;;Multiply int matrix by identical matrix using 
+    ;;a default dtype(destination type) parameter
+    (multiply int-mat-1 int-mat-2 dest1 1d0 -1)
+    ;;Multiply double float matrix by identical matrix using 
+    ;;a dtype parameter of 6(+64F+) or double float type
+    (multiply double-mat-1 double-mat-2 dest2 1d0 6)
+    ;;Multiply uchar matrix by identical matrix using 
+    ;;a default dtype parameter and a scalar, 2d0
+    (multiply uchar-mat-1 uchar-mat-2 dest3 2d0 -1)
+    ;;Print results
+    (format t "~%")
+    (dotimes (i (rows dest1))
+      (dotimes (j (cols dest1))
+	(format t "~a" (at dest1 i j :int))
+	(princ #\Space))
+      (princ #\Newline))
+    (format t "~%~%")
+    (dotimes (i (rows dest2))
+      (dotimes (j (cols dest2))
+	(format t "~a" (at dest2 i j :double))
+	(princ #\Space))
+      (princ #\Newline))
+    (format t "~%~%")
+    (dotimes (i (rows dest3))
+      (dotimes (j (cols dest3))
+	(format t "~a" (at dest3 i j :uchar))
+	(princ #\Space))
+      (princ #\Newline))
+    (format t "~%")
+    ;;Clean up used memory
+    (free int-data)
+    (free double-data)
+    (free uchar-data)))
+
 
 Macro for CFFI::FOREIGN-ALLOC
 
