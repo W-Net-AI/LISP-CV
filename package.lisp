@@ -147,9 +147,11 @@
    #:clone
    #:cols
    #:convert-scale-abs
+   #:convert-to
    #:copy-to
    #:data
    #:del-mat
+   #:del-mat-expr
    #:div
    #:dot
    #:dot2d
@@ -265,6 +267,7 @@
  
    #:flip
    #:in-range-s
+   #:invert
 
    #:+l1+
    #:+l2+
@@ -381,7 +384,13 @@
    #:+border-reflect-101+
    #:+border-reflect101+
    #:+border-default+ 
-   #:copy-make-border
+   #:+border-transparent+
+   #:+border-isolated+
+
+   #:gaussian-blur
+   #:pyr-down
+   #:pyr-up
+
    #:+cv-shape-rect+
    #:+cv-shape-cross+
    #:+cv-shape-ellipse+
@@ -625,7 +634,9 @@
 
 ;; imgproc - Feature Detection
 
-;; Object Detection
+   #:canny
+
+;; imgproc - Object Detection
 
    #:+tm-sqdiff+   
    #:+tm-sqdiff-normed+
@@ -705,6 +716,7 @@
    #:+load-image-anydepth+
    #:+load-image-anycolor+
    #:imread
+   #:imwrite
    #:video-writer
    #:video-writer-init
    #:video-writer-is-open

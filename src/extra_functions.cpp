@@ -1,4 +1,5 @@
-#include <opencv2/c/point.hpp>
+#include <opencv2/c/extra_functions.hpp>
+
 
 #define ADD_POINT_FUNC_IMPL(t, tn) \
     Point2##t * cv_create_Point2##t ( tn x,  tn y) { \

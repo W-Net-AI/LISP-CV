@@ -10,10 +10,10 @@ vector_Mat* std_create_vectorm() {
 }
 
 vector_Mat* std_carrayTovectorm(Mat* a, size_t len) {
-    vector<Mat>* v = new vector<Mat>;
-    for(size_t i = 0; i < len; i++) 
-        v->push_back(a[i]);
-    return v;
+vector<Mat>* v = new vector<Mat>;
+for(size_t i = 0; i < len; i++)
+v->push_back(a[i]);
+return v;
 }
 
 Mat* std_vectormToCArray(vector_Mat* s) {
@@ -186,4 +186,24 @@ double* std_vectordToCArray(vector_double* s) {
 size_t std_vectord_length(vector_double* self) {
     return self->size();
 }
+
+vector_uchar* std_create_vectoru() {
+    return new vector<uchar>;
+}
+
+vector_uchar* std_carrayTovectoru(uchar* a, size_t len) {
+    vector<uchar>* v = new vector<uchar>;
+    for(size_t i = 0; i < len; i++) 
+        v->push_back(a[i]);
+    return v;
+}
+
+uchar* std_vectoruToCArray(vector_uchar* s) {
+    return s->data();
+}
+
+size_t std_vectoru_length(vector_uchar* self) {
+    return self->size();
+}
+
 }

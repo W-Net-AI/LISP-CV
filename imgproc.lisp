@@ -25,6 +25,33 @@
    (%gaussian-blur src dest ksize sigma-x sigma-y border-type))
 
 
+;;void pyrDown(InputArray src, OutputArray dst, const Size& dstsize=Size(), int borderType=BORDER_DEFAULT )
+;;void cv_pyrDown(Mat* src, Mat* dst, Size* dstsize, int borderType)
+(defcfun ("cv_pyrDown" %pyr-down) :void 
+	 (src (:pointer mat))
+	 (dest (:pointer mat))
+	 (dstsize (:pointer size))
+	 (border-type :int))
+
+(defun pyr-down (src dest &optional (dstsize (size)) (border-type +border-default+))
+  "Blurs an image and downsamples it."
+  (%pyr-down src dest dstsize border-type))
+
+
+;;void pyrUp(InputArray src, OutputArray dst, const Size& dstsize=Size(), int borderType=BORDER_DEFAULT )
+;;void cv_pyrUp(Mat* src, Mat* dst, Size* dstsize, int borderType)
+(defcfun ("cv_pyrUp" %pyr-up) :void 
+  (src (:pointer mat))
+  (dest (:pointer mat))
+  (dstsize (:pointer size))
+  (border-type :int))
+
+(defun pyr-up (src dest &optional (dstsize (size)) (border-type +border-default+))
+  "Upsamples an image and then blurs it."
+  (%pyr-up src dest dstsize border-type))
+
+
+
 ;;; Miscellaneous Image Transformations
 
 
@@ -47,7 +74,24 @@
 
 ;;; Motion Analysis and Object Tracking
 
+
 ;;; Feature Detection
+
+
+;; void Canny(InputArray image, OutputArray edges, double low-thresh, double high-thresh, int apertureSize=3, bool L2gradient=false )
+;; void cv_Canny(Mat* image, Mat* edges, double low-thresh, double high-thresh, int apertureSize, bool L2gradient)
+(defcfun ("cv_Canny" %canny) :void 
+	 (image (:pointer mat))
+	 (edges (:pointer mat))
+	 (low-thresh :double)
+	 (high-thresh :double)
+	 (aperture-size :int)
+	 (l2-gradient :boolean))
+
+(defun canny (image edges low-thresh high-thresh &optional (aperture-size 3) (l2-gradient nil))       
+  "Finds edges in an image using the [Canny86] algorithm."
+       (%canny image edges low-thresh high-thresh aperture-size l2-gradient))
+
 
 ;;; Object Detection
 

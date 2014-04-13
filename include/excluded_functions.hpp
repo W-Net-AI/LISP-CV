@@ -6,6 +6,7 @@ using namespace std;
 using namespace flann;
 using namespace cvflann;
 extern "C" {
+bool cv_imwrite2(const char* filename, Mat* img, vector_int* params);
 void cv_randu2(Mat* dst, Scalar* low, Scalar* high);
 void cv_goodFeaturesToTrack2(Mat* image, vector_Point2f* corners, int maxCorners, double qualityLevel, double minDistance, Mat* mask, int blockSize, bool useHarrisDetector, double k);
 Point* cv_Mat_at_Point0(Mat* self, int i, int j);
@@ -36,6 +37,7 @@ void cv_inRangeS(Mat* src, Scalar* lowerb, Scalar* upperb, Mat* dst);
 int cv_createTrackbar(String* trackbarname, String* winname, int* value, int count, TrackbarCallback onChange, void* userdata);
 void cv_setMouseCallback(String* winname, MouseCallback onMouse, void* userdata);
 void cv_delete_Mat(void* ptr);
+void cv_delete_MatExpr(void* ptr);
 void cv_delete_BFMatcher(void* ptr);
 void cv_delete_BRISK(void* ptr);
 )

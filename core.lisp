@@ -6,12 +6,6 @@
 
 (in-package :lisp-cv)
 
-; Point* cv_Mat_at_Point(Mat* self, int row, int col);
-(defcfun ("cv_Mat_at_Point0" at-point) (:pointer point)
-  "Returns a reference to a POINT array element."
-  (self (:pointer mat))
-  (i :int)
-  (j :int)) 
 
 ;; Default parameters
 
@@ -145,7 +139,7 @@
   (mask (:pointer mat)))
 
 
-(defun copy-to (&optional (mat nil) (m nil) (mask nil))
+(defun copy-to (&optional mat m mask)
   (cond ((eq mask nil)
 	 (copy-to2 mat m))
 	(t (copy-to3 mat m mask))))
@@ -172,7 +166,6 @@
   (alpha :double)
   (beta :double))
 
-
 (defun convert-to (self m rtype &optional (alpha 1.0d0) (beta 0.0d0))
   "Converts an array to another data type with optional scaling."
   (%convert-to self m rtype alpha beta))
@@ -188,6 +181,12 @@
 ;; void operator delete  ( void* ptr )
 ;; void cv_delete_Mat(void* ptr)
 (defcfun ("cv_delete_Mat" del-mat) :void
+  (ptr :pointer))
+
+
+;; void operator delete  ( void* ptr )
+;; void cv_delete_MatExpr(void* ptr)
+(defcfun ("cv_delete_MatExpr" del-mat-expr) :void
   (ptr :pointer))
 
 
@@ -293,8 +292,26 @@
 
 ;; Mat::Mat()
 ;; Mat* cv_create_Mat()
-(defcfun ("cv_create_Mat" mat) (:pointer mat)
+(defcfun ("cv_create_Mat" %mat) (:pointer mat)
   "MAT constructor")
+
+(defstruct (cvmatrix (:constructor %make-cvmatrix))
+  (sap (%mat) :type sb-sys:system-area-pointer :read-only t))
+
+ (defun mat (&optional enable-finalizer)
+  (let* ((matrix (%make-cvmatrix))
+          (sap (cvmatrix-sap matrix)))
+(when enable-finalizer
+    (tg:finalize matrix (lambda () (del-mat sap))))
+    sap))
+
+(defmacro with-mat ((mat-var mat) &body body)
+  "Ensures DEL-MAT gets called on 
+   when MAT goes out of scope."
+  `(let ((,mat-var ,mat))
+     (unwind-protect
+	 (progn ,@body)
+       (del-mat ,mat-var))))
 
 
 ;; Mat::Mat(int rows, int cols, int type, void* data) 
@@ -665,7 +682,7 @@
   (width :int)
   (height :int))
 
-(defun rect (&optional (x nil) (y nil) (width nil) (height nil))
+(defun rect (&optional x y width height)
 	   (cond ((eq (or x y) nil)
 		  (rect0))
 		 ((and x y)
@@ -825,6 +842,13 @@
 
 ;;; Operations on Arrays
 
+
+;; MatExpr abs(const Mat& m)
+;; MatExpr* cv_abs(Mat* m)
+(defcfun ("cv_abs" ~abs) (:pointer mat-expr)
+  (m (:pointer mat)))
+
+
 ;; C++: void absdiff(InputArray src1, InputArray src2, OutputArray dst)
 ;; void cv_absdiff(Mat* src1, Mat* src2, Mat* dst) 
 (defcfun ("cv_absdiff" absdiff) :void
@@ -864,6 +888,18 @@
   (lowerb (:pointer scalar))
   (upperb (:pointer scalar))
   (dst :pointer mat))
+
+
+;; double invert(InputArray src, OutputArray dst, int flags=DECOMP_LU)
+;; double cv_invert(Mat* src, Mat* dst, int flags)
+(defcfun ("cv_invert" %invert) :double
+  (src (:pointer mat))
+  (dest (:pointer mat))
+  (flags :int))
+
+(defun invert (src dest &optional (flags +decomp-lu+))
+  "Finds the inverse or pseudo-inverse of a matrix."
+   (%invert src dest flags))
 
 
 ;; Scalar mean(InputArray src, InputArray mask=noArray())

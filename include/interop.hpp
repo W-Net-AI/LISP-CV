@@ -9,6 +9,7 @@ typedef vector<int> vector_int;
 typedef vector<float> vector_float;
 typedef vector<DMatch> vector_DMatch;
 typedef vector<KeyPoint> vector_KeyPoint;
+typedef vector<Point> vector_Point;
 typedef vector<Point2f> vector_Point2f;
 typedef vector<Mat> vector_Mat;
 
@@ -16,6 +17,12 @@ typedef vector<Mat> vector_Mat;
 
 
 extern "C" {
+
+vector_uchar* std_create_vectoru();
+vector_uchar* std_carrayTovectoru(uchar* a, size_t len);
+uchar* std_vectoruToCArray(vector_uchar* s);
+size_t std_vectoru_length(vector_uchar* self);
+
 vector_Mat* std_create_vectorm();
 vector_Mat* std_carrayTovectorm(Mat* a, size_t len);
 Mat* std_vectormToCArray(vector_Mat* s);

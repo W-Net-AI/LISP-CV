@@ -13,6 +13,7 @@
 ;; vector_DMatch* std_create_vectordm() 
 (defcfun ("std_create_vectordm" %vector-dmatch) (:pointer vector-dmatch))
 
+
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_DMatch* std_carrayTovectordm(DMatch* a, size_t len)
 (defcfun ("std_carrayTovectordm" %c-arr-to-vector-dmatch) (:pointer vector-dmatch)
@@ -46,11 +47,45 @@
 ;; vector_KeyPoint* std_create_vectorkp() 
 (defcfun ("std_create_vectorkp" %vector-keypoint) (:pointer vector-keypoint))
 
+
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_KeyPoint* std_carrayTovectorkp(float* a, size_t len)
 (defcfun ("std_carrayTovectorkp" %c-arr-to-vector-keypoint) (:pointer vector-keypoint)
   (a :pointer)
   (len :unsigned-int))
+
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_double* std_create_vectord() 
+(defcfun ("std_create_vectord" %vector-double) (:pointer vector-double))
+
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_double* std_carrayTovectord(double* a, size_t len)
+(defcfun ("std_carrayTovectord" %c-arr-to-vector-double) (:pointer vector-double)
+  (a :pointer)
+  (len :unsigned-int))
+
+
+(let ((previous nil))
+  (defun c-arr-to-vector-double (a)
+    (unless (equal a (car previous))
+      (setf previous (cons a (foreign-alloc :double :initial-contents a))))
+    (%c-arr-to-vector-double (cdr previous) (length a))))
+
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; double* std_vectordToCArray(vector_double* s) 
+(defcfun ("std_vectordToCArray" %vector-double-to-c-array) :pointer 
+  (s (:pointer vector-double)))
+
+
+(defun vector-double (&optional arg (i 0))
+  (cond ((eq arg nil) (return-from vector-double (%vector-double)))
+	((listp arg)
+	 (return-from vector-double (c-arr-to-vector-double arg)))
+	((pointerp arg) (mem-aref (%vector-double-to-c-array arg) :double i))
+    (t nil)))
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
@@ -76,7 +111,7 @@
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
-;; vector_char* std_create_vectorf() 
+;; vector_float* std_create_vectorf() 
 (defcfun ("std_create_vectorf" %vector-float) (:pointer vector-float))
 
 
@@ -250,7 +285,7 @@
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_Mat* std_carrayTovectorm(Mat* a, size_t len)
 (defcfun ("std_carrayTovectorm" %c-arr-to-vector-mat) (:pointer vector-mat)
-  (a (:pointer mat))
+  (a :pointer)
   (len :unsigned-int))
 
 
@@ -274,4 +309,36 @@
 		 ((and (pointerp arg) n (not i)) (mem-aref (%vector-mat-to-c-array arg) :pointer n))
 		 ((and (pointerp arg) n i) (mem-aref (mem-aref (%vector-mat-to-c-array arg) :pointer n) :float i))
 		 (t nil)))
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_uchar* std_create_vectoru() 
+(defcfun ("std_create_vectoru" %vector-uchar) (:pointer vector-uchar))
+
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_uchar* std_carrayTovectoru(uchar* a, size_t len)
+(defcfun ("std_carrayTovectoru" %c-arr-to-vector-uchar) (:pointer vector-uchar)
+  (a :pointer)
+  (len :unsigned-int))
+
+
+(let ((previous nil))
+  (defun c-arr-to-vector-uchar (a)
+    (unless (equal a (car previous))
+      (setf previous (cons a (foreign-alloc :uchar :initial-contents a))))
+    (%c-arr-to-vector-uchar (cdr previous) (length a))))
+
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; uchar* std_vectoruToCArray(vector_uchar* s) 
+(defcfun ("std_vectoruToCArray" %vector-uchar-to-c-array) :pointer 
+  (s (:pointer vector-uchar)))
+
+
+(defun vector-uchar (&optional arg (i 0))
+  (cond ((eq arg nil) (return-from vector-uchar (%vector-uchar)))
+	((listp arg)
+	 (return-from vector-uchar (c-arr-to-vector-uchar arg)))
+	((pointerp arg) (mem-aref (%vector-uchar-to-c-array arg) :uchar i))
+    (t nil)))
 

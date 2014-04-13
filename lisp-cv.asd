@@ -8,6 +8,7 @@
   :description "OpenCV bindings for SBCL"
   :depends-on (#:cffi
                #:swank 
+               #:trivial-garbage
                ;Commenting out swank above -> gets rid of - WARNING: Not reloading SWANK.  Package already exists. -
                ;in inferior-lisp at startup - re-add to get live code editing. 
 )

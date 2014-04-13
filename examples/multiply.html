@@ -14,12 +14,13 @@ function addLoadEvent(func){var oldonload=window.onload;if(typeof window.onload!
 /* ]]> */
 </script>
 <link rel='stylesheet' id='open-sans-css'  href='//fonts.googleapis.com/css?family=Open+Sans%3A300italic%2C400italic%2C600italic%2C300%2C400%2C600&#038;subset=latin%2Clatin-ext&#038;ver=3.9-RC1' type='text/css' media='all' />
-<link rel='stylesheet' id='all-css-2' href='http://s0.wp.com/_static/??-eJx9UttyQiEM/KFirNZ2fOj0W7hEDgqEIRxt/745x1atTnliE3Y3F4BTUSHbODpksMzgNA/BUuZFCnkhmSe4p2gnV8ro+ocimoa5QRpViaMPmYFHw7aG0oL4wY5ipFOPP9ARqzKjMVFKcfuK+NjBnqFJhwdDnxfQM43hMKmwFW0Pao569Mtwcm8pqeuwHZGlipJPRbeJkdAFjRGT0HqyVF5/VRMcpMHH3togPgxlNKCzq6hvFxMgU5uf6wJ6BYWDNyOq46rHrmgieYF+fvZr2BM1YlWxUG1qRzXdxz1pIRZS1KECD7pOdX/OnspjxnpewRX+t8XhBXwko2PP8RScx3b+655o2rmbHT/S+/N6+7bcbJar7f4beXw15A==' type='text/css' media='all' />
+<link rel='stylesheet' id='all-css-2' href='http://s1.wp.com/_static/??-eJx9Utt2AiEM/KFiTq328tDTb+ESWRQIh7Bu+/fNrq1aPeWJSZiZXACmokK2cXTIYJnBaR6CpcyrFPJKMg9wS9FOrpTR9Q9FNA1zgzSqEkcfMgOPhm0NpQXxgx3FSFOPP9ARqzKjMVFKcfuKeN/BnqFJhwdDn2fQM43hMKuwFW0Paol69PNwcm8pqcuwHZGlipJPRbeZkdAFjRGT0HqyVJ5/VTMcpMH73togPgxlNKCzq6ivFxMgU1ue6wx6BYWDVyOq47rHrmgieYF+efZL2BM1YlWxUG1qRzXdxj1pIRZS1KECD7rOdX/OnspjxnpawQX+t8VhAz6S0bHnOAXnsZ3+uiead+4Wx4/0/vj09rJeb1632/03eZQ16Q==' type='text/css' media='all' />
 <link rel='stylesheet' id='print-css-2' href='http://s0.wp.com/wp-content/mu-plugins/global-print/global-print.css?m=1387483371g' type='text/css' media='print' />
 <script type='text/javascript' src='http://s0.wp.com/_static/??-eJx9kFEKwjAMQC9k18k+dB/iWbaalcw2rU3q0NPbj4k4qhAIIY8kL3qJCsm4fAHWc4lbhvRYUzPzTv8DlEebBoHGI71hE0iARPusossWiTXnkU3CKBhKNQXnwrLFy+gYWDwwDxYqXR9GdKAyQyoASblqChXu2wDpjlBbthEFiYO5qgSMT6h5c/wo/n7YSp39ad/1h/bYt10/vwBJX4VC'></script>
 <link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://wnetai.wordpress.com/xmlrpc.php?rsd" />
 <link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://wnetai.wordpress.com/wp-includes/wlwmanifest.xml" /> 
 <link rel='prev' title='FLIP' href='http://wnetai.wordpress.com/flip/' />
+<link rel='next' title='INVERT' href='http://wnetai.wordpress.com/invert/' />
 <meta name="generator" content="WordPress.com" />
 <link rel='canonical' href='http://wnetai.wordpress.com/multiply/' />
 <link rel='shortlink' href='http://wp.me/P3E9Y7-111' />
@@ -30,7 +31,7 @@ function addLoadEvent(func){var oldonload=window.onload;if(typeof window.onload!
 <meta property="og:url" content="http://wnetai.wordpress.com/multiply/" />
 <meta property="og:description" content="======================================================================= Calculates the per-element scaled product of two arrays. C++: void multiply(InputArray src1, InputArray src2, OutputArray dst..." />
 <meta property="article:published_time" content="2014-04-11T01:13:30+00:00" />
-<meta property="article:modified_time" content="2014-04-11T01:32:29+00:00" />
+<meta property="article:modified_time" content="2014-04-12T15:31:00+00:00" />
 <meta property="article:author" content="http://wnetai.wordpress.com/author/joeish80829-2/" />
 <meta property="og:site_name" content="WNET A.I." />
 <meta property="og:image" content="http://1.gravatar.com/blavatar/dcebe59d8afca988dd05c567ee79faf5?s=200" />
@@ -128,15 +129,13 @@ function addLoadEvent(func){var oldonload=window.onload;if(typeof window.onload!
 <p><strong><span style="color:#ff0000;"><span style="font-size:13px;">SRC2</span></span> &#8211; Second input array of the same size and the same type as SRC1.</strong></p>
 <p><strong><span style="color:#ff0000;"><span style="font-size:13px;">DEST</span></span> &#8211; Output array of the same size and type as SRC1.</strong></p>
 <p><strong><span style="color:#ff0000;"><span style="font-size:13px;">SCALE</span></span> &#8211; Optional scale factor.</strong></p>
-<p><strong><span style="color:#ff0000;"><span style="font-size:13px;">DTYPE</span></span> &#8211; Destination matrix type.</strong></p>
-<p><strong>The function multiply calculates the per-element product of two arrays. There is also a Matrix Expressions <span style="color:#3366ff;">(MAT-EXPR)</span> variant of this function. See <span style="color:#3366ff;">(MUL)</span>. For a not-per-element matrix product, see <span style="color:#3366ff;">(GEMM)</span>.</strong></p>
-<p><strong>Note:</strong></p>
-<p><strong>Saturation is not applied when the output array has the depth <span style="color:#3366ff;">+32S+</span>. You may even get result of an</strong><br />
-<strong> incorrect sign in the case of overflow.</strong></p>
-<p><strong>See also:</strong></p>
-<p><strong><span style="color:#3366ff;">(ADD)</span>, <span style="color:#3366ff;">(SUBTRACT)</span>, <span style="color:#3366ff;">(DIVIDE)</span>, <span style="color:#3366ff;">MAT-EXPR</span>, <span style="color:#3366ff;">(SCALE-ADD)</span>, <span style="color:#3366ff;">(ADD-WEIGHTED)</span>,<span style="color:#3366ff;"> (ACCUMULATE)</span>, <span style="color:#3366ff;">(ACCUMULATE-PRODUCT)</span>,</strong><br />
-<strong> <span style="color:#3366ff;">(ACCUMULATE-SQUARE)</span>, <span style="color:#3366ff;">(CONVERT-TO)</span></strong></p>
-<p><strong><span style="color:#ff0000;"><span style="font-size:16px;">Example:</span></span></strong></p>
+<p><strong><span style="color:#ff0000;"><span style="font-size:13px;">DTYPE</span></span> &#8211; Destination matrix type, default is -1: <span style="color:#3366ff;">(EQ (MAT-TYPE DEST) (MAT-TYPE SRC))</span><br />
+<span style="margin-left:65px;">You can change DTYPE to a double float(<span style="color:#3366ff;">+64F+</span>) to achieve higher precision).</span></strong></p>
+<p><strong>The function multiply calculates the per-element product of two arrays. There is also a Matrix<br />
+Expressions <span style="color:#3366ff;">(MAT-EXPR)</span> variant of this function. See <span style="color:#3366ff;">(MUL)</span>. For a not-per-element matrix product,<br />
+see <span style="color:#3366ff;">(GEMM)</span>.</strong></p>
+<p><strong>Note: Saturation is not applied when the output array has the depth <span style="color:#3366ff;">+32S+</span>. You may even get result </br>of an incorrect sign in the case of overflow.</strong></p>
+<p></br><strong><span style="color:#ff0000;"><span style="font-size:16px;">Example:</span></span></strong></p>
 <pre style="font-size:13px;"><strong><span style="color:#3366ff;">(defun multiply-example ()
   ;;Allocate int, double float and unsigned char matrix data
   (let* ((int-data (alloc :int '(1 2 3 4 5 6 7 8 9)))
@@ -189,7 +188,7 @@ function addLoadEvent(func){var oldonload=window.onload;if(typeof window.onload!
 
 </span></strong></pre>
 <p><span style="color:#999999;"><strong><span style="color:#999999;"><strong>=======================================================================</strong></span></strong></span></p>
-<div id="jp-post-flair" class="sharedaddy sd-like-enabled sd-sharing-enabled"><div class="sharedaddy sd-sharing-enabled"><div class="robots-nocontent sd-block sd-social sd-social-icon-text sd-sharing"><h3 class="sd-title">Share this:</h3><div class="sd-content"><ul><li class="share-press-this"><a rel="nofollow" class="share-press-this sd-button share-icon" href="http://wnetai.wordpress.com/multiply/?share=press-this" title="Click to Press This!"><span>Press This</span></a></li><li class="share-twitter"><a rel="nofollow" class="share-twitter sd-button share-icon" href="http://wnetai.wordpress.com/multiply/?share=twitter" title="Click to share on Twitter" id="sharing-twitter-3907"><span>Twitter</span></a></li><li class="share-facebook"><a rel="nofollow" class="share-facebook sd-button share-icon" href="http://wnetai.wordpress.com/multiply/?share=facebook" title="Share on Facebook" id="sharing-facebook-3907"><span>Facebook</span></a></li><li class="share-end"></li></ul></div></div></div><div class='sharedaddy sd-block sd-like jetpack-likes-widget-wrapper jetpack-likes-widget-unloaded' id='like-post-wrapper-53900451-3907-534746a8542fe' data-src='//widgets.wp.com/likes/#blog_id=53900451&amp;post_id=3907&amp;origin=wnetai.wordpress.com&amp;obj_id=53900451-3907-534746a8542fe' data-name='like-post-frame-53900451-3907-534746a8542fe'><h3 class='sd-title'>Like this:</h3><div class='likes-widget-placeholder post-likes-widget-placeholder' style='height:55px'><span class='button'><span>Like</span></span> <span class="loading">Loading...</span></div><span class='sd-text-color'></span><a class='sd-link-color'></a></div></div>			</div>
+<div id="jp-post-flair" class="sharedaddy sd-like-enabled sd-sharing-enabled"><div class="sharedaddy sd-sharing-enabled"><div class="robots-nocontent sd-block sd-social sd-social-icon-text sd-sharing"><h3 class="sd-title">Share this:</h3><div class="sd-content"><ul><li class="share-press-this"><a rel="nofollow" class="share-press-this sd-button share-icon" href="http://wnetai.wordpress.com/multiply/?share=press-this" title="Click to Press This!"><span>Press This</span></a></li><li class="share-twitter"><a rel="nofollow" class="share-twitter sd-button share-icon" href="http://wnetai.wordpress.com/multiply/?share=twitter" title="Click to share on Twitter" id="sharing-twitter-3907"><span>Twitter</span></a></li><li class="share-facebook"><a rel="nofollow" class="share-facebook sd-button share-icon" href="http://wnetai.wordpress.com/multiply/?share=facebook" title="Share on Facebook" id="sharing-facebook-3907"><span>Facebook</span></a></li><li class="share-end"></li></ul></div></div></div><div class='sharedaddy sd-block sd-like jetpack-likes-widget-wrapper jetpack-likes-widget-unloaded' id='like-post-wrapper-53900451-3907-53495c46eb470' data-src='//widgets.wp.com/likes/#blog_id=53900451&amp;post_id=3907&amp;origin=wnetai.wordpress.com&amp;obj_id=53900451-3907-53495c46eb470' data-name='like-post-frame-53900451-3907-53495c46eb470'><h3 class='sd-title'>Like this:</h3><div class='likes-widget-placeholder post-likes-widget-placeholder' style='height:55px'><span class='button'><span>Like</span></span> <span class="loading">Loading...</span></div><span class='sd-text-color'></span><a class='sd-link-color'></a></div></div>			</div>
 
 	<div class="meta">
 		<p>Posted April 10, 2014 by <span class="author vcard"><a class="url fn n" href="http://wnetai.wordpress.com/author/joeish80829-2/" title="View all posts by Joe W. BiMedina">Joe W. BiMedina</a></span><span class="edit"> &mdash; <a class="post-edit-link" href="http://wnetai.wordpress.com/wp-admin/post.php?post=3907&amp;action=edit">Edit</a></span></p>
@@ -202,7 +201,7 @@ function addLoadEvent(func){var oldonload=window.onload;if(typeof window.onload!
 <div id="sidebar">
 	<ul>
 	<li id="blog-stats-2" class="widget widget_blog-stats"><h3 class="widget-title">Blog Stats</h3>		<ul>
-			<li>556 hits</li>
+			<li>558 hits</li>
 		</ul>
 		</li><li id="recent-comments-3" class="widget widget_recent_comments"><h3 class="widget-title">Recent Comments</h3></li>	</ul>
 
@@ -609,7 +608,7 @@ try{
 </script><script src="http://s.stats.wordpress.com/w.js?21" type="text/javascript"></script>
 <script type="text/javascript">
 st_go({'blog':'53900451','v':'wpcom','tz':'-7','user':'1','user_id':'51554914','post':'3907','subd':'wnetai'});
-ex_go({'crypt':'UE40eW5QN0p8M2Y/RE1zNDZ8S252Wis9XUQyb3YrcUVIU2R0VH5TdXIyfFgyfjVBN0lIeEpROGxdTnl0NVVYdjNTZURNdE02OUdKNkUyY0E5bXUzSWdEL3dpVEk0P09LYVRHX2NRcEFWcTJdYmxCQ184N0RwOVRSbUhWXXErQTYrOElmTVdTdHdsZzJxM1FidlNrdlFKd3lUMkRVWEV5VlRjWElZMT9Udkp3S1RSMSZbTGQrK0FmVXh0eW93X1RCVVRqaDRCN1l4OT9NY3U4LE9IUmhqUl9sMm9tWC9CRHNFYWxZL0FbeFZkelZzUzhRdlkmTXE3PXpwQzE1fHN0RWd1X1NbXT1qLllWc1AyX1l2UWNKWFU3dWFQW2ViRVZVX2RdeWZNaEFdODRbRl92S1VJaw=='});
+ex_go({'crypt':'UE40eW5QN0p8M2Y/RE1zNDZ8S252Wis9XUQyb3YrcUVIU2R0VH5TdXIyfFgyfjVBN0lIeEpROGxdTnl0NVVYdjNTZURNdE02OUdKNkUyY0E5bXUzSWdEL3dpVEk0P09LYVRHX2NRcEFWcTJdYmxCQ184N0RwOVRSbUhWXXErQTYrOElmTVdTdHdsZzJxM1FieVNTNVthW2x2JW8/ZEhVLSYvalAvMmN6dUxxejRTc2JjMnh2TnQwXTh3Ti1yQyVdOVt+WFdxcmRLc0xdZmE4bCxyOCV8aS9RV2xCNkFtdltZQjBLd2I9NnxdTmdtVnxDd3dSckZvP1o5YTJWTnosVF9EaFk0a1IraWMsLUNmZyVLZVJpMkRValhiODh3VjAwUklQbS1FcTZNbWx8ZmNHYWtd'});
 	</script>
 <noscript><img src="http://stats.wordpress.com/b.gif?v=noscript" style="height:0px;width:0px;overflow:hidden" alt="" /></noscript>
 	<script type="text/javascript">
@@ -649,7 +648,7 @@ ex_go({'crypt':'UE40eW5QN0p8M2Y/RE1zNDZ8S252Wis9XUQyb3YrcUVIU2R0VH5TdXIyfFgyfjVB
 		<li id="wp-admin-bar-random-post" class="menu-item-random-post"><a class="ab-item"  href="http://wnetai.wordpress.com/?random">Random Post</a>		</li>
 		<li id="wp-admin-bar-theme-andrea"><a class="ab-item"  href="http://theme.wordpress.com/themes/andrea/">Theme: Andrea</a>		</li>
 		<li id="wp-admin-bar-wpcom_report_url"><a class="ab-item"  href="http://en.wordpress.com/complaints/">Report this content</a>		</li></ul></div>		</li>
-		<li id="wp-admin-bar-follow" class="subscribed"><a class="ab-item"  href="http://wordpress.com/read?b=53900451&#038;unsub=1&#038;_wpnonce=fb4fdd9b9c"><span id="admin-bar-unfollow-link">Following</span></a>		</li>
+		<li id="wp-admin-bar-follow" class="subscribed"><a class="ab-item"  href="http://wordpress.com/read?b=53900451&#038;unsub=1&#038;_wpnonce=da38490fe0"><span id="admin-bar-unfollow-link">Following</span></a>		</li>
 		<li id="wp-admin-bar-admin-bar-likes-widget"><div class="ab-item ab-empty-item" ></div><iframe class='admin-bar-likes-widget jetpack-likes-widget' scrolling='no' frameBorder='0' name='admin-bar-likes-widget' src='http://widgets.wp.com/likes/#blog_id=53900451&amp;post_id=3907&amp;origin=http://wnetai.wordpress.com'></iframe>		</li>
 		<li id="wp-admin-bar-stats"><a class="ab-item"  href="http://wordpress.com/my-stats/"><div><script type='text/javascript'>var src;if(typeof(window.devicePixelRatio)=='undefined'||window.devicePixelRatio<2){src='/wp-includes/charts/admin-bar-hours-scale.php';}else{src='/wp-includes/charts/admin-bar-hours-scale-2x.php';}document.write('<img style=\'vertical-align: baseline\' src=\''+src+'\' alt=\'Stats\' title=\'Showing site views per hour for the last 48 hours. Click for full Site Stats.\' />');</script></div></a>		</li></ul><ul id="wp-admin-bar-top-secondary" class="ab-top-secondary ab-top-menu">
 		<li id="wp-admin-bar-search" class="admin-bar-search"><div class="ab-item ab-empty-item" tabindex="-1"><form id='adminbarsearch' name='adminbarsearch' action='http://en.search.wordpress.com' method='get'>
@@ -672,7 +671,7 @@ ex_go({'crypt':'UE40eW5QN0p8M2Y/RE1zNDZ8S252Wis9XUQyb3YrcUVIU2R0VH5TdXIyfFgyfjVB
 						<span class="noticon noticon-notification"></span>
 						</span></div><div id="wpnt-notes-panel" style="display:none" lang="en" dir="ltr"><div class="wpnt-notes-panel-header"><span class="wpnt-notes-header"></span><span class="wpnt-notes-panel-link"></span></div></div>		</li>
 		<li id="wp-admin-bar-ab-new-post"><a class="ab-item"  href="http://wordpress.com/post/">New Post</a>		</li></ul>			</div>
-						<a class="screen-reader-shortcut" href="http://wnetai.wordpress.com/wp-login.php?action=logout&#038;_wpnonce=a9cd837c17">Log Out</a>
+						<a class="screen-reader-shortcut" href="http://wnetai.wordpress.com/wp-login.php?action=logout&#038;_wpnonce=b9e43d8f7d">Log Out</a>
 					</div>
 
 		

@@ -134,6 +134,9 @@
 ;; vector_DMatch*
 (defctype vector-dmatch :pointer)
 
+;; vector_double*
+(defctype vector-double :pointer)
+
 ;; vector_float*
 (defctype vector-float :pointer)
 
@@ -151,6 +154,9 @@
 
 ;; vector_Point2f*
 (defctype vector-point2f :pointer)
+
+;; vector_uchar*
+(defctype vector-uchar :pointer)
 
 ;; VideoCapture*
 (defctype video-capture :pointer)

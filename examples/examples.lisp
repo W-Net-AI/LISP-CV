@@ -9,6 +9,60 @@
 BASIC STRUCTURES:
 
 
+ASSGN-VAL
+
+Assign a scalar value to a matrix.
+
+C++: MatExpr = operator
+
+LISP-CV: (ASSGN-VAL (SELF (:POINTER MAT)) (S (:POINTER SCALAR))) => (:POINTER MAT)
+
+    Parameters:	
+
+        SELF - A matrix
+
+        S - A scalar.
+
+
+Use the function SCALAR-ALL, as the S parameter value, to set each matrix element to the same value
+for example: (SCALAR-ALL -1) will assign -1 to every element of the matrix. Use the function SCALAR 
+to assign a specific color value to each element of the matrix i.e. (SCALAR 0 255 0) will set every 
+matrix element to green. This is useful when you need to add/subtract a certain color value from an 
+image. The matrix you assign the scalar value to will be overwritten by the operation, there is no 
+need to access the return value of ASSGN-VAL to complete the operation,
+
+
+(defun assgn-val-example (filename)
+
+  (let* ((window-name-1 "IMAGE - ASSGN-VAL Example")
+         (window-name-2 "MAT - ASSGN-VAL Example")
+	 (image (imread filename 1))
+         ;; Create a matrix to fill with a scalar 
+         ;; value defined below
+         (mat (mat-ones 640 480 +8uc3+))
+         (scalar (scalar 255 0 0))
+         (result 0))
+    (named-window window-name-1 +window-normal+)
+    (named-window window-name-2 +window-normal+)	
+    (move-window window-name-1 464 175)
+    (move-window window-name-2 915 175)
+    ;; Set all elements of MAT to the value defined 
+    ;; by SCALAR.
+    (assgn-val mat scalar)
+    ;; Print IMAGE type. It is important to know this
+    ;; Before subtracting a matrix from an Image. You 
+    ;; must set the matrix size and type to be the sa-
+    ;; me as the image
+    (format t "IMAGE type = ~a(+8UC3+)" (mat-type image))
+    ;; Subtract MAT from IMAGE
+    (setf result (sub image mat))
+    ;; Show results
+    (imshow window-name-1 image)
+    (imshow window-name-2 (>> result))
+    (loop while (not (= (wait-key 0) 27)))
+    (destroy-all-windows)))
+
+
 CHANNELS
 
 Returns the number of matrix channels.
@@ -80,7 +134,7 @@ LISP-CV: (COPY-TO (SELF (:POINTER MAT)) (M (:POINTER MAT)) (MASK (:POINTER MAT))
         M - Destination matrix. If it does not have a proper size or type before the operation, it 
             is reallocated.
 
-        MASK - Operation mask. Its non-zero elements indicate which matrix elements need to be copi-
+        MASK - Operation mask. Its non-zero elements - which matrix elements need to be copi-
                ed.
 
 
@@ -107,7 +161,7 @@ ces. When the operation mask is specified, and the (CREATE) call shown above rea
 	 (m-2 (mat))
          ;; create a mask for MAT-2 copy operation,
          ;; an identity matrix. its non-zero eleme-
-         ;; nts indicate which matrix elements nee-
+         ;; nts - which matrix elements nee-
          ;; d to be copied.
          (mask (mat-eye 2 2 +8u+)))
     ;; copy data from MAT-1 to M.
@@ -116,7 +170,7 @@ ces. When the operation mask is specified, and the (CREATE) call shown above rea
     (format t "MAT-1 =~%~%")
     (dotimes (i (rows mat-1))
       (dotimes (j (cols mat-1))
-	(format t "~a" (at-int mat-1 i j))
+	(format t "~a" (at mat-1 i j :int))
 	(princ #\Space))
       (princ #\Newline))
     (format t "~%")
@@ -124,7 +178,7 @@ ces. When the operation mask is specified, and the (CREATE) call shown above rea
     (format t "M-1 =~%~%")
     (dotimes (i (rows m-1))
       (dotimes (j (cols m-1))
-	(format t "~a" (at-int m-1 i j))
+	(format t "~a" (at m-1 i j :int))
 	(princ #\Space))
       (princ #\Newline))
     (format t "~%")
@@ -134,7 +188,7 @@ ces. When the operation mask is specified, and the (CREATE) call shown above rea
     (format t "MAT-2 =~%~%")
     (dotimes (i (rows mat-2))
       (dotimes (j (cols mat-2))
-	(format t "~a" (at-int mat-2 i j))
+	(format t "~a" (at mat-2 i j :int))
 	(princ #\Space))
       (princ #\Newline))
     (format t "~%")
@@ -142,15 +196,15 @@ ces. When the operation mask is specified, and the (CREATE) call shown above rea
     (format t "MASK =~%~%")
     (dotimes (i (rows mask))
       (dotimes (j (cols mask))
-	(format t "~a" (at-uchar mask i j))
+	(format t "~a" (at mask i j :uchar))
 	(princ #\Space))
       (princ #\Newline))
     (format t "~%")
-    ;; print contents of of M-2.
+    ;; print final contents of M-2.
     (format t "M-2 =~%~%")
     (dotimes (i (rows m-2))
       (dotimes (j (cols m-2))
-	(format t "~a" (at-int m-2 i j))
+	(format t "~a" (at m-2 i j :int))
 	(princ #\Space))
       (princ #\Newline))
     (format t "~%~%")))
@@ -489,6 +543,153 @@ bit faster matrix size accessor choose the MAT-SIZE Dfunction.
 OPERATIONS ON ARRAYS:
 
 
+~ABS
+
+Calculates an absolute value of each matrix element.
+
+C++: MatExpr abs(const Mat& m)
+
+LISP-CV: (%ABS (M (:POINTER MAT))) => (:POINTER MAT-EXPR)
+
+    Parameters:	
+
+        M - matrix.
+
+~ABS is a meta-function that is expanded to one of (ABS-DIFF) or (CONVERT-SCALE-ABS) forms:
+
+        (DEFPARAMETER C (~ABS (>> (SUB A B)))) is equivalent to (ABSDIFF A B C)
+
+        (DEFPARAMETER C (~ABS A)) is equivalent to (ABSDIFF A (SCALAR-ALL 0) C)
+
+
+The output matrix has the same size and the same type as the input one except for the last case, 
+where C is (EQ DEPTH +8U+). 
+
+
+    See also:
+
+    Matrix Expressions(MAT-EXPR), (ABS-DIFF), (CONVERT-SCALE-ABS)
+
+
+
+(defun ~abs-example (&optional 
+		      (camera-index *camera-index*))
+  ;;Set Camera feed to CAP.
+  (with-capture (cap (cap-cam camera-index))
+    (let* ((window-name "~ABS Example")
+           ;;Allocate data and create a 2x2 matrix.
+	   (data (alloc :float '(4f0 -7f0 2f0 -3f0)))
+	   (mat (mat-data 2 2 +32f+ data))
+           ;;Find absolute value of all MAT elements.
+           (abs-val (>> (~abs mat))))
+      (if (not (cap-is-open cap)) 
+	  (return-from ~abs-example 
+	    (format t "Cannot open the video camera")))
+      ;;Print MAT's absolute value.
+      (dotimes (i (cols abs-val))
+	(dotimes (j (rows abs-val))
+	  (princ (at abs-val i j :float))
+	  (princ #\Space))
+	(princ #\Newline))
+      (named-window window-name +window-normal+)
+      (move-window window-name 720 175)
+      (do* ((frame 0)
+	    (clone 0))
+	   ((plusp (wait-key *millis-per-frame*)) 
+	    (format t "Key is pressed by user"))
+        ;;Read camera feed, set to FRAME.
+	(setf frame (mat))
+	(cap-read cap frame)
+	;;Clone FRAME(CLONE).
+	(setf clone (clone frame))
+        ;;Assign each element of CLONE 
+        ;;a 3 channel scalar value.
+	(assgn-val clone (scalar 255 0 255 ))
+	;;Subtract CLONE from frame to remove all color 
+	;;values but green. Then calculate the absolute 
+	;;value of FRAME before showing output in a win-
+	;;dow. Negative matrix elements in FRAME would 
+	;;cause an unhandled memory fault error.
+	(setf abs-val (~abs (>> (sub frame clone))))
+	(imshow window-name (>> abs-val))
+        ;;Clean up used memory.
+	(del-mat-expr abs-val)
+	(del-mat clone))
+      (destroy-window window-name))))
+
+
+
+ABSDIFF
+
+Calculates the per-element absolute difference between two arrays or between an array and a scalar.
+
+C++: void absdiff(InputArray src1, InputArray src2, OutputArray dst)
+
+LISP-CV: (ABSDIFF (SRC1 (:POINTER MAT)) (SRC2 (:POINTER MAT)) (DEST (:POINTER MAT)))
+
+    Parameters:	
+
+        SRC1 - first input array or a scalar.
+
+        SRC2 - second input array or a scalar.
+
+        DEST - output array that has the same size and type as input arrays.
+
+The function absdiff calculates:
+
+        Absolute difference between two arrays when they have the same size and type.
+
+        Absolute difference between an array and a scalar when the second array is constructed from
+        Scalar or has as many elements as the number of channels in SRC1:
+
+        Absolute difference between a scalar and an array when the first array is constructed from 
+        Scalar or has as many elements as the number of channels in SRC2:
+
+        where I is a multi-dimensional index of array elements. In case of multi-channel arrays, ea-
+        ch channel is processed independently.
+
+Note:
+
+Saturation is not applied when the arrays have the depth +32S+. You may even get a negative value i-
+n the case of overflow.
+
+See also:
+
+(ABS) 
+
+
+(defun absdiff-example (&optional 
+			  (camera-index 
+			   *camera-index*) 
+			  (width *default-width*)
+			  (height *default-height*))
+
+  "The function ABSDIFF calculates the per-element absolute 
+   difference between FRAME(the camera stream) and SCALAR a-
+   nd outputs the result to a window...Makes for quite an i-
+   nteresting effect."
+
+  (with-capture (cap (cap-cam camera-index))
+    (let ((scalar (mat-value 1 1 +64f+ (scalar 128 128 128)))
+	  (window-name "ABSDIFF Example"))
+      (if (not (cap-is-open cap)) 
+	  (return-from absdiff-example 
+	    (format t "Cannot open the video camera")))
+      (cap-set cap +cap-prop-frame-width+ width)
+      (cap-set cap +cap-prop-frame-height+ height)
+      (named-window window-name +window-normal+)
+      (move-window window-name 720 175)
+      (do* ((frame 0))
+	   ((plusp (wait-key *millis-per-frame*)) 
+	    (format t "Key is pressed by user"))
+	(setf frame (mat))
+	(cap-read cap frame)
+	(absdiff frame scalar frame)
+	(imshow window-name frame))
+      (destroy-window window-name))))
+
+
+
 CONVERT-SCALE-ABS
 
 Scales, calculates absolute values, and converts the result to 8-bit.
@@ -666,6 +867,153 @@ See also:
 
 
 
+INVERT
+
+Finds the inverse or pseudo-inverse of a matrix.
+
+C++: double invert(InputArray src, OutputArray dst, int flags=DECOMP_LU)
+
+LISP-CV: (INVERT (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) &OPTIONAL ((FLAGS :INT) +DECOMP-LU+))) => :DOUBLE
+
+    Parameters:	
+
+        SRC - Input floating-point M x N matrix.
+
+        DEST - Output matrix of N x M size and the same type as SRC.
+
+        flags -
+
+        Inversion method :
+
+            +DECOMP-LU+ Gaussian elimination with the optimal pivot element chosen.
+
+            +DECOMP-SVD+ singular value decomposition (SVD) method.
+
+            +DECOMP-CHOLESKY+ Cholesky decomposition; the matrix must 
+                              be symmetrical and positively defined.
+
+
+The function INVERT inverts the matrix SRC and stores the result in DEST . When the matrix SRC is 
+singular or non-square, the function calculates the pseudo-inverse matrix (the DEST matrix) so that 
+(NORM (- (* SRC DST) I)) is minimal, where I is an identity matrix.
+
+In case of the +DECOMP-LU+ method, the function returns non-zero value if the inverse has been successfully 
+calculated and 0 if SRC is singular.
+
+In case of the +DECOMP-SVD+ method, the function returns the inverse condition number of SRC (the 
+ratio of the smallest singular value to the largest singular value) and 0 if SRC is singular. The 
+SVD method calculates a pseudo-inverse matrix if SRC is singular.
+
+Similarly to +DECOMP-LU+ , the method +DECOMP-CHOLESKY+ works only with non-singular square matrices 
+that should also be symmetrical and positively defined. In this case, the function stores the inverted 
+matrix in DEST and returns non-zero. Otherwise, it returns 0.
+
+See also:
+
+(SOLVE), SVD
+
+
+(defun invert-example (&optional 
+			 (camera-index *camera-index*)) 
+
+  (with-capture (cap (cap-cam camera-index))
+    ;;Allocate matrix data and create a square matrix
+    (let* ((data (alloc :float '(4f0 -7f0 2f0 -3f0)))
+	   (mat (mat-data 2 2 +32f+ data))
+           ;;Create a destination matrix 
+           ;;the same size/type as MAT
+	   (dest-1 (mat-typed 2 2 +32f+))
+	   (invert-return 0)
+	   (identity-mat 0)
+           ;;Create an array of window names
+	   (window-name-arr 
+	    (make-array 6 :initial-contents 
+			(list
+                         "Original MAT - INVERT Example"
+			 "Inverted MAT - INVERT Example"
+                         "IDENTITY-MAT - INVERT Example"
+                         "Camera output - 1 channel float - INVERT Example"
+			 "Camera output inverted - INVERT Example"
+			 "Identity MAT - INVERT Example"))))
+      (if (not (cap-is-open cap)) 
+	  (return-from invert-example 
+	    (format t "Cannot open the video camera")))
+      ;;Create array of windows
+      (dotimes (i 6)
+	(named-window (aref window-name-arr i) +window-normal+))
+      ;;Move windows to specified locations
+      (move-window (aref window-name-arr 0) 288 150)
+      (move-window (aref window-name-arr 1) 738 150)
+      (move-window (aref window-name-arr 2) 1188 150)
+      (move-window (aref window-name-arr 3) 288 518)
+      (move-window (aref window-name-arr 4) 738 518)
+      (move-window (aref window-name-arr 5) 1188 515)
+      ;;Find inverse of MAT
+      (setf invert-return (invert mat dest-1 +decomp-lu+))
+      ;;Print the return of INVERT(if non-zero the operation was successful)
+      (format t "Return from Invert Function = ~a~%" invert-return)
+      ;;Print the inverse of MAT
+      (dotimes (i (cols dest-1))
+	(dotimes (j (rows dest-1))
+	  (princ (at dest-1 i j :float))
+	  (princ #\Space))
+	(princ #\Newline))
+      (format t "~%~%")
+      ;;Multiply MAT by its inverse. If the inversion was 
+      ;;a success the output will be an identity matrix
+      (setf identity-mat (>> (mul mat dest-1))) 
+      ;;Operation was a success!, print the identity matrix
+      (dotimes (i (cols identity-mat))
+	(dotimes (j (rows identity-mat))
+	  (princ (at identity-mat i j :float))
+	  (princ #\Space))
+	(princ #\Newline))
+      (format t "~%~%")
+      ;;Show MAT, its inverse and the identity 
+      ;;matrix in the top windows
+      (imshow (aref window-name-arr 0) mat)
+      (imshow (aref window-name-arr 1) dest-1)
+      (imshow (aref window-name-arr 2) identity-mat)
+      (do* ((frame 0)
+	    (dest-2 0)
+            (roi 0)
+            (result 0)
+            (n (coerce (/ 1 255) 'double-float)))
+	   ((plusp (wait-key *millis-per-frame*)) 
+	    (format t "Key is pressed by user"))
+	;;Read in camera feed, call it FRAME
+	(setf frame (mat))
+	(cap-read cap frame)
+        ;;Make a clone of the camera feed, DEST-2
+	(setf dest-2 (clone frame))
+        ;;Crop FRAME to make it a square matrix, set to ROI
+        (setf roi (roi frame (rect 0 0 (rows frame) (rows frame))))
+        ;;Convert ROI to 1 channel image
+	(cvt-color roi roi +bgr2gray+)
+        ;;Convert ROI to a float(+32F+) matrix
+        (convert-to roi roi +32f+ n)
+        ;;Show the float matrix in bottom-left window
+       	(imshow (aref window-name-arr 3) roi)
+        ;;Find the inverse of ROI and show it in 
+        ;;bottom-center window, just for fun
+        (invert roi dest-2 +decomp-lu+)
+	(imshow (aref window-name-arr 4) dest-2)
+        ;;Find if inverse was a success by multiplying the 
+        ;;original ROI by the output of the INVERT function. 
+        ;;Then show the resulting identity matrix in the 
+        ;;bottom-right window
+	(setf result (mul roi dest-2))
+	(setf identity-mat (>> result))
+ 	(imshow (aref window-name-arr 5) identity-mat)
+        ;;Clean up used memory
+	(del-mat roi)
+        (del-mat dest-2)
+	(del-mat identity-mat)
+        (del-mat-expr result))
+      (destroy-all-windows))))
+
+
+
 MEAN
 
 Calculates an average (mean) of array elements.
@@ -817,12 +1165,13 @@ LISP-CV: (MULTIPLY (SRC1 (:POINTER MAT)) (SRC2 (:POINTER MAT)) (DEST (:POINTER M
 
         SCALE - Optional scale factor.
   
-        DTYPE - Destination matrix type.
+        DTYPE - Destination matrix type, default is -1 i.e. (EQ (MAT-TYPE DEST) (MAT-TYPE SRC))
+                You can change DTYPE to a double float(+64F+) to achieve higher precision).
 
 
 The function multiply calculates the per-element product of two arrays. There is also a Matrix 
-Expressions (MAT-EXPR) variant of this function. See (MUL). For a not-per-element 
-matrix product, see (GEMM).
+Expressions (MAT-EXPR) variant of this function. See (MUL). For a not-per-element matrix product, 
+see (GEMM).
 
 Note:
 
@@ -1079,7 +1428,7 @@ C++: void ellipse(Mat& img, const RotatedRect& box, const Scalar& color, int thi
 
         COLOR - Ellipse color.
 
-        THICKNESS - Thickness of the ellipse arc outline, if positive. Otherwise, this indicates th-
+        THICKNESS - Thickness of the ellipse arc outline, if positive. Otherwise, this -s th-
                     at a filled ellipse sector is to be drawn.
 
         LINE-TYPE - Type of the ellipse boundary. See the (LINE) description.
@@ -1150,7 +1499,7 @@ Example:
 
 
 
-=
+
 
 LINE
 
@@ -1425,7 +1774,7 @@ Example:
     (destroy-window window-name)))
 
 
-==
+
 
 RGB
 
@@ -1456,18 +1805,340 @@ CIRCLE IMAGE POINT RADIUS (RGB 255 0 0) +FILLED+ +AA+ 0)
 
 
 
-TYPES AND STRUCTURES
---------------------
+
+READING AND WRITING IMAGES AND VIDEO:
 
 
 
-USER INTERFACE
---------------
+
+IMWRITE
+
+Saves an image to a specified file.
+
+C++: bool imwrite(const string& filename, InputArray img, const vector<int>& params=vector<int>() )
+
+LISP-CV: (IMWRITE (FILENAME :STRING) (IMG (:POINTER MAT)) ((PARAMS (:POINTER VECTOR-INT)) (VECTOR-INT))) => :BOOLEAN
+
+    Parameters:	
+
+        FILENAME - Name of the file.
+
+        IMAGE - Image to be saved.
+
+        PARAMS -
+
+        Format-specific save parameters encoded as pairs PARAM-ID-1, PARAM-VALUE-1, PARAM-ID-2, 
+        PARAM-VALUE-2, ... . The following parameters are currently supported:
+
+            For JPEG, it can be a quality (+IMWRITE-JPEG-QUALITY+) from 0 to 100 (the higher is the 
+            better). Default value is 95.
+
+            For PNG, it can be the compression level (+IMWRITE-PNG-COMPRESSION+) from 0 to 9. A higher 
+            value means a smaller size and longer compression time. Default value is 3.
+
+            For PPM, PGM, or PBM, it can be a binary format flag (+IMWRITE-PXM-BINARY+ ), 0 or 1. 
+            Default value is 1.
+
+The function IMWRITE saves the image to the specified file. The image format is chosen based on the 
+filename extension (see (IMREAD) for the list of extensions). Only 8-bit (or 16-bit unsigned (+16U+) 
+in case of PNG, JPEG 2000, and TIFF) single-channel or 3-channel (with ‘BGR’ channel order) images 
+can be saved using this function. If the format, depth or channel order is different, use (CONVERT-TO), 
+and (CVT-COLOR) to convert it before saving. Or, use the universal XML I/O functions to save the image 
+to XML or YAML format.
+
+It is possible to store PNG images with an alpha channel using this function. To do this, create 8-bit 
+(or 16-bit) 4-channel image BGRA, where the alpha channel goes last. Fully transparent pixels should 
+have alpha set to 0, fully opaque pixels should have alpha set to 255/65535. 
+
+
+(defun imwrite-example (filename-1 out-file)
+       ;;Read in image
+  (let* ((image (imread filename-1 1))
+	 (window-name-1 "Original image - IMWRITE Example")
+         (window-name-2 "Flipped image - IMWRITE Example"))
+    (if (empty image) 
+	(return-from imwrite-example 
+	  (format t "Image not loaded")))
+    (named-window window-name-1 +window-normal+)
+    (named-window window-name-2 +window-normal+)
+    (move-window window-name-1 464 175)
+    (move-window window-name-2 915 175)
+    ;;Show original IMAGE in window
+    (imshow window-name-1 image)
+    ;;Flip IMAGE around the x-axis
+    (flip image image -1)
+    ;;Show flipped image in window
+    (imshow window-name-2 image)
+    ;;Write flipped image to filename specified 
+    ;;by the OUT-FILE parameter 
+    (imwrite out-file image (vector-int 
+			     (list +imwrite-jpeg-quality+ 99)))
+    (loop while (not (= (wait-key 0) 27)))
+    (destroy-all-windows)))
 
 
 
-QT NEW FUNCTIONS
-----------------
+IMAGE FILTERING:
+
+
+PYR-DOWN
+
+Blurs an image and downsamples it.
+
+C++: void pyrDown(InputArray src, OutputArray dst, const Size& dstsize=Size(), int borderType=BORDER_DEFAULT )
+
+LISP-CV: (PYR-DOWN (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) &OPTIONAL ((DSTSIZE (:POINTER SIZE)) (SIZE)) 
+         ((BORDER-TYPE :INT) +BORDER-DEFAULT+)) => :VOID
+
+    Parameters:	
+
+        SRC - Input image.
+
+        DEST - Output image; it has the specified size and the same type as SRC.
+
+        DSTSIZE -
+
+        size of the output image; by default, it is computed as:
+
+               (SIZE (/ (+ (COLS SRC) 1) 2) (/ (+ (ROW SRC) 1) 2)), 
+
+
+        BORDER-TYPE - Border type, one of the +BORDER-*+ , except for +BORDER-TRANSPARENT+ and 
+                      +BORDER-ISOLATED+. 
+     
+
+The function performs the downsampling step of the Gaussian pyramid construction. First, it convolves 
+the source image with the kernel, then, it downsamples the image by rejecting even rows and columns.
+
+
+(defun pyr-down-example (filename)
+
+  (defun do-pyr-down (in)
+    (let* ((in-size (size in)) 
+           (in-height (round (height in-size)))
+	   (in-width (round (width in-size)))
+	   (out (mat-typed (/ in-height 2) (/ in-width 2) +8uc3+)))
+      ;;Make sure input image is divisible by two."
+      (assert (and (equal (mod in-height 2) 0)
+		   (equal (mod in-width 2) 0))
+	      (in-height in-width)
+	      "~S or ~S are not divisible by two" in-width in-height)
+      ;;Blur and downsample image
+      (pyr-down in out)
+      out))
+
+  (defun main (filename)
+    
+    (let* ((img-1 (imread filename 1))
+	   (img-2 0)
+	   (window-name-1 "Original image - PYR-DOWN Example")
+	   (window-name-2 "Downsampled blurred Image - PYR-DOWN Example"))
+      (named-window window-name-1 +window-autosize+)
+      (named-window window-name-2 +window-autosize+)
+      (move-window window-name-1 450 300)
+      (move-window window-name-2 985 300)
+      (format t "Image size before downsampling = (~a, ~a)
+       ~%~%"(rows img-1) (cols img-1))
+      ;;Show original image in window
+      (imshow window-name-1 img-1)
+      (setf img-2 (do-pyr-down img-1))
+      (format t "Image size after downsampling = (~a, ~a)
+       ~%~%"(rows img-2)(cols img-2))
+      ;;Show blurred downsampled image in window
+      (imshow window-name-2 img-2)
+      (loop while (not (= (wait-key 0) 27)))
+      (destroy-all-windows)))
+
+  (main filename))
+
+
+
+PYR-UP
+
+Upsamples an image and then blurs it.
+
+C++: void pyrUp(InputArray src, OutputArray dst, const Size& dstsize=Size(), int borderType=BORDER_DEFAULT )
+
+LISP-CV: (PYR-UP (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) &OPTIONAL ((DSTSIZE (:POINTER SIZE)) (SIZE)) 
+         ((BORDER-TYPE :INT) +BORDER-DEFAULT+)) => :VOID
+
+    Parameters:	
+
+        SRC - Input image.
+
+        DEST - Output image. It has the specified size and the same type as SRC.
+
+        DESTSIZE - Size of the output image; by default, it is computed as:
+
+                   (SIZE (* (COLS SRC) 2) (* (ROWS SRC) 2)) 
+
+        BORDER-TYPE - Border type, one of the +BORDER-*+ , except for +BORDER-TRANSPARENT+ and 
+                      +BORDER-ISOLATED+. 
+
+The function performs the upsampling step of the Gaussian pyramid construction, though it can actually 
+be used to construct the Laplacian pyramid. First, it upsamples the source image by injecting even 
+zero rows and columns and then convolves the result with the same kernel as in (PYR-DOWN) multiplied by 4.
+
+
+(defun pyr-up-example (filename)
+
+  (defun do-pyr-up (in)
+    (let* ((in-size (size in)) 
+	   (in-width (round (width in-size)))
+	   (in-height (round (height in-size)))
+	   (out (mat-typed (/ in-width 2) (/ in-height 2) +8uc3+)))
+      ;;Make sure input image is divisible by two."
+      (assert (and (equal (mod in-width 2) 0)
+		   (equal (mod in-height 2) 0))
+	      (in-width in-height)
+	      "~S or ~S are not divisible by two" in-width in-height)
+      ;;Blur and downsample image
+      (pyr-up in out)
+      out))
+
+  (defun main (filename)
+    
+    (let* ((img-1 (imread filename 1))
+	   (img-2 0)
+	   (window-name-1 "Original image - PYR-UP Example")
+	   (window-name-2 "Upsampled blurred image - PYR-UP Example"))
+      (named-window window-name-1 +window-autosize+)
+      (named-window window-name-2 +window-autosize+)
+      (move-window window-name-1 450 0)
+      (move-window window-name-2 985 0)
+      (format t "Image size before upsampling = (~a, ~a)
+       ~%~%"(cols img-1) (rows img-1))
+      ;;Show original image in window
+      (imshow window-name-1 img-1)
+      (setf img-2 (do-pyr-up img-1))
+      (format t "Image size after upsampling = (~a, ~a)
+       ~%~%"(cols img-2) (rows img-2))
+      ;;Show blurred upsampled image in window
+      (imshow window-name-2 img-2)
+      (loop while (not (= (wait-key 0) 27)))
+      (destroy-all-windows)))
+
+  (main filename))
+
+
+
+;;; Feature Detection
+
+
+CANNY
+
+Finds edges in an image using the [Canny86] algorithm.
+
+C++: void Canny(InputArray image, OutputArray edges, double threshold1, double threshold2, int apertureSize=3, bool L2gradient=false)
+
+LISP-CV: (CANNY (IMAGE (:POINTER MAT)) (EDGES (:POINTER MAT)) (THRESHOLD1 :DOUBLE) (THRESHOLD2 :DOUBLE) ((APERTURE-SIZE :INT) 3) 
+         ((L2-GRADIENT :BOOLEAN) NIL)) => :VOID
+
+    Parameters:	
+
+        IMAGE - Single-channel 8-bit input image.
+
+        EDGES - Output edge map; it has the same size and type as image.
+
+        THRESHOLD1 - First threshold for the hysteresis procedure.
+
+        THRESHOLD2 - Second threshold for the hysteresis procedure.
+
+        APERTURE-SIZE - Aperture size for the (SOBEL) operator.
+
+        L2-GRADIENT - A flag, indicating whether a more accurate L2 norm should be used to calculate 
+                      the image gradient magnitude (EQ L2-GRADIENT T), or whether the default L1 norm 
+                      is enough (EQ L2-GRADIENT NIL).
+
+The function finds edges in the input image IMAGE and marks them in the output map edges using the 
+Canny algorithm. The smallest value between THRESHOLD1 and THRESHOLD2 is used for edge linking. The 
+largest value is used to find initial segments of strong edges. 
+
+See: http://en.wikipedia.org/wiki/Canny_edge_detector
+
+
+;;Define global parameters
+(defparameter n 0)
+(defparameter i 5)
+(defparameter low-thresh 10d0) 
+(defparameter high-thresh 100d0)
+(defparameter aperture-size 3)
+(defparameter l2-gradient nil)
+
+
+
+(defcallback call-back-func :void ((event :int) (x :int) (y :int) (flags :int))
+  ;This callback function is called by the SET-MOUSE CALLBACK function in 
+  ;the MAIN function below. It captures button clicks and keypresses.
+
+  ;Mouse position
+  (format t "Mouse position = (~a, ~a)~%~%" x y)
+  
+  ;If left mouse button and shift pressed, 
+  ;increment the CANNY, LOW-THRESH parameter.
+  (if (= flags (+ +event-flag-shiftkey+ +event-flag-lbutton+))
+      (progn (incf low-thresh i) (format t "low-thresh = ~a~%~%" low-thresh)))
+  ;If left mouse button and ctrl pressed, deccrement 
+  ;the CANNY, LOW-THRESH parameter.
+  (if (= flags (+ +event-flag-ctrlkey+ +event-flag-lbutton+))
+      (progn (decf low-thresh i) (format t "low-thresh = ~a~%~%" low-thresh)))
+  ;If middle mouse button and shift pressed, 
+  ;increment the CANNY, HIGH-THRESH parameter.
+  (if (= flags (+ +event-flag-shiftkey+ +event-flag-mbutton+))
+      (progn (incf high-thresh i) (format t "high-thresh = ~a~%~%" high-thresh)))
+  ;If middle mouse button and ctrl pressed, 
+  ;deccrement the CANNY, HIGH-THRESH parameter.
+  (if (= flags (+ +event-flag-ctrlkey+ +event-flag-mbutton+))
+      (progn (decf high-thresh i) (format t "high-thresh = ~a~%~%" high-thresh)))
+  ;If right mouse button double clicked, toggle L2-GRADIENT.
+  (if (= event +event-rbuttondblclk+)
+      (progn (if (eq n 0) (progn 
+			    (setf l2-gradient t) (setf n 1) 
+			    (format t "L2-GRADIENT = ~a~%~%" l2-gradient)) 
+		 (progn 
+		   (setf l2-gradient nil) (setf n 0) 
+		   (format t "L2-GRADIENT = ~a~%~%" l2-gradient))))))
+
+
+(defun canny-example (&optional (camera-index *camera-index*))
+  "Finds edges in an image using the [Canny86] algorithm.
+   Canny only handles gray scale images"
+  (with-capture (cap (cap-cam camera-index))
+    (let* ((window-name "OUT - CANNY Example"))
+      (named-window window-name +window-normal+)
+      (move-window window-name 305 300)
+      ;Set window to fullscreen with stretched aspect ratio.
+      (set-window-property window-name +wnd-prop-fullscreen+ 
+			   +window-fullscreen+)
+      (if (equal 1.0d0 (get-window-property window-name +wnd-prop-fullscreen+)) 
+	  (set-window-property window-name +wnd-prop-aspectratio+ 
+			       +window-freeratio+))
+      (do* ((frame 0)
+	    (clone 0)
+	    (out 0))
+	   ((eq 27 (wait-key *millis-per-frame*)) 
+	    (format t "Key is pressed by user"))
+	;Set camera feed to FRAME.
+	(setf frame (mat))
+	(cap-read cap frame)
+	;Clone FRAME
+	(setf clone (clone frame))
+	;Create destination matrix, half the size of FRAME.
+	(setf out (mat-typed (/ (cols frame) 2) (/ (rows frame) 2) +8uc3+))
+	;Convert CLONE to a 1 channel grayscale image.
+	(cvt-color clone clone +bgr2gray+)
+	;Blur and downsample CLONE.
+	(pyr-down clone out)
+	;Detect edges in camera feed, The parameters can be changed 
+	;by clicking the mouse button in the window and pressing a 
+	;key. See the callback function above for how to use. 
+	(canny out out low-thresh high-thresh aperture-size l2-gradient)
+	(set-mouse-callback window-name (callback call-back-func))
+	(imshow window-name out)
+	(del-mat clone)
+	(del-mat out))
+      (destroy-all-windows))))
+
 
 
 GET-WINDOW-PROPERTY
@@ -2360,83 +3031,8 @@ If the previous call to VIDEO-CAPTURE constructor or CAP-IS-OPEN succeeded, the 
 	(cap-read cap frame)
 	(imshow window-name frame))
       (cap-release cap)
-      (destroy-window window-name))))indicate
-
-
-ABSDIFF
-
-Calculates the per-element absolute difference between two arrays or between an array and a scalar.
-
-C++: void absdiff(InputArray src1, InputArray src2, OutputArray dst)
-
-LISP-CV: (ABSDIFF (SRC1 (:POINTER MAT)) (SRC2 (:POINTER MAT)) (DEST (:POINTER MAT)))
-
-    Parameters:	
-
-        SRC1 - first input array or a scalar.
-
-        SRC2 - second input array or a scalar.
-
-        DEST - output array that has the same size and type as input arrays.
-
-The function absdiff calculates:
-
-        Absolute difference between two arrays when they have the same size and type:
-
-        \texttt{dst}(I) = \texttt{saturate} (| \texttt{src1}(I) - \texttt{src2}(I)|) todo
-
-        Absolute difference between an array and a scalar when the second array is constructed from
-        Scalar or has as many elements as the number of channels in SRC1:
-
-        \texttt{dst}(I) = \texttt{saturate} (| \texttt{src1}(I) - \texttt{src2} |) todo
-
-        Absolute difference between a scalar and an array when the first array is constructed from 
-        Scalar or has as many elements as the number of channels in SRC2:
-
-        \texttt{dst}(I) = \texttt{saturate} (| \texttt{src1} - \texttt{src2}(I) |) todo
-
-        where I is a multi-dimensional index of array elements. In case of multi-channel arrays, ea-
-        ch channel is processed independently.
-
-Note:
-
-Saturation is not applied when the arrays have the depth +32S+. You may even get a negative value i-
-n the case of overflow.
-
-See also:
-
-(ABS) 
-
-
-(defun absdiff-example (&optional 
-			  (camera-index 
-			   *camera-index*) 
-			  (width *default-width*)
-			  (height *default-height*))
-
-  "The function ABSDIFF calculates the per-element absolute 
-   difference between FRAME(the camera stream) and SCALAR a-
-   nd outputs the result to a window...Makes for quite an i-
-   nteresting effect."
-
-  (with-capture (cap (cap-cam camera-index))
-    (let ((scalar (mat-value 1 1 +64f+ (scalar 128 128 128)))
-	  (window-name "ABSDIFF Example"))
-      (if (not (cap-is-open cap)) 
-	  (return-from absdiff-example 
-	    (format t "Cannot open the video camera")))
-      (cap-set cap +cap-prop-frame-width+ width)
-      (cap-set cap +cap-prop-frame-height+ height)
-      (named-window window-name +window-normal+)
-      (move-window window-name 720 175)
-      (do* ((frame 0))
-	   ((plusp (wait-key *millis-per-frame*)) 
-	    (format t "Key is pressed by user"))
-	(setf frame (mat))
-	(cap-read cap frame)
-	(absdiff frame scalar frame)
-	(imshow window-name frame))
       (destroy-window window-name))))
+
 
 
 SCALAR
@@ -3090,7 +3686,7 @@ The example below initializes a Hilbert matrix:
 
 (defun at-example ()
   (let ((h (mat-typed 5 5 +64f+)))
-    (dotimes (i (rows h))indicate
+    (dotimes (i (rows h))
       (dotimes (j (cols h))
 	(at-double+ h i j (/ 1.0d0 (+ i j 1)))
 	(princ (at-double h i j))
@@ -3709,12 +4305,10 @@ use in other functions.
    cond matrix(M2) and result(RESULT) a-
    re printed."
 
-  (let* ((m1-data (alloc :float '(1.0f0 2.0f0 3.0f0 4.0f0 5.0f0 
-				  6.0f0 7.0f0 8.0f0 9.0f0)))
-	 (m2-data (alloc :float '(1.0f0 2.0f0 3.0f0 4.0f0 5.0f0 
-				  6.0f0 7.0f0 8.0f0 9.0f0)))
-	 (m1 (mat-data 3 3 +32f+ m1-data))
-         (m2 (mat-data 3 3 +32f+ m2-data))
+  (let* ((data (alloc :float '(1.0f0 2.0f0 3.0f0 4.0f0 5.0f0 
+			       6.0f0 7.0f0 8.0f0 9.0f0)))
+	 (m1 (mat-data 3 3 +32f+ data))
+         (m2 (mat-data 3 3 +32f+ data))
          (result (mul m1 m2)))
     (dotimes (i (rows m1))
       (dotimes (j (cols m1))
@@ -3733,8 +4327,7 @@ use in other functions.
 	(format t "~a" (at (>> result) i j :float))
 	(princ #\Space))
       (princ #\Newline))
-    (free m1-data)
-    (free m2-data)))
+    (free data)))
 
 
 
@@ -3839,7 +4432,7 @@ functions.
       (princ #\Newline))
     (format t "~%~%")
     (dotimes (i 3)
-      (dotimes (j 3)indicate
+      (dotimes (j 3)
 	       (format t "~a" (at (>> result) i j :int))
 	       (princ #\Space))
       (princ #\Newline))
@@ -3910,7 +4503,7 @@ VIDEO-WRITER constructors
 
 C++: VideoWriter::VideoWriter()
 
-LISP-CV: (VIDEO-WRITER0)
+LISP-CV: (VIDEO-WRITER)
 
 C++: VideoWriter::VideoWriter(const string& filename, int fourcc, double fps, Size frameSize, bool isColor=true)
 
@@ -4011,7 +4604,7 @@ VIDEO-WRITER-WRITE
 
 Writes the next video frame
 
-C++: VideoWriter& VideoWriter::operator<<(const Mat& indicateimage)
+C++: VideoWriter& VideoWriter::operator<<(const Mat& image)
 
 LISP-CV: (VIDEO-WRITER-WRITE (SELF (:POINTER VIDEO-WRITER)) (IMAGE (:POINTER MAT)))
 
@@ -4204,7 +4797,7 @@ returns a pointer to the resultant sub-array header.
         (setf frame (roi frame region-of-interest))
 	(imshow window-name frame)
 	(if (= x the-right-wall) (progn 
-				   (format t "right wall has been toucindicatehed~%") 
+				   (format t "right wall has been touc-hed~%") 
 				   (setf right-wall-switch 1)))    
 	(if (= x the-left-wall) (progn
 				  (format t "left wall has been touched~%") 
@@ -4813,7 +5406,7 @@ Draws the found matches of keypoints from two images.
 C++: void drawMatches(const Mat& img1, const vector<KeyPoint>& keypoints1, const Mat& img2, const vector<KeyPoint>& keypoints2, const vector<DMatch>& matches1to2, Mat& outImg, const Scalar& matchColor=Scalar::all(-1), const Scalar& singlePointColor=Scalar::all(-1), const vector<char>& matchesMask=vector<char>(), int flags=DrawMatchesFlags::DEFAULT )
 
 LISP-CV: (DRAW-MATCHES (IMG1 (:POINTER MAT)) (KEYPOINTS1 (:POINTER KEYPOINT)) (IMG2 (:POINTER MAT)) (KEYPOINTS2 (:POINTER KEYPOINT)) (MATCHES1TO2 (:POINTER VECTOR-DMATCH)) (OUTIMG (:POINTER MAT)) (MATCH-COLOR (:POINTER SCALAR)) (SINGLE-POINT-COLOR (:POINTER SCALAR)) &OPTIONAL ((MATCHES-MASK (:POINTER VECTOR-CHAR)) (VECTOR-CHAR)) ((FLAGS :INT) +DEFAULT+))
-indicate
+-
 C++: void drawMatches(const Mat& img1, const vector<KeyPoint>& keypoints1, const Mat& img2, const vector<KeyPoint>& keypoints2, const vector<vector<DMatch>>& matches1to2, Mat& outImg, const Scalar& matchColor=Scalar::all(-1), const Scalar& singlePointColor=Scalar::all(-1), const vector<vector<char>>& matchesMask=vector<vector<char> >(), int flags=DrawMatchesFlags::DEFAULT )
 
     Parameters:	
@@ -5062,7 +5655,7 @@ http://docs.opencv.org/modules/features2d/doc/feature_detection_and_description.
     (move-window (aref window-name-arr 3) 1438 0)
     (move-window (aref window-name-arr 4) 88 368)
     (move-window (aref window-name-arr 5) 538 368)
-    (move-window (aref window-name-arr 6) 988 368)indicate
+    (move-window (aref window-name-arr 6) 988 368)-
     (move-window (aref window-name-arr 7) 1438 368)
     (move-window (aref window-name-arr 8) 88 708)
     (move-window (aref window-name-arr 9) 538 708)
@@ -5712,6 +6305,8 @@ VECTOR-CHAR(vector<char>)
 
 VECTOR-DMATCH(vector<DMatch>)      
 
+VECTOR-DOUBLE(vector<double>) 
+
 VECTOR-FLOAT(vector<float>)
 
 VECTOR-INT(vector<int>)
@@ -5722,14 +6317,15 @@ VECTOR-POINT(vector<Point>)
 
 VECTOR-POINT2F(vector<Point2f>)
 
+VECTOR-UCHAR(vector<uchar>)
+
 
 
 Description:
 
 
-Vectors with numbers as elements, VECTOR-CHAR, VECTOR-FLOAT and VECTOR-INT operate as follows: 
-(I use VECTOR-FLOAT as an example of the 3 vectors).
-
+Vectors with numbers as elements, VECTOR-CHAR, VECTOR-DOUBLE, VECTOR-FLOAT and VECTOR-INT 
+VECTOR-UCHAR operate as follows: (I use VECTOR-FLOAT as an example of the 5 vectors).
 
 
 If you would like to created an unititialized vector, you evaluate:
@@ -5839,115 +6435,15 @@ LISP-CV> (VECTOR-POINT2F A 1 1) <--- Access the 1st element of the 1st POINT2F i
 
 
 
-ASSGN-VAL
-
-Assign a scalar value to a matrix.
-
-C++: MatExpr = operator
-
-LISP-CV: (ASSGN-VAL (SELF (:POINTER MAT)) (S (:POINTER SCALAR))) => (:POINTER MAT)
-
-    Parameters:	
-
-        SELF - A matrix
-
-        S - A scalar.
 
 
-Use the function SCALAR-ALL, as the S parameter value, to set each matrix element to the same value
-for example: (SCALAR-ALL -1) will assign -1 to every element of the matrix. Use the function SCALAR 
-to assign a specific color value to each element of the matrix i.e. (SCALAR 0 255 0) will set every 
-matrix element to green. This is useful when you need to add/subtract a certain color value from an 
-image. The matrix you assign the scalar value to will be overwritten by the operation, there is no 
-need to access the return value of ASSGN-VAL to complete the operation,
 
 
-(defun assgn-val-example (filename)
-
-  (let* ((window-name-1 "IMAGE - ASSGN-VAL Example")
-         (window-name-2 "MAT - ASSGN-VAL Example")
-	 (image (imread filename 1))
-         ;; Create a matrix to fill with a scalar 
-         ;; value defined below
-         (mat (mat-ones 640 480 +8uc3+))
-         (scalar (scalar 255 0 0))
-         (result 0))
-    (named-window window-name-1 +window-normal+)
-    (named-window window-name-2 +window-normal+)	
-    (move-window window-name-1 464 175)
-    (move-window window-name-2 915 175)
-    ;; Set all elements of MAT to the value defined 
-    ;; by SCALAR.
-    (assgn-val mat scalar)
-    ;; Print IMAGE type. It is important to know this
-    ;; Before subtracting a matrix from an Image. You 
-    ;; must set the matrix size and type to be the sa-
-    ;; me as the image
-    (format t "IMAGE type = ~a(+8UC3+)" (mat-type image))
-    ;; Subtract MAT from IMAGE
-    (setf result (sub image mat))
-    ;; Show results
-    (imshow window-name-1 image)
-    (imshow window-name-2 (>> result))
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-all-windows)))
-
-
-=======================================================MACROS===========================================================
 
 MACROS
 
-=======================================================MACROS===========================================================
 
-ALLOC(defun multiply-example ()
-  ;;Allocate int, double float and unsigned char matrix data
-  (let* ((int-data (alloc :int '(1 2 3 4 5 6 7 8 9)))
-	 (double-data (alloc :double '(1d0 2d0 3d0 4d0 5d0 6d0 7d0 8d0 9d0)))
-	 (uchar-data (alloc :uchar '(1 2 3 4 5 6 7 8 9)))
-	 ;;Create 2 identical src matrices and 
-	 ;;1 dest matrix for each data type
-	 (int-mat-1 (mat-data 3 3 +32s+ int-data))
-         (int-mat-2 (mat-data 3 3 +32s+ int-data))
-         (dest1 (mat))
-	 (double-mat-1 (mat-data 3 3 +64f+ double-data))
-         (double-mat-2 (mat-data 3 3 +64f+ double-data))
-         (dest2 (mat))
-	 (uchar-mat-1 (mat-data 3 3 +8u+ uchar-data))
-         (uchar-mat-2 (mat-data 3 3 +8u+ uchar-data))
-         (dest3 (mat)))
-    ;;Multiply int matrix by identical matrix using 
-    ;;a default dtype(destination type) parameter
-    (multiply int-mat-1 int-mat-2 dest1 1d0 -1)
-    ;;Multiply double float matrix by identical matrix using 
-    ;;a dtype parameter of 6(+64F+) or double float type
-    (multiply double-mat-1 double-mat-2 dest2 1d0 6)
-    ;;Multiply uchar matrix by identical matrix using 
-    ;;a default dtype parameter and a scalar, 2d0
-    (multiply uchar-mat-1 uchar-mat-2 dest3 2d0 -1)
-    ;;Print results
-    (format t "~%")
-    (dotimes (i (rows dest1))
-      (dotimes (j (cols dest1))
-	(format t "~a" (at dest1 i j :int))
-	(princ #\Space))
-      (princ #\Newline))
-    (format t "~%~%")
-    (dotimes (i (rows dest2))
-      (dotimes (j (cols dest2))
-	(format t "~a" (at dest2 i j :double))
-	(princ #\Space))
-      (princ #\Newline))
-    (format t "~%~%")
-    (dotimes (i (rows dest3))
-      (dotimes (j (cols dest3))
-	(format t "~a" (at dest3 i j :uchar))
-	(princ #\Space))
-      (princ #\Newline))
-    (format t "~%")
-    ;;Clean up used memory
-    (free int-data)
-    (free double-data)
-    (free uchar-data)))
+
 
 
 Macro for CFFI::FOREIGN-ALLOC
@@ -5992,7 +6488,7 @@ LISP-CV> (MEM-AREF B :INT 2)
 
 3
 
-=======================================================MACROS===========================================================
+
 
 FREE
 
@@ -6026,7 +6522,7 @@ LISP-CV> (MEM-REF A :INT)
 
 0
 
-;=======================================================MACROS===========================================================
+;
 
 
 

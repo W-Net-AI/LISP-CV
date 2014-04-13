@@ -175,29 +175,43 @@
   (filename (:pointer string*))
   (flags :int))
 
-
 (defun imread (filename &optional (flags 1))
   (%imread (c-string-to-string* filename (length filename)) flags))
 
 
+;; bool imwrite(const string& filename, InputArray img, const vector<int>& params=vector<int>() )
+;; bool cv_imwrite(String* filename, Mat* img, vector_int* params) 
+(defcfun ("cv_imwrite2" %imwrite) :boolean
+  (filename :string)
+  (img (:pointer mat))
+  (params (:pointer vector-int)))
+
+(defun imwrite (filename img &optional (params (vector-int)))
+  "Saves an image to a specified file."
+  (%imwrite filename img params))
+
+
+;; VideoWriter* cv_create_VideoWriter() 
+(defcfun ("cv_create_VideoWriter" video-writer0) (:pointer video-writer)
+  "VIDEO-WRITER constructor")
+
+
 ;; VideoWriter::VideoWriter(const string& filename, int fourcc, double fps, Size frameSize, bool isColor) 
 ;; VideoWriter* cv_create_VideoWriter5(String* filename, int fourcc, double fps, Size* frameSize, bool isColor)
-(defcfun ("cv_create_VideoWriter5" %video-writer) (:pointer video-writer)
+(defcfun ("cv_create_VideoWriter5" video-writer5) (:pointer video-writer)
   (filename (:pointer string*))
   (fourcc :int)
   (fps :double)
   (frame-size (:pointer size))
   (is-color :boolean))
 
-
-(defun video-writer (filename fourcc fps frame-size &optional (is-color t))
-  "VIDEO-WRITER constructor"
-  (%video-writer (foreign-alloc :string :initial-element filename) fourcc fps frame-size is-color))
-
-
-;; VideoWriter* cv_create_VideoWriter() 
-(defcfun ("cv_create_VideoWriter" video-writer0) (:pointer video-writer)
-  "VIDEO-WRITER constructor")
+(defun video-writer (&optional filename fourcc fps frame-size (is-color t))
+  "VIDEO-WRITER constructor"  
+	   (cond ((eq filename nil)
+		  (video-writer0))
+		 (filename
+		  (video-writer5 (foreign-alloc :string :initial-element filename) fourcc fps frame-size is-color))
+		 (t nil)))
 
 
 ;; bool VideoWriter::isOpened()
