@@ -18,6 +18,19 @@
 #include <opencv2/c/mat.hpp>
 
 extern "C" {
+
+size_t cv_Mat_get_Step(Mat* self) {
+    return self->step;
+}
+
+void cv_Mat_convertTo(Mat* self,Mat* m, int rtype, double alpha, double beta) {
+    self->convertTo(*m, rtype, alpha, beta);
+}
+
+Mat* cv_create_Mat_with_value(int rows, int cols, int type, Scalar* s) {
+    return new Mat(rows, cols, type, *s);
+}
+
 Mat* cv_create_Mat() {
     return new Mat();
 }
@@ -128,7 +141,7 @@ size_t cv_Mat_total(Mat* self) {
     return self->total();
 }
 
-fbool cv_Mat_isContinuous(Mat* self) {
+bool cv_Mat_isContinuous(Mat* self) {
     return self->isContinuous();
 }
 
@@ -192,6 +205,10 @@ MatExpr* cv_Mat_add(Mat* m1, Mat* m2) {
     return new MatExpr(*m1 + *m2);
 }
 
+MatExpr* cv_Mat_sub(Mat* m1, Mat* m2) {
+    return new MatExpr(*m1 - *m2);
+}
+
 MatExpr* cv_Mat_mult(Mat* m1, Mat* m2) {
     return new MatExpr(*m1 * *m2);
 }
@@ -224,6 +241,22 @@ void cv_Mat_locateROI(Mat* self, Size* s, Point* p) {
 
 Mat* cv_Mat_adjustROI(Mat* self, int dtop, int dbottom, int dleft, int dright) {
     return new Mat(self->adjustROI(dtop, dbottom, dleft, dright));
+}
+
+void cv_delete_Mat(Mat* self) {
+     delete self;
+}
+
+void cv_destruct_Mat(Mat* self) {
+     self->~Mat();
+}
+
+void cv_delete_MatExpr(MatExpr* self) {
+     delete self;
+}
+
+void cv_destruct_MatExpr(MatExpr* self) {
+     self->~MatExpr();
 }
 
 }

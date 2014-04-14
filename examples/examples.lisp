@@ -9,6 +9,159 @@
 BASIC STRUCTURES:
 
 
+
+ADD
+
+Adds two matrices.
+
+C++: MatExpr + operator
+
+LISP-CV: (ADD (M1 (:POINTER MAT)) (M2 (:POINTER MAT))) => (:POINTER MAT-EXPR)
+
+
+    Parameters:	
+
+        M1 - A matrix.
+
+        M2 - A matrix.
+
+
+The function ADD adds the elements of matrix M1 to the elements of matrix M2 in order. Both 
+matrices must have the same number of rows and columns. You may need to coerce the result o-
+f ADD, the return value, back to type (:POINTER MAT) with the function (FORCE), (or the 
+shorthand version (>>)) to use in other functions. 
+
+
+
+(defun add-example ()
+
+  "Matrix M1 and M2 are added together with the 
+   function ADD. Matrix M1, M2 and RESULT are t-
+   hen printed."
+
+  (let* ((m1-data (alloc :uint '(1 2 3 4 5 6 7 8 9)))
+	 (m2-data (alloc :uint '(1 2 3 4 5 6 7 8 9)))
+	 (m1 (mat-data 3 3 +32s+ m1-data))
+         (m2 (mat-data 3 3 +32s+ m2-data))
+         (result (add m1 m2)))
+    (dotimes (i (rows m1))
+      (dotimes (j (cols m1))
+	(format t "~a" (at m1 i j :int))
+	(princ #\Space))
+      (princ #\Newline))
+    (format t "~%~%")
+    (dotimes (i (rows m2))
+      (dotimes (j (cols m2))
+	(format t "~a" (at m2 i j :int))
+	(princ #\Space))
+      (princ #\Newline))
+    (format t "~%~%")
+    (dotimes (i 3)
+      (dotimes (j 3)
+	(format t "~a" (at (>> result) i j :int))
+	(princ #\Space))
+      (princ #\Newline))
+    (free m1-data)
+    (free m2-data)))
+
+
+
+ADJUST-ROI
+
+Adjusts a submatrix size and position within the parent matrix.
+
+C++: Mat& Mat::adjustROI(int dtop, int dbottom, int dleft, int dright)
+
+LISP-CV: (ADJUST-ROI (SELF (:POINTER MAT)) (DTOP :INT) (DBOTTOM :INT) (DLEFT :INT) (DRIGHT :INT)) => (:POINTER MAT)
+
+    Parameters:	
+
+        SELF - A Matrix
+
+        DTOP - Shift of the top submatrix boundary upwards.
+
+        DBOTTOM - Shift of the bottom submatrix boundary downwards.
+
+        DLEFT - Shift of the left submatrix boundary to the left.
+
+        DRIGHT - Shift of the right submatrix boundary to the right.
+
+The method is complimentary to the function (LOCATE-ROI). The typical use of these functions is to 
+determine the submatrix position within the parent matrix and then shift the position. Typically, it 
+can be required for filtering operations when pixels outside of the ROI should be taken into account. 
+When all the method parameters are positive, the ROI needs to grow in all directions by the specified 
+amount, for example:
+
+(ADJUST-ROI A 2 2 2 2)
+
+In this example, the matrix size is increased by 2 elements in each direction. The matrix is shifted 
+by 2 elements to the left and 2 elements up, which brings in all the necessary pixels for filtering 
+with the 5x5 kernel.
+
+ADJUST-ROI forces the adjusted ROI to be inside of the parent matrix that is in the boundaries of the 
+adjusted ROI are constrained by boundaries of the parent matrix. For example, if the submatrix A is 
+located in the first row of a parent matrix and you called (ADJUST-ROI A 2 2 2 2) then A will not be 
+increased in the upward direction.
+
+The function is used internally by the OpenCV filtering functions, like (FILTER-2D) , morphological 
+operations, and so on.
+
+See also
+
+(COPY-MAKE-BORDER)
+
+
+(defun adjust-roi-example (&optional 
+			     (camera-index *camera-index*) 
+			     (width *default-width*)
+			     (height *default-height*))
+  ;Set camera feed to CAP
+  (with-capture (cap (cap-cam camera-index))
+    (let ((window-name-1 "Original FRAME - ADJUST-ROI Example")
+	  (window-name-2 "Region of interest - ADJUST-ROI Example")
+	  (window-name-3 "FRAME readjusted to original dimensions - ADJUST-ROI Example"))
+      (if (not (cap-is-open cap)) 
+	  (return-from adjust-roi-example 
+	    (format t "Cannot open the video camera")))
+      ;Set width and height of CAP
+      (cap-set cap +cap-prop-frame-width+ width)
+      (cap-set cap +cap-prop-frame-height+ height)
+      (format t "Frame Size : ~ax~a~%~%" 
+	      (cap-get cap +cap-prop-frame-width+)
+	      (cap-get cap +cap-prop-frame-height+))
+      (named-window window-name-1 +window-normal+)
+      (named-window window-name-2 +window-normal+)
+      (named-window window-name-3 +window-normal+)
+      (move-window window-name-1 315 175)
+      (move-window window-name-2 765 175)
+      (move-window window-name-3 1215 175)
+      (do* ((frame 0)
+            ;Create rectangle RECT
+            (rect (rect (round (/ width 4)) 
+			(round (/ height 4))  
+			(round (/ width 2)) 
+			(round (/ height 2)))))
+	   ((plusp (wait-key *millis-per-frame*)) 
+	    (format t "Key is pressed by user"))
+        ;Set camera feed to FRAME
+	(setf frame (mat))
+	(cap-read cap frame)
+        ;Show original FRAME in window
+	(imshow window-name-1 frame)
+        ;Set FRAME region of interest to RECT, half 
+        ;the size of FRAME, positioned in the middle 
+        ;of FRAME
+	(setf frame (roi frame rect))
+        ;;Show adjusted FRAME in window
+	(imshow window-name-2 frame)
+        ;Readjust frame back to original dimensions
+	(adjust-roi frame 120 120 160 160)
+        ;Show readjusted FRAME in a window
+	(imshow window-name-3 frame))
+      (destroy-all-windows))))
+
+
+
 ASSGN-VAL
 
 Assign a scalar value to a matrix.
@@ -271,6 +424,146 @@ no longer have this property.
 	    (is-continuous img-roi))
     (loop while (not (= (wait-key 0) 27)))
     (destroy-all-windows)))
+
+
+
+LOCATE-ROI
+
+Locates the matrix header within a parent matrix.
+
+C++: void Mat::locateROI(Size& wholeSize, Point& ofs) const
+
+LISP-CV: (LOCATE-ROI (SELF (:POINTER MAT)) (S (:POINTER SIZE)) (P (:POINTER POINT))) => :VOID
+
+
+    Parameters:	
+
+        SELF - A matrix
+
+        WHOLE-SIZE - Output parameter that contains the size of the whole matrix containing *this as a part.
+
+        OFS - Output parameter that contains an offset of *this inside the whole matrix.
+
+After you have extracted a submatrix from a matrix MAT using (ROWS MAT), (COLS MAT), (ROW-RANGE MAT) 
+,(COL-RANGE MAT), and others, the resultant submatrix points just to the part of the original parent 
+matrix. However, each submatrix contains information (represented by the OpenCv Mat class DATASTART 
+and DATAEND members) that helps reconstruct the original matrix size and the position of the extracted 
+submatrix within the original matrix. The function LOCATE-ROI does exactly that.
+
+
+(defun locate-roi-example (&optional 
+			     (camera-index *camera-index*) 
+			     (width *default-width*)
+			     (height *default-height*))
+  ;Set camera feed to CAP
+  (with-capture (cap (cap-cam camera-index))
+    (let ((window-name-1 "Original FRAME - LOCATE-ROI Example")
+	  (window-name-2 "Submatrix - LOCATE-ROI Example"))
+      (if (not (cap-is-open cap)) 
+	  (return-from locate-roi-example 
+	    (format t "Cannot open the video camera")))
+      ;Set width and height of CAP
+      (cap-set cap +cap-prop-frame-width+ width)
+      (cap-set cap +cap-prop-frame-height+ height)
+      (format t "Frame Size : ~ax~a~%~%" 
+	      (cap-get cap +cap-prop-frame-width+)
+	      (cap-get cap +cap-prop-frame-height+))
+      ;;Create windows and move to specified positions
+      (named-window window-name-1 +window-normal+)
+      (named-window window-name-2 +window-normal+)
+      (move-window window-name-1 514 175)
+      (move-window window-name-2 966 175)
+      (do* ((frame 0)
+            ;Create rectangle RECT
+            (rect (rect (round (/ width 4)) 
+			(round (/ height 4))  
+			(round (/ width 2)) 
+			(round (/ height 2))))
+            ;;Create variables to hold the size and location 
+            ;;information derived by LOCATE-ROI
+            (roi-size (size 0 0))
+             (roi-loc (point 0 0)))
+	   ((plusp (wait-key *millis-per-frame*)) 
+	    (format t "Key is pressed by user"))
+        ;Set camera feed to FRAME
+	(setf frame (mat))
+	(cap-read cap frame)
+        ;Show original FRAME in window
+	(imshow window-name-1 frame)
+        ;Extract submatrix(roi) from FRAME
+        (setf frame (roi frame rect))
+        ;Locate the position of the submatrix 
+        ;inside FRAME we just extracted as well 
+        ;as the size of its parent matrix which 
+        ;is, in this case FRAME 
+	(locate-roi frame roi-size roi-loc)
+        ;Print location of submatrix
+        (format t "Location of FRAME region of interest (~a, ~a)
+        ~%~%" (point-x roi-loc) (point-y roi-loc))
+        ;Print size of parent matrix
+        (format t "Size of FRAME (~a, ~a)
+        ~%~%" (width roi-size) (height roi-size))
+        ;;Show submatrix in window
+	(imshow window-name-2 frame))
+      (destroy-all-windows))))
+
+
+
+MUL
+
+Finds the product of two matrices.
+
+C++: MatExpr * operator
+
+LISP-CV: (MUL (M1 (:POINTER MAT)) (M2 (:POINTER MAT))) => (:POINTER MAT-EXPR)
+
+
+    Parameters:	
+
+        M1 - A single float or double float matrix.
+
+        M2 - A single float or double float matrix.
+
+
+To perform matrix multiplication on two Matrices, the number of columns in the first matrix must be 
+the same as the number of rows in the second Matrix. The matrices to be multiplied must also be of 
+type Single Float(+32F+) or Double Float(+64f+). You may need to coerce the result of MUL, the retu-
+rn value, back to type (:POINTER MAT) with the function (FORCE), (or the shorthand version (>>)) to 
+use in other functions. 
+
+
+
+(defun mul-example ()
+
+  "In this example, MUL is used to find 
+   the product of two matrices. The con-
+   tent of the first matrix(M1), the se-
+   cond matrix(M2) and result(RESULT) a-
+   re printed."
+
+  (let* ((data (alloc :float '(1.0f0 2.0f0 3.0f0 4.0f0 5.0f0 
+			       6.0f0 7.0f0 8.0f0 9.0f0)))
+	 (m1 (mat-data 3 3 +32f+ data))
+         (m2 (mat-data 3 3 +32f+ data))
+         (result (mul m1 m2)))
+    (dotimes (i (rows m1))
+      (dotimes (j (cols m1))
+	(format t "~a" (at m1 i j :float))
+	(princ #\Space))
+      (princ #\Newline))
+    (format t "~%~%")
+    (dotimes (i (rows m2))
+      (dotimes (j (cols m2))
+	(format t "~a" (at m2 i j :float))
+	(princ #\Space))
+      (princ #\Newline))
+    (format t "~%~%")
+    (dotimes (i 3)
+      (dotimes (j 3)
+	(format t "~a" (at (>> result) i j :float))
+	(princ #\Space))
+      (princ #\Newline))
+    (free data)))
 
 
 
@@ -779,9 +1072,7 @@ LISP-CV: (FLIP (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) (FLIP-CODE :INT)) => :
                     (for example, -1) means flipping around both axes (see the discussion below for 
                     the formulas).
 
-The function FLIP flips the array in one of three different ways (row and column indices are 0-based):
-
-\texttt{dst} _{ij} = \left\{ \begin{array}{l l} \texttt{src} _{\texttt{src.rows}-i-1,j} & if\; \texttt{flipCode} = 0 \\ \texttt{src} _{i, \texttt{src.cols} -j-1} & if\; \texttt{flipCode} > 0 \\ \texttt{src} _{ \texttt{src.rows} -i-1, \texttt{src.cols} -j-1} & if\; \texttt{flipCode} < 0 \\ \end{array} \right.
+The function FLIP flips the array in one of three different ways (row and column indices are 0-based).
 
 The example scenarios of using the function are the following:
 
@@ -2021,8 +2312,109 @@ zero rows and columns and then convolves the result with the same kernel as in (
   (main filename))
 
 
+MISCELLANEOUS IMAGE TRANSFORMATIONS:
 
-;;; Feature Detection
+
+
+THRESHOLD
+
+Applies a fixed-level threshold to each array element.
+
+C++: double threshold(InputArray src, OutputArray dst, double thresh, double maxval, int type)
+
+LISP-CV: (THRESHOLD (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) (THRESH :DOUBLE) (MAX-VAL :DOUBLE) (TYPE :INT)) => :DOUBLE
+
+
+    Parameters:	
+
+        SRC - Input array (single-channel, 8-bit or 32-bit floating point).
+
+        DEST - Output array of the same size and type as SRC.
+
+        THRESH - Threshold value.
+
+        MAX-VAL - Maximum value to use with the +THRESH-BINARY+ and +THRESH-BINARY-INV+ thresholding types.
+
+        TYPE - Thresholding type (see the details below).
+
+
+The function applies fixed-level thresholding to a single-channel array. The function is typically 
+used to get a bi-level (binary) image out of a grayscale image ( (COMPARE) could be also used for 
+this purpose) or for removing a noise, that is, filtering out pixels with too small or too large 
+values. There are several types of thresholding supported by the function. 
+
+They are determined by type:
+
+                        +THRESH-BINARY+
+
+                        +THRESH-BINARY-INV+
+
+                        +THRESH-TRUNC+
+
+                        +THRESH-TOZERO+
+
+                        +THRESH-TOZERO-INV+
+
+
+Also, the special value +THRESH-OTSU+ may be combined with one of the above values. In this case, 
+the function determines the optimal threshold value using the Otsu’s algorithm and uses it instead 
+of the specified thresh . The function returns the computed threshold value. Currently, the Otsu’s 
+method is implemented only for 8-bit images. 
+
+See also
+
+(ADAPTIVE-THRESHOLD), (FIND-CONTOURS), (COMPARE), (MIN), (MAX)
+
+
+(defun threshold-example (&optional (camera-index 0)
+			    (width 640) (height 480))
+
+  "Show the camera output and a thresholded 
+   version in a single window."
+
+  (with-capture (cap (cap-cam camera-index))
+    (let* ((window-name "Camera/Threshold")
+           (grayscale (mat-typed height width +8u+))
+           (threshold (mat-typed height width +8u+))
+           (threshold3 (mat-typed height width +8uc3+))
+           ;Create a double wide window to show the camera 
+           ;output and a thresholded camera output in
+           (window (mat-typed height (* width 2) +8uc3+)))
+      (cap-set cap +cap-prop-frame-width+ width)
+      (cap-set cap +cap-prop-frame-height+ height)
+      (named-window window-name)
+      (move-window window-name 333 175)
+      (do* ((frame 0))
+	   ((plusp (wait-key *millis-per-frame*)) 
+	    (format t "Key is pressed by user"))
+        ;Set camera feed to FRAME
+	(setf frame (mat))
+	(cap-read cap frame)
+        ;Convert FRAME to a 1 channel grayscale 
+        ;image and assign to GRAYSCALE
+        (cvt-color frame grayscale +bgr2gray+)
+        ;Apply a fixed-level threshold to 
+        ;each array element of GRAYSCALE
+        (threshold grayscale threshold 128d0 255d0 +thresh-binary+)
+        ;Convert threshold back to a 3 channel 
+        ;BGR image and assign to THRESHOLD3
+	(cvt-color threshold threshold3 +gray2bgr+)
+        ;Set WINDOW roi to the left half
+        (adjust-roi window 0 0 0 (* (cols threshold3) -1))
+        ;Copy original camera feed(FRAME) to WINDOW 
+        (copy-to frame window)
+        ;Set WINDOW roi to the right half
+        (adjust-roi window 0 0 (* (cols frame) -1) (cols threshold3))
+        ;Copy thresholded camera feed to WINDOW
+        (copy-to threshold3 window)
+        ;Restore original roi
+        (adjust-roi window 0 0 (cols frame) 0)
+        ;Show WINDOW in a window
+	(imshow window-name window))
+      (destroy-window window-name))))
+
+
+FEATURE DETECTION:
 
 
 CANNY
@@ -3950,18 +4342,12 @@ C++: static MatExpr Mat::eye(int rows, int cols, int type)
 
 LISP-CV: (MAT-EYE (ROWS :INT) (COLS :INT) (TYPE :INT)) => (:POINTER MAT)
 
-C++: static MatExpr Mat::eye(Size size, int type)
-
-LISP-CV: (MAT-EYE (S (:POINTER SIZE)) (TYPE :INT)) => (:POINTER MAT)
-
 
     Parameters:	
 
         ROWS - Number of rows.
 
         COLS - Number of columns.
-
-        SIZE - Alternative matrix size specification as (SIZE ROWS COLS).
 
         TYPE - Created matrix type.
 
@@ -3976,59 +4362,47 @@ to (MAT-ONES), you can use a scale operation to create a scaled identity matrix 
 
 (defun mat-eye-example ()
 
-  "This example introduces the functions MAT-EYE a-
-   nd MAT-EYE. Both identity matrix functions are 
-   the same, except that MAT-EYE has row,column pa-
-   rameters, and MAT-EYE has a size parameters.  B-
-   oth are used to create identical 3x3 identity m-
-   atrices of unsigned-char type, IDENTITY-MAT-1 a-
-   nd IDENTITY-MAT-2, which are shown in a window. 
+  "Here we use the function MAT-EYE to create a 3x3 
+   identity matrix IDENTITY-MAT-1, which is shown i-
+   n the left-most window. 
 
-   Next an identity matrix, IDENTITY-MAT-3 is creat-
-   ed and using the function SCALE is scaled by 
-   0.1 . Then both the pre-scaled version and the s-
-   caled version are shown in window. This allows y-
-   ou to see the fact that, because they are of typ-
-   e +32F+(single-float) matrices, their elements a-
-   re shown as colors, not numbers, unlike the matr-
-   ices in the top 2 windows. So an identity matrix 
-   which has a diagonal that is all ones, it's diag-
-   onal would be represented as pure white. An iden-
-   tity matrix whose diagonal is all 0.1, it's diag-
-   onal would be represented as a dark, dark grey V-
-   ery close to black...A colored boolean.
+   Next an identity matrix, IDENTITY-MAT-2 is creat-
+   ed and using the function SCALE is scaled by 0.1. 
+   Then both the pre-scaled version and the scaled 
+   version are shown in the 2 right-most windows. T-
+   his allows you to see the fact that, because the-
+   y are single-float matrices, their elements are 
+   shown as colors, not numbers, unlike the matrix 
+   in the left-most window. So an identity matrix w-
+   hich has a diagonal that is all ones, it's diago-
+   nal would be represented as pure white. An ident-
+   ity matrix whose diagonal is all 0.1, it's diago-
+   nal would be represented as a dark, dark grey Ve-
+   ry close to black, a colored boolean.
 
    Note: The PROMOTE(<<) function was needed in the 
-   SCALE function to cooerce IDENTITY-MAT-3 to 
-   MAT-EXPR from MAT type for the scaling operation. 
-   The FORCE(>>) function is used in IMSHOW to coer-
-   ce SCALED-IDENTITY-MAT-3 back to MAT."
+   SCALE function to coerce IDENTITY-MAT-2 to MAT-E-
+   XPR from MAT type for the scaling operation. The 
+   FORCE(>>) function is then used in IMSHOW to coe-
+   rce SCALED-IDENTITY-MAT-3 back to MAT."
 
   (let* ((identity-mat-1 (mat-eye 3 3 +8u+))
-         (identity-mat-2 (mat-eye (size 3 3) +8u+))
-         (identity-mat-3 (mat-eye 4 4 +32f+))
-	 (scaled-identity-mat-3 (scale (<< identity-mat-3) 0.1d0))
+         (identity-mat-2 (mat-eye 4 4 +32f+))
+	 (scaled-identity-mat (scale (<< identity-mat-2) 0.1d0))
 	 (window-name-1 "IDENTITY-MAT-1 - MAT-EYE Example")
-         (window-name-2 "IDENTITY-MAT-2 - MAT-EYE Example")
-	 (window-name-3 "IDENTITY-MAT-3 - MAT-EYE Example")
-         (window-name-4 "SCALED-IDENTITY-MAT-3 - MAT-EYE Example"))
+	 (window-name-2 "IDENTITY-MAT-3 - MAT-EYE Example")
+         (window-name-3 "SCALED-IDENTITY-MAT-3 - MAT-EYE Example"))
     (named-window window-name-1 +window-normal+)
     (named-window window-name-2 +window-normal+)
     (named-window window-name-3 +window-normal+)
-    (named-window window-name-4 +window-normal+)
-    (move-window window-name-1 485 98)
-    (move-window window-name-2 894 98)
-    (move-window window-name-3 485 444)
-    (move-window window-name-4 894 444)
+    (move-window window-name-1 315 175)
+    (move-window window-name-2 765 175)
+    (move-window window-name-3 1215 175)
     (imshow window-name-1 identity-mat-1)
     (imshow window-name-2 identity-mat-2)
-    (imshow window-name-3 identity-mat-3)
-    (imshow window-name-4  (>> scaled-identity-mat-3))
+    (imshow window-name-3  (>> scaled-identity-mat))
     (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name-1)
-    (destroy-window window-name-2)
-    (destroy-window window-name-3)
-    (destroy-window window-name-4)))
+    (destroy-all-windows)))
 
 
 GET-TICK-COUNT
@@ -4272,118 +4646,6 @@ single-column matrix. Similarly to (ROW) and (COL) , this is an O(1) operation.
       (princ #\Newline))
     (free data)))
 
-
-MUL
-
-Finds the product of two matrices.
-
-C++: MatExpr * operator
-
-LISP-CV: (MUL (M1 (:POINTER MAT)) (M2 (:POINTER MAT))) => (:POINTER MAT-EXPR)
-
-
-    Parameters:	
-
-        M1 - A single float or double float matrix.
-
-        M2 - A single float or double float matrix.
-
-
-To perform matrix multiplication on two Matrices, the number of columns in the first matrix must be 
-the same as the number of rows in the second Matrix. The matrices to be multiplied must also be of 
-type Single Float(+32F+) or Double Float(+64f+). You may need to coerce the result of MUL, the retu-
-rn value, back to type (:POINTER MAT) with the function (FORCE), (or the shorthand version (>>)) to 
-use in other functions. 
-
-
-
-(defun mul-example ()
-
-  "In this example, MUL is used to find 
-   the product of two matrices. The con-
-   tent of the first matrix(M1), the se-
-   cond matrix(M2) and result(RESULT) a-
-   re printed."
-
-  (let* ((data (alloc :float '(1.0f0 2.0f0 3.0f0 4.0f0 5.0f0 
-			       6.0f0 7.0f0 8.0f0 9.0f0)))
-	 (m1 (mat-data 3 3 +32f+ data))
-         (m2 (mat-data 3 3 +32f+ data))
-         (result (mul m1 m2)))
-    (dotimes (i (rows m1))
-      (dotimes (j (cols m1))
-	(format t "~a" (at m1 i j :float))
-	(princ #\Space))
-      (princ #\Newline))
-    (format t "~%~%")
-    (dotimes (i (rows m2))
-      (dotimes (j (cols m2))
-	(format t "~a" (at m2 i j :float))
-	(princ #\Space))
-      (princ #\Newline))
-    (format t "~%~%")
-    (dotimes (i 3)
-      (dotimes (j 3)
-	(format t "~a" (at (>> result) i j :float))
-	(princ #\Space))
-      (princ #\Newline))
-    (free data)))
-
-
-
-ADD
-
-Adds two matrices.
-
-C++: MatExpr + operator
-
-LISP-CV: (ADD (M1 (:POINTER MAT)) (M2 (:POINTER MAT))) => (:POINTER MAT-EXPR)
-
-
-    Parameters:	
-
-        M1 - A matrix.
-
-        M2 - A matrix.
-
-
-The function ADD adds the elements of matrix M1 to the elements of matrix M2 in order. Both 
-matrices must have the same number of rows and columns. You may need to coerce the result o-
-f ADD, the return value, back to type (:POINTER MAT) with the function (FORCE), (or the 
-shorthand version (>>)) to use in other functions. 
-
-
-
-(defun add-example ()
-
-  "Matrix M1 and M2 are added together with the 
-   function ADD. Matrix M1, M2 and RESULT are t-
-   hen printed."
-
-  (let* ((m1-data (alloc :uint '(1 2 3 4 5 6 7 8 9)))
-	 (m2-data (alloc :uint '(1 2 3 4 5 6 7 8 9)))
-	 (m1 (mat-data 3 3 +32s+ m1-data))
-         (m2 (mat-data 3 3 +32s+ m2-data))
-         (result (add m1 m2)))
-    (dotimes (i (rows m1))
-      (dotimes (j (cols m1))
-	(format t "~a" (at m1 i j :int))
-	(princ #\Space))
-      (princ #\Newline))
-    (format t "~%~%")
-    (dotimes (i (rows m2))
-      (dotimes (j (cols m2))
-	(format t "~a" (at m2 i j :int))
-	(princ #\Space))
-      (princ #\Newline))
-    (format t "~%~%")
-    (dotimes (i 3)
-      (dotimes (j 3)
-	(format t "~a" (at (>> result) i j :int))
-	(princ #\Space))
-      (princ #\Newline))
-    (free m1-data)
-    (free m2-data)))
 
 
 SUB

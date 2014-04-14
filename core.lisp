@@ -86,6 +86,17 @@
   (m2 (:pointer mat)))
 
 
+;; Mat& Mat::adjustROI(int dtop, int dbottom, int dleft, int dright)
+;; Mat* cv_Mat_adjustROI(Mat* self, int dtop, int dbottom, int dleft, int dright) {
+(defcfun ("cv_Mat_adjustROI" adjust-roi) (:pointer mat) 
+	 "Adjusts a submatrix size and position within the parent matrix."
+	 (self (:pointer mat))
+	 (dtop :int)
+	 (dbottom :int)
+	 (dleft :int)
+	 (dright :int))
+
+
 ;; _Tp area() const
 ;; int cv_Size_area(Size* self)
 (defcfun ("cv_Size_area" area) :int
@@ -179,15 +190,16 @@
 
 
 ;; void operator delete  ( void* ptr )
-;; void cv_delete_Mat(void* ptr)
+;; void cv_delete_Mat(void* self)
 (defcfun ("cv_delete_Mat" del-mat) :void
-  (ptr :pointer))
+  (self :pointer))
 
 
 ;; void operator delete  ( void* ptr )
-;; void cv_delete_MatExpr(void* ptr)
+;; void cv_delete_MatExpr(void* self)
 (defcfun ("cv_delete_MatExpr" del-mat-expr) :void
-  (ptr :pointer))
+  (self :pointer))
+
 
 
 ;; Mat Mat::diag(int d=0 ) const
@@ -332,26 +344,33 @@
 
 ;; static MatExpr Mat::eye(int rows, int cols, int type) 
 ;; Mat* cv_create_identity(int rows, int cols, int type)
-(defcfun ("cv_create_identity" mat-eye3) (:pointer mat)
+(defcfun ("cv_create_identity" mat-eye) (:pointer mat)
   "Returns an identity matrix of the specified size and type."
   (rows :int)
   (cols :int)
   (type :int))
 
 
-;; static MatExpr Mat::eye(Size size, int type)
-;; Mat* cv_create_sized_identity(Size* s, int type)
-(defcfun ("cv_create_sized_identity" mat-eye2)  (:pointer mat)
-  "Returns an identity matrix of the specified size and type."
-  (s (:pointer size))
-  (type :int))
+;; ~Mat();
+;; void cv_destruct_Mat(Mat* self)
+(defcfun ("cv_destruct_Mat" destruct-mat) :void
+  "Destructor - calls release()"
+  (self :pointer))
 
 
-(defun mat-eye (&rest args)
-       (cond ((third args)
-	      (mat-eye3 (first args) (second args) (third args)))
-	      (t
-	       (mat-eye2 (first args) (second args)))))
+;; void cv_destruct_MatExpr(MatExpr* self) 
+(defcfun ("cv_destruct_MatExpr" destruct-mat-expr) :void
+  "Destructor - calls release()"
+  (self :pointer))
+
+
+;; void Mat::locateROI(Size& wholeSize, Point& ofs) const
+;; void cv_Mat_locateROI(Mat* self, Size* s, Point* p) {
+(defcfun ("cv_Mat_locateROI" locate-roi) :void 
+	 "Locates the matrix header within a parent matrix."
+	 (self (:pointer mat))
+	 (whole-size (:pointer size))
+	 (ofs (:pointer point)))
 
 
 ;; static MatExpr Mat::ones(int rows, int cols, int type)

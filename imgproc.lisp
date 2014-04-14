@@ -64,8 +64,18 @@
   (dest-cn :int))
 
 (defun cvt-color (src dest code &optional (dest-cn 0))
-  "Converts an image from one color space to another."
+  "Converts an image from one cofmisclor space to another."
    (%cvt-color src dest code dest-cn))
+
+
+;; double threshold(InputArray src, OutputArray dst, double thresh, double maxval, int type)
+;; double cv_threshold(Mat* src, Mat* dst, double thresh, double maxval, int type) 
+(defcfun ("cv_threshold" threshold) :double
+  (src (:pointer mat))
+  (dest (:pointer mat))
+  (thresh :double)
+  (max-val :double)
+  (type :int))
 
 
 ;;; Histograms

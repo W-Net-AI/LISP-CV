@@ -139,9 +139,10 @@
 
    #:<<
    #:>>
+   #:add
+   #:adjust-roi
    #:area
    #:area2f
-   #:add
    #:br
    #:channels
    #:clone
@@ -164,6 +165,7 @@
    #:height
    #:height2f
    #:is-continuous
+   #:locate-roi
    #:mat-diag
    #:mat-expr-t
    #:mat-expr-s
@@ -625,6 +627,7 @@
    #:+dist-mask-precise+ 
 
    #:cvt-color
+   #:threshold
    
 ;; imgproc - Histograms
 

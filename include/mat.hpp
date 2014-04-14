@@ -18,6 +18,9 @@
 #include <opencv2/c/opencv_generated.hpp>
 
 extern "C" {
+size_t cv_Mat_get_Step(Mat* self); 
+void cv_Mat_convertTo(Mat* self,Mat* m, int rtype, double alpha, double beta);
+Mat* cv_create_Mat_with_value(int rows, int cols, int type, Scalar* s);
 Mat* cv_create_Mat(); 
 Mat* cv_create_Mat_typed(int rows, int cols, int type); 
 Mat* cv_create_Mat_with_data(int rows, int cols, int type, void* data );
@@ -60,6 +63,7 @@ MatExpr* cv_abs(Mat* m);
 MatExpr* cv_Mat_transpose_mat(Mat* self); 
 MatExpr* cv_Mat_inv_mat(Mat* self, int method);
 MatExpr* cv_Mat_add(Mat* m1, Mat* m2); 
+MatExpr* cv_Mat_sub(Mat* m1, Mat* m2); 
 MatExpr* cv_Mat_mult(Mat* m1, Mat* m2);
 Mat* force(MatExpr* expr);
 MatExpr* promote(Mat* m); 
@@ -68,5 +72,9 @@ double cv_Mat_dot(Mat* self, Mat* m);
 Mat* cv_Mat_cross(Mat* self, Mat* m); 
 void cv_Mat_locateROI(Mat* self, Size* s, Point* p); 
 Mat* cv_Mat_adjustROI(Mat* self, int dtop, int dbottom, int dleft, int dright);
+void cv_delete_Mat(Mat* self);
+void cv_destruct_Mat(Mat* self);
+void cv_delete_MatExpr(MatExpr* self);
+void cv_destruct_MatExpr(MatExpr* self);
 }
 
