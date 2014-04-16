@@ -69,14 +69,14 @@
 (defcfun ("promote" <<) (:pointer mat-expr)
   "Converts a (:POINTER MAT) to a (:POINTER MAT-EXPR).
    This is a shorthand version of the PROMOTE function." 
-  (m (:pointer mat)))
+  (mat (:pointer mat)))
 
 
 ;; Mat* force(MatExpr* expr)
 (defcfun ("force" >>) (:pointer mat)
   "Coerces a (:POINTER MAT-EXPR) to a (:POINTER MAT). 
    This is a shorthand version of the FORCE function."
-  (expr (:pointer mat-expr)))
+  (mat-expr (:pointer mat-expr)))
 
 
 ;; MatExpr + operator
@@ -87,7 +87,7 @@
 
 
 ;; Mat& Mat::adjustROI(int dtop, int dbottom, int dleft, int dright)
-;; Mat* cv_Mat_adjustROI(Mat* self, int dtop, int dbottom, int dleft, int dright) {
+;; Mat* cv_Mat_adjustROI(Mat* self, int dtop, int dbottom, int dleft, int dright) 
 (defcfun ("cv_Mat_adjustROI" adjust-roi) (:pointer mat) 
 	 "Adjusts a submatrix size and position within the parent matrix."
 	 (self (:pointer mat))
@@ -124,7 +124,7 @@
 
 
 ;; Point_<_Tp> br() const;
-;; Point* cv_Rect_br(Rect* self) {
+;; Point* cv_Rect_br(Rect* self) 
 (defcfun ("cv_Rect_br" br) (:pointer point) 
   "Retrievies the bottom-right corner of a rectangle."
   (self (:pointer rect)))
@@ -285,7 +285,7 @@
 ;; Mat* force(MatExpr* expr)
 (defcfun ("force" force) (:pointer mat)
   "Coerces a (:POINTER MAT-EXPR) to a (:POINTER MAT)."
-  (expr (:pointer mat-expr)))
+  (mat-expr (:pointer mat-expr)))
 
 
 ;; _Tp width, height
@@ -300,6 +300,14 @@
 (defcfun ("cv_Size2f_height" height2f) :float
   "Gets the height of a (:POINTER SIZE2F)"
   (self (:pointer size2f)))
+
+
+;; MatExpr Mat::inv(int method=DECOMP_LU) const
+;; MatExpr* cv_Mat_inv_mat(Mat* self, int method)
+(defcfun ("cv_Mat_inv_mat" inv) (:pointer mat-expr) 
+	 "Inverses a matrix."
+	 (self (:pointer mat))
+	 (method :int))
 
 
 ;; Mat::Mat()
@@ -365,7 +373,7 @@
 
 
 ;; void Mat::locateROI(Size& wholeSize, Point& ofs) const
-;; void cv_Mat_locateROI(Mat* self, Size* s, Point* p) {
+;; void cv_Mat_locateROI(Mat* self, Size* s, Point* p) 
 (defcfun ("cv_Mat_locateROI" locate-roi) :void 
 	 "Locates the matrix header within a parent matrix."
 	 (self (:pointer mat))
@@ -503,14 +511,14 @@
 
 
 ;; typedef Point_<float> Point2f;
-;; tn cv_Point2##t##_getX( Point2##t * self) {
+;; tn cv_Point2##t##_getX( Point2##t * self) 
 (defcfun ("cv_create_Point2f" point2f0) (:pointer point2f) 
   "Point2f constructor")
 
 
 
 ;; typedef Point_<float> Point2f
-;; Point2##t * cv_create_Point2##t ( tn x,  tn y)  {
+;; Point2##t * cv_create_Point2##t ( tn x,  tn y)  
 (defcfun ("cv_create_Point2f" point2f2) (:pointer point2f) 
   "Point2f constructor"
   (x :float)
@@ -674,7 +682,7 @@
 ;; MatExpr* promote(Mat* m) 
 (defcfun ("promote" promote) (:pointer mat-expr)
   "Converts a (:POINTER MAT) to a (:POINTER MAT-EXPR)."
-  (m (:pointer mat)))
+  (mat (:pointer mat)))
 
 ;; uchar* Mat::ptr(int i0=0)
 ;; uchar* cv_Mat_ptr_index(Mat* self, int i)
@@ -767,7 +775,7 @@
 
 
 ;; Size_()
-;; Size* cv_create_Size() {
+;; Size* cv_create_Size() 
 (defcfun ("cv_create_Size" size0) (:pointer size)
   "Create SIZE construct")
 
@@ -833,7 +841,7 @@
 
 
 ;; Point_<_Tp> tl() const;
-;; Point* cv_Rect_tl(Rect* self) {
+;; Point* cv_Rect_tl(Rect* self) 
 (defcfun ("cv_Rect_tl" tl) (:pointer point) 
   "Retrievies the top-left corner of a rectangle."
   (self (:pointer rect)))
@@ -864,8 +872,26 @@
 
 ;; MatExpr abs(const Mat& m)
 ;; MatExpr* cv_abs(Mat* m)
-(defcfun ("cv_abs" ~abs) (:pointer mat-expr)
+(defcfun ("cv_abs" *abs) (:pointer mat-expr)
   (m (:pointer mat)))
+
+
+;; void max(InputArray src1, InputArray src2, OutputArray dst)
+;; void cv_max(Mat* src1, Mat* src2, Mat* dst)
+(defcfun ("cv_max" *max) :void 
+  "Calculates per-element maximum of two arrays."
+  (src1 (:pointer mat))
+  (src2 (:pointer mat))
+  (dest (:pointer mat)))
+
+
+;; void min(InputArray src1, InputArray src2, OutputArray dst)
+;; void cv_min(Mat* src1, Mat* src2, Mat* dst)
+(defcfun ("cv_min" *min) :void 
+  "Calculates per-element minimum of two arrays."
+  (src1 (:pointer mat))
+  (src2 (:pointer mat))
+  (dest (:pointer mat)))
 
 
 ;; C++: void absdiff(InputArray src1, InputArray src2, OutputArray dst)
@@ -875,6 +901,33 @@
   (src1 (:pointer mat))
   (src2 (:pointer mat))
   (dest (:pointer mat)))
+
+
+;; void bitwise_or(InputArray src1, InputArray src2, OutputArray dst, InputArray mask=noArray())
+;; void cv_bitwise_or(Mat* src1, Mat* src2, Mat* dst, Mat* mask)
+(defcfun ("cv_bitwise_or" %bitwise-or) :void 
+	 (src1 (:pointer mat))
+	 (src2 (:pointer mat))
+     (dest (:pointer mat))
+	 (mask (:pointer mat)))
+
+(defun bitwise-or (src1 src2 dest &optional (mask (mat)))
+  "Calculates the per-element bit-wise disjunction of two arrays."
+  (%bitwise-or src1 src2 dest mask))
+
+
+;; void bitwise_xor(InputArray src1, InputArray src2, OutputArray dst, InputArray mask=noArray())
+;; void cv_bitwise_xor(Mat* src1, Mat* src2, Mat* dst, Mat* mask)
+(defcfun ("cv_bitwise_xor" %bitwise-xor) :void
+  "Calculates the per-element bit-wise “exclusive or” operation on two arrays."
+  (src1 (:pointer mat))
+  (src2 (:pointer mat))
+  (dest (:pointer mat))
+  (mask (:pointer mat)))
+
+(defun bitwise-xor (src1 src2 dest &optional (mask (mat)))
+  "Calculates the per-element bit-wise disjunction of two arrays."
+  (%bitwise-xor src1 src2 dest mask))
 
 
 ;; void convertScaleAbs(InputArray src, OutputArray dst, double alpha=1, double beta=0)
@@ -888,6 +941,13 @@
 (defun convert-scale-abs (src dest &optional (alpha 1d0) (beta 0d0))
   "Scales, calculates absolute values, and converts the result to 8-bit."
    (%convert-scale-abs src dest alpha beta))
+
+
+;; double determinant(InputArray mtx)
+;; double cv_determinant(Mat* mtx) 
+(defcfun ("cv_determinant" det) :double 
+	 "Returns the determinant of a square floating-point matrix."
+	 (mtx (:pointer mat)))
 
 
 ;; void flip(InputArray src, OutputArray dst, int flipCode)

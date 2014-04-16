@@ -163,6 +163,7 @@
    #:empty
    #:force
    #:height
+   #:inv
    #:height2f
    #:is-continuous
    #:locate-roi
@@ -240,8 +241,12 @@
 
 ;; core - Operations on Arrays
 
+   #:*abs
+   #:*max
+   #:*min
    #:abs-diff
-
+   #:bitwise-or
+   #:bitwise-xor
    #:+C+
    #:+cmp-eq+ 
    #:+cmp-gt+ 
@@ -269,6 +274,7 @@
  
    #:flip
    #:in-range-s
+   #:inv
    #:invert
 
    #:+l1+
@@ -682,8 +688,7 @@
 
 ;; highgui - Reading and Writing Images and Video
 
-   #:cap-cam
-   #:cap-file
+   #:video-capture
    #:+cap-prop-pos-msec+
    #:+cap-prop-pos-frames+
    #:+cap-prop-pos-avi-ratio+

@@ -13,13 +13,14 @@
 function addLoadEvent(func){var oldonload=window.onload;if(typeof window.onload!='function'){window.onload=func;}else{window.onload=function(){oldonload();func();}}}
 /* ]]> */
 </script>
-<link rel='stylesheet' id='open-sans-css'  href='//fonts.googleapis.com/css?family=Open+Sans%3A300italic%2C400italic%2C600italic%2C300%2C400%2C600&#038;subset=latin%2Clatin-ext&#038;ver=3.9-beta2-27714' type='text/css' media='all' />
-<link rel='stylesheet' id='all-css-2' href='http://s1.wp.com/_static/??-eJx9UttWAyEM/CFpqtZ6fPD4LVxSlhYIh7Ct/r3ZrXZre+SJSZiZXABORYVs4+iQwTKD0zwES5lXKeSVZB7glqKdXCmj6x+KaBrmBmlUJY4+ZAYeDdsaSgviBzuKkU49/kBHrMqMxkQpxe0r4n0He4YmHR4MfV5AzzSGw6TCVrQ9qDnq0S/Dyb2lpJZhOyJLFSWfim4TI6ELGiMmofVkqWx/VRMcpMH73togPgxlNKCzq6ivFxMgU5uf6wJ6BYWDVyOq41OPXdFE8gL9/OxL2BM1YlWxUG1qRzXdxj1pIRZS1KECD7pOdX/OnspjxnpewQL/2+KwAR/J6NhzPAXnsZ3/uieadu5mx4/0/vj8tl1vXtfbl/03eXw15A==' type='text/css' media='all' />
+<link rel='stylesheet' id='open-sans-css'  href='//fonts.googleapis.com/css?family=Open+Sans%3A300italic%2C400italic%2C600italic%2C300%2C400%2C600&#038;subset=latin%2Clatin-ext&#038;ver=3.9-RC1' type='text/css' media='all' />
+<link rel='stylesheet' id='all-css-2' href='http://s1.wp.com/_static/??-eJx9Utt2AiEM/KFiTq328tDTb+ESWRQIh7Bu+/fNrq1aPeWJSZiZXACmokK2cXTIYJnBaR6CpcyrFPJKMg9wS9FOrpTR9Q9FNA1zgzSqEkcfMgOPhm0NpQXxgx3FSFOPP9ARqzKjMVFKcfuKeN/BnqFJhwdDn2fQM43hMKuwFW0Paol69PNwcm8pqcuwHZGlipJPRbeZkdAFjRGT0HqyVJ5/VTMcpMH73togPgxlNKCzq6ivFxMgU1ue6wx6BYWDVyOq47rHrmgieYF+efZL2BM1YlWxUG1qRzXdxj1pIRZS1KECD7rOdX/OnspjxnpawQX+t8VhAz6S0bHnOAXnsZ3+uiead+4Wx4/0/vj09rJeb1632/03eZQ16Q==' type='text/css' media='all' />
 <link rel='stylesheet' id='print-css-2' href='http://s0.wp.com/wp-content/mu-plugins/global-print/global-print.css?m=1387483371g' type='text/css' media='print' />
-<script type='text/javascript' src='http://s2.wp.com/_static/??-eJx9kFEKwjAMQC9kV5zo2Id4lq1mI7NtapNu6Ontx0QcVQiEkEeSF70Ehd7YdAXWU457gvhYUzXxTv8DlMMxdgKVQ/+GDXkBL9olFWwa0bPm1LOJGAQpVwNZS8sWz6MDsThg7kYodB31aEElhpgBL/mqgQrctwH6GaG0bCMKEjpzUxEYn1Dy5vBR/P2wlbq48/7QHk9N09b19AJJfIVE'></script>
+<script type='text/javascript' src='http://s0.wp.com/_static/??-eJx9kFEKwjAMQC9k18k+dB/iWbaalcw2rU3q0NPbj4k4qhAIIY8kL3qJCsm4fAHWc4lbhvRYUzPzTv8DlEebBoHGI71hE0iARPusossWiTXnkU3CKBhKNQXnwrLFy+gYWDwwDxYqXR9GdKAyQyoASblqChXu2wDpjlBbthEFiYO5qgSMT6h5c/wo/n7YSp39ad/1h/bYt10/vwBJX4VC'></script>
 <link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://wnetai.wordpress.com/xmlrpc.php?rsd" />
 <link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://wnetai.wordpress.com/wp-includes/wlwmanifest.xml" /> 
 <link rel='prev' title='PTR' href='http://wnetai.wordpress.com/ptr/' />
+<link rel='next' title='RESHAPE' href='http://wnetai.wordpress.com/reshape/' />
 <meta name="generator" content="WordPress.com" />
 <link rel='canonical' href='http://wnetai.wordpress.com/get-text-size/' />
 <link rel='shortlink' href='http://wp.me/P3E9Y7-103' />
@@ -121,8 +122,7 @@ function addLoadEvent(func){var oldonload=window.onload;if(typeof window.onload!
 		<p><span style="color:#999999;"><strong>=======================================================================</strong></span></p>
 <p><strong>Calculates the width and height of a text string.</strong></p>
 <p><strong><span style="color:#3366ff;">C++: Size getTextSize(const string&amp; text, int fontFace, double fontScale, int thickness, int* baseLine)</span></strong></p>
-<p><strong><span style="color:#3366ff;">LISP-CV: (GET-TEXT-SIZE (TEXT (:POINTER STRING*)) (FONT-FACE :INT) (FONT-SCALE :DOUBLE) (THICKNESS :INT) (BASE-LINE :POINTER))<br />
-=&gt; (:POINTER SIZE)</span></strong></p>
+<p><strong><span style="color:#3366ff;">LISP-CV: (GET-TEXT-SIZE (TEXT (:POINTER STRING*)) (FONT-FACE :INT) (FONT-SCALE :DOUBLE) <span style="margin-left:65px;">(THICKNESS :INT) (BASE-LINE :POINTER)) =&gt; (:POINTER SIZE)</span></span></strong></p>
 <p><strong>Parameters:</strong></p>
 <p><strong><span style="color:#ff0000;"><span style="font-size:13px;">TEXT</span></span> &#8211; Input text string.</strong></p>
 <p><strong><span style="color:#ff0000;"><span style="font-size:13px;">FONT-FACE</span></span> &#8211; Font to use. See <span style="color:#3366ff;">(PUT-TEXT)</span> for details.</strong></p>
@@ -180,7 +180,7 @@ That is, the following code renders some text, the tight box surrounding it, and
 
 </span></strong></pre>
 <p><span style="color:#999999;"><strong><span style="color:#999999;"><strong>=======================================================================</strong></span></strong></span></p>
-<div id="jp-post-flair" class="sharedaddy sd-like-enabled sd-sharing-enabled"><div class="sharedaddy sd-sharing-enabled"><div class="robots-nocontent sd-block sd-social sd-social-icon-text sd-sharing"><h3 class="sd-title">Share this:</h3><div class="sd-content"><ul><li class="share-press-this"><a rel="nofollow" class="share-press-this sd-button share-icon" href="http://wnetai.wordpress.com/get-text-size/?share=press-this" title="Click to Press This!"><span>Press This</span></a></li><li class="share-twitter"><a rel="nofollow" class="share-twitter sd-button share-icon" href="http://wnetai.wordpress.com/get-text-size/?share=twitter" title="Click to share on Twitter" id="sharing-twitter-3847"><span>Twitter</span></a></li><li class="share-facebook"><a rel="nofollow" class="share-facebook sd-button share-icon" href="http://wnetai.wordpress.com/get-text-size/?share=facebook" title="Share on Facebook" id="sharing-facebook-3847"><span>Facebook</span></a></li><li class="share-end"></li></ul></div></div></div><div class='sharedaddy sd-block sd-like jetpack-likes-widget-wrapper jetpack-likes-widget-unloaded' id='like-post-wrapper-53900451-3847-53440f1405826' data-src='//widgets.wp.com/likes/#blog_id=53900451&amp;post_id=3847&amp;origin=wnetai.wordpress.com&amp;obj_id=53900451-3847-53440f1405826' data-name='like-post-frame-53900451-3847-53440f1405826'><h3 class='sd-title'>Like this:</h3><div class='likes-widget-placeholder post-likes-widget-placeholder' style='height:55px'><span class='button'><span>Like</span></span> <span class="loading">Loading...</span></div><span class='sd-text-color'></span><a class='sd-link-color'></a></div></div>			</div>
+			</div>
 
 	<div class="meta">
 		<p>Posted April 8, 2014 by <span class="author vcard"><a class="url fn n" href="http://wnetai.wordpress.com/author/joeish80829-2/" title="View all posts by Joe W. BiMedina">Joe W. BiMedina</a></span><span class="edit"> &mdash; <a class="post-edit-link" href="http://wnetai.wordpress.com/wp-admin/post.php?post=3847&amp;action=edit">Edit</a></span></p>
@@ -193,9 +193,11 @@ That is, the following code renders some text, the tight box surrounding it, and
 <div id="sidebar">
 	<ul>
 	<li id="blog-stats-2" class="widget widget_blog-stats"><h3 class="widget-title">Blog Stats</h3>		<ul>
-			<li>556 hits</li>
+			<li>564 hits</li>
 		</ul>
-		</li><li id="recent-comments-3" class="widget widget_recent_comments"><h3 class="widget-title">Recent Comments</h3></li>	</ul>
+		</li><li id="recent-comments-3" class="widget widget_recent_comments"><h3 class="widget-title">Recent Comments</h3>				<table class="recentcommentsavatar" cellspacing="0" cellpadding="0" border="0">
+					<tr><td class="recentcommentstexttop" style="">There are no public comments available to display.</td></tr>				</table>
+				</li>	</ul>
 
 </div><!-- /#sidebar -->
 </div><!-- /#wrap -->
@@ -272,7 +274,7 @@ That is, the following code renders some text, the tight box surrounding it, and
 		});
 	/* ]]> */
 	</script>
-<script type='text/javascript' src='//0.gravatar.com/js/gprofiles.js?ver=201415x'></script>
+<script type='text/javascript' src='//0.gravatar.com/js/gprofiles.js?ver=201416x'></script>
 <script type='text/javascript'>
 /* <![CDATA[ */
 var WPGroHo = {"my_hash":"66420f145f6404d2e6c7ea034449b17f"};
@@ -293,264 +295,7 @@ var WPGroHo = {"my_hash":"66420f145f6404d2e6c7ea034449b17f"};
 
 		<div style="display:none">
 	</div>
-<div id="report-form-window" style="display:none;"></div>
-	<script type="text/javascript">
-		WPCOM_sharing_counts = {"http:\/\/wnetai.wordpress.com\/get-text-size\/":3847}	</script>
-		<script type="text/javascript">
-		jQuery(document).on( 'ready post-load', function(){
-			jQuery( 'a.share-twitter' ).on( 'click', function() {
-				window.open( jQuery(this).attr( 'href' ), 'wpcomtwitter', 'menubar=1,resizable=1,width=600,height=350' );
-				return false;
-			});
-		});
-		</script>
-				<script type="text/javascript">
-		jQuery(document).on( 'ready post-load', function(){
-			jQuery( 'a.share-facebook' ).on( 'click', function() {
-				window.open( jQuery(this).attr( 'href' ), 'wpcomfacebook', 'menubar=1,resizable=1,width=600,height=400' );
-				return false;
-			});
-		});
-		</script>
-				<iframe src='http://widgets.wp.com/likes/master.html?ver=20140227#ver=20140227&amp;mp6=1' scrolling='no' id='likes-master' name='likes-master' style='display:none;'></iframe>
-		<div id='likes-other-gravatars'><div class="likes-text"><span>%d</span> bloggers like this:</div><ul class="wpl-avatars sd-like-gravatars"></ul></div>
-		<script type="text/javascript">
-		//<![CDATA[
-			var jetpackLikesWidgetQueue = [];
-			var jetpackLikesWidgetBatch = [];
-			var jetpackLikesMasterReady = false;
-
-			function JetpackLikespostMessage( message, target ) {
-				if ( "string" === typeof message ){
-					try{
-						message = JSON.parse( message );
-					}
-					catch(e) {
-						return;
-					}
-				}
-
-				pm( {
-					target: target,
-					type: 'likesMessage',
-					data: message,
-					origin: '*'
-				} );
-			}
-
-			function JetpackLikesBatchHandler() {
-				var requests = [];
-				jQuery( 'div.jetpack-likes-widget-unloaded' ).each( function( i ) {
-					if ( jetpackLikesWidgetBatch.indexOf( this.id ) > -1 )
-						return;
-					jetpackLikesWidgetBatch.push( this.id );
-					var regex = /like-(post|comment)-wrapper-(\d+)-(\d+)-(\w+)/;
-					var match = regex.exec( this.id );
-					if ( ! match || match.length != 5 )
-						return;
-
-					var info = {
-						blog_id: match[2],
-						width:   this.width
-					};
-
-					if ( 'post' == match[1] ) {
-						info.post_id = match[3];
-					} else if ( 'comment' == match[1] ) {
-						info.comment_id = match[3];
-					}
-
-					info.obj_id = match[4];
-
-					requests.push( info );
-				});
-
-				if ( requests.length > 0 ) {
-					JetpackLikespostMessage( { event: 'initialBatch', requests: requests }, window.frames['likes-master'] );
-				}
-			}
-
-			function JetpackLikesMessageListener( event ) {
-				if ( "undefined" == typeof event.event )
-					return;
-
-				if ( 'masterReady' == event.event ) {
-					jQuery( document ).ready( function() {
-						jetpackLikesMasterReady = true;
-
-						var stylesData = {
-								event: 'injectStyles'
-						};
-
-						if ( jQuery( 'iframe.admin-bar-likes-widget' ).length > 0 ) {
-							JetpackLikespostMessage( { event: 'adminBarEnabled' }, window.frames[ 'likes-master' ] );
-
-							stylesData.adminBarStyles = {
-								background: jQuery( '#wpadminbar .quicklinks li#wp-admin-bar-wpl-like > a' ).css( 'background' ),
-								isRtl: ( 'rtl' == jQuery( '#wpadminbar' ).css( 'direction' ) )
-							};
-						}
-
-						if ( !window.addEventListener )
-							jQuery( '#wp-admin-bar-admin-bar-likes-widget' ).hide();
-
-						stylesData.textStyles = {
-							color: jQuery( '.sd-text-color').css( 'color' ),
-							fontFamily: jQuery( '.sd-text-color' ).css( 'font-family' ),
-							fontSize: jQuery( '.sd-text-color' ).css( 'font-size' ),
-							direction: jQuery( '.sd-text-color' ).css( 'direction' ),
-							fontWeight: jQuery( '.sd-text-color' ).css( 'font-weight' ),
-							fontStyle: jQuery( '.sd-text-color' ).css( 'font-style' ),
-							textDecoration: jQuery( '.sd-text-color' ).css('text-decoration')
-						};
-
-						stylesData.linkStyles = {
-							color: jQuery( '.sd-link-color' ).css('color'),
-							fontFamily: jQuery( '.sd-link-color' ).css('font-family'),
-							fontSize: jQuery( '.sd-link-color' ).css('font-size'),
-							textDecoration: jQuery( '.sd-link-color' ).css('text-decoration'),
-							fontWeight: jQuery( '.sd-link-color' ).css( 'font-weight' ),
-							fontStyle: jQuery( '.sd-link-color' ).css( 'font-style' )
-						};
-
-						JetpackLikespostMessage( stylesData, window.frames[ 'likes-master' ] );
-
-						JetpackLikesBatchHandler();
-
-						jQuery( document ).on( 'inview', 'div.jetpack-likes-widget-unloaded', function() {
-							jetpackLikesWidgetQueue.push( this.id );
-						});
-					});
-				}
-
-				if ( 'showLikeWidget' == event.event ) {
-					jQuery( '#' + event.id + ' .post-likes-widget-placeholder'  ).fadeOut( 'fast', function() {
-						jQuery( '#' + event.id + ' .post-likes-widget' ).fadeIn( 'fast', function() {
-							JetpackLikespostMessage( { event: 'likeWidgetDisplayed', blog_id: event.blog_id, post_id: event.post_id, obj_id: event.obj_id }, window.frames['likes-master'] );
-						});
-					});
-				}
-
-				if ( 'clickReblogFlair' == event.event ) {
-					wpcom_reblog.toggle_reblog_box_flair( event.obj_id );
-				}
-
-				if ( 'showOtherGravatars' == event.event ) {
-					var $container = jQuery( '#likes-other-gravatars' );
-					var $list = $container.find( 'ul' );
-
-					$container.hide();
-					$list.html( '' );
-
-					$container.find( '.likes-text span' ).text( event.total );
-
-					jQuery.each( event.likers, function( i, liker ) {
-						$list.append( '<li class="' + liker.css_class + '"><a href="' + liker.profile_URL + '" class="wpl-liker" rel="nofollow" target="_parent"><img src="' + liker.avatar_URL + '" alt="' + liker.name + '" width="30" height="30" style="padding-right: 3px;" /></a></li>');
-					} );
-
-					var offset = jQuery( "[name='" + event.parent + "']" ).offset();
-
-					$container.css( 'left', offset.left + event.position.left - 10 + 'px' );
-					$container.css( 'top', offset.top + event.position.top - 33 + 'px' );
-
-					var rowLength = Math.floor( event.width / 37 );
-					var height = ( Math.ceil( event.likers.length / rowLength ) * 37 ) + 13;
-					if ( height > 204 ) {
-						height = 204;
-					}
-
-					$container.css( 'height', height + 'px' );
-					$container.css( 'width', rowLength * 37 - 7 + 'px' );
-
-					$list.css( 'width', rowLength * 37 + 'px' );
-
-					$container.fadeIn( 'slow' );
-
-					var scrollbarWidth = $list[0].offsetWidth - $list[0].clientWidth;
-					if ( scrollbarWidth > 0 ) {
-						$container.width( $container.width() + scrollbarWidth );
-						$list.width( $list.width() + scrollbarWidth );
-					}
-				}
-			}
-
-			pm.bind( 'likesMessage', function(e) { JetpackLikesMessageListener(e); } );
-
-			jQuery( document ).click( function( e ) {
-				var $container = jQuery( '#likes-other-gravatars' );
-
-				if ( $container.has( e.target ).length === 0 ) {
-					$container.fadeOut( 'slow' );
-				}
-			});
-
-			function JetpackLikesWidgetQueueHandler() {
-				var wrapperID;
-				if ( ! jetpackLikesMasterReady ) {
-					setTimeout( JetpackLikesWidgetQueueHandler, 500 );
-					return;
-				}
-
-				if ( jetpackLikesWidgetQueue.length > 0 ) {
-					// We may have a widget that needs creating now
-					var found = false;
-					while( jetpackLikesWidgetQueue.length > 0 ) {
-						// Grab the first member of the queue that isn't already loading.
-						wrapperID = jetpackLikesWidgetQueue.splice( 0, 1 )[0];
-						if ( jQuery( '#' + wrapperID ).hasClass( 'jetpack-likes-widget-unloaded' ) ) {
-							found = true;
-							break;
-						}
-					}
-					if ( ! found ) {
-						setTimeout( JetpackLikesWidgetQueueHandler, 500 );
-						return;
-					}
-				} else if ( jQuery( 'div.jetpack-likes-widget-unloaded' ).length > 0 ) {
-					// Grab any unloaded widgets for a batch request
-					JetpackLikesBatchHandler();
-
-					// Get the next unloaded widget
-					wrapperID = jQuery( 'div.jetpack-likes-widget-unloaded' ).first()[0].id;
-					if ( ! wrapperID ) {
-						// Everything is currently loaded
-						setTimeout( JetpackLikesWidgetQueueHandler, 500 );
-						return;
-					}
-				}
-
-				if ( 'undefined' === typeof wrapperID ) {
-					setTimeout( JetpackLikesWidgetQueueHandler, 500 );
-					return;
-				}
-
-				var $wrapper = jQuery( '#' + wrapperID );
-				$wrapper.find( 'iframe' ).remove();
-
-				if ( $wrapper.hasClass( 'slim-likes-widget' ) ) {
-					$wrapper.find( '.post-likes-widget-placeholder' ).after( "<iframe class='post-likes-widget jetpack-likes-widget' name='" + $wrapper.data( 'name' ) + "' height='22px' width='68px' frameBorder='0' scrolling='no' src='" + $wrapper.data( 'src' ) + "'></iframe>" );
-				} else {
-					$wrapper.find( '.post-likes-widget-placeholder' ).after( "<iframe class='post-likes-widget jetpack-likes-widget' name='" + $wrapper.data( 'name' ) + "' height='55px' width='100%' frameBorder='0' src='" + $wrapper.data( 'src' ) + "'></iframe>" );
-				}
-
-				$wrapper.removeClass( 'jetpack-likes-widget-unloaded' ).addClass( 'jetpack-likes-widget-loading' );
-
-				$wrapper.find( 'iframe' ).load( function( e ) {
-					var $iframe = jQuery( e.target );
-					$wrapper.removeClass( 'jetpack-likes-widget-loading' ).addClass( 'jetpack-likes-widget-loaded' );
-
-					JetpackLikespostMessage( { event: 'loadLikeWidget', name: $iframe.attr( 'name' ), width: $iframe.width() }, window.frames[ 'likes-master' ] );
-
-					if ( $wrapper.hasClass( 'slim-likes-widget' ) ) {
-						$wrapper.find( 'iframe' ).Jetpack( 'resizeable' );
-					}
-				});
-				setTimeout( JetpackLikesWidgetQueueHandler, 250 );
-			}
-			JetpackLikesWidgetQueueHandler();
-		//]]>
-		</script>
-<script type='text/javascript'>
+<div id="report-form-window" style="display:none;"></div><script type='text/javascript'>
 /* <![CDATA[ */
 var thickboxL10n = {"next":"Next >","prev":"< Prev","image":"Image","of":"of","close":"Close","noiframes":"This feature requires inline frames. You have iframes disabled or your browser does not support them.","loadingAnimation":"http:\/\/wnetai.wordpress.com\/wp-includes\/js\/thickbox\/loadingAnimation.gif"};
 var thickboxL10n = {"next":"Next >","prev":"< Prev","image":"Image","of":"of","close":"Close","noiframes":"This feature requires inline frames. You have iframes disabled or your browser does not support them.","loadingAnimation":"http:\/\/wnetai.wordpress.com\/wp-includes\/js\/thickbox\/loadingAnimation.gif"};
@@ -574,12 +319,7 @@ var wpNotesArgs = {"cacheBuster":"20140321","iframeUrl":"https:\/\/widgets.wp.co
 var wpcom_tos_report_form = {"ajaxurl":"\/wp-admin\/admin-ajax.php","isLoggedoutUser":"","post_ID":"3847","current_url":"http:\/\/wnetai.wordpress.com\/get-text-size","report_this_content":"Report this content"};
 /* ]]> */
 </script>
-<script type='text/javascript'>
-/* <![CDATA[ */
-var recaptcha_options = {"lang":"en"};
-/* ]]> */
-</script>
-<script type='text/javascript' src='http://s0.wp.com/_static/??-eJyFjUEOwjAMBD9EGlEEVQ+It6SJaVNqO7KT8n2CBAd6KJe1rJnV2mcykfxSAqid1RYKIOpZoMFIzawHuzEG5x8D0w/3TBkovzEWzc5PsEVYTFrKGEktcYZPVozIZNb2r+9CHTSDk305sxqBxJLNnQW3/04zsVZncVGsTk4ijd9bSze8Hk/9+dJ1fdvOLygdcko='></script>
+<script type='text/javascript' src='http://s2.wp.com/_static/??-eJyFjUsOAiEQRC8kQ8ToZBbGs/BpFZzuJjSM1xcTN7LQTSWV9yqln1lF8msLIDqJbhSgiOcCE0aakuz0YDjrH47pi3umClTfGJtU6+8wImwqr+0WSTRxhU92jMikNvPXt6EfKmfLb7myqAKZS1VXLjj2vrzgeX9Yjqd5XoxJLywaXi8='></script>
 <script type="text/javascript">
 // <![CDATA[
 (function() {
@@ -597,13 +337,7 @@ try{
 }catch(e){}
 })();
 // ]]>
-</script><script src="http://s.stats.wordpress.com/w.js?21" type="text/javascript"></script>
-<script type="text/javascript">
-st_go({'blog':'53900451','v':'wpcom','tz':'-7','user':'1','user_id':'51554914','post':'3847','subd':'wnetai'});
-ex_go({'crypt':'UE40eW5QN0p8M2Y/RE1zNDZ8S252Wis9XUQyb3YrcUVIU2R0VH5TdXIyfFgyfjVBN0lIeEpROGxdTnl0NVVYdjNTZURNdE02OUdKNkUyY0E5bXUzSWdEL3dpVEk0P09LYVRHX2NRcEFWcTJdYmxCQ184N0RwOVRSbUhWXXErQTYrOElmTVdTdHdsZzJxM1FieGZbc1pIQUNEMGlfR2dOU2dfQUxbL2kuSndiUmsvWk5qOEE5eXBoOX5ycS8wPzRpXWZBfHBfJVJkQkFUNnQ9S34zayxfOS1aNUNpdzhzU34uN1tfNk4lZmI3eWpUaVJYaCVfNFdaSXZaNTZ2eXxBRDFpJUZBM2Q5VlBmb1UlT3hkV0Ntck1OT2Ima0EyXT1yel8udnNKMTItOV9hVnNkLGpB'});
-	</script>
-<noscript><img src="http://stats.wordpress.com/b.gif?v=noscript" style="height:0px;width:0px;overflow:hidden" alt="" /></noscript>
-	<script type="text/javascript">
+</script>	<script type="text/javascript">
 		(function() {
 			var request, b = document.body, c = 'className', cs = 'customize-support', rcs = new RegExp('(^|\\s+)(no-)?'+cs+'(\\s+|$)');
 
@@ -633,15 +367,14 @@ ex_go({'crypt':'UE40eW5QN0p8M2Y/RE1zNDZ8S252Wis9XUQyb3YrcUVIU2R0VH5TdXIyfFgyfjVB
 		<li id="wp-admin-bar-new-page"><a class="ab-item"  href="http://wnetai.wordpress.com/wp-admin/post-new.php?post_type=page">Page</a>		</li>
 		<li id="wp-admin-bar-new-attachment"><a class="ab-item"  href="http://wnetai.wordpress.com/wp-admin/post-new.php?post_type=attachment">Media</a>		</li>
 		<li id="wp-admin-bar-new-link"><a class="ab-item"  href="http://wnetai.wordpress.com/wp-admin/link-add.php">Link</a>		</li></ul></div>		</li>
-		<li id="wp-admin-bar-comments"><a class="ab-item"  href="http://wnetai.wordpress.com/wp-admin/edit-comments.php">Comments <span class="comment-moderation-count">2</span></a>		</li>
-		<li id="wp-admin-bar-customize" class="hide-if-no-customize"><a class="ab-item"  href="http://wnetai.wordpress.com/wp-admin/customize.php?url=http%3A%2F%2Fwnetai.wordpress.com%2Fget-text-size%2F">Customize</a>		</li>
+		<li id="wp-admin-bar-comments"><a class="ab-item"  href="http://wnetai.wordpress.com/wp-admin/edit-comments.php">Comments <span class="comment-moderation-count">1</span></a>		</li>
+		<li id="wp-admin-bar-customize" class="hide-if-no-customize"><a class="ab-item"  href="http://wnetai.wordpress.com/wp-admin/customize.php?url=http%3A%2F%2Fwnetai.wordpress.com%2Fget-text-size%2F%3Fpreview%3Dtrue%26preview_id%3D3847%26preview_nonce%3D699c413cf1">Customize</a>		</li>
 		<li id="wp-admin-bar-widgets"><a class="ab-item"  href="http://wnetai.wordpress.com/wp-admin/widgets.php">Widgets</a>		</li></ul><ul id="wp-admin-bar-blog-secondary" class="ab-sub-secondary ab-submenu">
 		<li id="wp-admin-bar-shortlink"><a class="ab-item"  href="http://wp.me/P3E9Y7-103">Shortlink http://wp.me/P3E9Y7-103</a>Shortlink: <input id="adminbar-shortlink-input" value="http://wp.me/P3E9Y7-103" readonly="readonly" />		</li>
 		<li id="wp-admin-bar-random-post" class="menu-item-random-post"><a class="ab-item"  href="http://wnetai.wordpress.com/?random">Random Post</a>		</li>
 		<li id="wp-admin-bar-theme-andrea"><a class="ab-item"  href="http://theme.wordpress.com/themes/andrea/">Theme: Andrea</a>		</li>
 		<li id="wp-admin-bar-wpcom_report_url"><a class="ab-item"  href="http://en.wordpress.com/complaints/">Report this content</a>		</li></ul></div>		</li>
-		<li id="wp-admin-bar-follow" class="subscribed"><a class="ab-item"  href="http://wordpress.com/read?b=53900451&#038;unsub=1&#038;_wpnonce=cd4d5c4aeb"><span id="admin-bar-unfollow-link">Following</span></a>		</li>
-		<li id="wp-admin-bar-admin-bar-likes-widget"><div class="ab-item ab-empty-item" ></div><iframe class='admin-bar-likes-widget jetpack-likes-widget' scrolling='no' frameBorder='0' name='admin-bar-likes-widget' src='http://widgets.wp.com/likes/#blog_id=53900451&amp;post_id=3847&amp;origin=http://wnetai.wordpress.com'></iframe>		</li>
+		<li id="wp-admin-bar-follow" class="subscribed"><a class="ab-item"  href="http://wordpress.com/read?b=53900451&#038;unsub=1&#038;_wpnonce=39179b375c"><span id="admin-bar-unfollow-link">Following</span></a>		</li>
 		<li id="wp-admin-bar-stats"><a class="ab-item"  href="http://wordpress.com/my-stats/"><div><script type='text/javascript'>var src;if(typeof(window.devicePixelRatio)=='undefined'||window.devicePixelRatio<2){src='/wp-includes/charts/admin-bar-hours-scale.php';}else{src='/wp-includes/charts/admin-bar-hours-scale-2x.php';}document.write('<img style=\'vertical-align: baseline\' src=\''+src+'\' alt=\'Stats\' title=\'Showing site views per hour for the last 48 hours. Click for full Site Stats.\' />');</script></div></a>		</li></ul><ul id="wp-admin-bar-top-secondary" class="ab-top-secondary ab-top-menu">
 		<li id="wp-admin-bar-search" class="admin-bar-search"><div class="ab-item ab-empty-item" tabindex="-1"><form id='adminbarsearch' name='adminbarsearch' action='http://en.search.wordpress.com' method='get'>
 				<input class='adminbar-search-input' name='q' id='q' type='text' value='' maxlength='150' tabindex='10' />
@@ -659,11 +392,11 @@ ex_go({'crypt':'UE40eW5QN0p8M2Y/RE1zNDZ8S252Wis9XUQyb3YrcUVIU2R0VH5TdXIyfFgyfjVB
 		<li id="wp-admin-bar-blog-53900451-s"><a class="ab-item"  href="http://wordpress.com/my-stats/?blog=53900451">Site Stats</a>		</li>
 		<li id="wp-admin-bar-blog-53900451-c"><a class="ab-item"  href="http://wnetai.wordpress.com/wp-admin/edit-comments.php">Manage Comments</a>		</li>
 		<li id="wp-admin-bar-blog-53900451-v"><a class="ab-item"  href="http://wnetai.wordpress.com">Read Blog</a>		</li></ul></div>		</li></ul></div>		</li>
-		<li id="wp-admin-bar-notes" class="menupop"><div class="ab-item ab-empty-item" ><span id="wpnt-notes-unread-count" class="wpnt-loading wpn-unread">
-						<span class="noticon noticon-comment"></span>
+		<li id="wp-admin-bar-notes" class="menupop"><div class="ab-item ab-empty-item" ><span id="wpnt-notes-unread-count" class="wpnt-loading wpn-read">
+						<span class="noticon noticon-notification"></span>
 						</span></div><div id="wpnt-notes-panel" style="display:none" lang="en" dir="ltr"><div class="wpnt-notes-panel-header"><span class="wpnt-notes-header"></span><span class="wpnt-notes-panel-link"></span></div></div>		</li>
 		<li id="wp-admin-bar-ab-new-post"><a class="ab-item"  href="http://wordpress.com/post/">New Post</a>		</li></ul>			</div>
-						<a class="screen-reader-shortcut" href="http://wnetai.wordpress.com/wp-login.php?action=logout&#038;_wpnonce=c18a52e5d0">Log Out</a>
+						<a class="screen-reader-shortcut" href="http://wnetai.wordpress.com/wp-login.php?action=logout&#038;_wpnonce=af1c6fd19f">Log Out</a>
 					</div>
 
 		

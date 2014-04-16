@@ -111,22 +111,34 @@
 ;;; Reading and Writing Images and Video
 
 
+;; VideoCapture::VideoCapture()
+;; VideoCapture* cv_create_VideoCapture() 
+(defcfun ("cv_create_VideoCapture" video-capture0) (:pointer video-capture) 
+	 "VideoCapture constructor")
+
+
 ;; VideoCapture::VideoCapture(int device)
 ;; VideoCapture* cv_create_VideoCapture1_0(int device)
-(cffi:defcfun ("cv_create_VideoCapture1_0" cap-cam) (:pointer video-capture)
-	      "Open video file or a capturing device for video capturing"
-	      (device :int))
+(cffi:defcfun ("cv_create_VideoCapture1_0" video-capture-dev) (:pointer video-capture)
+  "VideoCapture constructor"
+  (device :int))
 
 
 ;; VideoCapture::VideoCapture(const string& filename)
 ;; VideoCapture* cv_create_VideoCapture1(String* filename) {
-(defcfun ("cv_create_VideoCapture1" %cap-file) (:pointer video-capture)
+(defcfun ("cv_create_VideoCapture1" video-capture-fn) (:pointer video-capture)
+  "VideoCapture constructor"
   (filename (:pointer string*)))
 
 
-(defun cap-file (filename)
-  "VideoCapture constructor."
-  (%cap-file (foreign-alloc :string :initial-element filename)))
+(defun video-capture (&optional src)
+  (cond ((eq src nil)
+	 (video-capture0))
+	((numberp src)
+	 (video-capture-dev src))
+	((stringp src) 
+	 (video-capture-fn (foreign-alloc :string :initial-element src)))
+	(t nil)))
 
 
 ;; double VideoCapture::get(int propId)

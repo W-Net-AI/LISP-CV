@@ -116,7 +116,7 @@ See also
 			     (width *default-width*)
 			     (height *default-height*))
   ;Set camera feed to CAP
-  (with-capture (cap (cap-cam camera-index))
+  (with-capture (cap (video-capture camera-index))
     (let ((window-name-1 "Original FRAME - ADJUST-ROI Example")
 	  (window-name-2 "Region of interest - ADJUST-ROI Example")
 	  (window-name-3 "FRAME readjusted to original dimensions - ADJUST-ROI Example"))
@@ -132,9 +132,9 @@ See also
       (named-window window-name-1 +window-normal+)
       (named-window window-name-2 +window-normal+)
       (named-window window-name-3 +window-normal+)
-      (move-window window-name-1 315 175)
-      (move-window window-name-2 765 175)
-      (move-window window-name-3 1215 175)
+      (move-window window-name-1 310 175)
+      (move-window window-name-2 760 175)
+      (move-window window-name-3 1210 175)
       (do* ((frame 0)
             ;Create rectangle RECT
             (rect (rect (round (/ width 4)) 
@@ -197,8 +197,8 @@ need to access the return value of ASSGN-VAL to complete the operation,
          (result 0))
     (named-window window-name-1 +window-normal+)
     (named-window window-name-2 +window-normal+)	
-    (move-window window-name-1 464 175)
-    (move-window window-name-2 915 175)
+    (move-window window-name-1 533 175)
+    (move-window window-name-2 984 175)
     ;; Set all elements of MAT to the value defined 
     ;; by SCALAR.
     (assgn-val mat scalar)
@@ -214,6 +214,59 @@ need to access the return value of ASSGN-VAL to complete the operation,
     (imshow window-name-2 (>> result))
     (loop while (not (= (wait-key 0) 27)))
     (destroy-all-windows)))
+
+
+AT
+
+Returns a reference to the specified array element.
+
+C++: uchar* Mat::ptr(int i0=0)
+
+CFFI: mem-aref ptr type &optional (index 0)
+
+CFFI: (setf (mem-aref ptr type &optional (index 0)) new-value) 
+
+LISP-CV: (AT (SELF (:POINTER MAT)) (I :INT) (J :INT) (TYPE :KEYWORD)) 
+
+LISP-CV: (AT (SELF (:POINTER MAT)) (I :INT) (J :INT) (TYPE :KEYWORD)) 
+
+
+    Parameters:	
+
+        I - Index along the dimension 0
+
+        J - Index along the dimension 1
+
+
+This isn't a binding for the OpenCV Mat::at functions. It was decided, when making the C bindings 
+for the C++ interface that LISP-CV wraps around, that they wouldn't be included. The reason was 
+they were slower than accessing the data directly with the Mat class ptr member. So this function 
+offers the same functionality as Mat::at but it is a binding for the Mat class ptr member. It is 
+setf-able, meaning you can retrieve a matrix element but also set data to a matrix element with it 
+as well using the SETF function. That functionality is gained by the inclusion the CFFI function 
+MEM-AREF in the binding. The use of typenames in OpenCV is simulated here with keyword parameters:
+
+The typenames associated with AT include(so far):
+
+:char     :int16    :short    :uint32
+:double   :int32    :uchar    :uint64
+:float    :int64    :uint     :ullong
+:int      :llong    :uint8    :ulong
+:int8     :long     :uint16   :ushort
+
+
+The example below initializes a Hilbert matrix:
+
+
+(defun at-example ()
+  (let ((h (mat-typed 5 5 +64f+)))
+    (dotimes (i (rows h))
+      (dotimes (j (cols h))
+	(setf (at h i j :double) (/ 1.0d0 (+ i j 1)))
+	(princ (at h i j :double))
+	(princ #\Space))
+      (princ #\Newline)))) 
+
 
 
 CHANNELS
@@ -364,6 +417,139 @@ ces. When the operation mask is specified, and the (CREATE) call shown above rea
 
 
 
+INV
+
+Inverses a matrix.
+
+C++: MatExpr Mat::inv(int method=DECOMP_LU) const
+
+LISP-CV: (INV (SELF (:POINTER MAT)) (METHOD :INT)) => (:POINTER MAT-EXPR) 
+
+    Parameters:	
+
+        SELF - A matrix.
+
+        METHOD -
+
+        Matrix inversion method. Possible values are the following:
+
+            +DECOMP-LU+ is the LU decomposition. The matrix must be non-singular.
+
+            +DECOMP-CHOLESKY+ is the Cholesky decomposition for symmetrical positively 
+                              defined matrices only. This type is about twice faster than 
+                              +DECOMP-LU+ on big matrices.
+
+            +DECOMP-SVD+ is the SVD decomposition. If the matrix is singular or even 
+                         non-square, the pseudo inversion is computed.
+
+
+The method performs a matrix inversion by means of Matrix Expressions. This means that a temporary 
+matrix inversion object is returned by the method and can be used further as a part of more complex 
+Matrix Expressions or can be assigned to a matrix. You may need to coerce the return value of INV 
+back to type (:POINTER MAT) with the function (FORCE), (or the shorthand version (>>)) to use in 
+other functions.
+
+
+(defun inv-example (filename)
+
+  "Matrix division, which is undefined in vector mathematics, 
+   is simulated here by finding the inverse of a matrix, DIV-
+   ISOR and then multiplying another matrix, MAT by it. We a-
+   lso find the inverse of an image, IMAGE and show in a win-
+   dow just to see what it looks like."
+
+	 ;Read in image
+  (let* ((image (imread filename 1))
+	 ;Create matrix data
+	 (data-1 (alloc :float '(1f0 2f0 3f0 3f0 2f0 1f0 2f0 1f0 3f0)))
+	 (data-2 (alloc :float '(4f0 5f0 6f0 6f0 5f0 4f0 4f0 6f0 5f0)))
+	 ;Create numerator matrix
+         (numerator (mat-data 3 3 +32f+ data-1))
+	 ;Create divisor matrix
+         (divisor (mat-data 3 3 +32f+ data-2)) 
+	 ;Find determinant of DIVISOR       
+	 (determinant (det divisor)) 
+	 (divisor-inv 0)
+         (identity-mat 0)
+	 (quotient 0)
+         (image-inv 0)
+	 (n (coerce (/ 1 255) 'double-float))
+	 (window-name-1 "Original IMAGE - INV Example")
+         (window-name-2 "Inverse of IMAGE - INV Example"))
+    (if (empty image) 
+	(return-from inv-example 
+	  (format t "Image not loaded")))
+    (named-window window-name-1 +window-normal+)
+    (named-window window-name-2 +window-normal+)
+    (move-window window-name-1 533 175)
+    (move-window window-name-2 984 175)
+    ;Print NUMERATOR
+    (format t "NUMERATOR =~%~%")
+    (dotimes (i (rows numerator))
+      (dotimes (j (cols numerator))
+	(princ (at numerator i j :float))
+	(princ #\Space))
+      (princ #\Newline))
+    (format t "~%~%")
+    ;Print DIVISOR
+    (format t "DIVISOR =~%~%")
+    (dotimes (i (rows divisor))
+      (dotimes (j (cols divisor))
+	(princ (at divisor i j :float))
+	(princ #\Space))
+      (princ #\Newline))
+    (format t "~%~%")
+   ;Check if the determinant of divisor is 0. If not, 
+   ;an inverse cannot be determined, so exit program
+    (if (= 0.0d0 determinant) 
+	(return-from inv-example 
+	  (progn (format t "The determinant of DIVISOR is 0.0d0.~%")
+		 (format t "Cannot find its inverse.~%")))
+	(format t "The determinant of DIVISOR = ~a~%~%" determinant))
+   ;Find inverse of DIVISOR and print it
+    (setf divisor-inv (>> (inv divisor +decomp-lu+)))
+    (format t "The inverse of DIVISOR =~%~%")
+    (dotimes (i (rows divisor-inv))
+      (dotimes (j (cols divisor-inv))
+	(princ (at divisor-inv i j :float))
+	(princ #\Space))
+      (princ #\Newline))
+    (format t "~%~%")
+   ;Multiply DIVISOR by the inverse of divisor
+   ;Output is a float identity matrix
+    (setf identity-mat (>> (mul divisor divisor-inv)))
+   ;Print the identity matrix
+    (format t "Product of DIVISOR and its inverse =~%~%")
+    (dotimes (i (rows identity-mat))
+      (dotimes (j (cols identity-mat))
+	(princ (at identity-mat i j :float))
+	(princ #\Space))
+      (princ #\Newline))
+    (format t "~%~%")
+    (setf quotient (>> (mul numerator (>> (inv divisor +decomp-lu+)))))
+    (format t "Simulated quotient of NUMERATOR and DIVISOR =~%~%")
+    (dotimes (i (rows quotient))
+      (dotimes (j (cols quotient))
+	(princ (at quotient i j :float))
+	(princ #\Space))
+      (princ #\Newline))
+    ;Show original image
+    (imshow window-name-1 image)
+    ;Convert image to 1 channel
+    (cvt-color image image +bgr2gray+)
+    ;Convert image to float
+    (convert-to image image +32f+ n)
+    ;Find inverse of IMAGE
+    (setf image-inv (>> (inv image +decomp-svd+)))
+    ;Show inverse of IMAGE in window
+    (imshow window-name-2 image-inv)
+    (loop while (not (= (wait-key 0) 27)))
+    (free data-1)
+    (free data-2)
+    (destroy-all-windows)))
+
+
+
 IS-CONTINOUS
 
 Reports whether the matrix is continuous or not.
@@ -456,7 +642,7 @@ submatrix within the original matrix. The function LOCATE-ROI does exactly that.
 			     (width *default-width*)
 			     (height *default-height*))
   ;Set camera feed to CAP
-  (with-capture (cap (cap-cam camera-index))
+  (with-capture (cap (video-capture camera-index))
     (let ((window-name-1 "Original FRAME - LOCATE-ROI Example")
 	  (window-name-2 "Submatrix - LOCATE-ROI Example"))
       (if (not (cap-is-open cap)) 
@@ -610,7 +796,7 @@ Example:
          (out (scale (<< mat) s))
 	 (window-name "PROMOTE Example"))
     (named-window window-name +window-normal+)
-    (move-window window-name 720 175)
+    (move-window window-name 759 175)
     (imshow window-name  (>> out))
     (loop while (not (= (wait-key 0) 27)))
     (destroy-window window-name)))
@@ -836,7 +1022,7 @@ bit faster matrix size accessor choose the MAT-SIZE Dfunction.
 OPERATIONS ON ARRAYS:
 
 
-~ABS
+%ABS
 
 Calculates an absolute value of each matrix element.
 
@@ -848,35 +1034,38 @@ LISP-CV: (%ABS (M (:POINTER MAT))) => (:POINTER MAT-EXPR)
 
         M - matrix.
 
-~ABS is a meta-function that is expanded to one of (ABS-DIFF) or (CONVERT-SCALE-ABS) forms:
+%ABS is a meta-function that is expanded to one of (ABS-DIFF) or (CONVERT-SCALE-ABS) forms:
 
-        (DEFPARAMETER C (~ABS (>> (SUB A B)))) is equivalent to (ABSDIFF A B C)
+        (DEFPARAMETER C (%ABS (>> (SUB A B)))) is equivalent to (ABSDIFF A B C)
 
-        (DEFPARAMETER C (~ABS A)) is equivalent to (ABSDIFF A (SCALAR-ALL 0) C)
+        (DEFPARAMETER C (%ABS A)) is equivalent to (ABSDIFF A (SCALAR-ALL 0) C)
 
 
 The output matrix has the same size and the same type as the input one except for the last case, 
 where C is (EQ DEPTH +8U+). 
 
 
-    See also:
-
-    Matrix Expressions(MAT-EXPR), (ABS-DIFF), (CONVERT-SCALE-ABS)
+Note: The function is named %ABS instead of ABS because, ABS is the name of a Common Lisp function.
 
 
+See also:
 
-(defun ~abs-example (&optional 
+Matrix Expressions(MAT-EXPR), (ABS-DIFF), (CONVERT-SCALE-ABS)
+
+
+
+(defun %abs-example (&optional 
 		      (camera-index *camera-index*))
   ;;Set Camera feed to CAP.
-  (with-capture (cap (cap-cam camera-index))
+  (with-capture (cap (video-capture camera-index))
     (let* ((window-name "~ABS Example")
            ;;Allocate data and create a 2x2 matrix.
 	   (data (alloc :float '(4f0 -7f0 2f0 -3f0)))
 	   (mat (mat-data 2 2 +32f+ data))
            ;;Find absolute value of all MAT elements.
-           (abs-val (>> (~abs mat))))
+           (abs-val (>> (%abs mat))))
       (if (not (cap-is-open cap)) 
-	  (return-from ~abs-example 
+	  (return-from %abs-example 
 	    (format t "Cannot open the video camera")))
       ;;Print MAT's absolute value.
       (dotimes (i (cols abs-val))
@@ -885,7 +1074,7 @@ where C is (EQ DEPTH +8U+).
 	  (princ #\Space))
 	(princ #\Newline))
       (named-window window-name +window-normal+)
-      (move-window window-name 720 175)
+      (move-window window-name 759 175)
       (do* ((frame 0)
 	    (clone 0))
 	   ((plusp (wait-key *millis-per-frame*)) 
@@ -903,7 +1092,7 @@ where C is (EQ DEPTH +8U+).
 	;;value of FRAME before showing output in a win-
 	;;dow. Negative matrix elements in FRAME would 
 	;;cause an unhandled memory fault error.
-	(setf abs-val (~abs (>> (sub frame clone))))
+	(setf abs-val (%abs (>> (sub frame clone))))
 	(imshow window-name (>> abs-val))
         ;;Clean up used memory.
 	(del-mat-expr abs-val)
@@ -962,7 +1151,7 @@ See also:
    nd outputs the result to a window...Makes for quite an i-
    nteresting effect."
 
-  (with-capture (cap (cap-cam camera-index))
+  (with-capture (cap (video-capture camera-index))
     (let ((scalar (mat-value 1 1 +64f+ (scalar 128 128 128)))
 	  (window-name "ABSDIFF Example"))
       (if (not (cap-is-open cap)) 
@@ -971,7 +1160,7 @@ See also:
       (cap-set cap +cap-prop-frame-width+ width)
       (cap-set cap +cap-prop-frame-height+ height)
       (named-window window-name +window-normal+)
-      (move-window window-name 720 175)
+      (move-window window-name 759 175)
       (do* ((frame 0))
 	   ((plusp (wait-key *millis-per-frame*)) 
 	    (format t "Key is pressed by user"))
@@ -981,6 +1170,117 @@ See also:
 	(imshow window-name frame))
       (destroy-window window-name))))
 
+
+BITWISE-OR
+
+Calculates the per-element bit-wise disjunction of two arrays.
+
+C++: void bitwise_or(InputArray src1, InputArray src2, OutputArray dst, InputArray mask=noArray())
+
+LISP-CV: (BITWISE-OR (SRC1 (:POINTER MAT)) (SRC2 (:POINTER MAT)) (DEST (:POINTER MAT)) (MASK (:POINTER MAT))) => :VOID
+
+
+    Parameters:	
+
+        SRC1 - A matrix.
+
+        SRC2 - A matrix.
+
+        DEST - Output matrix that has the same size and type as the input matrices.
+
+        MASK - Optional operation mask, 8-bit single channel matrix, that 
+               specifies elements of the output matrix to be changed.
+
+
+The function calculates the per-element bit-wise logical disjunction for two matrices when SRC1 and SRC2 
+have the same size. In case of floating-point arrays, their machine-specific bit representations (usually 
+IEEE754-compliant) are used for the operation. In case of multi-channel arrays, each channel is processed 
+independently.
+
+
+(defun bitwise-or-example (filename-1 filename-2)
+
+  "Calculates the per-element bit-wise disjunction of two 
+   images.
+
+   Note: You are encouraged to use the Black and White.png 
+   and the White and Black.png in the LISP-CV images direc-
+   tory to get the full effect of this example."
+
+  (let* ((image-1 (imread filename-1 1))
+	 (image-2 (imread filename-2 1))
+	 (dest (mat-typed (rows image-1) (cols image-1) +8uc3+ ))
+	 (window-name-1 "IMAGE-1 - BITWISE-OR Example")
+	 (window-name-2 "IMAGE-2 - BITWISE-OR Example")
+	 (window-name-3 "DEST - BITWISE-OR Example"))
+    (named-window window-name-1 +window-normal+)
+    (named-window window-name-2 +window-normal+)
+    (named-window window-name-3 +window-normal+)
+    (move-window window-name-1 310 175)
+    (move-window window-name-2 760 175)
+    (move-window window-name-3 1210 175)
+    (bitwise-or image-1 image-2 dest)
+    (imshow window-name-1 image-1)
+    (imshow window-name-2 image-2)
+    (imshow window-name-3 dest)
+    (loop while (not (= (wait-key 0) 27)))
+    (destroy-all-windows)))
+
+
+
+BITWISE-XOR
+
+Calculates the per-element bit-wise “exclusive or” operation on two arrays.
+
+C++: void bitwise_xor(InputArray src1, InputArray src2, OutputArray dst, InputArray mask=noArray())
+
+LISP-CV: (BITWISE-XOR (SRC1 (:POINTER MAT)) (SRC2 (:POINTER MAT)) (DEST (:POINTER MAT)) (MASK (:POINTER MAT))) => :VOID
+
+    Parameters:	
+
+        SRC1 - A matrix.
+
+        SRC2 - A matrix.
+
+        DEST - Output matrix that has the same size and type as the input matrices.
+
+        MASK - Optional operation mask, 8-bit single channel matrix, that 
+               specifies elements of the output matrix to be changed.
+
+
+The function calculates the per-element bit-wise logical “exclusive-or” operation for two matrices 
+when SRC1 and SRC2 have the same size. In case of floating-point arrays, their machine-specific bit 
+representations (usually IEEE754-compliant) are used for the operation. In case of multi-channel 
+arrays, each channel is processed independently.
+
+
+(defun bitwise-xor-example (filename-1 filename-2)
+
+  "Calculates the per-element bit-wise “exclusive or” oper-
+   ation of two images.
+
+   Note: You are encouraged to use the Black and White.png 
+   and the White and Black.png in the LISP-CV images direc-
+   tory to get the full effect of this example."
+
+  (let* ((image-1 (imread filename-1 1))
+	 (image-2 (imread filename-2 1))
+	 (dest (mat-typed (rows image-1) (cols image-1) +8uc3+ ))
+	 (window-name-1 "IMAGE-1 - BITWISE-XOR Example")
+	 (window-name-2 "IMAGE-2 - BITWISE-XOR Example")
+	 (window-name-3 "DEST - BITWISE-XOR Example"))
+    (named-window window-name-1 +window-normal+)
+    (named-window window-name-2 +window-normal+)
+    (named-window window-name-3 +window-normal+)
+    (move-window window-name-1 310 175)
+    (move-window window-name-2 760 175)
+    (move-window window-name-3 1210 175)
+    (bitwise-xor image-1 image-2 dest)
+    (imshow window-name-1 image-1)
+    (imshow window-name-2 image-2)
+    (imshow window-name-3 dest)
+    (loop while (not (= (wait-key 0) 27)))
+    (destroy-all-windows)))
 
 
 CONVERT-SCALE-ABS
@@ -1010,7 +1310,7 @@ the function processes each channel independently.
 				    (width *default-width*)
 				    (height *default-height*))
 
-  (with-capture (cap (cap-cam camera-index))    
+  (with-capture (cap (video-capture camera-index))    
     (let ((window-name "CONVERT-SCALE-ABS Example")
 	  ;;Create matrix so we can scale it, caclculate its 
 	  ;;absolute value and convert it to 8-bit with fun-
@@ -1019,7 +1319,7 @@ the function processes each channel independently.
       (cap-set cap +cap-prop-frame-width+ width)
       (cap-set cap +cap-prop-frame-height+ height)
       (named-window window-name +window-normal+)
-       (move-window window-name 720 175)
+       (move-window window-name 759 175)
       ;;Print original type of MAT
       (format t "MAT type before conversion = ~a(or +32f+)~%~%" (mat-type mat))
       ;;Print original MAT before conversion
@@ -1051,6 +1351,85 @@ the function processes each channel independently.
         (imshow window-name frame))
       (destroy-window window-name))))
 
+
+DET
+
+Returns the determinant of a square floating-point matrix.
+
+C++: double determinant(InputArray mtx)
+
+LISP-CV: (DET (MTX (:POINTER MAT))) => :DOUBLE
+
+    Parameters:	
+
+        MYX - Input matrix that must have +32FC1+ or +64FC1+ type and square size.
+ 
+
+The function determinant calculates and returns the determinant of the specified matrix. For small 
+matrices, the direct method is used. For larger matrices, the function uses LU factorization with 
+partial pivoting.
+
+For symmetric positively-determined matrices, it is also possible to use (EIGEN) decomposition to 
+calculate the determinant.
+
+See also:
+
+(TRACE), (INVERT), (SOLVE), (EIGEN), Matrix Expressions(MAT-EXPR)
+
+
+(defun det-example ()
+	;Create matrix data.
+  (let* ((data-1 (alloc :float '(1f0 2f0 3f0 4f0 5f0 6f0 5f0 7f0 9f0)))
+	 (data-2 (alloc :float '(4f0 5f0 6f0 6f0 5f0 4f0 4f0 6f0 5f0)))
+	;Create matrix with zero determinant.
+         (zero-det-mat (mat-data 3 3 +32f+ data-1))
+	;Create matrix with non-zero determinant.
+         (mat (mat-data 3 3 +32f+ data-2))      
+	 (zero-det-mat-inv 0)
+         (mat-inv 0))
+	;Print MAT.
+    (format t "MAT =~%~%")
+    (dotimes (i (rows mat))
+      (dotimes (j (cols mat))
+	(princ (at mat i j :float))
+	(princ #\Space))
+      (princ #\Newline))
+    (format t "~%~%")
+	;Print ZERO-DET-MAT.
+    (format t "ZERO-DET-MAT =~%~%")
+    (dotimes (i (rows zero-det-mat))
+      (dotimes (j (cols zero-det-mat))
+	(princ (at zero-det-mat i j :float))
+	(princ #\Space))
+      (princ #\Newline))
+    (format t "~%~%")
+	;Check if the determinant of ZERO-DET-MAT is 0. 
+	;It is not, so an inverse cannot be determined.
+    (format t "The determinant of ZER0-DET-MAT = ~a~%~%" (det zero-det-mat))
+	;Check if the determinant of MAT is 0. It 
+	;is, so an inverse can be determined.
+    (format t "The determinant of MAT = ~a~%~%" (det mat))
+	;Find inverse of ZERO-DET-MAT and 
+        ;print it. It will be all zeros.
+    (setf zero-det-mat-inv (>> (inv zero-det-mat +decomp-lu+)))
+    (format t "The inverse of ZERO-DET-MAT =~%~%")
+    (dotimes (i (rows zero-det-mat-inv))
+      (dotimes (j (cols zero-det-mat-inv))
+	(princ (at zero-det-mat-inv i j :float))
+	(princ #\Space))
+      (princ #\Newline))
+    (format t "~%~%")
+	;Find inverse of MAT and print it.
+    (setf mat-inv (>> (inv mat +decomp-lu+)))
+    (format t "The inverse of MAT =~%~%")
+    (dotimes (i (rows mat-inv))
+      (dotimes (j (cols mat-inv))
+	(princ (at mat-inv i j :float))
+	(princ #\Space))
+      (princ #\Newline))
+      (princ #\Newline)
+      (free data-1)
+      (free data-2)))
 
 
 FLIP
@@ -1094,7 +1473,7 @@ See also:
 
 (defun flip-example (&optional (camera-index *camera-index*))
   ;;Capture camera feed
-  (with-capture (cap (cap-cam camera-index))
+  (with-capture (cap (video-capture camera-index))
     ;;Make array of window names
     (let* ((window-name-arr 
 	    (make-array 6 :initial-contents 
@@ -1207,7 +1586,7 @@ See also:
 (defun invert-example (&optional 
 			 (camera-index *camera-index*)) 
 
-  (with-capture (cap (cap-cam camera-index))
+  (with-capture (cap (video-capture camera-index))
     ;;Allocate matrix data and create a square matrix
     (let* ((data (alloc :float '(4f0 -7f0 2f0 -3f0)))
 	   (mat (mat-data 2 2 +32f+ data))
@@ -1342,7 +1721,7 @@ Example:
    the rectangle over some thing red, the rectangle will turn a 
    shade of red. The rectangle starts at 0,0 X,Y coordinates."
 
-  (with-capture (cap (cap-cam camera-index))
+  (with-capture (cap (video-capture camera-index))
     (let* ((window-name "IMG - MEAN Example")
            (n 10)
            ;;Initialize the rectangle location/
@@ -1433,6 +1812,257 @@ Example:
       (free rect-y)
       (free rect-width)
       (free rect-height)
+      (destroy-all-windows))))
+
+
+%MAX
+
+Calculates per-element maximum of two arrays.
+
+C++: void max(InputArray src1, InputArray src2, OutputArray dst)
+
+LISP-CV: (%MAX (SRC1 (:POINTER MAT)) (SRC2 (:POINTER MAT)) (DEST (:POINTER MAT))) => :VOID
+
+
+    Parameters:	
+
+        SRC1 - First input array.
+
+        SRC2 - Second input array of the same size and type as SRC1.
+
+        DEST - Output array of the same size and type as SRC1.
+
+
+The function %MAX calculates the per-element maximum of two arrays. When the input array is multi-channel, 
+each channel is compared with value independently.
+
+Note: The function is named %MAX instead of MAX because, MAX is the name of a Common Lisp function.
+
+
+See also:
+
+(%MIN), (COMPARE), (INRANGE), (MIN-MAX-LOC), Matrix Expressions(MAT-EXPR)
+
+
+(defun %max-example (&optional (camera-index 0)
+		       (width *default-width*)
+		       (height *default-height*))
+
+  "Look at the first window and notice that whatever is black
+   in the first window has a beautiful glow in the third wind-
+   ow. You can change the effect by altering the color of the 
+   matrix MAT-3 in the middle window with the trackbar .The t-
+   rackbar changes the scalar value the ASSGN-VAL function us-
+   es to decide what to set each element of MAT-3 to."
+
+  (with-capture (cap (video-capture camera-index))   
+       ;Create two matrices: MAT-1 and MAT-2(used to show how %MAX works)
+    (let* ((mat-1 (mat-data 3 3 +32s+ (alloc :int '(1 2 3 4 5 6 7 8 9))))
+	   (mat-2 (mat-data 3 3 +32s+ (alloc :int '(9 8 7 6 5 4 3 2 1))))
+           ;Create destination matrix of same size and type: DEST
+           (dest (mat-typed 3 3 +32s+))
+           ;Create 3 matrices used to hold 
+           ;data we use later in the example
+           (mat-3 (mat-typed height width +8u+))
+           (mat-4 (mat-typed height width +8u+))
+           (mat-5 (mat-typed height width +8u+))
+           ;Allocate :int pointer for trackbar to change
+           (val (alloc :int '(128)))
+	   (window-name-1 "MAT-3 after THRESHOLD - %MAX-Example")
+	   (window-name-2 "MAT-5 after ASSGN-VAL - %MAX-Example")
+	   (window-name-3 "MAT-4 after %MAX - %MAX-Example")) 
+      ;Set CAP to default width and height
+      (cap-set cap +cap-prop-frame-width+ width)
+      (cap-set cap +cap-prop-frame-height+ height)
+      ;Create windows and move to specified locations
+      (named-window window-name-1 +window-normal+)
+      (named-window window-name-2 +window-normal+)
+      (named-window window-name-3 +window-normal+)
+      (move-window window-name-1 310 175)
+      (move-window window-name-2 760 175)
+      (move-window window-name-3 1210 175)
+      ;Print MAT-1
+      (format t "MAT-1:~%~%")
+      (dotimes (i (cols mat-1))
+	(dotimes (j (rows mat-1))
+	  (princ (at mat-1 i j :int))
+	  (princ #\Space))
+	(princ #\Newline))
+      (format t "~%~%")
+      ;Print MAT-2
+      (format t "MAT-2:~%~%")
+      (dotimes (i (cols mat-2))
+	(dotimes (j (rows mat-2))
+	  (princ (at mat-2 i j :int))
+	  (princ #\Space))
+	(princ #\Newline))
+      (format t "~%~%")
+      ;Find per element maximum of 
+      ;MAT-1 and MAT-2, set to DEST
+      (%max mat-1 mat-2 dest)
+      ;Print DEST
+      (format t "Per element maximum of MAT-1 and  MAT-2:~%~%")
+      (dotimes (i (cols dest))
+	(dotimes (j (rows dest))
+	  (princ (at dest i j :int))
+	  (princ #\Space))
+	(princ #\Newline))
+      (format t "~%~%")
+      (do* ((frame 0))
+	   ((plusp (wait-key *millis-per-frame*)) 
+	    (format t "Key is pressed by user"))
+        ;Set camera feed to FRAME
+	(setf frame (mat))
+	(cap-read cap frame)
+        ;Convert FRAME to 1 channel 
+        ;grayscale image, set to mat-1
+        ;FRAME stays the same
+	(cvt-color frame mat-3 +bgr2gray+)
+        ;Convert FRAME to 1 channel 
+        ;grayscale image, set to mat-4
+        ;FRAME stays the same
+	(cvt-color frame mat-4  +bgr2gray+)
+        ;Apply a fixed-level threshold to 
+        ;each array element of mat-3
+	(threshold mat-3 mat-3 128d0 255d0 +thresh-binary-inv+)
+        ;Create trackbar on middle window which changes 
+        ;the scalar value ASSGN-VAL uses in the next step
+        (create-trackbar "Value of mat-3" window-name-2 val 255)
+        ;Assign each element of mat-5 a scalar value
+	(assgn-val mat-5 (scalar (mem-aref val :int)))
+        ;Find the maximum of each element 
+        ;of mat-4 AND mat-5, set to mat-4
+        (%max mat-4 mat-5 mat-4)
+        ;Show mat-3, mat-5 and mat-4 in windows
+	(imshow window-name-1 mat-3)
+	(imshow window-name-2 mat-5)
+	(imshow window-name-3 mat-4)) 
+      (destroy-all-windows))))
+
+
+
+%MIN
+
+Calculates per-element minimum of two arrays.
+
+C++: void min(InputArray src1, InputArray src2, OutputArray dst)
+
+LISP-CV: (%MIN (SRC1 (:POINTER MAT)) (SRC2 (:POINTER MAT)) (DEST (:POINTER MAT))) => :VOID
+
+
+    Parameters:	
+
+        SRC1 - First input array.
+
+        SRC2 - Second input array of the same size and type as SRC1.
+
+        DEST - Output array of the same size and type as SRC1.
+
+
+The function %MIN calculates the per-element minimum of two arrays. When the input array is multi-channel, 
+each channel is compared with value independently.
+
+Note: The function is named %MIN instead of MIN because, MIN is the name of a Common Lisp function.
+
+
+See also:
+
+(%MAX), (COMPARE), (INRANGE), (MIN-MAX-LOC), Matrix Expressions(MAT-EXPR)
+
+
+(defun %min-example (&optional (camera-index 0)
+		       (width *default-width*)
+		       (height *default-height*))
+
+  "Look at the first window and notice that whatever is black
+   in the first window has a beautiful glow in the third wind-
+   ow. You can change the effect by altering the color of the 
+   matrix MAT-3 in the middle window with the trackbar .The t-
+   rackbar changes the scalar value the ASSGN-VAL function us-
+   es to decide what to set each element of MAT-3 to."
+
+  (with-capture (cap (video-capture camera-index))   
+       ;Create two matrices: MAT-1 and MAT-2(used to show how %MIN works)
+    (let* ((mat-1 (mat-data 3 3 +32s+ (alloc :int '(1 2 3 4 5 6 7 8 9))))
+	   (mat-2 (mat-data 3 3 +32s+ (alloc :int '(9 8 7 6 5 4 3 2 1))))
+           ;Create destination matrix of same size and type: DEST
+           (dest (mat-typed 3 3 +32s+))
+           ;Create 3 matrices used to hold 
+           ;data we use later in the example
+           (mat-3 (mat-typed height width +8u+))
+           (mat-4 (mat-typed height width +8u+))
+           (mat-5 (mat-typed height width +8u+))
+           ;Allocate :int pointer for trackbar to change
+           (val (alloc :int '(128)))
+	   (window-name-1 "MAT-3 after THRESHOLD - %MIN-Example")
+	   (window-name-2 "MAT-5 after ASSGN-VAL - %MIN-Example")
+	   (window-name-3 "MAT-4 after %MIN - %MIN-Example")) 
+      ;Set CAP to default width and height
+      (cap-set cap +cap-prop-frame-width+ width)
+      (cap-set cap +cap-prop-frame-height+ height)
+      ;Create windows and move to specified locations
+      (named-window window-name-1 +window-normal+)
+      (named-window window-name-2 +window-normal+)
+      (named-window window-name-3 +window-normal+)
+      (move-window window-name-1 310 175)
+      (move-window window-name-2 760 175)
+      (move-window window-name-3 1210 175)
+      ;Print MAT-1
+      (format t "MAT-1:~%~%")
+      (dotimes (i (cols mat-1))
+	(dotimes (j (rows mat-1))
+	  (princ (at mat-1 i j :int))
+	  (princ #\Space))
+	(princ #\Newline))
+      (format t "~%~%")
+      ;Print MAT-2
+      (format t "MAT-2:~%~%")
+      (dotimes (i (cols mat-2))
+	(dotimes (j (rows mat-2))
+	  (princ (at mat-2 i j :int))
+	  (princ #\Space))
+	(princ #\Newline))
+      (format t "~%~%")
+      ;Find per element minimum of 
+      ;MAT-1 and MAT-2, set to DEST
+      (%min mat-1 mat-2 dest)
+      ;Print DEST
+      (format t "Per element minimum of MAT-1 and  MAT-2:~%~%")
+      (dotimes (i (cols dest))
+	(dotimes (j (rows dest))
+	  (princ (at dest i j :int))
+	  (princ #\Space))
+	(princ #\Newline))
+      (format t "~%~%")
+      (do* ((frame 0))
+	   ((plusp (wait-key *millis-per-frame*)) 
+	    (format t "Key is pressed by user"))
+        ;Set camera feed to FRAME
+	(setf frame (mat))
+	(cap-read cap frame)
+        ;Convert FRAME to 1 channel 
+        ;grayscale image, set to mat-1
+        ;FRAME stays the same
+	(cvt-color frame mat-3 +bgr2gray+)
+        ;Convert FRAME to 1 channel 
+        ;grayscale image, set to mat-4
+        ;FRAME stays the same
+	(cvt-color frame mat-4  +bgr2gray+)
+        ;Apply a fixed-level threshold to 
+        ;each array element of mat-3
+	(threshold mat-3 mat-3 128d0 255d0 +thresh-binary-inv+)
+        ;Create trackbar on middle window which changes 
+        ;the scalar value ASSGN-VAL uses in the next step
+        (create-trackbar "Value of mat-3" window-name-2 val 255)
+        ;Assign each element of mat-5 a scalar value
+	(assgn-val mat-5 (scalar (mem-aref val :int)))
+        ;Find the minimum of each element 
+        ;of mat-4 AND mat-5, set to mat-4
+        (%min mat-4 mat-5 mat-4)
+        ;Show mat-3, mat-5 and mat-4 in windows
+	(imshow window-name-1 mat-3)
+	(imshow window-name-2 mat-5)
+	(imshow window-name-3 mat-4)) 
       (destroy-all-windows))))
 
 
@@ -2152,8 +2782,8 @@ have alpha set to 0, fully opaque pixels should have alpha set to 255/65535.
 	  (format t "Image not loaded")))
     (named-window window-name-1 +window-normal+)
     (named-window window-name-2 +window-normal+)
-    (move-window window-name-1 464 175)
-    (move-window window-name-2 915 175)
+    (move-window window-name-1 533 175)
+    (move-window window-name-2 984 175)
     ;;Show original IMAGE in window
     (imshow window-name-1 image)
     ;;Flip IMAGE around the x-axis
@@ -2166,6 +2796,75 @@ have alpha set to 0, fully opaque pixels should have alpha set to 255/65535.
 			     (list +imwrite-jpeg-quality+ 99)))
     (loop while (not (= (wait-key 0) 27)))
     (destroy-all-windows)))
+
+
+
+VIDEO-CAPTURE
+
+VideoCapture constructors.
+
+C++: VideoCapture::VideoCapture()
+
+LISP-CV: (VIDEO-CAPTURE) => (:POINTER VIDEO-CAPTURE)
+
+C++: VideoCapture::VideoCapture(int device)
+
+LISP-CV: (VIDEO-CAPTURE &OPTIONAL (SRC :INT)) => (:POINTER VIDEO-CAPTURE)
+
+C++: VideoCapture::VideoCapture(const string& filename)
+
+LISP-CV: (VIDEO-CAPTURE &OPTIONAL (SRC :POINTER STRING*)) => (:POINTER VIDEO-CAPTURE)
+
+
+  Parameters:	
+
+        SRC - 
+
+             A device: ID of the opened video capturing device (i.e. a camera index). If there is 
+                       a single camera connected, just pass 0.     
+
+             A file name: Name of the opened video file (eg. video.avi) or image sequence (eg. 
+                          img_%02d.jpg, which will read samples like img_00.jpg, img_01.jpg, 
+                          img_02.jpg, ...)
+
+             NIL: Creates an uninitialized (:POINTER VIDEO-CAPTURE)
+        
+
+
+(defun video-capture-example (filename &optional 
+					 (camera-index *camera-index*))
+
+  "This example use the function VIDEO-CAPTURE to open a video 
+   capturing device, supplied by the *CAMERA-INDEX* parameter. 
+   The setf-able *CAMERA-INDEX* parameter defaults to 0. Then 
+   the function VIDEO-CAPTURE is used to open a video file sup-
+   plied by the parameter FILENAME."
+  
+  (with-capture (video-capture (video-capture camera-index))
+    (with-capture (cap-file (video-capture filename))
+      (let ((window-name-1 "Camera - VIDEO-CAPTURE Example")
+	    (window-name-2 "Video file - VIDEO-CAPTURE Example"))
+	(if (not (cap-is-open video-capture)) 
+	    (return-from video-capture-example 
+	      (format t "Cannot open the video camera")))
+	(if (not (cap-is-open cap-file)) 
+	    (return-from video-capture-example 
+	      (format t "Cannot open the video file")))
+	(named-window window-name-1 +window-normal+)
+	(named-window window-name-2 +window-normal+)
+	(move-window window-name-1 533 175)
+	(move-window window-name-2 984 175)
+	(do* ((camera 0)
+	      (video-file 0))
+	     ((plusp (wait-key *millis-per-frame*)) 
+	      (format t "Key is pressed by user"))
+	  (setf camera (mat))
+	  (cap-read video-capture camera)
+	  (setf video-file (mat))
+	  (cap-read cap-file video-file)
+	  (imshow window-name-1 camera)
+	  (imshow window-name-2 video-file))
+	(destroy-all-windows)))))
 
 
 
@@ -2226,8 +2925,8 @@ the source image with the kernel, then, it downsamples the image by rejecting ev
 	   (window-name-2 "Downsampled blurred Image - PYR-DOWN Example"))
       (named-window window-name-1 +window-autosize+)
       (named-window window-name-2 +window-autosize+)
-      (move-window window-name-1 450 300)
-      (move-window window-name-2 985 300)
+      (move-window window-name-1 533 175)
+      (move-window window-name-2 984 175)
       (format t "Image size before downsampling = (~a, ~a)
        ~%~%"(rows img-1) (cols img-1))
       ;;Show original image in window
@@ -2372,7 +3071,7 @@ See also
   "Show the camera output and a thresholded 
    version in a single window."
 
-  (with-capture (cap (cap-cam camera-index))
+  (with-capture (cap (video-capture camera-index))
     (let* ((window-name "Camera/Threshold")
            (grayscale (mat-typed height width +8u+))
            (threshold (mat-typed height width +8u+))
@@ -2495,7 +3194,7 @@ See: http://en.wikipedia.org/wiki/Canny_edge_detector
 (defun canny-example (&optional (camera-index *camera-index*))
   "Finds edges in an image using the [Canny86] algorithm.
    Canny only handles gray scale images"
-  (with-capture (cap (cap-cam camera-index))
+  (with-capture (cap (video-capture camera-index))
     (let* ((window-name "OUT - CANNY Example"))
       (named-window window-name +window-normal+)
       (move-window window-name 305 300)
@@ -2720,7 +3419,7 @@ If window was created with OpenGL support, IMSHOW also support ogl::Buffer , ogl
 	(return-from imshow-example 
 	  (format t "Image not loaded")))
     (named-window window-name +window-normal+)
-    (move-window window-name 720 175)
+    (move-window window-name 759 175)
     (imshow window-name image)
     (loop while (not (= (wait-key 0) 27)))
     (destroy-window window-name)))
@@ -2810,7 +3509,7 @@ In the case of color images, the decoded images will have the channels stored in
 	(return-from imread-example 
 	  (format t "Image not loaded")))
     (named-window window-name +window-normal+)
-    (move-window window-name 720 175)
+    (move-window window-name 759 175)
     (imshow window-name image)
     (loop while (not (= (wait-key 0) 27)))
     (destroy-window window-name)))
@@ -3005,7 +3704,7 @@ LISP-CV: (MOVE-WINDOW (WINNAME (:POINTER STRING*)) (X :INT) (Y :INT))
 
   (let* ((window-name "MOVE-WINDOW Example")))
     (named-window window-name +window-normal+)
-    (move-window window-name 720 175)
+    (move-window window-name 759 175)
     (loop while (not (= (wait-key 0) 27)))
     (destroy-window window-name))
 
@@ -3050,7 +3749,7 @@ f there are several HighGUI windows, any of them can be active.
 
   (let* ((window-name "WAIT-KEY Example"))
     (named-window window-name +window-normal+)
-    (move-window window-name 720 175)
+    (move-window window-name 759 175)
     (loop while (not (= (wait-key 0) 27)))
     (destroy-window window-name)))
 
@@ -3120,7 +3819,7 @@ value 0 is returned.
   "Gets the width and height of the camera capture 
    with the function CAP-GET and prints it."
 
-  (with-capture (cap (cap-cam camera-index))
+  (with-capture (cap (video-capture camera-index))
     (let ((window-name "CAP-GET Example"))
       (if (not (cap-is-open cap)) 
 	  (return-from cap-get-example 
@@ -3131,7 +3830,7 @@ value 0 is returned.
 	      (cap-get cap +cap-prop-frame-width+)
 	      (cap-get cap +cap-prop-frame-height+))
       (named-window window-name +window-normal+)
-      (move-window window-name 720 175)
+      (move-window window-name 759 175)
       (do* ((frame 0))
 	   ((plusp (wait-key *millis-per-frame*)) 
 	    (format t "Key is pressed by user"))
@@ -3206,7 +3905,7 @@ LISP-CV: (CAP-SET (SELF (:POINTER VIDEO-CAPTURE)) (PROP-ID :INT) (VALUE :DOUBLE)
    with the function CAP-SET and then prints the b-
    rightness level."
 
-  (with-capture (cap (cap-cam camera-index))
+  (with-capture (cap (video-capture camera-index))
     (let ((window-name "CAP-SET Example"))
       (if (not (cap-is-open cap)) 
 	  (return-from cap-set-example 
@@ -3215,7 +3914,7 @@ LISP-CV: (CAP-SET (SELF (:POINTER VIDEO-CAPTURE)) (PROP-ID :INT) (VALUE :DOUBLE)
       (format t "Brightness level: ~a~%~%" 
 	      (cap-get cap +cap-prop-brightness+))
       (named-window window-name +window-normal+)
-      (move-window window-name 720 175)
+      (move-window window-name 759 175)
       (do* ((frame 0))
 	   ((plusp (wait-key *millis-per-frame*)) 
 	    (format t "Key is pressed by user"))
@@ -3273,13 +3972,13 @@ size-un-init)
    with the function CAP-READ and then shows it in 
    a window with the function IMSHOW."
 
-  (with-capture (cap (cap-cam camera-index))
+  (with-capture (cap (video-capture camera-index))
     (let ((window-name "CAP-READ Example"))
       (if (not (cap-is-open cap)) 
 	  (return-from cap-read-example 
 	    (format t "Cannot open the video camera")))
       (named-window window-name +window-normal+)
-      (move-window window-name 720 175)
+      (move-window window-name 759 175)
       (do* ((frame 0))
 	   ((plusp (wait-key *millis-per-frame*)) 
 	    (format t "Key is pressed by user"))
@@ -3319,13 +4018,13 @@ Parameters:
    Note: If you use the macro WITH-CAPTURE, CAP-RELEASE will b-
    e called automatically. See WITH-CAPTURE EXAMPLE for usage."
   
-  (let ((cap (cap-cam camera-index))
+  (let ((cap (video-capture camera-index))
 	(window-name "CAP-RELEASE Example"))
     (if (not (cap-is-open cap)) 
 	(return-from cap-release-example 
 	  (format t "Cannot open the video camera")))
     (named-window window-name +window-normal+)
-    (move-window window-name 720 175)
+    (move-window window-name 759 175)
     (do* ((frame 0))
 	 ((plusp (wait-key *millis-per-frame*)) 
 	  (format t "Key is pressed by user"))
@@ -3348,7 +4047,7 @@ Parameters:
                        device. Similar to the variable in a LET statement.
 
          CAP - The function used to open video file or a capturing device for video capturing, as i-
-               n (CAP-CAM (DEVICE :INT)). See WITH-CAPTURE example.
+               n (video-capture (DEVICE :INT)). See WITH-CAPTURE example.
     
          BODY - The body of the code to be executed once the video file or capturing device is open.
 
@@ -3359,14 +4058,14 @@ Parameters:
   "WITH-CAPTURE is a macro that basically ensures 
    CAP-RELEASE gets called on all captures. CAP-R-
    ELEASE is a function that releases the capture 
-   structure created by CAP-CAM, autom-
+   structure created by video-capture, autom-
    atically, when the code exits. Using it is not 
    neccesary, but it does make the code a bit mor-
    eelegant. See CAP-RELEASE example to see how t-
    o release the capture structure without callin-
    g WITH-CAPTURE."
 
-  (with-capture (cap (cap-cam camera-index))
+  (with-capture (cap (video-capture camera-index))
     (let ((window-name "WITH-CAPTURE Example"))
       (if (not (cap-is-open cap)) 
 	  (return-from with-capture-example 
@@ -3401,7 +4100,7 @@ If the previous call to VIDEO-CAPTURE constructor or CAP-IS-OPEN succeeded, the 
                                *camera-index*))
 
   "If the previous call to VIDEO-CAPTURE constructor (i/e, 
-   (CAP-CAM CAMERA-INDEX) in the below example) or the fu-
+   (video-capture CAMERA-INDEX) in the below example) or the fu-
    nction CAP-IS-OPEN succeeded, the method returns true. 
    The boolean output of the PRINC function in the IF sta-
    tement in this example reflects a good or bad capture. 
@@ -3409,13 +4108,13 @@ If the previous call to VIDEO-CAPTURE constructor or CAP-IS-OPEN succeeded, the 
    is unplugged....Try unplugging your camera to test it 
    out."
 
-  (with-capture (cap (cap-cam camera-index)) 
+  (with-capture (cap (video-capture camera-index)) 
     (let ((window-name "CAP-IS-OPEN Example"))
       (if (not (princ (cap-is-open cap))) 
 	  (return-from cap-is-open-example 
 	    (format t "Cannot open the video camera")))
       (named-window window-name +window-normal+)
-      (move-window window-name 720 175)
+      (move-window window-name 759 175)
       (do* ((frame 0))
 	   ((plusp (wait-key *millis-per-frame*)) 
 	    (format t "~%~%Key is pressed by user"))
@@ -3923,7 +4622,7 @@ size-un-init)
     (format t "Height of SIZE = ~a" (height size)))))
 
 rmal+)
-    (move-window window-name 720 175)
+    (move-window window-name 759 175)
     (imshow window-name image)
     (loop while (not (= (wait-key 0) 27)))
     (destroy-window window-name)))
@@ -3942,7 +4641,7 @@ LISP-CV: (CV-TYPE (SELF (:POINTER MAT)))
         SELF - A matrix(MAT)
 
 The method returns a matrix element type. This is an identifier compatible with OpenCV's CvMat type
-system, like CV_16SC3(+16SC3+ in Common Lisp) or 16-bit signed 3-channel array, and so on.
+system, like CV_16SC3(+16SC3+ in LISP-CV) or 16-bit signed 3-channel array, and so on.
 
 
 (defun mat-type-example ()
@@ -3956,155 +4655,6 @@ system, like CV_16SC3(+16SC3+ in Common Lisp) or 16-bit signed 3-channel array, 
 	    (mat-type mat-one))
     (format t "~%MAT-TWO type is ~a(+64f+). It is a Double Precision Floating Point Matrix." 
 	    (mat-type mat-two))))
-
-
-
-CAP-CAM
-
-C++: VideoCapture::VideoCapture(int device)
-
-LISP-CV: (CAP-CAM (DEVICE :INT))
-
-    Parameters:	
-
-        DEVICE - id of the opened video capturing device (i.e. a camera index). If there is a singl-
-                 e camera connected, just pass 0.
-
-
-(defun cap-cam-example (&optional 
-			  (camera-index 
-			   *camera-index*))
-
-  "This function use CAP-CAM to open a video 
-   capturing device (i.e. a camera index). If th-
-   ere is a single camera connected, just pass 0
-   (the default value of *camera-index*)."
-
-  (with-capture (cap (cap-cam camera-index))
-    (let ((window-name "CAP-CAM Example"))
-      (if (not (cap-is-open cap)) 
-	  (return-from cap-cam-example 
-	    (format t "Cannot open the video camera")))
-      (named-window window-name +window-autosize+)
-      (do* ((frame 0))
-	   ((plusp (wait-key *millis-per-frame*)) 
-	    (format t "Key is pressed by user"))
-	(setf frame (mat))
-	(cap-read cap frame)
-	(imshow window-name frame))
-      (destroy-window window-name))))
-
-
-CAP-FILE
-
-C++: VideoCapture::VideoCapture(const string& filename)
-
-LISP-CV: (CAP-FILE (FILENAME (:POINTER STRING*)))
-
-    Parameters:	
-
-        FILENAME - Name of the opened video file (eg. video.avi) or image sequence (eg. img_%02d.j-
-                    pg, which will read samples like img_00.jpg, img_01.jpg, img_02.jpg, ...)
-
-
-(defun cap-file-example (filename)
-
-  "This function use CAP-FILE to open a video 
-   file supplied by the parameter FILENAME."
-
-  (with-capture (cap (cap-file filename))
-    (let ((window-name "CAP-FILE Example"))
-      (if (not (cap-is-open cap)) 
-	  (return-from cap-file-example 
-	    (format t "Cannot open the video camera")))
-      (named-window window-name +window-autosize+)
-      (do* ((frame 0))
-	   ((plusp (wait-key *millis-per-frame*)) 
-	    (format t "Key is pressed by user"))
-	(setf frame (mat))
-	(cap-read cap frame)
-	(imshow window-name frame))
-      (destroy-window window-name))))
-
-
-AT
-
-Returns a reference to the specified array element.
-
-C++: template<typename T> T& Mat::at(int i) const
-
-C++: template<typename T> const T& Mat::at(int i) const
-
-C++: template<typename T> T& Mat::at(int i, int j)
-
-LISP-CV: (AT-<TYPE-MAME> (SELF (:POINTER MAT)) (I :INT) (J :INT))
-
-C++: template<typename T> const T& Mat::at(int i, int j) const
-
-C++: template<typename T> T& Mat::at(Point pt)
-
-C++: template<typename T> const T& Mat::at(Point pt) const
-
-C++: template<typename T> T& Mat::at(int i, int j, int k)
-
-C++: template<typename T> const T& Mat::at(int i, int j, int k) const
-
-C++: template<typename T> T& Mat::at(const int* idx)
-
-C++: template<typename T> const T& Mat::at(const int* idx) const
-
-    Parameters:	
-
-        I - Index along the dimension 0
-
-        J - Index along the dimension 1
-
-        K - Index along the dimension 2
-
-        PT - Element position specified as Point(j,i) .
-
-        IDX - Array of Mat::dims indices.
-
-The template methods return a reference to the specified array element. For the sake of higher perf-
-ormance, the index range checks are only performed in the Debug configuration.
-
-Note that the variants with a single index (I) can be used to access elements of single-row or sing-
-le-column 2-dimensional arrays. That is, if, for example, A is a 1 x N floating-point matrix and B 
-is an M x 1 integer matrix, you can simply write (AT-FLOAT A (+ K 4)) and (AT-INT B (+ 1 (* 2 4))) instead of 
-(AT-FLOAT A 0 (+ K 4)) and (AT-INT B (+ 1 (* 2 I)) 0) , respectively.
-
-
-The example below initializes a Hilbert matrix:
-
-(defun at-example ()
-  (let ((h (mat-typed 5 5 +64f+)))
-    (dotimes (i (rows h))
-      (dotimes (j (cols h))
-	(at-double+ h i j (/ 1.0d0 (+ i j 1)))
-	(princ (at-double h i j))
-	(princ #\Space))
-      (princ #\Newline)))) 
-
-
-   The typenames associated with AT include:
-
-
-        char       point       vec2b     scalar
-        double     point2d     vec2d
-        float      point2f     vec2f
-        int        point3d     vec2i
-        short      point3f     vec2s
-        uchar                  vec3b
-        ushort                 vec3d
-                               vec3f
-                               vec3i
-                               vec3s
-                               vec4b
-                               vec4d
-                               vec4f
-                               vec4i
-                               vec4s 
-
 
 
 
@@ -4188,7 +4738,7 @@ CIRCLE-EXAMPLE:
    red ball. Then it uses a bit of logic to make the ball b-
    ounce around the room."
 
-  (with-capture (cap (cap-cam camera-index))
+  (with-capture (cap (video-capture camera-index))
     (let* ((window-name "CICRLE Example")
 	   (color (scalar 0 0 255)))
       (if (not (cap-is-open cap)) 
@@ -4198,7 +4748,7 @@ CIRCLE-EXAMPLE:
 	      (cap-get cap +cap-prop-frame-width+)
 	      (cap-get cap +cap-prop-frame-height+))
       (named-window window-name +window-normal+)
-      (move-window window-name 720 175)
+      (move-window window-name 759 175)
       (do* ((frame 0))
 	   ((plusp (wait-key *millis-per-frame*)) 
 	    (format t "Key is pressed by user"))
@@ -4274,7 +4824,7 @@ wise, the existing matrix A is filled with zeros.
   (let* ((mat (mat-zeros 3 3 +8u+))
 	 (window-name "MAT - MAT-ZEROS Example"))
     (named-window window-name +window-normal+)
-    (move-window window-name 720 175)
+    (move-window window-name 759 175)
     (imshow window-name mat)
     (loop while (not (= (wait-key 0) 27)))
     (destroy-window window-name)))
@@ -4328,7 +4878,7 @@ izer.
   (let* ((mat (mat-ones 4 4 +8u+))
 	 (window-name "MAT - MAT-ONES Example"))
     (named-window window-name +window-normal+)
-    (move-window window-name 720 175)
+    (move-window window-name 759 175)
     (imshow window-name mat)
     (loop while (not (= (wait-key 0) 27)))
     (destroy-window window-name)))
@@ -4395,9 +4945,9 @@ to (MAT-ONES), you can use a scale operation to create a scaled identity matrix 
     (named-window window-name-1 +window-normal+)
     (named-window window-name-2 +window-normal+)
     (named-window window-name-3 +window-normal+)
-    (move-window window-name-1 315 175)
-    (move-window window-name-2 765 175)
-    (move-window window-name-3 1215 175)
+    (move-window window-name-1 310 175)
+    (move-window window-name-2 760 175)
+    (move-window window-name-3 1210 175)
     (imshow window-name-1 identity-mat-1)
     (imshow window-name-2 identity-mat-2)
     (imshow window-name-3  (>> scaled-identity-mat))
@@ -4561,7 +5111,7 @@ nction >> is an identical shorthand version of the FORCE function supplied for e
          (out (add mat mat))
 	 (window-name "FORCE Example"))
     (named-window window-name +window-normal+)
-    (move-window window-name 720 175)
+    (move-window window-name 759 175)
     (imshow window-name  (>> out))
     (loop while (not (= (wait-key 0) 27)))
     (destroy-window window-name)))
@@ -4592,7 +5142,7 @@ LISP-CV: (mat-typed) (ROWS :INT) (COLS :INT) (TYPE :INT)) => (:POINTER MAT)
   (let* ((mat (mat-typed 4 4 +32s+))
 	 (window-name "mat-typed Example"))
     (named-window window-name +window-normal+)
-    (move-window window-name 720 175)
+    (move-window window-name 759 175)
     (imshow window-name mat)
     (loop while (not (= (wait-key 0) 27)))
     (destroy-window window-name)))
@@ -4794,7 +5344,7 @@ ndows FFMPEG or VFW is used; on MacOSX QTKit is used.
 (defun video-writer-example (filename &optional 
 					(camera-index *camera-index*))
 
-  (with-capture (cap (cap-cam camera-index)) ; Open the video camera no. 0
+  (with-capture (cap (video-capture camera-index)) ; Open the video camera no. 0
     (let* ((filename filename)
 	   (window-name "VIDEO-WRITER Example")
 
@@ -4821,7 +5371,7 @@ ndows FFMPEG or VFW is used; on MacOSX QTKit is used.
       (format t "Frame Size : ~ax~a~%~%" dwidth dheight)
 
       (named-window window-name +window-normal+) ; Create a window
-      (move-window window-name 720 175)
+      (move-window window-name 759 175)
       (do* ((frame 0))
 
 	          ; Wait for 'esc' key press for 30ms. 
@@ -4854,7 +5404,7 @@ LISP-CV: (VIDEO-WRITER-IS-OPEN (SELF (:POINTER VIDEO-WRITER)))
 
 (defun video-writer-is-open-example (filename &optional (camera-index *camera-index*))
 
-  (with-capture (cap (cap-cam camera-index)) ; Open the video camera no. 0
+  (with-capture (cap (video-capture camera-index)) ; Open the video camera no. 0
     (let* (; Initialize the VideoWriter object 
 	   (o-video-writer (video-writer filename 1196444237 ; todo
 					 20.0d0 (size 640 480) 1)))
@@ -4883,7 +5433,7 @@ e as has been specified when opening the video writer.
 (defun video-writer-write-example (filename &optional 
 					      (camera-index *camera-index*))
 
-  (with-capture (cap (cap-cam camera-index)) 
+  (with-capture (cap (video-capture camera-index)) 
     (let* ((window-name "VIDEO-WRITER-WRITE Example")
 	   (o-video-writer (video-writer filename 1196444237 
 					 20.0d0 (size 640 480) 1)))
@@ -4894,7 +5444,7 @@ e as has been specified when opening the video writer.
 	  (return-from video-writer-write-example 
 	    (format t "ERROR: Failed to write the video"))) 
       (named-window window-name +window-normal+)
-      (move-window window-name 720 175)
+      (move-window window-name 759 175)
       (do* ((frame 0))
 	   ((plusp (wait-key *millis-per-frame*)) 
 	    (format t "Key is pressed by user"))
@@ -5040,7 +5590,7 @@ returns a pointer to the resultant sub-array header.
    room. Have a look through the code, I named the variables in 
    a way to make it easy to understand."
 
-  (with-capture (cap (cap-cam camera-index))
+  (with-capture (cap (video-capture camera-index))
     (let* ((window-name "ROI Example"))
       (if (not (cap-is-open cap)) 
 	  (return-from roi-example 
@@ -5049,7 +5599,7 @@ returns a pointer to the resultant sub-array header.
 	      (cap-get cap +cap-prop-frame-width+)
 	      (cap-get cap +cap-prop-frame-height+))
       (named-window window-name +window-normal+)
-      (move-window window-name 720 175)
+      (move-window window-name 759 175)
       (do* ((frame 0))
 	   ((plusp (wait-key *millis-per-frame*)) 
 	    (format t "Key is pressed by user"))
@@ -5276,7 +5826,7 @@ All the arrays must have the same type, except the destination, and the same siz
 			     (width 640)
 			     (height 480))
 
-  (with-capture (cap (cap-cam camera-index))
+  (with-capture (cap (video-capture camera-index))
     (let ((window-name-1 "Original camera feed - IN-RANGE-S Example")
 	  (window-name-2 "Only red objects - IN-RANGE-S Example")
 	  (img-hsv 0)
@@ -5292,8 +5842,8 @@ All the arrays must have the same type, except the destination, and the same siz
 	      (cap-get cap +cap-prop-frame-height+))
       (named-window window-name-1 +window-normal+)
       (named-window window-name-2 +window-normal+)
-      (move-window window-name-1 464 175)
-      (move-window window-name-2 915 175)
+      (move-window window-name-1 533 175)
+      (move-window window-name-2 984 175)
       ;; Iterate through each frames of the video
       (do* ((frame 0)
 	    (lower-hsv (scalar 170 160 60))
@@ -5369,7 +5919,7 @@ See also:
    to blur an image using a Gaussian filter. The orig-
    inal image FRAME and the blurred image SRC are sho-
    wn in separate windows."
-  (with-capture (cap (cap-cam camera-index))
+  (with-capture (cap (video-capture camera-index))
     (let ((window-name-1 "Original - GAUSSIAN-BLUR Example")
 	  (window-name-2 "Blurred output - GAUSSIAN-BLUR Example")
 	  (src 0))
@@ -5383,8 +5933,8 @@ See also:
 	      (cap-get cap +cap-prop-frame-height+))
       (named-window window-name-1 +window-normal+)
       (named-window window-name-2 +window-normal+)
-      (move-window window-name-1 464 175)
-      (move-window window-name-2 915 175)
+      (move-window window-name-1 533 175)
+      (move-window window-name-2 984 175)
       (do* ((frame 0))
 	   ((plusp (wait-key *millis-per-frame*)) 
 	    (format t "Key is pressed by user"))
@@ -5569,7 +6119,7 @@ pattern is 50% green, 25% red and 25% blue, hence is also called RGBG,[1][2] GRG
 
    for more information on these color spaces."
 
-  (with-capture (cap (cap-cam camera-index))
+  (with-capture (cap (video-capture camera-index))
     (let ((window-name-1 "+BGR2HSV+ - CVT-COLOR Example")
 	  (window-name-2 "+BGR2XYZ+ - CVT-COLOR Example")
 	  (window-name-3 "+BGR2GRAY+ - CVT-COLOR Example")
@@ -6058,7 +6608,7 @@ Also a combined format is supported: feature detector adapter name:
     ;; find the best match for each descriptor
     (descrip-matcher-match matcher descriptors-a descriptors-b matches)
     (named-window window-name +window-normal+)
-    (move-window window-name 720 175)
+    (move-window window-name 759 175)
     ;; draw the found matches
     (draw-matches gray-a keypoints-a gray-b keypoints-b matches all-matches 
 		  (scalar-all -1) (scalar-all -1) (vector-char) 
@@ -6131,7 +6681,7 @@ LISP-CV: (SURF5 (HESSIAN-THRESHOLD :DOUBLE) &OPTIONAL ((N-OCTAVES :INT) 4)
     ;-- Step 3: Matching descriptor vectors with a brute force matcher
     (descrip-matcher-match matcher descriptors-1 descriptors-2 matches)
     (named-window window-name +window-normal+)
-    (move-window window-name 720 175)
+    (move-window window-name 759 175)
     ;;-- Draw matches
     (draw-matches img-1 keypoints-1 img-2 keypoints-2 matches img-matches)
     ;;-- Show detected matches
@@ -6206,7 +6756,7 @@ Example:
 	(return-from create-trackbar-example
 	  (format t "Image not loaded")))
     (named-window window-name 1)
-    (move-window window-name 720 175)
+    (move-window window-name 759 175)
     (do* ((dest 0)
 	  (brightness 0)
 	  (contrast 0))
@@ -6313,7 +6863,7 @@ LISP-CV: (SET-MOUSE-CALLBACK (WINNAME :STRING) (ON-MOUSE (:POINTER MOUSE-CALLBAC
 	(return-from set-mouse-callback-example
 	  (format t "Image not loaded")))
     (named-window window-name 1)
-    (move-window window-name 720 175)
+    (move-window window-name 759 175)
     ;; Set mouse handler for the window, which passes a constant 
     ;; stream of mouse and mouse button positional data to the f-
     ;; unction above.  Also passes the contents of USERDATA to t-
@@ -6370,7 +6920,7 @@ ix or because there can be some padding space in the end of each row for a prope
 	(return-from data-example 
 	  (format t "Image not loaded")))
     (named-window window-name +window-normal+)
-    (move-window window-name 720 175)
+    (move-window window-name 759 175)
     ;;In a loop access IMG pixel data using the STEP* 
     ;;function and print to a file instead of the co-
     ;;nsole so your implimentation doesn't freeze.
@@ -6426,7 +6976,7 @@ tion is named STEP*, because the name STEP conflicts with a Lisp Macro.
 	(return-from step*-example 
 	  (format t "Image not loaded")))
     (named-window window-name +window-normal+)
-    (move-window window-name 720 175)
+    (move-window window-name 759 175)
     ;; access pixel value at x = 0, y = 0 using the STEP* function
     (setf b (mem-aref input :uchar 
 		      (+  (* (step* img) 0) 0)))
