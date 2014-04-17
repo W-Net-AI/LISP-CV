@@ -147,12 +147,12 @@
    #:channels
    #:clone
    #:cols
-   #:convert-scale-abs
    #:convert-to
    #:copy-to
    #:data
    #:del-mat
    #:del-mat-expr
+   #:depth
    #:div
    #:dot
    #:dot2d
@@ -199,7 +199,6 @@
    #:point3i-z
    #:promote
    #:ptr
-   #:randu
    #:rect
    #:rect-init
    #:reshape
@@ -241,12 +240,6 @@
 
 ;; core - Operations on Arrays
 
-   #:*abs
-   #:*max
-   #:*min
-   #:abs-diff
-   #:bitwise-or
-   #:bitwise-xor
    #:+C+
    #:+cmp-eq+ 
    #:+cmp-gt+ 
@@ -271,17 +264,6 @@
    #:+decomp-cholesky+ 
    #:+decomp-qr+ 
    #:+decomp-normal+
- 
-   #:flip
-   #:in-range-s
-   #:inv
-   #:invert
-
-   #:+l1+
-   #:+l2+
-
-   #:mean
-   #:multiply
    #:+norm-inf+
    #:+norm-l1+
    #:+norm-l2+
@@ -292,6 +274,29 @@
    #:+relative-c+
    #:+relative-l1+
    #:+relative-l2+
+
+   #:*abs
+   #:*max
+   #:*min
+   #:abs-diff
+   #:bitwise-or
+   #:bitwise-xor
+   #:convert-scale-abs
+   #:det
+   #:flip
+   #:in-range-s
+   #:inv
+   #:invert
+
+   #:+l1+
+   #:+l2+
+
+   #:mean
+   #:multiply
+   #:randu
+   #:rng
+   #:scale-add
+   #:uniform
 
 ;; core - Drawing Functions
    #:+aa+
@@ -314,6 +319,7 @@
 
 ;; core - Utility and System Functions and Macros
 
+   #:fast-atan2
    #:get-tick-count
    #:get-tick-frequency
    #:+cpu-none+
@@ -395,6 +401,7 @@
    #:+border-transparent+
    #:+border-isolated+
 
+   #:copy-make-border
    #:gaussian-blur
    #:pyr-down
    #:pyr-up

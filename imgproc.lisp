@@ -9,6 +9,21 @@
 ;;; Image Filtering
 
 
+;; void copyMakeBorder(InputArray src, OutputArray dst, int top, int bottom, int left, int right, int borderType, 
+;; const Scalar& value=Scalar())
+;; void cv_copyMakeBorder(Mat* src, Mat* dst, int top, int bottom, int left, int right, int borderType, Scalar* value) 
+(defcfun ("cv_copyMakeBorder" copy-make-border) :void 
+  "Forms a border around an image."
+  (src (:pointer mat))
+  (dest (:pointer mat))
+  (top :int)
+  (bottom :int)
+  (left :int)
+  (right :int)
+  (border-type :int)
+  (value (:pointer scalar)))
+
+
 ;; void GaussianBlur(InputArray src, OutputArray dst, Size ksize, double sigmaX, double sigmaY=0, int borderType=BORDER_DEFAULT )
 ;; void cv_GaussianBlur(Mat* src, Mat* dst, Size* ksize, double sigmaX, double sigmaY, int borderType)
 (defcfun ("cv_GaussianBlur" %gaussian-blur) :void

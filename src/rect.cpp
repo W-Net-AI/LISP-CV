@@ -1,7 +1,6 @@
 #include <opencv2/c/rect.hpp>
 
 extern "C" {
-
 Rect* cv_create_Rect() {
     return new Rect;
 }

@@ -201,6 +201,11 @@
   (self :pointer))
 
 
+;; int Mat::depth() const
+;; int cv_Mat_depth(Mat* self)
+(defcfun ("cv_Mat_depth" depth) :int 
+	 (self (:pointer mat)))
+
 
 ;; Mat Mat::diag(int d=0 ) const
 ;; Mat* cv_Mat_diag_d(Mat* self, int d)
@@ -302,14 +307,6 @@
   (self (:pointer size2f)))
 
 
-;; MatExpr Mat::inv(int method=DECOMP_LU) const
-;; MatExpr* cv_Mat_inv_mat(Mat* self, int method)
-(defcfun ("cv_Mat_inv_mat" inv) (:pointer mat-expr) 
-	 "Inverses a matrix."
-	 (self (:pointer mat))
-	 (method :int))
-
-
 ;; Mat::Mat()
 ;; Mat* cv_create_Mat()
 (defcfun ("cv_create_Mat" %mat) (:pointer mat)
@@ -332,6 +329,7 @@
      (unwind-protect
 	 (progn ,@body)
        (del-mat ,mat-var))))
+
 
 
 ;; Mat::Mat(int rows, int cols, int type, void* data) 
@@ -969,6 +967,14 @@
   (dst :pointer mat))
 
 
+;; MatExpr Mat::inv(int method=DECOMP_LU) const
+;; MatExpr* cv_Mat_inv_mat(Mat* self, int method)
+(defcfun ("cv_Mat_inv_mat" inv) (:pointer mat-expr) 
+	 "Inverses a matrix."
+	 (self (:pointer mat))
+	 (method :int))
+
+
 ;; double invert(InputArray src, OutputArray dst, int flags=DECOMP_LU)
 ;; double cv_invert(Mat* src, Mat* dst, int flags)
 (defcfun ("cv_invert" %invert) :double
@@ -1032,6 +1038,16 @@
          (%rng))
 	((integerp state) (rng-state state))
         (t nil)))
+
+
+;; void scaleAdd(InputArray src1, double alpha, InputArray src2, OutputArray dst)
+;; void cv_scaleAdd(Mat* src1, double alpha, Mat* src2, Mat* dst)
+(defcfun ("cv_scaleAdd" scale-add) :void 
+	 "Calculates the sum of a scaled array and another array."
+	 (src1 (:pointer mat))
+	 (alpha :double)
+	 (src2 (:pointer mat))
+	 (dest (:pointer mat)))
 
 
 ;; double RNG::uniform(double a, double b)
@@ -1214,6 +1230,20 @@
 
 
 ;;; Utility and System Functions and Macros
+
+
+;; bool checkHardwareSupport(int feature)
+;; bool cv_checkHardwareSupport(int feature)
+(defcfun ("cv_checkHardwareSupport" check-hardware-support) :boolean
+  (feature :int))
+
+
+;; float fastAtan2(float y, float x)
+;; float cv_fastAtan2(float y, float x)
+(defcfun ("cv_fastAtan2" fast-atan2) :float 
+  (x :float)
+  (y :float))
+
 
 ;; int64 getTickCount()
 ;; int64 cv_getTickCount()

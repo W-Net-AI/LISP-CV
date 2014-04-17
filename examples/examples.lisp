@@ -417,6 +417,64 @@ ces. When the operation mask is specified, and the (CREATE) call shown above rea
 
 
 
+DEPTH
+
+Returns the depth of a matrix element.
+
+C++: int Mat::depth() const
+
+LISP-CV: (DEPTH (SELF (:POINTER MAT))) => :INT
+
+The method returns the identifier of the matrix element depth (the type of each individual channel). 
+For example, for a 16-bit signed element array, the method returns +16S+ . A complete list of matrix 
+types contains the following values:
+
+    +8U+ - 8-bit unsigned integers ( 0..255 )
+
+    +8S+ - 8-bit signed integers ( -128..127 )
+
+    +16U+ - 16-bit unsigned integers ( 0..65535 )
+
+    +16S+ - 16-bit signed integers ( -32768..32767 )
+
+    +32S+ - 32-bit signed integers ( -2147483648..2147483647 )
+
+    +32F+ - 32-bit floating-point numbers ((* +FLT-MAX+ -1)..+FLT-MAX+, INF, NAN) 
+
+    +64F+ - 64-bit floating-point numbers ((* +DBL-MAX+ 1)..+DBL-MAX+, INF, NAN)
+
+;; INF and NAN C++ constants and are not currently implimented in LISP-CV
+
+
+Example:
+
+LCV> (DEFPARAMETER A (MAT-TYPED 3 3 +8SC1+)) ;Initialize 1 channel matrix of 8-bit signed integer type
+
+A
+
+LCV> (MAT-TYPE A) 
+
+1  ;The type of the matrix is 1(+8SC1+) - 1 channel matrix with 8-bit signed integer elements
+
+LCV> (DEPTH A)
+
+1  ;The type of the matrix elements are 1(+8S+) - 8-bit signed integer
+
+
+LCV> (DEFPARAMETER A (MAT-TYPED 3 3 +8SC3+)) ;Initialize 3 channel matrix of 8-bit signed integer type
+
+A
+
+LCV> (MAT-TYPE A)  
+
+17  ;The type of the matrix is 17(+8SC1+) - 3 channel matrix with 8-bit signed integer elements
+
+LCV> (DEPTH A)
+
+1  ;The type of the matrix elements are 1(+8S+) - 8-bit signed integer
+
+
+
 INV
 
 Inverses a matrix.
@@ -2204,6 +2262,78 @@ See also:
     (free data)))
 
 
+SCALE-ADD
+
+Calculates the sum of a scaled array and another array.
+
+C++: void scaleAdd(InputArray src1, double alpha, InputArray src2, OutputArray dst)
+
+LISP-CV: (SCALE-ADD (SRC1 (:POINTER MAT)) (ALPHA :DOUBLE) (SRC2 (:POINTER MAT)) (DEST (:POINTER MAT))) => :VOID
+
+
+    Parameters:	
+
+        SRC1 - First input matrix.
+
+        ALPHA - Scale factor for the first matrix.
+
+        SRC2 - Second input matrix of the same size and type as SRC1.
+
+        DEST - Output matrix of the same size and type as SRC1.
+
+
+The function SCALE-ADD is one of the classical primitive linear algebra operations, known as DAXPY 
+or SAXPY in BLAS. It calculates the sum of a scaled matrix and another matrix.
+
+
+See also:
+
+(ADD), (ADD-WEIGHTED), (SUBTRACT), (DOT), (CONVERT-TO), Matrix Expressions(MAT-EXPR)
+
+
+(defun scale-add-example (filename-1 filename-2)
+
+  "Calculates the sum of a scaled IMAGE-1 and IMAGE-2 
+   and shows the result in the third window. Moving t-
+   he trackabar changes the scalar value used to scal-
+   e IMAGE-1. 
+
+   Using the Bear Drawing.jpg and Bear Painting.jpg i-
+   n the LISP-CV images directory for IMAGE-1 and IMA-
+   GE-2 respectively will give a nice effect in this 
+   example."
+
+  (let* ((image-1 (imread filename-1 1))
+	 (image-2 (imread filename-2 1))
+	 (dest (mat-typed (rows image-1) (cols image-1) +8uc3+))
+	 (alpha-val (alloc :int '(0))) 
+	 (window-name-1 "IMAGE-1 - SCALE-ADD Example")
+	 (window-name-2 "IMAGE-2 - SCALE-ADD Example")
+	 (window-name-3 "DEST - SCALE-ADD Example"))
+    (if (and (empty image-1)
+             (empty image-2)) 
+	(return-from scale-add-example 
+	  (format t "Images were not loaded")))
+    (named-window window-name-1 +window-normal+)
+    (named-window window-name-2 +window-normal+)
+    (named-window window-name-3 +window-normal+)
+    (move-window window-name-1 310 175)
+    (move-window window-name-2 760 175)
+    (move-window window-name-3 1210 175)
+    (do* ((n 0))
+	 ((plusp (wait-key *millis-per-frame*)) 
+	  (format t "Key is pressed by user"))
+      (create-trackbar "ALPHA-VAL" window-name-1 alpha-val 100)
+      (format t "ALPHA-VAL = ~a~%~%" 
+	      (setf n (coerce (mem-aref alpha-val :int) 
+			      'double-float)))
+      (scale-add image-1 n image-2 dest)
+      (imshow window-name-1 image-1)
+      (imshow window-name-2 image-2)
+      (imshow window-name-3 dest))
+    (free alpha-val)
+    (destroy-all-windows)))
+
 
 DRAWING FUNCTIONS:
 
@@ -2725,6 +2855,184 @@ Here RGB supplies a red color value.
 CIRCLE IMAGE POINT RADIUS (RGB 255 0 0) +FILLED+ +AA+ 0) 
 
 
+UTILITY AND SYSTEM FUNCTIONS AND MACROS:
+
+
+
+CHECK-HARDWARE-SUPPORT
+
+Returns true if the specified feature is supported by the host hardware.
+
+C++: bool checkHardwareSupport(int feature)
+
+LISP-CV: (CHECK-HARDWARE-SUPPORT (FEATURE :INT)) => :BOOLEAN
+
+    Parameters:	feature -
+
+       The feature of interest, one of:
+
+             +CPU_MMX+ - MMX
+             +CPU_SSE+ - SSE
+             +CPU_SSE2+ - SSE 2
+             +CPU_SSE3+ - SSE 3
+             +CPU_SSSE3+ - SSSE 3
+             +CPU_SSE4_1+ - SSE 4.1
+             +CPU_SSE4_2+ - SSE 4.2
+             +CPU_POPCNT+ - POPCOUNT
+             +CPU_AVX+ - AVX
+
+The function returns true if the host hardware supports the specified feature. When user calls 
+(SET-USE-OPTIMIZED 0), the subsequent calls to (CHECK-HARDWARE-SUPPORT) will return false until 
+(SET-USE-OPTIMIZED 1) is called. This way user can dynamically switch on and off the optimized 
+code.
+
+
+(defun check-hardware-support-example ()
+
+  "Returns true if the specified feature is supported 
+   by the host hardware. Returns 0 otherwise"
+
+  (let*  ((mmx (check-hardware-support +cpu-mmx+))
+	  (sse (check-hardware-support +cpu-sse+))
+          (sse2 (check-hardware-support +cpu-sse2+))
+          (sse3 (check-hardware-support +cpu-sse3+))
+          (ssse3 (check-hardware-support +cpu-ssse3+))
+          (sse4-1 (check-hardware-support +cpu-sse4-1+))   
+          (sse4-2 (check-hardware-support +cpu-sse4-2+))
+          (popcnt (check-hardware-support +cpu-popcnt+))
+	  (avx (check-hardware-support +cpu-avx+))
+	  (hardware-max-feature (check-hardware-support 
+                                 +hardware-max-feature+)))
+    (format t "~%MMX Support = ~a~%" mmx)
+    (format t "SSE Support = ~a~%" sse)
+    (format t "SSE2 Support = ~a~%" sse2)
+    (format t "SSE3 Support = ~a~%" sse3)
+    (format t "SSSE3 Support = ~a~%" ssse3)
+    (format t "SSE4-1 Support = ~a~%" sse4-1)
+    (format t "SSE4-2 Support= ~a~%" sse4-2)
+    (format t "POPCOUNT Support = ~a~%" popcnt)
+    (format t "AVX Support = ~a~%" avx)
+    (format t "HARDWARE-MAX-FEATURE = ~a~%~%" 
+	    hardware-max-feature)))
+
+
+
+FAST-ATAN2
+
+Calculates the angle of a 2D vector in degrees.
+
+C++: float fastAtan2(float y, float x)
+
+LISP-CV: (FAST-ATAN2 (X :FLOAT) (Y :FLOAT)) => :FLOAT
+
+    Parameters:	
+
+        X - x-coordinate of the vector.
+
+        Y - y-coordinate of the vector.
+
+
+The function FAST-ATAN2 calculates the full-range angle of an input 2D vector. The angle is measured 
+in degrees and varies from 0 to 360 degrees. The accuracy is about 0.3 degrees.
+
+
+(defun fast-atan2-example (x y)
+
+  "Calculates the angle of a 2D 
+   float vector in degrees."
+
+  (let*  ((float-y x)
+          (float-x y))
+    (format t "Angle of vector - float = ~a~%~%" 
+	    (fast-atan2 float-y float-x))))
+
+
+
+GET-TICK-COUNT
+
+Returns the number of ticks.
+
+
+C++: int64 getTickCount()
+
+LISP-CV: (GET-TICK-COUNT) => :INT64
+
+
+The function returns the number of ticks after the certain event (for example, when the machine was
+turned on). It can be used to initialize (RNG) - Random Number Generator - or to measure a function 
+execution time by reading the tick count before and after the function call. 
+
+See also: (GET-TICK-FREQUENCY)
+
+
+
+(defun get-tick-count-example ()
+
+  "Calculates the amount CPU ticks that occur while 
+   running the function used to create a matrix MAT 
+   once and 1000 times in microseconds."
+
+  (let* ((t1 0)
+	 (t2 0)
+	 (time-calc 0))
+    (setf t1 (get-tick-count))
+    (dotimes (i 1)
+      (mat))
+    (setf t2 (get-tick-count))
+    (setf time-calc (- t2 t1))
+    (format t "~a CPU ticks occurred while running MAT once ~%" 
+	    time-calc)
+    
+    (setf t1 (get-tick-count))
+    (dotimes (i 1000)
+      (mat))
+    (setf t2 (get-tick-count))
+    (setf time-calc (- t2 t1))
+    (format t "~a CPU ticks occurred while ruuning MAT 1000 times ~%"  
+	    time-calc)))
+
+
+GET-TICK-FREQUENCY
+
+
+Returns the number of ticks per second.
+
+
+C++: double getTickFrequency()
+
+LISP-CV: (GET-TICK-FREQUENCY) => :DOUBLE
+
+
+The function returns the number of ticks per second. That is, the following code computes the execu-
+tion time in seconds:
+
+
+(defun get-tick-frequency-example ()
+
+  "Calculates the seconds that pass while the SLEEP function 
+   is ran for 5 seconds and the seconds that pass while runn-
+   ing the MAT-EYE function(used to create an identity matri-
+   x) 1 million times for comparision.
+   
+   Note: This function takes about 6 seconds to complete on 
+   a Quad-Core Processor."
+
+  (let* ((t1 0)
+	 (t2 0)
+	 (time-calc 0))
+    (setf t1 (coerce (get-tick-count) 'double-float))
+    (sleep 5)
+    (setf t2 (coerce (get-tick-count) 'double-float))
+    (setf time-calc (/ (- t2 t1) (get-tick-frequency)))
+    (format t "Sleeping for 5 seconds took ~a seconds~%~%" 
+	    time-calc)
+    (setf t1 (coerce (get-tick-count) 'double-float))
+    (dotimes (i 1000000)
+      (mat-eye 3 3 +8u+))
+    (setf t2 (coerce (get-tick-count) 'double-float))
+    (setf time-calc (/ (- t2 t1) (get-tick-frequency)))
+    (format t "1 million runs of MAT-EYE took ~a seconds"  
+	    time-calc)))
 
 
 READING AND WRITING IMAGES AND VIDEO:
@@ -2871,6 +3179,92 @@ LISP-CV: (VIDEO-CAPTURE &OPTIONAL (SRC :POINTER STRING*)) => (:POINTER VIDEO-CAP
 IMAGE FILTERING:
 
 
+COPY-MAKE-BORDER
+
+Forms a border around an image.
+
+C++: void copyMakeBorder(InputArray src, OutputArray dst, int top, int bottom, int left, int right, int borderType, 
+     const Scalar& value=Scalar() )
+
+LISP-CV: (COPY-MAKE-BORDER (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) (TOP :INT) (BOTTOM :INT) (LEFT :INT) (RIGHT :INT) 
+         (BORDER-TYPE :INT) (VALUE (:POINTER SCALAR))) => :VOID
+
+    Parameters:	
+
+        SRC - Source image.
+
+        DEST - Destination image of the same type as SRC and the size:
+
+                (+ (COLS SRC) LEFT RIGHT), (+ (ROWS SRC) TOP BOTTOM).
+
+        TOP -
+
+        BOTTOM -
+
+        LEFT -
+
+        RIGHT - Parameter specifying how many pixels in each direction from the source image rectangle 
+                to extrapolate. For example, (EQ TOP 1), (EQ BOTTOM 1), (EQ LEFT 1), (EQ RIGHT 1) means 
+                that 1 pixel-wide border needs to be built.
+
+        BORDER-TYPE - Border type, one of the +BORDER-*+ constants, except for +BORDER-TRANSPARENT+ 
+                      and +BORDER-ISOLATED+. 
+
+        VALUE - Border value if (EQ BORDER-TYPE +BORDER-CONSTANT+).
+
+
+The function copies the source image into the middle of the destination image. The areas to the left, 
+to the right, above and below the copied source image will be filled with extrapolated pixels. This 
+is not what the OpenCV class FilterEngine or filtering functions based on it do (they extrapolate pi-
+xels on-fly), but what other more complex functions, including your own, may do to simplify image bo-
+undary handling.
+
+
+Note
+
+When the source image is a part (ROI) of a bigger image, the function will try to use the pixels outside 
+of the ROI to form a border. To disable this feature and always do extrapolation, as if src was not a ROI, 
+use (LOGIOR BORDER-TYPE +BORDER-ISOLATED+).
+
+See also:
+
+(BORDER-INTERPOLATE)
+
+
+(defun copy-make-border-example (&optional (camera-index *camera-index*)
+				   (width *default-width*)
+				   (height *default-height*))
+  "Forms a border around FRAME"
+
+  (with-capture (cap (video-capture camera-index))
+    (let* ((window-name-1 "FRAME - COPY-MAKE-BORDER Example")
+	   (window-name-2 "BORDERED - COPY-MAKE-BORDER Example")
+	   (border 100)
+           ;Create a matrix big enough to accommodate 
+           ;a 100 pixel border on all sides
+           (border-width (+ (* 2  border) width))
+           (border-height (+ (* 2  border) height))
+	   (rgb (mat-typed border-height border-width +8uc3+)))
+      (cap-set cap +cap-prop-frame-width+ width)
+      (cap-set cap +cap-prop-frame-height+ height)
+      (named-window window-name-1 +window-normal+)
+      (named-window window-name-2 +window-normal+)
+      (move-window window-name-1 533 175)
+      (move-window window-name-2 984 175)
+      (do* ((frame 0))
+	   ((plusp (wait-key *millis-per-frame*)) 
+	    (format t "Key is pressed by user"))
+	(setf frame (mat))
+	(cap-read cap frame)
+        ;Make a border around FRAME set to BORDERED
+	(copy-make-border frame rgb border border border border  
+			  +border-replicate+ (scalar-all 75))
+	(imshow window-name-1 gray)
+	(imshow window-name-2 rgb)) 
+      (destroy-all-windows))))
+
+
+
 PYR-DOWN
 
 Blurs an image and downsamples it.
@@ -2893,8 +3287,8 @@ LISP-CV: (PYR-DOWN (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) &OPTIONAL ((DSTSIZ
                (SIZE (/ (+ (COLS SRC) 1) 2) (/ (+ (ROW SRC) 1) 2)), 
 
 
-        BORDER-TYPE - Border type, one of the +BORDER-*+ , except for +BORDER-TRANSPARENT+ and 
-                      +BORDER-ISOLATED+. 
+        BORDER-TYPE - Border type, one of the +BORDER-*+ constants, except 
+                      for +BORDER-TRANSPARENT+ and +BORDER-ISOLATED+.
      
 
 The function performs the downsampling step of the Gaussian pyramid construction. First, it convolves 
@@ -2962,8 +3356,9 @@ LISP-CV: (PYR-UP (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) &OPTIONAL ((DSTSIZE 
 
                    (SIZE (* (COLS SRC) 2) (* (ROWS SRC) 2)) 
 
-        BORDER-TYPE - Border type, one of the +BORDER-*+ , except for +BORDER-TRANSPARENT+ and 
-                      +BORDER-ISOLATED+. 
+        BORDER-TYPE - Border type, one of the +BORDER-*+ constants, except 
+                      or +BORDER-TRANSPARENT+ and +BORDER-ISOLATED+.
+
 
 The function performs the upsampling step of the Gaussian pyramid construction, though it can actually 
 be used to construct the Laplacian pyramid. First, it upsamples the source image by injecting even 
@@ -4955,107 +5350,6 @@ to (MAT-ONES), you can use a scale operation to create a scaled identity matrix 
     (destroy-all-windows)))
 
 
-GET-TICK-COUNT
-
-Returns the number of ticks.
-
-C++: int64 getTickCount()
-
-LISP-CV: (GET-TICK-COUNT) => :INT64
-
-The function returns the number of ticks after the certain event (for example, when the machine was
-turned on). It can be used to initialize (RNG) - Random Number Generator - or to measure a function 
-execution time by reading the tick count before and after the function call. 
-
-See also: (GET-TICK-FREQUENCY)
-
-
-(defun get-tick-count-example ()
-
-  "Calculates the amount CPU ticks that occur while 
-   running the function used to create a matrix MAT 
-   once and 1000 times in microseconds."
-
-  (let* ((t1 0)
-	 (t2 0)
-	 (time-calc 0))
-    (setf t1 (get-tick-count))
-    (dotimes (i 1)
-      (mat))
-    (setf t2 (get-tick-count))
-    (setf time-calc (- t2 t1))
-    (format t "~a CPU ticks occurred while running MAT once ~%" 
-	    time-calc)
-    
-    (setf t1 (get-tick-count))
-    (dotimes (i 1000)
-      (mat))
-    (setf t2 (get-tick-count))
-    (setf time-calc (- t2 t1))
-    (format t "~a CPU ticks occurred while ruuning MAT 1000 times ~%"  
-	    time-calc)))
-
-
-GET-TICK-FREQUENCY
-
-Returns the number of ticks per second.
-
-C++: double getTickFrequency()
-  "In the code below the (COLS, ROWS) values of MAT are 
-   accessed and stored in a SIZE construct. Their values 
-   are accessed with the WIDTH and HEIGHT functions. The-
-   n an uninitialized and an initialized SIZE construct  
-   are created. Their values are also printed."
-
-  (let* ((mat (mat-value 5 5 +64f+ (scalar 100 100 100)))
-         (mat-size (mat-size mat))
-          (size-un-init)
-          (size (size 640 480)))
-    (format t " The (COLS ROWS) of MAT = (~a ~a)~%"  
-	    (width mat-size)
-	    (height mat-size)
-            (format t "Pointer to an uninitialized SIZE construct:~a~%" 
-size-un-init) 
-(format t "Width of SIZE = ~a~%" (width size))
-    (format t "Height of SIZE = ~a" (height size)))))
-
-
-
-LISP-CV: (GET-TICK-FREQUENCY) => :DOUBLE
-
-The function returns the nu
-mber of ticks per second. That is, the following code computes the execu-
-tion time in seconds:
-
-
-(defun get-tick-frequency-example ()
-
-  "Calculates the seconds that pass while the SLEEP function 
-   is ran for 5 seconds and the seconds that pass while runn-
-   ing the MAT-EYE function(used to create an identity matri-
-   x) 1 million times for comparision.
-   
-   Note: This function takes about 6 seconds to complete on 
-   a Quad-Core Processor."
-
-  (let* ((t1 0)
-	 (t2 0)
-	 (time-calc 0))
-    (setf t1 (coerce (get-tick-count) 'double-float))
-    (sleep 5)
-    (setf t2 (coerce (get-tick-count) 'double-float))
-    (setf time-calc (/ (- t2 t1) (get-tick-frequency)))
-    (format t "Sleeping for 5 seconds took ~a seconds~%~%" 
-	    time-calc)
-    
-
-    (setf t1 (coerce (get-tick-count) 'double-float))
-    (dotimes (i 1000000)
-      (mat-eye 3 3 +8u+))
-    (setf t2 (coerce (get-tick-count) 'double-float))
-    (setf time-calc (/ (- t2 t1) (get-tick-frequency)))
-    (format t "1 million runs of MAT-EYE took ~a seconds"  
-	    time-calc)))
 
 
 MAT-EXPR-T
@@ -7334,7 +7628,85 @@ LISP-CV> (MEM-REF A :INT)
 
 0
 
-;
+
+
+LIVE-CODE-EDITING:
+
+
+CONTINUABLE
+
+Catches any error and gives the option to ignore it and continue.
+
+LISP-CV: (CONTINUABLE &BODY BODY)
+
+    Parameters: 
+          
+         body - Give all expressions in the macro
+
+
+Macro included for reference:
+
+
+(defmacro continuable (&body body)
+  `(restart-case
+       (progn ,@body)
+     (continue () :report "Continue"  )))
+
+
+UPDATE-SWANK
+
+Grabs SWANK connections and tells it to handle requests. Call this every loop in the main loop of your 
+program.
+
+LISP-CV: (UPDATE-SWANK)
+
+     Parameters: None
+
+
+Function included for reference:
+
+
+(defun update-swank ()
+  "Grabs SWANK connections and tells it to handle requests. 
+   Call this every loop in the main loop of your program"
+  (continuable
+    (let ((connection (or swank::*emacs-connection*
+			  (swank::default-connection))))
+      (when connection
+	(swank::handle-requests connection t)))))
+
+
+Example:
+
+
+(defvar n (/ 1 1))
+
+(defun live-code-editing-example (filename)
+
+  "You can update this program as it runs! Just run 
+   M-x SLIME-COMPILE-AND-LOAD-FILE then at the REPL 
+   run (LIVE-CODE-EDITING-EXAMPLE FILENAME). Switch 
+   to the REPL, even though its not active, you can 
+   use (SETF N (/ 1 <NEW VALUE>)) to update N which 
+   will change the strobe effect. After you running 
+   SETF once you will get the REPL back"
+
+  (let ((image (imread filename 1))
+	(x 0)
+	(window-name "test"))
+    (named-window window-name +window-normal+)
+    (move-window window-name 759 175)
+    (do* ((value (scalar 0 0 0)))
+	 ((plusp (wait-key *millis-per-frame*)) 
+	  (format t "Key is pressed by user"))
+      (incf x 1)
+      (if (= x 2) (progn (assgn-val image value)  (decf x 2)))
+      (update-swank)
+      (continuable (imshow window-name image))
+      (del-mat image)
+      (setf image (imread filename 1))
+      (sleep n))
+    (destroy-window window-name)))
 
 
 
