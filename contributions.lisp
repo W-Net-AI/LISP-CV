@@ -5,7 +5,9 @@
 
 
 ;;Thank you to Jay Bromley for writing CL-OPENCV https://github.com/ryepup/cl-opencv. 
-
 ;;The knowledge gained from that library helped get started writing this project.
 
-;; Thanks to Arjun Comar for all his help and guidance on my project so far. https://github.com/arjuncomar
+;;Thanks to Arjun Comar for all his help and guidance on my project so far. https://github.com/arjuncomar
+
+;;Thank you to OpenCV, the best Computer Vision library in the world. I mold their documentation into my own, 
+;;because why mess with perfection.
