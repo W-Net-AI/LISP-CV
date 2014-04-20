@@ -80,6 +80,9 @@
 ;; CvSVMParams*
 (defctype svm-params :pointer)
 
+;; TermCriteria*
+(defctype term-criteria :pointer)
+
 ;; TrackbarCallback*
 (defctype trackbar-callback :pointer)
 

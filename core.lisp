@@ -135,32 +135,20 @@
   (self (:pointer mat)))
 
 
-;; void Mat::copyTo(OutputArray m) const
-;; void cv_Mat_copyTo(Mat* self, Mat* m)
-(defcfun ("cv_Mat_copyTo" copy-to2) :void
-  (self (:pointer mat))
-  (m (:pointer mat)))
-
-
-;; void Mat::copyTo(OutputArray m, InputArray mask) const
-;; void cv_Mat_copyTo_masked(Mat* self, Mat* m, Mat* mask)
-(defcfun ("cv_Mat_copyTo_masked" copy-to3) :void
-  (self (:pointer mat))
-  (m (:pointer mat))
-  (mask (:pointer mat)))
-
-
-(defun copy-to (&optional mat m mask)
-  (cond ((eq mask nil)
-	 (copy-to2 mat m))
-	(t (copy-to3 mat m mask))))
-
-
 ;; Mat Mat::clone() const
 ;; Mat* cv_Mat_clone(Mat* self) 
 (defcfun ("cv_Mat_clone" clone) (:pointer mat)
   "Creates a full copy of the array and the underlying data."
   (self (:pointer mat)))
+
+
+;; Mat Mat::colRange(int startcol, int endcol) const
+;; Mat* cv_Mat_getColRange(Mat* self, int startcol, int endrow)
+(defcfun ("cv_Mat_getColRange" col-range) (:pointer mat)
+  "Creates a matrix header for the specified column span."
+  (self (:pointer mat))
+  (startcol :int)
+  (endcol :int))
 
 
 ;; int cv_Mat_cols(Mat* self)
@@ -180,6 +168,27 @@
 (defun convert-to (self m rtype &optional (alpha 1.0d0) (beta 0.0d0))
   "Converts an array to another data type with optional scaling."
   (%convert-to self m rtype alpha beta))
+
+
+;; void Mat::copyTo(OutputArray m) const
+;; void cv_Mat_copyTo(Mat* self, Mat* m)
+(defcfun ("cv_Mat_copyTo" copy-to2) :void
+  (self (:pointer mat))
+  (m (:pointer mat)))
+
+
+;; void Mat::copyTo(OutputArray m, InputArray mask) const
+;; void cv_Mat_copyTo_masked(Mat* self, Mat* m, Mat* mask)
+(defcfun ("cv_Mat_copyTo_masked" copy-to3) :void
+  (self (:pointer mat))
+  (m (:pointer mat))
+  (mask (:pointer mat)))
+
+
+(defun copy-to (&optional mat m mask)
+  (cond ((eq mask nil)
+	 (copy-to2 mat m))
+	(t (copy-to3 mat m mask))))
 
 
 ;; uchar* data
@@ -228,7 +237,7 @@
 
 ;; _Tp dot(const Point_& pt) const;
 ;; int cv_Point_dot(Point* self, Point* other) 
-(defcfun ("cv_Point_dot2i" dot) :int 
+(defcfun ("cv_Point2i_dot" dot) :int 
   "Finds the dot product of a point."
   (self (:pointer point))
   (other (:pointer point)))
@@ -690,7 +699,7 @@
 
 (defun ptr (self &optional (i0 0))
        "Returns pointer to i0-th submatrix along the dimension #0"
-       (ptr-index self i0))
+       (%ptr self i0))
 
 ;; Rect_();
 ;; Rect* cv_create_Rect() 
@@ -742,6 +751,15 @@
   "Returns matrix header corresponding to the rectangular sub-array of input MAT."
   (self (:pointer mat))
   (roi (:pointer rect)))
+
+
+;; Mat Mat::rowRange(int startrow, int endrow) const
+;; Mat* cv_Mat_getRowRange(Mat* self, int startrow, int endrow)
+(defcfun ("cv_Mat_getRowRange" row-range) (:pointer mat)
+  "Creates a matrix header for the specified row span."
+  (self (:pointer mat))
+  (startrow :int)
+  (endrow :int))
 
 
 ;; int cv_Mat_rows(Mat* self) 
@@ -948,6 +966,14 @@
 	 (mtx (:pointer mat)))
 
 
+;; void exp(InputArray src, OutputArray dst)
+;; void cv_exp(Mat* src, Mat* dst)
+(defcfun ("cv_exp" *exp) :void
+  "Calculates the exponent of every array element."
+  (src (:pointer mat))
+  (dest (:pointer mat)))
+
+
 ;; void flip(InputArray src, OutputArray dst, int flipCode)
 ;; void cv_flip(Mat* src, Mat* dst, int flipCode)
 (defcfun ("cv_flip" flip) :void
@@ -987,6 +1013,14 @@
    (%invert src dest flags))
 
 
+;; void log(InputArray src, OutputArray dst)
+;; void cv_log(Mat* src, Mat* dst)
+(defcfun ("cv_log" *log) :int
+  "Calculates the natural logarithm of every array element."
+  (src (:pointer mat))
+  (dest (:pointer mat)))
+
+
 ;; Scalar mean(InputArray src, InputArray mask=noArray())
 ;; Scalar* cv_mean(Mat* src, Mat* mask)
 (defcfun ("cv_mean" %mean) (:pointer scalar)
@@ -997,6 +1031,21 @@
 (defun mean (src &optional (mask (mat)))
   "Calculates an average (mean) of array elements."
   (%mean src mask))
+
+
+;; void minMaxLoc(InputArray src, double* minVal, double* maxVal=0, Point* minLoc=0, Point* maxLoc=0, InputArray mask=noArray())
+;; void cv_minMaxLoc(Mat* src, double* minVal, double* maxVal, Point* minLoc, Point* maxLoc, Mat* mask)
+(defcfun ("cv_minMaxLoc" %min-max-loc) :void
+  (src (:pointer mat))
+  (min-val :pointer)
+  (max-val :pointer)
+  (min-loc (:pointer point))
+  (max-loc (:pointer point))
+  (mask (:pointer mat)))
+
+(defun min-max-loc (src min-val &optional (max-val (null-pointer)) (min-loc (null-pointer)) (max-loc (null-pointer)) (mask (mat)))
+       "Finds the global minimum and maximum in an array."
+       (%min-max-loc src min-val max-val min-loc max-loc mask))
 
 
 ;; void multiply(InputArray src1, InputArray src2, OutputArray dst, double scale=1, int dtype=-1 )
@@ -1011,6 +1060,24 @@
 (defun multiply (src1 src2 dest &optional (scale 1.0d0) (dtype -1))
   "Calculates the per-element scaled product of two arrays."
    (%multiply src1 src2 dest scale dtype))
+
+
+;; void normalize(InputArray src, OutputArray dst, double alpha=1, double beta=0, int norm_type=NORM_L2, int dtype=-1, 
+;; InputArray mask=noArray() )
+;; void cv_normalize(Mat* src, Mat* dst, double alpha, double beta, int norm_type, int dtype, Mat* mask)
+(defcfun ("cv_normalize" %normalize) :void
+  (src (:pointer mat))
+  (dest (:pointer mat))
+  (alpha :double)
+  (beta :double)
+  (norm-type :int)
+  (dtype :int)
+  (mask (:pointer mat)))
+
+
+(defun normalize (src dest &optional (alpha 1) (beta 0) (norm-type  +norm-l2+) (dtype -1) (mask (mat)))
+       "Normalizes the norm or value range of an array."
+       (%normalize src dest alpha beta norm-type  dtype  mask))
 
 
 ;; void randu(InputOutputArray dst, InputArray low, InputArray high)
@@ -1048,6 +1115,27 @@
 	 (alpha :double)
 	 (src2 (:pointer mat))
 	 (dest (:pointer mat)))
+
+
+;; void subtract(InputArray src1, InputArray src2, OutputArray dst, InputArray mask=noArray(), int dtype=-1)
+;; void cv_subtract(Mat* src1, Mat* src2, Mat* dst, Mat* mask, int dtype)
+(defcfun ("cv_subtract" %subtract) :void
+  "Calculates the per-element difference between two arrays."
+  (src1 (:pointer mat))
+  (src2 (:pointer mat))
+  (dest (:pointer mat))
+  (mask (:pointer mat))
+  (dtype :int))
+
+(defun subtract (src1 src2 dest &optional (mask (mat)) (dtype -1))
+       (%subtract src1 src2 dest mask dtype))
+
+
+;; Scalar sum(InputArray src)
+;; Scalar* cv_sum(Mat* src)
+(defcfun ("cv_sum" sum) (:pointer scalar)
+  "Calculates the sum of array elements."
+  (src (:pointer mat)))
 
 
 ;; double RNG::uniform(double a, double b)
@@ -1235,12 +1323,21 @@
 ;; bool checkHardwareSupport(int feature)
 ;; bool cv_checkHardwareSupport(int feature)
 (defcfun ("cv_checkHardwareSupport" check-hardware-support) :boolean
+  "Returns true if the specified feature is supported by the host hardware."
   (feature :int))
+
+
+;; float cubeRoot(float val)
+;; float cv_cubeRoot(float val)
+(defcfun ("cv_cubeRoot" cube-root) :float
+  "Computes the cube root of an argument."
+  (value :float))
 
 
 ;; float fastAtan2(float y, float x)
 ;; float cv_fastAtan2(float y, float x)
 (defcfun ("cv_fastAtan2" fast-atan2) :float 
+  "Calculates the angle of a 2D vector in degrees."
   (x :float)
   (y :float))
 
@@ -1255,3 +1352,11 @@
 ;; double cv_getTickFrequency()
 (defcfun ("cv_getTickFrequency" get-tick-frequency)  :double
   "Returns the number of ticks per second.")
+
+
+;; void sqrt(InputArray src, OutputArray dst)
+;; void cv_sqrt(Mat* src, Mat* dst)
+(defcfun ("cv_sqrt" *sqrt) :void
+  "Calculates a square root of array elements."
+  (src (:pointer mat))
+  (dest (:pointer mat)))

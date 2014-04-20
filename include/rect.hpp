@@ -3,7 +3,6 @@
 #include <opencv2/c/opencv_generated.hpp>
 
 extern "C" {
-
 Rect* cv_create_Rect();
 Rect* cv_create_Rect4(int x, int y, int width, int height);
 Rect* cv_Rect_assignTo(Rect* self, Rect* r);

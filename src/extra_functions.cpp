@@ -8,6 +8,34 @@ using namespace cvflann;
 
 extern "C" {
 
+TermCriteria* cv_create_TermCriteria(int type, int maxCount, double epsilon) {
+    return new TermCriteria(type, maxCount, epsilon);
+}
+
+MatExpr* cv_Mat_sub(Mat* m1, Mat* m2) {
+    return new MatExpr(*m1 - *m2);
+}
+
+RNG* cv_create_RNG() {
+    return new RNG();
+}
+
+RNG* cv_create_RNG_state(uint64 state) {
+    return new RNG(state);
+}
+
+double cv_RNG_uniform_double(RNG* self, double a, double b) {
+    return self->uniform(a, b);
+}
+
+float cv_RNG_uniform_float(RNG* self, float a, float b) {
+    return self->uniform(a, b);
+}
+
+int cv_RNG_uniform_int(RNG* self, int a, int b) {
+    return self->uniform(a, b);
+}
+
 uchar* cv_Mat_get_Data(Mat* self) {
     return self->data;
 }

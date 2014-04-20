@@ -298,7 +298,7 @@
   (+scharr+ -1)
   (+warp-fill-outliers+ 8)
   (+warp-inverse-map+ 16)
-  (+inter-nn+ 0)
+  (+inter-nearest+ 0)
   (+inter-linear+ 1)
   (+inter-cubic+ 2)
   (+inter-area+ 3)

@@ -66,6 +66,42 @@
   (%pyr-up src dest dstsize border-type))
 
 
+;; void Sobel(InputArray src, OutputArray dst, int ddepth, int dx, int dy, int ksize=3, double scale=1, double delta=0, 
+;; int borderType=BORDER_DEFAULT)
+;; void cv_Sobel(Mat* src, Mat* dst, int ddepth, int dx, int dy, int ksize, double scale, double delta, int borderType) 
+(defcfun ("cv_Sobel" %sobel) :void
+  (src (:pointer mat))
+  (dest (:pointer mat))
+  (ddepth :int)
+  (dx :int)
+  (dy :int)
+  (ksize :int)
+  (scale :double)
+  (delta :double)
+  (border-type :int))
+
+(defun sobel (src dest ddepth dx dy &optional (ksize 3) (scale 1d0) (delta 0d0) (border-type +border-default+))
+       "Calculates the first, second, third, or mixed image derivatives using an extended Sobel operator."
+       (%sobel src dest ddepth dx dy ksize scale delta border-type))
+
+
+;;; Geometric Image Transformations
+
+
+;; void resize(InputArray src, OutputArray dst, Size dsize, double fx=0, double fy=0, int interpolation=INTER_LINEAR )
+;; void cv_resize(Mat* src, Mat* dst, Size* dsize, double fx, double fy, int interpolation)
+(defcfun ("cv_resize" %resize) :void
+  (src (:pointer mat))
+  (dest (:pointer mat))
+  (dsize (:pointer size))
+  (fx :double)
+  (fy :double)
+  (interpolation :int))
+
+(defun resize (src dest dsize &optional (fx 0d0) (fy 0d0) (interpolation +inter-linear+))
+  "Resizes an image."
+  (%resize src dest dsize fx fy interpolation))
+
 
 ;;; Miscellaneous Image Transformations
 
@@ -119,6 +155,16 @@
 
 
 ;;; Object Detection
+
+
+;; void matchTemplate(InputArray image, InputArray templ, OutputArray result, int method)
+;; void cv_matchTemplate(Mat* image, Mat* templ, Mat* result, int method) 
+(defcfun ("cv_matchTemplate" match-template) :void
+  "Compares a template against overlapped image regions."
+  (image (:pointer mat))
+  (templ (:pointer mat))
+  (result (:pointer mat))
+  (method :int))
 
 
 

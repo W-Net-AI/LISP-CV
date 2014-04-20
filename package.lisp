@@ -146,6 +146,7 @@
    #:br
    #:channels
    #:clone
+   #:col-range
    #:cols
    #:convert-to
    #:copy-to
@@ -203,6 +204,7 @@
    #:rect-init
    #:reshape
    #:roi
+   #:row-range
    #:rows
    #:scalar
    #:scalar-all
@@ -276,6 +278,8 @@
    #:+relative-l2+
 
    #:*abs
+   #:*exp
+   #:*log
    #:*max
    #:*min
    #:abs-diff
@@ -292,10 +296,14 @@
    #:+l2+
 
    #:mean
+   #:min-max-loc
    #:multiply
+   #:normalize
    #:randu
    #:rng
    #:scale-add
+   #:subtract
+   #:sum
    #:uniform
 
 ;; core - Drawing Functions
@@ -319,6 +327,8 @@
 
 ;; core - Utility and System Functions and Macros
 
+   #:check-hardware-support
+   #:cube-root
    #:fast-atan2
    #:get-tick-count
    #:get-tick-frequency
@@ -405,6 +415,7 @@
    #:gaussian-blur
    #:pyr-down
    #:pyr-up
+   #:sobel
 
    #:+cv-shape-rect+
    #:+cv-shape-cross+
@@ -425,6 +436,13 @@
 
    #:+warp-fill-outliers+
    #:+warp-inverse-map+
+   #:+inter-nearest+ 
+   #:+inter-linear+ 
+   #:+inter-cubic+ 
+   #:+inter-area+ 
+   #:+inter-lanczos4+ 
+
+   #:resize
 
 ;; imgproc - Miscellaneous Image Transformations
 

@@ -318,6 +318,54 @@ The method returns the number of matrix channels.
 
 
 
+COL-RANGE
+
+Creates a matrix header for the specified column span.
+
+C++: Mat Mat::colRange(int startcol, int endcol) const
+
+LISP-CV: (COL-RANGE (SELF (:POINTER MAT)) (STARTCOL :INT) (ENDCOL :INT)) => (:POINTER MAT)
+
+
+    Parameters:	
+
+        SELF - A matrix
+
+        STARTCOL - An inclusive 0-based start index of the column span.
+
+        ENDCOL - An exclusive 0-based ending index of the column span.
+
+    
+The method makes a new header for the specified column span of the matrix. Similarly to (ROW) and 
+(COL) functions, this is an O(1) operation.
+
+
+(defun col-range-example ()
+        ;Create matrix data
+  (let* ((data (alloc :uchar '(1 2 3 4 5 6 7 8 9)))
+         ;Create matrix
+	 (mat (mat-data 3 3 +8u+ data)))
+    (princ #\Newline)
+    ;Print matrix normally by 
+    ;accessing entire matrix
+    (dotimes (i (rows mat))
+      (dotimes (j (cols mat))
+	(format t "~a" (at mat i j :uchar))
+	(princ #\Space))
+      (princ #\Newline))
+    (format t "~%~%")
+    ;Retrieve all 3 columns of MAT 
+    ;with COL-RANGE to print matrix
+    (dotimes (i (rows mat))
+      (dotimes (j (cols mat))
+	(format t "~a" (at 
+			(col-range mat 0 (cols mat)) 
+			i j :uchar))
+	(princ #\Space))
+      (princ #\Newline))
+      (format t "~%")
+      (free data)))
+
 
 COPY-TO
 
@@ -950,6 +998,11 @@ This function returns a pointer to the specified matrix row.
     (destroy-all-windows)))
 
 
+Usage: 
+
+   (PTR-EXAMPLE "/HOME/W/IMG.JPG" "~/DATA.TXT")
+
+
 RESHAPE
 
 Changes the shape and/or the number of channels of a 2D matrix without copying the data.
@@ -1009,6 +1062,56 @@ and/or different number of channels. Any combination is possible if:
     (imshow window-name-4 (reshape img 1))
     (loop while (not (= (wait-key 0) 27)))
     (destroy-all-windows)))
+
+
+
+ROW-RANGE
+
+Creates a matrix header for the specified row span.
+
+C++: Mat Mat::rowRange(int startrow, int endrow) const
+
+LISP-CV: (ROW-RANGE (SELF (:POINTER MAT)) (STARTROW :INT) (ENDROW :INT)) => (:POINTER MAT)
+
+
+    Parameters:	
+
+        SELF - A matrix.
+
+        STARTROW - An inclusive 0-based start index of the row span.
+
+        ENDROW - An exclusive 0-based ending index of the row span.
+
+
+The method makes a new header for the specified row span of the matrix. Similarly to (ROW) and (COL) 
+functions, this is an O(1) operation.
+
+
+(defun row-range-example ()
+        ;Create matrix data
+  (let* ((data (alloc :uchar '(1 2 3 4 5 6 7 8 9)))
+         ;Create matrix
+	 (mat (mat-data 3 3 +8u+ data)))
+    (princ #\Newline)
+    ;Print matrix normally by 
+    ;accessing entire matrix
+    (dotimes (i (rows mat))
+      (dotimes (j (cols mat))
+	(format t "~a" (at mat i j :uchar))
+	(princ #\Space))
+      (princ #\Newline))
+    (format t "~%~%")
+    ;Retrieve all 3 rows of MAT with 
+    ;ROW-RANGE to print matrix
+    (dotimes (i (rows mat))
+      (dotimes (j (cols mat))
+	(format t "~a" (at 
+			(row-range mat 0 (rows mat)) 
+			i j :uchar))
+	(princ #\Space))
+      (princ #\Newline))
+      (free data)
+      (format t "~%")))
 
 
 
@@ -1080,30 +1183,30 @@ bit faster matrix size accessor choose the MAT-SIZE Dfunction.
 OPERATIONS ON ARRAYS:
 
 
-%ABS
+*ABS
 
 Calculates an absolute value of each matrix element.
 
 C++: MatExpr abs(const Mat& m)
 
-LISP-CV: (%ABS (M (:POINTER MAT))) => (:POINTER MAT-EXPR)
+LISP-CV: (*ABS (M (:POINTER MAT))) => (:POINTER MAT-EXPR)
 
     Parameters:	
 
         M - matrix.
 
-%ABS is a meta-function that is expanded to one of (ABS-DIFF) or (CONVERT-SCALE-ABS) forms:
+*ABS is a meta-function that is expanded to one of (ABS-DIFF) or (CONVERT-SCALE-ABS) forms:
 
-        (DEFPARAMETER C (%ABS (>> (SUB A B)))) is equivalent to (ABSDIFF A B C)
+        (DEFPARAMETER C (*ABS (>> (SUB A B)))) is equivalent to (ABSDIFF A B C)
 
-        (DEFPARAMETER C (%ABS A)) is equivalent to (ABSDIFF A (SCALAR-ALL 0) C)
+        (DEFPARAMETER C (*ABS A)) is equivalent to (ABSDIFF A (SCALAR-ALL 0) C)
 
 
 The output matrix has the same size and the same type as the input one except for the last case, 
 where C is (EQ DEPTH +8U+). 
 
 
-Note: The function is named %ABS instead of ABS because, ABS is the name of a Common Lisp function.
+Note: This function is named *ABS instead of ABS because, ABS is the name of a Common Lisp function.
 
 
 See also:
@@ -1112,7 +1215,7 @@ Matrix Expressions(MAT-EXPR), (ABS-DIFF), (CONVERT-SCALE-ABS)
 
 
 
-(defun %abs-example (&optional 
+(defun *abs-example (&optional 
 		      (camera-index *camera-index*))
   ;;Set Camera feed to CAP.
   (with-capture (cap (video-capture camera-index))
@@ -1121,9 +1224,9 @@ Matrix Expressions(MAT-EXPR), (ABS-DIFF), (CONVERT-SCALE-ABS)
 	   (data (alloc :float '(4f0 -7f0 2f0 -3f0)))
 	   (mat (mat-data 2 2 +32f+ data))
            ;;Find absolute value of all MAT elements.
-           (abs-val (>> (%abs mat))))
+           (abs-val (>> (*abs mat))))
       (if (not (cap-is-open cap)) 
-	  (return-from %abs-example 
+	  (return-from *abs-example 
 	    (format t "Cannot open the video camera")))
       ;;Print MAT's absolute value.
       (dotimes (i (cols abs-val))
@@ -1150,12 +1253,264 @@ Matrix Expressions(MAT-EXPR), (ABS-DIFF), (CONVERT-SCALE-ABS)
 	;;value of FRAME before showing output in a win-
 	;;dow. Negative matrix elements in FRAME would 
 	;;cause an unhandled memory fault error.
-	(setf abs-val (%abs (>> (sub frame clone))))
+	(setf abs-val (*abs (>> (sub frame clone))))
 	(imshow window-name (>> abs-val))
         ;;Clean up used memory.
 	(del-mat-expr abs-val)
 	(del-mat clone))
       (destroy-window window-name))))
+
+
+*MAX
+
+Calculates per-element maximum of two arrays.
+
+C++: void max(InputArray src1, InputArray src2, OutputArray dst)
+
+LISP-CV: (*MAX (SRC1 (:POINTER MAT)) (SRC2 (:POINTER MAT)) (DEST (:POINTER MAT))) => :VOID
+
+
+    Parameters:	
+
+        SRC1 - First input array.
+
+        SRC2 - Second input array of the same size and type as SRC1.
+
+        DEST - Output array of the same size and type as SRC1.
+
+
+The function *MAX calculates the per-element maximum of two arrays. When the input array is multi-channel, 
+each channel is compared with value independently.
+
+Note: This function is named *MAX instead of MAX because, MAX is the name of a Common Lisp function.
+
+
+See also:
+
+(*MIN), (COMPARE), (INRANGE), (MIN-MAX-LOC), Matrix Expressions(MAT-EXPR)
+
+
+(defun *max-example (&optional (camera-index 0)
+		       (width *default-width*)
+		       (height *default-height*))
+
+  "Look at the first window and notice that whatever is black
+   in the first window has a beautiful glow in the third wind-
+   ow. You can change the effect by altering the color of the 
+   matrix MAT-3 in the middle window with the trackbar .The t-
+   rackbar changes the scalar value the ASSGN-VAL function us-
+   es to decide what to set each element of MAT-3 to."
+
+  (with-capture (cap (video-capture camera-index))   
+       ;Create two matrices: MAT-1 and MAT-2(used to show how *MAX works)
+    (let* ((mat-1 (mat-data 3 3 +32s+ (alloc :int '(1 2 3 4 5 6 7 8 9))))
+	   (mat-2 (mat-data 3 3 +32s+ (alloc :int '(9 8 7 6 5 4 3 2 1))))
+           ;Create destination matrix of same size and type: DEST
+           (dest (mat-typed 3 3 +32s+))
+           ;Create 3 matrices used to hold 
+           ;data we use later in the example
+           (mat-3 (mat-typed height width +8u+))
+           (mat-4 (mat-typed height width +8u+))
+           (mat-5 (mat-typed height width +8u+))
+           ;Allocate :int pointer for trackbar to change
+           (val (alloc :int '(128)))
+	   (window-name-1 "MAT-3 after THRESHOLD - *MAX-Example")
+	   (window-name-2 "MAT-5 after ASSGN-VAL - *MAX-Example")
+	   (window-name-3 "MAT-4 after *MAX - *MAX-Example")) 
+      ;Set CAP to default width and height
+      (cap-set cap +cap-prop-frame-width+ width)
+      (cap-set cap +cap-prop-frame-height+ height)
+      ;Create windows and move to specified locations
+      (named-window window-name-1 +window-normal+)
+      (named-window window-name-2 +window-normal+)
+      (named-window window-name-3 +window-normal+)
+      (move-window window-name-1 310 175)
+      (move-window window-name-2 760 175)
+      (move-window window-name-3 1210 175)
+      ;Print MAT-1
+      (format t "MAT-1:~%~%")
+      (dotimes (i (cols mat-1))
+	(dotimes (j (rows mat-1))
+	  (princ (at mat-1 i j :int))
+	  (princ #\Space))
+	(princ #\Newline))
+      (format t "~%~%")
+      ;Print MAT-2
+      (format t "MAT-2:~%~%")
+      (dotimes (i (cols mat-2))
+	(dotimes (j (rows mat-2))
+	  (princ (at mat-2 i j :int))
+	  (princ #\Space))
+	(princ #\Newline))
+      (format t "~%~%")
+      ;Find per element maximum of 
+      ;MAT-1 and MAT-2, set to DEST
+      (*max mat-1 mat-2 dest)
+      ;Print DEST
+      (format t "Per element maximum of MAT-1 and  MAT-2:~%~%")
+      (dotimes (i (cols dest))
+	(dotimes (j (rows dest))
+	  (princ (at dest i j :int))
+	  (princ #\Space))
+	(princ #\Newline))
+      (format t "~%~%")
+      (do* ((frame 0))
+	   ((plusp (wait-key *millis-per-frame*)) 
+	    (format t "Key is pressed by user"))
+        ;Set camera feed to FRAME
+	(setf frame (mat))
+	(cap-read cap frame)
+        ;Convert FRAME to 1 channel 
+        ;grayscale image, set to mat-1
+        ;FRAME stays the same
+	(cvt-color frame mat-3 +bgr2gray+)
+        ;Convert FRAME to 1 channel 
+        ;grayscale image, set to mat-4
+        ;FRAME stays the same
+	(cvt-color frame mat-4  +bgr2gray+)
+        ;Apply a fixed-level threshold to 
+        ;each array element of mat-3
+	(threshold mat-3 mat-3 128d0 255d0 +thresh-binary-inv+)
+        ;Create trackbar on middle window which changes 
+        ;the scalar value ASSGN-VAL uses in the next step
+        (create-trackbar "Value of mat-3" window-name-2 val 255)
+        ;Assign each element of mat-5 a scalar value
+	(assgn-val mat-5 (scalar (mem-aref val :int)))
+        ;Find the maximum of each element 
+        ;of mat-4 AND mat-5, set to mat-4
+        (*max mat-4 mat-5 mat-4)
+        ;Show mat-3, mat-5 and mat-4 in windows
+	(imshow window-name-1 mat-3)
+	(imshow window-name-2 mat-5)
+	(imshow window-name-3 mat-4)) 
+      (destroy-all-windows))))
+
+
+
+*MIN
+
+Calculates per-element minimum of two arrays.
+
+C++: void min(InputArray src1, InputArray src2, OutputArray dst)
+
+LISP-CV: (*MIN (SRC1 (:POINTER MAT)) (SRC2 (:POINTER MAT)) (DEST (:POINTER MAT))) => :VOID
+
+
+    Parameters:	
+
+        SRC1 - First input array.
+
+        SRC2 - Second input array of the same size and type as SRC1.
+
+        DEST - Output array of the same size and type as SRC1.
+
+
+The function *MIN calculates the per-element minimum of two arrays. When the input array is multi-channel, 
+each channel is compared with value independently.
+
+Note: This function is named *MIN instead of MIN because, MIN is the name of a Common Lisp function.
+
+
+See also:
+
+(*MAX), (COMPARE), (INRANGE), (MIN-MAX-LOC), Matrix Expressions(MAT-EXPR)
+
+
+
+(defun *min-example (&optional (camera-index 0)
+		       (width *default-width*)
+		       (height *default-height*))
+
+  "Look at the first window and notice that whatever is black
+   in the first window has a beautiful glow in the third wind-
+   ow. You can change the effect by altering the color of the 
+   matrix MAT-3 in the middle window with the trackbar .The t-
+   rackbar changes the scalar value the ASSGN-VAL function us-
+   es to decide what to set each element of MAT-3 to."
+
+  (with-capture (cap (video-capture camera-index))   
+       ;Create two matrices: MAT-1 and MAT-2(used to show how *MIN works)
+    (let* ((mat-1 (mat-data 3 3 +32s+ (alloc :int '(1 2 3 4 5 6 7 8 9))))
+	   (mat-2 (mat-data 3 3 +32s+ (alloc :int '(9 8 7 6 5 4 3 2 1))))
+           ;Create destination matrix of same size and type: DEST
+           (dest (mat-typed 3 3 +32s+))
+           ;Create 3 matrices used to hold 
+           ;data we use later in the example
+           (mat-3 (mat-typed height width +8u+))
+           (mat-4 (mat-typed height width +8u+))
+           (mat-5 (mat-typed height width +8u+))
+           ;Allocate :int pointer for trackbar to change
+           (val (alloc :int '(128)))
+	   (window-name-1 "MAT-3 after THRESHOLD - *MIN-Example")
+	   (window-name-2 "MAT-5 after ASSGN-VAL - *MIN-Example")
+	   (window-name-3 "MAT-4 after *MIN - *MIN-Example")) 
+      ;Set CAP to default width and height
+      (cap-set cap +cap-prop-frame-width+ width)
+      (cap-set cap +cap-prop-frame-height+ height)
+      ;Create windows and move to specified locations
+      (named-window window-name-1 +window-normal+)
+      (named-window window-name-2 +window-normal+)
+      (named-window window-name-3 +window-normal+)
+      (move-window window-name-1 310 175)
+      (move-window window-name-2 760 175)
+      (move-window window-name-3 1210 175)
+      ;Print MAT-1
+      (format t "MAT-1:~%~%")
+      (dotimes (i (cols mat-1))
+	(dotimes (j (rows mat-1))
+	  (princ (at mat-1 i j :int))
+	  (princ #\Space))
+	(princ #\Newline))
+      (format t "~%~%")
+      ;Print MAT-2
+      (format t "MAT-2:~%~%")
+      (dotimes (i (cols mat-2))
+	(dotimes (j (rows mat-2))
+	  (princ (at mat-2 i j :int))
+	  (princ #\Space))
+	(princ #\Newline))
+      (format t "~%~%")
+      ;Find per element minimum of 
+      ;MAT-1 and MAT-2, set to DEST
+      (*min mat-1 mat-2 dest)
+      ;Print DEST
+      (format t "Per element minimum of MAT-1 and  MAT-2:~%~%")
+      (dotimes (i (cols dest))
+	(dotimes (j (rows dest))
+	  (princ (at dest i j :int))
+	  (princ #\Space))
+	(princ #\Newline))
+      (format t "~%~%")
+      (do* ((frame 0))
+	   ((plusp (wait-key *millis-per-frame*)) 
+	    (format t "Key is pressed by user"))
+        ;Set camera feed to FRAME
+	(setf frame (mat))
+	(cap-read cap frame)
+        ;Convert FRAME to 1 channel 
+        ;grayscale image, set to mat-1
+        ;FRAME stays the same
+	(cvt-color frame mat-3 +bgr2gray+)
+        ;Convert FRAME to 1 channel 
+        ;grayscale image, set to mat-4
+        ;FRAME stays the same
+	(cvt-color frame mat-4  +bgr2gray+)
+        ;Apply a fixed-level threshold to 
+        ;each array element of mat-3
+	(threshold mat-3 mat-3 128d0 255d0 +thresh-binary-inv+)
+        ;Create trackbar on middle window which changes 
+        ;the scalar value ASSGN-VAL uses in the next step
+        (create-trackbar "Value of mat-3" window-name-2 val 255)
+        ;Assign each element of mat-5 a scalar value
+	(assgn-val mat-5 (scalar (mem-aref val :int)))
+        ;Find the minimum of each element 
+        ;of mat-4 AND mat-5, set to mat-4
+        (*min mat-4 mat-5 mat-4)
+        ;Show mat-3, mat-5 and mat-4 in windows
+	(imshow window-name-1 mat-3)
+	(imshow window-name-2 mat-5)
+	(imshow window-name-3 mat-4)) 
+      (destroy-all-windows))))
 
 
 
@@ -1235,7 +1590,7 @@ Calculates the per-element bit-wise disjunction of two arrays.
 
 C++: void bitwise_or(InputArray src1, InputArray src2, OutputArray dst, InputArray mask=noArray())
 
-LISP-CV: (BITWISE-OR (SRC1 (:POINTER MAT)) (SRC2 (:POINTER MAT)) (DEST (:POINTER MAT)) (MASK (:POINTER MAT))) => :VOID
+LISP-CV: (BITWISE-OR (SRC1 (:POINTER MAT)) (SRC2 (:POINTER MAT)) (DEST (:POINTER MAT)) &OPTIONAL ((MASK (:POINTER MAT)) (MAT))) => :VOID
 
 
     Parameters:	
@@ -1292,7 +1647,7 @@ Calculates the per-element bit-wise “exclusive or” operation on two arrays.
 
 C++: void bitwise_xor(InputArray src1, InputArray src2, OutputArray dst, InputArray mask=noArray())
 
-LISP-CV: (BITWISE-XOR (SRC1 (:POINTER MAT)) (SRC2 (:POINTER MAT)) (DEST (:POINTER MAT)) (MASK (:POINTER MAT))) => :VOID
+LISP-CV: (BITWISE-XOR (SRC1 (:POINTER MAT)) (SRC2 (:POINTER MAT)) (DEST (:POINTER MAT)) &OPTIONAL (MASK (:POINTER MAT))) => :VOID
 
     Parameters:	
 
@@ -1488,6 +1843,117 @@ See also:
       (princ #\Newline)
       (free data-1)
       (free data-2)))
+
+
+
+*EXP
+
+Calculates the exponent of every array element.
+
+
+C++: void exp(InputArray src, OutputArray dst)
+
+LISP-CV: (*EXP (SRC (:POINTER MAT)) (DEST (:POINTER MAT))) => :VOID
+
+
+    Parameters:	
+
+        SRC - Input array.
+
+        DEST - Output array of the same size and type as SRC.
+
+
+The function *EXP calculates the exponent of every element of the input array:
+
+See OpenCV documentation:
+
+http://docs.opencv.org/modules/core/doc/operations_on_arrays.html?highlight=log#exp 
+
+for a description and formula.
+
+
+Note: This function is named *EXP instead of EXP because, EXP is the name of a Common Lisp function.
+
+See also:
+
+(*LOG) , (CART-TO-POLAR) , (POLAR-TO-CART) , (PHASE) , (POW) , (*SQRT) , (MAGNITUDE)
+
+
+(defun *exp-example (filename)
+
+        ;Create double float matrix data
+  (let* ((data (alloc :double '(1d0 2d0 3d0 4d0 5d0 
+                               6d0 7d0 8d0 9d0)))
+         ;Create double float matrix
+	 (mat (mat-data 3 3 +64f+ data))
+	 (window-name-1 "Original Image - *EXP Example")
+	 (window-name-2 "Image after CONVERT-TO - *EXP Example")
+	 (window-name-3 "Image after LOG - *EXP Example")
+	 (window-name-4 "Image after EXP and LOG - *EXP Example")
+         (image (imread filename 1))
+         (dest (mat-typed 3 3 +64f+)))
+      (named-window window-name-1 +window-normal+)
+      (named-window window-name-2 +window-normal+)
+      (named-window window-name-3 +window-normal+)
+      (named-window window-name-4 +window-normal+)
+      (move-window window-name-1 485 98)
+      (move-window window-name-2 894 98)
+      (move-window window-name-3 485 444)
+      (move-window window-name-4 894 444)
+    (format t "~%MAT: ~%~%")
+    ;Print MAT
+    (dotimes (i (rows mat))
+      (dotimes (j (cols mat))
+	(format t "~a" (at mat i j :double))
+	(princ #\Space))
+      (princ #\Newline))
+    ;Calculate exponent of each element of 
+    ;MAT, using MAT as destination matrix
+    (format t "~%Calculate exponents: ~%~%")
+    (*exp mat mat)
+    (format t "MAT after *EXP: ~%~%")
+    ;Print MAT
+    (dotimes (i (rows mat))
+      (dotimes (j (cols mat))
+	(format t "~a" (at mat i j :double))
+	(princ #\Space))
+      (princ #\Newline))
+    ;Calculating natural logarithm of the 
+    ;exponent of each matrix element of M-
+    ;AT, virtually reverts MAT to it's or-
+    ;iginal state
+    (format t "~%Calculate natural logarithm: ~%~%")
+    (*log mat mat)
+    (format t "MAT after *LOG: ~%~%")
+    ;Print MAT
+    (dotimes (i (rows mat))
+      (dotimes (j (cols mat))
+	(format t "~a" (at mat i j :double))
+	(princ #\Space))
+      (princ #\Newline))
+    (free data)
+    (format t "~%")
+    ;Show original IMAGE in window
+    (imshow window-name-1 image)
+    ;Convert IMAGE to 1 channel
+    (cvt-color image image +bgr2gray+)
+    ;Convert IMAGE to double float
+    ;and show image in window
+    (convert-to image image +64f+)
+    (imshow window-name-2 image)
+    ;Find natural logarithm of 
+    ;IMAGE and show in window
+    (*log image dest)
+    (imshow window-name-3 dest)
+    ;Finding natural logarithm of each exponent 
+    ;of each element of IMAGE, reverts IMAGE ba-
+    ;ck to its original state after CONVERT-TO
+    (*exp image image)
+    (*log image image)
+    ;Show result in window
+    (imshow window-name-4 image)
+    (loop while (not (= (wait-key 0) 27)))
+    (destroy-all-windows)))
 
 
 FLIP
@@ -1741,6 +2207,90 @@ See also:
       (destroy-all-windows))))
 
 
+*LOG
+
+Calculates the natural logarithm of every array element.
+
+C++: void log(InputArray src, OutputArray dst)
+
+LISP-CV: (*LOG (SRC (:POINTER MAT)) (DEST (:POINTER MAT))) => :VOID
+
+
+    Parameters:	
+
+        SRC - Input array.
+
+        DST - Output array of the same size and type as SRC.
+
+
+The function *LOG calculates the natural logarithm of the absolute value of every element of the input 
+array:
+
+See OpenCV documentation:
+
+http://docs.opencv.org/modules/core/doc/operations_on_arrays.html?highlight=log#log
+
+for a description and formula.
+
+
+Note: This function is named *LOG instead of LOG because, LOG is the name of a Common Lisp function.
+
+
+See also:
+
+(*EXP), (CART-TO-POLAR), (POLAR-TO-CART), (PHASE), (POW), (*SQRT), (MAGNITUDE)
+
+
+
+(defun *log-example (filename)
+
+	 ;Create double float matrix data
+  (let* ((data (alloc :double '(1d0 2d0 3d0 4d0 5d0 
+                               6d0 7d0 8d0 9d0)))
+         ;Create double float matrix
+	 (mat (mat-data 3 3 +64f+ data))
+	 (window-name-1 "Original Image - *LOG Example")
+	 (window-name-2 "Natural logarithm of image - *LOG Example")
+         (image (imread filename 1)))
+    (named-window window-name-1 +window-normal+)
+    (named-window window-name-2 +window-normal+)
+    (move-window window-name-1 533 175)
+    (move-window window-name-2 984 175)
+    (format t "~%MAT = ~%~%")
+    ;Print MAT
+    (dotimes (i (rows mat))
+      (dotimes (j (cols mat))
+	(format t "~a" (at mat i j :double))
+	(princ #\Space))
+      (princ #\Newline))
+    ;Calculate natural logarithm of each element 
+    ;of MAT, using MAT as destination matrix
+    (format t "~%Calculate natural logarithm: ~%~%")
+    (*log mat mat)
+    (format t "MAT = ~%~%")
+    ;Print MAT
+    (dotimes (i (rows mat))
+      (dotimes (j (cols mat))
+	(format t "~a" (at mat i j :double))
+	(princ #\Space))
+      (princ #\Newline))
+    (free data)
+    (format t "~%")
+    ;Show original IMAGE in window
+    (imshow window-name-1 image)
+    ;Convert IMAGE to 1 channel
+    (cvt-color image image +bgr2gray+)
+    ;Convert IMAGE to double float
+    (convert-to image image +64f+)
+    ;Find natural logarithm of each element of 
+    ;IMAGE, just to see what it looks like
+    (*log image image)
+    ;Show IMAGE
+    (imshow window-name-2 image)
+    (loop while (not (= (wait-key 0) 27)))
+    (destroy-all-windows)))
+
+
 
 MEAN
 
@@ -1873,257 +2423,6 @@ Example:
       (destroy-all-windows))))
 
 
-%MAX
-
-Calculates per-element maximum of two arrays.
-
-C++: void max(InputArray src1, InputArray src2, OutputArray dst)
-
-LISP-CV: (%MAX (SRC1 (:POINTER MAT)) (SRC2 (:POINTER MAT)) (DEST (:POINTER MAT))) => :VOID
-
-
-    Parameters:	
-
-        SRC1 - First input array.
-
-        SRC2 - Second input array of the same size and type as SRC1.
-
-        DEST - Output array of the same size and type as SRC1.
-
-
-The function %MAX calculates the per-element maximum of two arrays. When the input array is multi-channel, 
-each channel is compared with value independently.
-
-Note: The function is named %MAX instead of MAX because, MAX is the name of a Common Lisp function.
-
-
-See also:
-
-(%MIN), (COMPARE), (INRANGE), (MIN-MAX-LOC), Matrix Expressions(MAT-EXPR)
-
-
-(defun %max-example (&optional (camera-index 0)
-		       (width *default-width*)
-		       (height *default-height*))
-
-  "Look at the first window and notice that whatever is black
-   in the first window has a beautiful glow in the third wind-
-   ow. You can change the effect by altering the color of the 
-   matrix MAT-3 in the middle window with the trackbar .The t-
-   rackbar changes the scalar value the ASSGN-VAL function us-
-   es to decide what to set each element of MAT-3 to."
-
-  (with-capture (cap (video-capture camera-index))   
-       ;Create two matrices: MAT-1 and MAT-2(used to show how %MAX works)
-    (let* ((mat-1 (mat-data 3 3 +32s+ (alloc :int '(1 2 3 4 5 6 7 8 9))))
-	   (mat-2 (mat-data 3 3 +32s+ (alloc :int '(9 8 7 6 5 4 3 2 1))))
-           ;Create destination matrix of same size and type: DEST
-           (dest (mat-typed 3 3 +32s+))
-           ;Create 3 matrices used to hold 
-           ;data we use later in the example
-           (mat-3 (mat-typed height width +8u+))
-           (mat-4 (mat-typed height width +8u+))
-           (mat-5 (mat-typed height width +8u+))
-           ;Allocate :int pointer for trackbar to change
-           (val (alloc :int '(128)))
-	   (window-name-1 "MAT-3 after THRESHOLD - %MAX-Example")
-	   (window-name-2 "MAT-5 after ASSGN-VAL - %MAX-Example")
-	   (window-name-3 "MAT-4 after %MAX - %MAX-Example")) 
-      ;Set CAP to default width and height
-      (cap-set cap +cap-prop-frame-width+ width)
-      (cap-set cap +cap-prop-frame-height+ height)
-      ;Create windows and move to specified locations
-      (named-window window-name-1 +window-normal+)
-      (named-window window-name-2 +window-normal+)
-      (named-window window-name-3 +window-normal+)
-      (move-window window-name-1 310 175)
-      (move-window window-name-2 760 175)
-      (move-window window-name-3 1210 175)
-      ;Print MAT-1
-      (format t "MAT-1:~%~%")
-      (dotimes (i (cols mat-1))
-	(dotimes (j (rows mat-1))
-	  (princ (at mat-1 i j :int))
-	  (princ #\Space))
-	(princ #\Newline))
-      (format t "~%~%")
-      ;Print MAT-2
-      (format t "MAT-2:~%~%")
-      (dotimes (i (cols mat-2))
-	(dotimes (j (rows mat-2))
-	  (princ (at mat-2 i j :int))
-	  (princ #\Space))
-	(princ #\Newline))
-      (format t "~%~%")
-      ;Find per element maximum of 
-      ;MAT-1 and MAT-2, set to DEST
-      (%max mat-1 mat-2 dest)
-      ;Print DEST
-      (format t "Per element maximum of MAT-1 and  MAT-2:~%~%")
-      (dotimes (i (cols dest))
-	(dotimes (j (rows dest))
-	  (princ (at dest i j :int))
-	  (princ #\Space))
-	(princ #\Newline))
-      (format t "~%~%")
-      (do* ((frame 0))
-	   ((plusp (wait-key *millis-per-frame*)) 
-	    (format t "Key is pressed by user"))
-        ;Set camera feed to FRAME
-	(setf frame (mat))
-	(cap-read cap frame)
-        ;Convert FRAME to 1 channel 
-        ;grayscale image, set to mat-1
-        ;FRAME stays the same
-	(cvt-color frame mat-3 +bgr2gray+)
-        ;Convert FRAME to 1 channel 
-        ;grayscale image, set to mat-4
-        ;FRAME stays the same
-	(cvt-color frame mat-4  +bgr2gray+)
-        ;Apply a fixed-level threshold to 
-        ;each array element of mat-3
-	(threshold mat-3 mat-3 128d0 255d0 +thresh-binary-inv+)
-        ;Create trackbar on middle window which changes 
-        ;the scalar value ASSGN-VAL uses in the next step
-        (create-trackbar "Value of mat-3" window-name-2 val 255)
-        ;Assign each element of mat-5 a scalar value
-	(assgn-val mat-5 (scalar (mem-aref val :int)))
-        ;Find the maximum of each element 
-        ;of mat-4 AND mat-5, set to mat-4
-        (%max mat-4 mat-5 mat-4)
-        ;Show mat-3, mat-5 and mat-4 in windows
-	(imshow window-name-1 mat-3)
-	(imshow window-name-2 mat-5)
-	(imshow window-name-3 mat-4)) 
-      (destroy-all-windows))))
-
-
-
-%MIN
-
-Calculates per-element minimum of two arrays.
-
-C++: void min(InputArray src1, InputArray src2, OutputArray dst)
-
-LISP-CV: (%MIN (SRC1 (:POINTER MAT)) (SRC2 (:POINTER MAT)) (DEST (:POINTER MAT))) => :VOID
-
-
-    Parameters:	
-
-        SRC1 - First input array.
-
-        SRC2 - Second input array of the same size and type as SRC1.
-
-        DEST - Output array of the same size and type as SRC1.
-
-
-The function %MIN calculates the per-element minimum of two arrays. When the input array is multi-channel, 
-each channel is compared with value independently.
-
-Note: The function is named %MIN instead of MIN because, MIN is the name of a Common Lisp function.
-
-
-See also:
-
-(%MAX), (COMPARE), (INRANGE), (MIN-MAX-LOC), Matrix Expressions(MAT-EXPR)
-
-
-(defun %min-example (&optional (camera-index 0)
-		       (width *default-width*)
-		       (height *default-height*))
-
-  "Look at the first window and notice that whatever is black
-   in the first window has a beautiful glow in the third wind-
-   ow. You can change the effect by altering the color of the 
-   matrix MAT-3 in the middle window with the trackbar .The t-
-   rackbar changes the scalar value the ASSGN-VAL function us-
-   es to decide what to set each element of MAT-3 to."
-
-  (with-capture (cap (video-capture camera-index))   
-       ;Create two matrices: MAT-1 and MAT-2(used to show how %MIN works)
-    (let* ((mat-1 (mat-data 3 3 +32s+ (alloc :int '(1 2 3 4 5 6 7 8 9))))
-	   (mat-2 (mat-data 3 3 +32s+ (alloc :int '(9 8 7 6 5 4 3 2 1))))
-           ;Create destination matrix of same size and type: DEST
-           (dest (mat-typed 3 3 +32s+))
-           ;Create 3 matrices used to hold 
-           ;data we use later in the example
-           (mat-3 (mat-typed height width +8u+))
-           (mat-4 (mat-typed height width +8u+))
-           (mat-5 (mat-typed height width +8u+))
-           ;Allocate :int pointer for trackbar to change
-           (val (alloc :int '(128)))
-	   (window-name-1 "MAT-3 after THRESHOLD - %MIN-Example")
-	   (window-name-2 "MAT-5 after ASSGN-VAL - %MIN-Example")
-	   (window-name-3 "MAT-4 after %MIN - %MIN-Example")) 
-      ;Set CAP to default width and height
-      (cap-set cap +cap-prop-frame-width+ width)
-      (cap-set cap +cap-prop-frame-height+ height)
-      ;Create windows and move to specified locations
-      (named-window window-name-1 +window-normal+)
-      (named-window window-name-2 +window-normal+)
-      (named-window window-name-3 +window-normal+)
-      (move-window window-name-1 310 175)
-      (move-window window-name-2 760 175)
-      (move-window window-name-3 1210 175)
-      ;Print MAT-1
-      (format t "MAT-1:~%~%")
-      (dotimes (i (cols mat-1))
-	(dotimes (j (rows mat-1))
-	  (princ (at mat-1 i j :int))
-	  (princ #\Space))
-	(princ #\Newline))
-      (format t "~%~%")
-      ;Print MAT-2
-      (format t "MAT-2:~%~%")
-      (dotimes (i (cols mat-2))
-	(dotimes (j (rows mat-2))
-	  (princ (at mat-2 i j :int))
-	  (princ #\Space))
-	(princ #\Newline))
-      (format t "~%~%")
-      ;Find per element minimum of 
-      ;MAT-1 and MAT-2, set to DEST
-      (%min mat-1 mat-2 dest)
-      ;Print DEST
-      (format t "Per element minimum of MAT-1 and  MAT-2:~%~%")
-      (dotimes (i (cols dest))
-	(dotimes (j (rows dest))
-	  (princ (at dest i j :int))
-	  (princ #\Space))
-	(princ #\Newline))
-      (format t "~%~%")
-      (do* ((frame 0))
-	   ((plusp (wait-key *millis-per-frame*)) 
-	    (format t "Key is pressed by user"))
-        ;Set camera feed to FRAME
-	(setf frame (mat))
-	(cap-read cap frame)
-        ;Convert FRAME to 1 channel 
-        ;grayscale image, set to mat-1
-        ;FRAME stays the same
-	(cvt-color frame mat-3 +bgr2gray+)
-        ;Convert FRAME to 1 channel 
-        ;grayscale image, set to mat-4
-        ;FRAME stays the same
-	(cvt-color frame mat-4  +bgr2gray+)
-        ;Apply a fixed-level threshold to 
-        ;each array element of mat-3
-	(threshold mat-3 mat-3 128d0 255d0 +thresh-binary-inv+)
-        ;Create trackbar on middle window which changes 
-        ;the scalar value ASSGN-VAL uses in the next step
-        (create-trackbar "Value of mat-3" window-name-2 val 255)
-        ;Assign each element of mat-5 a scalar value
-	(assgn-val mat-5 (scalar (mem-aref val :int)))
-        ;Find the minimum of each element 
-        ;of mat-4 AND mat-5, set to mat-4
-        (%min mat-4 mat-5 mat-4)
-        ;Show mat-3, mat-5 and mat-4 in windows
-	(imshow window-name-1 mat-3)
-	(imshow window-name-2 mat-5)
-	(imshow window-name-3 mat-4)) 
-      (destroy-all-windows))))
-
-
 
 MULTIPLY
 
@@ -2131,7 +2430,8 @@ Calculates the per-element scaled product of two arrays.
 
 C++: void multiply(InputArray src1, InputArray src2, OutputArray dst, double scale=1, int dtype=-1 )
 
-LISP-CV: (MULTIPLY (SRC1 (:POINTER MAT)) (SRC2 (:POINTER MAT)) (DEST (:POINTER MAT)) (SCALE :DOUBLE) (DTYPE :INT)) => :VOID
+LISP-CV: (MULTIPLY (SRC1 (:POINTER MAT)) (SRC2 (:POINTER MAT)) (DEST (:POINTER MAT)) &OPTIONAL ((SCALE :DOUBLE) 1) 
+         ((DTYPE :INT) -1)) => :VOID
 
 
     Parameters:	
@@ -2214,6 +2514,54 @@ See also:
     (free uchar-data)))
 
 
+
+
+NORMALIZE
+
+Normalizes the norm or value range of an array.
+
+C++: void normalize(InputArray src, OutputArray dst, double alpha=1, double beta=0, int norm_type=NORM_L2, int dtype=-1, 
+     InputArray mask=noArray())
+
+LISP-CV: (NORMALIZE (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) &OPTIONAL ((ALPHA :DOUBLE) 1) ((BETA :DOUBLE) 0) 
+         ((NORM-TYPE :INT) +NORM-L2+) ((DTYPE :INT) -1) ((MASK (:POINTER MAT)) (MAT))) => :VOID 
+
+    Parameters:	
+
+        SRC - Input array.
+
+        DEST - Output array of the same size as SRC.
+
+        ALPHA - Norm value to normalize to or the lower range boundary in case of the range normalization.
+
+        BETA - Upper range boundary in case of the range normalization; it is not used for the norm 
+               normalization.
+
+        NORM-TYPE - Normalization type (see the details below).
+
+        DTYPE - When negative, the output array has the same type as SRC; otherwise, it has the same 
+                number of channels as SRC and the depth =CV_MAT_DEPTH(dtype)(internal, See OpenCV source 
+                code at: <opencv_source_directory>/modules/core/include/opencv2/core/cvdef.h
+
+        MASK - Optional operation mask.
+
+
+See OpenCV documentation:
+
+http://docs.opencv.org/modules/core/doc/operations_on_arrays.html?highlight=normalize#normalize
+
+for a description and formulae.
+
+See also:
+
+(NORM), (CONVER-TO)
+
+Example:
+
+See MATCH-TEMPLATE-EXAMPLE for example usage of NORMALIZE.
+
+
+
 RANDU
 
 Generates a single uniformly-distributed random number or an array of random numbers.
@@ -2260,6 +2608,50 @@ See also:
       (princ #\Newline))
     (princ #\Space)
     (free data)))
+
+
+RNG
+
+The constructors
+
+C++: RNG::RNG()
+
+LISP-CV: (RNG) => (:POINTER RNG)
+
+C++: RNG::RNG(uint64 state)
+
+LISP-CV: (RNG (STATE :UINT64)) => (:POINTER RNG)
+
+    Parameters:	
+
+        STATE - 64-bit value used to initialize the RNG.
+
+
+These are the RNG constructors. The first form sets the state to some pre-defined value, equal to 
+2**32-1 in the current implementation. The second form sets the state to the specified value. If 
+you passed STATE = 0 , the constructor uses the above default value instead to avoid the singular 
+random number sequence, consisting of all zeros.
+
+
+Example:
+
+
+LCV> (DEFPARAMETER RNG (RNG #XFFFFFFFF))
+
+RNG
+
+LCV> (UNIFORM RNG 0 10)
+
+6
+
+LCV> (UNIFORM RNG 0D0 10D0)
+
+6.992592005760082d0
+
+LCV> (UNIFORM RNG 0F0 10F0)
+
+3.1438508
+
 
 
 SCALE-ADD
@@ -2333,6 +2725,164 @@ See also:
       (imshow window-name-3 dest))
     (free alpha-val)
     (destroy-all-windows)))
+
+
+
+SUBTRACT
+
+Calculates the per-element difference between two arrays or array and a scalar.
+
+C++: void subtract(InputArray src1, InputArray src2, OutputArray dst, InputArray mask=noArray(), int dtype=-1)
+
+LISP-CV: (SUBTRACT (SRC1 (:POINTER MAT)) (SRC2 (:POINTER MAT)) (DEST (:POINTER MAT)) ((MASK (:POINTER MAT)) (MAT)) 
+         ((DTYPE :INT) -1) => :VOID
+
+
+    Parameters:	
+
+        SRC1 - First input array or a scalar.
+
+        SRC2 - Second input array or a scalar.
+
+        DST - Output array of the same size and the same number of channels as the input arrays.
+
+        MASK - Optional operation mask; this is an 8-bit single channel array that specifies elements 
+               of the output array to be changed.
+
+        DTYPE - Optional depth of the output array (see the details below).
+
+
+See OpenCV documentation:
+
+http://docs.opencv.org/modules/core/doc/operations_on_arrays.html?highlight=log#subtract
+
+for description and formulae.
+
+See also:
+
+(ADD), (ADD-WEIGHTED), (SCALE-ADD), (CONVERT-TO), Matrix Expressions(MAT-EXPR)
+
+
+(defun subtract-example (&optional (camera-index 0) 
+			   (width *default-width*)
+			   (height *default-height*))
+
+  (with-capture (cap (video-capture camera-index))
+    (let* ((window-name "Frame Subtract - SUBTRACT Example")
+	   (last-frame (mat-typed height width +8uc3+))
+	   (dest (mat-typed height width +8uc3+)))
+      (cap-set cap +cap-prop-frame-width+ width)
+      (cap-set cap +cap-prop-frame-height+ height)
+      (named-window window-name)
+      (move-window window-name 610 225)
+      (do* ((frame 0))
+	   ((plusp (wait-key *millis-per-frame*)) 
+	    (format t "Key is pressed by user"))
+	(setf frame (mat))
+	(cap-read cap frame)
+	(subtract frame last-frame dest)
+	(imshow window-name dest)
+	(copy-to frame last-frame))
+      (destroy-window window-name))))
+
+
+
+SUM
+
+Calculates the sum of array elements.
+
+C++: Scalar sum(InputArray src)
+
+LISP-CV: (SUM (SRC (:POINTER MAT))) => (:POINTER SCALAR)
+
+
+    Parameters:	SUM - Input array that must have from 1 to 4 channels.
+
+
+The functions sum calculate and return the sum of array elements, independently for each channel.
+
+
+See also:
+
+(COUNT-NON-ZERO), (MEAN), (MEAN-STD-DEV), (NORM), (MIN-MAX-LOC), (REDUCE)
+
+
+(defun sum-example ()
+        ;Create matrix
+  (let* ((mat (mat-typed 4 4 +8u+))
+         ;Initialize random number generator
+         (rng (rng #xFFFFFFFF)))
+    (format t "~%")
+    ;Fill MAT with random values
+    (dotimes (i (rows mat))
+      (dotimes (j (cols mat))
+	(setf (at mat i j :uchar) (uniform rng 1 8))))
+     ;Print MAT
+    (dotimes (i (rows mat))
+      (dotimes (j (cols mat))
+	(format t "~a" (at mat i j :uchar))
+	(princ #\Space))
+      (princ #\Newline))
+      (format t "~%")
+    ;Assign each each element 
+    ;of MAT the sum of its ra-
+    ;ndom elements
+    (assgn-val mat (sum mat))
+    ;Print MAT
+    (dotimes (i (rows mat))
+      (dotimes (j (cols mat))
+	(format t "~a" (at mat i j :uchar))
+	(princ #\Space))
+      (princ #\Newline))
+    (format t "~%")))
+
+
+
+UNIFORM
+
+Returns the next random number sampled from the uniform distribution.
+
+C++: int RNG::uniform(int a, int b)
+
+LISP-CV: (UNIFORM (RNG (:POINTER RNG)) (A :DOUBLE) (B :DOUBLE)) => :DOUBLE
+
+C++: float RNG::uniform(float a, float b)
+
+LISP-CV: (UNIFORM (RNG (:POINTER RNG)) (A :FLOAT) (B :FLOAT)) => :FLOAT
+
+C++: double RNG::uniform(double a, double b)
+
+LISP-CV: (UNIFORM (RNG (:POINTER RNG)) (A :INT) (B :INT)) => :INT
+
+
+    Parameters:	
+
+        RNG - An RNG construct
+
+        A - lower inclusive boundary of the returned random numbers.
+
+        B - upper non-inclusive boundary of the returned random numbers.
+
+
+The methods transform the state using the MWC algorithm and return the next uniformly-distributed r-
+andom number of the specified type, deduced from the input parameter type, from the range (a, b) . 
+There is a nuance illustrated by the following example:
+
+
+(defparameter rng (rng))
+
+;; always produces 0
+(defparameter a (uniform rng 0 1))
+
+;; produces double from (0, 1)
+(defparameter a1 (uniform rng 0d0 1d0))
+
+;; produces float from (0, 1)
+(defparameter b (uniform-f rng 0.0f0 1.0f0))
+
+;; may cause compiler error because of ambiguity:
+(defparameter d (uniform rng 0 .999999))
+
 
 
 DRAWING FUNCTIONS:
@@ -2455,7 +3005,7 @@ C++: void ellipse(Mat& img, Point center, Size axes, double angle, double startA
      int thickness=1, int lineType=8, int shift=0)
 
 LISP-CV: (ELLIPSE (IMG (:POINTER MAT)) (CENTER (:POINTER POINT)) (AXES (:POINTER SIZE)) (ANGLE :DOUBLE) (START-ANGLE :DOUBLE)
-             (END-ANGEL :DOUBLE) (COLOR (:POINTER SCALAR)) (THICKNESS :INT) (LINE-TYPE :INT) (SHIFT :INT)) => :VOID
+             (END-ANGEL :DOUBLE) (COLOR (:POINTER SCALAR)) &OPTIONAL ((THICKNESS :INT) 1) ((LINE-TYPE :INT) 8) ((SHIFT :INT) 0)) => :VOID
 
 C++: void ellipse(Mat& img, const RotatedRect& box, const Scalar& color, int thickness=1, int lineType=8)
 
@@ -2917,6 +3467,28 @@ code.
 
 
 
+CUBE-ROOT
+
+Computes the cube root of an argument.
+
+C++: float cubeRoot(float val)
+
+LISP-CV:: (CUBE-ROOT (VAL :FLOAT)) => :FLOAT
+
+    Parameters:	VAL - A function argument.
+
+The function CUBE-ROOT computes the cubic root of VAL. Negative arguments are handled correctly. NAN 
+and INFINITY are not handled. The accuracy approaches the maximum possible accuracy for single-precision 
+data.
+
+
+(defun cube-root-example (&optional (float-val 27.0))
+  "Computes the cube root of FLOAT-VAL."
+  (format t "Cube root of FLOAT-VAL = ~a~%~%" 
+	  (cube-root float-val)))
+
+
+
 FAST-ATAN2
 
 Calculates the angle of a 2D vector in degrees.
@@ -3033,6 +3605,60 @@ tion time in seconds:
     (setf time-calc (/ (- t2 t1) (get-tick-frequency)))
     (format t "1 million runs of MAT-EYE took ~a seconds"  
 	    time-calc)))
+
+
+
+*SQRT
+
+Calculates a square root of array elements.
+
+C++: void sqrt(InputArray src, OutputArray dst)
+
+LISP-CV: (SQRT (SRC (:POINTER MAT)) (DEST (:POINTER MAT))) => :VOID
+
+    Parameters:	
+
+        SRC - Input floating-point array.
+
+        DEST - Output array of the same size and type as SRC.
+
+
+The functions *SQRT calculate a square root of each input array element. In case of multi-channel 
+arrays, each channel is processed independently. The accuracy is approximately the same as of the 
+Common Lisp function SQRT.
+
+Note: This function is named *SQRT instead of SQRT because, SQRT is the name of a Common Lisp function.
+
+See also:
+
+(POW), (MAGNITUDE)
+
+
+(defun *sqrt-example ()
+
+  "Computes the square root of 
+   each element of matrix M"
+
+  (let* ((data (alloc :float '(53.0f0 62.0f0 85.0f0 64.0f0 23.0f0 
+			       97.0f0 52.0f0 16.0f0 12.0f0)))
+	 (m (mat-data 3 3 +32f+ data))
+         (dest (mat-typed 3 3 +32f+)))
+    (format t "M = ~%~%")
+    (dotimes (i (rows m))
+      (dotimes (j (cols m))
+	(format t "~a" (at m i j :float))
+	(princ #\Space))
+      (princ #\Newline))
+    (format t "~%~%")
+    (*sqrt m dest)
+    (format t "DEST = ~%~%")
+    (dotimes (i 3)
+      (dotimes (j 3)
+	(format t "~a" (at dest i j :float))
+	(princ #\Space))
+      (princ #\Newline))
+    (free data)))
+
 
 
 READING AND WRITING IMAGES AND VIDEO:
@@ -3203,7 +3829,9 @@ LISP-CV: (COPY-MAKE-BORDER (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) (TOP :INT)
 
         LEFT -
 
-        RIGHT - Parameter specifying how many pixels in each direction from the source image rectangle 
+        RIGHT - 
+   
+                Parameters specifying how many pixels in each direction from the source image rectangle 
                 to extrapolate. For example, (EQ TOP 1), (EQ BOTTOM 1), (EQ LEFT 1), (EQ RIGHT 1) means 
                 that 1 pixel-wide border needs to be built.
 
@@ -3406,6 +4034,130 @@ zero rows and columns and then convolves the result with the same kernel as in (
   (main filename))
 
 
+
+SOBEL
+
+Calculates the first, second, third, or mixed image derivatives using an extended Sobel operator.
+
+C++: void Sobel(InputArray src, OutputArray dst, int ddepth, int dx, int dy, int ksize=3, double scale=1, 
+     double delta=0, int borderType=BORDER_DEFAULT)
+
+LISP-CV: (SOBEL (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) (DDEPTH :INT) (DX :INT) (DY :INT) &OPTIONAL ((KSIZE :INT) 3) 
+         ((SCALE :DOUBLE) 1D0) ((DELTA :DOUBLE) 0D0) ((BORDER-TYPE :INT) +BORDER-DEFAULT+))  => :VOID
+
+
+    Parameters:	
+
+        SRC - Input image.
+
+        DEST - Output image of the same size and the same number of channels as SRC.
+
+        DDEPTH -
+
+        Output image depth; the following combinations of (DEPTH SRC) and DDEPTH are supported:
+
+                (DEPTH SRC) = +8U+, DDEPTH = -1/+16S+/+32F+/+64F+
+
+                (DEPTH SRC) = +16U+/+16S+, DDEPTH = -1/+32F+/+64F+
+
+                (DEPTH SRC) = +32F+, DDEPTH = -1/+32F+/+64F+
+
+                (DEPTH SRC) = +64F+, DDEPTH = -1/+64F+
+
+        when (EQ DDEPTH -1), the destination image will have the same depth as the source; in the 
+        case of 8-bit input images it will result in truncated derivatives.
+
+        DX - Order of the derivative x.
+
+        DY - Order of the derivative y.
+
+        KSIZE - Size of the extended Sobel kernel; it must be 1, 3, 5, or 7.
+
+        SCALE - Optional scale factor for the computed derivative values; by default, no scaling is 
+                applied (see (GET-DERIV-KERNELS) for details).
+
+        DELTA - Optional delta value that is added to the results prior to storing them in DEST.
+
+        BORDER-TYPE - Pixel extrapolation method, one of the +BORDER-*+ constants, except for 
+                      +BORDER-TRANSPARENT+ and +BORDER-ISOLATED+. 
+
+
+Description: See OpenCv documentation:
+
+
+http://docs.opencv.org/modules/imgproc/doc/filtering.html?highlight=sobel#sobel
+
+
+for a description and formulae.
+
+
+See also:
+
+(SCHARR), (LAPLACIAN), (SEP-FILTER2D), FILTER2D), (GAUSSIAN-BLUR), (CART-TO-POLAR)
+
+
+(defun sobel-example (&optional (camera-index *camera-index*) 
+			(width *default-width*)
+			(height *default-height*))
+
+  "One of the most basic and important convolutions is the 
+   computation of derivatives (or approximations to them). 
+   There are many ways to do this, but only a few are well 
+   suited to a given situation. In general, the most common 
+   operator used to represent differentiation is the Sobel 
+   derivative [Sobel68] operator. 
+
+   Sobel operators exist for any order of derivative as well 
+   as for mixed partial derivatives. The second window shows 
+   the effect of the Sobel operator when used to approximate 
+   a first derivative in the x-dimension. The first window s-
+   hows the original camera output, FRAME.
+
+   In a nutshell, this example uses SOBEL to detect edges in
+   a sequence of camera frames(FRAME)."
+
+  (with-capture (cap (video-capture camera-index))
+    (let* ((window-name-1 "FRAME - SOBEL Example")
+           (window-name-2 "DRAW - SOBEL Example")
+	   (gray (mat))
+           (sobelx (mat))
+           (minval (alloc :double 0d0))
+           (maxval (alloc :double 0d0))
+           (ddepth +32f+)
+           (draw (mat)))
+      (cap-set cap +cap-prop-frame-width+ width)
+      (cap-set cap +cap-prop-frame-height+ height)
+      (named-window window-name-1 +window-normal+)
+      (named-window window-name-2 +window-normal+)
+      (move-window window-name-1 533 175)
+      (move-window window-name-2 984 175)
+      (do* ((frame 0))
+	   ((plusp (wait-key *millis-per-frame*)) 
+	    (format t "Key is pressed by user"))
+	(setf frame (mat))
+	(cap-read cap frame)
+	;Show original camera output in window
+	(imshow window-name-1 frame)
+	;Convert camera output, a 3 channel 
+	;matrix, to 1 channel matrix
+	(cvt-color frame gray +bgr2gray+)
+	;Compute Sobel x derivative and set 
+        ;to destination matrix SOBELX
+	(sobel gray sobelx ddepth 1 0)
+	;Find minimum and maximum intensities
+	(min-max-loc sobelx minval maxval)
+	(format t "MINVAL: ~a~%~%" (mem-aref minval :double 0))
+	(format t "MAXVAL: ~a~%~%" (mem-aref maxval :double 0))
+        ;;+32F+ image needs to be converted to +8U+ type
+	(convert-to sobelx draw +8u+ (/ 255d0 (- (? maxval :double) (? minval :double))) 
+		    (* (* (? minval :double) -1)  (/ 255.d0 (- (? maxval :double) 
+							       (? minval :double)))))
+	(imshow window-name-2 draw))
+      (free minval) (free maxval)
+      (destroy-all-windows))))
+
+
+
 MISCELLANEOUS IMAGE TRANSFORMATIONS:
 
 
@@ -3506,6 +4258,113 @@ See also
         ;Show WINDOW in a window
 	(imshow window-name window))
       (destroy-window window-name))))
+
+
+GEOMETRIC IMAGE TRANSFORMATIONS:
+
+
+RESIZE
+
+
+Resizes an image.
+
+C++: void resize(InputArray src, OutputArray dst, Size dsize, double fx=0, double fy=0, int interpolation=INTER_LINEAR )
+
+LISP-CV: (RESIZE (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) (DSIZE (:POINTER SIZE)) &OPTIONAL ((FX :DOUBLE) 0D0) ((FY :DOUBLE) 0D0) 
+         ((INTERPOLATION :INT) +INTER-LINEAR+)) => :VOID
+
+
+    Parameters:	
+
+        SRC - Input image.
+
+        DEST - Output image; it has the size DSIZE (when it is non-zero) or the size computed from 
+              (SIZE SRC), FX, and FY; the type of DEST is the same as of SRC.
+
+        DSIZE - Output image size.
+
+        FX - Scale factor along the horizontal axis.
+
+        FY - Scale factor along the vertical axis.
+
+        INTERPOLATION -
+
+        interpolation method:
+
+            +INTER-NEAREST+ - A nearest-neighbor interpolation
+
+            +INTER-LINEAR+ - A bilinear interpolation (used by default)
+
+            +INTER-AREA+ - Resampling using pixel area relation. It may be a preferred method for image 
+                           decimation, as it gives moire’-free results. But when the image is zoomed, it 
+                           is similar to the +INTER-NEAREST+ method.
+
+            +INTER-CUBIC+ - a bicubic interpolation over 4x4 pixel neighborhood
+
+            +INTER-LANCZOS4+ - a Lanczos interpolation over 8x8 pixel neighborhood
+
+
+The function RESIZE resizes the image SRC down to or up to the specified size. Note that the initial 
+DEST type or size are not taken into account. Instead, the size and type are derived from the SRC, 
+DSIZE, FX , and FY . If you want to resize SRC so that it fits the pre-created DEST , you may call 
+the function as follows:
+
+
+;; Explicitly specify (EQ DSIZE (SIZE DEST)) FX and FY will be computed from that.
+
+
+(RESIZE SRC DEST (SIZE DEST) 0d0 0d0 INTERPOLATION)
+
+
+If you want to decimate the image by factor of 2 in each direction, you can call the function this way:
+
+
+;; Specify FX and FY and let the function compute the destination image size.
+
+
+(RESIZE SRC DEST (SIZE) 0.5d0 0.5d0 INTERPOLATION)
+
+
+To shrink an image, it will generally look best with +INTER-AREA+ interpolation, whereas to enlarge 
+an image, it will generally look best with +INTER-CUBIC+ (slow) or +INTER-LINEAR+ (faster but still 
+looks OK).
+
+
+See also:
+
+(WARP-AFFINE), (WARP-PERSPECTIVE), (REMAP)
+
+
+
+(defun resize-example (&optional (camera-index *camera-index*) 
+			 (width 640)
+			 (height 480))
+
+  "Uses RESIZE to enlarge the camera output and then shows
+   both the resized FRAME(RESIZED) and the original FRAME 
+   a window"
+
+  (with-capture (cap (video-capture camera-index))
+    (let* ((window-name-1 "Original FRAME - RESIZE Example")
+	   (window-name-2 "RESIZED - RESIZE Example")
+	   (resized (mat-typed (round (* height 1.5)) (round (* width 1.35)) +8uc3+)))
+      (cap-set cap +cap-prop-frame-width+ width)
+      (cap-set cap +cap-prop-frame-height+ height)
+      (named-window window-name-1 +window-autosize+)
+      (named-window window-name-2 +window-autosize+)
+      (move-window window-name-1 0 0)
+      (move-window window-name-2 650 175)
+      (do* ((frame 0))
+	   ((plusp (wait-key *millis-per-frame*)) 
+	    (format t "Key is pressed by user"))
+	(setf frame (mat))
+	(cap-read cap frame)
+        (resize frame resized (size 1280 960) 0.0d0 
+		0.0d0 +inter-lanczos4+)
+	(imshow window-name-1 frame)
+        (imshow window-name-2 resized))
+      (destroy-all-windows))))
+
 
 
 FEATURE DETECTION:
@@ -3623,6 +4482,225 @@ See: http://en.wikipedia.org/wiki/Canny_edge_detector
 	(imshow window-name out)
 	(del-mat clone)
 	(del-mat out))
+      (destroy-all-windows))))
+
+
+OBJECT DETECTION:
+
+
+MATCH-TEMPLATE:
+
+Compares a template against overlapped image regions.
+
+C++: void matchTemplate(InputArray image, InputArray templ, OutputArray result, int method)
+
+LISP-CV: (MATCH-TEMPLATE (IMAGE (:POINTER MAT)) (TEMPL (:POINTER MAT)) (RESULT (:POINTER MAT)) 
+         (METHOD :INT))) => :VOID
+
+
+    Parameters:	
+
+        IMAGE - Image where the search is running. It must be 8-bit or 32-bit floating-point.
+
+        TEMPL - Searched template. It must be not greater than the source image and have the 
+                same data type.
+
+        RESULT - Map of comparison results. It must be single-channel 32-bit floating-point. 
+                 If image is (* W H) and templ is (* w h), then result is: (* (+ (- W w) 1) (+ (- H h) 1)).
+
+        METHOD - Parameter specifying the comparison method (see below).
+
+
+The function slides through image , compares the overlapped patches of size (* w h) against TEMPL 
+using the specified method and stores the comparison results in RESULT. (See OpenCV documentation:
+ 
+http://docs.opencv.org/modules/imgproc/doc/object_detection.html?highlight=matchtem#matchtemplate 
+
+for the formulae for the available comparison methods). 
+
+After the function finishes the comparison, the best matches can be found as global minimums (when 
++TM-SQDIFF+ was used) or maximums (when +TM-CCORR+ or +TM-CCOEFF+ was used) using the (MIN-MAX-LOC) 
+function. In case of a color image, template summation in the numerator and each sum in the denominator 
+is done over all of the channels and separate mean values are used for each channel. That is, the 
+function can take a color template and a color image. The result will still be a single-channel image, 
+which is easier to analyze.
+
+
+
+(defun match-template-example (&optional (camera-index *camera-index*) 
+				 (width *default-width*)
+				 (height *default-height*))
+
+  "Here a template image extracted from a frame of the camera feed i-
+   s compared to that frame to find the area most similiar to the te-
+   mplate image in the camera feed. 
+   
+   The function: 
+
+   (MATCH-TEMPLATE IMAGE TEMPL RESULT METHOD)
+ 
+   is used for the matching. The last parameter chooses the method o-
+   f template matching. We use all six methods, shown in six windows 
+   starting with square difference matching (SQDIFF).
+
+   Note the use of (NORMALIZE) in this code, which allows us to show 
+   the results in a consistent way (recall that some of the matching 
+   methods can return negative-valued results. We use the +NORM-MIN-
+   MAX+ flag when normalizing; this tells the function to shift and 
+   scale the floating-point images so that all returned values are b-
+   etween 0 and 1.
+
+   Matches are indicated by dark areas in the left column of black 
+   and white images and by bright spots in the other two columns
+  
+   Position the rectangle in the top-leftmost window to select the 
+   template MATCH-TEMPLATE uses to find objects in camera feed by 
+   moving the trackbar sliders in the bottom-leftmost window"
+
+  (with-capture (cap (video-capture camera-index))
+     ;Create array of window names
+    (let* ((window-name-arr (make-array 8 :initial-contents 
+					(list "SRC - MATCH-TEMPLATE-EXAMPLE"
+					      "FRAME - MATCH-TEMPLATE-EXAMPLE"
+					      "SQDIFF - MATCH-TEMPLATE-EXAMPLE"
+					      "SQDIFF-NORMED - MATCH-TEMPLATE-EXAMPLE"
+					      "CCORR - MATCH-TEMPLATE-EXAMPLE"
+					      "CCORR-NORMED - MATCH-TEMPLATE-EXAMPLE"
+					      "COEFF - MATCH-TEMPLATE-EXAMPLE"
+					      "COEFF-NORMED - MATCH-TEMPLATE-EXAMPLE")))
+	   (arr (make-array '(6)))
+           (n 10)
+            ;Allocate int pointers for the trackbars to 
+            ;adjust which will set the template image a-
+            ;nd the guiding rectangle location and boun-
+            ;daries
+	   (rect-x (alloc :int '(0)))
+	   (rect-y (alloc :int '(0)))
+	   (rect-width (alloc :int (list (round (/ width n)))))
+	   (rect-height (alloc :int (list (round (/ height n))))))      
+      (cap-set cap +cap-prop-frame-width+ width)
+      (cap-set cap +cap-prop-frame-width+ height)
+      ;;Create array of windows
+      (dotimes (i 8)
+	(named-window (aref window-name-arr i) +window-normal+))
+      ;Move windows to specified locations     
+      (move-window (aref window-name-arr 0) 134 0)
+      (move-window (aref window-name-arr 1) 134 400)
+      (move-window (aref window-name-arr 2) 551 0)
+      (move-window (aref window-name-arr 3) 551 400)
+      (move-window (aref window-name-arr 4) 968 0)
+      (move-window (aref window-name-arr 5) 968 400)
+      (move-window (aref window-name-arr 6) 1385 0)
+      (move-window (aref window-name-arr 7) 1385 400)
+      (do* ((frame 0)
+            ;Set rectangle to green
+            (color (scalar 0 255 0))
+            (roi 0)
+	    (img 0)
+            (src 0)
+            ;Initialize other rectangle 
+            ;location/size parameters
+	    (point-1 0)
+	    (point-2 0) 
+            ;Initialize size parameters 
+            ;for the matches
+            (iwidth 0)
+	    (iheight 0))
+	   ((plusp (wait-key *millis-per-frame*)) 
+	    (format t "Key is pressed by user"))
+        ;Set camera feed to FRAME
+	(setf frame (mat))
+	(cap-read cap frame)
+        ;Print location and size of the 
+        ;template used to do the matchi-
+        ;ng and the rectangle
+	(format t "RECT-X: ~a~%~%" (mem-ref rect-x :int))
+	(format t "RECT-Y: ~a~%~%" (mem-ref rect-y :int))
+	(format t "RECT-WIDTH: ~a~%~%" (mem-ref rect-width :int))
+	(format t "RECT-HEIGHT: ~a~%~%" (mem-ref rect-height :int))
+         ;Create trackbars used to adjust template and rectangle position
+       	(create-trackbar "RECT-X" (aref window-name-arr 1) rect-x (cols frame))
+	(create-trackbar "RECT-Y" (aref window-name-arr 1) rect-y (rows frame))
+	(create-trackbar "RECT-WIDTH" (aref window-name-arr 1) rect-width 
+			 (cols frame))
+	(create-trackbar "RECT-HEIGHT" (aref window-name-arr 1) rect-height 
+			 (rows frame))
+        ;Instantiate logic used to move the 
+        ;template and the rectangle as one
+	(if (< (mem-ref rect-x :int) (mem-ref rect-width :int)) 
+	    (setf (mem-ref rect-x :int) 1))
+	(if (> (mem-ref rect-x :int) 
+	       (- (cols frame) (mem-ref rect-width :int))) 
+	    (setf (mem-ref rect-x :int) 
+		  (- (cols frame) (mem-ref rect-width :int))))
+	(if (< (mem-ref rect-y :int) (mem-ref rect-height :int)) 
+	    (setf (mem-ref rect-y :int) 1))
+	(if (> (mem-ref rect-y :int) 
+	       (- (rows frame) (mem-ref rect-height :int))) 
+	    (setf (mem-ref rect-y :int) 
+		  (- (rows frame) (mem-ref rect-height :int))))
+	(if (< (mem-ref rect-width :int) 1) 
+	    (setf (mem-ref rect-width :int) 1))
+        (if (< (mem-ref rect-height :int) 1) 
+	    (setf (mem-ref rect-height :int) 1))
+        ;Set template position and location parameters
+	(setf roi (rect (mem-ref rect-x :int)
+			(mem-ref rect-y :int)
+			(mem-ref rect-width :int)
+			(mem-ref rect-height :int)))
+	(setf img (mat))
+	(setf src (mat))
+        ;Create 2 clones of FRAME, IMG will be where the 
+        ;rectangle is moved to choose the template. SRC 
+        ;is MATCH-TEMPLATE IMAGE parameter. FRAME will b-
+        ;e the template image 
+        (copy-to frame img)
+	(copy-to frame src)
+        ;Create template image from FRAME 
+        ;to use in MATCH-TEMPLATE. Set to 
+        ;FRAME
+     	(setf frame (roi frame roi))
+        ;Set rectangle location parameters
+	(setf point-1 (point (mem-ref rect-x :int) 
+                             (mem-ref rect-y :int)))
+	(setf point-2 (point (+ (mem-ref rect-x :int) 
+                                (mem-ref rect-width :int)) 
+			     (+ (mem-ref rect-y :int) 
+                                (mem-ref rect-height :int)))) 
+        ;Create rectangle on IMG at same 
+        ;position as the template
+        (rectangle img point-1 point-2 color 5 4 0)
+    	(imshow (aref window-name-arr 0) img)
+	(del-mat img)
+        ;Set width and height of matrices 
+        ;we will create in next step
+	(setf iwidth (+ (- (cols src) (cols frame)) 1))
+	(setf iheight (+ (- (rows src) (rows frame)) 1))
+        ;Create array of matrices to 
+        ;hold all of the matches
+        (dotimes (i 6)
+	  (setf (aref arr i) (mat-typed iheight iwidth +32f+)))
+        ;Run all versions of MATCH-TEMPLATE 
+        ;and run NORMALIZE on each match 
+	(dotimes (i 6)
+	  (match-template src frame (aref arr i) i)
+	  (normalize (aref arr i) (aref arr i) 1d0 0d0 +norm-minmax+))
+        ;Show template(FRAME) in a window
+	(imshow (aref window-name-arr 1) frame)
+        ;Show matches
+        (dotimes (i 6)
+	  (imshow (aref window-name-arr (+ i 2)) (aref arr i)))
+        ;Clean up used matrices
+	(dotimes (i 6)        
+	  (del-mat (aref arr i)))
+	(del-mat src)
+        ;Reset ROI
+	(setf roi (rect 0 0 (cols frame) (rows frame)))
+	(setf frame (roi frame roi)))
+      (free rect-x)
+      (free rect-y)
+      (free rect-width)
+      (free rect-height)
       (destroy-all-windows))))
 
 
@@ -6195,7 +7273,8 @@ Commom Lisp: (GAUSSIAN-BLUR (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) (KSIZE (:
                  ontrol the result regardless of possible future modifications of all this semantics, 
                  it is recommended To specify all of KSIZE, SIGMA-X, AND SIGMA-Y.
 
-        BORDER-TYPE - pixel extrapolation method (see (BORDER-INTERPOLATE) for details).
+        BORDER-TYPE - pixel extrapolation method, one of the +BORDER-*+ constants, except for 
+                      +BORDER-TRANSPARENT+ and +BORDER-ISOLATED+.
 
 
 The function convolves the source image with the specified Gaussian kernel. In-place filtering is s-
@@ -7317,74 +8396,6 @@ Evaluation took:
   33,008 bytes consed
   
 NIL
-
-
-UNIFORM
-
-Returns the next random number sampled from the uniform distribution.
-
-C++: int RNG::uniform(int a, int b)
-
-LISP-CV: (UNIFORM (RNG (:POINTER RNG)) (A :DOUBLE) (B :DOUBLE)) => :DOUBLE
-
-C++: float RNG::uniform(float a, float b)
-
-LISP-CV: (UNIFORM (RNG (:POINTER RNG)) (A :FLOAT) (B :FLOAT)) => :FLOAT
-
-C++: double RNG::uniform(double a, double b)
-
-LISP-CV: (UNIFORM (RNG (:POINTER RNG)) (A :INT) (B :INT)) => :INT
-
-
-    Parameters:	
-
-        RNG - An RNG construct
-
-        A - lower inclusive boundary of the returned random numbers.
-
-        B - upper non-inclusive boundary of the returned random numbers.
-
-The methods transform the state using the MWC algorithm and return the next uniformly-distributed r-
-andom number of the specified type, deduced from the input parameter type, from the range (a, b) . 
-There is a nuance illustrated by the following example:
-
-
-(defparameter rng (rng))
-
-;; always produces 0
-(defparameter a (uniform rng 0 1))
-
-;; produces double from (0, 1)
-(defparameter a1 (uniform rng 0d0 1d0))
-
-;; produces float from (0, 1)
-(defparameter b (uniform-f rng 0.0f0 1.0f0))
-
-;; may cause compiler error because of ambiguity:
-(defparameter d (uniform rng 0 .999999))
-
-
-RNG
-
-The constructors
-
-C++: RNG::RNG()
-
-LISP-CV: (RNG)
-
-C++: RNG::RNG(uint64 state)
-
-
-    Parameters:	
-
-        STATE - 64-bit value used to initialize the RNG.
-
-
-These are the RNG constructors. The first form sets the state to some pre-defined value, equal to 
-2**32-1 in the current implementation. The second form sets the state to the specified value. If 
-you passed STATE = 0 , the constructor uses the above default value instead to avoid the singular 
-random number sequence, consisting of all zeros.
-
 
 
 VECTOR

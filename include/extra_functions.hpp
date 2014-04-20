@@ -7,6 +7,13 @@ using namespace flann;
 using namespace cvflann;
 
 extern "C" {
+TermCriteria* cv_create_TermCriteria(int type, int maxCount, double epsilon);
+MatExpr* cv_Mat_sub(Mat* m1, Mat* m2);
+RNG* cv_create_RNG();
+RNG* cv_create_RNG_state(uint64 state);
+double cv_RNG_uniform_double(RNG* self, double a, double b);
+float cv_RNG_uniform_float(RNG* self, float a, float b);
+int cv_RNG_uniform_int(RNG* self, int a, int b);
 uchar* cv_Mat_get_Data(Mat* self);
 Mat* cv_Mat_get_ROI(Mat* self, Rect* roi);
 Mat* cv_imread2(const char* filename, int flags);
