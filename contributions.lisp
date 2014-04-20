@@ -7,3 +7,5 @@
 ;;Thank you to Jay Bromley for writing CL-OPENCV https://github.com/ryepup/cl-opencv. 
 
 ;;The knowledge gained from that library helped get started writing this project.
+
+;; Thanks to Arjun Comar for all his help and guidance on my project so far. https://github.com/arjuncomar
