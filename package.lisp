@@ -113,7 +113,6 @@
 
 
 
-
 ;; core - Basic Structures
 
 
@@ -338,11 +337,7 @@
 
 ;; core - Utility and System Functions and Macros
 
-   #:check-hardware-support
-   #:cube-root
-   #:fast-atan2
-   #:get-tick-count
-   #:get-tick-frequency
+
    #:+cpu-none+
    #:+cpu-mm+
    #:+cpu-sse+
@@ -407,6 +402,13 @@
    #:+openglnotsupported+
    #:+openglapicallerror+
 
+   #:check-hardware-support
+   #:cube-root
+   #:fast-atan2
+   #:get-tick-count
+   #:get-tick-frequency
+
+
 ;; imgproc - Image Filtering
 
    #:ipl-conv-kernel
@@ -421,13 +423,6 @@
    #:+border-default+ 
    #:+border-transparent+
    #:+border-isolated+
-
-   #:copy-make-border
-   #:gaussian-blur
-   #:pyr-down
-   #:pyr-up
-   #:sobel
-
    #:+cv-shape-rect+
    #:+cv-shape-cross+
    #:+cv-shape-ellipse+
@@ -442,6 +437,14 @@
    #:+median+
    #:+bilateral+
    #:+scharr+
+
+   #:copy-make-border
+   #:gaussian-blur
+   #:pyr-down
+   #:pyr-up
+   #:sobel
+
+
 
 ;; imgproc - Geometric Image Transformations
 
@@ -694,10 +697,6 @@
 
    #:+cvtimg-flip+
    #:+cvtimage-swap-rb+
-   #:convert-image
-   #:create-trackbar
-   #:destroy-all-windows
-   #:destroy-window
    #:+event-mousemove+ 
    #:+event-lbuttondown+ 
    #:+event-rbuttondown+ 
@@ -714,6 +713,12 @@
    #:+event-flag-ctrlkey+ 
    #:+event-flag-shiftkey+ 
    #:+event-flag-altkey+ 
+
+   #:convert-image
+   #:create-trackbar
+   #:destroy-all-windows
+   #:destroy-window
+
    #:imshow
    #:move-window
    #:set-mouse-callback
@@ -724,7 +729,6 @@
 
 ;; highgui - Reading and Writing Images and Video
 
-   #:video-capture
    #:+cap-prop-pos-msec+
    #:+cap-prop-pos-frames+
    #:+cap-prop-pos-avi-ratio+
@@ -744,11 +748,6 @@
    #:+cap-prop-convert-rgb+
    #:+cap-prop-white-balance+
    #:+cap-prop-rectification+
-   #:cap-get
-   #:cap-is-open
-   #:cap-read
-   #:cap-release
-   #:cap-set
    #:+imread_unchanged+
    #:+imread_grayscale+
    #:+imread_color+
@@ -759,8 +758,17 @@
    #:+load-image-color+
    #:+load-image-anydepth+
    #:+load-image-anycolor+
+
+   #:cap-get
+   #:cap-is-open
+   #:cap-read
+   #:cap-release
+   #:cap-set
+ 
+
    #:imread
    #:imwrite
+   #:video-capture
    #:video-writer
    #:video-writer-init
    #:video-writer-is-open
@@ -775,6 +783,7 @@
    #:+wnd-prop-fullscreen+
    #:+wnd-prop-autosize+ 
    #:+wnd-prop-aspectratio+
+
    #:get-window-property
    #:set-window-property
 
@@ -807,6 +816,7 @@
    #:+draw-over-outimg+
    #:+not-draw-single-points+
    #:+draw-rich-keypoints+
+
    #:draw-matches
 
 
