@@ -35,6 +35,7 @@
 ;; C Constants
 
 ;; C Integer Limits
+
    #:+char-bit+
    #:+schar-min+
    #:+schar-max+
@@ -47,10 +48,14 @@
    #:+shrt-min+
    #:+shrt-max+
    #:+ushrt-max+
+   #:+int-min+
    #:+int-max+
    #:+uint-max+
+   #:+long-min+
    #:+long-max+
    #:+ulong-max+
+   #:+dbl-max+
+   #:+flt-max+
 
 
 
