@@ -14,8 +14,8 @@
   (+schar-max+ 127)        
   (+uchar-max+ 255)       
   (+char-min+ -128)        
-  (+char-min-j+ 0)         
-
+  (+char-min-j+ 0)
+  (+char-max+ 127)         
   (+char-max-j+ 255)       
   (+mb-len-max+ 5)         
   (+shrt-min+ -32768)    
