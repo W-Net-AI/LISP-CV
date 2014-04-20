@@ -11,3 +11,6 @@
 
 ;;Thank you to OpenCV, the best Computer Vision library in the world. I mold their documentation into my own, 
 ;;because why mess with perfection.
+
+;;Thank you to all the folks at Stack Overflow, who made this alot easier, Baggers, Roerd, Marol, Joshua Taylor, 
+;;berak, acelent, B...,Rainer Joswig, Xach, and much, much, more.
