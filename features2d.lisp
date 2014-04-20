@@ -67,7 +67,7 @@
 ;; void DescriptorExtractor::compute(const Mat& image, vector<KeyPoint>& keypoints, Mat& descriptors) const
 ;; void cv_Feature2D_compute3(Feature2D* self, Mat* image, vector_KeyPoint* keypoints, Mat* descriptors) {
 (defcfun ("cv_Feature2D_compute3" feat-2d-compute) (:pointer feature-2d)
-  "Computes the descriptors for a set of keypoints detected in an image"
+  "Computes the descriptors for a set of keypoints detected in an image."
   (self (:pointer feature-2d))
   (image (:pointer mat))
   (keypoints (:pointer vector-keypoint))
