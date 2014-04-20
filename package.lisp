@@ -63,6 +63,7 @@
    #:feature-detector
    #:mat
    #:mat-expr
+   #:mouse-callback
    #:point
    #:point2d
    #:point2f
@@ -70,11 +71,17 @@
    #:point3f
    #:point3i
    #:rect
+   #:rng
+   #:rotated-rect
    #:scalar
    #:size
+   #:size2f
    #:string*
+   #:surf
    #:svm
    #:svm-params
+   #:term-criteria
+   #:trackbar-callback
    #:vec2b
    #:vec2d
    #:vec2f
@@ -92,11 +99,16 @@
    #:vec4s
    #:vector-char
    #:vector-dmatch
+   #:vector-double
    #:vector-float
    #:vector-int
+   #:vector-keypoint
+   #:vector-mat
    #:vector-point
    #:vector-point2f
-   #:vector-keypoint
+   #:vector-uchar
+   #:video-capture
+   #:video-writer
 
 
 
@@ -201,7 +213,6 @@
    #:promote
    #:ptr
    #:rect
-   #:rect-init
    #:reshape
    #:roi
    #:row-range

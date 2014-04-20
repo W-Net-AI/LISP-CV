@@ -50,9 +50,6 @@
 ;; Point3i*
 (defctype point3i :pointer)
 
-;; Scalar*
-(defctype scalar :pointer)
-
 ;; Rect*
 (defctype rect :pointer)
 
@@ -61,6 +58,9 @@
 
 ;; RotatedRect*
 (defctype rotated-rect :pointer)
+
+;; Scalar*
+(defctype scalar :pointer)
 
 ;; Size*
 (defctype size :pointer)
