@@ -86,7 +86,7 @@ INSTALLATION:
 pull of Itseez/OpenCV(the original OpenCV). Then you will need to install Emacs, SBCL, SLIME and 
 QuickLisp, and then finally Lisp-Cv and all of the required .so files.
 
-To install arjuncomrs OpenCV go to this link:
+To install arjuncomars OpenCV go to this link:
 
 https://github.com/arjuncomar/opencv
 
