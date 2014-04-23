@@ -161,7 +161,7 @@
    #:adjust-roi
    #:area
    #:area2f
-   #:br
+   #:rect-br
    #:channels
    #:clone
    #:col-range
@@ -239,7 +239,7 @@
    #:width2f
    #:step*
    #:sub
-   #:tl
+   #:rect-tl
    #:total
    #:x
    #:y

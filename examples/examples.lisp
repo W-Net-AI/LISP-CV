@@ -64,7 +64,7 @@ matrices must have the same number of rows and columns. You may need to coerce t
 f ADD, the return value, back to type (:POINTER MAT) with the function (FORCE), (or the 
 shorthand version (>>)) to use in other functions. 
 
-***
+****
 (defun add-example ()
 
   "Matrix M1 and M2 are added together with the 
