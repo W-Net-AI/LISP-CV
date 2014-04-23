@@ -14,6 +14,9 @@
 ;; BRISK*
 (defctype brisk :pointer)
 
+;; CascadeClassifier*
+(defctype cascade-classifier :pointer)
+
 ;; DescriptorMatcher*
 (defctype descriptor-matcher :pointer)
 
@@ -157,6 +160,9 @@
 
 ;; vector_Point2f*
 (defctype vector-point2f :pointer)
+
+;; vector_Rect*
+(defctype vector-rect :pointer)
 
 ;; vector_uchar*
 (defctype vector-uchar :pointer)

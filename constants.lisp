@@ -269,6 +269,14 @@
   (+wnd-prop-autosize+ 1) 
   (+wnd-prop-aspectratio+ 2)
 
+
+;;; calib3d:
+
+  (+calib-cb-adaptive-thresh+ 1)
+  (+calib-cb-normalize-image+ 2)
+  (+calib-cb-filter-quads+ 4)
+  (+calib-cb-fast-check+ 8)
+
 ;;; improc:
 
   (+ipl-border-constant+ 0)
@@ -536,8 +544,13 @@
   (+default+ 0)
   (+draw-over-outimg+ 1)
   (+not-draw-single-points+ 2)
-  (+draw-rich-keypoints+ 4))
+  (+draw-rich-keypoints+ 4)
 
 
 
-;;test
+;;; objdetect
+
+  (+cascade-do-canny-pruning+ 1)
+  (+cascade-scale-image+ 2)
+  (+cascade-find-biggest-object+ 4)
+  (+cascade-do-rough-search+ 8))

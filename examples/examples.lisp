@@ -2,11 +2,44 @@
 ;;;; examples.lisp
 ;;;; Documentation and Examples(In process):
 
+There are 3 major types of memory management, manual, with-* macros and Trivial Garbage finalizers
+Most examples so far use manual memory management, which is unsafe, but long-lived and fast. I'll 
+be adding some examples from now on, using the new with-* macro syntax, because with-* macros are 
+safe, scoped and they are also fast. Trivial Garbage finalizers automatically free memory without 
+having to use with-* macros or manual memory management, but, though they are long-lived and safe, 
+they a little slower than the aforementoned forms of memory management. I will likely be offering 
+all three forms of memory management in this library. For reference, here is an example that shows 
+the camera output in a window using the with-* macro syntax:
+
+
+(defun with-macro-example (&optional 
+			     (camera-index *camera-index*) 
+			     (width *default-width*)
+			     (height *default-height*))
+
+  (with-capture (cap (video-capture camera-index))
+    (let ((window-name "WITH-MACRO Example"))
+      (if (not (cap-is-open cap)) 
+	  (return-from with-mat-example 
+	    (format t "Cannot open the video camera")))
+      (cap-set cap +cap-prop-frame-width+ width)
+      (cap-set cap +cap-prop-frame-height+ height)
+      (format t "Frame Size : ~ax~a~%~%" 
+	      (cap-get cap +cap-prop-frame-width+)
+	      (cap-get cap +cap-prop-frame-height+))
+      (with-named-window (window-name +window-normal+)
+	(move-window window-name 759 175)
+	(loop
+	   (with-mat (frame (mat))
+	     (cap-read cap frame)
+	     (imshow window-name frame)
+	     (let ((c (wait-key 33)))
+	       (when (= c 27)
+		 (return)))))))))
 
 
 
-
-BASIC STRUCTURES:
+CORE - BASIC STRUCTURES:
 
 
 
@@ -31,38 +64,36 @@ matrices must have the same number of rows and columns. You may need to coerce t
 f ADD, the return value, back to type (:POINTER MAT) with the function (FORCE), (or the 
 shorthand version (>>)) to use in other functions. 
 
-
-
+***
 (defun add-example ()
 
   "Matrix M1 and M2 are added together with the 
    function ADD. Matrix M1, M2 and RESULT are t-
    hen printed."
 
-  (let* ((m1-data (alloc :uint '(1 2 3 4 5 6 7 8 9)))
-	 (m2-data (alloc :uint '(1 2 3 4 5 6 7 8 9)))
-	 (m1 (mat-data 3 3 +32s+ m1-data))
-         (m2 (mat-data 3 3 +32s+ m2-data))
-         (result (add m1 m2)))
-    (dotimes (i (rows m1))
-      (dotimes (j (cols m1))
-	(format t "~a" (at m1 i j :int))
-	(princ #\Space))
-      (princ #\Newline))
-    (format t "~%~%")
-    (dotimes (i (rows m2))
-      (dotimes (j (cols m2))
-	(format t "~a" (at m2 i j :int))
-	(princ #\Space))
-      (princ #\Newline))
-    (format t "~%~%")
-    (dotimes (i 3)
-      (dotimes (j 3)
-	(format t "~a" (at (>> result) i j :int))
-	(princ #\Space))
-      (princ #\Newline))
-    (free m1-data)
-    (free m2-data)))
+  (with-alloc (data (alloc :uint '(1 2 3 4 5 6 7 8 9)))
+    (with-mat (m1 (mat-data 3 3 +32s+ data))
+      (with-mat (m2 (mat-data 3 3 +32s+ data))
+	(with-mat-expr (result (add m1 m2))
+	  (format t "~%M1 =~%~%")
+	  (dotimes (i (rows m1))
+	    (dotimes (j (cols m1))
+	      (format t "~a" (at m1 i j :int))
+	      (princ #\Space))
+	    (princ #\Newline))
+	  (format t "~%M2 = ~%~%")
+	  (dotimes (i (rows m2))
+	    (dotimes (j (cols m2))
+	      (format t "~a" (at m2 i j :int))
+	      (princ #\Space))
+	    (princ #\Newline))
+	  (format t "~%RESULT = ~%~%")
+	  (dotimes (i 3)
+	    (dotimes (j 3)
+	      (format t "~a" (at (>> result) i j :int))
+	      (princ #\Space))
+	    (princ #\Newline))
+	  (format t "~%"))))))
 
 
 
@@ -462,6 +493,54 @@ ces. When the operation mask is specified, and the (CREATE) call shown above rea
 	(princ #\Space))
       (princ #\Newline))
     (format t "~%~%")))
+
+
+
+CROSS
+
+Computes a cross-product of two 3-element vectors.
+
+C++: Mat Mat::cross(InputArray m) const
+
+LISP-CV: (CROSS (SELF (:POINTER MAT)) (M (:POINTER MAT))) => (:POINTER MAT)
+
+
+    Parameters:	
+
+        SELF - A 3-element vector
+
+        m - Another cross-product operand.
+
+
+The function CROSS computes a cross-product of two 3-element vectors. The vectors must be 3-element 
+floating-point vectors of the same shape and size. The result is another 3-element vector of the same 
+shape and type as operands.
+
+
+(defun cross-example ()
+
+  (with-alloc (data1 (alloc :double '(7d0 3d0 -4d0)))
+    (with-alloc (data2 (alloc :double '(1d0 0d0 6d0)))
+      (with-mat (vec1 (mat-data 1 3 +64f+ data1))
+	(with-mat (vec2 (mat-data 1 3 +64f+ data2))
+	  ;Print VEC1
+	  (format t "~%VEC1 = ~%~%")
+	  (dotimes (j (cols vec1))
+	    (format t "~a" (at vec1 0 j :double))
+	    (princ #\Space))
+	  ;Print VEC2
+	  (format t "~%~%VEC2 = ~%~%")
+	  (dotimes (j (cols vec2))
+	    (format t "~a" (at vec2 0 j :double))
+	    (princ #\Space))
+	  ;Find and print cross product 
+	  ;of VEC1 and VEC2
+	  (with-mat (cp (cross vec1 vec2))
+	    (format t "~%~%The cross product is: ~%~%")
+	    (dotimes (j (cols cp))
+	      (format t "~a" (at cp 0 j :double))
+	      (princ #\Space))
+	    (format t "~%~%")))))))
 
 
 
@@ -927,6 +1006,7 @@ LISP-CV: (PTR (SELF (:POINTER MAT)) &OPTIONAL ((I0 :INT) 0)) => :POINTER
 This function returns a pointer to the specified matrix row.
 
 
+
 ;;Must supply a filename parameter for the image you 
 ;;will be using in this example and one for the file 
 ;;the image's pixel value will be written it.
@@ -995,7 +1075,9 @@ This function returns a pointer to the specified matrix row.
     ;;Show the all white image in a window.
     (imshow window-name-2 img)
     (loop while (not (= (wait-key 0) 27)))
+    (del-mat img)
     (destroy-all-windows)))
+
 
 
 Usage: 
@@ -1180,7 +1262,7 @@ bit faster matrix size accessor choose the MAT-SIZE Dfunction.
 
 
 
-OPERATIONS ON ARRAYS:
+CORE - OPERATIONS ON ARRAYS:
 
 
 *ABS
@@ -1259,6 +1341,203 @@ Matrix Expressions(MAT-EXPR), (ABS-DIFF), (CONVERT-SCALE-ABS)
 	(del-mat-expr abs-val)
 	(del-mat clone))
       (destroy-window window-name))))
+
+
+
+*EXP
+
+Calculates the exponent of every array element.
+
+
+C++: void exp(InputArray src, OutputArray dst)
+
+LISP-CV: (*EXP (SRC (:POINTER MAT)) (DEST (:POINTER MAT))) => :VOID
+
+
+    Parameters:	
+
+        SRC - Input array.
+
+        DEST - Output array of the same size and type as SRC.
+
+
+The function *EXP calculates the exponent of every element of the input array:
+
+See OpenCV documentation:
+
+http://docs.opencv.org/modules/core/doc/operations_on_arrays.html?highlight=log#exp 
+
+for a description and formula.
+
+
+Note: This function is named *EXP instead of EXP because, EXP is the name of a Common Lisp function.
+
+See also:
+
+(*LOG) , (CART-TO-POLAR) , (POLAR-TO-CART) , (PHASE) , (POW) , (*SQRT) , (MAGNITUDE)
+
+
+(defun *exp-example (filename)
+
+        ;Create double float matrix data
+  (let* ((data (alloc :double '(1d0 2d0 3d0 4d0 5d0 
+                               6d0 7d0 8d0 9d0)))
+         ;Create double float matrix
+	 (mat (mat-data 3 3 +64f+ data))
+	 (window-name-1 "Original Image - *EXP Example")
+	 (window-name-2 "Image after CONVERT-TO - *EXP Example")
+	 (window-name-3 "Image after LOG - *EXP Example")
+	 (window-name-4 "Image after EXP and LOG - *EXP Example")
+         (image (imread filename 1))
+         (dest (mat-typed 3 3 +64f+)))
+      (named-window window-name-1 +window-normal+)
+      (named-window window-name-2 +window-normal+)
+      (named-window window-name-3 +window-normal+)
+      (named-window window-name-4 +window-normal+)
+      (move-window window-name-1 485 98)
+      (move-window window-name-2 894 98)
+      (move-window window-name-3 485 444)
+      (move-window window-name-4 894 444)
+    (format t "~%MAT: ~%~%")
+    ;Print MAT
+    (dotimes (i (rows mat))
+      (dotimes (j (cols mat))
+	(format t "~a" (at mat i j :double))
+	(princ #\Space))
+      (princ #\Newline))
+    ;Calculate exponent of each element of 
+    ;MAT, using MAT as destination matrix
+    (format t "~%Calculate exponents: ~%~%")
+    (*exp mat mat)
+    (format t "MAT after *EXP: ~%~%")
+    ;Print MAT
+    (dotimes (i (rows mat))
+      (dotimes (j (cols mat))
+	(format t "~a" (at mat i j :double))
+	(princ #\Space))
+      (princ #\Newline))
+    ;Calculating natural logarithm of the 
+    ;exponent of each matrix element of M-
+    ;AT, virtually reverts MAT to it's or-
+    ;iginal state
+    (format t "~%Calculate natural logarithm: ~%~%")
+    (*log mat mat)
+    (format t "MAT after *LOG: ~%~%")
+    ;Print MAT
+    (dotimes (i (rows mat))
+      (dotimes (j (cols mat))
+	(format t "~a" (at mat i j :double))
+	(princ #\Space))
+      (princ #\Newline))
+    (free data)
+    (format t "~%")
+    ;Show original IMAGE in window
+    (imshow window-name-1 image)
+    ;Convert IMAGE to 1 channel
+    (cvt-color image image +bgr2gray+)
+    ;Convert IMAGE to double float
+    ;and show image in window
+    (convert-to image image +64f+)
+    (imshow window-name-2 image)
+    ;Find natural logarithm of 
+    ;IMAGE and show in window
+    (*log image dest)
+    (imshow window-name-3 dest)
+    ;Finding natural logarithm of each exponent 
+    ;of each element of IMAGE, reverts IMAGE ba-
+    ;ck to its original state after CONVERT-TO
+    (*exp image image)
+    (*log image image)
+    ;Show result in window
+    (imshow window-name-4 image)
+    (loop while (not (= (wait-key 0) 27)))
+    (destroy-all-windows)))
+
+
+
+*LOG
+
+Calculates the natural logarithm of every array element.
+
+C++: void log(InputArray src, OutputArray dst)
+
+LISP-CV: (*LOG (SRC (:POINTER MAT)) (DEST (:POINTER MAT))) => :VOID
+
+
+    Parameters:	
+
+        SRC - Input array.
+
+        DST - Output array of the same size and type as SRC.
+
+
+The function *LOG calculates the natural logarithm of the absolute value of every element of the input 
+array:
+
+See OpenCV documentation:
+
+http://docs.opencv.org/modules/core/doc/operations_on_arrays.html?highlight=log#log
+
+for a description and formula.
+
+
+Note: This function is named *LOG instead of LOG because, LOG is the name of a Common Lisp function.
+
+
+See also:
+
+(*EXP), (CART-TO-POLAR), (POLAR-TO-CART), (PHASE), (POW), (*SQRT), (MAGNITUDE)
+
+
+
+(defun *log-example (filename)
+
+	 ;Create double float matrix data
+  (let* ((data (alloc :double '(1d0 2d0 3d0 4d0 5d0 
+                               6d0 7d0 8d0 9d0)))
+         ;Create double float matrix
+	 (mat (mat-data 3 3 +64f+ data))
+	 (window-name-1 "Original Image - *LOG Example")
+	 (window-name-2 "Natural logarithm of image - *LOG Example")
+         (image (imread filename 1)))
+    (named-window window-name-1 +window-normal+)
+    (named-window window-name-2 +window-normal+)
+    (move-window window-name-1 533 175)
+    (move-window window-name-2 984 175)
+    (format t "~%MAT = ~%~%")
+    ;Print MAT
+    (dotimes (i (rows mat))
+      (dotimes (j (cols mat))
+	(format t "~a" (at mat i j :double))
+	(princ #\Space))
+      (princ #\Newline))
+    ;Calculate natural logarithm of each element 
+    ;of MAT, using MAT as destination matrix
+    (format t "~%Calculate natural logarithm: ~%~%")
+    (*log mat mat)
+    (format t "MAT = ~%~%")
+    ;Print MAT
+    (dotimes (i (rows mat))
+      (dotimes (j (cols mat))
+	(format t "~a" (at mat i j :double))
+	(princ #\Space))
+      (princ #\Newline))
+    (free data)
+    (format t "~%")
+    ;Show original IMAGE in window
+    (imshow window-name-1 image)
+    ;Convert IMAGE to 1 channel
+    (cvt-color image image +bgr2gray+)
+    ;Convert IMAGE to double float
+    (convert-to image image +64f+)
+    ;Find natural logarithm of each element of 
+    ;IMAGE, just to see what it looks like
+    (*log image image)
+    ;Show IMAGE
+    (imshow window-name-2 image)
+    (loop while (not (= (wait-key 0) 27)))
+    (destroy-all-windows)))
+
 
 
 *MAX
@@ -1584,6 +1863,129 @@ See also:
       (destroy-window window-name))))
 
 
+BITWISE-AND
+
+Calculates the per-element bit-wise conjunction of two arrays.
+
+C++: void bitwise_and(InputArray src1, InputArray src2, OutputArray dst, InputArray mask=noArray())
+
+LISP-CV: (BITWISE-AND (SRC1 (:POINTER MAT)) (SRC2 (:POINTER MAT)) (DEST (:POINTER MAT)) &OPTIONAL ((MASK (:POINTER MAT)) (MAT))) => :VOID
+
+
+    Parameters:	
+
+        SRC1 - First input array.
+
+        SRC2 - Second input array.
+
+        DEST - Output array that has the same size and type as the input arrays.
+
+        MASK - Optional operation mask, 8-bit single channel array, that 
+               specifies elements of the output array to be changed.
+
+
+The function calculates the per-element bit-wise logical conjunction for two arrays when SRC1 and SRC2 
+have the same size. In case of floating-point arrays, their machine-specific bit representations (usually 
+IEEE754-compliant) are used for the operation. In case of multi-channel arrays, each channel is processed 
+independently.
+
+
+(defun bitwise-and-example (filename-1 filename-2)
+
+  "Calculates the per-element bit-wise conjunction of two 
+   images.
+
+   Note: You are encouraged to use the Black and White.png 
+   and the White and Black.png in the LISP-CV images direc-
+   tory to get the full effect of this example."
+
+  (let* ((image-1 (imread filename-1 1))
+	 (image-2 (imread filename-2 1))
+	 (dest (mat-typed (rows image-1) (cols image-1) +8uc3+))
+	 (window-name-1 "IMAGE-1 - BITWISE-AND Example")
+	 (window-name-2 "IMAGE-2 - BITWISE-AND Example")
+	 (window-name-3 "DEST - BITWISE-AND Example"))
+    (named-window window-name-1 +window-normal+)
+    (named-window window-name-2 +window-normal+)
+    (named-window window-name-3 +window-normal+)
+    (move-window window-name-1 310 175)
+    (move-window window-name-2 760 175)
+    (move-window window-name-3 1210 175)
+    (bitwise-and image-1 image-2 dest)
+    (imshow window-name-1 image-1)
+    (imshow window-name-2 image-2)
+    (imshow window-name-3 dest)
+    (loop while (not (= (wait-key 0) 27)))
+    (del-mat image-1)
+    (del-mat image-2)
+    (del-mat dest)
+    (destroy-all-windows)))
+
+
+
+BITWISE-NOT
+
+Inverts every bit of an array.
+
+C++: void bitwise_not(InputArray src, OutputArray dst, InputArray mask=noArray())
+
+LISP-CV: (BITWISE-NOT (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) &OPTIONAL ((MASK (:POINTER MAT)) (MAT))) => :VOID
+
+
+    Parameters:	
+
+        SRC - Input array.
+
+        DEST - Output array that has the same size and type as the input array.
+
+        MASK - Optional operation mask, 8-bit single channel array, that 
+               specifies elements of the output array to be changed.
+
+
+The function calculates per-element bit-wise inversion of the input array. In case of a floating-point 
+input array, its machine-specific bit representation (usually IEEE754-compliant) is used for the operation. 
+In case of multi-channel arrays, each channel is processed independently.
+
+
+(defun bitwise-not-example (filename-1 filename-2)
+
+  "Inverts every bit of IMAGE-1 and IMAGE-2.
+
+   Note: You are encouraged to use the Black and White.png 
+   in the LISP-CV images directory and an image of your ow-
+   n choosing to get the full effect of this example."
+
+  (let* ((image-1 (imread filename-1 1))
+	 (image-2 (imread filename-2 1))
+	 (dest-1 (mat-typed (rows image-1) (cols image-1) +8uc3+))
+         (dest-2 (mat-typed (rows image-2) (cols image-2) +8uc3+))
+	 (window-name-1 "IMAGE-1 - BITWISE-NOT Example")
+	 (window-name-2 "IMAGE-2 - BITWISE-NOT Example")
+	 (window-name-3 "DEST-1 - BITWISE-NOT Example")
+	 (window-name-4 "DEST-2 - BITWISE-NOT Example"))
+    (named-window window-name-1 +window-normal+)
+    (named-window window-name-2 +window-normal+)
+    (named-window window-name-3 +window-normal+)
+    (named-window window-name-4 +window-normal+)
+    (move-window window-name-1 485 98)
+    (move-window window-name-2 894 98)
+    (move-window window-name-3 485 444)
+    (move-window window-name-4 894 444)
+    (bitwise-not image-1 dest-1)
+    (bitwise-not image-2 dest-2)
+    (imshow window-name-1 image-1)
+    (imshow window-name-2 dest-1)
+    (imshow window-name-3 image-2)
+    (imshow window-name-4 dest-2)
+    (loop while (not (= (wait-key 0) 27)))
+    (del-mat image-1)
+    (del-mat image-2)
+    (del-mat dest-1)
+    (del-mat dest-2)
+    (destroy-all-windows)))
+
+
+
 BITWISE-OR
 
 Calculates the per-element bit-wise disjunction of two arrays.
@@ -1595,17 +1997,17 @@ LISP-CV: (BITWISE-OR (SRC1 (:POINTER MAT)) (SRC2 (:POINTER MAT)) (DEST (:POINTER
 
     Parameters:	
 
-        SRC1 - A matrix.
+        SRC1 - First input array.
 
-        SRC2 - A matrix.
+        SRC2 - Second input array.
 
-        DEST - Output matrix that has the same size and type as the input matrices.
+        DEST - Output array that has the same size and type as the input arrays.
 
-        MASK - Optional operation mask, 8-bit single channel matrix, that 
-               specifies elements of the output matrix to be changed.
+        MASK - Optional operation mask, 8-bit single channel array, that 
+               specifies elements of the output array to be changed.
 
 
-The function calculates the per-element bit-wise logical disjunction for two matrices when SRC1 and SRC2 
+The function calculates the per-element bit-wise logical disjunction for two arrays when SRC1 and SRC2 
 have the same size. In case of floating-point arrays, their machine-specific bit representations (usually 
 IEEE754-compliant) are used for the operation. In case of multi-channel arrays, each channel is processed 
 independently.
@@ -1622,7 +2024,7 @@ independently.
 
   (let* ((image-1 (imread filename-1 1))
 	 (image-2 (imread filename-2 1))
-	 (dest (mat-typed (rows image-1) (cols image-1) +8uc3+ ))
+	 (dest (mat-typed (rows image-1) (cols image-1) +8uc3+))
 	 (window-name-1 "IMAGE-1 - BITWISE-OR Example")
 	 (window-name-2 "IMAGE-2 - BITWISE-OR Example")
 	 (window-name-3 "DEST - BITWISE-OR Example"))
@@ -1637,6 +2039,9 @@ independently.
     (imshow window-name-2 image-2)
     (imshow window-name-3 dest)
     (loop while (not (= (wait-key 0) 27)))
+    (del-mat image-1)
+    (del-mat image-2)
+    (del-mat dest)
     (destroy-all-windows)))
 
 
@@ -1651,17 +2056,17 @@ LISP-CV: (BITWISE-XOR (SRC1 (:POINTER MAT)) (SRC2 (:POINTER MAT)) (DEST (:POINTE
 
     Parameters:	
 
-        SRC1 - A matrix.
+        SRC1 - First input array.
 
-        SRC2 - A matrix.
+        SRC2 - Second input array.
 
-        DEST - Output matrix that has the same size and type as the input matrices.
+        DEST - Output array that has the same size and type as the input arrays.
 
-        MASK - Optional operation mask, 8-bit single channel matrix, that 
-               specifies elements of the output matrix to be changed.
+        MASK - Optional operation mask, 8-bit single channel array, that 
+               specifies elements of the output array to be changed.
 
 
-The function calculates the per-element bit-wise logical “exclusive-or” operation for two matrices 
+The function calculates the per-element bit-wise logical “exclusive-or” operation for two arrays 
 when SRC1 and SRC2 have the same size. In case of floating-point arrays, their machine-specific bit 
 representations (usually IEEE754-compliant) are used for the operation. In case of multi-channel 
 arrays, each channel is processed independently.
@@ -1678,7 +2083,7 @@ arrays, each channel is processed independently.
 
   (let* ((image-1 (imread filename-1 1))
 	 (image-2 (imread filename-2 1))
-	 (dest (mat-typed (rows image-1) (cols image-1) +8uc3+ ))
+	 (dest (mat-typed (rows image-1) (cols image-1) +8uc3+))
 	 (window-name-1 "IMAGE-1 - BITWISE-XOR Example")
 	 (window-name-2 "IMAGE-2 - BITWISE-XOR Example")
 	 (window-name-3 "DEST - BITWISE-XOR Example"))
@@ -1693,7 +2098,11 @@ arrays, each channel is processed independently.
     (imshow window-name-2 image-2)
     (imshow window-name-3 dest)
     (loop while (not (= (wait-key 0) 27)))
+    (del-mat image-1)
+    (del-mat image-2)
+    (del-mat dest)
     (destroy-all-windows)))
+
 
 
 CONVERT-SCALE-ABS
@@ -1843,117 +2252,6 @@ See also:
       (princ #\Newline)
       (free data-1)
       (free data-2)))
-
-
-
-*EXP
-
-Calculates the exponent of every array element.
-
-
-C++: void exp(InputArray src, OutputArray dst)
-
-LISP-CV: (*EXP (SRC (:POINTER MAT)) (DEST (:POINTER MAT))) => :VOID
-
-
-    Parameters:	
-
-        SRC - Input array.
-
-        DEST - Output array of the same size and type as SRC.
-
-
-The function *EXP calculates the exponent of every element of the input array:
-
-See OpenCV documentation:
-
-http://docs.opencv.org/modules/core/doc/operations_on_arrays.html?highlight=log#exp 
-
-for a description and formula.
-
-
-Note: This function is named *EXP instead of EXP because, EXP is the name of a Common Lisp function.
-
-See also:
-
-(*LOG) , (CART-TO-POLAR) , (POLAR-TO-CART) , (PHASE) , (POW) , (*SQRT) , (MAGNITUDE)
-
-
-(defun *exp-example (filename)
-
-        ;Create double float matrix data
-  (let* ((data (alloc :double '(1d0 2d0 3d0 4d0 5d0 
-                               6d0 7d0 8d0 9d0)))
-         ;Create double float matrix
-	 (mat (mat-data 3 3 +64f+ data))
-	 (window-name-1 "Original Image - *EXP Example")
-	 (window-name-2 "Image after CONVERT-TO - *EXP Example")
-	 (window-name-3 "Image after LOG - *EXP Example")
-	 (window-name-4 "Image after EXP and LOG - *EXP Example")
-         (image (imread filename 1))
-         (dest (mat-typed 3 3 +64f+)))
-      (named-window window-name-1 +window-normal+)
-      (named-window window-name-2 +window-normal+)
-      (named-window window-name-3 +window-normal+)
-      (named-window window-name-4 +window-normal+)
-      (move-window window-name-1 485 98)
-      (move-window window-name-2 894 98)
-      (move-window window-name-3 485 444)
-      (move-window window-name-4 894 444)
-    (format t "~%MAT: ~%~%")
-    ;Print MAT
-    (dotimes (i (rows mat))
-      (dotimes (j (cols mat))
-	(format t "~a" (at mat i j :double))
-	(princ #\Space))
-      (princ #\Newline))
-    ;Calculate exponent of each element of 
-    ;MAT, using MAT as destination matrix
-    (format t "~%Calculate exponents: ~%~%")
-    (*exp mat mat)
-    (format t "MAT after *EXP: ~%~%")
-    ;Print MAT
-    (dotimes (i (rows mat))
-      (dotimes (j (cols mat))
-	(format t "~a" (at mat i j :double))
-	(princ #\Space))
-      (princ #\Newline))
-    ;Calculating natural logarithm of the 
-    ;exponent of each matrix element of M-
-    ;AT, virtually reverts MAT to it's or-
-    ;iginal state
-    (format t "~%Calculate natural logarithm: ~%~%")
-    (*log mat mat)
-    (format t "MAT after *LOG: ~%~%")
-    ;Print MAT
-    (dotimes (i (rows mat))
-      (dotimes (j (cols mat))
-	(format t "~a" (at mat i j :double))
-	(princ #\Space))
-      (princ #\Newline))
-    (free data)
-    (format t "~%")
-    ;Show original IMAGE in window
-    (imshow window-name-1 image)
-    ;Convert IMAGE to 1 channel
-    (cvt-color image image +bgr2gray+)
-    ;Convert IMAGE to double float
-    ;and show image in window
-    (convert-to image image +64f+)
-    (imshow window-name-2 image)
-    ;Find natural logarithm of 
-    ;IMAGE and show in window
-    (*log image dest)
-    (imshow window-name-3 dest)
-    ;Finding natural logarithm of each exponent 
-    ;of each element of IMAGE, reverts IMAGE ba-
-    ;ck to its original state after CONVERT-TO
-    (*exp image image)
-    (*log image image)
-    ;Show result in window
-    (imshow window-name-4 image)
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-all-windows)))
 
 
 FLIP
@@ -2205,90 +2503,6 @@ See also:
 	(del-mat identity-mat)
         (del-mat-expr result))
       (destroy-all-windows))))
-
-
-*LOG
-
-Calculates the natural logarithm of every array element.
-
-C++: void log(InputArray src, OutputArray dst)
-
-LISP-CV: (*LOG (SRC (:POINTER MAT)) (DEST (:POINTER MAT))) => :VOID
-
-
-    Parameters:	
-
-        SRC - Input array.
-
-        DST - Output array of the same size and type as SRC.
-
-
-The function *LOG calculates the natural logarithm of the absolute value of every element of the input 
-array:
-
-See OpenCV documentation:
-
-http://docs.opencv.org/modules/core/doc/operations_on_arrays.html?highlight=log#log
-
-for a description and formula.
-
-
-Note: This function is named *LOG instead of LOG because, LOG is the name of a Common Lisp function.
-
-
-See also:
-
-(*EXP), (CART-TO-POLAR), (POLAR-TO-CART), (PHASE), (POW), (*SQRT), (MAGNITUDE)
-
-
-
-(defun *log-example (filename)
-
-	 ;Create double float matrix data
-  (let* ((data (alloc :double '(1d0 2d0 3d0 4d0 5d0 
-                               6d0 7d0 8d0 9d0)))
-         ;Create double float matrix
-	 (mat (mat-data 3 3 +64f+ data))
-	 (window-name-1 "Original Image - *LOG Example")
-	 (window-name-2 "Natural logarithm of image - *LOG Example")
-         (image (imread filename 1)))
-    (named-window window-name-1 +window-normal+)
-    (named-window window-name-2 +window-normal+)
-    (move-window window-name-1 533 175)
-    (move-window window-name-2 984 175)
-    (format t "~%MAT = ~%~%")
-    ;Print MAT
-    (dotimes (i (rows mat))
-      (dotimes (j (cols mat))
-	(format t "~a" (at mat i j :double))
-	(princ #\Space))
-      (princ #\Newline))
-    ;Calculate natural logarithm of each element 
-    ;of MAT, using MAT as destination matrix
-    (format t "~%Calculate natural logarithm: ~%~%")
-    (*log mat mat)
-    (format t "MAT = ~%~%")
-    ;Print MAT
-    (dotimes (i (rows mat))
-      (dotimes (j (cols mat))
-	(format t "~a" (at mat i j :double))
-	(princ #\Space))
-      (princ #\Newline))
-    (free data)
-    (format t "~%")
-    ;Show original IMAGE in window
-    (imshow window-name-1 image)
-    ;Convert IMAGE to 1 channel
-    (cvt-color image image +bgr2gray+)
-    ;Convert IMAGE to double float
-    (convert-to image image +64f+)
-    ;Find natural logarithm of each element of 
-    ;IMAGE, just to see what it looks like
-    (*log image image)
-    ;Show IMAGE
-    (imshow window-name-2 image)
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-all-windows)))
 
 
 
@@ -2559,6 +2773,38 @@ See also:
 Example:
 
 See MATCH-TEMPLATE-EXAMPLE for example usage of NORMALIZE.
+
+
+
+POW
+
+Raises every array element to a power.
+
+C++: void pow(InputArray src, double power, OutputArray dst)
+
+LISP-CV: (POW (SRC (:POINTER MAT)) (POWER :DOUBLE) (DEST (:POINTER MAT))) => :VOID
+
+
+    Parameters:	
+
+        SRC - Input array.
+
+        POWER - Exponent of power.
+
+        DEST - Output array of the same size and type as SRC.
+
+
+See OpenCV documentation:
+
+http://docs.opencv.org/modules/core/doc/operations_on_arrays.html?highlight=pow#pow
+
+for description and formula.
+
+
+See also:
+
+(*SQRT), (*EXP), (*LOG), (CART-TO-POLAR), (POLAR-TO-CART)
+
 
 
 
@@ -3661,148 +3907,7 @@ See also:
 
 
 
-READING AND WRITING IMAGES AND VIDEO:
-
-
-
-
-IMWRITE
-
-Saves an image to a specified file.
-
-C++: bool imwrite(const string& filename, InputArray img, const vector<int>& params=vector<int>() )
-
-LISP-CV: (IMWRITE (FILENAME :STRING) (IMG (:POINTER MAT)) ((PARAMS (:POINTER VECTOR-INT)) (VECTOR-INT))) => :BOOLEAN
-
-    Parameters:	
-
-        FILENAME - Name of the file.
-
-        IMAGE - Image to be saved.
-
-        PARAMS -
-
-        Format-specific save parameters encoded as pairs PARAM-ID-1, PARAM-VALUE-1, PARAM-ID-2, 
-        PARAM-VALUE-2, ... . The following parameters are currently supported:
-
-            For JPEG, it can be a quality (+IMWRITE-JPEG-QUALITY+) from 0 to 100 (the higher is the 
-            better). Default value is 95.
-
-            For PNG, it can be the compression level (+IMWRITE-PNG-COMPRESSION+) from 0 to 9. A higher 
-            value means a smaller size and longer compression time. Default value is 3.
-
-            For PPM, PGM, or PBM, it can be a binary format flag (+IMWRITE-PXM-BINARY+ ), 0 or 1. 
-            Default value is 1.
-
-The function IMWRITE saves the image to the specified file. The image format is chosen based on the 
-filename extension (see (IMREAD) for the list of extensions). Only 8-bit (or 16-bit unsigned (+16U+) 
-in case of PNG, JPEG 2000, and TIFF) single-channel or 3-channel (with ‘BGR’ channel order) images 
-can be saved using this function. If the format, depth or channel order is different, use (CONVERT-TO), 
-and (CVT-COLOR) to convert it before saving. Or, use the universal XML I/O functions to save the image 
-to XML or YAML format.
-
-It is possible to store PNG images with an alpha channel using this function. To do this, create 8-bit 
-(or 16-bit) 4-channel image BGRA, where the alpha channel goes last. Fully transparent pixels should 
-have alpha set to 0, fully opaque pixels should have alpha set to 255/65535. 
-
-
-(defun imwrite-example (filename-1 out-file)
-       ;;Read in image
-  (let* ((image (imread filename-1 1))
-	 (window-name-1 "Original image - IMWRITE Example")
-         (window-name-2 "Flipped image - IMWRITE Example"))
-    (if (empty image) 
-	(return-from imwrite-example 
-	  (format t "Image not loaded")))
-    (named-window window-name-1 +window-normal+)
-    (named-window window-name-2 +window-normal+)
-    (move-window window-name-1 533 175)
-    (move-window window-name-2 984 175)
-    ;;Show original IMAGE in window
-    (imshow window-name-1 image)
-    ;;Flip IMAGE around the x-axis
-    (flip image image -1)
-    ;;Show flipped image in window
-    (imshow window-name-2 image)
-    ;;Write flipped image to filename specified 
-    ;;by the OUT-FILE parameter 
-    (imwrite out-file image (vector-int 
-			     (list +imwrite-jpeg-quality+ 99)))
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-all-windows)))
-
-
-
-VIDEO-CAPTURE
-
-VideoCapture constructors.
-
-C++: VideoCapture::VideoCapture()
-
-LISP-CV: (VIDEO-CAPTURE) => (:POINTER VIDEO-CAPTURE)
-
-C++: VideoCapture::VideoCapture(int device)
-
-LISP-CV: (VIDEO-CAPTURE &OPTIONAL (SRC :INT)) => (:POINTER VIDEO-CAPTURE)
-
-C++: VideoCapture::VideoCapture(const string& filename)
-
-LISP-CV: (VIDEO-CAPTURE &OPTIONAL (SRC :POINTER STRING*)) => (:POINTER VIDEO-CAPTURE)
-
-
-  Parameters:	
-
-        SRC - 
-
-             A device: ID of the opened video capturing device (i.e. a camera index). If there is 
-                       a single camera connected, just pass 0.     
-
-             A file name: Name of the opened video file (eg. video.avi) or image sequence (eg. 
-                          img_%02d.jpg, which will read samples like img_00.jpg, img_01.jpg, 
-                          img_02.jpg, ...)
-
-             NIL: Creates an uninitialized (:POINTER VIDEO-CAPTURE)
-        
-
-
-(defun video-capture-example (filename &optional 
-					 (camera-index *camera-index*))
-
-  "This example use the function VIDEO-CAPTURE to open a video 
-   capturing device, supplied by the *CAMERA-INDEX* parameter. 
-   The setf-able *CAMERA-INDEX* parameter defaults to 0. Then 
-   the function VIDEO-CAPTURE is used to open a video file sup-
-   plied by the parameter FILENAME."
-  
-  (with-capture (video-capture (video-capture camera-index))
-    (with-capture (cap-file (video-capture filename))
-      (let ((window-name-1 "Camera - VIDEO-CAPTURE Example")
-	    (window-name-2 "Video file - VIDEO-CAPTURE Example"))
-	(if (not (cap-is-open video-capture)) 
-	    (return-from video-capture-example 
-	      (format t "Cannot open the video camera")))
-	(if (not (cap-is-open cap-file)) 
-	    (return-from video-capture-example 
-	      (format t "Cannot open the video file")))
-	(named-window window-name-1 +window-normal+)
-	(named-window window-name-2 +window-normal+)
-	(move-window window-name-1 533 175)
-	(move-window window-name-2 984 175)
-	(do* ((camera 0)
-	      (video-file 0))
-	     ((plusp (wait-key *millis-per-frame*)) 
-	      (format t "Key is pressed by user"))
-	  (setf camera (mat))
-	  (cap-read video-capture camera)
-	  (setf video-file (mat))
-	  (cap-read cap-file video-file)
-	  (imshow window-name-1 camera)
-	  (imshow window-name-2 video-file))
-	(destroy-all-windows)))))
-
-
-
-IMAGE FILTERING:
+IMGPROC - IMAGE FILTERING:
 
 
 COPY-MAKE-BORDER
@@ -4158,109 +4263,7 @@ See also:
 
 
 
-MISCELLANEOUS IMAGE TRANSFORMATIONS:
-
-
-
-THRESHOLD
-
-Applies a fixed-level threshold to each array element.
-
-C++: double threshold(InputArray src, OutputArray dst, double thresh, double maxval, int type)
-
-LISP-CV: (THRESHOLD (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) (THRESH :DOUBLE) (MAX-VAL :DOUBLE) (TYPE :INT)) => :DOUBLE
-
-
-    Parameters:	
-
-        SRC - Input array (single-channel, 8-bit or 32-bit floating point).
-
-        DEST - Output array of the same size and type as SRC.
-
-        THRESH - Threshold value.
-
-        MAX-VAL - Maximum value to use with the +THRESH-BINARY+ and +THRESH-BINARY-INV+ thresholding types.
-
-        TYPE - Thresholding type (see the details below).
-
-
-The function applies fixed-level thresholding to a single-channel array. The function is typically 
-used to get a bi-level (binary) image out of a grayscale image ( (COMPARE) could be also used for 
-this purpose) or for removing a noise, that is, filtering out pixels with too small or too large 
-values. There are several types of thresholding supported by the function. 
-
-They are determined by type:
-
-                        +THRESH-BINARY+
-
-                        +THRESH-BINARY-INV+
-
-                        +THRESH-TRUNC+
-
-                        +THRESH-TOZERO+
-
-                        +THRESH-TOZERO-INV+
-
-
-Also, the special value +THRESH-OTSU+ may be combined with one of the above values. In this case, 
-the function determines the optimal threshold value using the Otsu’s algorithm and uses it instead 
-of the specified thresh . The function returns the computed threshold value. Currently, the Otsu’s 
-method is implemented only for 8-bit images. 
-
-See also
-
-(ADAPTIVE-THRESHOLD), (FIND-CONTOURS), (COMPARE), (MIN), (MAX)
-
-
-(defun threshold-example (&optional (camera-index 0)
-			    (width 640) (height 480))
-
-  "Show the camera output and a thresholded 
-   version in a single window."
-
-  (with-capture (cap (video-capture camera-index))
-    (let* ((window-name "Camera/Threshold")
-           (grayscale (mat-typed height width +8u+))
-           (threshold (mat-typed height width +8u+))
-           (threshold3 (mat-typed height width +8uc3+))
-           ;Create a double wide window to show the camera 
-           ;output and a thresholded camera output in
-           (window (mat-typed height (* width 2) +8uc3+)))
-      (cap-set cap +cap-prop-frame-width+ width)
-      (cap-set cap +cap-prop-frame-height+ height)
-      (named-window window-name)
-      (move-window window-name 333 175)
-      (do* ((frame 0))
-	   ((plusp (wait-key *millis-per-frame*)) 
-	    (format t "Key is pressed by user"))
-        ;Set camera feed to FRAME
-	(setf frame (mat))
-	(cap-read cap frame)
-        ;Convert FRAME to a 1 channel grayscale 
-        ;image and assign to GRAYSCALE
-        (cvt-color frame grayscale +bgr2gray+)
-        ;Apply a fixed-level threshold to 
-        ;each array element of GRAYSCALE
-        (threshold grayscale threshold 128d0 255d0 +thresh-binary+)
-        ;Convert threshold back to a 3 channel 
-        ;BGR image and assign to THRESHOLD3
-	(cvt-color threshold threshold3 +gray2bgr+)
-        ;Set WINDOW roi to the left half
-        (adjust-roi window 0 0 0 (* (cols threshold3) -1))
-        ;Copy original camera feed(FRAME) to WINDOW 
-        (copy-to frame window)
-        ;Set WINDOW roi to the right half
-        (adjust-roi window 0 0 (* (cols frame) -1) (cols threshold3))
-        ;Copy thresholded camera feed to WINDOW
-        (copy-to threshold3 window)
-        ;Restore original roi
-        (adjust-roi window 0 0 (cols frame) 0)
-        ;Show WINDOW in a window
-	(imshow window-name window))
-      (destroy-window window-name))))
-
-
-GEOMETRIC IMAGE TRANSFORMATIONS:
+IMGPROC - GEOMETRIC IMAGE TRANSFORMATIONS:
 
 
 RESIZE
@@ -4367,7 +4370,185 @@ See also:
 
 
 
-FEATURE DETECTION:
+
+IMGPROC - MISCELLANEOUS IMAGE TRANSFORMATIONS:
+
+
+
+THRESHOLD
+
+Applies a fixed-level threshold to each array element.
+
+C++: double threshold(InputArray src, OutputArray dst, double thresh, double maxval, int type)
+
+LISP-CV: (THRESHOLD (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) (THRESH :DOUBLE) (MAX-VAL :DOUBLE) (TYPE :INT)) => :DOUBLE
+
+
+    Parameters:	
+
+        SRC - Input array (single-channel, 8-bit or 32-bit floating point).
+
+        DEST - Output array of the same size and type as SRC.
+
+        THRESH - Threshold value.
+
+        MAX-VAL - Maximum value to use with the +THRESH-BINARY+ and +THRESH-BINARY-INV+ thresholding types.
+
+        TYPE - Thresholding type (see the details below).
+
+
+The function applies fixed-level thresholding to a single-channel array. The function is typically 
+used to get a bi-level (binary) image out of a grayscale image ( (COMPARE) could be also used for 
+this purpose) or for removing a noise, that is, filtering out pixels with too small or too large 
+values. There are several types of thresholding supported by the function. 
+
+They are determined by type:
+
+                        +THRESH-BINARY+
+
+                        +THRESH-BINARY-INV+
+
+                        +THRESH-TRUNC+
+
+                        +THRESH-TOZERO+
+
+                        +THRESH-TOZERO-INV+
+
+
+Also, the special value +THRESH-OTSU+ may be combined with one of the above values. In this case, 
+the function determines the optimal threshold value using the Otsu’s algorithm and uses it instead 
+of the specified thresh . The function returns the computed threshold value. Currently, the Otsu’s 
+method is implemented only for 8-bit images. 
+
+See also
+
+(ADAPTIVE-THRESHOLD), (FIND-CONTOURS), (COMPARE), (MIN), (MAX)
+
+
+(defun threshold-example (&optional (camera-index 0)
+			    (width 640) (height 480))
+
+  "Show the camera output and a thresholded 
+   version in a single window."
+
+  (with-capture (cap (video-capture camera-index))
+    (let* ((window-name "Camera/Threshold")
+           (grayscale (mat-typed height width +8u+))
+           (threshold (mat-typed height width +8u+))
+           (threshold3 (mat-typed height width +8uc3+))
+           ;Create a double wide window to show the camera 
+           ;output and a thresholded camera output in
+           (window (mat-typed height (* width 2) +8uc3+)))
+      (cap-set cap +cap-prop-frame-width+ width)
+      (cap-set cap +cap-prop-frame-height+ height)
+      (named-window window-name)
+      (move-window window-name 333 175)
+      (do* ((frame 0))
+	   ((plusp (wait-key *millis-per-frame*)) 
+	    (format t "Key is pressed by user"))
+        ;Set camera feed to FRAME
+	(setf frame (mat))
+	(cap-read cap frame)
+        ;Convert FRAME to a 1 channel grayscale 
+        ;image and assign to GRAYSCALE
+        (cvt-color frame grayscale +bgr2gray+)
+        ;Apply a fixed-level threshold to 
+        ;each array element of GRAYSCALE
+        (threshold grayscale threshold 128d0 255d0 +thresh-binary+)
+        ;Convert threshold back to a 3 channel 
+        ;BGR image and assign to THRESHOLD3
+	(cvt-color threshold threshold3 +gray2bgr+)
+        ;Set WINDOW roi to the left half
+        (adjust-roi window 0 0 0 (* (cols threshold3) -1))
+        ;Copy original camera feed(FRAME) to WINDOW 
+        (copy-to frame window)
+        ;Set WINDOW roi to the right half
+        (adjust-roi window 0 0 (* (cols frame) -1) (cols threshold3))
+        ;Copy thresholded camera feed to WINDOW
+        (copy-to threshold3 window)
+        ;Restore original roi
+        (adjust-roi window 0 0 (cols frame) 0)
+        ;Show WINDOW in a window
+	(imshow window-name window))
+      (destroy-window window-name))))
+
+
+
+
+IMGPROC - HISTOGRAMS:
+
+
+
+EQUALIZE-HIST
+
+
+Equalizes the histogram of a grayscale image.
+
+
+C++: void equalizeHist(InputArray src, OutputArray dst)
+
+LISP-CV: (EQUALIZE-HIST (SRC (:POINTER MAT)) (DEST (:POINTER MAT))) => :VOID
+
+
+    Parameters:	
+
+        SRC - Source 8-bit single channel image.
+
+        DST - Destination image of the same size and type as SRC.
+
+
+The function equalizes the histogram of the input image using the following algorithm:
+
+See OpenCV documentation for algorithm: 
+
+http://docs.opencv.org/modules/imgproc/doc/histograms.html?highlight=equalizeh#equalizehist
+
+
+(defun equalize-hist-example (&optional 
+				(camera-index *camera-index*) 
+				(width *default-width*)
+				(height *default-height*))
+
+  (with-capture (cap (video-capture camera-index))
+    (let* ((window-name-1 "Original FRAME - EQUALIZE-HIST Example")
+           (window-name-2 "1 channel FRAME - EQUALIZE-HIST Example")
+           (window-name-3 "Equalized FRAME - EQUALIZE-HIST Example")
+	   (frame-gray (mat)))
+      (if (not (cap-is-open cap)) 
+	  (return-from equalize-hist-example 
+	    (format t "Cannot open the video camera")))
+      (cap-set cap +cap-prop-frame-width+ width)
+      (cap-set cap +cap-prop-frame-height+ height)
+      (format t "Frame Size : ~ax~a~%~%" 
+	      (cap-get cap +cap-prop-frame-width+)
+	      (cap-get cap +cap-prop-frame-height+))
+      (with-named-window (window-name-1 +window-normal+)
+	(with-named-window (window-name-2 +window-normal+)
+	  (with-named-window (window-name-3 +window-normal+)
+	    (move-window window-name-1 310 175)
+	    (move-window window-name-2 760 175)
+	    (move-window window-name-3 1210 175)
+	    (loop
+	       (with-mat (frame (mat))
+		 (cap-read cap frame)
+		 ;Show FRAME in a window
+		 (imshow window-name-1 frame)
+		 ;Convert FRAME to 1 channel 
+		 ;image, FRAME-GRAY
+		 (cvt-color frame frame-gray +bgr2gray+)
+		 ;Show FRAME-GRAY in a window
+		 (imshow window-name-2 frame-gray)
+	         ;Run EQUALIZE-HIST on FRAME-GRAY
+		 (equalize-hist frame-gray frame-gray)
+		 ;Show FRAME-GRAY in a window
+		 (imshow window-name-3 frame-gray)
+		 (let ((c (wait-key 33)))
+		   (when (= c 27)
+		     (return)))))))))))
+
+
+
+IMGPROC - FEATURE DETECTION:
 
 
 CANNY
@@ -4485,7 +4666,7 @@ See: http://en.wikipedia.org/wiki/Canny_edge_detector
       (destroy-all-windows))))
 
 
-OBJECT DETECTION:
+IMGPROC - OBJECT DETECTION:
 
 
 MATCH-TEMPLATE:
@@ -4702,6 +4883,230 @@ which is easier to analyze.
       (free rect-width)
       (free rect-height)
       (destroy-all-windows))))
+
+
+
+HIGHGUI - READING AND WRITING IMAGES AND VIDEO:
+
+
+
+IMWRITE
+
+Saves an image to a specified file.
+
+C++: bool imwrite(const string& filename, InputArray img, const vector<int>& params=vector<int>() )
+
+LISP-CV: (IMWRITE (FILENAME :STRING) (IMG (:POINTER MAT)) ((PARAMS (:POINTER VECTOR-INT)) (VECTOR-INT))) => :BOOLEAN
+
+    Parameters:	
+
+        FILENAME - Name of the file.
+
+        IMAGE - Image to be saved.
+
+        PARAMS -
+
+        Format-specific save parameters encoded as pairs PARAM-ID-1, PARAM-VALUE-1, PARAM-ID-2, 
+        PARAM-VALUE-2, ... . The following parameters are currently supported:
+
+            For JPEG, it can be a quality (+IMWRITE-JPEG-QUALITY+) from 0 to 100 (the higher is the 
+            better). Default value is 95.
+
+            For PNG, it can be the compression level (+IMWRITE-PNG-COMPRESSION+) from 0 to 9. A higher 
+            value means a smaller size and longer compression time. Default value is 3.
+
+            For PPM, PGM, or PBM, it can be a binary format flag (+IMWRITE-PXM-BINARY+ ), 0 or 1. 
+            Default value is 1.
+
+The function IMWRITE saves the image to the specified file. The image format is chosen based on the 
+filename extension (see (IMREAD) for the list of extensions). Only 8-bit (or 16-bit unsigned (+16U+) 
+in case of PNG, JPEG 2000, and TIFF) single-channel or 3-channel (with ‘BGR’ channel order) images 
+can be saved using this function. If the format, depth or channel order is different, use (CONVERT-TO), 
+and (CVT-COLOR) to convert it before saving. Or, use the universal XML I/O functions to save the image 
+to XML or YAML format.
+
+It is possible to store PNG images with an alpha channel using this function. To do this, create 8-bit 
+(or 16-bit) 4-channel image BGRA, where the alpha channel goes last. Fully transparent pixels should 
+have alpha set to 0, fully opaque pixels should have alpha set to 255/65535. 
+
+
+(defun imwrite-example (filename-1 out-file)
+       ;;Read in image
+  (let* ((image (imread filename-1 1))
+	 (window-name-1 "Original image - IMWRITE Example")
+         (window-name-2 "Flipped image - IMWRITE Example"))
+    (if (empty image) 
+	(return-from imwrite-example 
+	  (format t "Image not loaded")))
+    (named-window window-name-1 +window-normal+)
+    (named-window window-name-2 +window-normal+)
+    (move-window window-name-1 533 175)
+    (move-window window-name-2 984 175)
+    ;;Show original IMAGE in window
+    (imshow window-name-1 image)
+    ;;Flip IMAGE around the x-axis
+    (flip image image -1)
+    ;;Show flipped image in window
+    (imshow window-name-2 image)
+    ;;Write flipped image to filename specified 
+    ;;by the OUT-FILE parameter 
+    (imwrite out-file image (vector-int 
+			     (list +imwrite-jpeg-quality+ 99)))
+    (loop while (not (= (wait-key 0) 27)))
+    (destroy-all-windows)))
+
+
+
+VIDEO-CAPTURE
+
+VideoCapture constructors.
+
+C++: VideoCapture::VideoCapture()
+
+LISP-CV: (VIDEO-CAPTURE) => (:POINTER VIDEO-CAPTURE)
+
+C++: VideoCapture::VideoCapture(int device)
+
+LISP-CV: (VIDEO-CAPTURE &OPTIONAL (SRC :INT)) => (:POINTER VIDEO-CAPTURE)
+
+C++: VideoCapture::VideoCapture(const string& filename)
+
+LISP-CV: (VIDEO-CAPTURE &OPTIONAL (SRC :POINTER STRING*)) => (:POINTER VIDEO-CAPTURE)
+
+
+  Parameters:	
+
+        SRC - 
+
+             A device: ID of the opened video capturing device (i.e. a camera index). If there is 
+                       a single camera connected, just pass 0.     
+
+             A file name: Name of the opened video file (eg. video.avi) or image sequence (eg. 
+                          img_%02d.jpg, which will read samples like img_00.jpg, img_01.jpg, 
+                          img_02.jpg, ...)
+
+             NIL: Creates an uninitialized (:POINTER VIDEO-CAPTURE)
+        
+
+
+(defun video-capture-example (filename &optional 
+					 (camera-index *camera-index*))
+
+  "This example use the function VIDEO-CAPTURE to open a video 
+   capturing device, supplied by the *CAMERA-INDEX* parameter. 
+   The setf-able *CAMERA-INDEX* parameter defaults to 0. Then 
+   the function VIDEO-CAPTURE is used to open a video file sup-
+   plied by the parameter FILENAME."
+  
+  (with-capture (video-capture (video-capture camera-index))
+    (with-capture (cap-file (video-capture filename))
+      (let ((window-name-1 "Camera - VIDEO-CAPTURE Example")
+	    (window-name-2 "Video file - VIDEO-CAPTURE Example"))
+	(if (not (cap-is-open video-capture)) 
+	    (return-from video-capture-example 
+	      (format t "Cannot open the video camera")))
+	(if (not (cap-is-open cap-file)) 
+	    (return-from video-capture-example 
+	      (format t "Cannot open the video file")))
+	(named-window window-name-1 +window-normal+)
+	(named-window window-name-2 +window-normal+)
+	(move-window window-name-1 533 175)
+	(move-window window-name-2 984 175)
+	(do* ((camera 0)
+	      (video-file 0))
+	     ((plusp (wait-key *millis-per-frame*)) 
+	      (format t "Key is pressed by user"))
+	  (setf camera (mat))
+	  (cap-read video-capture camera)
+	  (setf video-file (mat))
+	  (cap-read cap-file video-file)
+	  (imshow window-name-1 camera)
+	  (imshow window-name-2 video-file))
+	(destroy-all-windows)))))
+
+
+
+OBJDETECT - CASCADE CLASSIFICATION:
+
+
+
+CASCADE-CLASSIFIER
+
+
+Creates a CASCADE-CLASSIFIER construct or loads a classifier from a file.
+
+
+C++: CascadeClassifier::CascadeClassifier()
+
+C++: CascadeClassifier::CascadeClassifier(const string& filename)
+
+LISP-CV: (CASCADE-CLASSIFIER) => (:POINTER CASCADE-CLASSIFIER)
+
+LISP-CV: (CASCADE-CLASSIFIER (FILENAME (:POINTER STRING*))) => (:POINTER CASCADE-CLASSIFIER)
+
+
+    Parameters:	
+
+        SELF - A CASCADE-CLASSIFIER construct
+
+        FILENAME - Name of the file from which the classifier is loaded.
+
+
+Example:
+
+
+;Create an uninitialized CASCADE-CLASSIFIER construct
+
+LCV> (DEFPARAMETER FACE-CASCADE (CASCADE-CLASSIFIER))
+
+FACE-CASCADE
+
+
+;Create a CASCADE-CLASSIFIER construct initialized with an XML classifier 
+
+LCV> (DEFPARAMETER FACE-CASCADE-NAME "<opencv_source_directory>/data/haarcascades/haarcascade_frontalface_alt.xml")
+
+FACE-CASCADE-NAME
+
+LCV> (DEFPARAMETER FACE-CASCADE (CASCADE-CLASSIFIER FACE-CASCADE-NAME))
+
+FACE-CASCADE
+
+
+
+
+CASCADE-CLASSIFIER-LOAD
+
+Loads a classifier from a file.
+
+C++: bool CascadeClassifier::load(const string& filename)
+
+LISP-CV: (CASCADE-CLASSIFIER-LOAD (SELF (:POINTER CASCADE-CLASSIFIER)) (FILENAME (:POINTER STRING*))) => :BOOLEAN
+
+
+    Parameters:	
+
+        SELF - A CASCADE-CLASSIFIER construct
+
+        FILENAME - Name of the file from which the classifier is loaded. The file may contain an old 
+                   HAAR classifier trained by the haartraining application or a new cascade classifier 
+                   trained by the traincascade application.
+
+
+Example:
+
+
+LCV> (DEFPARAMETER FACE-CASCADE-NAME "<opencv_source_directory>/data/haarcascades/haarcascade_frontalface_alt.xml")
+
+FACE-CASCADE-NAME
+
+LCV> (DEFPARAMETER FACE-CASCADE (CASCADE-CLASSIFIER)) ;Create CASCADE-CLASSIFIER construct 
+
+FACE-CASCADE
+
+LCV> (CASCADE-CLASSIFIER-LOAD FACE-CASCADE FACE-CASCADE-NAME)  ;Load the Classifier
+
+T ;<--- Operation successful
 
 
 
@@ -4971,21 +5376,41 @@ Note
 In the case of color images, the decoded images will have the channels stored in B G R order.
 
 
-(defun imread-example (filename)
+(defun imread-example-1 (filename)
 
   "Open the image FILENAME with IMREAD 
-   and show it in a window."
+   and show it in a window. This examp-
+   le uses manual memory management"
 
   (let* ((image (imread filename 1))
-	 (window-name "IMREAD Example"))
+	 (window-name "IMREAD Example 1"))
     (if (empty image) 
-	(return-from imread-example 
+	(return-from imread-example-1 
 	  (format t "Image not loaded")))
     (named-window window-name +window-normal+)
     (move-window window-name 759 175)
     (imshow window-name image)
     (loop while (not (= (wait-key 0) 27)))
+    (del-mat image)
     (destroy-window window-name)))
+
+
+(defun imread-example-2 (filename)
+
+  "Open the image FILENAME with IMREAD 
+   and show it in a window. This examp-
+   le uses with-* macros for memory ma-
+   nagement"
+
+  (let ((window-name "IMREAD Example 2"))
+    (with-named-window (window-name +window-normal+)
+      (move-window window-name 759 175)
+      (with-mat (image (imread filename 1))
+	(imshow window-name image)
+	(loop
+	   (let ((c (wait-key 33)))
+	     (when (= c 27)
+	       (return))))))))
 
 
 NAMED-WINDOW
@@ -5309,7 +5734,8 @@ value 0 is returned.
 	    (format t "Key is pressed by user"))
 	(setf frame (mat))
 	(cap-read cap frame)
-	(imshow window-name frame))
+	(imshow window-name frame)
+        (del-mat frame))
       (destroy-window window-name))))
 
 
@@ -7008,26 +7434,40 @@ C++: Rect_(_Tp _x, _Tp _y, _Tp _width, _Tp _height);
 
 LISP-CV:  (RECT (X :INT) (Y :INT) (:WIDTH :INT) (HEIGHT :INT)) => (:POINTER RECT)
 
-C++: Point_<_Tp> tl() const;
+C++: _Tp x, y, width, height;
 
-LISP-CV: (TL (SELF (:POINTER RECT))) => (:POINTER POINT)
+LISP-CV: (RECT-X (SELF (:POINTER RECT))) => :INT
 
-C++: Point_<_Tp> br() const;
+LISP-CV: (RECT-Y (SELF (:POINTER RECT))) => :INT
 
-LISP-CV: (BR (SELF (:POINTER RECT))) => (:POINTER POINT)
+LISP-CV: (RECT-WIDTH (SELF (:POINTER RECT))) => :INT
+
+LISP-CV: (RECT-HEIGHT (SELF (:POINTER RECT))) => :INT
 
 C++: Size_<_Tp> size() const;
 
-LISP-CV: (SZ (SELF (:POINTER RECT))) => (:POINTER SIZE)
+LISP-CV: (RECT-SIZE (SELF (:POINTER RECT))) => (:POINTER SIZE)
+
+C++: Point_<_Tp> tl() const;
+
+LISP-CV: (RECT-TL (SELF (:POINTER RECT))) => (:POINTER POINT)
+
+C++: Point_<_Tp> br() const;
+
+LISP-CV: (RECT-BR (SELF (:POINTER RECT))) => (:POINTER POINT)
+
+C++ See cv_Rect_clone in LISP-CV-MASTER/SRC
+
+LISP-CV: (RECT-CLONE (SELF (:POINTER RECT))) => (:POINTER RECT)
 
 
     Parameters:	
 
         SELF - A rectangle.
 
-        X - x-coordinate of the rectangle.
+        X - X-coordinate of the rectangle.
 
-        Y -	y-coordinate of the rectangle.
+        Y -	Y-coordinate of the rectangle.
 
         WIDTH - Width of the rectangle.
 
@@ -7036,39 +7476,77 @@ LISP-CV: (SZ (SELF (:POINTER RECT))) => (:POINTER SIZE)
 
 The function RECT stores coordinates of a rectangle.
 
-The function TL retrieves the top-left corner of the rectangle.
+The function RECT-X retrieves the x coordinate of the rectangle.
 
-The function BR retrieves t
-)he bottom-right corner of the rectangle.
+The function RECT-Y retrieves the y coordinate of the rectangle.
 
-The function SZ retrieves the size (width, height) of the rectangle.
+The function RECT-WIDTH retrieves the WIDTH of the rectangle.
 
-The function AREA retrieves the area (width*height) of the rectangle.
+The function RECT-HEIGHT retrieves the HEIGHT of the rectangle.
+
+The function RECT-SIZE retrieves the size (width, height) of the rectangle.
+
+The function RECT-TL retrieves the top-left corner of the rectangle.
+
+The function RECT-BR retrieves the bottom-right corner of the rectangle.
 
 
-(defun rect-example ()
 
-  "The function RECT is a RECT constructor. It returns a 
-   pointer to a rectangle. In this function a rectangle 
-   is created. The size of the rectangle(width, height) 
-   is retrieved with the function SZ. The top-left corne-
-   r is retrieved with the function TL. The bottom-right 
-   corner is retrieved with the function BR. All three a-
-   re printed to the screen."
+(defun rect-example (x y width height)
 
-  (let* ((rectangle (rect 0 0 640 480))
-	 (rect-size (sz rectangle))
-	 (rect-tl-corner (tl rectangle))
-	 (rect-br-corner (br rectangle)))
-    (format t "~%The size(width, height) of RECTANGLE = (~a, ~a)~%" 
-	    (mem-aref rect-size :int 0)
-	    (mem-aref rect-size :int 1))
-    (format t "~%The top-left corner of RECTANGLE = (~a, ~a)~%" 
-	    (mem-aref rect-tl-corner :int 0)
-	    (mem-aref rect-tl-corner :int 1))
-    (format t "~%The bottom-right corner of RECTANGLE = (~a, ~a)~%" 
-	    (mem-aref rect-br-corner :int 0)
-	    (mem-aref rect-br-corner :int 1))))
+  ;Create a rectangle and find its size(width, height), 
+  ;location and size(x, y, width, height) and its top-
+  ;left and bottom-right corner
+
+  ;WITH-RECT calls DEL-RECT automatically when RECTAN-
+  ;GLE goes out of scope. DEL-RECT frees the memory a-
+  ;llocated by RECT
+  
+  (format t "~%~%RECTANGLE:~%~%")
+  (with-rect (rectangle (rect x y width height))
+    (let* ((x (rect-x rectangle))
+	   (y (rect-y rectangle))
+	   (width (rect-width rectangle))
+	   (height (rect-height rectangle))
+           (size (rect-size rectangle))
+	   (tl-corner (rect-tl rectangle))
+	   (br-corner (rect-br rectangle)))
+      (format t "~%The (x, y, width, height) of RECTANGLE = (~a, ~a, ~a, ~a)~%" 
+	      x y width height)
+      (format t "~%The size(width, height) of RECTANGLE = (~a, ~a)~%" 
+	      (width size)
+	      (height size))
+      (format t "~%The top-left corner of RECTANGLE = (~a, ~a)~%" 
+	      (point-x tl-corner)
+	      (point-y tl-corner))
+      (format t "~%The bottom-right corner of RECTANGLE = (~a, ~a)~%" 
+	      (point-x br-corner)
+	      (point-y br-corner)))
+
+   ;Create a clone of RECTANGLE and find its size(width, 
+   ;height), location and size(x, y, width, height) and 
+   ;its top-left and bottom-right corner
+
+    (format t "~%~%RECTANGLE-CLONE:~%")
+    (with-rect (rectangle-clone (rect-clone rectangle)) 
+      (let* ((clone-x (rect-x rectangle-clone))
+	     (clone-y (rect-y rectangle-clone))
+	     (clone-width (rect-width rectangle-clone))
+	     (clone-height (rect-height rectangle-clone))
+             (clone-size (rect-size rectangle-clone))
+	     (clone-tl-corner (rect-tl rectangle-clone))
+	     (clone-br-corner (rect-br rectangle-clone)))
+	(format t "~%~%The (x, y, width, height) of RECTANGLE-CLONE = (~a, ~a, ~a, ~a)~%" 
+		clone-x clone-y clone-width clone-height)
+	(format t "~%The size(width, height) of RECTANGLE-CLONE = (~a, ~a)~%" 
+		(width clone-size)
+		(height clone-size))
+	(format t "~%The top-left corner of RECTANGLE-CLONE = (~a, ~a)~%" 
+		(point-x clone-tl-corner)
+		(point-y clone-tl-corner))
+	(format t "~%The bottom-right corner of RECTANGLE-CLONE = (~a, ~a)~%~%" 
+		(point-x clone-br-corner)
+		(point-y clone-br-corner))))))
 
 
 DOT
@@ -8434,6 +8912,8 @@ VECTOR-POINT(vector<Point>)
 
 VECTOR-POINT2F(vector<Point2f>)
 
+VECTOR-RECT(vector<Rect>)
+
 VECTOR-UCHAR(vector<uchar>)
 
 
@@ -8491,8 +8971,8 @@ LISP-CV> (VECTOR-FLOAT A 2) <---Access the 2nd element of A.
 
 
 Vectors with, pointers to vectors with numbers, as their elements, VECTOR-DMATCH, VECTOR-KEYPOINT,
-VECTOR-POINT, and VECTOR-POINT2F operate as follows:(I use VECTOR-POINT2F as an example of the 
-four vectors.)
+VECTOR-POINT, VECTOR-POINT2F and VECTOR-RECT operate as follows:(I use VECTOR-POINT2F as an example 
+of the four vectors.)
 
 
 

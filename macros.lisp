@@ -74,6 +74,16 @@
 	      `(foreign-alloc ,type ,:initial-contents ,value))
 	     (t `(foreign-alloc ,type ,:initial-element ,value))))
 
+
+(defmacro with-alloc ((var alloc) &body body)
+  "Ensures FOREIGN-FREE gets called on 
+   when ALLOC goes out of scope."
+  `(let ((,var ,alloc))
+     (unwind-protect
+	 (progn ,@body)
+       (foreign-free ,var))))
+
+
 ;; Macro for FOREIGN-FREE
 
 (defmacro free (ptr)

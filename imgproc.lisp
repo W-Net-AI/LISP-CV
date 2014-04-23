@@ -129,7 +129,17 @@
   (type :int))
 
 
+
 ;;; Histograms
+
+
+;; void equalizeHist(InputArray src, OutputArray dst)
+;; void cv_equalizeHist(Mat* src, Mat* dst)
+(defcfun ("cv_equalizeHist" equalize-hist) :void
+  "Equalizes the histogram of a grayscale image."
+  (src (:pointer mat))
+  (dest (:pointer mat)))
+
 
 ;;; Structural Analysis and Shape Descriptors
 

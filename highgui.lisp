@@ -78,10 +78,15 @@
 	      (winname (:pointer string*))
 	      (flags :int))
 
-
 (defun named-window (winname &optional (flags +window-autosize+))
   "Creates a window."
   (%named-window (foreign-alloc :string :initial-element winname) flags))
+
+(defmacro with-named-window ((winname &optional (flags +window-autosize+)) &body body)
+  `(unwind-protect (progn (named-window ,winname ,flags)
+			  ,@body)
+     (destroy-window ,winname)))
+
 
 
 ;; void setMouseCallback(const string& winname, MouseCallback onMouse, void* userdata=0)

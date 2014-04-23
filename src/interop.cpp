@@ -5,6 +5,45 @@ typedef string String;
 
 extern "C" {
 
+
+vector_Rect* std_create_vectorr() {
+    return new vector<Rect>;
+}
+
+vector_Rect* std_carrayTovectorr(Rect* a, size_t len) {
+    vector<Rect>* v = new vector<Rect>;
+    for(size_t i = 0; i < len; i++)
+        v->push_back(a[i]);
+     return v;
+}
+
+Rect* std_vectorrToCArray(vector_Rect* s) {
+    return s->data();
+}
+
+size_t std_vectorr_length(vector_Rect* self) {
+    return self->size();
+}
+
+vector_uchar* std_create_vectoru() {
+    return new vector<uchar>;
+}
+
+vector_uchar* std_carrayTovectoru(uchar* a, size_t len) {
+    vector<uchar>* v = new vector<uchar>;
+    for(size_t i = 0; i < len; i++) 
+        v->push_back(a[i]);
+    return v;
+}
+
+uchar* std_vectoruToCArray(vector_uchar* s) {
+    return s->data();
+}
+
+size_t std_vectoru_length(vector_uchar* self) {
+    return self->size();
+}
+
 vector_Mat* std_create_vectorm() {
     return new vector<Mat>;
 }
@@ -184,25 +223,6 @@ double* std_vectordToCArray(vector_double* s) {
 }
 
 size_t std_vectord_length(vector_double* self) {
-    return self->size();
-}
-
-vector_uchar* std_create_vectoru() {
-    return new vector<uchar>;
-}
-
-vector_uchar* std_carrayTovectoru(uchar* a, size_t len) {
-    vector<uchar>* v = new vector<uchar>;
-    for(size_t i = 0; i < len; i++) 
-        v->push_back(a[i]);
-    return v;
-}
-
-uchar* std_vectoruToCArray(vector_uchar* s) {
-    return s->data();
-}
-
-size_t std_vectoru_length(vector_uchar* self) {
     return self->size();
 }
 

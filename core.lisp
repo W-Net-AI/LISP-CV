@@ -55,10 +55,45 @@
 
 ;; string* std_cstringToString(char* s, size_t len) 
 (defcfun ("std_cstringToString" c-string-to-string*) (:pointer string*) 
-  "test"
+  "Converts C string to C++"
   (s :string)
   (len :unsigned-int))
 
+
+(defmacro with-mat ((mat-var mat) &body body)
+  "Ensures DEL-MAT gets called on 
+   when MAT goes out of scope."
+  `(let ((,mat-var ,mat))
+     (unwind-protect
+	 (progn ,@body)
+       (del-mat ,mat-var))))
+
+
+(defmacro with-mat-expr ((mat-expr-var mat-expr) &body body)
+  "Ensures DEL-MAT-EXPR gets called on 
+   when MAT-EXPR goes out of scope."
+  `(let ((,mat-expr-var ,mat-expr))
+     (unwind-protect
+	 (progn ,@body)
+       (del-mat-expr ,mat-expr-var))))
+
+
+(defmacro with-rect ((rect-var rect) &body body)
+  "Ensures DEL-RECT gets called on 
+   when RECT goes out of scope."
+  `(let ((,rect-var ,rect))
+     (unwind-protect
+	 (progn ,@body)
+       (del-rect ,rect-var))))
+
+
+(defmacro with-point ((point-var point) &body body)
+  "Ensures DEL-POINT gets called on 
+   when POINT goes out of scope."
+  `(let ((,point-var ,point))
+     (unwind-protect
+	 (progn ,@body)
+       (del-point ,point-var))))
 
 
 ;;; Basic Structures
@@ -123,9 +158,9 @@
 	       `(mem-aref (%ptr ,self ,i) ,type ,j))
 
 
-;; Point_<_Tp> br() const;
+;; Point_<_Tp> br() const
 ;; Point* cv_Rect_br(Rect* self) 
-(defcfun ("cv_Rect_br" br) (:pointer point) 
+(defcfun ("cv_Rect_br" rect-br) (:pointer point) 
   "Retrievies the bottom-right corner of a rectangle."
   (self (:pointer rect)))
 
@@ -191,6 +226,14 @@
 	(t (copy-to3 mat m mask))))
 
 
+;; Mat Mat::cross(InputArray m) const
+;; Mat* cv_Mat_cross(Mat* self, Mat* m)
+(defcfun ("cv_Mat_cross" cross) (:pointer mat)
+  "Computes a cross-product of two 3-element vectors."
+  (self (:pointer mat))
+  (m (:pointer mat)))
+
+
 ;; uchar* data
 ;; uchar* cv_Mat_get_Data(Mat* self)
 (defcfun ("cv_Mat_get_Data" data) :pointer
@@ -207,6 +250,18 @@
 ;; void operator delete  ( void* ptr )
 ;; void cv_delete_MatExpr(void* self)
 (defcfun ("cv_delete_MatExpr" del-mat-expr) :void
+  (self :pointer))
+
+
+;; void operator delete  ( void* ptr )
+;; void cv_delete_Point(void* self)
+(defcfun ("cv_delete_Point" del-point) :void
+  (self :pointer))
+
+
+;; void operator delete  ( void* ptr )
+;; void cv_delete_Rect(void* self)
+(defcfun ("cv_delete_Rect" del-rect) :void
   (self :pointer))
 
 
@@ -235,7 +290,7 @@
   (m2 (:pointer mat)))
 
 
-;; _Tp dot(const Point_& pt) const;
+;; _Tp dot(const Point_& pt) const
 ;; int cv_Point_dot(Point* self, Point* other) 
 (defcfun ("cv_Point2i_dot" dot) :int 
   "Finds the dot product of a point."
@@ -243,7 +298,7 @@
   (other (:pointer point)))
 
 
-;; _Tp dot(const Point_& pt) const;
+;; _Tp dot(const Point_& pt) const
 ;; double cv_Point2d_dot(Point2d* self, Point2d* other) 
 (defcfun ("cv_Point2d_dot" dot2d) :double
   "Finds the dot product of a point2d."
@@ -251,7 +306,7 @@
   (other (:pointer point2d)))
 
 
-;; _Tp dot(const Point_& pt) const;
+;; _Tp dot(const Point_& pt) const
 ;; float cv_Point2f_dot(Point2f* self, Point2f* other)
 (defcfun ("cv_Point2f_dot" dot2f) :float
   "Finds the dot product of a point2f."
@@ -259,7 +314,7 @@
   (other (:pointer point2f)))
 
 
-;; _Tp dot(const Point3_& pt) const;
+;; _Tp dot(const Point3_& pt) const
 ;; double cv_Point3d_dot(Point3d* self, Point3d* other)
 (defcfun ("cv_Point3d_dot" dot3d) :double 
   "Finds the dot product of a point3d."
@@ -273,7 +328,7 @@
   (self (:pointer mat)))
 
 
-;; _Tp dot(const Point3_& pt) const;
+;; _Tp dot(const Point3_& pt) const
 ;; float cv_Point3f_dot(Point3f* self, Point3f* other)
 (defcfun ("cv_Point3f_dot" dot3f) :float 
   "Finds the dot product of a point3f."
@@ -281,7 +336,7 @@
   (other (:pointer point3f)))
 
 
-;; _Tp dot(const Point3_& pt) const;
+;; _Tp dot(const Point3_& pt) const
 ;; int cv_Point3i_dot(Point3i* self, Point3i* other)
 (defcfun ("cv_Point3i_dot" dot3i) :int 
   "Finds the dot product of a point3i."
@@ -322,7 +377,7 @@
   "MAT constructor")
 
 (defstruct (cvmatrix (:constructor %make-cvmatrix))
-  (sap (%mat) :type sb-sys:system-area-pointer :read-only t))
+  (sap (%mat) :read-only t))
 
  (defun mat (&optional enable-finalizer)
   (let* ((matrix (%make-cvmatrix))
@@ -330,15 +385,6 @@
 (when enable-finalizer
     (tg:finalize matrix (lambda () (del-mat sap))))
     sap))
-
-(defmacro with-mat ((mat-var mat) &body body)
-  "Ensures DEL-MAT gets called on 
-   when MAT goes out of scope."
-  `(let ((,mat-var ,mat))
-     (unwind-protect
-	 (progn ,@body)
-       (del-mat ,mat-var))))
-
 
 
 ;; Mat::Mat(int rows, int cols, int type, void* data) 
@@ -366,15 +412,27 @@
   (type :int))
 
 
-;; ~Mat();
+;; ~Mat()
 ;; void cv_destruct_Mat(Mat* self)
 (defcfun ("cv_destruct_Mat" destruct-mat) :void
   "Destructor - calls release()"
   (self :pointer))
 
-
+;; ~MatExpr()
 ;; void cv_destruct_MatExpr(MatExpr* self) 
 (defcfun ("cv_destruct_MatExpr" destruct-mat-expr) :void
+  "Destructor - calls release()"
+  (self :pointer))
+
+;; ~Point()
+;; void cv_destruct_Point(Mat* self)
+(defcfun ("cv_destruct_Point" destruct-point) :void
+  "Destructor - calls release()"
+  (self :pointer))
+
+;; ~Rect()
+;; void cv_destruct_Rect(Rect* self)
+(defcfun ("cv_destruct_Rect" destruct-rect) :void
   "Destructor - calls release()"
   (self :pointer))
 
@@ -446,12 +504,12 @@
   (m1 (:pointer mat))
   (m2 (:pointer mat)))
 
-;; Point_();
+;; Point_()
 ;; Point2##t * cv_create_Point2##t ( tn x,  tn y)
 (defcfun ("cv_create_Point2i" point0) (:pointer point)
   "Point constructor")
 
-;; Point_(_Tp _x, _Tp _y);
+;; Point_(_Tp _x, _Tp _y)
 ;; Point2##t * cv_create_Point2##t ( tn x,  tn y) 
 (defcfun ("cv_create_Point2i" point2) (:pointer point)
   "Point constructor"
@@ -503,21 +561,21 @@
 		 (t nil)))
 
 
-;; _Tp x, y;
+;; _Tp x, y
 ;; double cv_Point2d_getX(Point2d* self) 
 (defcfun ("cv_Point2d_getX" point2d-x) :double
   "Retrieves x coordinate of a point2d"
   (self (:pointer point2d)))
 
 
-;; _Tp x, y;
+;; _Tp x, y
 ;; double cv_Point2d_getY(Point2d* self) 
 (defcfun ("cv_Point2d_getY" point2d-y) :double
   "Retrieves y coordinate of a point2d"
   (self (:pointer point2d)))
 
 
-;; typedef Point_<float> Point2f;
+;; typedef Point_<float> Point2f
 ;; tn cv_Point2##t##_getX( Point2##t * self) 
 (defcfun ("cv_create_Point2f" point2f0) (:pointer point2f) 
   "Point2f constructor")
@@ -701,7 +759,7 @@
        "Returns pointer to i0-th submatrix along the dimension #0"
        (%ptr self i0))
 
-;; Rect_();
+;; Rect_()
 ;; Rect* cv_create_Rect() 
 (defcfun ("cv_create_Rect" rect0) (:pointer mat) 
   "RECT constructor.")
@@ -722,6 +780,52 @@
 		 ((and x y)
 		  (rect4 x y width height))
 		 (t nil)))
+
+
+;; Rect_(_Tp _x, _Tp _y, _Tp _width, _Tp _height)
+;; _Tp x, y, width, height
+;; Rect* cv_Rect_clone(Rect* self)
+(defcfun ("cv_Rect_clone" rect-clone) (:pointer rect)
+  (self (:pointer rect)))
+
+
+;; _Tp x, y, width, height
+;; int &cv_Rect_getHeight(Rect* self)
+(defcfun ("cv_Rect_getHeight" rect-height) :int
+  (self (:pointer rect)))
+
+
+;; Size_<_Tp> size() const
+;; Size* cv_Rect_size(Rect* self)  
+(defcfun ("cv_Rect_size" rect-size) (:pointer size) 
+  "Size (width, height) of the rectangle."
+  (self (:pointer rect)))
+
+
+;; Point_<_Tp> tl() const
+;; Point* cv_Rect_tl(Rect* self) 
+(defcfun ("cv_Rect_tl" rect-tl) (:pointer point) 
+  "Retrievies the top-left corner of a rectangle."
+  (self (:pointer rect)))
+
+
+;; _Tp x, y, width, height
+;; int cv_Rect_getWidth(Rect* self)
+(defcfun ("cv_Rect_getWidth" rect-width) :int
+  (self (:pointer rect)))
+
+
+;; _Tp x, y, width, height
+;; int cv_Rect_getX(Rect* self) 
+(defcfun ("cv_Rect_getX" rect-x) :int
+  (self (:pointer rect)))
+
+
+;; _Tp x, y, width, height
+;; int cv_Rect_getY(Rect* self)
+(defcfun ("cv_Rect_getY" rect-y) :int
+  (self (:pointer rect)))
+
 
 ;; Mat Mat::reshape(int cn, int rows=0) const
 ;; Mat* cv_Mat_reshape(Mat* self, int cn) 
@@ -814,13 +918,13 @@
 	(t nil)))
 
 
-;; Size_<float>();
+;; Size_<float>()
 ;; Size2f* cv_create_Size2f(float width, float height)
 (defcfun ("cv_create_Size2f" size2f0) (:pointer size2f)
   "Size2f constructor")
 
 
-;; Size_<float>(float width, float height);
+;; Size_<float>(float width, float height)
 ;; Size2f* cv_create_Size2f(float width, float height)
 (defcfun ("cv_create_Size2f" size2f2) (:pointer size2f)
   "Size2f constructor"
@@ -849,27 +953,14 @@
   (m2 (:pointer mat)))
 
 
-;; Size_<_Tp> size() const;
-;; Size* size(Rect* self) 
-(defcfun ("size" sz) (:pointer rect) 
-  "Size (width, height) of the rectangle."
-  (self (:pointer rect)))
-
-
-;; Point_<_Tp> tl() const;
-;; Point* cv_Rect_tl(Rect* self) 
-(defcfun ("cv_Rect_tl" tl) (:pointer point) 
-  "Retrievies the top-left corner of a rectangle."
-  (self (:pointer rect)))
-
-
 ;; size_t Mat::total() const
 ;; size_t cv_Mat_total(Mat* self)
 (defcfun ("cv_Mat_total" total) :unsigned-int
   "Returns the total number of array elements."
   (self (:pointer mat)))
 
-;; _Tp width, height;
+
+;; _Tp width, height
 ;; double cv_Size_width(Size* self) 
 (defcfun ("cv_Size_width" width) :double
   "Gets the width of a SIZE construct"
@@ -917,6 +1008,31 @@
   (src1 (:pointer mat))
   (src2 (:pointer mat))
   (dest (:pointer mat)))
+
+
+;; void bitwise_and(InputArray src1, InputArray src2, OutputArray dst, InputArray mask=noArray())
+;; void cv_bitwise_and(Mat* src1, Mat* src2, Mat* dst, Mat* mask)
+(defcfun ("cv_bitwise_and" %bitwise-and) :void 
+	 (src1 (:pointer mat))
+	 (src2 (:pointer mat))
+     (dest (:pointer mat))
+	 (mask (:pointer mat)))
+
+(defun bitwise-and (src1 src2 dest &optional (mask (mat)))
+  "Calculates the per-element bit-wise conjunction of two arrays."
+  (%bitwise-or src1 src2 dest mask))
+
+
+;; void bitwise_not(InputArray src, OutputArray dst, InputArray mask=noArray())
+;; void cv_bitwise_not(Mat* src, Mat* dst, Mat* mask)
+(defcfun ("cv_bitwise_not" %bitwise-not) :void 
+	 (src (:pointer mat))
+     (dest (:pointer mat))
+	 (mask (:pointer mat)))
+
+(defun bitwise-not (src dest &optional (mask (mat)))
+  "Inverts every bit of an array."
+  (%bitwise-not src dest mask))
 
 
 ;; void bitwise_or(InputArray src1, InputArray src2, OutputArray dst, InputArray mask=noArray())
@@ -1078,6 +1194,15 @@
 (defun normalize (src dest &optional (alpha 1) (beta 0) (norm-type  +norm-l2+) (dtype -1) (mask (mat)))
        "Normalizes the norm or value range of an array."
        (%normalize src dest alpha beta norm-type  dtype  mask))
+
+
+;; void pow(InputArray src, double power, OutputArray dst)
+;; void cv_pow(Mat* src, double power, Mat* dst)
+(defcfun ("cv_pow" pow) :void
+  "Raises every array element to a power."
+  (src (:pointer mat))
+  (power :double)
+  (dest (:pointer mat)))
 
 
 ;; void randu(InputOutputArray dst, InputArray low, InputArray high)

@@ -34,12 +34,12 @@
     (%c-arr-to-vector-dmatch (cdr previous) (length a))))
 
 
-(defun vector-dmatch (&optional arg (n nil) (i nil))
+(defun vector-dmatch (&optional arg i n)
 	   (cond ((eq arg nil) (return-from vector-dmatch (%vector-dmatch)))
 		 ((listp arg)
 		  (return-from vector-dmatch (c-arr-to-vector-dmatch arg)))
-		 ((and (pointerp arg) n (not i)) (mem-aref (%vector-dmatch-to-c-array arg) :pointer n))
-		 ((and (pointerp arg) n i) (mem-aref (mem-aref (%vector-dmatch-to-c-array arg) :pointer n) :float i))
+		 ((and (pointerp arg) i (not n)) (mem-aref (%vector-dmatch-to-c-array arg) :pointer i))
+		 ((and (pointerp arg) i n) (mem-aref (mem-aref (%vector-dmatch-to-c-array arg) :pointer i) :float n))
 		 (t nil)))
 
 
@@ -101,12 +101,12 @@
     (%c-arr-to-vector-keypoint (cdr previous) (length a))))
 
 
-(defun vector-keypoint (&optional arg (n nil) (i nil))
+(defun vector-keypoint (&optional arg i n)
 	   (cond ((eq arg nil) (return-from vector-keypoint (%vector-keypoint)))
 		 ((listp arg)
 		  (return-from vector-keypoint (c-arr-to-vector-keypoint arg)))
-		 ((and (pointerp arg) n (not i)) (mem-aref (%vector-keypoint-to-c-array arg) :pointer n))
-		 ((and (pointerp arg) n i) (mem-aref (mem-aref (%vector-keypoint-to-c-array arg) :pointer n) :float i))
+		 ((and (pointerp arg) i (not n)) (mem-aref (%vector-keypoint-to-c-array arg) :pointer i))
+		 ((and (pointerp arg) i n) (mem-aref (mem-aref (%vector-keypoint-to-c-array arg) :pointer i) :float n))
 		 (t nil)))
 
 
@@ -234,12 +234,12 @@
     (%c-arr-to-vector-point (cdr previous) (length a))))
 
 
-(defun vector-point (&optional arg (n nil) (i nil))
+(defun vector-point (&optional arg i n)
 	   (cond ((eq arg nil) (return-from vector-point (%vector-point)))
 		 ((listp arg)
 		  (return-from vector-point (c-arr-to-vector-point arg)))
-		 ((and (pointerp arg) n (not i)) (mem-aref (%vector-point-to-c-array arg) :pointer n))
-		 ((and (pointerp arg) n i) (mem-aref (mem-aref (%vector-point-to-c-array arg) :pointer n) :int i))
+		 ((and (pointerp arg) i (not n)) (mem-aref (%vector-point-to-c-array arg) :pointer i))
+		 ((and (pointerp arg) i n) (mem-aref (mem-aref (%vector-point-to-c-array arg) :pointer i) :int n))
 		 (t nil)))
 
 
@@ -268,12 +268,12 @@
     (%c-arr-to-vector-point2f (cdr previous) (length a))))
 
 
-(defun vector-point2f (&optional arg (n nil) (i nil))
+(defun vector-point2f (&optional arg i n)
 	   (cond ((eq arg nil) (return-from vector-point2f (%vector-point2f)))
 		 ((listp arg)
 		  (return-from vector-point2f (c-arr-to-vector-point2f arg)))
-		 ((and (pointerp arg) n (not i)) (mem-aref (%vector-point2f-to-c-array arg) :pointer n))
-		 ((and (pointerp arg) n i) (mem-aref (mem-aref (%vector-point2f-to-c-array arg) :pointer n) :float i))
+		 ((and (pointerp arg) i (not n)) (mem-aref (%vector-point2f-to-c-array arg) :pointer i))
+		 ((and (pointerp arg) i n) (mem-aref (mem-aref (%vector-point2f-to-c-array arg) :pointer i) :float n))
 		 (t nil)))
 
 
@@ -302,12 +302,12 @@
     (%c-arr-to-vector-mat (cdr previous) (length a))))
 
 
-(defun vector-mat (&optional arg (n nil) (i nil))
+(defun vector-mat (&optional arg i n)
 	   (cond ((eq arg nil) (return-from vector-mat (%vector-mat)))
 		 ((listp arg)
 		  (return-from vector-mat (c-arr-to-vector-mat arg)))
-		 ((and (pointerp arg) n (not i)) (mem-aref (%vector-mat-to-c-array arg) :pointer n))
-		 ((and (pointerp arg) n i) (mem-aref (mem-aref (%vector-mat-to-c-array arg) :pointer n) :float i))
+		 ((and (pointerp arg) i (not n)) (mem-aref (%vector-mat-to-c-array arg) :pointer i))
+		 ((and (pointerp arg) i n) (mem-aref (mem-aref (%vector-mat-to-c-array arg) :pointer i) :int n))
 		 (t nil)))
 
 ;; template < class T, class Alloc = allocator<T> > class vector
@@ -341,4 +341,38 @@
 	 (return-from vector-uchar (c-arr-to-vector-uchar arg)))
 	((pointerp arg) (mem-aref (%vector-uchar-to-c-array arg) :uchar i))
     (t nil)))
+
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_Rect* std_create_vectorr() 
+(defcfun ("std_create_vectorr" %vector-rect) (:pointer vector-rect))
+
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_Rect* std_carrayTovectorr(Rect* a, size_t len)
+(defcfun ("std_carrayTovectorr" %c-arr-to-vector-rect) (:pointer vector-rect)
+  (a :pointer)
+  (len :unsigned-int))
+
+
+(let ((previous nil))
+  (defun c-arr-to-vector-rect (a)
+    (unless (equal a (car previous))
+      (setf previous (cons a (foreign-alloc :pointer :initial-contents a))))
+    (%c-arr-to-vector-rect (cdr previous) (length a))))
+
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; Rect* std_vectorrToCArray(vector_Rect* s) 
+(defcfun ("std_vectorrToCArray" %vector-rect-to-c-array) (:pointer rect) 
+  (s (:pointer vector-rect)))
+
+
+(defun vector-rect (&optional arg i n)
+	   (cond ((eq arg nil) (return-from vector-rect (%vector-rect)))
+		 ((listp arg)
+		  (return-from vector-rect (c-arr-to-vector-rect arg)))
+		 ((and (pointerp arg) i (not n)) (mem-aref (%vector-rect-to-c-array arg) :pointer i))
+		 ((and (pointerp arg) i n) (mem-aref (mem-aref (%vector-rect-to-c-array arg) :pointer i) :int n))
+		 (t nil)))
 

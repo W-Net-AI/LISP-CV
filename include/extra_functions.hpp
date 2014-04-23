@@ -7,6 +7,19 @@ using namespace flann;
 using namespace cvflann;
 
 extern "C" {
+CascadeClassifier* cv_create_CascadeClassifier1_2(const char* filename);
+bool cv_CascadeClassifier_load1_2(CascadeClassifier* self, const char* filename);
+void cv_delete_Point(Point* self);
+void cv_destruct_Point(Point* self);
+void cv_delete_Rect(Rect* self);
+void cv_destruct_Rect(Rect* self);
+int &cv_Rect_x(Rect* self);
+int &cv_Rect_y(Rect* self);
+int &cv_Rect_width(Rect* self);
+int &cv_Rect_height(Rect* self);
+bool cv_findChessboardCorners2(Mat* image, Size* patternSize, vector_Point2f* corners, int flags);
+void cv_cornerSubPix2(Mat* image, vector_Point2f* corners, Size* winSize, Size* zeroZone, TermCriteria* criteria);
+void cv_drawChessboardCorners2(Mat* image, Size* patternSize, vector_Point2f* corners, bool patternWasFound);
 TermCriteria* cv_create_TermCriteria(int type, int maxCount, double epsilon);
 MatExpr* cv_Mat_sub(Mat* m1, Mat* m2);
 RNG* cv_create_RNG();

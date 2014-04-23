@@ -4,9 +4,63 @@ using namespace std;
 using namespace flann;
 using namespace cvflann;
 
+typedef vector<Rect> vector_Rect;
+
 #include <opencv2/c/extra_functions.hpp>
 
 extern "C" {
+
+CascadeClassifier* cv_create_CascadeClassifier1_2(const char* filename) {
+	return new CascadeClassifier(filename);
+}
+
+bool cv_CascadeClassifier_load1_2(CascadeClassifier* self, const char* filename) {
+	return self->load(filename);
+}
+
+void cv_delete_Point(Point* self) {
+     delete self;
+}
+
+void cv_destruct_Point(Point* self) {
+     self->~Point();
+}
+
+void cv_delete_Rect(Rect* self) {
+     delete self;
+}
+
+void cv_destruct_Rect(Rect* self) {
+     self->~Rect();
+}
+
+int &cv_Rect_x(Rect* self) {
+    return self->x;
+}
+
+int &cv_Rect_y(Rect* self) {
+    return self->y;
+}
+
+int &cv_Rect_width(Rect* self) {
+    return self->width;
+}
+
+int &cv_Rect_height(Rect* self) {
+    return self->height;
+}
+
+bool cv_findChessboardCorners2(Mat* image, Size* patternSize, vector_Point2f* corners, int flags) {
+	return cv::findChessboardCorners(*image, *patternSize, *corners, flags);
+}
+
+void cv_cornerSubPix2(Mat* image, vector_Point2f* corners, Size* winSize, Size* zeroZone, TermCriteria* criteria) {
+	cv::cornerSubPix(*image, *corners, *winSize, *zeroZone, *criteria);
+}
+
+void cv_drawChessboardCorners2(Mat* image, Size* patternSize, vector_Point2f* corners, bool patternWasFound) {
+	cv::drawChessboardCorners(*image, *patternSize, *corners, patternWasFound);
+}
 
 TermCriteria* cv_create_TermCriteria(int type, int maxCount, double epsilon) {
     return new TermCriteria(type, maxCount, epsilon);

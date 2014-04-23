@@ -22,6 +22,8 @@
                (:file "core" :depends-on ("package" "lisp-cv" "constants" "types"))
 	           (:file "imgproc" :depends-on ("package" "lisp-cv" "constants" "types"))
 	           (:file "highgui" :depends-on ("package" "lisp-cv" "constants" "types"))
+               (:file "calib3d" :depends-on ("package" "lisp-cv" "constants" "types"))
                (:file "features2d" :depends-on ("package" "lisp-cv" "constants" "types"))
+               (:file "objdetect" :depends-on ("package" "lisp-cv" "constants" "types"))
                (:file "nonfree" :depends-on ("package" "lisp-cv" "constants" "types"))
                (:file "macros" :depends-on ("package" "lisp-cv" "constants" "types" "vector" "core" "highgui" "imgproc" "features2d" "nonfree"))))

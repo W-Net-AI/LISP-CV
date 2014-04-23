@@ -14,9 +14,12 @@ typedef vector<Point2f> vector_Point2f;
 typedef vector<Mat> vector_Mat;
 
 
-
-
 extern "C" {
+
+vector_Rect* std_create_vectorr();
+vector_Rect* std_carrayTovectorr(Rect* a, size_t len);
+Rect* std_vectorrToCArray(vector_Rect* s);
+size_t std_vectorr_length(vector_Rect* self);
 
 vector_uchar* std_create_vectoru();
 vector_uchar* std_carrayTovectoru(uchar* a, size_t len);

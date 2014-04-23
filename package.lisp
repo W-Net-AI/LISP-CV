@@ -63,6 +63,7 @@
 
    #:bf-matcher
    #:brisk
+   #:cascade-classifier
    #:descriptor-matcher
    #:feature-2d
    #:feature-detector
@@ -111,6 +112,7 @@
    #:vector-mat
    #:vector-point
    #:vector-point2f
+   #:vector-rect
    #:vector-uchar
    #:video-capture
    #:video-writer
@@ -165,6 +167,7 @@
    #:col-range
    #:cols
    #:convert-to
+   #:cross
    #:copy-to
    #:data
    #:del-mat
@@ -217,6 +220,12 @@
    #:promote
    #:ptr
    #:rect
+   #:rect-clone
+   #:rect-height
+   #:rect-size
+   #:rect-width
+   #:rect-x
+   #:rect-y
    #:reshape
    #:roi
    #:row-range
@@ -230,7 +239,6 @@
    #:width2f
    #:step*
    #:sub
-   #:sz
    #:tl
    #:total
    #:x
@@ -298,6 +306,8 @@
    #:*max
    #:*min
    #:abs-diff
+   #:bitwise-and
+   #:bitwise-not
    #:bitwise-or
    #:bitwise-xor
    #:convert-scale-abs
@@ -314,6 +324,7 @@
    #:min-max-loc
    #:multiply
    #:normalize
+   #:pow
    #:randu
    #:rng
    #:scale-add
@@ -681,6 +692,8 @@
    
 ;; imgproc - Histograms
 
+   #:equalize-hist
+
 ;; imgproc - Structural Analysis and Shape Descriptors
 
 ;; imgproc - Motion Analysis and Object Tracking
@@ -793,6 +806,15 @@
    #:set-window-property
 
 
+;; calib3d - Camera Calibration and 3D Reconstruction
+
+
+   #:+calib-cb-adaptive-thresh+ 
+   #:+calib-cb-normalize-image+ 
+   #:+calib-cb-filter-quads+ 
+   #:+calib-cb-fast-check+ 
+
+
 ;; features2d - Feature Detection and Description
 
    #:brisk
@@ -824,6 +846,16 @@
 
    #:draw-matches
 
+;;; objdetect - Cascade Classification
+
+   #:+cascade-do-canny-pruning+
+   #:+cascade-scale-image+
+   #:+cascade-find-biggest-object+
+   #:+cascade-do-rough-search+
+
+
+   #:cascade-classifier
+   #:cascade-classifier-load
 
 ;;; nonfree - Feature Detection and Description
 
