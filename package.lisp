@@ -65,8 +65,10 @@
    #:brisk
    #:cascade-classifier
    #:descriptor-matcher
+   #:dmatch
    #:feature-2d
    #:feature-detector
+   #:keypoint
    #:mat
    #:mat-expr
    #:mouse-callback
@@ -172,6 +174,34 @@
    #:data
    #:del-mat
    #:del-mat-expr
+   #:del-point
+   #:del-rect
+   #:del-vec-char
+   #:del-vec-dbl
+   #:del-vec-dm
+   #:del-vec-flt
+   #:del-vec-int
+   #:del-vec-kp
+   #:del-vec-mat
+   #:del-vec-point
+   #:del-vec-point2f
+   #:del-vec-rect
+   #:del-vec-uchar
+   #:dest-mat
+   #:dest-mat-expr
+   #:dest-point
+   #:dest-rect
+   #:dest-vec-char
+   #:dest-vec-dbl
+   #:dest-vec-dm
+   #:dest-vec-flt
+   #:dest-vec-int
+   #:dest-vec-kp
+   #:dest-vec-mat
+   #:dest-vec-point
+   #:dest-vec-point2f
+   #:dest-vec-rect
+   #:dest-vec-uchar
    #:depth
    #:div
    #:dot

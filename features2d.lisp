@@ -5,18 +5,6 @@
 
 (in-package :lisp-cv)
 
-;;; Extra functions
-
-;; void operator delete  ( void* ptr )
-;; void cv_delete_BFMatcher(void* ptr)
-(defcfun ("cv_delete_BFMatcher" del-bf-matcher) :void
-  (ptr :pointer))
-
-;; void operator delete  ( void* ptr )
-;; void cv_delete_BRISK(void* ptr) 
-(defcfun ("cv_delete_BRISK" del-brisk) :void
-  (ptr :pointer))
-
 
 ;;; Feature Detection and Description
 
@@ -59,6 +47,32 @@
 (defun feat-detector-detect (self image keypoints &optional (mask (mat)))
   "Detects keypoints in an image."
    (%feat-detector-detect self image keypoints mask))
+
+
+;; KeyPoint::KeyPoint()
+;; KeyPoint* cv_create_KeyPoint()
+(defcfun ("cv_create_KeyPoint" keypoint0) (:pointer keypoint)
+  "Keypoint constructor")
+
+;; KeyPoint::KeyPoint(float x, float y, float _size, float _angle=-1, float _response=0, int _octave=0, int _class_id=-1)
+;; KeyPoint* cv_create_KeyPoint7(float x, float y, float _size, float _angle, float _response, int _octave, int _class_id)
+(defcfun ("cv_create_KeyPoint7" keypoint7) (:pointer keypoint)
+  "Keypoint constructor"
+  (x :float)
+  (y :float)
+  (_size :float)
+  (_angle :float)
+  (_response :float)
+  (_octave :int)
+  (_class_id :int))
+
+(defun keypoint (&optional x y _size (_angle -1) (_response 0) (_octave 0) (_class_id -1))
+	   (cond ((eq x nil)
+		  (keypoint0))
+		 (x
+		  (keypoint7 x y _size _angle _response _octave _class_id))
+		 (t nil)))
+
 
 
 ;;; Common Interfaces of Descriptor Extractors

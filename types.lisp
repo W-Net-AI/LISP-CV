@@ -20,11 +20,17 @@
 ;; DescriptorMatcher*
 (defctype descriptor-matcher :pointer)
 
+;; DMatch*
+(defctype dmatch :pointer)
+
 ;; Feature2D*
 (defctype feature-2d :pointer)
 
 ;; FeatureDetector*
 (defctype feature-detector :pointer)
+
+;; KeyPoint*
+(defctype keypoint :pointer)
 
 ;; Mat*
 (defctype mat :pointer)

@@ -54,46 +54,11 @@
 ;; Interop - String*
 
 ;; string* std_cstringToString(char* s, size_t len) 
-(defcfun ("std_cstringToString" c-string-to-string*) (:pointer string*) 
+(defcfun ("cstring_to_std_string" c-string-to-string*) (:pointer string*) 
   "Converts C string to C++"
   (s :string)
   (len :unsigned-int))
 
-
-(defmacro with-mat ((mat-var mat) &body body)
-  "Ensures DEL-MAT gets called on 
-   when MAT goes out of scope."
-  `(let ((,mat-var ,mat))
-     (unwind-protect
-	 (progn ,@body)
-       (del-mat ,mat-var))))
-
-
-(defmacro with-mat-expr ((mat-expr-var mat-expr) &body body)
-  "Ensures DEL-MAT-EXPR gets called on 
-   when MAT-EXPR goes out of scope."
-  `(let ((,mat-expr-var ,mat-expr))
-     (unwind-protect
-	 (progn ,@body)
-       (del-mat-expr ,mat-expr-var))))
-
-
-(defmacro with-rect ((rect-var rect) &body body)
-  "Ensures DEL-RECT gets called on 
-   when RECT goes out of scope."
-  `(let ((,rect-var ,rect))
-     (unwind-protect
-	 (progn ,@body)
-       (del-rect ,rect-var))))
-
-
-(defmacro with-point ((point-var point) &body body)
-  "Ensures DEL-POINT gets called on 
-   when POINT goes out of scope."
-  `(let ((,point-var ,point))
-     (unwind-protect
-	 (progn ,@body)
-       (del-point ,point-var))))
 
 
 ;;; Basic Structures
@@ -185,7 +150,7 @@
   (startcol :int)
   (endcol :int))
 
-
+;; int rows, cols;
 ;; int cv_Mat_cols(Mat* self)
 (defcfun ("cv_Mat_cols" cols) :int
   (self (:pointer mat)))
@@ -239,30 +204,6 @@
 (defcfun ("cv_Mat_get_Data" data) :pointer
   "Pointer to the data."
   (self (:pointer mat)))
-
-
-;; void operator delete  ( void* ptr )
-;; void cv_delete_Mat(void* self)
-(defcfun ("cv_delete_Mat" del-mat) :void
-  (self :pointer))
-
-
-;; void operator delete  ( void* ptr )
-;; void cv_delete_MatExpr(void* self)
-(defcfun ("cv_delete_MatExpr" del-mat-expr) :void
-  (self :pointer))
-
-
-;; void operator delete  ( void* ptr )
-;; void cv_delete_Point(void* self)
-(defcfun ("cv_delete_Point" del-point) :void
-  (self :pointer))
-
-
-;; void operator delete  ( void* ptr )
-;; void cv_delete_Rect(void* self)
-(defcfun ("cv_delete_Rect" del-rect) :void
-  (self :pointer))
 
 
 ;; int Mat::depth() const
@@ -410,31 +351,6 @@
   (rows :int)
   (cols :int)
   (type :int))
-
-
-;; ~Mat()
-;; void cv_destruct_Mat(Mat* self)
-(defcfun ("cv_destruct_Mat" destruct-mat) :void
-  "Destructor - calls release()"
-  (self :pointer))
-
-;; ~MatExpr()
-;; void cv_destruct_MatExpr(MatExpr* self) 
-(defcfun ("cv_destruct_MatExpr" destruct-mat-expr) :void
-  "Destructor - calls release()"
-  (self :pointer))
-
-;; ~Point()
-;; void cv_destruct_Point(Mat* self)
-(defcfun ("cv_destruct_Point" destruct-point) :void
-  "Destructor - calls release()"
-  (self :pointer))
-
-;; ~Rect()
-;; void cv_destruct_Rect(Rect* self)
-(defcfun ("cv_destruct_Rect" destruct-rect) :void
-  "Destructor - calls release()"
-  (self :pointer))
 
 
 ;; void Mat::locateROI(Size& wholeSize, Point& ofs) const
@@ -865,7 +781,7 @@
   (startrow :int)
   (endrow :int))
 
-
+;; int rows, cols;
 ;; int cv_Mat_rows(Mat* self) 
 (defcfun ("cv_Mat_rows" rows) :int
   (self (:pointer mat)))

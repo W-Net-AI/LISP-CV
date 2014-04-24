@@ -252,4 +252,9 @@ void cv_destruct_MatExpr(MatExpr* self) {
      self->~MatExpr();
 }
 
+void cv_delete(char* self) {
+     delete self;
+}
+
+
 }

@@ -1,6 +1,8 @@
 ;;;; -*- mode: lisp; indent-tabs: nil -*-
 ;;;; examples.lisp
-;;;; Documentation and Examples(In process):
+;;;; Documentation and Examples(In process) -> For now, if you want to know if a Lisp binding exists 
+;;;; for a specified OpenCV C++ function search this file for the OpenCV C++ function name to find its 
+;;;; Lisp name, documentation and an example program.
 
 There are 3 major types of memory management, manual, with-* macros and Trivial Garbage finalizers
 Most examples so far use manual memory management, which is unsafe, but long-lived and fast. I'll 
@@ -20,7 +22,7 @@ the camera output in a window using the with-* macro syntax:
   (with-capture (cap (video-capture camera-index))
     (let ((window-name "WITH-MACRO Example"))
       (if (not (cap-is-open cap)) 
-	  (return-from with-mat-example 
+	  (return-from with-macro-example 
 	    (format t "Cannot open the video camera")))
       (cap-set cap +cap-prop-frame-width+ width)
       (cap-set cap +cap-prop-frame-height+ height)
@@ -64,7 +66,7 @@ matrices must have the same number of rows and columns. You may need to coerce t
 f ADD, the return value, back to type (:POINTER MAT) with the function (FORCE), (or the 
 shorthand version (>>)) to use in other functions. 
 
-****
+
 (defun add-example ()
 
   "Matrix M1 and M2 are added together with the 
@@ -96,7 +98,7 @@ shorthand version (>>)) to use in other functions.
 	  (format t "~%"))))))
 
 
-
+****
 ADJUST-ROI
 
 Adjusts a submatrix size and position within the parent matrix.
@@ -575,28 +577,28 @@ types contains the following values:
 
 Example:
 
-LCV> (DEFPARAMETER A (MAT-TYPED 3 3 +8SC1+)) ;Initialize 1 channel matrix of 8-bit signed integer type
+LISP-CV> (DEFPARAMETER A (MAT-TYPED 3 3 +8SC1+)) ;Initialize 1 channel matrix of 8-bit signed integer type
 
 A
 
-LCV> (MAT-TYPE A) 
+LISP-CV> (MAT-TYPE A) 
 
 1  ;The type of the matrix is 1(+8SC1+) - 1 channel matrix with 8-bit signed integer elements
 
-LCV> (DEPTH A)
+LISP-CV> (DEPTH A)
 
 1  ;The type of the matrix elements are 1(+8S+) - 8-bit signed integer
 
 
-LCV> (DEFPARAMETER A (MAT-TYPED 3 3 +8SC3+)) ;Initialize 3 channel matrix of 8-bit signed integer type
+LISP-CV> (DEFPARAMETER A (MAT-TYPED 3 3 +8SC3+)) ;Initialize 3 channel matrix of 8-bit signed integer type
 
 A
 
-LCV> (MAT-TYPE A)  
+LISP-CV> (MAT-TYPE A)  
 
 17  ;The type of the matrix is 17(+8SC1+) - 3 channel matrix with 8-bit signed integer elements
 
-LCV> (DEPTH A)
+LISP-CV> (DEPTH A)
 
 1  ;The type of the matrix elements are 1(+8S+) - 8-bit signed integer
 
@@ -1259,6 +1261,57 @@ bit faster matrix size accessor choose the MAT-SIZE Dfunction.
                ~%" size-un-init) 
 	       (format t "Width of SIZE = ~a~%" (width size))
 	       (format t "Height of SIZE = ~a" (height size))))
+
+
+
+STEP*
+
+Used to compute address of a matrix element
+
+C++: MStep step
+
+LISP-CV: (STEP (SELF (:POINTER MAT))) => :UNSIGNED-INT
+
+    Parameters:	
+
+        SELF  a pointer to matrix(MAT construc
+
+
+This function is used to compute the address of a matrix element. The image step gives you the dist-
+ance in bytes between the first element of one row and the first element of the next row. This func-
+tion is named STEP*, because the name STEP conflicts with a Lisp Macro.
+
+
+(defun step*-example (filename)
+  ;; load image
+  (let* ((img (imread filename 1))
+	 ;; variables used to access a pixel value.
+         ;; BGR - Blue,Green,Red is the default co-
+         ;; lor format in LisP-CV.
+	 (input (data img))
+         ;; variables used to hold the BGR image pixel value
+	 (b 0)
+	 (g 0)
+	 (r 0)
+	 (window-name "STEP* Example"))
+    (if (empty img) 
+	(return-from step*-example 
+	  (format t "Image not loaded")))
+    (named-window window-name +window-normal+)
+    (move-window window-name 759 175)
+    ;; access pixel value at x = 0, y = 0 using the STEP* function
+    (setf b (mem-aref input :uchar 
+		      (+  (* (step* img) 0) 0)))
+    (setf g (mem-aref input :uchar 
+		      (+ (+  (* (step* img) 0) 0) 1)))
+    (setf r (mem-aref input :uchar 
+		      (+ (+  (* (step* img) 0) 0) 2)))
+    ;; print the 0,0 pixel value
+    (format t "The pixel value at 0,0 is: (~a,~a,~a) " b g r)
+    (imshow window-name img)
+    (loop while (not (= (wait-key 0) 27)))
+    (destroy-window window-name)))
+
 
 
 
@@ -2882,19 +2935,19 @@ random number sequence, consisting of all zeros.
 Example:
 
 
-LCV> (DEFPARAMETER RNG (RNG #XFFFFFFFF))
+LISP-CV> (DEFPARAMETER RNG (RNG #XFFFFFFFF))
 
 RNG
 
-LCV> (UNIFORM RNG 0 10)
+LISP-CV> (UNIFORM RNG 0 10)
 
 6
 
-LCV> (UNIFORM RNG 0D0 10D0)
+LISP-CV> (UNIFORM RNG 0D0 10D0)
 
 6.992592005760082d0
 
-LCV> (UNIFORM RNG 0F0 10F0)
+LISP-CV> (UNIFORM RNG 0F0 10F0)
 
 3.1438508
 
@@ -3915,7 +3968,7 @@ COPY-MAKE-BORDER
 Forms a border around an image.
 
 C++: void copyMakeBorder(InputArray src, OutputArray dst, int top, int bottom, int left, int right, int borderType, 
-     const Scalar& value=Scalar() )
+     const Scalar& value=Scalar() )ning: deleting ‘void*’ is undefined [enabled by default]
 
 LISP-CV: (COPY-MAKE-BORDER (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) (TOP :INT) (BOTTOM :INT) (LEFT :INT) (RIGHT :INT) 
          (BORDER-TYPE :INT) (VALUE (:POINTER SCALAR))) => :VOID
@@ -4137,7 +4190,7 @@ zero rows and columns and then convolves the result with the same kernel as in (
       (destroy-all-windows)))
 
   (main filename))
-
+ning: deleting ‘void*’ is undefined [enabled by default]
 
 
 SOBEL
@@ -4890,6 +4943,427 @@ HIGHGUI - READING AND WRITING IMAGES AND VIDEO:
 
 
 
+CAP-GET
+
+
+Returns the specified VIDEO-CAPTURE property
+
+
+C++: double VideoCapture::get(int propId)
+
+LISP-CV: (CAP-GET (SELF (:POINTER VIDEO-CAPTURE)) (PROP-ID :INT))
+
+
+    Parameters:	SELF - The VIDEO-CAPTURE structure. 
+
+                PROP-ID -
+
+       Property identifier. It can be one of the following:
+
+            +CAP-PROP-POS-MSEC+ Current position of the video file in milliseconds or video capture tim-
+                                estamp.
+            +CAP-PROP-POS-FRAMES+ 0-based index of the frame to be decoded/captured next.
+
+            +CAP-PROP-POS-AVI-RATIO+ Relative position of the video file: 0 - start of the film, 1 - en-
+                                     d of the film.
+            +CAP-PROP-FRAME-WIDTH+ Width of the frames in the video stream.
+
+            +CAP-PROP-FRAME-HEIGHT+ Height of the frames in the video stream.
+
+            +CAP-PROP-FPS+ Frame rate.
+
+            +CAP-PROP-FOURCC+ 4-character code of codec.
+
+            +CAP-PROP-FRAME-COUNT+ Number of frames in the video file.
+
+            +CAP-PROP-FORMAT+ Format of the Mat objects returned by retrieve() .
+
+            +CAP-PROP-MODE+ Backend-specific value indicating the current capture mode.
+
+            +CAP-PROP-BRIGHTNESS+ Brightness of the image (only for cameras).
+
+            +CAP-PROP-CONTRAST+ Contrast of the image (only for cameras).
+
+            +CAP-PROP-SATURATION+ Saturation of the image (only for cameras).
+
+            +CAP-PROP-HUE+ Hue of the image (only for cameras).
+
+            +CAP-PROP-GAIN+ Gain of the image (only for cameras).
+
+            +CAP-PROP-EXPOSURE+ Exposure (only for cameras).
+
+            +CAP-PROP-CONVERT-RGB+ Boolean flags indicating whether images should be converted to RGB.
+
+            +CAP-PROP-WHITE-BALANCE+ Currently not supported
+
+            +CAP-PROP-RECTIFICATION+ Rectification flag for stereo cameras (note: only supported by DC1394 
+                                     v 2.x backend currently)
+
+Note: When querying a property that is not supported by the backend used by the VideoCapture class <-todo,
+value 0 is returned.
+
+
+(defun cap-get-example (&optional 
+                          (camera-index *camera-index*) 
+			  (width *default-width*)
+			  (height *default-height*))
+
+  "Gets the width and height of the camera capture 
+   with the function CAP-GET and prints it."
+
+  (with-capture (cap (video-capture camera-index))
+    (let ((window-name "CAP-GET Example"))
+      (if (not (cap-is-open cap)) 
+	  (return-from cap-get-example 
+	    (format t "Cannot open the video camera")))
+      (cap-set cap +cap-prop-frame-width+ width)
+      (cap-set cap +cap-prop-frame-height+ height)
+      (format t "Frame Size : ~ax~a~%~%" 
+	      (cap-get cap +cap-prop-frame-width+)
+	      (cap-get cap +cap-prop-frame-height+))
+      (named-window window-name +window-normal+)
+      (move-window window-name 759 175)
+      (do* ((frame 0))
+	   ((plusp (wait-key *millis-per-frame*)) 
+	    (format t "Key is pressed by user"))
+	(setf frame (mat))
+	(cap-read cap frame)
+	(imshow window-name frame)
+        (del-mat frame))
+      (destroy-window window-name))))
+
+
+
+CAP-READ
+
+
+Grabs, decodes and returns the next video frame.
+
+
+C++: bool VideoCapture::read(Mat& image)
+
+LISP-CV: (CAP-READ (SELF (:POINTER VIDEO-CAPTURE)) (IMAGE (:POINTER MAT)))
+
+
+    Parameters:	
+
+         SELF - The "grabbed" camera feed.
+
+         IMAGE - The returned frame.
+
+
+The methods/functions combine (CAP-GRAB) and (CAP-RETRIEVE) in one call. This is the most convenient 
+method for reading video files or capturing data from decode and return the just grabbed frame. If no 
+frames has been grabbed (camera has been disconnected, or there are no more frames in video file), the 
+methods return false and the functions return NULL pointer.
+
+
+(defun cap-read-example (&optional 
+  "In the code below the (COLS, ROWS) values of MAT are 
+   accessed and stored in a SIZE construct. Their values 
+   are accessed with the WIDTH and HEIGHT functions. The-
+   n an uninitialized and an initialized SIZE construct  
+   are created. Their values are also printed."
+
+  (let* ((mat (mat-value 5 5 +64f+ (scalar 100 100 100)))
+         (mat-size (mat-size mat))
+          (size-un-init)
+          (size (size 640 480)))
+    (format t " The (COLS ROWS) of MAT = (~a ~a)~%"  
+	    (width mat-size)
+	    (height mat-size)
+            (format t "Pointer to an uninitialized SIZE construct:~a~%" 
+size-un-init) 
+(format t "Width of SIZE = ~a~%" (width size))
+    (format t "Height of SIZE = ~a" (height size)))))
+
+
+                           (camera-index 
+                            *camera-index*))
+
+  "Grabs, decodes and returns the next video frame 
+   with the function CAP-READ and then shows it in 
+   a window with the function IMSHOW."
+
+  (with-capture (cap (video-capture camera-index))
+    (let ((window-name "CAP-READ Example"))
+      (if (not (cap-is-open cap)) 
+	  (return-from cap-read-example 
+	    (format t "Cannot open the video camera")))
+      (named-window window-name +window-normal+)
+      (move-window window-name 759 175)
+      (do* ((frame 0))
+	   ((plusp (wait-key *millis-per-frame*)) 
+	    (format t "Key is pressed by user"))
+	(setf frame (mat))
+	(cap-read cap frame)
+	(imshow window-name frame))
+      (destroy-window window-name))))
+
+
+
+CAP-RELEASE
+
+
+Closes video file or capturing device.
+
+
+C++: void VideoCapture::release()
+
+LISP-CV: (CAP-RELEASE (SELF (:POINTER VIDEO-CAPTURE))) => :VOID
+
+
+The methods are automatically called by subsequent (CAP-OPEN) and by VIDEO-CAPTURE destructor.
+
+
+    Parameters:	
+
+         SELF - The VIDEO-CAPTURE structure.
+
+
+(defun cap-release-example (&optional 
+                              (camera-index 
+                               *camera-index*))
+
+  "In order: First the function CAPTURE-FROM-CAM allocates and 
+   initializes the structure for reading a video stream from t-
+   he camera. Next a window is created with NAMED-WINDOW. Then 
+   the camera stream is read with CAP-READ and then shown in t-
+   he window with IMSHOW. Then, once the user invokes the WAIT-
+   KEY function by pressing the Escape key while the window is 
+   active the DO loop is exited and CAP-RELEASE is called clos-
+   ing the structure used to read and show the video stream. 
+   Note: If you use the macro WITH-CAPTURE, CAP-RELEASE will b-
+   e called automatically. See WITH-CAPTURE EXAMPLE for usage."
+  
+  (let ((cap (video-capture camera-index))
+	(window-name "CAP-RELEASE Example"))
+    (if (not (cap-is-open cap)) 
+	(return-from cap-release-example 
+	  (format t "Cannot open the video camera")))
+    (named-window window-name +window-normal+)
+    (move-window window-name 759 175)
+    (do* ((frame 0))
+	 ((plusp (wait-key *millis-per-frame*)) 
+	  (format t "Key is pressed by user"))
+      (setf frame (mat))
+      (cap-read cap frame)
+      (imshow window-name frame))
+    (cap-release cap)
+    (destroy-window window-name)))
+
+
+
+CAP-SET
+
+
+Sets a property in the VIDEO-CAPTURE
+
+
+C++: bool VideoCapture::set(int propId, double value)
+
+LISP-CV: (CAP-SET (SELF (:POINTER VIDEO-CAPTURE)) (PROP-ID :INT) (VALUE :DOUBLE)) => :BOOLEAN
+
+
+    Parameters:	SELF - The VIDEO-CAPTURE structure.
+
+                PROP-ID -
+
+       Property identifier. It can be one of the following:
+
+            +CAP-PROP-POS-MSEC+ Current position of the video file in milliseconds.
+
+            +CAP-PROP-POS-FRAMES+ 0-based index of the frame to be decoded/captured next.
+
+            +CAP-PROP-POS-AVI-RATIO+ Relative position of the video file: 0 - start of the file, 
+
+                                                                          1 - end of the file.
+
+            +CAP-PROP-FRAME-WIDTH+ Width of the frames in the video stream.
+
+            +CAP-PROP-FRAME-HEIGHT+ Height of the frames in the video stream.
+
+            +CAP-PROP-FPS+ Frame rate.
+
+            +CAP-PROP-FOURCC+ 4-character code of codec.
+
+            +CAP-PROP-FRAME-COUNT+ Number of frames in the video file.
+
+            +CAP-PROP-FORMAT+ Format of the Mat objects returned by retrieve() .
+
+            +CAP-PROP-MODE+ Backend-specific value indicating the current capture mode.
+
+            +CAP-PROP-BRIGHTNESS+ Brightness of the image (only for cameras).
+
+            +CAP-PROP-CONTRAST+ Contrast of the image (only for cameras).
+
+            +CAP-PROP-SATURATION+ Saturation of the image (only for cameras).
+
+            +CAP-PROP-HUE+ Hue of the image (only for cameras).
+
+            +CAP-PROP-GAIN+ Gain of the image (only for cameras).
+
+            +CAP-PROP-EXPOSURE+ Exposure (only for cameras).
+
+            +CAP-PROP-CONVERT-RGB+ Boolean flags indicating whether images should be converted to RGB.
+
+            +CAP-PROP-WHITE-BALANCE+ Currently unsupported
+
+            +CAP-PROP-RECTIFICATION+ Rectification flag for stereo cameras (note: only supported by
+                                     DC1394 v 2.x backend currently)
+  
+                 VALUE - Value of the property.
+
+
+             
+(defun cap-set-example (&optional 
+                          (camera-index 
+                           *camera-index*))
+
+  "Changes the brightness level of the camera feed 
+   with the function CAP-SET and then prints the b-
+   rightness level."
+
+  (with-capture (cap (video-capture camera-index))
+    (let ((window-name "CAP-SET Example"))
+      (if (not (cap-is-open cap)) 
+	  (return-from cap-set-example 
+	    (format t "Cannot open the video camera")))
+(cap-set cap +cap-prop-brightness+ 0.7)
+      (format t "Brightness level: ~a~%~%" 
+	      (cap-get cap +cap-prop-brightness+))
+      (named-window window-name +window-normal+)
+      (move-window window-name 759 175)
+      (do* ((frame 0))
+	   ((plusp (wait-key *millis-per-frame*)) 
+	    (format t "Key is pressed by user"))
+	(setf frame (mat))
+	(cap-read cap frame)
+	(imshow window-name frame))
+      (destroy-window window-name))))
+
+
+
+IMREAD
+
+
+Loads an image from a file.
+
+
+C++: Mat imread(const string& filename, int flags=1)
+
+LISP-CV: (IMREAD (FILENAME (:POINTER STRING*)) &OPTIONAL ((FLAGS :INT) +LOAD-IMAGE-COLOR+)) => (:POINTER MAT)
+
+
+    Parameters:	
+
+        FILENAME - Name of file to be loaded.
+
+        FLAGS -
+
+        Flags specifying the color type of a loaded image:
+
+            +LOAD-IMAGE-ANYDEPTH+ - If set, return 16-bit/32-bit image when the input has the corresponding 
+                                    depth, otherwise convert it to 8-bit.
+
+            +LOAD-IMAGE-COLOR+ - If set, always convert image to the color one
+
+            +LOAD-IMAGE-GRAYSCALE+ - If set, always convert image to the grayscale one
+
+            >0 Return a 3-channel color image.
+
+                Note
+
+                In the current implementation the alpha channel, if any, is stripped from the output 
+                image. Use negative value if you need the alpha channel.
+
+            =0 Return a grayscale image.
+
+            <0 Return the loaded image as is (with alpha channel).
+
+
+The function IMREAD loads an image from the specified file and returns it. If the image cannot be r-
+ead (because of missing file, improper permissions, unsupported or invalid format), the function re-
+turns an empty matrix ( Mat::data==NULL )todo. Currently, the following file formats are supported:
+
+        Windows bitmaps - *.bmp, *.dib (always supported)
+
+        JPEG files - *.jpeg, *.jpg, *.jpe (see the Notes section)
+
+        JPEG 2000 files - *.jp2 (see the Notes section)
+
+        Portable Network Graphics - *.png (see the Notes section)
+
+        Portable image format - *.pbm, *.pgm, *.ppm (always supported)
+
+        Sun rasters - *.sr, *.ras (always supported)
+
+        TIFF files - *.tiff, *.tif (see the Notes section)
+
+Note:
+
+    The function determines the type of an image by the content, not by the file extension.
+
+    On Microsoft Windows* OS and MacOSX*, the codecs shipped with an LISP-CV image (libjpeg
+    , libpng, libtiff, and libjasper) are used by default. So, LISP-CV can always read JPEG-
+    s, PNGs, and TIFFs. On MacOSX, there is also an option to use native MacOSX image readers. But 
+    beware that currently these native image loaders give images with different pixel values becaus-
+    e of the color management embedded into MacOSX. 
+
+    On Linux*, BSD flavors and other Unix-like open-source operating systems, LISP-CV looks
+    for codecs supplied with an OS image. Install the relevant packages (do not forget the developm-
+    ent files, for example, “libjpeg-dev”, in Debian* and Ubuntu*) to get the codec support or turn 
+    on the OPENCV_BUILD_3RDPARTY_LIBS flag in CMake.
+
+Note
+
+In the case of color images, the decoded images will have the channels stored in B G R order.
+
+
+Example using manual memory management:
+
+
+(defun imread-example-1 (filename)
+
+  "Open the image FILENAME with IMREAD 
+   and show it in a window. This examp-
+   le uses manual memory management"
+
+  (let* ((image (imread filename 1))
+	 (window-name "IMREAD Example 1"))
+    (if (empty image) 
+	(return-from imread-example-1 
+	  (format t "Image not loaded")))
+    (named-window window-name +window-normal+)
+    (move-window window-name 759 175)
+    (imshow window-name image)
+    (loop while (not (= (wait-key 0) 27)))
+    (del-mat image)
+    (destroy-window window-name)))
+
+
+Example using WITH-* macros for memory/window managemant:
+
+
+(defun imread-example-2 (filename)
+
+  "Open the image FILENAME with IMREAD 
+   and show it in a window. This examp-
+   le uses with-* macros for memory ma-
+   nagement"
+
+  (let ((window-name "IMREAD Example 2"))
+    (with-named-window (window-name +window-normal+)
+      (move-window window-name 759 175)
+      (with-mat (image (imread filename 1))
+	(imshow window-name image)
+	(loop
+	   (let ((c (wait-key 33)))
+	     (when (= c 27)
+	       (return))))))))
+
+
+
 IMWRITE
 
 Saves an image to a specified file.
@@ -5026,6 +5500,289 @@ LISP-CV: (VIDEO-CAPTURE &OPTIONAL (SRC :POINTER STRING*)) => (:POINTER VIDEO-CAP
 
 
 
+HIGHGUI - USER INTERFACE:
+
+
+
+IMSHOW
+
+Displays an image in the specified window.
+
+C++: void imshow(const string& winname, InputArray mat)
+
+LISP-CV: (IMSHOW (WINNAME (:POINTER STRING*)) (MAT (:POINTER MAT))) => :void
+
+    Parameters:	
+
+        WINNAME - Name of the window.
+
+        MAT - Image to be shown.
+
+
+The function IMSHOW displays an image in the specified window. If the window was created with the 
++WINDOW-AUTOSIZE+ flag, the image is shown with its original size. Otherwise, the image is scaled 
+to fit the window. The function may scale the image, depending on its depth:
+
+        If the image is 8-bit unsigned, it is displayed as is.
+
+        If the image is 16-bit unsigned or 32-bit integer, the pixels are divided by 256. That is, 
+        the value range [0,255*256] is mapped to [0,255].
+
+        If the image is 32-bit floating-point, the pixel values are multiplied by 255. That is, the
+        value range [0,1] is mapped to [0,255].
+
+If window was created with OpenGL support, IMSHOW also support ogl::Buffer , ogl::Texture2D and gpu::GpuMat as input. todo
+
+
+(defun imshow-example (filename)
+
+  "Opens the image FILENAME and shows it 
+   in a window with IMSHOW."
+
+  (let* ((image (imread filename 1))
+	 (window-name "IMSHOW Example"))
+    (if (empty image) 
+	(return-from imshow-example 
+	  (format t "Image not loaded")))
+    (named-window window-name +window-normal+)
+    (move-window window-name 759 175)
+    (imshow window-name image)
+    (loop while (not (= (wait-key 0) 27)))
+    (destroy-window window-name)))
+
+
+
+DESTROY-WINDOW
+
+
+Destroys a window.
+
+
+C++: void destroyWindow(const string& winname)
+
+LISP-CV: (DESTROY-WINDOW (WINNAME (:POINTER STRING*))) => :VOID
+
+    Parameters:	WINNAME - Name of the window to be destroyed.
+
+The function DESTROY-WINDOW destroys the window with the given name.
+
+
+(defun destroy-window-example ()
+
+  "Creates a window. Window will be closed 
+   by DESTROY-WINDOW when it is active and
+   any key is pressed."
+
+  (let* ((window-name "DESTROY-WINDOW Example"))
+    (named-window window-name +window-normal+)
+    (loop while (not (= (wait-key 0) 27)))
+    (destroy-window window-name)))
+
+
+
+DESTROY-ALL-WINDOWS
+
+Destroys all of the HighGUI windows.
+
+C++: void destroyAllWindows()
+
+LISP-CV: (DESTROY-ALL-WINDOWS) => :VOID
+
+
+The function DESTROY-ALL-WINDOWS destroys all of the opened HighGUI windows.
+
+
+(defun destroy-all-windows-example ()
+
+  "In this example we create
+ 12 windows and DESTROY THEM!!!"
+
+  (let* ((window-name-arr 
+	  (make-array 12 :initial-contents 
+
+		      (list
+		       "WINDOW 1 - DESTROY-ALL-WINDOWS Example"
+		       "WINDOW 2 - DESTROY-ALL-WINDOWS Example"
+		       "WINDOW 3 - DESTROY-ALL-WINDOWS Example"
+		       "WINDOW 4 - DESTROY-ALL-WINDOWS Example"
+		       "WINDOW 5 - DESTROY-ALL-WINDOWS Example"
+		       "WINDOW 6 - DESTROY-ALL-WINDOWS Example"
+		       "WINDOW 7 - DESTROY-ALL-WINDOWS Example"
+		       "WINDOW 8 - DESTROY-ALL-WINDOWS Example"
+		       "WINDOW 9 - DESTROY-ALL-WINDOWS Example"
+		       "WINDOW 10 - DESTROY-ALL-WINDOWS Example"
+		       "WINDOW 11 - DESTROY-ALL-WINDOWS Example"
+		       "WINDOW 12 - DESTROY-ALL-WINDOWS Example"))))
+
+    ;; Create 12 windows to DESTROY!!!
+    (dotimes (i 12)
+      (named-window (aref window-name-arr i) +window-normal+))
+    ;; Move the windows to specific coordinates.
+    (move-window (aref window-name-arr 0) 88 0)
+    (move-window (aref window-name-arr 1) 538 0)
+    (move-window (aref window-name-arr 2) 988 0)
+    (move-window (aref window-name-arr 3) 1438 0)
+    (move-window (aref window-name-arr 4) 88 368)
+    (move-window (aref window-name-arr 5) 538 368)
+    (move-window (aref window-name-arr 6) 988 368)
+    (move-window (aref window-name-arr 7) 1438 368)
+    (move-window (aref window-name-arr 8) 88 708)
+    (move-window (aref window-name-arr 9) 538 708)
+    (move-window (aref window-name-arr 10) 988 708)
+    (move-window (aref window-name-arr 11) 1438 708)
+    ;; When you press the escape key, you will...
+    ;; DESTROY 12 WINDOWS!!!
+    (loop while (not (= (wait-key 0) 27)))
+    (destroy-all-windows)))
+
+
+MOVE-WINDOW
+
+Moves window to the specified position
+
+C++: void moveWindow(const string& winname, int x, int y)
+
+LISP-CV: (MOVE-WINDOW (WINNAME (:POINTER STRING*)) (X :INT) (Y :INT)) => VOID
+
+
+    Parameters:	
+
+        WINNAME - Window name
+
+        X - The new x-coordinate of the window
+
+        Y - The new y-coordinate of the window
+
+
+(defun move-window-example ()
+
+  "Creates a window then uses MOVE-WINDOW 
+   to move the window to (x, y) position 
+   (720, 175)."
+
+  (let* ((window-name "MOVE-WINDOW Example")))
+    (named-window window-name +window-normal+)
+    (move-window window-name 759 175)
+    (loop while (not (= (wait-key 0) 27)))
+    (destroy-window window-name))
+
+
+
+NAMED-WINDOW
+
+
+Creates a window.
+
+
+C++: void namedWindow(const string& winname, int flags=WINDOW_AUTOSIZE)
+
+LISP-CV: (NAMED-WINDOW (WINNAME (:POINTER STRING*)) &OPTIONAL ((FLAGS :INT) +WINDOW-AUTOSIZE+)) => :VOID
+
+
+    Parameters:	
+
+        NAME - Name of the window in the window caption that may be used as a window identifier.
+
+        FLAGS -
+
+        Flags of the window. The supported flags are:
+
+            +WINDOW-NORMAL+ If this is set, the user can resize the window (no constraint).
+
+            +WINDOW-AUTOSIZE+ If this is set, the window size is automatically adjusted to fit the 
+                              displayed image (see (IMSHOW) ), and you cannot change the window size 
+                              manually.
+
+            +WINDOW-OPENGL+ If this is set, the window will be created with OpenGL support.
+
+
+The function NAMED-WINDOW creates a window that can be used as a placeholder for images and trackba-
+rs. Created windows are referred to by their names.
+
+If a window with the same name already exists, the function does nothing.
+
+You can call (DESTROY-WINDOW) or (DESTROY-ALL-WINDOWS) to close the window and de-allocate any asso-
+ciated memory usage. For a simple program, you do not really have to call these functions because a-
+ll the resources and windows of the application are closed automatically by the operating system up-
+on exit.
+
+Note:
+
+Qt backend supports additional flags:
+
+        +WINDOW-NORMAL+ or +WINDOW-AUTOSIZE+: +WINDOW-NORMAL+ enables you to resize the window, wher-
+        eas +WINDOW-AUTOSIZE adjusts automatically the window size to fit the displayed image (see 
+        (IMSHOW) ), and you cannot change the window size manually.
+
+        +WINDOW-FREERATIO+ or +WINDOW-KEEPRATIO+: +WINDOW-FREERATIO+ adjusts the image with no resp-
+        ect to its ratio, whereas +WINDOW-KEEPRATIO keeps the image ratio. 
+        
+        +GUI-NORMAL+ or +GUI-EXPANDED+: +GUI-NORMAL+ is the old way to draw the window without stat-
+        usbar and toolbar, whereas +GUI-EXPANDED+ is a new enhanced GUI.
+
+By default, (= FLAGS (LOGIOR +WINDOW-AUTOSIZE+  +WINDOW-KEEPRATIO+  +GUI-EXPANDED+))
+
+
+(defun named-window-example ()
+
+  "Creates a named window with NAMED-WINDOW. Window 
+   will close when it is selected and any key is pr-
+   essed."
+
+  (let* ((window-name "NAMED-WINDOW Example"))
+    (named-window window-name +window-normal+)
+    (loop while (not (= (wait-key 0) 27)))
+    (destroy-window window-name)))
+
+
+
+WAIT-KEY
+
+Waits for a pressed key.
+
+C++: int waitKey(int delay=0)
+
+LISP-CV: (WAIT-KEY &OPTIONAL ((DELAY :INT) 0))
+
+    Parameters:	DELAY - Delay in milliseconds. 0 is the special value that means “forever”.
+
+The function WAIT-KEY waits for a key event infinitely when (<= DELAY 0), for DELAY milliseconds wh-
+en it is positive. Since the OS has a minimum time between switching threads, the function will not 
+wait exactly delay ms, it will wait at least delay ms, depending on what else is running on your co-
+mputer at that time. It returns the code of the pressed key or -1 if no key was pressed before the 
+specified time had elapsed.
+
+Note
+
+This function is the only method in HighGUI that can fetch and handle events, so it needs to be cal-
+led periodically for normal event processing unless HighGUI is used within an environment that take-
+s care of event processing.
+
+Note
+
+The function only works if there is at least one HighGUI window created and the window is active. I-
+f there are several HighGUI windows, any of them can be active.
+
+
+(defun wait-key-example ()
+
+  "After window is created with NAMED-WINDOW 
+   and moved with MOVE-WINDOW this function 
+   waits until a keypress(ESC) is detected w-
+   ith the function WAIT-KEY until it runs t-
+   he function DESTROY-WINDOW. Note: window 
+   must be active before the key press will 
+   be detected."
+
+  (let* ((window-name "WAIT-KEY Example"))
+    (named-window window-name +window-normal+)
+    (move-window window-name 759 175)
+    (loop while (not (= (wait-key 0) 27)))
+    (destroy-window window-name)))
+
+
+
+
 OBJDETECT - CASCADE CLASSIFICATION:
 
 
@@ -5057,18 +5814,18 @@ Example:
 
 ;Create an uninitialized CASCADE-CLASSIFIER construct
 
-LCV> (DEFPARAMETER FACE-CASCADE (CASCADE-CLASSIFIER))
+LISP-CV> (DEFPARAMETER FACE-CASCADE (CASCADE-CLASSIFIER))
 
 FACE-CASCADE
 
 
 ;Create a CASCADE-CLASSIFIER construct initialized with an XML classifier 
 
-LCV> (DEFPARAMETER FACE-CASCADE-NAME "<opencv_source_directory>/data/haarcascades/haarcascade_frontalface_alt.xml")
+LISP-CV> (DEFPARAMETER FACE-CASCADE-NAME "<opencv_source_directory>/data/haarcascades/haarcascade_frontalface_alt.xml")
 
 FACE-CASCADE-NAME
 
-LCV> (DEFPARAMETER FACE-CASCADE (CASCADE-CLASSIFIER FACE-CASCADE-NAME))
+LISP-CV> (DEFPARAMETER FACE-CASCADE (CASCADE-CLASSIFIER FACE-CASCADE-NAME))
 
 FACE-CASCADE
 
@@ -5096,15 +5853,15 @@ LISP-CV: (CASCADE-CLASSIFIER-LOAD (SELF (:POINTER CASCADE-CLASSIFIER)) (FILENAME
 Example:
 
 
-LCV> (DEFPARAMETER FACE-CASCADE-NAME "<opencv_source_directory>/data/haarcascades/haarcascade_frontalface_alt.xml")
+LISP-CV> (DEFPARAMETER FACE-CASCADE-NAME "<opencv_source_directory>/data/haarcascades/haarcascade_frontalface_alt.xml")
 
 FACE-CASCADE-NAME
 
-LCV> (DEFPARAMETER FACE-CASCADE (CASCADE-CLASSIFIER)) ;Create CASCADE-CLASSIFIER construct 
+LISP-CV> (DEFPARAMETER FACE-CASCADE (CASCADE-CLASSIFIER)) ;Create CASCADE-CLASSIFIER construct 
 
 FACE-CASCADE
 
-LCV> (CASCADE-CLASSIFIER-LOAD FACE-CASCADE FACE-CASCADE-NAME)  ;Load the Classifier
+LISP-CV> (CASCADE-CLASSIFIER-LOAD FACE-CASCADE FACE-CASCADE-NAME)  ;Load the Classifier
 
 T ;<--- Operation successful
 
@@ -5254,684 +6011,7 @@ size-un-init)
 
     (loop while (not (= (wait-key 0) 27)))
     (destroy-window window-name)))
-
-
-IMSHOW
-
-Displays an image in the specified window.
-
-C++: void imshow(const string& winname, InputArray mat)
-
-LISP-CV: (IMSHOW (WINNAME (:POINTER STRING*)) (MAT (:POINTER MAT))) => :void
-
-    Parameters:	
-
-        WINNAME - Name of the window.
-
-        MAT - Image to be shown.
-
-
-The function IMSHOW displays an image in the specified window. If the window was created with the 
-+WINDOW-AUTOSIZE+ flag, the image is shown with its original size. Otherwise, the image is scaled 
-to fit the window. The function may scale the image, depending on its depth:
-
-        If the image is 8-bit unsigned, it is displayed as is.
-
-        If the image is 16-bit unsigned or 32-bit integer, the pixels are divided by 256. That is, 
-        the value range [0,255*256] is mapped to [0,255].
-
-        If the image is 32-bit floating-point, the pixel values are multiplied by 255. That is, the
-        value range [0,1] is mapped to [0,255].
-
-If window was created with OpenGL support, IMSHOW also support ogl::Buffer , ogl::Texture2D and gpu::GpuMat as input. todo
-
-
-(defun imshow-example (filename)
-
-  "Opens the image FILENAME and shows it 
-   in a window with IMSHOW."
-
-  (let* ((image (imread filename 1))
-	 (window-name "IMSHOW Example"))
-    (if (empty image) 
-	(return-from imshow-example 
-	  (format t "Image not loaded")))
-    (named-window window-name +window-normal+)
-    (move-window window-name 759 175)
-    (imshow window-name image)
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name)))
-
-
-IMREAD
-
-Loads an image from a file.
-
-C++: Mat imread(const string& filename, int flags=1)
-
-LISP-CV: (IMREAD (FILENAME (:POINTER STRING*)) &OPTIONAL ((FLAGS :INT) +LOAD-IMAGE-COLOR+)) => (:POINTER MAT)
-
-    Parameters:	
-
-        FILENAME - Name of file to be loaded.
-
-        FLAGS -
-
-        Flags specifying the color type of a loaded image:
-
-            +LOAD-IMAGE-ANYDEPTH+ - If set, return 16-bit/32-bit image when the input has the corre-
-                                    sponding depth, otherwise convert it to 8-bit.
-
-            +LOAD-IMAGE-COLOR+ - If set, always convert image to the color one
-
-            +LOAD-IMAGE-GRAYSCALE+ - If set, always convert image to the grayscale one
-
-            >0 Return a 3-channel color image.
-
-                Note
-
-                In the current implementation the alpha channel, if any, is stripped from the outpu-
-                t image. Use negative value if you need the alpha channel.
-
-            =0 Return a grayscale image.
-
-            <0 Return the loaded image as is (with alpha channel).
-
-
-The function IMREAD loads an image from the specified file and returns it. If the image cannot be r-
-ead (because of missing file, improper permissions, unsupported or invalid format), the function re-
-turns an empty matrix ( Mat::data==NULL )todo. Currently, the following file formats are supported:
-
-        Windows bitmaps - *.bmp, *.dib (always supported)
-
-        JPEG files - *.jpeg, *.jpg, *.jpe (see the Notes section)
-
-        JPEG 2000 files - *.jp2 (see the Notes section)
-
-        Portable Network Graphics - *.png (see the Notes section)
-
-        Portable image format - *.pbm, *.pgm, *.ppm (always supported)
-
-        Sun rasters - *.sr, *.ras (always supported)
-
-        TIFF files - *.tiff, *.tif (see the Notes section)
-
-Note:
-
-    The function determines the type of an image by the content, not by the file extension.
-
-    On Microsoft Windows* OS and MacOSX*, the codecs shipped with an LISP-CV image (libjpeg
-    , libpng, libtiff, and libjasper) are used by default. So, LISP-CV can always read JPEG-
-    s, PNGs, and TIFFs. On MacOSX, there is also an option to use native MacOSX image readers. But 
-    beware that currently these native image loaders give images with different pixel values becaus-
-    e of the color management embedded into MacOSX. 
-
-    On Linux*, BSD flavors and other Unix-like open-source operating systems, LISP-CV looks
-    for codecs supplied with an OS image. Install the relevant packages (do not forget the developm-
-    ent files, for example, “libjpeg-dev”, in Debian* and Ubuntu*) to get the codec support or turn 
-    on the OPENCV_BUILD_3RDPARTY_LIBS flag in CMake.
-
-Note
-
-In the case of color images, the decoded images will have the channels stored in B G R order.
-
-
-(defun imread-example-1 (filename)
-
-  "Open the image FILENAME with IMREAD 
-   and show it in a window. This examp-
-   le uses manual memory management"
-
-  (let* ((image (imread filename 1))
-	 (window-name "IMREAD Example 1"))
-    (if (empty image) 
-	(return-from imread-example-1 
-	  (format t "Image not loaded")))
-    (named-window window-name +window-normal+)
-    (move-window window-name 759 175)
-    (imshow window-name image)
-    (loop while (not (= (wait-key 0) 27)))
-    (del-mat image)
-    (destroy-window window-name)))
-
-
-(defun imread-example-2 (filename)
-
-  "Open the image FILENAME with IMREAD 
-   and show it in a window. This examp-
-   le uses with-* macros for memory ma-
-   nagement"
-
-  (let ((window-name "IMREAD Example 2"))
-    (with-named-window (window-name +window-normal+)
-      (move-window window-name 759 175)
-      (with-mat (image (imread filename 1))
-	(imshow window-name image)
-	(loop
-	   (let ((c (wait-key 33)))
-	     (when (= c 27)
-	       (return))))))))
-
-
-NAMED-WINDOW
-
-Creates a window.
-
-C++: void namedWindow(const string& winname, int flags=WINDOW_AUTOSIZE)
-
-LISP-CV: (NAMED-WINDOW (WINNAME (:POINTER STRING*)) &OPTIONAL ((FLAGS :INT) +WINDOW-AUTOSIZE+)) => :VOID
-
-    Parameters:	
-
-        NAME - Name of the window in the window caption that may be used as a window identifier.
-
-        FLAGS -
-
-        Flags of the window. The supported flags are:
-
-            +WINDOW-NORMAL+ If this is set, the user can resize the window (no constraint).
-
-            +WINDOW-AUTOSIZE+ If this is set, the window size is automatically adjusted to fit the 
-                              displayed image (see (IMSHOW) ), and you cannot change Mat::copyTo
-
-Copies the matrix to another one.
-
-C++: void Mat::copyTo(OutputArray m) const
-
-C++: void Mat::copyTo(OutputArray m, InputArray mask) const
-    Parameters:	
-
-        m - Destination matrix. If it does not have a proper size or type before the operation, it is reallocated.
-        mask - Operation mask. Its non-zero elements indicate which matrix elements need to be copied.
-
-The method copies the matrix data to another matrix. Before copying the data, the method invokes
-
-m.create(this->size(), this->type);
-
-so that the destination matrix is reallocated if needed. While m.copyTo(m); works flawlessly, the function does not handle the case of a partial overlap between the source and the destination matrices.
-
-When the operation mask is specified, and the Mat::create call shown above reallocated the matrix, the newly allocated matrix is initialized with all zeros before copying the data.
-the window siz-
-                              e manually.
-
-            +WINDOW-OPENGL+ If this is set, the window will be created with OpenGL support.
-
-The function NAMED-WINDOW creates a window that can be used as a placeholder for images and trackba-
-rs. Created windows are referred to by their names.
-
-If a window with the same name already exists, the function does nothing.
-
-You can call (DESTROY-WINDOW) or (DESTROY-ALL-WINDOWS) to close the window and de-allocate any asso-
-ciated memory usage. For a simple program, you do not really have to call these functions because a-
-ll the resources and windows of the application are closed automatically by the operating system up-
-on exit.
-
-Note:
-
-Qt backend supports additional flags:
-
-        +WINDOW-NORMAL+ or +WINDOW-AUTOSIZE+: +WINDOW-NORMAL+ enables you to resize the window, wher-
-        eas +WINDOW-AUTOSIZE adjusts automatically the window size to fit the displayed image (see 
-        (IMSHOW) ), and you cannot change the window size manually.
-
-        +WINDOW-FREERATIO+ or +WINDOW-KEEPRATIO+: +WINDOW-FREERATIO+ adjusts the image with no resp-
-        ect to its ratio, whereas +WINDOW-KEEPRATIO keeps the image ratio. 
-        
-        +GUI-NORMAL+ or +GUI-EXPANDED+: +GUI-NORMAL+ is the old way to draw the window without stat-
-        usbar and toolbar, whereas +GUI-EXPANDED+ is a new enhanced GUI.
-
-By default, (= FLAGS (LOGIOR +WINDOW-AUTOSIZE+  +WINDOW-KEEPRATIO+  +GUI-EXPANDED+))
-
-
-(defun named-window-example ()
-
-  "Creates a named window with NAMED-WINDOW. Window 
-   will close when it is selected and any key is pr-
-   essed."
-
-  (let* ((window-name "NAMED-WINDOW Example"))
-    (named-window window-name +window-normal+)
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name)))
-
-
-DESTROY-WINDOW
-
-Destroys a window.
-
-C++: void destroyWindow(const string& winname)
-
-LISP-CV: (DESTROY-WINDOW (WINNAME (:POINTER STRING*)))
-
-    Parameters:	WINNAME - Name of the window to be destroyed.
-
-The function DESTROY-WINDOW destroys the window with the given name.
-
-
-(defun destroy-window-example ()
-
-  "Creates a window. Window will be closed 
-   by DESTROY-WINDOW when it is active and
-   any key is pressed."
-
-  (let* ((window-name "DESTROY-WINDOW Example"))
-    (named-window window-name +window-normal+)
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name)))
-
-
-
-DESTROY-ALL-WINDOWS
-
-Destroys all of the HighGUI windows.
-
-C++: void destroyAllWindows()
-
-LISP-CV: (DESTROY-ALL-WINDOWS) => :VOID
-
-
-The function DESTROY-ALL-WINDOWS destroys all of the opened HighGUI windows.
-
-
-(defun destroy-all-windows-example ()
-
-  "In this example we create
- 12 windows and DESTROY THEM!!!"
-
-  (let* ((window-name-arr 
-	  (make-array 12 :initial-contents 
-
-		      (list
-		       "WINDOW 1 - DESTROY-ALL-WINDOWS Example"
-		       "WINDOW 2 - DESTROY-ALL-WINDOWS Example"
-		       "WINDOW 3 - DESTROY-ALL-WINDOWS Example"
-		       "WINDOW 4 - DESTROY-ALL-WINDOWS Example"
-		       "WINDOW 5 - DESTROY-ALL-WINDOWS Example"
-		       "WINDOW 6 - DESTROY-ALL-WINDOWS Example"
-		       "WINDOW 7 - DESTROY-ALL-WINDOWS Example"
-		       "WINDOW 8 - DESTROY-ALL-WINDOWS Example"
-		       "WINDOW 9 - DESTROY-ALL-WINDOWS Example"
-		       "WINDOW 10 - DESTROY-ALL-WINDOWS Example"
-		       "WINDOW 11 - DESTROY-ALL-WINDOWS Example"
-		       "WINDOW 12 - DESTROY-ALL-WINDOWS Example"))))
-
-    ;; Create 12 windows to DESTROY!!!
-    (dotimes (i 12)
-      (named-window (aref window-name-arr i) +window-normal+))
-    ;; Move the windows to specific coordinates.
-    (move-window (aref window-name-arr 0) 88 0)
-    (move-window (aref window-name-arr 1) 538 0)
-    (move-window (aref window-name-arr 2) 988 0)
-    (move-window (aref window-name-arr 3) 1438 0)
-    (move-window (aref window-name-arr 4) 88 368)
-    (move-window (aref window-name-arr 5) 538 368)
-    (move-window (aref window-name-arr 6) 988 368)
-    (move-window (aref window-name-arr 7) 1438 368)
-    (move-window (aref window-name-arr 8) 88 708)
-    (move-window (aref window-name-arr 9) 538 708)
-    (move-window (aref window-name-arr 10) 988 708)
-    (move-window (aref window-name-arr 11) 1438 708)
-    ;; When you press the escape key, you will...
-    ;; DESTROY 12 WINDOWS!!!
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-all-windows)))
-
-
-MOVE-WINDOW
-
-Moves window to the specified position
-
-C++: void moveWindow(const string& winname, int x, int y)
-
-LISP-CV: (MOVE-WINDOW (WINNAME (:POINTER STRING*)) (X :INT) (Y :INT))
-
-    Parameters:	
-
-        WINNAME - Window name
-
-        X - The new x-coordinate of the window
-
-        Y - The new y-coordinate of the window
-
-
-(defun move-window-example ()
-
-  "Creates a window then uses MOVE-WINDOW 
-   to move the window to (x, y) position 
-   (720, 175)."
-
-  (let* ((window-name "MOVE-WINDOW Example")))
-    (named-window window-name +window-normal+)
-    (move-window window-name 759 175)
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name))
-
-
-WAIT-KEY
-
-Waits for a pressed key.
-
-C++: int waitKey(int delay=0)
-
-LISP-CV: (WAIT-KEY &OPTIONAL ((DELAY :INT) 0))
-
-    Parameters:	DELAY - Delay in milliseconds. 0 is the special value that means “forever”.
-
-The function WAIT-KEY waits for a key event infinitely when (<= DELAY 0), for DELAY milliseconds wh-
-en it is positive. Since the OS has a minimum time between switching threads, the function will not 
-wait exactly delay ms, it will wait at least delay ms, depending on what else is running on your co-
-mputer at that time. It returns the code of the pressed key or -1 if no key was pressed before the 
-specified time had elapsed.
-
-Note
-
-This function is the only method in HighGUI that can fetch and handle events, so it needs to be cal-
-led periodically for normal event processing unless HighGUI is used within an environment that take-
-s care of event processing.
-
-Note
-
-The function only works if there is at least one HighGUI window created and the window is active. I-
-f there are several HighGUI windows, any of them can be active.
-
-
-(defun wait-key-example ()
-
-  "After window is created with NAMED-WINDOW 
-   and moved with MOVE-WINDOW this function 
-   waits until a keypress(ESC) is detected w-
-   ith the function WAIT-KEY until it runs t-
-   he function DESTROY-WINDOW. Note: window 
-   must be active before the key press will 
-   be detected."
-
-  (let* ((window-name "WAIT-KEY Example"))
-    (named-window window-name +window-normal+)
-    (move-window window-name 759 175)
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name)))
-
-
-CAP-GET
-
-Returns the specified VIDEO-CAPTURE property
-
-C++: double VideoCapture::get(int propId)
-
-LISP-CV: (CAP-GET (SELF (:POINTER VIDEO-CAPTURE)) (PROP-ID :INT))
-
-    Parameters:	SELF - The VIDEO-CAPTURE structure. 
-
-                PROP-ID -
-
-       Property identifier. It can be one of the following:
-
-            +CAP-PROP-POS-MSEC+ Current position of the video file in milliseconds or video capture tim-
-                                estamp.
-            +CAP-PROP-POS-FRAMES+ 0-based index of the frame to be decoded/captured next.
-
-            +CAP-PROP-POS-AVI-RATIO+ Relative position of the video file: 0 - start of the film, 1 - en-
-                                     d of the film.
-            +CAP-PROP-FRAME-WIDTH+ Width of the frames in the video stream.
-
-            +CAP-PROP-FRAME-HEIGHT+ Height of the frames in the video stream.
-
-            +CAP-PROP-FPS+ Frame rate.
-
-            +CAP-PROP-FOURCC+ 4-character code of codec.
-
-            +CAP-PROP-FRAME-COUNT+ Number of frames in the video file.
-
-            +CAP-PROP-FORMAT+ Format of the Mat objects returned by retrieve() .
-
-            +CAP-PROP-MODE+ Backend-specific value indicating the current capture mode.
-
-            +CAP-PROP-BRIGHTNESS+ Brightness of the image (only for cameras).
-
-            +CAP-PROP-CONTRAST+ Contrast of the image (only for cameras).
-
-            +CAP-PROP-SATURATION+ Saturation of the image (only for cameras).
-
-            +CAP-PROP-HUE+ Hue of the image (only for cameras).
-
-            +CAP-PROP-GAIN+ Gain of the image (only for cameras).
-
-            +CAP-PROP-EXPOSURE+ Exposure (only for cameras).
-
-            +CAP-PROP-CONVERT-RGB+ Boolean flags indicating whether images should be converted to RGB.
-
-            +CAP-PROP-WHITE-BALANCE+ Currently not supported
-
-            +CAP-PROP-RECTIFICATION+ Rectification flag for stereo cameras (note: only supported by DC1394 
-                                     v 2.x backend currently)
-
-Note: When querying a property that is not supported by the backend used by the VideoCapture class <-todo,
-value 0 is returned.
-
-
-(defun cap-get-example (&optional 
-                          (camera-index *camera-index*) 
-			  (width *default-width*)
-			  (height *default-height*))
-
-  "Gets the width and height of the camera capture 
-   with the function CAP-GET and prints it."
-
-  (with-capture (cap (video-capture camera-index))
-    (let ((window-name "CAP-GET Example"))
-      (if (not (cap-is-open cap)) 
-	  (return-from cap-get-example 
-	    (format t "Cannot open the video camera")))
-      (cap-set cap +cap-prop-frame-width+ width)
-      (cap-set cap +cap-prop-frame-height+ height)
-      (format t "Frame Size : ~ax~a~%~%" 
-	      (cap-get cap +cap-prop-frame-width+)
-	      (cap-get cap +cap-prop-frame-height+))
-      (named-window window-name +window-normal+)
-      (move-window window-name 759 175)
-      (do* ((frame 0))
-	   ((plusp (wait-key *millis-per-frame*)) 
-	    (format t "Key is pressed by user"))
-	(setf frame (mat))
-	(cap-read cap frame)
-	(imshow window-name frame)
-        (del-mat frame))
-      (destroy-window window-name))))
-
-
-CAP-SET
-
-Sets a property in the VIDEO-CAPTURE
-
-C++: bool VideoCapture::set(int propId, double value)
-
-LISP-CV: (CAP-SET (SELF (:POINTER VIDEO-CAPTURE)) (PROP-ID :INT) (VALUE :DOUBLE)) => :BOOLEAN
-
-    Parameters:	SELF - The VIDEO-CAPTURE structure.
-
-                PROP-ID -
-
-       Property identifier. It can be one of the following:
-
-            +CAP-PROP-POS-MSEC+ Current position of the video file in milliseconds.
-
-            +CAP-PROP-POS-FRAMES+ 0-based index of the frame to be decoded/captured next.
-
-            +CAP-PROP-POS-AVI-RATIO+ Relative position of the video file: 0 - start of the film, 1 -
-                                     end of the film.
-
-            +CAP-PROP-FRAME-WIDTH+ Width of the frames in the video stream.
-
-            +CAP-PROP-FRAME-HEIGHT+ Height of the frames in the video stream.
-
-            +CAP-PROP-FPS+ Frame rate.
-
-            +CAP-PROP-FOURCC+ 4-character code of codec.
-
-            +CAP-PROP-FRAME-COUNT+ Number of frames in the video file.
-
-            +CAP-PROP-FORMAT+ Format of the Mat objects returned by retrieve() .
-
-            +CAP-PROP-MODE+ Backend-specific value indicating the current capture mode.
-
-            +CAP-PROP-BRIGHTNESS+ Brightness of the image (only for cameras).
-
-            +CAP-PROP-CONTRAST+ Contrast of the image (only for cameras).
-
-            +CAP-PROP-SATURATION+ Saturation of the image (only for cameras).
-
-            +CAP-PROP-HUE+ Hue of the image (only for cameras).
-
-            +CAP-PROP-GAIN+ Gain of the image (only for cameras).
-
-            +CAP-PROP-EXPOSURE+ Exposure (only for cameras).
-
-            +CAP-PROP-CONVERT-RGB+ Boolean flags indicating whether images should be converted to RGB.
-
-            +CAP-PROP-WHITE-BALANCE+ Currently unsupported
-
-            +CAP-PROP-RECTIFICATION+ Rectification flag for stereo cameras (note: only supported by
-                                     DC1394 v 2.x backend currently)
-  
-                 VALUE - Value of the property.
-
-             
-(defun cap-set-example (&optional 
-                          (camera-index 
-                           *camera-index*))
-
-  "Changes the brightness level of the camera feed 
-   with the function CAP-SET and then prints the b-
-   rightness level."
-
-  (with-capture (cap (video-capture camera-index))
-    (let ((window-name "CAP-SET Example"))
-      (if (not (cap-is-open cap)) 
-	  (return-from cap-set-example 
-	    (format t "Cannot open the video camera")))
-(cap-set cap +cap-prop-brightness+ 0.7)
-      (format t "Brightness level: ~a~%~%" 
-	      (cap-get cap +cap-prop-brightness+))
-      (named-window window-name +window-normal+)
-      (move-window window-name 759 175)
-      (do* ((frame 0))
-	   ((plusp (wait-key *millis-per-frame*)) 
-	    (format t "Key is pressed by user"))
-	(setf frame (mat))
-	(cap-read cap frame)
-	(imshow window-name frame))
-      (destroy-window window-name))))
-
-
-CAP-READ
-
-Grabs, decodes and returns the next video frame.
-
-C++: bool VideoCapture::read(Mat& image)
-
-LISP-CV: (CAP-READ (SELF (:POINTER VIDEO-CAPTURE)) (IMAGE (:POINTER MAT)))
-
-Parameters:	
-
-         SELF - The "grabbed" camera feed.
-
-         IMAGE - The returned frame.
-
-
-The methods/functions combine (CAP-GRAB) and (CAP-RETRIEVE) in one call. This is the most convenien-
-t method for reading video files or capturing data from decode and return the just grabbed frame. I-
-f no frames has been grabbed (camera has been disconnected, or there are no more frames in video fi-
-le), the methods return false and the functions return NULL pointer.
-
-
-(defun cap-read-example (&optional 
-  "In the code below the (COLS, ROWS) values of MAT are 
-   accessed and stored in a SIZE construct. Their values 
-   are accessed with the WIDTH and HEIGHT functions. The-
-   n an uninitialized and an initialized SIZE construct  
-   are created. Their values are also printed."
-
-  (let* ((mat (mat-value 5 5 +64f+ (scalar 100 100 100)))
-         (mat-size (mat-size mat))
-          (size-un-init)
-          (size (size 640 480)))
-    (format t " The (COLS ROWS) of MAT = (~a ~a)~%"  
-	    (width mat-size)
-	    (height mat-size)
-            (format t "Pointer to an uninitialized SIZE construct:~a~%" 
-size-un-init) 
-(format t "Width of SIZE = ~a~%" (width size))
-    (format t "Height of SIZE = ~a" (height size)))))
-
-
-                           (camera-index 
-                            *camera-index*))
-
-  "Grabs, decodes and returns the next video frame 
-   with the function CAP-READ and then shows it in 
-   a window with the function IMSHOW."
-
-  (with-capture (cap (video-capture camera-index))
-    (let ((window-name "CAP-READ Example"))
-      (if (not (cap-is-open cap)) 
-	  (return-from cap-read-example 
-	    (format t "Cannot open the video camera")))
-      (named-window window-name +window-normal+)
-      (move-window window-name 759 175)
-      (do* ((frame 0))
-	   ((plusp (wait-key *millis-per-frame*)) 
-	    (format t "Key is pressed by user"))
-	(setf frame (mat))
-	(cap-read cap frame)
-	(imshow window-name frame))
-      (destroy-window window-name))))
-
-
-CAP-RELEASE
-
-Closes video file or capturing device.
-
-C++: void VideoCapture::release()
-
-LISP-CV: (CAP-RELEASE (SELF (:POINTER VIDEO-CAPTURE))) => :VOID
-
-The methods are automatically called by subsequent (CAP-OPEN) and by VIDEO-CAPTURE destructor.
-
-Parameters:	
-
-         SELF - The VIDEO-CAPTURE structure.
-
-
-(defun cap-release-example (&optional 
-                              (camera-index 
-                               *camera-index*))
-
-  "In order: First the function CAPTURE-FROM-CAM allocates and 
-   initializes the structure for reading a video stream from t-
-   he camera. Next a window is created with NAMED-WINDOW. Then 
-   the camera stream is read with CAP-READ and then shown in t-
-   he window with IMSHOW. Then, once the user invokes the WAIT-
-   KEY function by pressing the Escape key while the window is 
-   active the DO loop is exited and CAP-RELEASE is called clos-
-   ing the structure used to read and show the video stream. 
-   Note: If you use the macro WITH-CAPTURE, CAP-RELEASE will b-
-   e called automatically. See WITH-CAPTURE EXAMPLE for usage."
-  
-  (let ((cap (video-capture camera-index))
-	(window-name "CAP-RELEASE Example"))
-    (if (not (cap-is-open cap)) 
-	(return-from cap-release-example 
-	  (format t "Cannot open the video camera")))
-    (named-window window-name +window-normal+)
-    (move-window window-name 759 175)
-    (do* ((frame 0))
-	 ((plusp (wait-key *millis-per-frame*)) 
-	  (format t "Key is pressed by user"))
-      (setf frame (mat))
-      (cap-read cap frame)
-      (imshow window-name frame))
-    (cap-release cap)
-    (destroy-window window-name)))
+ 
 
 
 WITH-CAPTURE
@@ -6091,12 +6171,6 @@ ugh 3, are initialized with one value(VAL0123).
       (format t "~%SCALAR element ~a = ~a~%" n 
 	      (mem-aref scalar :double n)))))
 
-
-;;; Types and structures
-
-
-
-;;; User Interface
 
 
 MAT-SIZE
@@ -8793,53 +8867,6 @@ ix or because there can be some padding space in the end of each row for a prope
     (destroy-window window-name)))
 
 
-STEP*
-
-Used to compute address of a matrix element
-
-C++: MStep step
-
-LISP-CV: (STEP (SELF (:POINTER MAT))) => :UNSIGNED-INT
-
-    Parameters:	
-
-        SELF  a pointer to matrix(MAT construc
-
-
-This function is used to compute the address of a matrix element. The image step gives you the dist-
-ance in bytes between the first element of one row and the first element of the next row. This func-
-tion is named STEP*, because the name STEP conflicts with a Lisp Macro.
-
-
-(defun step*-example (filename)
-  ;; load image
-  (let* ((img (imread filename 1))
-	 ;; variables used to access a pixel value.
-         ;; BGR - Blue,Green,Red is the default co-
-         ;; lor format in LisP-CV.
-	 (input (data img))
-         ;; variables used to hold the BGR image pixel value
-	 (b 0)
-	 (g 0)
-	 (r 0)
-	 (window-name "STEP* Example"))
-    (if (empty img) 
-	(return-from step*-example 
-	  (format t "Image not loaded")))
-    (named-window window-name +window-normal+)
-    (move-window window-name 759 175)
-    ;; access pixel value at x = 0, y = 0 using the STEP* function
-    (setf b (mem-aref input :uchar 
-		      (+  (* (step* img) 0) 0)))
-    (setf g (mem-aref input :uchar 
-		      (+ (+  (* (step* img) 0) 0) 1)))
-    (setf r (mem-aref input :uchar 
-		      (+ (+  (* (step* img) 0) 0) 2)))
-    ;; print the 0,0 pixel value
-    (format t "The pixel value at 0,0 is: (~a,~a,~a) " b g r)
-    (imshow window-name img)
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name)))
 
 
 
@@ -9037,10 +9064,7 @@ LISP-CV> (VECTOR-POINT2F A 1 1) <--- Access the 1st element of the 1st POINT2F i
 
 
 
-MACROS
-
-
-
+LISP-CV - MACROS
 
 
 Macro for CFFI::FOREIGN-ALLOC
@@ -9121,7 +9145,7 @@ LISP-CV> (MEM-REF A :INT)
 
 
 
-LIVE-CODE-EDITING:
+COMMON-LISP - LIVE-CODE-EDITING:
 
 
 CONTINUABLE
@@ -9198,6 +9222,133 @@ Example:
       (setf image (imread filename 1))
       (sleep n))
     (destroy-window window-name)))
+
+
+
+EXTRA FUNCTIONS:
+
+
+DEL-*
+
+Deletes allocated memory
+
+C++: void operator delete  ( void* ptr )
+
+LISP-CV: (DEL-BF-MATCHER (PTR :POINTER)) => :VOID
+
+LISP-CV: (DEL-BRISK (PTR :POINTER)) => :VOID
+
+LISP-CV: (DEL-MAT (PTR :POINTER)) => :VOID
+
+LISP-CV: (DEL-MAT-EXPR (PTR :POINTER)) => :VOID
+
+LISP-CV: (DEL-POINT (PTR :POINTER)) => :VOID
+
+LISP-CV: (DEL-RECT (PTR :POINTER)) => :VOID
+
+LISP-CV: (DEL-VEC-CHAR (PTR :POINTER)) => :VOID
+
+LISP-CV: (DEL-VEC-DBL (PTR :POINTER)) => :VOID
+
+LISP-CV: (DEL-VEC-DM (PTR :POINTER)) => :VOID
+
+LISP-CV: (DEL-VEC-FLT (PTR :POINTER)) => :VOID
+
+LISP-CV: (DEL-VEC-INT (PTR :POINTER)) => :VOID
+
+LISP-CV: (DEL-VEC-KP (PTR :POINTER)) => :VOID
+
+LISP-CV: (DEL-VEC-MAT (PTR :POINTER)) => :VOID
+
+LISP-CV: (DEL-VEC-POINT (PTR :POINTER)) => :VOID
+
+LISP-CV: (DEL-VEC-POINT2F (PTR :POINTER)) => :VOID
+
+LISP-CV: (DEL-VEC-RECT (PTR :POINTER)) => :VOID
+
+LISP-CV: (DEL-VEC-UCHAR (PTR :POINTER)) => :VOID
+
+
+  Parameters:	
+
+        PTR - A pointer to a <type> construct
+
+
+Some of the OpenCV C bindings for its C++ interface that this library binds to, allocate memory for 
+their return value, with a new operator. The return value of said functions are a pointer to an OpenCv 
+class specified by the return value. e.g. Mat* (represented in LISP-CV as (:POINTER MAT)) is a pointer 
+to the OpenCV Mat class. A call to the C++ delete operator must be made for every call to new to avoid 
+a memory leak. The DEL-* functions are wrappers for the C++ delete operator and pass the type of * to 
+the delete operator when the DEL-* function is called. The DEL-* function types are below.
+
+
+Note: Each DEL-* function has a companion WITH-* macro that calls the associated DEL-* function, when 
+the (:POINTER *) goes out of scope, automatically. See <lisp-cv-source directory>/with-macros.lisp for 
+the associated WITH-* macro.
+
+
+The function DEL-BF-MATCHER deletes a (:POINTER BF-MATCHER)
+
+The function DEL-BRISK deletes a (:POINTER BRISK)
+
+The function DEL-MAT deletes a (:POINTER MAT)
+
+The function DEL-MAT-EXPR deletes a (:POINTER MAT-EXPR)
+
+The function DEL-POINT deletes a (:POINTER POINT)
+
+The function DEL-RECT deletes a (:POINTER RECT)
+
+The function DEL-VEC-CHAR deletes a (:POINTER VECTOR-CHAR)
+
+The function DEL-VEC-DBL deletes a (:POINTER VECTOR-DOUBLE)
+
+The function DEL-VEC-DM deletes a (:POINTER VECTOR-DMATCH)
+
+The function DEL-VEC-FLT deletes a (:POINTER VECTOR-FLOAT)
+
+The function DEL-VEC-INT deletes a (:POINTER VECTOR-INT)
+
+The function DEL-VEC-KP deletes a (:POINTER VECTOR-KEYPOINT)
+
+The function DEL-VEC-MAT deletes a (:POINTER VECTOR-MAT)
+
+The function DEL-VEC-POINT deletes a (:POINTER VECTOR-POINT)
+
+The function DEL-VEC-POINT2F deletes a (:POINTER VECTOR-POINT2F)
+
+The function DEL-VEC-RECT deletes a (:POINTER VECTOR-RECT)
+
+The function DEL-VEC-UCHAR deletes a (:POINTER VECTOR-UCHAR)
+
+
+Example:
+
+
+LISP-CV> (DEFPARAMETER A (POINT 1 2)) ;A (:POINTER POINT) is created
+
+A
+
+LISP-CV> (POINT-X A) ;The x coordinate of A is retrieved
+
+1
+
+LISP-CV> (POINT-Y A) ;The y coordinate of A is retrieved
+
+2
+
+LISP-CV> (DEL-POINT A) ; A is deleted with DEL-POINT
+
+; No value
+
+
+LISP-CV> (POINT-X A) ; The memory has been deallocated
+
+0
+
+LISP-CV> (POINT-Y A)
+
+0
 
 
 

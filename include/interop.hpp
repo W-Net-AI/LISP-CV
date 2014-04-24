@@ -1,79 +1,60 @@
 #include <string>
 #include <vector>
-#include <opencv2/c/opencv_generated.hpp>
+#include <opencv2/opencv.h>
 
 using namespace std;
-typedef vector<char> vector_char;
-typedef vector<double> vector_double;
-typedef vector<int> vector_int;
-typedef vector<float> vector_float;
-typedef vector<DMatch> vector_DMatch;
-typedef vector<KeyPoint> vector_KeyPoint;
-typedef vector<Point> vector_Point;
-typedef vector<Point2f> vector_Point2f;
-typedef vector<Mat> vector_Mat;
 
+
+#define ADD_VECTOR_HEADERS(t, tn) \
+typedef vector< t > vector_##t; \
+vector_##t * create_std_vector##tn(); \
+vector_##t * carray_to_std_vector##tn( t * a, size_t len ); \
+t * std_vector##tn##_to_carray( vector_##t * v ); \
+size_t std_vector##tn##_length( vector_##t * v); \
+void destroy_std_vector##tn( vector_##t * v); \
+void delete_std_vector##tn( vector_##t * v);
+
+#define ADD_VECTOR_IMPL(t, tn) \
+vector_##t * create_std_vector##tn() { \
+return new vector_##t;\
+}\
+\
+vector_##t * carray_to_std_vector##tn( t * a, size_t len ) {\
+vector_##t * v = new vector_##t;\
+for(size_t i = 0; i < len; i++) \
+v->push_back(a[i]);\
+return v;\
+}\
+\
+t * std_vector##tn##_to_carray( vector_##t * v ) {\
+return v->data();\
+}\
+\
+size_t std_vector##tn##_length( vector_##t * v) { \
+return v->size();\
+} \
+void destroy_std_vector##tn( vector_##t * v) { \
+v->~vector_##t();\
+}\
+void delete_std_vector##tn( vector_##t * v) { \
+delete v;\
+}\
 
 extern "C" {
+string* create_std_string();
+string* cstring_to_std_string(char* s, size_t len);
+const char* std_string_to_cstring(string* s);
 
-vector_Rect* std_create_vectorr();
-vector_Rect* std_carrayTovectorr(Rect* a, size_t len);
-Rect* std_vectorrToCArray(vector_Rect* s);
-size_t std_vectorr_length(vector_Rect* self);
+ADD_VECTOR_HEADERS(char, c);
+ADD_VECTOR_HEADERS(double, d);
+ADD_VECTOR_HEADERS(float, f);
+ADD_VECTOR_HEADERS(int, i);
+ADD_VECTOR_HEADERS(uchar, u);
+ADD_VECTOR_HEADERS(DMatch, dm);
+ADD_VECTOR_HEADERS(KeyPoint, kp);
+ADD_VECTOR_HEADERS(Mat, m);
+ADD_VECTOR_HEADERS(Point, p);
+ADD_VECTOR_HEADERS(Point2f, p2f);
+ADD_VECTOR_HEADERS(Rect, r);
 
-vector_uchar* std_create_vectoru();
-vector_uchar* std_carrayTovectoru(uchar* a, size_t len);
-uchar* std_vectoruToCArray(vector_uchar* s);
-size_t std_vectoru_length(vector_uchar* self);
-
-vector_Mat* std_create_vectorm();
-vector_Mat* std_carrayTovectorm(Mat* a, size_t len);
-Mat* std_vectormToCArray(vector_Mat* s);
-size_t std_vectorm_length(vector_Mat* self);
-
-vector_Point* std_create_vectorp();
-vector_Point* std_carrayTovectorp(Point* a, size_t len);
-Point* std_vectorpToCArray(vector_Point* s);
-size_t std_vectorp_length(vector_Point* self);
-
-Point2f* std_vectorp2fToCArray(vector_Point2f* s);
-vector_Point2f* std_carrayTovectorp2f(Point2f* a, size_t len);
-vector_Point2f* std_create_vectorp2f();
-size_t std_vectorp2f_length(vector_Point2f* self);
-
-vector_KeyPoint* std_create_vectorkp();
-vector_KeyPoint* std_carrayTovectorkp(KeyPoint* a, size_t len);
-KeyPoint* std_vectorkpToCArray(vector_KeyPoint* s);
-size_t std_vectorkp_length(vector_KeyPoint* self);
-
-vector_DMatch* std_create_vectordm();
-vector_DMatch* std_carrayTovectordm(DMatch* a, size_t len);
-DMatch* std_vectordmToCArray(vector_DMatch* s);
-size_t std_vectordm_length(vector_DMatch* self);
-
-string* std_create_string();
-string* std_cstringToString(char* s, size_t len);
-const char*  std_stringToCString(string* s);
-size_t std_vectorc_length(vector_char* self);
-
-vector_char* std_create_vectorc();
-vector_char* std_carrayTovectorc(char* a, size_t len);
-char* std_vectorcToCArray(vector_char* s);
-size_t std_vectorc_length(vector_char* self);
-
-vector_int* std_create_vector();
-vector_int* std_carrayTovector(int* a, size_t len);
-int*   std_vectorToCArray(vector_int* s);
-size_t std_vector_length(vector_int* self);
-
-vector_float* std_create_vectorf();
-vector_float* std_carrayTovectorf(float* a, size_t len);
-float*   std_vectorfToCArray(vector_float* s);
-size_t std_vectorf_length(vector_float* self);
-
-vector_double* std_create_vectord();
-vector_double* std_carrayTovectord(double* a, size_t len);
-double*   std_vectordToCArray(vector_double* s);
-size_t std_vectord_length(vector_double* self);
 }
-

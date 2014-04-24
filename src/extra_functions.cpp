@@ -139,11 +139,21 @@ float cv_Size2f_height(Size2f* self) {
     return self->height;
 }
 
+void cv_delete_BRISK(void* ptr) {
+    delete (BRISK*)ptr;
+}
+
+void cv_destruct_BRISK(BRISK* self) {
+     self->~BRISK();
+}
+
 void cv_delete_BFMatcher(void* ptr) {
     delete (BFMatcher*)ptr;
 }
 
-void cv_delete_BRISK(void* ptr) {
-    delete (BRISK*)ptr;
+void cv_destruct_BFMatcher(BFMatcher* self) {
+     self->~BFMatcher();
 }
+
+
 }

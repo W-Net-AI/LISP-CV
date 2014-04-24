@@ -40,7 +40,9 @@ float cv_Size2f_area(Size2f* self);
 float cv_Size2f_width(Size2f* self);
 float cv_Size2f_height(Size2f* self);
 void cv_delete_BFMatcher(void* ptr);
+void cv_destruct_BFMatcher(BFMatcher* self);
 void cv_delete_BRISK(void* ptr);
+void cv_destruct_BRISK(BRISK* self);
 }
 
 
