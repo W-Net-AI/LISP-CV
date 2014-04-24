@@ -20,5 +20,5 @@
 
 ;;Thank you to my tutor David Holz: http://www.grindwork.com/site/ who has helped mold me into the competent 
 ;;programmer I am today. He has contributed alot of info to my project thus far and given me the courage to 
-;;excel at it. When approaching something new, I think "How would David Holz do this" and that consistently 
+;;excel at it. When approaching something new, I think "What would David Holz do" and that consistently 
 ;;makes me a winner
