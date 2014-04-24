@@ -4,6 +4,11 @@
 ;;;;If you would like to contribute, see the Readme.txt for more details.
 
 
+;;Thank you to my tutor David Holz: http://www.grindwork.com/site/ who has helped mold me into the competent 
+;;programmer I am today. He has contributed alot of info to my project thus far and given me the courage to 
+;;excel at it. When approaching something new, I think "What would David Holz do" and that consistently 
+;;makes me a winner
+
 ;;Thank you to Jay Bromley for writing CL-OPENCV https://github.com/ryepup/cl-opencv. The knowledge 
 ;;gained from that library helped get started writing this project.
 
@@ -17,8 +22,3 @@
 
 ;;Thanks to byulparan from whose COMMON-CV project: https://github.com/byulparan/common-cv I borrowed 
 ;;some writing styles. It's a beautiful project
-
-;;Thank you to my tutor David Holz: http://www.grindwork.com/site/ who has helped mold me into the competent 
-;;programmer I am today. He has contributed alot of info to my project thus far and given me the courage to 
-;;excel at it. When approaching something new, I think "What would David Holz do" and that consistently 
-;;makes me a winner
