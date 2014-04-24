@@ -58,6 +58,68 @@
    #:+flt-max+
 
 
+;; DELETE
+
+   #:del-bf-matcher
+   #:del-brisk
+   #:del-mat
+   #:del-mat-expr
+   #:del-point
+   #:del-rect
+   #:del-vec-char
+   #:del-vec-dbl
+   #:del-vec-dm
+   #:del-vec-flt
+   #:del-vec-int
+   #:del-vec-kp
+   #:del-vec-mat
+   #:del-vec-point
+   #:del-vec-point2f
+   #:del-vec-rect
+   #:del-vec-uchar
+
+
+;; DESTRUCT
+
+   #:dest-bf-matcher
+   #:dest-brisk
+   #:dest-mat
+   #:dest-mat-expr
+   #:dest-point
+   #:dest-rect
+   #:dest-vec-char
+   #:dest-vec-dbl
+   #:dest-vec-dm
+   #:dest-vec-flt
+   #:dest-vec-int
+   #:dest-vec-kp
+   #:dest-vec-mat
+   #:dest-vec-point
+   #:dest-vec-point2f
+   #:dest-vec-rect
+   #:dest-vec-uchar
+
+
+;; WITH-MACROS
+
+   #:with-bf-matcher
+   #:with-brisk
+   #:with-mat
+   #:with-mat-expr
+   #:with-rect
+   #:with-point
+   #:with-vec-char
+   #:with-vec-dbl
+   #:with-vec-dmatch
+   #:with-vec-flt
+   #:with-vec-int
+   #:with-vec-keypoint
+   #:with-vec-mat
+   #:with-vec-point
+   #:with-vec-point2f
+   #:with-vec-rect
+   #:with-vec-uchar
+
 
 ;; DEFCTYPE's
 
@@ -172,36 +234,6 @@
    #:cross
    #:copy-to
    #:data
-   #:del-mat
-   #:del-mat-expr
-   #:del-point
-   #:del-rect
-   #:del-vec-char
-   #:del-vec-dbl
-   #:del-vec-dm
-   #:del-vec-flt
-   #:del-vec-int
-   #:del-vec-kp
-   #:del-vec-mat
-   #:del-vec-point
-   #:del-vec-point2f
-   #:del-vec-rect
-   #:del-vec-uchar
-   #:dest-mat
-   #:dest-mat-expr
-   #:dest-point
-   #:dest-rect
-   #:dest-vec-char
-   #:dest-vec-dbl
-   #:dest-vec-dm
-   #:dest-vec-flt
-   #:dest-vec-int
-   #:dest-vec-kp
-   #:dest-vec-mat
-   #:dest-vec-point
-   #:dest-vec-point2f
-   #:dest-vec-rect
-   #:dest-vec-uchar
    #:depth
    #:div
    #:dot
@@ -761,19 +793,20 @@
    #:+event-flag-ctrlkey+ 
    #:+event-flag-shiftkey+ 
    #:+event-flag-altkey+ 
+   #:+window-normal+
+   #:+window-autosize+
 
    #:convert-image
    #:create-trackbar
    #:destroy-all-windows
    #:destroy-window
-
    #:imshow
    #:move-window
    #:set-mouse-callback
-   #:+window-normal+
-   #:+window-autosize+
    #:named-window
    #:wait-key
+   #:with-named-window
+
 
 ;; highgui - Reading and Writing Images and Video
 
