@@ -1,7 +1,7 @@
 ;;;; -*- mode: lisp; indent-tabs: nil -*-
 ;;;; core.lisp
 ;;;; OpenCV bindings
-;;;; Bindings for OpenCV Types
+;;;; Bindings for OpenCV types
 
 (in-package :lisp-cv)
 

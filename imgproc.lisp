@@ -6,6 +6,15 @@
 (in-package :lisp-cv)
 
 
+;;; Macros
+
+
+;; static inline Scalar morphologyDefaultBorderValue() { return Scalar::all(DBL_MAX); }
+;; Scalar* cv_create_morphologyDefaultBorderValue()
+(defcfun ("cv_create_morphologyDefaultBorderValue" morphology-default-border-value) (:pointer scalar))
+
+
+
 ;;; Image Filtering
 
 
@@ -22,6 +31,42 @@
   (right :int)
   (border-type :int)
   (value (:pointer scalar)))
+
+
+;; void dilate(InputArray src, OutputArray dst, InputArray kernel, Point anchor=Point(-1,-1), int iterations=1, 
+;; int borderType=BORDER_CONSTANT, const Scalar& borderValue=morphologyDefaultBorderValue())
+;; void cv_dilate(Mat* src, Mat* dst, Mat* kernel, Point* anchor, int iterations, int borderType, Scalar* borderValue)
+(defcfun ("cv_dilate" %dilate) :void
+  (src (:pointer mat))
+  (dest (:pointer mat))
+  (kernel (:pointer mat))
+  (anchor (:pointer point))
+  (iterations :int)
+  (border-type :int)
+  (border-value (:pointer scalar)))
+
+(defun dilate (src dest kernel &optional (anchor (point -1 -1)) (iterations 1) (border-type +border-constant+) 
+              (border-value (morphology-default-border-value)))
+       "Dilates an image by using a specific structuring element."
+       (%dilate src dest kernel anchor iterations border-type border-value))
+
+
+;; void erode(InputArray src, OutputArray dst, InputArray kernel, Point anchor=Point(-1,-1), int iterations=1, 
+;; int borderType=BORDER_CONSTANT, const Scalar& borderValue=morphologyDefaultBorderValue() )
+;; void cv_erode(Mat* src, Mat* dst, Mat* kernel, Point* anchor, int iterations, int borderType, Scalar* borderValue)
+(defcfun ("cv_erode" %erode) :void
+  (src (:pointer mat))
+  (dest (:pointer mat))
+  (kernel (:pointer mat))
+  (anchor (:pointer point))
+  (iterations :int)
+  (border-type :int)
+  (border-value (:pointer scalar)))
+
+(defun erode (src dest kernel &optional (anchor (point -1 -1)) (iterations 1) (border-type +border-constant+) 
+             (border-value (morphology-default-border-value)))
+       "Erodes an image by using a specific structuring element."
+       (%erode src dest kernel anchor iterations border-type border-value))
 
 
 ;; void GaussianBlur(InputArray src, OutputArray dst, Size ksize, double sigmaX, double sigmaY=0, int borderType=BORDER_DEFAULT )

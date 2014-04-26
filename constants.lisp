@@ -1,7 +1,8 @@
 ;;;; -*- mode: lisp; indent-tabs: nil -*-
 ;;;; constants.lisp
-;;;; OpenCV bindings for SBCL
+;;;; OpenCV bindings
 ;;;; OpenCV constants
+
 (in-package :lisp-cv)
 
 
@@ -27,6 +28,7 @@
   (+long-min+ -2147483648) 
   (+long-max+ 2147483647)  
   (+ulong-max+ 4294967295)
+  (+dbl-min+ -1.7976931348623157d308)
   (+dbl-max+ 1.7976931348623157d308)
   (+flt-max+ 3.40282347e38) 
 
@@ -553,4 +555,20 @@
   (+cascade-do-canny-pruning+ 1)
   (+cascade-scale-image+ 2)
   (+cascade-find-biggest-object+ 4)
-  (+cascade-do-rough-search+ 8))
+  (+cascade-do-rough-search+ 8)
+
+;;; contrib
+
+  (+colormap-autumn+ 0)
+  (+colormap-bone+ 1)
+  (+colormap-jet+ 2)
+  (+colormap-winter+ 3)
+  (+colormap-rainbow+ 4)
+  (+colormap-ocean+ 5)
+  (+colormap-summer+ 6)
+  (+colormap-spring+ 7)
+  (+colormap-cool+ 8)
+  (+colormap-hsv+ 9)
+  (+colormap-pink+ 10)
+  (+colormap-hot+ 11)
+)

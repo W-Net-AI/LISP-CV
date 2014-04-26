@@ -4051,6 +4051,223 @@ See also:
 
 
 
+
+DILATE
+
+Dilates an image by using a specific structuring element.
+
+C++: void dilate(InputArray src, OutputArray dst, InputArray kernel, Point anchor=Point(-1,-1), int iterations=1, int borderType=BORDER_CONSTANT, const Scalar& borderValue=morphologyDefaultBorderValue() )
+
+LISP-CV: (DILATEE (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) (KERNEL (:POINTER MAT)) ((ANCHOR (:POINTER POINT)) (POINT -1 -1)) 
+         ((ITERATIONS :INT) 1) ((BORDER-TYPE :INT) +BORDER-CONSTANT+) 
+         ((BORDER-VALUE (:POINTER SCALAR)) (MORPHOLOGY-DEFAULT-BORDER-VALUE+))) => :VOID
+
+    Parameters:	
+
+        SRC - Input image; the number of channels can be arbitrary, but the depth should be one of 
+              +8U+, +16U+, +16S+, +32F+ or +64F+.
+
+        DEST - Output image of the same size and type as SRC.
+
+        KERNEL - Structuring element used for erosion; if (EQ ELEMENT (MAT)) , a 3 x 3 rectangular 
+                 structuring element is used. Kernel can be created using (GET-STRUCTURING-ELEMENT).
+
+        ANCHOR - Position of the anchor within the element; default value (-1, -1) means that the 
+                  anchor is at the element center.
+
+        ITERATIONS - Number of times dilation is applied.
+
+        BORDER-TYPE - Border type, one of the +BORDER-*+ constants, except 
+                      for +BORDER-TRANSPARENT+ and +BORDER-ISOLATED+.
+
+        BORDER-VALUE - Border value in case of a constant border. 
+
+
+The function dilates the source image using the specified structuring element that determines the 
+shape of a pixel neighborhood over which the maximum is taken:
+
+See OpenCv documentation:
+
+http://docs.opencv.org/trunk/modules/imgproc/doc/filtering.html?highlight=erode#dilate
+
+for a description and formula.
+
+The function supports the in-place mode. Dilation can be applied several (ITERATIONS) times. In case 
+of multi-channel images, each channel is processed independently.
+
+
+See also:
+
+(ERODE), (MORPHOLOGY-EX), (CREATE-MORPHOLOGY-FILTER), (GET-STRUCTURING-ELEMENT)
+
+
+Example:
+
+
+;; Global variables
+
+(defparameter window-name "DILATION-DEST - DILATE Example")
+;; Load an image
+(defparameter src (imread <path-to-image>"" 1))
+(defparameter dilation-dest (mat))
+(defparameter dilation-elem (alloc :int 0))
+(defparameter dilation-size (alloc :int 0))
+(defparameter max-elem 2)
+(defparameter max-kernel-size 21)
+
+
+;; DILATION is a callback function called by the TRACKBAR in ERODE-EXAMPLE
+
+(defcallback dilation :void ((dilation-type :int))
+  ;; Adjust the GET-STRUCTURING-ELEMENT SHAPE 
+  ;; parameter based on trackbar position
+  (if (eq 0 (? dilation-elem :int)) (setf dilation-type +morph-rect+) 
+      (if (eq 1 (? dilation-elem :int)) (setf dilation-type +morph-cross+)
+	  (if (eq 2 (? dilation-elem :int)) (setf dilation-type +morph-ellipse+))))
+  ;; Specify the shape of the kernel used 
+  ;; to perform the dilation operation
+  (with-object (element (get-structuring-element 
+			 dilation-type 
+			 (size (+ (* (? dilation-size :int) 2) 1)
+			       (+ (* (? dilation-size :int) 2) 1)) 
+			 (point (? dilation-size :int) (? dilation-size :int))))
+    ;; Apply the dilation operation
+    (dilate src dilation-dest element)
+    (imshow window-name dilation-dest)))
+
+(defun dilate-example ()
+
+  (if (empty src) 
+      (return-from dilate-example
+	(format t "Image not loaded")))
+					; Create window
+  (with-named-window (window-name 1)
+    (move-window window-name (cols src) 0)
+    (imshow window-name src)
+    (loop
+       ;; Create trackbar that, adjusts the GET-STRUCTURING-ELEMENT 
+       ;; SHAPE parameter and calls the DILATION callback function, 
+       ;; every time it is moved
+       (create-trackbar "SHAPE" window-name dilation-elem max-elem (callback dilation))
+       ;; Create trackbar that, adjusts the GET-STRUCTURING-ELEMENT 
+       ;; KSIZE and KERNEL parameters and calls the DILATION callback 
+       ;; function, every time it is moved
+       (create-trackbar  "KERNEL/KSIZE" window-name dilation-size max-kernel-size 
+			 (callback dilation))
+       (let ((c (wait-key 33)))
+	 (when (= c 27)
+	   (return))))))
+
+
+
+ERODE
+
+Erodes an image by using a specific structuring element.
+
+C++: void erode(InputArray src, OutputArray dst, InputArray kernel, Point anchor=Point(-1,-1), int iterations=1, 
+     int borderType=BORDER_CONSTANT, const Scalar& borderValue=morphologyDefaultBorderValue() )
+
+LISP-CV: (ERODE (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) (KERNEL (:POINTER MAT)) ((ANCHOR (:POINTER POINT)) (POINT -1 -1)) 
+         ((ITERATIONS :INT) 1) ((BORDER-TYPE :INT) +BORDER-CONSTANT+) 
+         ((BORDER-VALUE (:POINTER SCALAR)) (MORPHOLOGY-DEFAULT-BORDER-VALUE+))) => :VOID
+
+    Parameters:	
+
+        SRC - Input image; the number of channels can be arbitrary, but the depth should be one of 
+              +8U+, +16U+, +16S+, +32F+ or +64F+.
+
+        DEST - Output image of the same size and type as SRC.
+
+        KERNEL - Structuring element used for erosion; if (EQ ELEMENT (MAT)) , a 3 x 3 rectangular 
+                 structuring element is used. Kernel can be created using (GET-STRUCTURING-ELEMENT).
+
+        ANCHOR - Position of the anchor within the element; default value (-1, -1) means that the 
+                  anchor is at the element center.
+
+        ITERATIONS - Number of times erosion is applied.
+
+        BORDER-TYPE - Border type, one of the +BORDER-*+ constants, except 
+                      for +BORDER-TRANSPARENT+ and +BORDER-ISOLATED+.
+
+        BORDER-VALUE - Border value in case of a constant border. 
+
+
+The function erodes the source image using the specified structuring element that determines the shape 
+of a pixel neighborhood over which the minimum is taken:
+
+See OpenCv documentation:
+
+http://docs.opencv.org/trunk/modules/imgproc/doc/filtering.html?highlight=erode#erode
+
+for a description and formula.
+
+The function supports the in-place mode. Erosion can be applied several (ITERATIONS) times. In case 
+of multi-channel images, each channel is processed independently.
+
+
+See also:
+
+(DILATE), (MORPHOLOGY-EX), (CREATE-MORPHOLOGY-FILTER), (GET-STRUCTURING-ELEMENT)
+
+
+Example:
+
+
+;; Global variables
+(defparameter window-name "EROSION-DEST - ERODE Example")
+;; Load an image
+(defparameter src (imread "<path-to-image>" 1))
+(defparameter erosion-dest (mat))
+(defparameter erosion-elem (alloc :int 0))
+(defparameter erosion-size (alloc :int 0))
+(defparameter max-elem 2)
+(defparameter max-kernel-size 21)
+
+
+;; EROSION is a callback function called by the TRACKBAR in ERODE-EXAMPLE
+
+(defcallback erosion :void ((erosion-type :int))
+  ;; Adjust the GET-STRUCTURING-ELEMENT SHAPE 
+  ;; parameter based on trackbar position
+  (if (eq 0 (? erosion-elem :int)) (setf erosion-type +morph-rect+) 
+      (if (eq 1 (? erosion-elem :int)) (setf erosion-type +morph-cross+)
+	  (if (eq 2 (? erosion-elem :int)) (setf erosion-type +morph-ellipse+))))
+  ;; Specify the shape of the kernel used 
+  ;; to perform the erosion operation
+  (with-object (element (get-structuring-element 
+			 erosion-type 
+			 (size (+ (* (? erosion-size :int) 2) 1)
+			       (+ (* (? erosion-size :int) 2) 1)) 
+			 (point (? erosion-size :int) (? erosion-size :int))))
+    ;; Apply the erosion operation
+    (erode src erosion-dest element)
+    (imshow window-name erosion-dest)))
+
+(defun erode-example ()
+
+  (if (empty src) 
+      (return-from erode-example
+	(format t "Image not loaded")))
+					; Create window
+  (with-named-window (window-name 1)
+    (move-window window-name (cols src) 0)
+    (imshow window-name src)
+    (loop
+       ;; Create trackbar that, adjusts the GET-STRUCTURING-ELEMENT 
+       ;; SHAPE parameter and calls the EROSION callback function, 
+       ;; every time it is moved
+       (create-trackbar "SHAPE" window-name erosion-elem max-elem (callback erosion))
+       ;; Create trackbar that, adjusts the GET-STRUCTURING-ELEMENT 
+       ;; KSIZE and KERNEL parameters and calls the EROSION callback 
+       ;; function, every time it is moved
+       (create-trackbar  "KERNEL/KSIZE" window-name erosion-size max-kernel-size 
+			 (callback erosion))
+       (let ((c (wait-key 33)))
+	 (when (= c 27)
+	   (return))))))
+
+
+
 PYR-DOWN
 
 Blurs an image and downsamples it.
@@ -5356,6 +5573,9 @@ Example using WITH-* macros for memory/window managemant:
     (with-named-window (window-name +window-normal+)
       (move-window window-name 759 175)
       (with-mat (image (imread filename 1))
+	(if (empty image) 
+	    (return-from imread-example-2 
+	      (format t "Image not loaded")))
 	(imshow window-name image)
 	(loop
 	   (let ((c (wait-key 33)))
@@ -5864,6 +6084,90 @@ FACE-CASCADE
 LISP-CV> (CASCADE-CLASSIFIER-LOAD FACE-CASCADE FACE-CASCADE-NAME)  ;Load the Classifier
 
 T ;<--- Operation successful
+
+
+CONTRIB - COLORMAPS IN OPENCV
+
+
+
+APPLY-COLOR-MAP
+
+Applies a GNU Octave/MATLAB equivalent colormap on a given image.
+
+C++: void applyColorMap(InputArray src, OutputArray dst, int colormap)
+
+LISP-CV: (APPLY-COLOR-MAP (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) (COLORMAP :INT)) => :VOID
+
+    Parameters:	
+
+        SRC - The source image, grayscale or colored does not matter.
+
+        DEST - The result is the colormapped source image. Note: In the OpenCV code Mat::create() 
+               is called on DEST.
+
+        COLORMAP - The colormap to apply, see the list of available colormaps below.
+
+
+Currently the following GNU Octave/MATLAB equivalent colormaps are implemented:
+
+
+(defanonenum 
+
+  (+colormap-autumn+ 0)
+  (+colormap-bone+ 1)
+  (+colormap-jet+ 2)
+  (+colormap-winter+ 3)
+  (+colormap-rainbow+ 4)
+  (+colormap-ocean+ 5)
+  (+colormap-summer+ 6)
+  (+colormap-spring+ 7)
+  (+colormap-cool+ 8)
+  (+colormap-hsv+ 9)
+  (+colormap-pink+ 10)
+  (+colormap-hot+ 11))
+
+
+Description:
+
+The human perception isn’t built for observing fine changes in grayscale images. Human eyes are more 
+sensitive to observing changes between colors, so you often need to recolor your grayscale images to 
+get a clue about them. OpenCV now comes with various colormaps to enhance the visualization in your 
+computer vision application.
+
+In Lisp-cv you only need (APPLY-COLOR-MAP) to apply a colormap on a given image. The following example 
+code applies all 11 color map types to an image based on the position of a trackbar.
+
+
+(defun apply-color-map-example (filename)
+
+  (let ((window-name "APPLY-COLOR-MAP Example")
+        (i (alloc :int 0)))
+    (with-named-window (window-name +window-normal+)
+      (move-window window-name 759 175)
+      ;Load image as grayscale - Color is okay too
+      (with-object (img0 (imread filename 0))
+	(if (empty img0) 
+	    (return-from apply-color-map-example
+	      (format t "Image not loaded")))
+        (with-object (cm-img0 (mat))
+	  (loop
+	     ;In a loop apply one of 11 color map 
+	     ;types based on trackbar position
+	     (apply-color-map img0 cm-img0 (? i :int))
+	     (imshow window-name cm-img0)
+	     (create-trackbar "Color Map" window-name i 11)
+	     (let ((c (wait-key 33)))
+	       (when (= c 27)
+		 (return)))))))))
+
+
+
+See OpenCv documentation for applyColorMap:
+
+http://docs.opencv.org/trunk/modules/contrib/doc/facerec/colormaps.html?highlight=colormap#applycolormap
+
+for the color scales for each of the available colormaps.
+
 
 
 
@@ -8550,11 +8854,11 @@ The SURF extractor constructors.
 
 C++: SURF::SURF()
 
-LISP-CV: (SURF0) => (:POINTER SURF)
+LISP-CV: (SURF) => (:POINTER SURF)
 
 C++: SURF::SURF(double hessianThreshold, int nOctaves=4, int nOctaveLayers=2, bool extended=true, bool upright=false )
 
-LISP-CV: (SURF5 (HESSIAN-THRESHOLD :DOUBLE) &OPTIONAL ((N-OCTAVES :INT) 4) 
+LISP-CV: (SURF (HESSIAN-THRESHOLD :DOUBLE) &OPTIONAL ((N-OCTAVES :INT) 4) 
                  ((EXTENDED :BOOLEAN) T) ((UPRIGHT :BOOLEAN) NIL)) => (:POINTER SURF)
 
     Parameters:	
@@ -8584,7 +8888,7 @@ LISP-CV: (SURF5 (HESSIAN-THRESHOLD :DOUBLE) &OPTIONAL ((N-OCTAVES :INT) 4)
 	 ;; The image the object is a part of
 	 (img-2 (imread filename-2 +load-image-grayscale+))
          (min-hessian 400d0) 
-         (detector (surf5 min-hessian))
+         (detector (surf min-hessian))
 	 (keypoints-1 (vector-keypoint))
 	 (keypoints-2 (vector-keypoint))
          (extractor (surf0))
@@ -8619,9 +8923,11 @@ CREATE-TRACKBAR
 
 Creates a trackbar and attaches it to the specified window.
 
-C++: int createTrackbar(const string& trackbarname, const string& winname, int* value, int count, TrackbarCallback onChange=0, void* userdata=0)
+C++: int createTrackbar(const string& trackbarname, const string& winname, int* value, int count, TrackbarCallback onChange=0, 
+     void* userdata=0)
 
-LISP-CV:  (CREATE-TRACKBAR (TRACKBARNAME :STRING) (WINNAME :STRING) (VALUE :POINTER) (COUNT :INT) &OPTIONAL ((ON-CHANGE (:POINTER TRACKBAR-CALLBACK)) (NULL-POINTER)) ((USERDATA :POINTER) (NULL-POINTER))) => :INT
+LISP-CV:  (CREATE-TRACKBAR (TRACKBARNAME :STRING) (WINNAME :STRING) (VALUE :POINTER) (COUNT :INT) &OPTIONAL 
+          ((ON-CHANGE (:POINTER TRACKBAR-CALLBACK)) (NULL-POINTER)) ((USERDATA :POINTER) (NULL-POINTER))) => :INT
 
     
     Parameters:	
@@ -8712,7 +9018,7 @@ Example:
 		  (coerce brightness 'double-float))
       ;; show adjusted image in a window
       (imshow window-name dest)
-      ;; clen up used memory
+      ;; clean up used memory
       (del-mat dest))
     (destroy-window window-name)
     (free slider-1-value)
@@ -9228,11 +9534,64 @@ Example:
 EXTRA FUNCTIONS:
 
 
-DEL-*
+DEL
 
 Deletes allocated memory
 
 C++: void operator delete  ( void* ptr )
+
+LISP-CV: (DEL (SELF :POINTER)) :VOID
+
+
+  Parameters:	
+
+        SELF - A pointer to allocated memory
+
+
+Some of the OpenCV C bindings for its C++ interface that this library binds to, allocate memory for 
+their return value, with a new operator. A call to the C++ delete operator must be made for every call 
+to new to avoid a memory leak. The DEL function is a wrapper for the C++ delete operator. See the specific 
+functions example to see if it is necessary to call DEL or use the macro WITH-ALLOC to free its memory when 
+the function goes out of scope.
+
+
+Example:
+
+
+LISP-CV> (DEFPARAMETER A (POINT 1 2)) ;A (:POINTER POINT) is created
+
+A
+
+LISP-CV> (POINT-X A) ;The x coordinate of A is retrieved
+
+1
+
+LISP-CV> (POINT-Y A) ;The y coordinate of A is retrieved
+
+2
+
+LISP-CV> (DEL A) ; A is deleted with DEL
+
+; No value
+
+
+LISP-CV> (POINT-X A) ; The memory has been deallocated
+
+0
+
+LISP-CV> (POINT-Y A)
+
+0
+
+
+EXTRA FUNCTIONS:
+
+
+DEL-*
+
+Deletes allocated memory
+
+C++: void operator delete ( void* ptr )
 
 LISP-CV: (DEL-BF-MATCHER (PTR :POINTER)) => :VOID
 
@@ -9274,16 +9633,16 @@ LISP-CV: (DEL-VEC-UCHAR (PTR :POINTER)) => :VOID
         PTR - A pointer to a <type> construct
 
 
-Some of the OpenCV C bindings for its C++ interface that this library binds to, allocate memory for 
-their return value, with a new operator. The return value of said functions are a pointer to an OpenCv 
-class specified by the return value. e.g. Mat* (represented in LISP-CV as (:POINTER MAT)) is a pointer 
-to the OpenCV Mat class. A call to the C++ delete operator must be made for every call to new to avoid 
-a memory leak. The DEL-* functions are wrappers for the C++ delete operator and pass the type of * to 
+Some of the OpenCV C bindings for its C++ interface that this library binds to, allocate memory for
+their return value, with a new operator. The return value of said functions are a pointer to an OpenCv
+class specified by the return value. e.g. Mat* (represented in LISP-CV as (:POINTER MAT)) is a pointer
+to the OpenCV Mat class. A call to the C++ delete operator must be made for every call to new to avoid
+a memory leak. The DEL-* functions are wrappers for the C++ delete operator and pass the type of * to
 the delete operator when the DEL-* function is called. The DEL-* function types are below.
 
 
-Note: Each DEL-* function has a companion WITH-* macro that calls the associated DEL-* function, when 
-the (:POINTER *) goes out of scope, automatically. See <lisp-cv-source directory>/with-macros.lisp for 
+Note: Each DEL-* function has a companion WITH-* macro that calls the associated DEL-* function, when
+the (:POINTER *) goes out of scope, automatically. See <lisp-cv-source directory>/with-macros.lisp for
 the associated WITH-* macro.
 
 
@@ -9349,6 +9708,4 @@ LISP-CV> (POINT-X A) ; The memory has been deallocated
 LISP-CV> (POINT-Y A)
 
 0
-
-
 

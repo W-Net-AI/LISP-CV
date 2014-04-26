@@ -79,27 +79,6 @@
    #:del-vec-uchar
 
 
-;; DESTRUCT
-
-   #:dest-bf-matcher
-   #:dest-brisk
-   #:dest-mat
-   #:dest-mat-expr
-   #:dest-point
-   #:dest-rect
-   #:dest-vec-char
-   #:dest-vec-dbl
-   #:dest-vec-dm
-   #:dest-vec-flt
-   #:dest-vec-int
-   #:dest-vec-kp
-   #:dest-vec-mat
-   #:dest-vec-point
-   #:dest-vec-point2f
-   #:dest-vec-rect
-   #:dest-vec-uchar
-
-
 ;; WITH-MACROS
 
    #:with-bf-matcher
@@ -515,8 +494,11 @@
    #:+median+
    #:+bilateral+
    #:+scharr+
+   #:morphology-default-border-value
 
    #:copy-make-border
+   #:erode
+   #:dilate
    #:gaussian-blur
    #:pyr-down
    #:pyr-up
@@ -924,5 +906,22 @@
 
    #:surf0
    #:surf5
+
+;;; contrib - ColorMaps in OpenCV
+
+   #:+colormap-autumn+ 
+   #:+colormap-bone+ 
+   #:+colormap-jet+ 
+   #:+colormap-winter+
+   #:+colormap-rainbow+ 
+   #:+colormap-ocean+ 
+   #:+colormap-summer+ 
+   #:+colormap-spring+ 
+   #:+colormap-cool+ 
+   #:+colormap-hsv+ 
+   #:+colormap-pink+ 
+   #:+colormap-hot+ 
+
+   #:apply-color-map
 ))
 

@@ -8,6 +8,13 @@
 
 
 ;; void operator delete  ( void* ptr )
+;; void cv_delete(char* ptr)
+(defcfun ("cv_delete" del) :void
+  "Calls delete"
+  (ptr :pointer))
+
+
+;; void operator delete  ( void* ptr )
 ;; void cv_delete_BFMatcher(void* ptr)
 (defcfun ("cv_delete_BFMatcher" del-bf-matcher) :void
   "Calls delete on a (:POINTER BF-MATCHER)"

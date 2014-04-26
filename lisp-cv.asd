@@ -20,7 +20,6 @@
                (:file "types" :depends-on ("package" "lisp-cv"))
                (:file "vector" :depends-on ("package" "lisp-cv"))
                (:file "delete" :depends-on ("package" "lisp-cv"))
-               (:file "destruct" :depends-on ("package" "lisp-cv"))
                (:file "with-macros" :depends-on ("package" "lisp-cv" "delete"))
                (:file "core" :depends-on ("package" "lisp-cv" "constants" "types"))
 	           (:file "imgproc" :depends-on ("package" "lisp-cv" "constants" "types"))
@@ -29,5 +28,6 @@
                (:file "objdetect" :depends-on ("package" "lisp-cv" "constants" "types"))
                (:file "features2d" :depends-on ("package" "lisp-cv" "constants" "types"))
                (:file "nonfree" :depends-on ("package" "lisp-cv" "constants" "types"))
-               (:file "macros" :depends-on ("package" "lisp-cv" "constants" "types" "delete" "destruct" "with-macros" "vector" "core" 
-                                            "imgproc" "highgui" "calib3d" "objdetect" "features2d" "nonfree"))))
+               (:file "contrib" :depends-on ("package" "lisp-cv" "constants" "types"))
+               (:file "macros" :depends-on ("package" "lisp-cv" "constants" "types" "delete" "with-macros" "vector" "core" 
+                                            "imgproc" "highgui" "calib3d" "objdetect" "features2d" "nonfree" "contrib"))))
