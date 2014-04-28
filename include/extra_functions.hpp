@@ -7,16 +7,8 @@ using namespace flann;
 using namespace cvflann;
 
 extern "C" {
-CascadeClassifier* cv_create_CascadeClassifier1_2(const char* filename);
-bool cv_CascadeClassifier_load1_2(CascadeClassifier* self, const char* filename);
-void cv_delete_Point(Point* self);
-void cv_destruct_Point(Point* self);
-void cv_delete_Rect(Rect* self);
-void cv_destruct_Rect(Rect* self);
-int &cv_Rect_x(Rect* self);
-int &cv_Rect_y(Rect* self);
-int &cv_Rect_width(Rect* self);
-int &cv_Rect_height(Rect* self);
+FeatureDetector* cv_FeatureDetector_create2(FeatureDetector* self, const char* detectorType);
+Scalar* cv_create_morphologyDefaultBorderValue();
 bool cv_findChessboardCorners2(Mat* image, Size* patternSize, vector_Point2f* corners, int flags);
 void cv_cornerSubPix2(Mat* image, vector_Point2f* corners, Size* winSize, Size* zeroZone, TermCriteria* criteria);
 void cv_drawChessboardCorners2(Mat* image, Size* patternSize, vector_Point2f* corners, bool patternWasFound);
@@ -40,9 +32,20 @@ float cv_Size2f_area(Size2f* self);
 float cv_Size2f_width(Size2f* self);
 float cv_Size2f_height(Size2f* self);
 void cv_delete_BFMatcher(void* ptr);
-void cv_destruct_BFMatcher(BFMatcher* self);
 void cv_delete_BRISK(void* ptr);
-void cv_destruct_BRISK(BRISK* self);
+void cv_delete_KeyPoint(KeyPoint* self);
+void cv_delete_Point(Point* self);
+void cv_delete_Point2d(Point2d* self);
+void cv_delete_Point2f(Point2f* self);
+void cv_delete_Point3d(Point3d* self);
+void cv_delete_Point3f(Point3f* self);
+void cv_delete_Point3i(Point3i* self);
+void cv_delete_Rect(Rect* self);
+void cv_delete_RNG(RNG* self);
+void cv_delete_Scalar(Scalar* self);
+void cv_delete_Size(Size* self);
+void cv_delete_SURF(SURF* self);
+void cv_delete_vector_char(vector_char* self);
 }
 
 

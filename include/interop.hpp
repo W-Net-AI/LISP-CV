@@ -44,7 +44,7 @@ extern "C" {
 string* create_std_string();
 string* cstring_to_std_string(char* s, size_t len);
 const char* std_string_to_cstring(string* s);
-
+void cv_delete_std_string(string* s);
 ADD_VECTOR_HEADERS(char, c);
 ADD_VECTOR_HEADERS(double, d);
 ADD_VECTOR_HEADERS(float, f);

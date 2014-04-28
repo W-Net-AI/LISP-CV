@@ -26,62 +26,14 @@
 ;; Feature2D*
 (defctype feature-2d :pointer)
 
-;; FeatureDetector*
-(defctype feature-detector :pointer)
-
-;; KeyPoint*
-(defctype keypoint :pointer)
-
-;; Mat*
-(defctype mat :pointer)
-
-;; MatExpr*
-(defctype mat-expr :pointer)
-
 ;; MouseCallback
 (defctype mouse-callback :pointer)
-
-;; Point*
-(defctype point :pointer)
-
-;; Point2d*
-(defctype point2d :pointer)
-
-;; Point2f*
-(defctype point2f :pointer)
-
-;; Point3d*
-(defctype point3d :pointer)
-
-;; Point3f*
-(defctype point3f :pointer)
-
-;; Point3i*
-(defctype point3i :pointer)
-
-;; Rect*
-(defctype rect :pointer)
-
-;; RNG*
-(defctype rng :pointer)
 
 ;; RotatedRect*
 (defctype rotated-rect :pointer)
 
-;; Scalar*
-(defctype scalar :pointer)
-
-;; Size*
-(defctype size :pointer)
-
 ;; Size2f*
 (defctype size2f :pointer)
-
-;; String*
-(defctype string* :pointer)
-
-;; SURF*
-(defctype surf :pointer)
 
 ;; CvSVM*
 (defctype svm :pointer)
@@ -140,14 +92,8 @@
 ;; Vec4s*
 (defctype vec4s :pointer)
 
-;; vector_char*
-(defctype vector-char :pointer)
-
 ;; vector_DMatch*
 (defctype vector-dmatch :pointer)
-
-;; vector_double*
-(defctype vector-double :pointer)
 
 ;; vector_float*
 (defctype vector-float :pointer)

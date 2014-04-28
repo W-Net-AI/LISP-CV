@@ -10,44 +10,8 @@ typedef vector<Rect> vector_Rect;
 
 extern "C" {
 
-CascadeClassifier* cv_create_CascadeClassifier1_2(const char* filename) {
-	return new CascadeClassifier(filename);
-}
-
-bool cv_CascadeClassifier_load1_2(CascadeClassifier* self, const char* filename) {
-	return self->load(filename);
-}
-
-void cv_delete_Point(Point* self) {
-     delete self;
-}
-
-void cv_destruct_Point(Point* self) {
-     self->~Point();
-}
-
-void cv_delete_Rect(Rect* self) {
-     delete self;
-}
-
-void cv_destruct_Rect(Rect* self) {
-     self->~Rect();
-}
-
-int &cv_Rect_x(Rect* self) {
-    return self->x;
-}
-
-int &cv_Rect_y(Rect* self) {
-    return self->y;
-}
-
-int &cv_Rect_width(Rect* self) {
-    return self->width;
-}
-
-int &cv_Rect_height(Rect* self) {
-    return self->height;
+Scalar* cv_create_morphologyDefaultBorderValue() { 
+    return new Scalar(Scalar::all(DBL_MAX)); 
 }
 
 bool cv_findChessboardCorners2(Mat* image, Size* patternSize, vector_Point2f* corners, int flags) {
@@ -143,17 +107,59 @@ void cv_delete_BRISK(void* ptr) {
     delete (BRISK*)ptr;
 }
 
-void cv_destruct_BRISK(BRISK* self) {
-     self->~BRISK();
-}
-
 void cv_delete_BFMatcher(void* ptr) {
     delete (BFMatcher*)ptr;
 }
 
-void cv_destruct_BFMatcher(BFMatcher* self) {
-     self->~BFMatcher();
+void cv_delete_KeyPoint(KeyPoint* self) {
+     delete self;
 }
 
+void cv_delete_Point(Point* self) {
+     delete self;
+}
 
+void cv_delete_Point2d(Point2d* self) {
+     delete self;
+}
+
+void cv_delete_Point2f(Point2f* self) {
+     delete self;
+}
+
+void cv_delete_Point3d(Point3d* self) {
+     delete self;
+}
+
+void cv_delete_Point3f(Point3f* self) {
+     delete self;
+}
+
+void cv_delete_Point3i(Point3i* self) {
+     delete self;
+}
+
+void cv_delete_Rect(Rect* self) {
+     delete self;
+}
+
+void cv_delete_RNG(RNG* self) {
+     delete self;
+}
+
+void cv_delete_Scalar(Scalar* self) {
+     delete self;
+}
+
+void cv_delete_Size(Size* self) {
+     delete self;
+}
+
+void cv_delete_SURF(SURF* self) {
+     delete self;
+}
+
+void cv_delete_vector_char(vector_char* self) {
+     delete self;
+}
 }

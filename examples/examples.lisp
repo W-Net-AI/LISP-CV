@@ -51,7 +51,7 @@ Adds two matrices.
 
 C++: MatExpr + operator
 
-LISP-CV: (ADD (M1 (:POINTER MAT)) (M2 (:POINTER MAT))) => (:POINTER MAT-EXPR)
+LISP-CV: (ADD (M1 MAT) (M2 MAT)) => MAT-EXPR
 
 
     Parameters:	
@@ -62,9 +62,9 @@ LISP-CV: (ADD (M1 (:POINTER MAT)) (M2 (:POINTER MAT))) => (:POINTER MAT-EXPR)
 
 
 The function ADD adds the elements of matrix M1 to the elements of matrix M2 in order. Both 
-matrices must have the same number of rows and columns. You may need to coerce the result o-
-f ADD, the return value, back to type (:POINTER MAT) with the function (FORCE), (or the 
-shorthand version (>>)) to use in other functions. 
+matrices must have the same number of rows and columns. You may need to coerce the result of 
+ADD, the return value, back to type MAT with the function (FORCE), (or the shorthand version 
+(>>)) to use in other functions. 
 
 
 (defun add-example ()
@@ -105,7 +105,7 @@ Adjusts a submatrix size and position within the parent matrix.
 
 C++: Mat& Mat::adjustROI(int dtop, int dbottom, int dleft, int dright)
 
-LISP-CV: (ADJUST-ROI (SELF (:POINTER MAT)) (DTOP :INT) (DBOTTOM :INT) (DLEFT :INT) (DRIGHT :INT)) => (:POINTER MAT)
+LISP-CV: (ADJUST-ROI (SELF MAT) (DTOP :INT) (DBOTTOM :INT) (DLEFT :INT) (DRIGHT :INT)) => MAT
 
     Parameters:	
 
@@ -201,7 +201,7 @@ Assign a scalar value to a matrix.
 
 C++: MatExpr = operator
 
-LISP-CV: (ASSGN-VAL (SELF (:POINTER MAT)) (S (:POINTER SCALAR))) => (:POINTER MAT)
+LISP-CV: (ASSGN-VAL (SELF MAT) (S SCALAR)) => MAT
 
     Parameters:	
 
@@ -259,9 +259,9 @@ CFFI: mem-aref ptr type &optional (index 0)
 
 CFFI: (setf (mem-aref ptr type &optional (index 0)) new-value) 
 
-LISP-CV: (AT (SELF (:POINTER MAT)) (I :INT) (J :INT) (TYPE :KEYWORD)) 
+LISP-CV: (AT (SELF MAT) (I :INT) (J :INT) (TYPE :KEYWORD)) 
 
-LISP-CV: (AT (SELF (:POINTER MAT)) (I :INT) (J :INT) (TYPE :KEYWORD)) 
+LISP-CV: (AT (SELF MAT) (I :INT) (J :INT) (TYPE :KEYWORD)) 
 
 
     Parameters:	
@@ -308,7 +308,7 @@ Returns the number of matrix channels.
 
 C++: int Mat::channels() const
 
-LISP-CV: (CHANNELS (SELF (:POINTER MAT))) => :INT
+LISP-CV: (CHANNELS (SELF MAT)) => :INT
 
     Parameters:	
 
@@ -357,7 +357,7 @@ Creates a matrix header for the specified column span.
 
 C++: Mat Mat::colRange(int startcol, int endcol) const
 
-LISP-CV: (COL-RANGE (SELF (:POINTER MAT)) (STARTCOL :INT) (ENDCOL :INT)) => (:POINTER MAT)
+LISP-CV: (COL-RANGE (SELF MAT) (STARTCOL :INT) (ENDCOL :INT)) => MAT
 
 
     Parameters:	
@@ -407,11 +407,11 @@ Copies the matrix to another one.
 
 C++: void Mat::copyTo(OutputArray m) const
 
-LISP-CV: (COPY-TO (SELF (:POINTER MAT)) (M (:POINTER MAT))) => :VOID
+LISP-CV: (COPY-TO (SELF MAT) (M MAT)) => :VOID
 
 C++: void Mat::copyTo(OutputArray m, InputArray mask) const
 
-LISP-CV: (COPY-TO (SELF (:POINTER MAT)) (M (:POINTER MAT)) (MASK (:POINTER MAT))) => :VOID
+LISP-CV: (COPY-TO (SELF MAT) (M MAT) (MASK MAT)) => :VOID
 
 
     Parameters:	
@@ -504,7 +504,7 @@ Computes a cross-product of two 3-element vectors.
 
 C++: Mat Mat::cross(InputArray m) const
 
-LISP-CV: (CROSS (SELF (:POINTER MAT)) (M (:POINTER MAT))) => (:POINTER MAT)
+LISP-CV: (CROSS (SELF MAT) (M MAT)) => MAT
 
 
     Parameters:	
@@ -552,7 +552,7 @@ Returns the depth of a matrix element.
 
 C++: int Mat::depth() const
 
-LISP-CV: (DEPTH (SELF (:POINTER MAT))) => :INT
+LISP-CV: (DEPTH (SELF MAT)) => :INT
 
 The method returns the identifier of the matrix element depth (the type of each individual channel). 
 For example, for a 16-bit signed element array, the method returns +16S+ . A complete list of matrix 
@@ -583,11 +583,11 @@ A
 
 LISP-CV> (MAT-TYPE A) 
 
-1  ;The type of the matrix is 1(+8SC1+) - 1 channel matrix with 8-bit signed integer elements
+1   ;The type of the matrix is 1(+8SC1+) - 1 channel matrix with 8-bit signed integer elements
 
 LISP-CV> (DEPTH A)
 
-1  ;The type of the matrix elements are 1(+8S+) - 8-bit signed integer
+1   ;The type of the matrix elements are 1(+8S+) - 8-bit signed integer
 
 
 LISP-CV> (DEFPARAMETER A (MAT-TYPED 3 3 +8SC3+)) ;Initialize 3 channel matrix of 8-bit signed integer type
@@ -596,11 +596,39 @@ A
 
 LISP-CV> (MAT-TYPE A)  
 
-17  ;The type of the matrix is 17(+8SC1+) - 3 channel matrix with 8-bit signed integer elements
+17   ;The type of the matrix is 17(+8SC1+) - 3 channel matrix with 8-bit signed integer elements
 
 LISP-CV> (DEPTH A)
 
-1  ;The type of the matrix elements are 1(+8S+) - 8-bit signed integer
+1   ;The type of the matrix elements are 1(+8S+) - 8-bit signed integer
+
+
+
+EMPTY
+
+Returns true if the array has no elements.
+
+C++: bool Mat::empty() const
+
+LISP-CV: (EMPTY (SELF MAT)) => :BOOLEAN
+
+
+(defun empty-example (filename)
+  ;; load image 
+  (let* ((image (imread filename 1))
+	 (window-name "EMPTY Example"))
+    ;; if image is not loaded correctly 
+    ;; the return of EMPTY is true and 
+    ;; the function is exited
+    (if (empty image) 
+	(return-from empty-example 
+	  (format t "Image not loaded")))
+    (named-window window-name +window-normal+)
+    (move-window window-name 759 175)
+    (imshow window-name image)
+    (loop while (not (= (wait-key 0) 27)))
+    (del-mat image)
+    (destroy-window window-name)))
 
 
 
@@ -610,7 +638,7 @@ Inverses a matrix.
 
 C++: MatExpr Mat::inv(int method=DECOMP_LU) const
 
-LISP-CV: (INV (SELF (:POINTER MAT)) (METHOD :INT)) => (:POINTER MAT-EXPR) 
+LISP-CV: (INV (SELF MAT) (METHOD :INT)) => MAT-EXPR 
 
     Parameters:	
 
@@ -633,8 +661,7 @@ LISP-CV: (INV (SELF (:POINTER MAT)) (METHOD :INT)) => (:POINTER MAT-EXPR)
 The method performs a matrix inversion by means of Matrix Expressions. This means that a temporary 
 matrix inversion object is returned by the method and can be used further as a part of more complex 
 Matrix Expressions or can be assigned to a matrix. You may need to coerce the return value of INV 
-back to type (:POINTER MAT) with the function (FORCE), (or the shorthand version (>>)) to use in 
-other functions.
+back to type MAT with the function (FORCE), (or the shorthand version (>>)) to use in other functions.
 
 
 (defun inv-example (filename)
@@ -806,7 +833,7 @@ Locates the matrix header within a parent matrix.
 
 C++: void Mat::locateROI(Size& wholeSize, Point& ofs) const
 
-LISP-CV: (LOCATE-ROI (SELF (:POINTER MAT)) (S (:POINTER SIZE)) (P (:POINTER POINT))) => :VOID
+LISP-CV: (LOCATE-ROI (SELF MAT) (S SIZE) (P POINT)) => :VOID
 
 
     Parameters:	
@@ -888,7 +915,7 @@ Finds the product of two matrices.
 
 C++: MatExpr * operator
 
-LISP-CV: (MUL (M1 (:POINTER MAT)) (M2 (:POINTER MAT))) => (:POINTER MAT-EXPR)
+LISP-CV: (MUL (M1 MAT) (M2 MAT)) => MAT-EXPR
 
 
     Parameters:	
@@ -900,9 +927,9 @@ LISP-CV: (MUL (M1 (:POINTER MAT)) (M2 (:POINTER MAT))) => (:POINTER MAT-EXPR)
 
 To perform matrix multiplication on two Matrices, the number of columns in the first matrix must be 
 the same as the number of rows in the second Matrix. The matrices to be multiplied must also be of 
-type Single Float(+32F+) or Double Float(+64f+). You may need to coerce the result of MUL, the retu-
-rn value, back to type (:POINTER MAT) with the function (FORCE), (or the shorthand version (>>)) to 
-use in other functions. 
+type Single Float(+32F+) or Double Float(+64f+). You may need to coerce the result of MUL, the return 
+value, back to type MAT with the function (FORCE), (or the shorthand version (>>)) to use in other 
+functions. 
 
 
 
@@ -940,21 +967,332 @@ use in other functions.
 
 
 
+POINT
+
+
+POINT constructor.
+
+
+C++: Point_()
+
+LISP-CV: (POINT) => POINT
+
+C++: Point_(_Tp _x, _Tp _y)
+
+LISP-CV:  (POINT (X :INT) (Y :INT)) => POINT
+
+C++: _Tp x, y;
+
+LISP-CV: (POINT-X (SELF POINT)) => :INT
+
+C++: _Tp x, y;
+
+LISP-CV: (POINT-Y (SELF POINT)) => :INT
+
+
+    Parameters:	
+
+        SELF - A POINT construct.
+
+        X - X-coordinate of the point.
+
+        Y -	Y-coordinate of the point.
+
+
+POINT creates a 2D point with integer coordinates (usually zero-based). The functions POINT-X and  
+POINT-Y are used to extract the x,y coordinates of a point.
+
+
+(defun point-example (x y)
+
+  "In this example we create an unitialized 
+   POINT with the function POINT. Then crea-
+   tes a point with the function POINT. Fin-
+   ally, lists the x,y coordinates with the 
+   POINT functions POINT-X and POINT-Y."
+
+  (let* ((initialized-point (point))
+	 (point (point x y)))
+    (format t "~%Pointer to initialized point: ~a~%~%" 
+	    initialized-point)
+    (format t "POINT (x, y) = (~a, ~a)~%~%" 
+	    (point-x point)
+	    (point-y point))))
+
+
+POINT2D
+
+
+POINT2D constructor.
+
+
+C++: typedef Point_<double> Point2d
+
+LISP-CV: (POINT2D (X :INT) (Y :INT)) => POINT2D
+
+C++: _Tp x, y
+
+LISP-CV: (POINT2D-X (SELF POINT2D)) => :DOUBLE
+
+C++: _Tp x, y
+
+LISP-CV: (POINT2D-Y (SELF POINT2D)) => :DOUBLE
+
+
+    Parameters:	
+
+        SELF - A POINT2D construct.
+
+        X - x-coordinate of the point.
+
+        Y -	y-coordinate of the point.
+
+
+POINT2D creates a 2D point with double-float coordinates (usually zero-based). Functions POINT2D-X 
+and  POINT2D-Y are used to extract the x,y coordinates of the point.
+
+
+(defun point2d-example (x y)
+
+  "In this example we create an uninitialized 
+   point2d with the function POINT2D. Then, w-
+   e create an initialized point2d and list t-
+   he x,y,z coordinates with the functions PO-
+   INT2D-X and POINT2D-Y."
+
+  (let* ((point2d-un-init (point2d))
+	 (point2d (point2d x y)))
+    (format t "~%Pointer to POINT2D: ~a~%~%" 
+	    point2d-un-init)
+    (format t "POINT2D (x, y) = (~a, ~a)~%~%" 
+	    (point2d-x point2d)
+	    (point2d-y point2d))))
+
+
+
+POINT2F
+
+
+POINT2F constructor.
+
+
+C++: typedef Point_<float> Point2f
+
+LISP-CV:  (POINT2F (X :INT) (Y :INT)) => POINT2F
+
+C++: _Tp x, y
+
+LISP-CV: (POINT2F-X (SELF POINT2F)) => :INT
+
+C++: _Tp x, y
+
+LISP-CV: (POINT2F-Y (SELF POINT2F)) => :INT
+
+
+    Parameters:	
+
+        SELF - A POINT2F construct.
+
+        X - x-coordinate of the point.
+
+        Y -	y-coordinate of the point.
+
+
+POINT2F creates a 2D point with float coordinates (usually zero-based). Functions POINT2F-X and POI-
+NT2F-Y are used to extract the x,y coordinates the point.
+
+
+(defun point2f-example (x y)
+
+  "In this example we create an uninitialized 
+   point2f with the function POINT2F. Then, w-
+   e create an initialized point2f and list t-
+   he x,y coordinates with the functions POIN-
+   T2F-X and POINT2F-Y."
+
+  (let* ((point2f-un-init (point2f))
+	 (point2f (point2f x y)))
+    (format t "~%Pointer to POINT2F: ~a~%~%" 
+	    point2f-un-init)
+    (format t "POINT2F (x, y) = (~a, ~a)~%~%" 
+	    (point2f-x point2f)
+	    (point2f-y point2f))))
+
+
+
+POINT3D
+
+
+POINT3D constructor.
+
+
+C++: typedef Point3_<double> Point3d
+
+LISP-CV:  (POINT3D (X :INT) (Y :INT) (Z :INT)) => POINT3D
+
+C++: _Tp x, y, z
+
+LISP-CV: (POINT3D-X (SELF POINT3D)) => :DOUBLE
+
+C++: _Tp x, y, z
+
+LISP-CV: (POINT3D-Y (SELF POINT3D)) => :DOUBLE
+
+
+    Parameters:	
+
+        SELF - A POINT3D construct.
+
+        X - x-coordinate of the point.
+
+        Y -	y-coordinate of the point.
+        
+        Z - Z-coordinate of the point.
+
+
+POINT3D creates a 3D point with double-float coordinates (usually zero-based). Functions POINT3D-X, 
+POINT3D-Y AND POINT3D-Z are used to extract the x,y,Z coordinates the point.
+
+
+(defun point3d-example (x y z)
+
+  "In this example we create an uninitialized 
+   point3d with the function POINT3D. Then, w-
+   e create an initialized point3d and list t-
+   he x,y,z coordinates with the functions PO-
+   INT3D-X, POINT3D-Y and POINT3D-Z."
+
+  (let* ((point3d-un-init (point3d))
+        (point3d (point3d x y z)))
+    (format t "~%Pointer to POINT3D: ~a~%~%" 
+	    point3d-un-init)
+    (format t "POINT3D (x, y, z) = (~a, ~a, ~a)~%~%" 
+	    (point3d-x point3d)
+	    (point3d-y point3d)
+            (point3d-z point3d))))
+
+
+
+POINT3F
+
+
+POINT3F constructor.
+
+
+C++: typedef Point3_<float> Point3f
+
+LISP-CV:  (POINT3F (X :INT) (Y :INT) (Z :INT)) => POINT3F
+
+C++: _Tp x, y, z
+
+LISP-CV: (POINT3F-X (SELF POINT3F)) => :FLOAT
+
+C++: _Tp x, y, z
+
+LISP-CV: (POINT3F-Y (SELF POINT)) => :FLOAT
+
+
+    Parameters:	
+
+        SELF - A POINT3F construct.
+
+        X - x-coordinate of the point.
+
+        Y -	y-coordinate of the point.
+        
+        Z - Z-coordinate of the point.
+
+
+POINT3F creates a 3D point with float coordinates (usually zero-based). Functions POINT3F-X, POINT3-
+F-Y AND POINT3F-Z are used to extract the x,y,Z coordinates the point.
+
+
+(defun point3f-example (x y z)
+
+  "In this example we create an uninitialized 
+   point3f with the function POINT3F. Then, w-
+   e create an initialized point3f and list t-
+   he x,y,z coordinates with the functions PO-
+   INT3F-X, POINT3F-Y and POINT3F-Z."
+
+  (let* ((point3f-un-init (point3f))
+	 (point3f (point3f x y z)))
+    (format t "~%Pointer to POINT3F: ~a~%~%" 
+	    point3f-un-init)
+    (format t "POINT3F (x, y, z) = (~a, ~a, ~a)~%~%" 
+	    (point3f-x point3f)
+	    (point3f-y point3f)
+            (point3f-z point3f))))
+
+
+
+POINT3I
+
+
+POINT3I constructor.
+
+
+C++: typedef Point3_<int> Point3i;
+
+LISP-CV:  (POINT3I (X :INT) (Y :INT) (Z :INT)) => POINT3I
+
+C++: _Tp x, y, z
+
+LISP-CV: (POINT3I-X (SELF POINT3I)) => :INT
+
+C++: _Tp x, y, z
+
+LISP-CV: (POINT3I-Y (SELF POINT3I)) => :INT
+
+
+    Parameters:	
+
+        SELF - A POINT3I construct.
+
+        X - x-coordinate of the point.
+
+        Y -	y-coordinate of the point.
+        
+        Z - Z-coordinate of the point.
+
+
+POINT3I creates a 3D point with integer coordinates (usually zero-based). Functions POINT3I-X, POIN-
+T3I-Y and POINT3I-Z are used to extract the x,y,Z coordinates of the point.
+
+
+(defun point3i-example (x y z)
+
+  "In this example we create an uninitialized 
+   point3i with the function POINT3I. Then, w-
+   e create an initialized point3i and list t-
+   he x,y,z coordinates with the functions PO-
+   INT3I-X, POINT3I-Y and POINT3I-Z."
+
+  (let* ((point3i-un-init (point3i))
+	 (point3i (point3i x y z)))
+    (format t "~%Pointer to POINT3I: ~a~%~%" 
+	    point3i-un-init)
+    (format t "POINT3I (x, y, z) = (~a, ~a, ~a)~%~%" 
+	    (point3i-x point3i)
+	    (point3i-y point3i)
+            (point3i-z point3i))))
+
+
+
 PROMOTE 
 
 Coverts a MAT to MAT-EXPR
 
-LISP-CV: (PROMOTE (SELF (:POINTER MAT))) => (:POINTER MAT-EXPR)
+LISP-CV: (PROMOTE (SELF MAT)) => MAT-EXPR
 
-LISP-CV: (<< (SELF (:POINTER MAT))) => (:POINTER MAT-EXPR)
+LISP-CV: (<< (SELF MAT)) => MAT-EXPR
 
-The function PROMOTE converts a functions return from (:POINTER MAT) to (:POINTER MAT-EXPR). This i-
-s useful if you would like to do math computation on a matrix with a (:POINTER MAT) type using a su-
-per fast Matrix Expressions(MAT-EXPR) function. Some Matrix Expressions functions will only accept 
-a (:POINTER MAT-EXPR) type as input and that is what makes this function necessary.  You can then c-
-onvert back to (:POINTER MAT) with the function FORCE to use the result in a function that only acc-
-epts a MAT as input i.e. IMSHOW. The function << is an identical shorthand version of the PROMOTE f-
-unction supplied for ease of use. 
+The function PROMOTE converts a functions return from MAT to MAT-EXPR. This is useful if you would 
+like to do math computation on a matrix with a MAT type using a fast Matrix Expressions(MAT-EXPR) 
+function. Some Matrix Expressions functions will only accept a MAT-EXPR type as input and that is 
+what makes this function necessary.  You can then convert back to MAT with the function FORCE to use
+the result in a function that only accepts a MAT as input i.e. IMSHOW. The function << is an identical 
+shorthand version of the PROMOTE function supplied for ease of use. 
 
    Parameters:	
 
@@ -969,17 +1307,16 @@ Example:
   "In this example a matrix filled with ones(MAT) is 
    created. PROMOTE or actually the shorthand versio-
    n of the function PROMOTE << is then used to coer-
-   ce MAT to a (:POINTER MAT-EXPR) type so it can th-
-   en be multiplied by the scalar S with the functio-
-   n SCALE. This is necessary since SCALE only accep-
-   ts (:POINTER MAT-EXPR) types as it's input. The o-
-   utput of SCALE(OUT) is then coerced back to (:POI-
-   NTER MAT) with the function FORCE for the opposit-
-   e reason so it can then be shown in a window with 
-   IMSHOW."
+   ce MAT to a MAT-EXPR type so it can then be multi-
+   plied by the scalar S with the function SCALE. Th-
+   is is necessary since SCALE only accepts MAT-EXPR 
+   types as it's input. The output of SCALE(OUT) is 
+   then coerced back to (:POINTER MAT) with the func-
+   tion FORCE for the opposite reason so it can then 
+   be shown in a window with IMSHOW."
 
   (let* ((mat (mat-ones 3 3 +8u+))
-         (s 5.0d0)
+         (s 255.0d0)
          (out (scale (<< mat) s))
 	 (window-name "PROMOTE Example"))
     (named-window window-name +window-normal+)
@@ -996,7 +1333,7 @@ Returns a pointer to the specified matrix row.
 
 C++: uchar* Mat::ptr(int i0=0)
 
-LISP-CV: (PTR (SELF (:POINTER MAT)) &OPTIONAL ((I0 :INT) 0)) => :POINTER
+LISP-CV: (PTR (SELF MAT) &OPTIONAL ((I0 :INT) 0)) => :POINTER
 
     Parameters:	
 
@@ -1087,13 +1424,14 @@ Usage:
    (PTR-EXAMPLE "/HOME/W/IMG.JPG" "~/DATA.TXT")
 
 
+
 RESHAPE
 
 Changes the shape and/or the number of channels of a 2D matrix without copying the data.
 
 C++: Mat Mat::reshape(int cn, int rows=0) const
 
-LISP-CV: (RESHAPE (SELF (:POINTER MAT)) (CN :INT) (ROWS :INT)) => (:POINTER MAT)
+LISP-CV: (RESHAPE (SELF MAT) (CN :INT) (ROWS :INT)) => MAT
 
 
     Parameters:	
@@ -1155,7 +1493,7 @@ Creates a matrix header for the specified row span.
 
 C++: Mat Mat::rowRange(int startrow, int endrow) const
 
-LISP-CV: (ROW-RANGE (SELF (:POINTER MAT)) (STARTROW :INT) (ENDROW :INT)) => (:POINTER MAT)
+LISP-CV: (ROW-RANGE (SELF MAT) (STARTROW :INT) (ENDROW :INT)) => MAT
 
 
     Parameters:	
@@ -1207,11 +1545,11 @@ C++: Size_(_Tp _width, _Tp _height);
      typedef Size_<int> Size2i;
      typedef Size2i Size;
 
-LISP-CV: (SIZE (WIDTH :INT) (HEIGHT :INT)) => (:POINTER SIZE)
+LISP-CV: (SIZE (WIDTH :INT) (HEIGHT :INT)) => SIZE
 
 C++: _Tp width, height
 
-LISP-CV: (WIDTH (SELF (:POINTER SIZE))) => :INT
+LISP-CV: (WIDTH (SELF SIZE)) => :INT
 
 C++: _Tp width, height
 
@@ -1242,25 +1580,25 @@ bit faster matrix size accessor choose the MAT-SIZE Dfunction.
 
 
 (defun size-example ()
-       
-       "In the code below the (COLS, ROWS) values of MAT are 
+  
+  "In the code below the (COLS, ROWS) values of MAT are 
    accessed and stored in a SIZE construct. Their value-
    s are accessed with the WIDTH and HEIGHT functions. 
    Then an uninitialized and an initialized SIZE constr-
    uct are created. Their values are also printed."
-   
-   (let* ((mat (mat-value 5 5 +8u+ (scalar 100 100 100)))
-	  (mat-size (size mat))
-          (size-un-init (size))
-          (size (size 640d0 480d0)))
-     ;;The '?' is a macro for CFFI:MEM-AREF
-     (format t "MAT (COLS,ROWS) = (~a ~a)~%" 
-	     (? mat-size :int)
-	     (? mat-size :int 1))
-	     (format t "Pointer to an uninitialized SIZE construct:~a
+  
+  (let* ((mat (mat-value 5 5 +8u+ (scalar 100 100 100)))
+	 (mat-size (size mat))
+	 (size-un-init (size))
+	 (size (size 640d0 480d0)))
+    ;;The '?' is a macro for CFFI:MEM-AREF
+    (format t "~MAT (COLS,ROWS) = (~a ~a)~%~%" 
+	    (width mat-size)
+	    (height mat-size))
+    (format t "Return of an uninitialized SIZE construct: ~a
                ~%" size-un-init) 
-	       (format t "Width of SIZE = ~a~%" (width size))
-	       (format t "Height of SIZE = ~a" (height size))))
+    (format t "Width of SIZE = ~a~%" (width size))
+    (format t "Height of SIZE = ~a~%~%" (height size))))
 
 
 
@@ -1270,7 +1608,7 @@ Used to compute address of a matrix element
 
 C++: MStep step
 
-LISP-CV: (STEP (SELF (:POINTER MAT))) => :UNSIGNED-INT
+LISP-CV: (STEP (SELF MAT)) => :UNSIGNED-INT
 
     Parameters:	
 
@@ -1324,7 +1662,7 @@ Calculates an absolute value of each matrix element.
 
 C++: MatExpr abs(const Mat& m)
 
-LISP-CV: (*ABS (M (:POINTER MAT))) => (:POINTER MAT-EXPR)
+LISP-CV: (*ABS (M MAT)) => MAT-EXPR
 
     Parameters:	
 
@@ -1404,7 +1742,7 @@ Calculates the exponent of every array element.
 
 C++: void exp(InputArray src, OutputArray dst)
 
-LISP-CV: (*EXP (SRC (:POINTER MAT)) (DEST (:POINTER MAT))) => :VOID
+LISP-CV: (*EXP (SRC MAT) (DEST MAT)) => :VOID
 
 
     Parameters:	
@@ -1451,7 +1789,7 @@ See also:
       (move-window window-name-2 894 98)
       (move-window window-name-3 485 444)
       (move-window window-name-4 894 444)
-    (format t "~%MAT: ~%~%")
+    (format t "~MAT: ~%~%")
     ;Print MAT
     (dotimes (i (rows mat))
       (dotimes (j (cols mat))
@@ -1514,7 +1852,7 @@ Calculates the natural logarithm of every array element.
 
 C++: void log(InputArray src, OutputArray dst)
 
-LISP-CV: (*LOG (SRC (:POINTER MAT)) (DEST (:POINTER MAT))) => :VOID
+LISP-CV: (*LOG (SRC MAT) (DEST MAT)) => :VOID
 
 
     Parameters:	
@@ -1557,7 +1895,7 @@ See also:
     (named-window window-name-2 +window-normal+)
     (move-window window-name-1 533 175)
     (move-window window-name-2 984 175)
-    (format t "~%MAT = ~%~%")
+    (format t "~MAT = ~%~%")
     ;Print MAT
     (dotimes (i (rows mat))
       (dotimes (j (cols mat))
@@ -1599,7 +1937,7 @@ Calculates per-element maximum of two arrays.
 
 C++: void max(InputArray src1, InputArray src2, OutputArray dst)
 
-LISP-CV: (*MAX (SRC1 (:POINTER MAT)) (SRC2 (:POINTER MAT)) (DEST (:POINTER MAT))) => :VOID
+LISP-CV: (*MAX (SRC1 MAT) (SRC2 MAT) (DEST MAT)) => :VOID
 
 
     Parameters:	
@@ -1725,7 +2063,7 @@ Calculates per-element minimum of two arrays.
 
 C++: void min(InputArray src1, InputArray src2, OutputArray dst)
 
-LISP-CV: (*MIN (SRC1 (:POINTER MAT)) (SRC2 (:POINTER MAT)) (DEST (:POINTER MAT))) => :VOID
+LISP-CV: (*MIN (SRC1 MAT) (SRC2 MAT) (DEST MAT)) => :VOID
 
 
     Parameters:	
@@ -1852,7 +2190,7 @@ Calculates the per-element absolute difference between two arrays or between an 
 
 C++: void absdiff(InputArray src1, InputArray src2, OutputArray dst)
 
-LISP-CV: (ABSDIFF (SRC1 (:POINTER MAT)) (SRC2 (:POINTER MAT)) (DEST (:POINTER MAT)))
+LISP-CV: (ABSDIFF (SRC1 MAT) (SRC2 MAT) (DEST MAT))
 
     Parameters:	
 
@@ -1922,7 +2260,7 @@ Calculates the per-element bit-wise conjunction of two arrays.
 
 C++: void bitwise_and(InputArray src1, InputArray src2, OutputArray dst, InputArray mask=noArray())
 
-LISP-CV: (BITWISE-AND (SRC1 (:POINTER MAT)) (SRC2 (:POINTER MAT)) (DEST (:POINTER MAT)) &OPTIONAL ((MASK (:POINTER MAT)) (MAT))) => :VOID
+LISP-CV: (BITWISE-AND (SRC1 MAT) (SRC2 MAT) (DEST MAT) &OPTIONAL ((MASK MAT) (MAT))) => :VOID
 
 
     Parameters:	
@@ -1982,7 +2320,7 @@ Inverts every bit of an array.
 
 C++: void bitwise_not(InputArray src, OutputArray dst, InputArray mask=noArray())
 
-LISP-CV: (BITWISE-NOT (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) &OPTIONAL ((MASK (:POINTER MAT)) (MAT))) => :VOID
+LISP-CV: (BITWISE-NOT (SRC MAT) (DEST MAT) &OPTIONAL ((MASK MAT) (MAT))) => :VOID
 
 
     Parameters:	
@@ -2045,7 +2383,7 @@ Calculates the per-element bit-wise disjunction of two arrays.
 
 C++: void bitwise_or(InputArray src1, InputArray src2, OutputArray dst, InputArray mask=noArray())
 
-LISP-CV: (BITWISE-OR (SRC1 (:POINTER MAT)) (SRC2 (:POINTER MAT)) (DEST (:POINTER MAT)) &OPTIONAL ((MASK (:POINTER MAT)) (MAT))) => :VOID
+LISP-CV: (BITWISE-OR (SRC1 MAT) (SRC2 MAT) (DEST MAT) &OPTIONAL ((MASK MAT) (MAT))) => :VOID
 
 
     Parameters:	
@@ -2105,7 +2443,7 @@ Calculates the per-element bit-wise “exclusive or” operation on two arrays.
 
 C++: void bitwise_xor(InputArray src1, InputArray src2, OutputArray dst, InputArray mask=noArray())
 
-LISP-CV: (BITWISE-XOR (SRC1 (:POINTER MAT)) (SRC2 (:POINTER MAT)) (DEST (:POINTER MAT)) &OPTIONAL (MASK (:POINTER MAT))) => :VOID
+LISP-CV: (BITWISE-XOR (SRC1 MAT) (SRC2 MAT) (DEST MAT) &OPTIONAL (MASK MAT)) => :VOID
 
     Parameters:	
 
@@ -2164,7 +2502,7 @@ Scales, calculates absolute values, and converts the result to 8-bit.
 
 C++: void convertScaleAbs(InputArray src, OutputArray dst, double alpha=1, double beta=0)
 
-LISP-CV: (CONVERT-SCALE-ABS  (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) &OPTIONAL ((ALPHA :INT) 1.0D0) ((BETA :INT) 0.0D0)) => :VOID
+LISP-CV: (CONVERT-SCALE-ABS  (SRC MAT) (DEST MAT) &OPTIONAL ((ALPHA :INT) 1.0D0) ((BETA :INT) 0.0D0)) => :VOID
 
     Parameters:	
 
@@ -2207,7 +2545,7 @@ the function processes each channel independently.
       ;;Run CONVERT-SCALE-ABS
       (convert-scale-abs mat mat 2d0 5d0)
       ;;Print converted MAT type which is 8-bit
-      (format t "~%~%MAT type after conversion = ~a(or +8u+)~%~%" (mat-type mat))
+      (format t "~%~MAT type after conversion = ~a(or +8u+)~%~%" (mat-type mat))
       ;;Print converted MAT
       (format t "~%~%Printing MAT after the conversion~%~%")
       (dotimes (i (rows mat))
@@ -2233,7 +2571,7 @@ Returns the determinant of a square floating-point matrix.
 
 C++: double determinant(InputArray mtx)
 
-LISP-CV: (DET (MTX (:POINTER MAT))) => :DOUBLE
+LISP-CV: (DET (MTX MAT)) => :DOUBLE
 
     Parameters:	
 
@@ -2313,7 +2651,7 @@ Flips a 2D array around vertical, horizontal, or both axes.
 
 C++: void flip(InputArray src, OutputArray dst, int flipCode)
 
-LISP-CV: (FLIP (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) (FLIP-CODE :INT)) => :VOID
+LISP-CV: (FLIP (SRC MAT) (DEST MAT) (FLIP-CODE :INT)) => :VOID
 
     Parameters:	
 
@@ -2418,7 +2756,7 @@ Finds the inverse or pseudo-inverse of a matrix.
 
 C++: double invert(InputArray src, OutputArray dst, int flags=DECOMP_LU)
 
-LISP-CV: (INVERT (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) &OPTIONAL ((FLAGS :INT) +DECOMP-LU+))) => :DOUBLE
+LISP-CV: (INVERT (SRC MAT) (DEST MAT) &OPTIONAL ((FLAGS :INT) +DECOMP-LU+))) => :DOUBLE
 
     Parameters:	
 
@@ -2565,7 +2903,7 @@ Calculates an average (mean) of array elements.
 
 C++: Scalar mean(InputArray src, InputArray mask=noArray())
 
-LISP-CV: (MEAN (SRC (:POINTER MAT)) &OPTIONAL ((MASK (:POINTER (MAT)) (MAT)))) => (:POINTER SCALAR)
+LISP-CV: (MEAN (SRC MAT) &OPTIONAL ((MASK (:POINTER (MAT)) (MAT)))) => SCALAR
 
 
     Parameters:	
@@ -2697,7 +3035,7 @@ Calculates the per-element scaled product of two arrays.
 
 C++: void multiply(InputArray src1, InputArray src2, OutputArray dst, double scale=1, int dtype=-1 )
 
-LISP-CV: (MULTIPLY (SRC1 (:POINTER MAT)) (SRC2 (:POINTER MAT)) (DEST (:POINTER MAT)) &OPTIONAL ((SCALE :DOUBLE) 1) 
+LISP-CV: (MULTIPLY (SRC1 MAT) (SRC2 MAT) (DEST MAT) &OPTIONAL ((SCALE :DOUBLE) 1) 
          ((DTYPE :INT) -1)) => :VOID
 
 
@@ -2790,8 +3128,8 @@ Normalizes the norm or value range of an array.
 C++: void normalize(InputArray src, OutputArray dst, double alpha=1, double beta=0, int norm_type=NORM_L2, int dtype=-1, 
      InputArray mask=noArray())
 
-LISP-CV: (NORMALIZE (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) &OPTIONAL ((ALPHA :DOUBLE) 1) ((BETA :DOUBLE) 0) 
-         ((NORM-TYPE :INT) +NORM-L2+) ((DTYPE :INT) -1) ((MASK (:POINTER MAT)) (MAT))) => :VOID 
+LISP-CV: (NORMALIZE (SRC MAT) (DEST MAT) &OPTIONAL ((ALPHA :DOUBLE) 1) ((BETA :DOUBLE) 0) 
+         ((NORM-TYPE :INT) +NORM-L2+) ((DTYPE :INT) -1) ((MASK MAT) (MAT))) => :VOID 
 
     Parameters:	
 
@@ -2835,7 +3173,7 @@ Raises every array element to a power.
 
 C++: void pow(InputArray src, double power, OutputArray dst)
 
-LISP-CV: (POW (SRC (:POINTER MAT)) (POWER :DOUBLE) (DEST (:POINTER MAT))) => :VOID
+LISP-CV: (POW (SRC MAT) (POWER :DOUBLE) (DEST MAT)) => :VOID
 
 
     Parameters:	
@@ -2867,7 +3205,7 @@ Generates a single uniformly-distributed random number or an array of random num
 
 C++: void randu(InputOutputArray dst, InputArray low, InputArray high)
 
-LISP-CV: (RANDU (DEST (:POINTER MAT)) (LOW (:POINTER SCALAR)) (HIGH (:POINTER SCALAR))) => :VOID
+LISP-CV: (RANDU (DEST MAT) (LOW SCALAR) (HIGH SCALAR)) => :VOID
 
 
     Parameters:	
@@ -2959,7 +3297,7 @@ Calculates the sum of a scaled array and another array.
 
 C++: void scaleAdd(InputArray src1, double alpha, InputArray src2, OutputArray dst)
 
-LISP-CV: (SCALE-ADD (SRC1 (:POINTER MAT)) (ALPHA :DOUBLE) (SRC2 (:POINTER MAT)) (DEST (:POINTER MAT))) => :VOID
+LISP-CV: (SCALE-ADD (SRC1 MAT) (ALPHA :DOUBLE) (SRC2 MAT) (DEST MAT)) => :VOID
 
 
     Parameters:	
@@ -3033,7 +3371,7 @@ Calculates the per-element difference between two arrays or array and a scalar.
 
 C++: void subtract(InputArray src1, InputArray src2, OutputArray dst, InputArray mask=noArray(), int dtype=-1)
 
-LISP-CV: (SUBTRACT (SRC1 (:POINTER MAT)) (SRC2 (:POINTER MAT)) (DEST (:POINTER MAT)) ((MASK (:POINTER MAT)) (MAT)) 
+LISP-CV: (SUBTRACT (SRC1 MAT) (SRC2 MAT) (DEST MAT) ((MASK MAT) (MAT)) 
          ((DTYPE :INT) -1) => :VOID
 
 
@@ -3092,7 +3430,7 @@ Calculates the sum of array elements.
 
 C++: Scalar sum(InputArray src)
 
-LISP-CV: (SUM (SRC (:POINTER MAT))) => (:POINTER SCALAR)
+LISP-CV: (SUM (SRC MAT)) => SCALAR
 
 
     Parameters:	SUM - Input array that must have from 1 to 4 channels.
@@ -3195,8 +3533,8 @@ Calculates the width and height of a text string.
 
 C++: Size getTextSize(const string& text, int fontFace, double fontScale, int thickness, int* baseLine)
 
-LISP-CV:  (GET-TEXT-SIZE (TEXT (:POINTER STRING*)) (FONT-FACE :INT) (FONT-SCALE :DOUBLE) (THICKNESS :INT) (BASE-LINE :POINTER)) 
-           => (:POINTER SIZE)
+LISP-CV:  (GET-TEXT-SIZE (TEXT *STRING) (FONT-FACE :INT) (FONT-SCALE :DOUBLE) (THICKNESS :INT) (BASE-LINE :POINTER)) 
+           => SIZE
 
 
     Parameters:	
@@ -3271,7 +3609,7 @@ BGR
 A macro for SCALAR organized as BGR(BLUE, GREEN, RED) color values.
 
 
-LISP-CV: (BGR B G R) => (:POINTER SCALAR)
+LISP-CV: (BGR B G R) => SCALAR
 
 
     Parameters:	
@@ -3303,8 +3641,8 @@ Draws a simple or thick elliptic arc or fills an ellipse sector.
 C++: void ellipse(Mat& img, Point center, Size axes, double angle, double startAngle, double endAngle, const Scalar& color, 
      int thickness=1, int lineType=8, int shift=0)
 
-LISP-CV: (ELLIPSE (IMG (:POINTER MAT)) (CENTER (:POINTER POINT)) (AXES (:POINTER SIZE)) (ANGLE :DOUBLE) (START-ANGLE :DOUBLE)
-             (END-ANGEL :DOUBLE) (COLOR (:POINTER SCALAR)) &OPTIONAL ((THICKNESS :INT) 1) ((LINE-TYPE :INT) 8) ((SHIFT :INT) 0)) => :VOID
+LISP-CV: (ELLIPSE (IMG MAT) (CENTER POINT) (AXES SIZE) (ANGLE :DOUBLE) (START-ANGLE :DOUBLE)
+             (END-ANGEL :DOUBLE) (COLOR SCALAR) &OPTIONAL ((THICKNESS :INT) 1) ((LINE-TYPE :INT) 8) ((SHIFT :INT) 0)) => :VOID
 
 C++: void ellipse(Mat& img, const RotatedRect& box, const Scalar& color, int thickness=1, int lineType=8)
 
@@ -3407,7 +3745,7 @@ Draws a line segment connecting two points.
 
 C++: void line(Mat& img, Point pt1, Point pt2, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
 
-LISP-CV: (LINE (IMG (:POINTER MAT)) (PT1 (:POINTER POINT)) (PT2 (:POINTER POINT)) (COLOR (:POINTER SCALAR)) &OPTIONAL 
+LISP-CV: (LINE (IMG MAT) (PT1 POINT) (PT2 POINT) (COLOR SCALAR) &OPTIONAL 
 ((THICKNESS :INT) 1) ((LINE-TYPE :INT) 8) ((SHIFT :INT) 0)) => :VOID
 
     Parameters:	
@@ -3488,8 +3826,8 @@ Draws a text string.
 C++: void putText(Mat& img, const string& text, Point org, int fontFace, double fontScale, Scalar color, int thickness=1, 
      int lineType=8, bool bottomLeftOrigin=false )
 
-LISP-CV: (PUT-TEXT (IMG (:POINTER MAT)) (TEXT (:POINTER STRING*)) (ORG (:POINTER POINT)) (FONT-FACE :INT) (FONT-SCALE :DOUBLE)  
-             (COLOR (:POINTER SCALAR)) (THICKNESS :INT) (LINE-TYPE :INT) (BOTTOM-LEFT-ORIGN :BOOLEAN)) => :VOID
+LISP-CV: (PUT-TEXT (IMG MAT) (TEXT *STRING) (ORG POINT) (FONT-FACE :INT) (FONT-SCALE :DOUBLE)  
+             (COLOR SCALAR) (THICKNESS :INT) (LINE-TYPE :INT) (BOTTOM-LEFT-ORIGN :BOOLEAN)) => :VOID
  
     Parameters:	
 
@@ -3596,7 +3934,7 @@ Draws a simple, thick, or filled up-right rectangle.
 
 C++: void rectangle(Mat& img, Point pt1, Point pt2, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
 
-LISP-CV: (RECTANGLE (IMG (:POINTER MAT)) (PT1 (:POINTER POINT)) (PT2 (:POINTER POINT)) (COLOR (:POINTER SCALAR)) &OPTIONAL 
+LISP-CV: (RECTANGLE (IMG MAT) (PT1 POINT) (PT2 POINT) (COLOR SCALAR) &OPTIONAL 
              ((THICKNESS :INT) 1) ((LINE-TYPE :INT) 8) ((SHIFT :INT) 0)) => :VOID
 
 
@@ -3680,7 +4018,7 @@ RGB
 
 A macro for SCALAR organized as RGB(RED, GREEN, BLUE) color values.
 
-LISP-CV: (RGB R G B) => (:POINTER SCALAR)
+LISP-CV: (RGB R G B) => SCALAR
 
     Parameters:	
 
@@ -3913,7 +4251,7 @@ Calculates a square root of array elements.
 
 C++: void sqrt(InputArray src, OutputArray dst)
 
-LISP-CV: (SQRT (SRC (:POINTER MAT)) (DEST (:POINTER MAT))) => :VOID
+LISP-CV: (SQRT (SRC MAT) (DEST MAT)) => :VOID
 
     Parameters:	
 
@@ -3970,8 +4308,8 @@ Forms a border around an image.
 C++: void copyMakeBorder(InputArray src, OutputArray dst, int top, int bottom, int left, int right, int borderType, 
      const Scalar& value=Scalar() )ning: deleting ‘void*’ is undefined [enabled by default]
 
-LISP-CV: (COPY-MAKE-BORDER (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) (TOP :INT) (BOTTOM :INT) (LEFT :INT) (RIGHT :INT) 
-         (BORDER-TYPE :INT) (VALUE (:POINTER SCALAR))) => :VOID
+LISP-CV: (COPY-MAKE-BORDER (SRC MAT) (DEST MAT) (TOP :INT) (BOTTOM :INT) (LEFT :INT) (RIGHT :INT) 
+         (BORDER-TYPE :INT) (VALUE SCALAR)) => :VOID
 
     Parameters:	
 
@@ -4058,9 +4396,9 @@ Dilates an image by using a specific structuring element.
 
 C++: void dilate(InputArray src, OutputArray dst, InputArray kernel, Point anchor=Point(-1,-1), int iterations=1, int borderType=BORDER_CONSTANT, const Scalar& borderValue=morphologyDefaultBorderValue() )
 
-LISP-CV: (DILATEE (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) (KERNEL (:POINTER MAT)) ((ANCHOR (:POINTER POINT)) (POINT -1 -1)) 
+LISP-CV: (DILATEE (SRC MAT) (DEST MAT) (KERNEL MAT) ((ANCHOR POINT) (POINT -1 -1)) 
          ((ITERATIONS :INT) 1) ((BORDER-TYPE :INT) +BORDER-CONSTANT+) 
-         ((BORDER-VALUE (:POINTER SCALAR)) (MORPHOLOGY-DEFAULT-BORDER-VALUE+))) => :VOID
+         ((BORDER-VALUE SCALAR) (MORPHOLOGY-DEFAULT-BORDER-VALUE+))) => :VOID
 
     Parameters:	
 
@@ -4108,7 +4446,7 @@ Example:
 
 (defparameter window-name "DILATION-DEST - DILATE Example")
 ;; Load an image
-(defparameter src (imread <path-to-image>"" 1))
+(defparameter src (imread "/d1" 1))
 (defparameter dilation-dest (mat))
 (defparameter dilation-elem (alloc :int 0))
 (defparameter dilation-size (alloc :int 0))
@@ -4140,7 +4478,7 @@ Example:
   (if (empty src) 
       (return-from dilate-example
 	(format t "Image not loaded")))
-					; Create window
+      ;; Create window
   (with-named-window (window-name 1)
     (move-window window-name (cols src) 0)
     (imshow window-name src)
@@ -4156,6 +4494,10 @@ Example:
 			 (callback dilation))
        (let ((c (wait-key 33)))
 	 (when (= c 27)
+ 	   (del-mat src)
+	   (del-mat dilation-dest)
+	   (free dilation-elem)
+	   (free dilation-size)
 	   (return))))))
 
 
@@ -4167,9 +4509,9 @@ Erodes an image by using a specific structuring element.
 C++: void erode(InputArray src, OutputArray dst, InputArray kernel, Point anchor=Point(-1,-1), int iterations=1, 
      int borderType=BORDER_CONSTANT, const Scalar& borderValue=morphologyDefaultBorderValue() )
 
-LISP-CV: (ERODE (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) (KERNEL (:POINTER MAT)) ((ANCHOR (:POINTER POINT)) (POINT -1 -1)) 
+LISP-CV: (ERODE (SRC MAT) (DEST MAT) (KERNEL MAT) ((ANCHOR POINT) (POINT -1 -1)) 
          ((ITERATIONS :INT) 1) ((BORDER-TYPE :INT) +BORDER-CONSTANT+) 
-         ((BORDER-VALUE (:POINTER SCALAR)) (MORPHOLOGY-DEFAULT-BORDER-VALUE+))) => :VOID
+         ((BORDER-VALUE SCALAR) (MORPHOLOGY-DEFAULT-BORDER-VALUE+))) => :VOID
 
     Parameters:	
 
@@ -4216,7 +4558,7 @@ Example:
 ;; Global variables
 (defparameter window-name "EROSION-DEST - ERODE Example")
 ;; Load an image
-(defparameter src (imread "<path-to-image>" 1))
+(defparameter src (imread "/home/w/100_0229.JPG" 1))
 (defparameter erosion-dest (mat))
 (defparameter erosion-elem (alloc :int 0))
 (defparameter erosion-size (alloc :int 0))
@@ -4264,6 +4606,10 @@ Example:
 			 (callback erosion))
        (let ((c (wait-key 33)))
 	 (when (= c 27)
+	   (del-mat src)
+	   (del-mat erosion-dest)
+	   (free erosion-elem)
+	   (free erosion-size)
 	   (return))))))
 
 
@@ -4274,7 +4620,7 @@ Blurs an image and downsamples it.
 
 C++: void pyrDown(InputArray src, OutputArray dst, const Size& dstsize=Size(), int borderType=BORDER_DEFAULT )
 
-LISP-CV: (PYR-DOWN (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) &OPTIONAL ((DSTSIZE (:POINTER SIZE)) (SIZE)) 
+LISP-CV: (PYR-DOWN (SRC MAT) (DEST MAT) &OPTIONAL ((DSTSIZE SIZE) (SIZE)) 
          ((BORDER-TYPE :INT) +BORDER-DEFAULT+)) => :VOID
 
     Parameters:	
@@ -4346,7 +4692,7 @@ Upsamples an image and then blurs it.
 
 C++: void pyrUp(InputArray src, OutputArray dst, const Size& dstsize=Size(), int borderType=BORDER_DEFAULT )
 
-LISP-CV: (PYR-UP (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) &OPTIONAL ((DSTSIZE (:POINTER SIZE)) (SIZE)) 
+LISP-CV: (PYR-UP (SRC MAT) (DEST MAT) &OPTIONAL ((DSTSIZE SIZE) (SIZE)) 
          ((BORDER-TYPE :INT) +BORDER-DEFAULT+)) => :VOID
 
     Parameters:	
@@ -4417,7 +4763,7 @@ Calculates the first, second, third, or mixed image derivatives using an extende
 C++: void Sobel(InputArray src, OutputArray dst, int ddepth, int dx, int dy, int ksize=3, double scale=1, 
      double delta=0, int borderType=BORDER_DEFAULT)
 
-LISP-CV: (SOBEL (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) (DDEPTH :INT) (DX :INT) (DY :INT) &OPTIONAL ((KSIZE :INT) 3) 
+LISP-CV: (SOBEL (SRC MAT) (DEST MAT) (DDEPTH :INT) (DX :INT) (DY :INT) &OPTIONAL ((KSIZE :INT) 3) 
          ((SCALE :DOUBLE) 1D0) ((DELTA :DOUBLE) 0D0) ((BORDER-TYPE :INT) +BORDER-DEFAULT+))  => :VOID
 
 
@@ -4543,7 +4889,7 @@ Resizes an image.
 
 C++: void resize(InputArray src, OutputArray dst, Size dsize, double fx=0, double fy=0, int interpolation=INTER_LINEAR )
 
-LISP-CV: (RESIZE (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) (DSIZE (:POINTER SIZE)) &OPTIONAL ((FX :DOUBLE) 0D0) ((FY :DOUBLE) 0D0) 
+LISP-CV: (RESIZE (SRC MAT) (DEST MAT) (DSIZE SIZE) &OPTIONAL ((FX :DOUBLE) 0D0) ((FY :DOUBLE) 0D0) 
          ((INTERPOLATION :INT) +INTER-LINEAR+)) => :VOID
 
 
@@ -4651,7 +4997,7 @@ Applies a fixed-level threshold to each array element.
 
 C++: double threshold(InputArray src, OutputArray dst, double thresh, double maxval, int type)
 
-LISP-CV: (THRESHOLD (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) (THRESH :DOUBLE) (MAX-VAL :DOUBLE) (TYPE :INT)) => :DOUBLE
+LISP-CV: (THRESHOLD (SRC MAT) (DEST MAT) (THRESH :DOUBLE) (MAX-VAL :DOUBLE) (TYPE :INT)) => :DOUBLE
 
 
     Parameters:	
@@ -4757,7 +5103,7 @@ Equalizes the histogram of a grayscale image.
 
 C++: void equalizeHist(InputArray src, OutputArray dst)
 
-LISP-CV: (EQUALIZE-HIST (SRC (:POINTER MAT)) (DEST (:POINTER MAT))) => :VOID
+LISP-CV: (EQUALIZE-HIST (SRC MAT) (DEST MAT)) => :VOID
 
 
     Parameters:	
@@ -4827,7 +5173,7 @@ Finds edges in an image using the [Canny86] algorithm.
 
 C++: void Canny(InputArray image, OutputArray edges, double threshold1, double threshold2, int apertureSize=3, bool L2gradient=false)
 
-LISP-CV: (CANNY (IMAGE (:POINTER MAT)) (EDGES (:POINTER MAT)) (THRESHOLD1 :DOUBLE) (THRESHOLD2 :DOUBLE) ((APERTURE-SIZE :INT) 3) 
+LISP-CV: (CANNY (IMAGE MAT) (EDGES MAT) (THRESHOLD1 :DOUBLE) (THRESHOLD2 :DOUBLE) ((APERTURE-SIZE :INT) 3) 
          ((L2-GRADIENT :BOOLEAN) NIL)) => :VOID
 
     Parameters:	
@@ -4945,7 +5291,7 @@ Compares a template against overlapped image regions.
 
 C++: void matchTemplate(InputArray image, InputArray templ, OutputArray result, int method)
 
-LISP-CV: (MATCH-TEMPLATE (IMAGE (:POINTER MAT)) (TEMPL (:POINTER MAT)) (RESULT (:POINTER MAT)) 
+LISP-CV: (MATCH-TEMPLATE (IMAGE MAT) (TEMPL MAT) (RESULT MAT) 
          (METHOD :INT))) => :VOID
 
 
@@ -5259,7 +5605,7 @@ Grabs, decodes and returns the next video frame.
 
 C++: bool VideoCapture::read(Mat& image)
 
-LISP-CV: (CAP-READ (SELF (:POINTER VIDEO-CAPTURE)) (IMAGE (:POINTER MAT)))
+LISP-CV: (CAP-READ (SELF (:POINTER VIDEO-CAPTURE)) (IMAGE MAT))
 
 
     Parameters:	
@@ -5275,32 +5621,8 @@ frames has been grabbed (camera has been disconnected, or there are no more fram
 methods return false and the functions return NULL pointer.
 
 
-(defun cap-read-example (&optional 
-  "In the code below the (COLS, ROWS) values of MAT are 
-   accessed and stored in a SIZE construct. Their values 
-   are accessed with the WIDTH and HEIGHT functions. The-
-   n an uninitialized and an initialized SIZE construct  
-   are created. Their values are also printed."
-
-  (let* ((mat (mat-value 5 5 +64f+ (scalar 100 100 100)))
-         (mat-size (mat-size mat))
-          (size-un-init)
-          (size (size 640 480)))
-    (format t " The (COLS ROWS) of MAT = (~a ~a)~%"  
-	    (width mat-size)
-	    (height mat-size)
-            (format t "Pointer to an uninitialized SIZE construct:~a~%" 
-size-un-init) 
-(format t "Width of SIZE = ~a~%" (width size))
-    (format t "Height of SIZE = ~a" (height size)))))
-
-
-                           (camera-index 
-                            *camera-index*))
-
-  "Grabs, decodes and returns the next video frame 
-   with the function CAP-READ and then shows it in 
-   a window with the function IMSHOW."
+(defun cap-read-example (&optional (camera-index 
+				    *camera-index*))
 
   (with-capture (cap (video-capture camera-index))
     (let ((window-name "CAP-READ Example"))
@@ -5314,7 +5636,8 @@ size-un-init)
 	    (format t "Key is pressed by user"))
 	(setf frame (mat))
 	(cap-read cap frame)
-	(imshow window-name frame))
+	(imshow window-name frame)
+        (del-mat frame))
       (destroy-window window-name))))
 
 
@@ -5469,7 +5792,7 @@ Loads an image from a file.
 
 C++: Mat imread(const string& filename, int flags=1)
 
-LISP-CV: (IMREAD (FILENAME (:POINTER STRING*)) &OPTIONAL ((FLAGS :INT) +LOAD-IMAGE-COLOR+)) => (:POINTER MAT)
+LISP-CV: (IMREAD (FILENAME *STRING) &OPTIONAL ((FLAGS :INT) +LOAD-IMAGE-COLOR+)) => MAT
 
 
     Parameters:	
@@ -5590,7 +5913,7 @@ Saves an image to a specified file.
 
 C++: bool imwrite(const string& filename, InputArray img, const vector<int>& params=vector<int>() )
 
-LISP-CV: (IMWRITE (FILENAME :STRING) (IMG (:POINTER MAT)) ((PARAMS (:POINTER VECTOR-INT)) (VECTOR-INT))) => :BOOLEAN
+LISP-CV: (IMWRITE (FILENAME :STRING) (IMG MAT) ((PARAMS (:POINTER VECTOR-INT)) (VECTOR-INT))) => :BOOLEAN
 
     Parameters:	
 
@@ -5730,7 +6053,7 @@ Displays an image in the specified window.
 
 C++: void imshow(const string& winname, InputArray mat)
 
-LISP-CV: (IMSHOW (WINNAME (:POINTER STRING*)) (MAT (:POINTER MAT))) => :void
+LISP-CV: (IMSHOW (WINNAME *STRING) (MAT MAT)) => :void
 
     Parameters:	
 
@@ -5780,7 +6103,7 @@ Destroys a window.
 
 C++: void destroyWindow(const string& winname)
 
-LISP-CV: (DESTROY-WINDOW (WINNAME (:POINTER STRING*))) => :VOID
+LISP-CV: (DESTROY-WINDOW (WINNAME *STRING)) => :VOID
 
     Parameters:	WINNAME - Name of the window to be destroyed.
 
@@ -5862,7 +6185,7 @@ Moves window to the specified position
 
 C++: void moveWindow(const string& winname, int x, int y)
 
-LISP-CV: (MOVE-WINDOW (WINNAME (:POINTER STRING*)) (X :INT) (Y :INT)) => VOID
+LISP-CV: (MOVE-WINDOW (WINNAME *STRING) (X :INT) (Y :INT)) => VOID
 
 
     Parameters:	
@@ -5896,7 +6219,7 @@ Creates a window.
 
 C++: void namedWindow(const string& winname, int flags=WINDOW_AUTOSIZE)
 
-LISP-CV: (NAMED-WINDOW (WINNAME (:POINTER STRING*)) &OPTIONAL ((FLAGS :INT) +WINDOW-AUTOSIZE+)) => :VOID
+LISP-CV: (NAMED-WINDOW (WINNAME *STRING) &OPTIONAL ((FLAGS :INT) +WINDOW-AUTOSIZE+)) => :VOID
 
 
     Parameters:	
@@ -6001,6 +6324,163 @@ f there are several HighGUI windows, any of them can be active.
     (destroy-window window-name)))
 
 
+FEATURES2D - COMMON INTERFACES OF DESCRIPTOR MATCHERS
+
+
+
+DESCRIP-MATCHER-MATCH
+
+Finds the best match for each descriptor from a query set.
+
+C++: void DescriptorMatcher::match(InputArray queryDescriptors, InputArray trainDescriptors, vector<DMatch>& matches, 
+     InputArray mask=noArray() ) const
+
+LISP-CV: (DESCRIP-MATCHER-MATCH (SELF (:POINTER DESCRIPTOR-MATCHER)) (QUERY-DESCRIPTORS MAT) (TRAIN-DESCRIPTORS MAT) 
+         (MATCHES (:POINTER VECTOR-DMATCH)) (MASK MAT)) => :VOID
+
+    Parameters:	
+
+        SELF - A DESCRIPTOR-MATCHER contruct e.g. BF-MATCHER
+
+        QUERY-DESCRIPTORS - Query set of descriptors.
+
+        TRAIN-DESCRIPTORS - Train set of descriptors. This set is not added to the train descriptors 
+                            collection stored in the class object.
+
+        MATCHES - Matches. If a query descriptor is masked out in mask , no match is added for this 
+                  descriptor. So, matches size may be smaller than the query descriptors count.
+
+        MASK - Mask specifying permissible matches between an input query and train matrices of descriptors.
+
+
+In this function the train descriptors are passed as an input argument. An optional mask can be passed 
+to specify which query and training descriptors can be matched. Namely, (QUERY-DESCRIPTORS I) can be 
+matched with (TRAIN-DESCRIPTORS J) only if (AT MASK I J :UCHAR) is non-zero.
+
+
+Example:
+
+(defun descrip-matcher-match-example (&optional 
+					(camera-index *camera-index*) 
+					(width *default-width*)
+					(height *default-height*))
+
+  "You can position the x,y position of the template image(OBJECT), 
+  in the left pane, as well as change its size by moving the track-
+  bar sliders. The function, DESCRIP-MATCHER-MATCH, finds the best 
+  match between a set of keypoints computed in OBJECT(in the left 
+  pane) and IMAGE(in the right pane). The matches are then drawn to 
+  the window with the function DRAW-MATCHES."
+
+  (with-capture (cap (video-capture camera-index))
+    (let* ((window-name "ALL-MATCHES - DESCRIP-MATCHER-MATCH Example")
+	   ;;set BRISK parameters
+	   (thresh 60)
+	   (octaves 4)
+	   (pattern-scale 2.0f0))     
+      (cap-set cap +cap-prop-frame-width+ width)
+      (cap-set cap +cap-prop-frame-height+ height) 
+      ;;create a fullscreen window
+      (with-named-window (window-name +window-normal+)
+	(set-window-property window-name +wnd-prop-fullscreen+ 
+			     +window-fullscreen+)
+	(if (equal 1.0d0 (get-window-property window-name +wnd-prop-fullscreen+)) 
+	    (set-window-property window-name +wnd-prop-aspectratio+ 
+				 +window-freeratio+))
+	(move-window window-name 624 100)
+	;;create a BRISK (keypoint detector/descriptor extractor)
+	(with-brisk (briskd (brisk thresh octaves pattern-scale))
+	  ;;initialize other variables
+	  (do* ((n 2)
+		;;initialize the template(OBJECT) 
+		;;location/dimension variables
+		(rect-x (alloc :int '(0)))
+		(rect-y (alloc :int '(0)))
+		(rect-width (alloc :int (list (round (/ width n)))))
+		(rect-height (alloc :int (list (round (/ height n))))))
+	       ((plusp (wait-key *millis-per-frame*)) nil)
+	    ;;declare keypoints and descriptors
+	    (with-keypoint (keypoints-a (vector-keypoint))
+	      (with-keypoint (keypoints-b (vector-keypoint))
+		(with-mat (descriptors-a (mat))
+		  (with-mat (descriptors-b (mat))
+		    ;;declare matcher
+		    (with-bf-matcher (matcher (bf-matcher))
+		      ;;declare variable to hold the 
+		      ;;matches from the IMG to OBJECT
+		      (with-vec-dmatch (matches (vector-dmatch))
+			(with-mat (all-matches (mat))
+			  (with-mat (frame (mat))
+			    ;;set FRAME to a frame of the camera feed
+			    (cap-read cap frame)
+			    ;;create trackbars to control 
+			    ;;OBJECT location/dimensions
+			    (create-trackbar "rect-x" window-name rect-x (/ width 2))
+			    (create-trackbar "rect-y" window-name rect-y (/ height 2))
+			    (create-trackbar "rect-width" window-name rect-width width)
+			    (create-trackbar "rect-height" window-name rect-height height)
+			    ;;instantiate logic for the location/dimensions 
+			    ;;of OBJECT based on the trackbar input
+			    (if (equal (mem-ref rect-x :int) 0) 
+				(setf (mem-ref rect-x :int) 1))
+			    (if (> (mem-ref rect-x :int) 
+				   (- width (mem-ref rect-width :int))) 
+				(setf (mem-ref rect-x :int) 
+				      (- width (mem-ref rect-width :int))))
+			    (if (equal (mem-ref rect-y :int) 0) 
+				(setf (mem-ref rect-y :int) 1))
+			    (if (> (mem-ref rect-y :int) 
+				   (- height (mem-ref rect-height :int))) 
+				(setf (mem-ref rect-y :int) 
+				      (- height (mem-ref rect-height :int))))
+			    (if (< (mem-ref rect-width :int) 15) 
+				(setf (mem-ref rect-width :int) 15))
+			    (if (< (mem-ref rect-height :int) 15) 
+				(setf (mem-ref rect-height :int) 15))
+			    ;;declare ROI
+			    (with-rect (roi (rect (mem-ref rect-x :int) (mem-ref rect-y :int)
+						  (mem-ref rect-width :int) (mem-ref rect-height :int)))
+			      ;;create empty matrices
+			      (with-mat (img (mat))
+				(with-mat  (object (mat))
+				  ;;make copies of FRAME, IMG and OBJECT 
+				  ;;to use as the image and the template
+				  (copy-to frame img)
+				  (copy-to frame object)
+				  ;;convert IMG and OBJECT to 
+				  ;;grayscale(a requirement)
+				  (cvt-color img img +bgr2gray+)
+				  (cvt-color object object +bgr2gray+)
+				  ;;normalize the brightness and increase 
+				  ;;the contrast of IMG and OBJECT so we 
+				  ;;get better results
+				  (equalize-hist img img)
+				  (equalize-hist object object)
+				  ;;set the region of interest of OBJECT to roi. this region 
+				  ;;of interest is what we use as the template image. 
+				  (with-mat (object (roi object roi))
+				    ;;create a feature detector
+				    (feat-detector-create briskd "simpleblob")
+				    ;;detect keypoints in OBJECT
+				    (feat-detector-detect briskd object keypoints-a)
+				    ;;compute the descriptors for a set 
+                                    ;;of keypoints detected in OBJECT
+				    (feat-2d-compute briskd object keypoints-a descriptors-a)
+				    ;;detect keypoints in IMG
+				    (feat-detector-detect briskd img keypoints-b)
+				    ;;compute the descriptors for a set 
+                                    ;;of keypoints detected in IMG
+				    (feat-2d-compute briskd img keypoints-b descriptors-b)
+				    ;;find the best match for each descriptor
+				    (descrip-matcher-match matcher descriptors-a descriptors-b matches)
+				    ;;draw the found matches
+				    (draw-matches object keypoints-a img keypoints-b matches all-matches 
+						  (scalar-all -1) (scalar-all -1) (vector-char) 
+						  +default+)
+				    ;;show the matches in a window 
+				    (imshow window-name all-matches)))))))))))))))))))
+
+
 
 
 OBJDETECT - CASCADE CLASSIFICATION:
@@ -6019,7 +6499,7 @@ C++: CascadeClassifier::CascadeClassifier(const string& filename)
 
 LISP-CV: (CASCADE-CLASSIFIER) => (:POINTER CASCADE-CLASSIFIER)
 
-LISP-CV: (CASCADE-CLASSIFIER (FILENAME (:POINTER STRING*))) => (:POINTER CASCADE-CLASSIFIER)
+LISP-CV: (CASCADE-CLASSIFIER (FILENAME *STRING)) => (:POINTER CASCADE-CLASSIFIER)
 
 
     Parameters:	
@@ -6058,7 +6538,7 @@ Loads a classifier from a file.
 
 C++: bool CascadeClassifier::load(const string& filename)
 
-LISP-CV: (CASCADE-CLASSIFIER-LOAD (SELF (:POINTER CASCADE-CLASSIFIER)) (FILENAME (:POINTER STRING*))) => :BOOLEAN
+LISP-CV: (CASCADE-CLASSIFIER-LOAD (SELF (:POINTER CASCADE-CLASSIFIER)) (FILENAME *STRING)) => :BOOLEAN
 
 
     Parameters:	
@@ -6096,7 +6576,7 @@ Applies a GNU Octave/MATLAB equivalent colormap on a given image.
 
 C++: void applyColorMap(InputArray src, OutputArray dst, int colormap)
 
-LISP-CV: (APPLY-COLOR-MAP (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) (COLORMAP :INT)) => :VOID
+LISP-CV: (APPLY-COLOR-MAP (SRC MAT) (DEST MAT) (COLORMAP :INT)) => :VOID
 
     Parameters:	
 
@@ -6206,6 +6686,7 @@ Note: See (SET-WINDOW-PROPERTY) to know the meaning of the returned values.
 The function GET-WINDOW-PROPERTY returns properties of a window.
 
 
+
 (defun get-window-property-example (filename)
 
   ;; Read in image
@@ -6226,6 +6707,7 @@ The function GET-WINDOW-PROPERTY returns properties of a window.
     ;; Show image
     (imshow window-name image)
     (loop while (not (= (wait-key 0) 27)))
+    (del-mat image)
     (destroy-window window-name)))
 
 
@@ -6238,7 +6720,7 @@ Changes parameters of a window dynamically.
 
 C++: void setWindowProperty(const string& winname, int prop_id, double prop_value)
 
-LISP-CV: (SET-WINDOW-PROPERTY (WINNAME (:POINTER STRING*)) (PROP-ID :INT) (PROP-VALUE :DOUBLE)) => :VOID
+LISP-CV: (SET-WINDOW-PROPERTY (WINNAME *STRING) (PROP-ID :INT) (PROP-VALUE :DOUBLE)) => :VOID
 
 
     Parameters:	
@@ -6294,26 +6776,8 @@ The function SET-WINDOW-PROPERTY enables changing properties of a window.
 			 +window-fullscreen+)
     ;; Show image
     (imshow window-name image)
-  "In the code below the (COLS, ROWS) values of MAT are 
-   accessed and stored in a SIZE construct. Their values 
-   are accessed with the WIDTH and HEIGHT functions. The-
-   n an uninitialized and an initialized SIZE construct  
-   are created. Their values are also printed."
-
-  (let* ((mat (mat-value 5 5 +64f+ (scalar 100 100 100)))
-         (mat-size (mat-size mat))
-          (size-un-init)
-          (size (size 640 480)))
-    (format t " The (COLS ROWS) of MAT = (~a ~a)~%"  
-	    (width mat-size)
-	    (height mat-size)
-            (format t "Pointer to an uninitialized SIZE construct:~a~%" 
-size-un-init) 
-(format t "Width of SIZE = ~a~%" (width size))
-    (format t "Height of SIZE = ~a" (height size)))))
-
-
     (loop while (not (= (wait-key 0) 27)))
+    (del-mat image)
     (destroy-window window-name)))
  
 
@@ -6483,9 +6947,9 @@ Returns pointer to a matrix size.
 
 C++: Size Mat::size() const
 
-LISP-CV: (MAT-SIZE (SELF (:POINTER MAT)))
+LISP-CV: (MAT-SIZE (SELF MAT)) => SIZE
 
-The function MAT-SIZE returns Size*, a matrix size pointer in which the columns are listed first an-
+The function MAT-SIZE returns SIZE, a matrix size pointer in which the columns are listed first an-
 d the rows second. When the matrix is more than 2-dimensional, the returned size is (-1 -1).
 
 
@@ -6510,7 +6974,7 @@ Returns number or rows in MAT.
 
 C++: int rows, cols
 
-LISP-CV: (ROWS (SELF (:POINTER MAT))) => :INT
+LISP-CV: (ROWS (SELF MAT)) => :INT
 
     Parameters:	
 
@@ -6535,7 +6999,7 @@ Returns number or cols in MAT.
 
 C++: int rows, cols
 
-LISP-CV:  (COLS (SELF (:POINTER MAT))) => :INT
+LISP-CV:  (COLS (SELF MAT)) => :INT
 
     Parameters:	
 
@@ -6555,370 +7019,21 @@ nsions.
 
 
 
-POINT
-
-POINT constructor.
-
-C++: Point_()
-
-LISP-CV: (POINT) => (:POINTER POINT)
-
-C++: Point_(_Tp _x, _Tp _y)
-
-LISP-CV:  (POINT (X :INT) (Y :INT)) => (:POINTER POINT)
-
-C++: _Tp x, y;
-
-LISP-CV: (POINT-X (SELF (:POINTER POINT))) => :INT
-
-C++: _Tp x, y;
-
-LISP-CV: (POINT-Y (SELF (:POINTER POINT))) => :INT
-
-
-    Parameters:	
-
-        SELF - A POINT construct.
-
-        X - X-coordinate of the point.
-
-        Y -	Y-coordinate of the point.
-
-
-POINT creates a 2D point with integer coordinates (usually zero-based). Functions POINT-X and  POINT-Y are used to extract the x,y coordinates of a point.
-
-
-
-(defun point-example (x y)
-
-  "In this example we create an unitialized 
-   POINT with the function POINT. Then crea-
-   tes a point with the function POINT. Fin-
-   ally, lists the x,y coordinates with the 
-   POINT functions POINT-X and POINT-Y."
-
-  (let* ((initialized-point (point))
-	 (point (point x y)))
-    (format t "Pointer to initialized point: ~a~%~%" 
-	    initialized-point)
-    (format t "POINT (x, y) = (~a, ~a)~%" 
-	    (point-x point)
-	    (point-y point))))
-
-
-POINT2D
-
-
-POINT2D constructor.
-
-
-C++: typedef Point_<double> Point2d
-
-LISP-CV: (POINT2D (X :INT) (Y :INT)) => (:POINTER POINT2D)
-
-C++: _Tp x, y
-
-LISP-CV: (POINT2D-X (SELF (:POINTER POINT2D))) => :DOUBLE
-
-C++: _Tp x, y
-
-LISP-CV: (POINT2D-Y (SELF (:POINTER POINT2D))) => :DOUBLE
-
-
-    Parameters:	
-
-        SELF - A POINT2D construct.
-
-        X - x-coordinate of the point.
-
-        Y -	y-coordinate of the point.
-
-
-POINT2D creates a 2D point with double-float coordinates (usually zero-based). Functions POINT2D-X 
-and  POINT2D-Y are used to extract the x,y coordinates of the point.
-
-
-(defun point2d-example (x y)
-
-  "In this example we create an uninitialized 
-   point2d with the function POINT2D. Then, w-
-   e create an initialized point2d and list t-
-   he x,y,z coordinates with the functions PO-
-   INT2D-X and POINT2D-Y."
-
-  (let* ((point2d-un-init (point2d))
-	 (point2d (point2d x y)))
-    (format t "Pointer to POINT2D: ~a~%~%" 
-	    point2d-un-init)
-    (format t "POINT2D (x, y) = (~a, ~a)~%" 
-	    (point2d-x point2d)
-	    (point2d-y point2d))))
-
-
-POINT2F
-
-POINT2F constructor.
-
-
-C++: typedef Point_<float> Point2f
-
-LISP-CV:  (POINT2F (X :INT) (Y :INT)) => (:POINTER POINT2F)
-
-C++: _Tp x, y
-
-LISP-CV: (POINT2F-X (SELF (:POINTER POINT2F))) => :INT
-
-C++: _Tp x, y
-
-LISP-CV: (POINT2F-Y (SELF (:POINTER POINT2F))) => :INT
-
-
-    Parameters:	
-
-        SELF - A POINT2F construct.
-
-        X - x-coordinate of the point.
-
-        Y -	y-coordinate of the point.
-
-
-POINT2F creates a 2D point with float coordinates (usually zero-based). Functions POINT2F-X and POI-
-NT2F-Y are used to extract the x,y coordinates the point.
-
-
-(defun point2f-example (x y)
-
-  "In this example we create an uninitialized 
-   point2f with the function POINT2F. Then, w-
-   e create an initialized point2f and list t-
-   he x,y coordinates with the functions POIN-
-   T2F-X and POINT2F-Y."
-
-  (let* ((point2f-un-init (point2f))
-	 (point2f (point2f x y)))
-    (format t "Pointer to POINT2F: ~a~%~%" 
-	    point2f-un-init)
-    (format t "POINT2F (x, y) = (~a, ~a)~%" 
-	    (point2f-x point2f)
-	    (point2f-y point2f))))
-
-
-
-POINT3I
-
-POINT3I constructor.
-
-
-C++: typedef Point3_<int> Point3i;
-
-LISP-CV:  (POINT3I (X :INT) (Y :INT) (Z :INT)) => (:POINTER POINT3I)
-
-C++: _Tp x, y, z
-
-LISP-CV: (POINT3I-X (SELF (:POINTER POINT3I))) => :INT
-
-C++: _Tp x, y, z
-
-LISP-CV: (POINT3I-Y (SELF (:POINTER POINT3I))) => :INT
-
-
-    Parameters:	
-
-        SELF - A POINT3I construct.
-
-        X - x-coordinate of the point.
-
-        Y -	y-coordinate of the point.
-        
-        Z - Z-coordinate of the point.
-
-
-POINT3I creates a 3D point with integer coordinates (usually zero-based). Functions POINT3I-X, POIN-
-T3I-Y and POINT3I-Z are used to extract the x,y,Z coordinates of the point.
-
-
-(defun point3i-example (x y z)
-
-  "In this example we create an uninitialized 
-   point3i with the function POINT3I. Then, w-
-   e create an initialized point3i and list t-
-   he x,y,z coordinates with the functions PO-
-   INT3I-X, POINT3I-Y and POINT3I-Z."
-
-  (let* ((point3i-un-init (point3i))
-        (point3i (point3i x y z)))
-    (format t "Pointer to POINT3I: ~a~%~%" 
-	    point3i-un-init)
-    (format t "POINT3I (x, y, z) = (~a, ~a, ~a)~%" 
-	    (point3i-x point3i)
-	    (point3i-y point3i)
-            (point3i-z point3i))))
-
-
-
-POINT3D
-
-POINT3D constructor.
-
-
-C++: typedef Point3_<double> Point3d
-
-LISP-CV:  (POINT3D (X :INT) (Y :INT) (Z :INT)) => (:POINTER POINT3D)
-
-C++: _Tp x, y, z
-
-LISP-CV: (POINT3D-X (SELF (:POINTER POINT3D))) => :DOUBLE
-
-C++: _Tp x, y, z
-
-LISP-CV: (POINT3D-Y (SELF (:POINTER POINT3D))) => :DOUBLE
-
-
-    Parameters:	
-
-        SELF - A POINT3D construct.
-
-        X - x-coordinate of the point.
-
-        Y -	y-coordinate of the point.
-        
-        Z - Z-coordinate of the point.
-
-
-POINT3D creates a 3D point with double-float coordinates (usually zero-based). Functions POINT3D-X, 
-POINT3D-Y AND POINT3D-Z are used to extract the x,y,Z coordinates the point.
-
-
-(defun point3d-example (x y z)
-
-  "In this example we create an uninitialized 
-   point3d with the function POINT3D. Then, w-
-   e create an initialized point3d and list t-
-   he x,y,z coordinates with the functions PO-
-   INT3D-X, POINT3D-Y and POINT3D-Z."
-
-  (let* ((point3d-un-init (point3d))
-        (point3d (point3d x y z)))
-    (format t "Pointer to POINT3D: ~a~%~%" 
-	    point3d-un-init)
-    (format t "POINT3D (x, y, z) = (~a, ~a, ~a)~%" 
-	    (point3d-x point3d)
-	    (point3d-y point3d)
-            (point3d-z point3d))))
-
-
-
-POINT3F
-
-POINT3F constructor.
-
-
-C++: typedef Point3_<float> Point3f
-
-LISP-CV:  (POINT3F (X :INT) (Y :INT) (Z :INT)) => (:POINTER POINT3F)
-
-C++: _Tp x, y, z
-
-LISP-CV: (POINT3F-X (SELF (:POINTER POINT3F))) => :FLOAT
-
-C++: _Tp x, y, z
-
-LISP-CV: (POINT3F-Y (SELF (:POINTER POINT))) => :FLOAT
-
-
-    Parameters:	
-
-        SELF - A POINT3F construct.
-
-        X - x-coordinate of the point.
-
-        Y -	y-coordinate of the point.
-        
-        Z - Z-coordinate of the point.
-
-
-POINT3F creates a 3D point with float coordinates (usually zero-based). Functions POINT3F-X, POINT3-
-F-Y AND POINT3F-Z are used to extract the x,y,Z coordinates the point.
-
-
-(defun point3f-example (x y z)
-
-  "In this example we create an uninitialized 
-   point3f with the function POINT3F. Then, w-
-   e create an initialized point3f and list t-
-   he x,y,z coordinates with the functions PO-
-   INT3F-X, POINT3F-Y and POINT3F-Z."
-
-  (let* ((point3f-un-init (point3f))
-        (point3f (point3f x y z)))
-    (format t "Pointer to POINT3F: ~a~%~%" 
-	    point3f-un-init)
-    (format t "POINT3F (x, y, z) = (~a, ~a, ~a)~%" 
-	    (point3f-x point3f)
-	    (point3f-y point3f)
-            (point3f-z point3f))))
-
-
-
-EMPTY
-
-Returns true if the array has no elements.
-
-C++: bool Mat::empty() const
-
-LISP-CV: (EMPTY (SELF (:POINTER MAT)))
-
-
-(defun empty-example (filename)
-        ;; load image 
-  (let* ((image (imread filename 1))
-	 (window-name "EMPTY Example"))
-         ;; if image is not loaded correctly 
-         ;; the return of EMPTY is true and 
-         ;; the function is exited
-    (if (empty image) 
-	(return-from empty-example 
-	  (format t "Image not loaded")))
-    (named-window window-name +window-no
-  "In the code below the (COLS, ROWS) values of MAT are 
-   accessed and stored in a SIZE construct. Their values 
-   are accessed with the WIDTH and HEIGHT functions. The-
-   n an uninitialized and an initialized SIZE construct  
-   are created. Their values are also printed."
-
-  (let* ((mat (mat-value 5 5 +64f+ (scalar 100 100 100)))
-         (mat-size (mat-size mat))
-          (size-un-init)
-          (size (size 640 480)))
-    (format t " The (COLS ROWS) of MAT = (~a ~a)~%"  
-	    (width mat-size)
-	    (height mat-size)
-            (format t "Pointer to an uninitialized SIZE construct:~a~%" 
-size-un-init) 
-(format t "Width of SIZE = ~a~%" (width size))
-    (format t "Height of SIZE = ~a" (height size)))))
-
-rmal+)
-    (move-window window-name 759 175)
-    (imshow window-name image)
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name)))
-
-
-CV-TYPE
+MAT-TYPE
 
 Returns the type of a matrix element.
 
 C++: int Mat::type() const
 
-LISP-CV: (CV-TYPE (SELF (:POINTER MAT)))
+LISP-CV: (CV-TYPE (SELF MAT))
 
     Parameters:	
 
         SELF - A matrix(MAT)
 
 The method returns a matrix element type. This is an identifier compatible with OpenCV's CvMat type
-system, like CV_16SC3(+16SC3+ in LISP-CV) or 16-bit signed 3-channel array, and so on.
+system, like CV_16SC3(+16SC3+ in LISP-CV) or 16-bit signed 3-channel array, and so on. You can also 
+get matrix size with the SIZE function e.g. (SIZE MAT)
 
 
 (defun mat-type-example ()
@@ -6930,7 +7045,7 @@ system, like CV_16SC3(+16SC3+ in LISP-CV) or 16-bit signed 3-channel array, and 
 	 (mat-two (mat-zeros 2 4 +64f+)))
     (format t "MAT-ONE type is ~a(+32f+). It is a Single Precision Floating Point Matrix.~%" 
 	    (mat-type mat-one))
-    (format t "~%MAT-TWO type is ~a(+64f+). It is a Double Precision Floating Point Matrix." 
+    (format t "~MAT-TWO type is ~a(+64f+). It is a Double Precision Floating Point Matrix." 
 	    (mat-type mat-two))))
 
 
@@ -6941,7 +7056,7 @@ Draws a circle.
 
 C++: void circle(Mat& img, Point center, int radius, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
 
-LISP-CV: (CIRCLE (IMG (:POINTER MAT)) (CENTER (:POINTER POINT)) (RADIUS :INT) (COLOR (:POINTER SCALAR)) &OPTIONAL ((THICKNESS :INT) 1) ((LINE-TYPE :INT) 8) ((SHIFT :INT) 0))
+LISP-CV: (CIRCLE (IMG MAT) (CENTER POINT) (RADIUS :INT) (COLOR SCALAR) &OPTIONAL ((THICKNESS :INT) 1) ((LINE-TYPE :INT) 8) ((SHIFT :INT) 0))
 
     Parameters:	
 
@@ -7167,7 +7282,7 @@ Returns an identity matrix of the specified size and type.
 
 C++: static MatExpr Mat::eye(int rows, int cols, int type)
 
-LISP-CV: (MAT-EYE (ROWS :INT) (COLS :INT) (TYPE :INT)) => (:POINTER MAT)
+LISP-CV: (MAT-EYE (ROWS :INT) (COLS :INT) (TYPE :INT)) => MAT
 
 
     Parameters:	
@@ -7240,7 +7355,7 @@ Transposes a matrix.
 
 C++: MatExpr Mat::t() const
 
-LISP-CV: (MAT-EXPR-T (SELF (:POINTER MAT))) => (:POINTER MAT-EXPR)
+LISP-CV: (MAT-EXPR-T (SELF MAT)) => MAT-EXPR
 
 The method performs matrix transposition by means of matrix expressions. It does not perform the ac-
 tual transposition but returns a temporary matrix transposition object that can be further used as 
@@ -7258,14 +7373,14 @@ FORCE
 
 Coverts a MAT-EXPR to MAT
 
-LISP-CV: (FORCE (SELF (:POINTER MAT-EXPR))) => (:POINTER MAT)
+LISP-CV: (FORCE (SELF MAT-EXPR)) => MAT
 
-LISP-CV: (>> (SELF (:POINTER MAT-EXPR))) => (:POINTER MAT)
+LISP-CV: (>> (SELF MAT-EXPR)) => MAT
 
-The function FORCE converts a functions output from (:POINTER MAT-EXPR) to (:POINTER MAT).  This is 
-useful if you have just done mathematical computation with a Matrix Expressions(MAT-EXPR) function 
-and would like to use the result in a function that only accepts a MAT as input i.e. IMSHOW. The fu-
-nction >> is an identical shorthand version of the FORCE function supplied for ease of use. 
+The function FORCE converts a functions output from MAT-EXPR to MAT.  This is useful if you have just 
+done mathematical computation with a Matrix Expressions(MAT-EXPR) function and would like to use the 
+result in a function that only accepts a MAT as input i.e. IMSHOW. The function >> is an identical 
+shorthand version of the FORCE function supplied for ease of use. 
 
   Parameters:	
 
@@ -7279,9 +7394,9 @@ nction >> is an identical shorthand version of the FORCE function supplied for e
    lt is shown in a window. The function >> which is 
    a shorthand version of the FORCE function, is nec-
    essary here is because the return of the matrix a-
-   ddition function MAT-EXPR+ is (:POINTER MAT-EXPR) 
-   and that return must be coerced to (:POINTER MAT) 
-   before it can be shown in a window with IMSHOW."
+   ddition function ADD is MAT-EXPR and that return 
+   must be coerced to MAT before it can be shown in 
+   a window with IMSHOW."
 
   (let* ((mat (mat-ones 3 3 +8u+))
          (out (add mat mat))
@@ -7294,11 +7409,12 @@ nction >> is an identical shorthand version of the FORCE function supplied for e
 
 
 
+
 mat-typed
 
 Creates an empty matrix of type TYPE.
 
-LISP-CV: (mat-typed) (ROWS :INT) (COLS :INT) (TYPE :INT)) => (:POINTER MAT)
+LISP-CV: (mat-typed) (ROWS :INT) (COLS :INT) (TYPE :INT)) => MAT
 
     Parameters:	
 
@@ -7330,7 +7446,7 @@ Extracts a diagonal from a matrix, or creates a diagonal matrix.
 
 C++: Mat Mat::diag(int d=0 ) const
 
-LISP-CV: (MAT-DIAG (SELF (:POINTER MAT)) (D :INT)) => (:POINTER MAT)
+LISP-CV: (MAT-DIAG (SELF MAT) (D :INT)) => MAT
 
 C++: static Mat Mat::diag(const Mat& d)
 
@@ -7380,7 +7496,7 @@ Subtracts matrix M1 from matrix M2
 
 C++: MatExpr - operator
 
-LISP-CV: (SUB (M1 (:POINTER MAT)) (M2 (:POINTER MAT))) => (:POINTER MAT-EXPR)
+LISP-CV: (SUB (M1 MAT) (M2 MAT)) => MAT-EXPR
 
 
     Parameters:	
@@ -7392,8 +7508,7 @@ LISP-CV: (SUB (M1 (:POINTER MAT)) (M2 (:POINTER MAT))) => (:POINTER MAT-EXPR)
 
 The function SUB subtracts the elements of matrix M2 from the elements of matrix M1 in order. Both 
 matrices must be the same size.  You may need to coerce the result of SUB, the return value, back 
-to type (:POINTER MAT) with the function (FORCE), (or the shorthand version (>>)) to use in other 
-functions. 
+to type MAT with the function (FORCE), (or the shorthand version (>>)) to use in other functions. 
 
 
 (defun sub-example ()
@@ -7434,7 +7549,7 @@ Divides matrix M1 by matrix M2.
 
 C++: MatExpr / operator
 
-LISP-CV: (DIV (M1 (:POINTER MAT)) (M2 (:POINTER MAT))) => (:POINTER MAT-EXPR)
+LISP-CV: (DIV (M1 MAT) (M2 MAT)) => MAT-EXPR
 
 
     Parameters:	
@@ -7444,10 +7559,9 @@ LISP-CV: (DIV (M1 (:POINTER MAT)) (M2 (:POINTER MAT))) => (:POINTER MAT-EXPR)
         M2 - A matrix.
 
 
-The function DIV divides the elements of matrix M1 by the elements of matrix M2 in order. Both matr-
-ices must be the same size. You may need to coerce the result of DIV, the return value, back to typ-
-e (:POINTER MAT) with the function (FORCE), (or the shorthand version (>>)) to use in other functio-
-ns. 
+The function DIV divides the elements of matrix M1 by the elements of matrix M2 in order. Both matrices 
+must be the same size. You may need to coerce the result of DIV, the return value, back to type MAT with 
+the function (FORCE), (or the shorthand version (>>)) to use in other functions. 
 
 
 (defun div-example ()
@@ -7495,8 +7609,8 @@ LISP-CV: (VIDEO-WRITER)
 
 C++: VideoWriter::VideoWriter(const string& filename, int fourcc, double fps, Size frameSize, bool isColor=true)
 
-LISP-CV: (VIDEO-WRITER (FILENAME (:POINTER STRING*)) (FOURCC :INT) (FPS :DOUBLE) 
-              (FRAME-SIZE (:POINTER SIZE)) ((IS-COLOR :INT) T)) => (:POINTER VIDEO-WRITER)
+LISP-CV: (VIDEO-WRITER (FILENAME *STRING) (FOURCC :INT) (FPS :DOUBLE) 
+              (FRAME-SIZE SIZE) ((IS-COLOR :INT) T)) => (:POINTER VIDEO-WRITER)
 
 
     Parameters:	
@@ -7571,7 +7685,9 @@ ndows FFMPEG or VFW is used; on MacOSX QTKit is used.
 
 VIDEO-WRITER-IS-OPEN
 
+
 Returns true if video writer has been successfully initialized.
+
 
 C++: bool VideoWriter::isOpened()
 
@@ -7588,19 +7704,23 @@ LISP-CV: (VIDEO-WRITER-IS-OPEN (SELF (:POINTER VIDEO-WRITER)))
 	      (video-writer-is-open o-video-writer)))))
 
 
+
 VIDEO-WRITER-WRITE
+
 
 Writes the next video frame
 
+
 C++: VideoWriter& VideoWriter::operator<<(const Mat& image)
 
-LISP-CV: (VIDEO-WRITER-WRITE (SELF (:POINTER VIDEO-WRITER)) (IMAGE (:POINTER MAT)))
+LISP-CV: (VIDEO-WRITER-WRITE (SELF (:POINTER VIDEO-WRITER)) (IMAGE MAT))
 
     Parameters:	
 
         SELF - Pointer to VIDEO-WRITER
 
         IMAGE - The written frame
+
 
 The function VIDEO-WRITER-WRITE writes the specified image to video file. It must have the same siz-
 e as has been specified when opening the video writer.
@@ -7637,7 +7757,7 @@ Creates a full copy of the array and the underlying data.
 
 C++: Mat Mat::clone() const
 
-LISP-CV: (MAT-CLONE (SELF (:POINTER MAT))) => (:POINTER MAT)
+LISP-CV: (MAT-CLONE (SELF MAT)) => MAT
 
 
     Parameters:	
@@ -7675,7 +7795,7 @@ Returns a normalized step.
 
 C++: size_t Mat::step1(int i=0 ) const
 
-LISP-CV: (STEP1 (SELF (:POINTER MAT))) => :UNSIGNED-INT
+LISP-CV: (STEP1 (SELF MAT)) => :UNSIGNED-INT
 
 The method returns a matrix step divided by (ELEM-SIZE1) . It can be useful to quickly access an ar
 bitrary matrix element.
@@ -7688,7 +7808,7 @@ Returns the total number of array elements.
 
 C++: size_t Mat::total() const
 
-LISP-CV: (TOTAL (SELF (:POINTER MAT))) => :UNSIGNED-INT
+LISP-CV: (TOTAL (SELF MAT)) => :UNSIGNED-INT
 
 
     Parameters:	
@@ -7721,7 +7841,7 @@ Returns matrix header corresponding to the rectangular sub-array of an input mat
 
 C++: Mat::Mat(const Mat& m, const Rect& roi)
 
-LISP-CV: (ROI (SELF (:POINTER MAT)) (ROI (:POINTER RECT))) => (:POINTER MAT)
+LISP-CV: (ROI (SELF MAT) (ROI RECT)) => MAT
 
 
     Parameters:	
@@ -7810,33 +7930,33 @@ RECT constructor.
 
 C++: Rect_(_Tp _x, _Tp _y, _Tp _width, _Tp _height);
 
-LISP-CV:  (RECT (X :INT) (Y :INT) (:WIDTH :INT) (HEIGHT :INT)) => (:POINTER RECT)
+LISP-CV:  (RECT (X :INT) (Y :INT) (:WIDTH :INT) (HEIGHT :INT)) => RECT
 
 C++: _Tp x, y, width, height;
 
-LISP-CV: (RECT-X (SELF (:POINTER RECT))) => :INT
+LISP-CV: (RECT-X (SELF RECT)) => :INT
 
-LISP-CV: (RECT-Y (SELF (:POINTER RECT))) => :INT
+LISP-CV: (RECT-Y (SELF RECT)) => :INT
 
-LISP-CV: (RECT-WIDTH (SELF (:POINTER RECT))) => :INT
+LISP-CV: (RECT-WIDTH (SELF RECT)) => :INT
 
-LISP-CV: (RECT-HEIGHT (SELF (:POINTER RECT))) => :INT
+LISP-CV: (RECT-HEIGHT (SELF RECT)) => :INT
 
 C++: Size_<_Tp> size() const;
 
-LISP-CV: (RECT-SIZE (SELF (:POINTER RECT))) => (:POINTER SIZE)
+LISP-CV: (RECT-SIZE (SELF RECT)) => SIZE
 
 C++: Point_<_Tp> tl() const;
 
-LISP-CV: (RECT-TL (SELF (:POINTER RECT))) => (:POINTER POINT)
+LISP-CV: (RECT-TL (SELF RECT)) => POINT
 
 C++: Point_<_Tp> br() const;
 
-LISP-CV: (RECT-BR (SELF (:POINTER RECT))) => (:POINTER POINT)
+LISP-CV: (RECT-BR (SELF RECT)) => POINT
 
-C++ See cv_Rect_clone in LISP-CV-MASTER/SRC
+C++ See cv_Rect_clone in LISP-CV-MASTER/SRC/RECT.CPP
 
-LISP-CV: (RECT-CLONE (SELF (:POINTER RECT))) => (:POINTER RECT)
+LISP-CV: (RECT-CLONE (SELF RECT)) => RECT
 
 
     Parameters:	
@@ -7933,19 +8053,19 @@ Dot product computed in double-precision arithmetics.
 
 C++:  _Tp dot(const Point_& pt) const;
 
-LISP-CV: (DOT (SELF (:POINTER POINT)) (OTHER (:POINTER POINT))) => :INT
+LISP-CV: (DOT (SELF POINT) (OTHER POINT)) => :INT
 
-LISP-CV: (DOT2F (SELF (:POINTER POINT2F)) (OTHER (:POINTER POINT2F))) => :FLOAT
+LISP-CV: (DOT2F (SELF POINT2F) (OTHER POINT2F)) => :FLOAT
 
-LISP-CV: (DOT2D (SELF (:POINTER POINT2D)) (OTHER (:POINTER POINT2D))) => :DOUBLE
+LISP-CV: (DOT2D (SELF POINT2D) (OTHER POINT2D)) => :DOUBLE
 
 C++"  _Tp dot(const Point3_& pt) const;
 
-LISP-CV: (DOT3I (SELF (:POINTER POINT3I)) (OTHER (:POINTER POINT3I))) => :INT
+LISP-CV: (DOT3I (SELF POINT3I) (OTHER POINT3I)) => :INT
 
-LISP-CV: (DOT3F (SELF (:POINTERRead POINT3F)) (OTHER (:POINTER POINT3F))) => :FLOAT
+LISP-CV: (DOT3F (SELF (:POINTER POINT3F)) (OTHER POINT3F)) => :FLOAT
 
-LISP-CV: (DOT3D (SELF (:POINTER POINT)) (OTHER (:POINTER POINT))) => :INT
+LISP-CV: (DOT3D (SELF POINT) (OTHER POINT)) => :INT
 
 
     Parameters:	
@@ -8032,7 +8152,7 @@ Checks if array elements lie between the elements of two other arrays.
 
 C++: void inRange(InputArray src, InputArray lowerb, InputArray upperb, OutputArray dst)
 
-LISP-CV: (IN-RANGE-S (SRC (:POINTER MAT)) (LOWERB (:POINTER SCALAR)) (UPPERB (:POINTER SCALAR)) (DEST (:POINTER MAT)) => :VOID
+LISP-CV: (IN-RANGE-S (SRC MAT) (LOWERB SCALAR) (UPPERB SCALAR) (DEST MAT) => :VOID
 
 
     Parameters:	
@@ -8108,7 +8228,7 @@ Blurs an image using a Gaussian filter.
 C++: void GaussianBlur(InputArray src, OutputArray dst, Size ksize, double sigmaX, double sigmaY=0,
      int borderType=BORDER_DEFAULT )                   
 
-Commom Lisp: (GAUSSIAN-BLUR (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) (KSIZE (:POINTER SIZE)) (SIG
+Commom Lisp: (GAUSSIAN-BLUR (SRC MAT) (DEST MAT) (KSIZE SIZE) (SIG
               MA-X :DOUBLE) &OPTIONAL ((SIGMA-Y :DOUBLE) 0) ((BORDER-TYPE :INT) +BORDER-DEFAULT+))
 
     Parameters:	
@@ -8184,7 +8304,7 @@ Converts an image from one color space to another.
 
 C++: void cvtColor(InputArray src, OutputArray dst, int code, int dstCn=0 )
 
-LISP-CV: (CVT-COLOR (SRC (:POINTER MAT)) (DEST (:POINTER MAT)) (CODE :INT) ((DEST-CN :INT) 0))
+LISP-CV: (CVT-COLOR (SRC MAT) (DEST MAT) (CODE :INT) ((DEST-CN :INT) 0))
 
 
     Parameters:	
@@ -8402,7 +8522,7 @@ Finds the product a matrix and a scalar..
 
 C++: MatExpr * operator
 
-LISP-CV: (SCALE (SELF (:POINTER MAT-EXPR)) (ALPHA :DOUBLE)) => (:POINTER MAT-EXPR)
+LISP-CV: (SCALE (SELF MAT-EXPR) (ALPHA :DOUBLE)) => MAT-EXPR
 
 
     Parameters:	
@@ -8413,10 +8533,10 @@ LISP-CV: (SCALE (SELF (:POINTER MAT-EXPR)) (ALPHA :DOUBLE)) => (:POINTER MAT-EXP
 
 
 This is the primary function used in this library for multiplication by and division by scalar. See 
-SCALE-EXAMPLE for an example of division by scalar. You may need to coerce the rerturn value of 
-SCALE, a scaled matrix, back to type (:POINTER MAT) with the function (FORCE), (or the shorthan-
-d version (>>)) to use in other functions. Also matrices of (:POINTER MAT) type must be coerced to 
-(:POINTER MAT-EXPR) type, with the function PROMOTE(<<), before passing to SCALE.
+SCALE-EXAMPLE for an example of division by scalar. You may need to coerce the rerturn value of SCALE, 
+a scaled matrix, back to type MAT with the function (FORCE), (or the shorthand version (>>)) to use in 
+other functions. Also matrices of MAT type must be coerced to MAT-EXPR, with the function PROMOTE(<<), 
+before passing to SCALE.
 
 
 (defun scale-example ()
@@ -8446,7 +8566,7 @@ Draws the found matches of keypoints from two images.
 
 C++: void drawMatches(const Mat& img1, const vector<KeyPoint>& keypoints1, const Mat& img2, const vector<KeyPoint>& keypoints2, const vector<DMatch>& matches1to2, Mat& outImg, const Scalar& matchColor=Scalar::all(-1), const Scalar& singlePointColor=Scalar::all(-1), const vector<char>& matchesMask=vector<char>(), int flags=DrawMatchesFlags::DEFAULT )
 
-LISP-CV: (DRAW-MATCHES (IMG1 (:POINTER MAT)) (KEYPOINTS1 (:POINTER KEYPOINT)) (IMG2 (:POINTER MAT)) (KEYPOINTS2 (:POINTER KEYPOINT)) (MATCHES1TO2 (:POINTER VECTOR-DMATCH)) (OUTIMG (:POINTER MAT)) (MATCH-COLOR (:POINTER SCALAR)) (SINGLE-POINT-COLOR (:POINTER SCALAR)) &OPTIONAL ((MATCHES-MASK (:POINTER VECTOR-CHAR)) (VECTOR-CHAR)) ((FLAGS :INT) +DEFAULT+))
+LISP-CV: (DRAW-MATCHES (IMG1 MAT) (KEYPOINTS1 KEYPOINT) (IMG2 MAT) (KEYPOINTS2 KEYPOINT) (MATCHES1TO2 (:POINTER VECTOR-DMATCH)) (OUTIMG MAT) (MATCH-COLOR SCALAR) (SINGLE-POINT-COLOR SCALAR) &OPTIONAL ((MATCHES-MASK VECTOR-CHAR) (VECTOR-CHAR)) ((FLAGS :INT) +DEFAULT+))
 -
 C++: void drawMatches(const Mat& img1, const vector<KeyPoint>& keypoints1, const Mat& img2, const vector<KeyPoint>& keypoints2, const vector<vector<DMatch>>& matches1to2, Mat& outImg, const Scalar& matchColor=Scalar::all(-1), const Scalar& singlePointColor=Scalar::all(-1), const vector<vector<char>>& matchesMask=vector<vector<char> >(), int flags=DrawMatchesFlags::DEFAULT )
 
@@ -8460,33 +8580,33 @@ C++: void drawMatches(const Mat& img1, const vector<KeyPoint>& keypoints1, const
 
         KEYPOINTS2 - Keypoints from the second source image.
 
-        MATCHES1TO2 - Matches from the first image to the second one, which means that keypoints1[i]
-                      has a corresponding point in keypoints2[matches[i]].
+        MATCHES1TO2 - Matches from the first image to the second one, which means that (KEYPOINTS1 I)
+                      has a corresponding point in (KEYPOINTS2 (MATCHES I)).
 
-        OUT-IMG - Output image. Its content depends on the flags value defining what is drawn in th-
-                  e output image. See possible flags bit values below.
+        OUT-IMG - Output image. Its content depends on the flags value defining what is drawn in the 
+                  output image. See possible flags bit values below.
 
-        MATCH-COLOR - Color of matches (lines and connected keypoints). If (EQUAL MATCH-COLOR (SCALAR-ALL -1)) 
+        MATCH-COLOR - Color of matches (lines and connected keypoints). If (EQ MATCH-COLOR (SCALAR-ALL -1)) 
                       the color is generated randomly.
 
         SINGLE-POINT-COLOR - Color of single keypoints (circles), which means that keypoints do not 
-                             have the matches. If (EQUAL SINGLE-POINT-COLOR (SCALAR-ALL -1)) , the 
-                             color is generated randomly.
+                             have the matches. If (EQ SINGLE-POINT-COLOR (SCALAR-ALL -1)) , the color 
+                             is generated randomly.
 
         MATCHES-MASK - Mask determining which matches are drawn. If the mask is empty, all matches are drawn.
 
         FLAGS - Flags setting drawing features. Possible flags bit values are defined below.
 
-This function draws matches of keypoints from two images in the output image. Match is a line conne-
-cting two keypoints (circles). The FLAGS parameters are defined as follows:
+This function draws matches of keypoints from two images in the output image. Match is a line connecting 
+two keypoints (circles). The FLAGS parameters are defined as follows:
 
-        +DEFAULT+ = 0 - Output image matrix will be created (MAT-CREATE), i.e. existing memory of o-
-                        utput image may be reused. Two source images, matches, and single keypoints 
-                        will be drawn. For each keypoint, only the center point will be drawn (with-
-                        out a circle around the keypoint with the keypoint size and orientation).
+        +DEFAULT+ = 0 - Output image matrix will be created (MAT-CREATE), i.e. existing memory of 
+                        output image may be reused. Two source images, matches, and single keypoints 
+                        will be drawn. For each keypoint, only the center point will be drawn (without 
+                        a circle around the keypoint with the keypoint size and orientation).
 
-        +DRAW-OVER-OUTIMG+ = 1 - Output image matrix will not be created (using MAT-CREATE). Matche-
-                                 s will be drawn on existing content of output image.
+        +DRAW-OVER-OUTIMG+ = 1 - Output image matrix will not be created (using MAT-CREATE). Matches 
+                                 will be drawn on existing content of output image.
 
         +NOT-DRAW-SINGLE-POINTS = 2 - Single keypoints will not be drawn.
 
@@ -8505,17 +8625,13 @@ cting two keypoints (circles). The FLAGS parameters are defined as follows:
    parameter. Finally, each window is labeled with the name of the flag u-
    sed to set  drawing features for that particular window, for example:
  
-      RED * WHITE * +NOT-;;; Types and structures
-
-
-
-;;; User InterfaceDRAW-SINGLE-POINTS+
+      RED * WHITE * +NOT-DRAW-SINGLE-POINTS+
     
     Try using the box.png and box_in_scene.png images located inside the
     LISP-CV-MASTER/IMAGES directory to get a clearer understanding of th-
     is example the first time you run it."
 
-  ;; the object you want to track - 
+  ;; the object you want to track 
   (let* ((object (imread filename-1 +load-image-grayscale+))
 	 ;; the image the object is a part of
 	 (image (imread filename-2 +load-image-grayscale+)) 
@@ -8585,12 +8701,21 @@ cting two keypoints (circles). The FLAGS parameters are defined as follows:
 		  +draw-rich-keypoints+)
     ;; show the matches in a window 
     (imshow window-name-4 all-matches)
+      (del-mat object)
+	 (del-mat image)
+	 (del-vec-kp keypoints-a)
+	 (del-vec-kp keypoints-b)
+	 (del-mat descriptors-a)
+	 (del-mat descriptors-b)
+         (del-brisk briskd)
+         (del-bf-matcher matcher)
+         (del-vec-dm matches)
+         (del-mat all-matches)
     (loop while (not (= (wait-key 0) 27)))
     (destroy-window window-name-1)
     (destroy-window window-name-2)
     (destroy-window window-name-3)
     (destroy-window window-name-4)))
-
 
 
 BRISK
@@ -8761,7 +8886,7 @@ Creates a feature detector by its name.
 
 C++: Ptr<FeatureDetector> FeatureDetector::create(const string& detectorType)
 
-LISP-CV: (FEAT-DETECTOR-CREATE (SELF (:POINTER FEATURE-DETECTOR)) (DETECTOR-TYPE :STRING)) => (:POINTER FEATURE-DETECTOR) 
+LISP-CV: (FEAT-DETECTOR-CREATE (SELF FEATURE-DETECTOR) (DETECTOR-TYPE :STRING)) => FEATURE-DETECTOR 
 
 
     Parameters:	
@@ -8854,12 +8979,12 @@ The SURF extractor constructors.
 
 C++: SURF::SURF()
 
-LISP-CV: (SURF) => (:POINTER SURF)
+LISP-CV: (SURF) => SURF
 
 C++: SURF::SURF(double hessianThreshold, int nOctaves=4, int nOctaveLayers=2, bool extended=true, bool upright=false )
 
 LISP-CV: (SURF (HESSIAN-THRESHOLD :DOUBLE) &OPTIONAL ((N-OCTAVES :INT) 4) 
-                 ((EXTENDED :BOOLEAN) T) ((UPRIGHT :BOOLEAN) NIL)) => (:POINTER SURF)
+                 ((EXTENDED :BOOLEAN) T) ((UPRIGHT :BOOLEAN) NIL)) => SURF
 
     Parameters:	
 
@@ -9113,7 +9238,7 @@ Pointer to MAT data.
 
 C++: uchar* data
 
-LISP-CV: (DATA (SELF (:POINTER MAT)) ) => :POINTER
+LISP-CV: (DATA (SELF MAT) ) => :POINTER
 
     Parameters:	
 
@@ -9558,7 +9683,7 @@ the function goes out of scope.
 Example:
 
 
-LISP-CV> (DEFPARAMETER A (POINT 1 2)) ;A (:POINTER POINT) is created
+LISP-CV> (DEFPARAMETER A (POINT 1 2)) ;A POINT is created
 
 A
 
@@ -9597,6 +9722,8 @@ LISP-CV: (DEL-BF-MATCHER (PTR :POINTER)) => :VOID
 
 LISP-CV: (DEL-BRISK (PTR :POINTER)) => :VOID
 
+LISP-CV: (DEL-KP (PTR :POINTER)) => :VOID
+
 LISP-CV: (DEL-MAT (PTR :POINTER)) => :VOID
 
 LISP-CV: (DEL-MAT-EXPR (PTR :POINTER)) => :VOID
@@ -9604,6 +9731,8 @@ LISP-CV: (DEL-MAT-EXPR (PTR :POINTER)) => :VOID
 LISP-CV: (DEL-POINT (PTR :POINTER)) => :VOID
 
 LISP-CV: (DEL-RECT (PTR :POINTER)) => :VOID
+
+LISP-CV: (DEL-SIZE (PTR :POINTER)) => :VOID
 
 LISP-CV: (DEL-VEC-CHAR (PTR :POINTER)) => :VOID
 
@@ -9634,33 +9763,33 @@ LISP-CV: (DEL-VEC-UCHAR (PTR :POINTER)) => :VOID
 
 
 Some of the OpenCV C bindings for its C++ interface that this library binds to, allocate memory for
-their return value, with a new operator. The return value of said functions are a pointer to an OpenCv
-class specified by the return value. e.g. Mat* (represented in LISP-CV as (:POINTER MAT)) is a pointer
-to the OpenCV Mat class. A call to the C++ delete operator must be made for every call to new to avoid
-a memory leak. The DEL-* functions are wrappers for the C++ delete operator and pass the type of * to
-the delete operator when the DEL-* function is called. The DEL-* function types are below.
+their return value, with a new operator. The return value of the C functions are a pointer to an OpenCv
+class specified by the return value. e.g. Mat* (represented in LISP-CV as MAT) is a pointer to the OpenCV 
+Mat class. A call to the C++ delete operator must be made for every call to new to avoid a memory leak. 
+The DEL-* functions are wrappers for the C++ delete operator and pass the type of * to the delete operator 
+when the DEL-* function is called. The DEL-* function types are below.
 
 
 Note: Each DEL-* function has a companion WITH-* macro that calls the associated DEL-* function, when
-the (:POINTER *) goes out of scope, automatically. See <lisp-cv-source directory>/with-macros.lisp for
-the associated WITH-* macro.
+the * goes out of scope, automatically. See <lisp-cv-source directory>/with-macros.lisp for the associated 
+WITH-* macro.
 
 
 The function DEL-BF-MATCHER deletes a (:POINTER BF-MATCHER)
 
 The function DEL-BRISK deletes a (:POINTER BRISK)
 
-The function DEL-MAT deletes a (:POINTER MAT)
+The function DEL-MAT deletes a MAT
 
-The function DEL-MAT-EXPR deletes a (:POINTER MAT-EXPR)
+The function DEL-MAT-EXPR deletes a MAT-EXPR
 
-The function DEL-POINT deletes a (:POINTER POINT)
+The function DEL-POINT deletes a POINT
 
-The function DEL-RECT deletes a (:POINTER RECT)
+The function DEL-RECT deletes a RECT
 
-The function DEL-VEC-CHAR deletes a (:POINTER VECTOR-CHAR)
+The function DEL-VEC-CHAR deletes a VECTOR-CHAR
 
-The function DEL-VEC-DBL deletes a (:POINTER VECTOR-DOUBLE)
+The function DEL-VEC-DBL deletes a VECTOR-DOUBLE
 
 The function DEL-VEC-DM deletes a (:POINTER VECTOR-DMATCH)
 
@@ -9684,7 +9813,7 @@ The function DEL-VEC-UCHAR deletes a (:POINTER VECTOR-UCHAR)
 Example:
 
 
-LISP-CV> (DEFPARAMETER A (POINT 1 2)) ;A (:POINTER POINT) is created
+LISP-CV> (DEFPARAMETER A (POINT 1 2)) ;A POINT is created
 
 A
 

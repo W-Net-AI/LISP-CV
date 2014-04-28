@@ -12,6 +12,6 @@
 ;; void applyColorMap(InputArray src, OutputArray dst, int colormap)
 ;; void cv_applyColorMap(Mat* src, Mat* dst, int colormap)
 (defcfun ("cv_applyColorMap" apply-color-map) :void
-  (src (:pointer mat))
-  (dest (:pointer mat))
+  (src mat)
+  (dest mat)
   (colormap :int))

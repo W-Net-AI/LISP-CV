@@ -5,7 +5,7 @@ extern "C" {
     Size* cv_create_Size() {
         return new Size;
     }
-    Size* cv_create_Size2(int width, int height) {
+    Size* cv_create_Size2(double width, double height) {
         return new Size(width, height);
     }
     Size* cv_Size_assignTo(Size* self, Size* other) {

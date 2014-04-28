@@ -17,8 +17,8 @@
 ;; int createTrackbar(const string& trackbarname, const string& winname, int* value, int count, TrackbarCallback onChange=0, void* userdata=0)
 ;; int cv_createTrackbar(String* trackbarname, String* winname, int* value, int count, TrackbarCallback* onChange, void* userdata)
 (defcfun ("cv_createTrackbar" %create-trackbar) :int
-  (trackbarname (:pointer string*))
-  (winname (:pointer string*))
+  (trackbarname *string)
+  (winname *string)
   (value :pointer)
   (count :int)
   (on-change (:pointer trackbar-callback))
@@ -27,7 +27,7 @@
 
 (defun create-trackbar (trackbarname winname value count &optional (on-change (null-pointer)) (userdata (null-pointer)))
   "Creates a trackbar and attaches it to the specified window."
-  (%create-trackbar (foreign-alloc :string :initial-element trackbarname) (foreign-alloc :string :initial-element winname) value count on-change userdata))
+  (%create-trackbar (c-string-to-string trackbarname (length trackbarname)) (c-string-to-string winname (length winname)) value count on-change userdata))
 
 
 ;; void destroyAllWindows()
@@ -37,50 +37,50 @@
 
 
 ;; void destroyWindow(const string& winname)
-;; void cv_destroyWindow((:pointer string*) winname)
+;; void cv_destroyWindow(String* winname)
 (defcfun ("cv_destroyWindow" %destroy-window) :void
   "Destroys a window."
-  (winname (:pointer string*)))
+  (winname *string))
 
 (defun destroy-window (winname)
   "Destroys a window."
-  (%destroy-window (foreign-alloc :string :initial-element winname)))
+  (%destroy-window (c-string-to-string winname (length winname))))
 
 
 ;; void imshow(const string& winname, InputArray mat)
 ;; void cv_imshow(String* winname, Mat* mat)
 (defcfun ("cv_imshow" %imshow) :void
-  (winname (:pointer string*))
-  (mat (:pointer mat)))
+  (winname *string)
+  (mat mat))
 
 
 (defun imshow (winname mat)
   "Displays an image in the specified window."
-  (%imshow (foreign-alloc :string :initial-element winname) mat))
+  (%imshow (c-string-to-string winname (length winname)) mat))
 
 
 ;; void moveWindow(const string& winname, int x, int y)
-;; void cv_moveWindow((:pointer string*) winname, int x, int y)
+;; void cv_moveWindow(String* winname, int x, int y)
 (defcfun ("cv_moveWindow" %move-window) :void
-  (winname (:pointer string*))
+  (winname *string)
   (x :int)
   (y :int))
 
 
 (defun move-window (winname x y)
   "Moves window to the specified position"
-  (%move-window (foreign-alloc :string :initial-element winname) x y))
+  (%move-window (c-string-to-string winname (length winname)) x y))
 
 
 ;; void namedWindow(const string& winname, int flags=WINDOW_AUTOSIZE)
-;; void cv_namedWindow((:pointer string*) winname, int flags)
+;; void cv_namedWindow(String* winname, int flags)
 (cffi:defcfun ("cv_namedWindow" %named-window) :void
-	      (winname (:pointer string*))
+	      (winname *string)
 	      (flags :int))
 
 (defun named-window (winname &optional (flags +window-autosize+))
   "Creates a window."
-  (%named-window (foreign-alloc :string :initial-element winname) flags))
+  (%named-window (c-string-to-string winname (length winname)) flags))
 
 (defmacro with-named-window ((winname &optional (flags +window-autosize+)) &body body)
   `(unwind-protect (progn (named-window ,winname ,flags)
@@ -133,7 +133,7 @@
 ;; VideoCapture* cv_create_VideoCapture1(String* filename) {
 (defcfun ("cv_create_VideoCapture1" video-capture-fn) (:pointer video-capture)
   "VideoCapture constructor"
-  (filename (:pointer string*)))
+  (filename *string))
 
 
 (defun video-capture (&optional src)
@@ -142,7 +142,7 @@
 	((numberp src)
 	 (video-capture-dev src))
 	((stringp src) 
-	 (video-capture-fn (foreign-alloc :string :initial-element src)))
+	 (video-capture-fn (c-string-to-string src (length src))))
 	(t nil)))
 
 
@@ -166,7 +166,7 @@
 (cffi:defcfun ("cv_VideoCapture_read" cap-read) :boolean
 	      "Grabs, decodes and returns the next video frame."
 	      (self (:pointer video-capture))
-	      (image (:pointer mat)))
+	      (image mat))
 
 
 (defcfun ("cv_VideoCapture_release0_0" cap-release) :void
@@ -188,19 +188,19 @@
 
 ;; Mat imread(const string& filename, int flags=1)
 ;; mat cv_imread (const char* filename, int flags)
-(defcfun ("cv_imread" %imread) (:pointer mat)
-  (filename (:pointer string*))
+(defcfun ("cv_imread" %imread) mat
+  (filename *string)
   (flags :int))
 
 (defun imread (filename &optional (flags 1))
-  (%imread (c-string-to-string* filename (length filename)) flags))
+  (%imread (c-string-to-string filename (length filename)) flags))
 
 
 ;; bool imwrite(const string& filename, InputArray img, const vector<int>& params=vector<int>() )
 ;; bool cv_imwrite(String* filename, Mat* img, vector_int* params) 
 (defcfun ("cv_imwrite2" %imwrite) :boolean
   (filename :string)
-  (img (:pointer mat))
+  (img mat)
   (params (:pointer vector-int)))
 
 (defun imwrite (filename img &optional (params (vector-int)))
@@ -216,10 +216,10 @@
 ;; VideoWriter::VideoWriter(const string& filename, int fourcc, double fps, Size frameSize, bool isColor) 
 ;; VideoWriter* cv_create_VideoWriter5(String* filename, int fourcc, double fps, Size* frameSize, bool isColor)
 (defcfun ("cv_create_VideoWriter5" video-writer5) (:pointer video-writer)
-  (filename (:pointer string*))
+  (filename *string)
   (fourcc :int)
   (fps :double)
-  (frame-size (:pointer size))
+  (frame-size size)
   (is-color :boolean))
 
 (defun video-writer (&optional filename fourcc fps frame-size (is-color t))
@@ -227,7 +227,7 @@
 	   (cond ((eq filename nil)
 		  (video-writer0))
 		 (filename
-		  (video-writer5 (foreign-alloc :string :initial-element filename) fourcc fps frame-size is-color))
+		  (video-writer5 (c-string-to-string filename (length filename)) fourcc fps frame-size is-color))
 		 (t nil)))
 
 
@@ -242,8 +242,8 @@
 ;; void cv_VideoWriter_write(VideoWriter* self, Mat* image)
 (defcfun ("cv_VideoWriter_write" video-writer-write) :void
   "Writes the next video frame"
-  (self (:pointer mat))
-  (image (:pointer mat)))
+  (self mat)
+  (image mat))
 
 
 (defmacro with-capture ((capture-var capture) &body body)
@@ -258,24 +258,24 @@
 
 ;; double cv_getWindowProperty(String* winname, int prop_id) 
 (defcfun ("cv_getWindowProperty" %get-window-property) :double
-  (winname (:pointer string*))
+  (winname *string)
   (prop-id :int))
 
 
 (defun get-window-property (winname prop-id)
   "Provides parameters of a window."
-  (%get-window-property (foreign-alloc :string :initial-element winname) prop-id))
+  (%get-window-property (c-string-to-string winname (length winname)) prop-id))
 
 
 ;; void setWindowProperty(const string& winname, int prop_id, double prop_value)
 ;; void cv_setWindowProperty(String* winname, int prop_id, double prop_value)
 (defcfun ("cv_setWindowProperty" %set-window-property) :void
-  (winname (:pointer string*))
+  (winname *string)
   (prop-id :int)
   (prop-value :double))
 
-
+;;(c-string-to-string filename (length filename))
 (defun set-window-property (winname prop-id prop-value)
   "Changes parameters of a window dynamically."
-  (%set-window-property  (foreign-alloc :string :initial-element winname) prop-id (coerce prop-value 'double-float)))
+  (%set-window-property  (c-string-to-string winname (length winname)) prop-id (coerce prop-value 'double-float)))
 

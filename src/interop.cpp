@@ -15,6 +15,11 @@ const char* std_string_to_cstring(stdstring* s) {
     return s->c_str();
 }
 
+
+void cv_delete_std_string(string* self) {
+     delete self;
+}
+
 ADD_VECTOR_IMPL(char, c);
 ADD_VECTOR_IMPL(double, d);
 ADD_VECTOR_IMPL(float, f);
@@ -26,4 +31,5 @@ ADD_VECTOR_IMPL(Mat, m);
 ADD_VECTOR_IMPL(Point, p);
 ADD_VECTOR_IMPL(Point2f, p2f);
 ADD_VECTOR_IMPL(Rect, r);
+
 }

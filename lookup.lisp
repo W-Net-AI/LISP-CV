@@ -4,7 +4,7 @@
 ;;;; Lookup functions 
 (in-package :lisp-cv)
 ;; TODO - This file in process - not functional
-;; Creates hash-table used to lookup and print the corresponding lisp function name for a C++ function
+
 
 (defparameter l  '((c .3) (inRange . (|in-range| . |cv_inRange|))))
 

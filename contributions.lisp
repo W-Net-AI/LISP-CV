@@ -1,6 +1,6 @@
 ;;;; -*- mode: lisp; indent-tabs: nil -*-
 ;;;; contributions.lisp
-;;;;This file contains respect and gratitude for all who have helped with this project.
+;;;;This file contains respect and gratitude for all who have helped with this project, In no particular order.
 ;;;;If you would like to contribute, see the Readme.txt for more details.
 
 
@@ -23,3 +23,7 @@
 
 ;;Thanks to byulparan from whose COMMON-CV project: https://github.com/byulparan/common-cv I borrowed 
 ;;some writing styles. It's a beautiful project
+
+;;Thank you to Willem Rein Oudshoorn from CFFI-DEVEL who has made possible my inclusion of finalizers 
+;;in this library. He has helped me to iron out a few bugs and has answered quite a few questions of 
+;;mine. The knowledge I gained from those answers has really made this a much better library.

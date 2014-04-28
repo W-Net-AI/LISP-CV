@@ -27,8 +27,8 @@
 
 ;; Ptr<FeatureDetector> FeatureDetector::create(const string& detectorType)
 ;; FeatureDetector* cv_FeatureDetector_create2(FeatureDetector* self, String* detectorType) 
-(defcfun ("cv_FeatureDetector_create2" %feat-detector-create) (:pointer feature-detector) 
-  (self (:pointer feature-detector))
+(defcfun ("cv_FeatureDetector_create2" %feat-detector-create) feature-detector 
+  (self feature-detector)
   (detector-type :string))
 
 (defun feat-detector-create (self detector-type)
@@ -39,10 +39,10 @@
 ;; void FeatureDetector::detect(const Mat& image, vector<KeyPoint>& keypoints, const Mat& mask=Mat() ) const
 ;; void cv_FeatureDetector_detect3(FeatureDetector* self, Mat* image, vector_KeyPoint* keypoints, Mat* mask)
 (defcfun ("cv_FeatureDetector_detect3" %feat-detector-detect) :void
-  (self (:pointer feature-detector))
-  (image (:pointer mat))
+  (self feature-detector)
+  (image mat)
   (keypoints (:pointer vector-keypoint))
-  (mask (:pointer mat)))
+  (mask mat))
 
 (defun feat-detector-detect (self image keypoints &optional (mask (mat)))
   "Detects keypoints in an image."
@@ -51,12 +51,12 @@
 
 ;; KeyPoint::KeyPoint()
 ;; KeyPoint* cv_create_KeyPoint()
-(defcfun ("cv_create_KeyPoint" keypoint0) (:pointer keypoint)
+(defcfun ("cv_create_KeyPoint" keypoint0) keypoint
   "Keypoint constructor")
 
 ;; KeyPoint::KeyPoint(float x, float y, float _size, float _angle=-1, float _response=0, int _octave=0, int _class_id=-1)
 ;; KeyPoint* cv_create_KeyPoint7(float x, float y, float _size, float _angle, float _response, int _octave, int _class_id)
-(defcfun ("cv_create_KeyPoint7" keypoint7) (:pointer keypoint)
+(defcfun ("cv_create_KeyPoint7" keypoint7) keypoint
   "Keypoint constructor"
   (x :float)
   (y :float)
@@ -83,9 +83,9 @@
 (defcfun ("cv_Feature2D_compute3" feat-2d-compute) (:pointer feature-2d)
   "Computes the descriptors for a set of keypoints detected in an image."
   (self (:pointer feature-2d))
-  (image (:pointer mat))
+  (image mat)
   (keypoints (:pointer vector-keypoint))
-  (descriptors (:pointer mat)))
+  (descriptors mat))
 
 
 ;;; Common Interfaces of Descriptor Matchers
@@ -105,11 +105,11 @@
 ;; DescriptorMatcher* cv_DescriptorMatcher_create1_2(DescriptorMatcher* self, String* descriptorMatcherType) 
 (defcfun ("cv_DescriptorMatcher_create1_2" %descrip-matcher-create) (:pointer descriptor-matcher)
   (self (:pointer descriptor-matcher))
-  (descriptor-matcher-type (:pointer string*)))
+  (descriptor-matcher-type *string))
 
 (defun descrip-matcher-create (self descriptor-matcher-type)
   "Creates a descriptor matcher of a given type with the default parameters (using default constructor)."
-   (%descrip-matcher-create self (foreign-alloc :string :initial-element descriptor-matcher-type)))
+   (%descrip-matcher-create self (c-string-to-string descriptor-matcher-type (length descriptor-matcher-type))))
 
 
 ;; void DescriptorMatcher::match(const Mat& queryDescriptors, const Mat& trainDescriptors, 
@@ -117,10 +117,10 @@
 ;;void cv_DescriptorMatcher_match(DescriptorMatcher* self, Mat* queryDescriptors, Mat* trainDescriptors, vector_DMatch* matches, Mat* mask)
 (defcfun ("cv_DescriptorMatcher_match" %descrip-matcher-match) :void
   (self (:pointer descriptor-matcher))
-  (query-descriptors (:pointer mat))
-  (train-descriptors (:pointer mat))
+  (query-descriptors mat)
+  (train-descriptors mat)
   (matches (:pointer vector-dmatch))
-  (mask (:pointer mat)))
+  (mask mat))
 
 (defun descrip-matcher-match (self query-descriptors train-descriptors matches &optional (mask (mat)))
   "Finds the best match for each descriptor from a query set."
@@ -139,15 +139,15 @@
 ;; Mat* outImg, Scalar* matchColor, Scalar* singlePointColor, vector_char* matchesMask, int flags) 
 
 (defcfun ("cv_drawMatches" %draw-matches) :void
-  (img1 (:pointer mat))
+  (img1 mat)
   (keypoints1 (:pointer vector-keypoint))
-  (img2 (:pointer mat))
+  (img2 mat)
   (keypoints2 (:pointer vector-keypoint))
   (matches1to2 (:pointer vector-dmatch))
-  (outimg (:pointer mat))
-  (match-color (:pointer scalar))
-  (single-point-color (:pointer scalar))
-  (matches-mask (:pointer vector-char))
+  (outimg mat)
+  (match-color scalar)
+  (single-point-color scalar)
+  (matches-mask vector-char)
   (flags :int))
 
 (defun draw-matches (img1 keypoints1 img2 keypoints2 matches1to2 outimg &optional (match-color (scalar-all -1)) (single-point-color (scalar-all -1)) (matches-mask (vector-char)) (flags +default+))

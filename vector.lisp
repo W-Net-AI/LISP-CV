@@ -48,7 +48,7 @@
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
 (defcfun ("carray_to_std_vectorkp" %c-arr-to-vector-keypoint) (:pointer vector-keypoint)
-  (a :pointer)
+  (a keypoint)
   (len :unsigned-int))
 
 (let ((previous nil))
@@ -60,7 +60,7 @@
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; t * std_vector##tn##_to_carray( vector_##t * v ) 
-(defcfun ("std_vectorkp_to_carray" %vector-Keypoint-to-c-array) :pointer 
+(defcfun ("std_vectorkp_to_carray" %vector-Keypoint-to-c-array) keypoint
   (s (:pointer vector-keypoint)))
 
 
@@ -75,12 +75,12 @@
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * create_std_vector##tn()
-(defcfun ("create_std_vectord" %vector-double) (:pointer vector-double))
+(defcfun ("create_std_vectord" %vector-double) vector-double)
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
-(defcfun ("carray_to_std_vectord" %c-arr-to-vector-double) (:pointer vector-double)
+(defcfun ("carray_to_std_vectord" %c-arr-to-vector-double) vector-double
   (a :pointer)
   (len :unsigned-int))
 
@@ -94,14 +94,26 @@
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; t * std_vector##tn##_to_carray( vector_##t * v ) 
 (defcfun ("std_vectord_to_carray" %vector-double-to-c-array) :pointer 
-  (s (:pointer vector-double)))
+  (s vector-double))
 
 
-(defun vector-double (&optional arg (i 0))
-  (cond ((eq arg nil) (return-from vector-double (%vector-double)))
-	((listp arg)
-	 (return-from vector-double (c-arr-to-vector-double arg)))
-	((pointerp arg) (mem-aref (%vector-double-to-c-array arg) :double i))
+;; size_t std_vectord_length(vector_double* self)
+(defcfun ("std_vectord_length" %vector-double-size) :unsigned-int
+  (self vector-double))
+
+
+(defun vector-double (&rest args)
+  (cond
+    ((null (first args))
+     (return-from vector-double (%vector-double)))
+    ((listp (first args))
+     (c-arr-to-vector-double (first args)))
+    ((eq :size (second args))
+     (%vector-double-size (first args)))
+    ((pointerp (first args))
+     (if (null (second args))
+	 (mem-aref (%vector-double-to-c-array (first args)) :double) 
+	 (mem-aref (%vector-double-to-c-array (first args)) :double (second args))))
     (t nil)))
 
 
@@ -129,22 +141,34 @@
   (s (:pointer vector-float)))
 
 
-(defun vector-float (&optional arg (i 0))
-  (cond ((eq arg nil) (return-from vector-float (%vector-float)))
-	((listp arg)
-	 (return-from vector-float (c-arr-to-vector-float arg)))
-	((pointerp arg) (mem-aref (%vector-float-to-c-array arg) :float i))
+;; size_t std_vectorf_length(vector_float* self)
+(defcfun ("std_vectorf_length" %vector-float-size) :unsigned-int
+  (self (:pointer vector-float)))
+
+
+(defun vector-float (&rest args)
+  (cond
+    ((null (first args))
+     (return-from vector-float (%vector-float)))
+    ((listp (first args))
+     (c-arr-to-vector-float (first args)))
+    ((eq :size (second args))
+     (%vector-float-size (first args)))
+    ((pointerp (first args))
+     (if (null (second args))
+	 (mem-aref (%vector-float-to-c-array (first args)) :float) 
+	 (mem-aref (%vector-float-to-c-array (first args)) :float (second args))))
     (t nil)))
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * create_std_vector##tn()
-(defcfun ("create_std_vectorc" %vector-char) (:pointer vector-char))
+(defcfun ("create_std_vectorc" %vector-char) vector-char)
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
-(defcfun ("carray_to_std_vectorc" %c-arr-to-vector-char) (:pointer vector-char)
+(defcfun ("carray_to_std_vectorc" %c-arr-to-vector-char) vector-char
   (a :pointer)
   (len :unsigned-int))
 
@@ -158,14 +182,26 @@
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; t * std_vector##tn##_to_carray( vector_##t * v ) 
 (defcfun ("std_vectorc_to_carray" %vector-char-to-c-array) :pointer 
-  (s (:pointer vector-char)))
+  (s vector-char))
 
 
-(defun vector-char (&optional arg (i 0))
-  (cond ((eq arg nil) (return-from vector-char (%vector-char)))
-	((listp arg)
-	 (return-from vector-char (c-arr-to-vector-char arg)))
-	((pointerp arg) (mem-aref (%vector-char-to-c-array arg) :char i))
+;; size_t std_vectorc_length(vector_char* self)
+(defcfun ("std_vectorc_length" %vector-char-size) :unsigned-int
+  (self vector-char))
+
+
+(defun vector-char (&rest args)
+  (cond
+    ((null (first args))
+     (return-from vector-char (%vector-char)))
+    ((listp (first args))
+     (c-arr-to-vector-char (first args)))
+    ((eq :size (second args))
+     (%vector-char-size (first args)))
+    ((eq (type-of (first args)) 'std-vector-char)
+     (if (null (second args))
+	 (mem-aref (%vector-char-to-c-array (first args)) :char) 
+	 (mem-aref (%vector-char-to-c-array (first args)) :char (second args))))
     (t nil)))
 
 
@@ -193,11 +229,23 @@
   (s (:pointer vector-int)))
 
 
-(defun vector-int (&optional arg (i 0))
-  (cond ((eq arg nil) (return-from vector-int (%vector-int)))
-	((listp arg)
-	 (return-from vector-int (c-arr-to-vector-int arg)))
-	((pointerp arg) (mem-aref (%vector-int-to-c-array arg) :int i))
+;; size_t std_vector_length(vector_int* self)
+(defcfun ("std_vectori_length" %vector-int-size) :unsigned-int
+  (self (:pointer vector-int)))
+
+
+(defun vector-int (&rest args)
+  (cond
+    ((null (first args))
+     (return-from vector-int (%vector-int)))
+    ((listp (first args))
+     (c-arr-to-vector-int (first args)))
+    ((eq :size (second args))
+     (%vector-int-size (first args)))
+    ((pointerp (first args))
+     (if (null (second args))
+	 (mem-aref (%vector-int-to-c-array (first args)) :int) 
+	 (mem-aref (%vector-int-to-c-array (first args)) :int (second args))))
     (t nil)))
 
 
@@ -209,7 +257,7 @@
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
 (defcfun ("carray_to_std_vectorp" %c-arr-to-vector-point) (:pointer vector-point)
-  (a :pointer)
+  (a point)
   (len :unsigned-int))
 
 (let ((previous nil))
@@ -221,7 +269,7 @@
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; t * std_vector##tn##_to_carray( vector_##t * v ) 
-(defcfun ("std_vectorp_to_carray" %vector-point-to-c-array) :pointer 
+(defcfun ("std_vectorp_to_carray" %vector-point-to-c-array) point 
   (s (:pointer vector-point)))
 
 
@@ -323,11 +371,23 @@
   (s (:pointer vector-uchar)))
 
 
-(defun vector-uchar (&optional arg (i 0))
-  (cond ((eq arg nil) (return-from vector-uchar (%vector-uchar)))
-	((listp arg)
-	 (return-from vector-uchar (c-arr-to-vector-uchar arg)))
-	((pointerp arg) (mem-aref (%vector-uchar-to-c-array arg) :uchar i))
+;; size_t std_vectorr_length(vector_uchar* self)
+(defcfun ("std_vectoru_length" %vector-uchar-size) :unsigned-int
+  (self (:pointer vector-uchar)))
+
+
+(defun vector-uchar (&rest args)
+  (cond
+    ((null (first args))
+     (return-from vector-uchar (%vector-uchar)))
+    ((listp (first args))
+     (c-arr-to-vector-uchar (first args)))
+    ((eq :size (second args))
+     (%vector-uchar-size (first args)))
+    ((pointerp (first args))
+     (if (null (second args))
+	 (mem-aref (%vector-uchar-to-c-array (first args)) :uchar) 
+	 (mem-aref (%vector-uchar-to-c-array (first args)) :uchar (second args))))
     (t nil)))
 
 

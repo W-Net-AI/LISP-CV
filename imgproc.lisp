@@ -11,7 +11,7 @@
 
 ;; static inline Scalar morphologyDefaultBorderValue() { return Scalar::all(DBL_MAX); }
 ;; Scalar* cv_create_morphologyDefaultBorderValue()
-(defcfun ("cv_create_morphologyDefaultBorderValue" morphology-default-border-value) (:pointer scalar))
+(defcfun ("cv_create_morphologyDefaultBorderValue" morphology-default-border-value) scalar)
 
 
 
@@ -23,27 +23,27 @@
 ;; void cv_copyMakeBorder(Mat* src, Mat* dst, int top, int bottom, int left, int right, int borderType, Scalar* value) 
 (defcfun ("cv_copyMakeBorder" copy-make-border) :void 
   "Forms a border around an image."
-  (src (:pointer mat))
-  (dest (:pointer mat))
+  (src mat)
+  (dest mat)
   (top :int)
   (bottom :int)
   (left :int)
   (right :int)
   (border-type :int)
-  (value (:pointer scalar)))
+  (value scalar))
 
 
 ;; void dilate(InputArray src, OutputArray dst, InputArray kernel, Point anchor=Point(-1,-1), int iterations=1, 
 ;; int borderType=BORDER_CONSTANT, const Scalar& borderValue=morphologyDefaultBorderValue())
 ;; void cv_dilate(Mat* src, Mat* dst, Mat* kernel, Point* anchor, int iterations, int borderType, Scalar* borderValue)
 (defcfun ("cv_dilate" %dilate) :void
-  (src (:pointer mat))
-  (dest (:pointer mat))
-  (kernel (:pointer mat))
-  (anchor (:pointer point))
+  (src mat)
+  (dest mat)
+  (kernel mat)
+  (anchor point)
   (iterations :int)
   (border-type :int)
-  (border-value (:pointer scalar)))
+  (border-value scalar))
 
 (defun dilate (src dest kernel &optional (anchor (point -1 -1)) (iterations 1) (border-type +border-constant+) 
               (border-value (morphology-default-border-value)))
@@ -55,13 +55,13 @@
 ;; int borderType=BORDER_CONSTANT, const Scalar& borderValue=morphologyDefaultBorderValue() )
 ;; void cv_erode(Mat* src, Mat* dst, Mat* kernel, Point* anchor, int iterations, int borderType, Scalar* borderValue)
 (defcfun ("cv_erode" %erode) :void
-  (src (:pointer mat))
-  (dest (:pointer mat))
-  (kernel (:pointer mat))
-  (anchor (:pointer point))
+  (src mat)
+  (dest mat)
+  (kernel mat)
+  (anchor point)
   (iterations :int)
   (border-type :int)
-  (border-value (:pointer scalar)))
+  (border-value scalar))
 
 (defun erode (src dest kernel &optional (anchor (point -1 -1)) (iterations 1) (border-type +border-constant+) 
              (border-value (morphology-default-border-value)))
@@ -72,9 +72,9 @@
 ;; void GaussianBlur(InputArray src, OutputArray dst, Size ksize, double sigmaX, double sigmaY=0, int borderType=BORDER_DEFAULT )
 ;; void cv_GaussianBlur(Mat* src, Mat* dst, Size* ksize, double sigmaX, double sigmaY, int borderType)
 (defcfun ("cv_GaussianBlur" %gaussian-blur) :void
-  (src (:pointer mat))
-  (dest (:pointer mat))
-  (ksize (:pointer size))
+  (src mat)
+  (dest mat)
+  (ksize size)
   (sigma-x :double)
   (sigma-y :double)
   (border-type :int))
@@ -88,9 +88,9 @@
 ;;void pyrDown(InputArray src, OutputArray dst, const Size& dstsize=Size(), int borderType=BORDER_DEFAULT )
 ;;void cv_pyrDown(Mat* src, Mat* dst, Size* dstsize, int borderType)
 (defcfun ("cv_pyrDown" %pyr-down) :void 
-	 (src (:pointer mat))
-	 (dest (:pointer mat))
-	 (dstsize (:pointer size))
+	 (src mat)
+	 (dest mat)
+	 (dstsize size)
 	 (border-type :int))
 
 (defun pyr-down (src dest &optional (dstsize (size)) (border-type +border-default+))
@@ -101,9 +101,9 @@
 ;;void pyrUp(InputArray src, OutputArray dst, const Size& dstsize=Size(), int borderType=BORDER_DEFAULT )
 ;;void cv_pyrUp(Mat* src, Mat* dst, Size* dstsize, int borderType)
 (defcfun ("cv_pyrUp" %pyr-up) :void 
-  (src (:pointer mat))
-  (dest (:pointer mat))
-  (dstsize (:pointer size))
+  (src mat)
+  (dest mat)
+  (dstsize size)
   (border-type :int))
 
 (defun pyr-up (src dest &optional (dstsize (size)) (border-type +border-default+))
@@ -115,8 +115,8 @@
 ;; int borderType=BORDER_DEFAULT)
 ;; void cv_Sobel(Mat* src, Mat* dst, int ddepth, int dx, int dy, int ksize, double scale, double delta, int borderType) 
 (defcfun ("cv_Sobel" %sobel) :void
-  (src (:pointer mat))
-  (dest (:pointer mat))
+  (src mat)
+  (dest mat)
   (ddepth :int)
   (dx :int)
   (dy :int)
@@ -136,9 +136,9 @@
 ;; void resize(InputArray src, OutputArray dst, Size dsize, double fx=0, double fy=0, int interpolation=INTER_LINEAR )
 ;; void cv_resize(Mat* src, Mat* dst, Size* dsize, double fx, double fy, int interpolation)
 (defcfun ("cv_resize" %resize) :void
-  (src (:pointer mat))
-  (dest (:pointer mat))
-  (dsize (:pointer size))
+  (src mat)
+  (dest mat)
+  (dsize size)
   (fx :double)
   (fy :double)
   (interpolation :int))
@@ -154,8 +154,8 @@
 ;; void cvtColor(InputArray src, OutputArray dst, int code, int dstCn=0 )
 ;; void cv_cvtColor(Mat* src, Mat* dst, int code, int dstCn) 
 (defcfun ("cv_cvtColor" %cvt-color) :void
-  (self (:pointer mat))
-  (dest (:pointer mat))
+  (self mat)
+  (dest mat)
   (code :int)
   (dest-cn :int))
 
@@ -167,8 +167,8 @@
 ;; double threshold(InputArray src, OutputArray dst, double thresh, double maxval, int type)
 ;; double cv_threshold(Mat* src, Mat* dst, double thresh, double maxval, int type) 
 (defcfun ("cv_threshold" threshold) :double
-  (src (:pointer mat))
-  (dest (:pointer mat))
+  (src mat)
+  (dest mat)
   (thresh :double)
   (max-val :double)
   (type :int))
@@ -182,8 +182,8 @@
 ;; void cv_equalizeHist(Mat* src, Mat* dst)
 (defcfun ("cv_equalizeHist" equalize-hist) :void
   "Equalizes the histogram of a grayscale image."
-  (src (:pointer mat))
-  (dest (:pointer mat)))
+  (src mat)
+  (dest mat))
 
 
 ;;; Structural Analysis and Shape Descriptors
@@ -197,8 +197,8 @@
 ;; void Canny(InputArray image, OutputArray edges, double low-thresh, double high-thresh, int apertureSize=3, bool L2gradient=false )
 ;; void cv_Canny(Mat* image, Mat* edges, double low-thresh, double high-thresh, int apertureSize, bool L2gradient)
 (defcfun ("cv_Canny" %canny) :void 
-	 (image (:pointer mat))
-	 (edges (:pointer mat))
+	 (image mat)
+	 (edges mat)
 	 (low-thresh :double)
 	 (high-thresh :double)
 	 (aperture-size :int)
@@ -216,9 +216,9 @@
 ;; void cv_matchTemplate(Mat* image, Mat* templ, Mat* result, int method) 
 (defcfun ("cv_matchTemplate" match-template) :void
   "Compares a template against overlapped image regions."
-  (image (:pointer mat))
-  (templ (:pointer mat))
-  (result (:pointer mat))
+  (image mat)
+  (templ mat)
+  (result mat)
   (method :int))
 
 

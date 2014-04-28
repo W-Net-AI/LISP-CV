@@ -20,14 +20,14 @@
 ;; CascadeClassifier* cv_create_CascadeClassifier1(String* filename)
 (defcfun ("cv_create_CascadeClassifier1" cascade-classifier1) (:pointer cascade-classifier)
   "Loads a classifier from a file."
-  (filename (:pointer string*)))
+  (filename *string))
 
 (defun cascade-classifier (&optional filename)
-	   (cond ((eq filename nil)
-		  (cascade-classifier0))
-		 (filename
-		  (cascade-classifier1 (foreign-alloc :string :initial-element filename)))
-		 (t nil)))
+  (cond ((eq filename nil)
+	 (cascade-classifier0))
+	(filename
+	 (cascade-classifier1 (c-string-to-string filename (length filename))))
+	(t nil)))
 
 
 ;; bool CascadeClassifier::load(const string& filename)
@@ -35,9 +35,8 @@
 (defcfun ("cv_CascadeClassifier_load1" %cascade-classifier-load) :boolean
   "Loads a classifier from a file."
   (self (:pointer cascade-classifier))
-(filename (:pointer string*)))
+  (filename *string))
 
 (defun cascade-classifier-load (self filename)
   "Loads a classifier from a file."
-  (%cascade-classifier-load self (foreign-alloc :string :initial-element filename)))
-
+  (%cascade-classifier-load self (c-string-to-string filename (length filename))))
