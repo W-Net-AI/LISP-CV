@@ -49,13 +49,15 @@ the main C wrapper repository at:
 
 https://github.com/arjuncomar/opencv_contrib 
 
-there are a few more as well. This is primarily for testing purposes, as the C wrapper 
-module matures those differences will be ironed out.  If you run into a Lisp function 
-that doesn't work suddenly after compiling the latest .cpp files in lisp-cv-master/src, 
-and it worked before, a change in the C wrappers might be the reason. To circumvent 
-that situation always install my full build (all of the .lisp, .cpp and .hpp files) 
-because I will always make sure it's in good working 
-order. 
+there are a few more as well. They are located in the 
+
+"<lisp-cv-directory>/src/extra_functions.cpp 
+file. This is primarily for testing purposes, as the C wrapper module matures those 
+differences will be ironed out.  If you run into a Lisp function that doesn't work 
+suddenly after compiling the latest .cpp files in lisp-cv-master/src, and it worked 
+before, a change in the C wrappers might be the reason. To circumvent that situation 
+always install my full build (all of the .lisp, .cpp and .hpp files) because I will 
+always make sure it's in good working order. 
 
   I write a code example and documentation for each function I add to the library, so 
 it is very well documented. In the lisp-cv-master/examples/examples.lisp folder there 
@@ -77,6 +79,8 @@ To add contributions just Fork my repository at:
 https://github.com/W-Net-AI/lisp-cv and send me a Pull Request.
 
 or send them to me in an e-mail at wnetai@gmail.com. 
+
+
 
 --------------------------------------------------------------------------------
 
@@ -113,64 +117,11 @@ In the file that opens, put a "-l" without quotes in front of the single occuren
 
 rt, pthread, m , dl, tbb
 
-Now to install Emacs, SBCL, SLIME, QuickLisp:
 
-To install Emacs run:
 
-sudo apt-get install emacs24
+Now Install Emacs, (SBCL,CLISP,ACL), SLIME, QuickLisp. You should be able to easily find a tutorial online .
 
-To install SBCL run:  
 
-sudo apt-get install sbcl
-
-To install SLIME run:
-
-sudo apt-get install slime
-
-To install QuickLisp:
-
-go to http://beta.quicklisp.org/quicklisp.lisp to download the quicklisp.lisp file
-
-Place it in ~/.emacs.d/
-
-Next, run sbcl, in Terminal, and type in the following:
-
-(load "~/.emacs.d/quicklisp.lisp")
-
-After it loads, run:
-
-(quicklisp-quickstart:install)
-
-That’ll download the rest of the system and get it set up for you. Quicklisp will
-install by default in ~/quicklisp.
-
-Finally, run:
-
-(ql:add-to-init-file) 
-
-Press Enter.
-
-That will add Quicklisp to your SBCL init file so that anytime you run SBCL Quicklisp 
-will be loaded and ready to go. 
-
-Now, go to terminal and type emacs, to start Emacs. When Emacs starts, if everything 
-went as planned, you should see the word "Polling" at the bottom of the window for a 
-few seconds and the a cool little text animation and then a prompt that looks like this:
-
-CL-USER>
-
-If Emacs stays stuck on "Polling", first verify you have a .sbclrc file in your 
-home directory(~/) and that it contains the following text:
-
-;;; The following lines added by ql:add-to-init-file:
-#-quicklisp
-(let ((quicklisp-init (merge-pathnames "quicklisp/setup.lisp"
-                                       (user-homedir-pathname))))
-  (when (probe-file quicklisp-init)
-    (load quicklisp-init)))
-
-If it doesn't or there is no file there, repeat the steps starting from "To inst-
-all QuickLisp:" and review any error messages to debug.
 
 Now in Emacs, at the CL-USER> prompt (it's correct name is the REPL(Read Eval Pr-
 int Loop), enter the below command to test out your QuickLisp installation and a-
@@ -190,7 +141,11 @@ ieee-floats-20140211-git
 You can remove the ieee-floats-20140211-git directory now if you like and it wil-
 l be effectively uninstalled.
 
+
+
 Now to install Lisp-Cv!!!
+
+
 
 Note #1: I will make a Makefile or script to install Lisp-Cv as library progress-
 es but for now this install tutorial is made people who want to work on the proj-
@@ -199,10 +154,7 @@ ibrary works...don't worry though it's easy.  If you do end up helping on the pr
 oject you might want to make a script to speed up some of the processes defined 
 below.
 
-Note #2: "Lisp-Cv" is a decorative name made to signify that is a Common Lisp wr-
-apper for OpenCV and to pay hommage to the fact the name Lisp was derived from i-
-ts method of operation, "List Processing". The name with the capitalized 'L', 'P',
-'C' and 'V' appears nowhere in the uncommented source code.
+
 
 Let's get started.
 
@@ -247,21 +199,31 @@ that you place in the directory.
 
 Then take each one of those .so files you created and place in /usr/local/lib.
 
+
+
 Now start Emacs and run:
+
 
 (ql:quickload "cffi")
 
+
 To install CFFI, which Lisp-Cv depends on, plus it's dependencies.
+
 
 Then run:
 
+
 (ql:quickload "asdf")
+
 
 To install ASDF, a Lisp-Cv dependency.
 
+
 Run:
 
+
 gksu gedit ~/.sbclrc
+
 
 and add this to the top of your ~/.sbclrc file.
 
@@ -270,21 +232,30 @@ and add this to the top of your ~/.sbclrc file.
  (dolist (dir (directory "/home/w/quicklisp/dists/quicklisp/software/*/"))
  (pushnew dir asdf:*central-registry* :test #'equal))
 
+
 Open Emacs and run this at the REPL:
+
 
 (asdf:operate 'asdf:load-op :lisp-cv)
 
+
 Lisp-Cv will load.
+
 
 Then run this at the REPL
 
+
 (in-package #:lisp-cv)
+
 
 Your REPL will change to look like this:
 
-LISP-CV>
+
+LCV>
+
 
 Now you are all finished!
+
 
 Run this at the REPL to test:
 
@@ -312,6 +283,8 @@ and then this:
 
 
 If all went as planned an empty window should open up.
+
+
 
 --------------------------------------------------------------------------------
 
