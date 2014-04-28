@@ -254,6 +254,30 @@
        (cap-release ,capture-var))))
 
 
+(defmacro with-captured-camera ((capture-var dev-index &key width height) &body body)
+  "Ensures CAP-RELEASE gets called on captures 
+   and sets capture width/height in function"
+  `(let ((,capture-var (video-capture ,dev-index)))
+     (when ,width
+       (cap-set ,capture-var +cap-prop-frame-width+ ,width))
+     (when ,height
+       (cap-set ,capture-var +cap-prop-frame-height+ ,height))
+     (unwind-protect (progn ,@body)
+       (cap-release ,capture-var))))
+
+
+(defmacro with-captured-file ((capture-var file-path &key width height) &body body)
+  "Ensures CAP-RELEASE gets called on captures 
+   and sets capture width/height in function"
+  `(let ((,capture-var (video-capture ,file-path)))
+     (when ,width
+       (cap-set ,capture-var +cap-prop-frame-width+ ,width))
+     (when ,height
+       (cap-set ,capture-var +cap-prop-frame-height+ ,height))
+     (unwind-protect (progn ,@body)
+       (cap-release ,capture-var))))
+
+
 ;;; Qt New Functions
 
 ;; double cv_getWindowProperty(String* winname, int prop_id) 

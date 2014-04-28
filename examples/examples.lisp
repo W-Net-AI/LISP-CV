@@ -1826,7 +1826,7 @@ See also:
     (imshow window-name-1 image)
     ;Convert IMAGE to 1 channel
     (cvt-color image image +bgr2gray+)
-    ;Convert IMAGE to double float
+    ;Convert IMAGE to double floatwith-call-gui-thread
     ;and show image in window
     (convert-to image image +64f+)
     (imshow window-name-2 image)
@@ -3821,7 +3821,7 @@ Example:
 
 PUT-TEXT
 
-Draws a text string.
+Draws a text string.with-call-gui-thread
 
 C++: void putText(Mat& img, const string& text, Point org, int fontFace, double fontScale, Scalar color, int thickness=1, 
      int lineType=8, bool bottomLeftOrigin=false )
@@ -4041,7 +4041,7 @@ Here RGB supplies a red color value.
 
 CIRCLE IMAGE POINT RADIUS (RGB 255 0 0) +FILLED+ +AA+ 0) 
 
-
+with-call-gui-thread
 UTILITY AND SYSTEM FUNCTIONS AND MACROS:
 
 
@@ -4227,7 +4227,7 @@ tion time in seconds:
    a Quad-Core Processor."
 
   (let* ((t1 0)
-	 (t2 0)
+	 (t2 0)with-call-gui-thread
 	 (time-calc 0))
     (setf t1 (coerce (get-tick-count) 'double-float))
     (sleep 5)
@@ -4939,7 +4939,7 @@ If you want to decimate the image by factor of 2 in each direction, you can call
 
 
 ;; Specify FX and FY and let the function compute the destination image size.
-
+with-call-gui-thread
 
 (RESIZE SRC DEST (SIZE) 0.5d0 0.5d0 INTERPOLATION)
 
@@ -4988,6 +4988,77 @@ See also:
 
 
 IMGPROC - MISCELLANEOUS IMAGE TRANSFORMATIONS:
+
+
+
+ADAPTIVE-THRESHOLD
+
+
+Applies an adaptive threshold to an array.
+
+
+C++: void adaptiveThreshold(InputArray src, OutputArray dst, double maxValue, int adaptiveMethod, int thresholdType, 
+     int blockSize, double C)
+
+LISP-CV: (ADAPTIVE-THRESHOLD (SRC MAT) (DEST MAT) (MAX-VALUE :DOUBLE) (ADAPTIVE-METHOD :INT) (THRESHOLD-TYPE :INT) 
+         (BLOCKSIZE :INT) (C :DOUBLE))
+
+
+    Parameters:	
+
+        SRC - Source 8-bit single-channel image.
+
+        DEST - Destination image of the same size and the same type as SRC.
+
+        MAX-VALUE - Non-zero value assigned to the pixels for which the condition is satisfied. 
+                    See the details below.
+
+        ADAPTIVE-METHOD - Adaptive thresholding algorithm to use, +ADAPTIVE-THRESH-MEAN-C+ or 
+                          +ADAPTIVE-THRESH-GAUSSIAN-C+ . See the details below.
+
+        THRESHOLD-TYPE - Thresholding type that must be either +THRESH-BINARY+ or +THRESH-BINARY-INV+.
+
+        BLOCK-SIZE - Size of a pixel neighborhood that is used to calculate a threshold value for the 
+                     pixel: 3, 5, 7, and so on.
+
+        C - Constant subtracted from the mean or weighted mean (see the details below). Normally, it is 
+            positive but may be zero or negative as well.
+
+
+The function transforms a grayscale image to a binary image according to the formulae:
+
+
+See OpenCV documentation for a description and formulae:
+
+http://docs.opencv.org/trunk/modules/imgproc/doc/miscellaneous_transformations.
+html?highlight=adaptivethresh#adaptivethreshold
+
+
+The function can process the image in-place.
+
+See also:
+
+(THRESHOLD), (BLUR), (GAUSSIAN-BLUR)
+
+
+
+(defun adaptive-threshold-example (&optional (cam 0))
+  (let ((window-name "ADAPTIVE-THRESHOLD Example"))
+    (with-named-window (window-name +window-autosize+)
+      (move-window window-name 640 100)
+      (with-captured-camera (cap cam :width 640 :height 480)
+	(loop
+	   (with-mat (frame (mat))
+	     (cap-read cap frame)
+	     (with-mat (img (mat-typed (rows frame) (cols frame) +8u+))
+	       (cvt-color frame img +bgr2gray+)
+	       (adaptive-threshold img img 245d0 
+				   +adaptive-thresh-mean-c+ 
+				   +thresh-binary+ 9 3.75d0)
+	       (imshow window-name img)))
+	   (let ((c (wait-key 33)))
+	     (when (= c 27)
+	       (return))))))))
 
 
 
@@ -6043,6 +6114,136 @@ LISP-CV: (VIDEO-CAPTURE &OPTIONAL (SRC :POINTER STRING*)) => (:POINTER VIDEO-CAP
 
 
 
+WITH-CAPTURE
+
+
+Ensures CAP-RELEASE gets called on captures.
+
+LISP-CV: (WITH-CAPTURE (CAPTURE-VAR CAP)) &BODY BODY)
+
+
+Parameters:	
+
+         CAPTURE-VAR - A variable representing the function used to open video file or a capturing 
+                       device. Similar to the variable in a LET statement.
+
+         CAP - The function used to open video file or a capturing device for video capturing, as i-
+               n (video-capture (DEVICE :INT)). See WITH-CAPTURE example.
+    
+         BODY - The body of the code to be executed once the video file or capturing device is open.
+
+
+(defun with-capture-example (&optional 
+			       (camera-index *camera-index*))
+
+  "WITH-CAPTURE is a macro that basically ensures 
+   CAP-RELEASE gets called on all captures. CAP-R-
+   ELEASE is a function that releases the capture 
+   structure created by video-capture, autom-
+   atically, when the code exits. Using it is not 
+   neccesary, but it does make the code a bit mor-
+   eelegant. See CAP-RELEASE example to see how t-
+   o release the capture structure without callin-
+   g WITH-CAPTURE."
+
+  (with-capture (cap (video-capture camera-index))
+    (let ((window-name "WITH-CAPTURE Example"))
+      (if (not (cap-is-open cap)) 
+	  (return-from with-capture-example 
+	    (format t "Cannot open the video camera")))
+      (named-window window-name +window-normal+)
+      (do* ((frame 0))
+	   ((plusp (wait-key *millis-per-frame*)) 
+	    (format t "Key is pressed by user"))
+	(setf frame (mat))
+	(cap-read cap frame)
+	(imshow window-name frame))
+      (destroy-window window-name))))
+
+
+
+WITH-CAPTURED-CAMERA
+
+
+Ensures CAP-RELEASE gets called on captures 
+and sets capture width/height in function.
+
+
+LISP-CV: (WITH-CAPTURED-CAMERA ((CAPTURE-VAR (DEV-INDEX :INT) &KEY (WIDTH :INT) (HEIGHT :INT)) &BODY BODY)) => (:POINTER VIDEO-CAPTURE)
+
+
+Parameters:	
+
+         CAPTURE-VAR - A variable representing the function used to open video file or a capturing 
+                       device. Similar to the variable in a LET statement.
+
+         DEV-INDEX - Id of the opened video capturing device (e.g. a camera index). If there is a 
+                     single camera connected, just pass 0.
+
+         WIDTH - Width of the frames in the video stream.
+
+         HEIGHT - Height of the frames in the video stream.
+    
+         BODY - The body of the code to be executed once the video file or capturing device is open.
+
+
+
+(defun with-captured-camera-example (&optional (cam 0))
+  (let ((window-name "WITH-CAPTURED-CAMERA Example"))
+    (with-named-window (window-name +window-autosize+)
+      (move-window window-name 640 100)
+      (with-captured-camera (cap cam :width 640 :height 480)
+	(loop
+	   (with-mat (frame (mat))
+	     (cap-read cap frame)
+	       (imshow window-name frame))
+	   (let ((c (wait-key 33)))
+	     (when (= c 27)
+	       (return))))))))
+
+
+
+WITH-CAPTURED-FILE
+
+
+Ensures CAP-RELEASE gets called on captures 
+and sets capture width/height in function.
+
+
+LISP-CV: (WITH-CAPTURED-FILE ((CAPTURE-VAR (FILE-PATH :INT) &KEY (WIDTH :INT) (HEIGHT :INT)) &BODY BODY))
+
+
+Parameters:	
+
+         CAPTURE-VAR - A variable representing the function used to open video file or a capturing 
+                       device. Similar to the variable in a LET statement.
+
+         FILENAME - Name of the opened video file (eg. video.avi) or image sequence (eg. img-%02d.jpg, 
+                    which will read samples like img-00.jpg, img-01.jpg, img-02.jpg,...)
+
+         WIDTH - Width of the frames in the video stream.
+
+         HEIGHT - Height of the frames in the video stream.
+    
+         BODY - The body of the code to be executed once the video file or capturing device is open.
+
+
+
+(defun with-captured-file-example (file-path)
+  (let ((window-name "WITH-CAPTURED-FILE Example"))
+    (with-named-window (window-name +window-autosize+)
+      (move-window window-name 640 100)
+      (with-captured-file (cap file-path :width 640 :height 480)
+	(loop
+	   (with-mat (frame (mat))
+	     (cap-read cap frame)
+	       (imshow window-name frame))
+	   (let ((c (wait-key 33)))
+	     (when (= c 27)
+	       (return))))))))
+
+
+
 HIGHGUI - USER INTERFACE:
 
 
@@ -6257,7 +6458,7 @@ Qt backend supports additional flags:
         eas +WINDOW-AUTOSIZE adjusts automatically the window size to fit the displayed image (see 
         (IMSHOW) ), and you cannot change the window size manually.
 
-        +WINDOW-FREERATIO+ or +WINDOW-KEEPRATIO+: +WINDOW-FREERATIO+ adjusts the image with no resp-
+        +WINDOW-FREERATIO+ or +with-call-gui-threadWINDOW-KEEPRATIO+: +WINDOW-FREERATIO+ adjusts the image with no resp-
         ect to its ratio, whereas +WINDOW-KEEPRATIO keeps the image ratio. 
         
         +GUI-NORMAL+ or +GUI-EXPANDED+: +GUI-NORMAL+ is the old way to draw the window without stat-
@@ -6779,52 +6980,8 @@ The function SET-WINDOW-PROPERTY enables changing properties of a window.
     (loop while (not (= (wait-key 0) 27)))
     (del-mat image)
     (destroy-window window-name)))
- 
 
 
-WITH-CAPTURE
-
-Ensures CAP-RELEASE gets called on captures.
-
-LISP-CV: (WITH-CAPTURE (CAPTURE-VAR CAP)) &BODY BODY)
-
-Parameters:	
-
-         CAPTURE-VAR - A variable representing the function used to open video file or a capturing 
-                       device. Similar to the variable in a LET statement.
-
-         CAP - The function used to open video file or a capturing device for video capturing, as i-
-               n (video-capture (DEVICE :INT)). See WITH-CAPTURE example.
-    
-         BODY - The body of the code to be executed once the video file or capturing device is open.
-
-
-(defun with-capture-example (&optional 
-			       (camera-index *camera-index*))
-
-  "WITH-CAPTURE is a macro that basically ensures 
-   CAP-RELEASE gets called on all captures. CAP-R-
-   ELEASE is a function that releases the capture 
-   structure created by video-capture, autom-
-   atically, when the code exits. Using it is not 
-   neccesary, but it does make the code a bit mor-
-   eelegant. See CAP-RELEASE example to see how t-
-   o release the capture structure without callin-
-   g WITH-CAPTURE."
-
-  (with-capture (cap (video-capture camera-index))
-    (let ((window-name "WITH-CAPTURE Example"))
-      (if (not (cap-is-open cap)) 
-	  (return-from with-capture-example 
-	    (format t "Cannot open the video camera")))
-      (named-window window-name +window-normal+)
-      (do* ((frame 0))
-	   ((plusp (wait-key *millis-per-frame*)) 
-	    (format t "Key is pressed by user"))
-	(setf frame (mat))
-	(cap-read cap frame)
-	(imshow window-name frame))
-      (destroy-window window-name))))
 
 
 CAP-IS-OPEN

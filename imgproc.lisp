@@ -151,6 +151,18 @@
 ;;; Miscellaneous Image Transformations
 
 
+;; void adaptiveThreshold(InputArray src, OutputArray dst, double maxValue, int adaptiveMethod, int thresholdType, int blockSize, double C)
+;; void cv_adaptiveThreshold(Mat* src, Mat* dst, double maxValue, int adaptiveMethod, int thresholdType, int blockSize, double C)
+(defcfun ("cv_adaptiveThreshold" adaptive-threshold) :void
+  (src mat)
+  (dest mat)
+  (max-value :double)
+  (adaptive-method :int)
+  (threshold-type :int) 
+  (blocksize :int) 
+  (c :double))
+
+
 ;; void cvtColor(InputArray src, OutputArray dst, int code, int dstCn=0 )
 ;; void cv_cvtColor(Mat* src, Mat* dst, int code, int dstCn) 
 (defcfun ("cv_cvtColor" %cvt-color) :void

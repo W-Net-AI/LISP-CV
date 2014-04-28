@@ -731,6 +731,7 @@
    #:+dist-mask-5+
    #:+dist-mask-precise+ 
 
+   #:adaptive-threshold 
    #:cvt-color
    #:threshold
    

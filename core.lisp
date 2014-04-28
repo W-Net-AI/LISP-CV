@@ -10,8 +10,8 @@
 ;; Default parameters
 
 (defvar *camera-index* 0)
-(defvar *default-width* 1280)
-(defvar *default-height* 1024)
+(defvar *default-width* 640)
+(defvar *default-height* 480)
 (defvar *frames-per-second* 30)
 (defvar *millis-per-frame* (round (/ 1000 *frames-per-second*)))
 
