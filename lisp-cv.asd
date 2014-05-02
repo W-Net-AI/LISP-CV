@@ -3,12 +3,15 @@
 ;;(ql:quickload "ieee-floats")
 (asdf:defsystem #:lisp-cv
   :name "lisp-cv"
-  :author "Joe W. BiMedina <wnetai@yahoo.com>. Thanks to J. Bromley <jbromley@gmail.com> inspiring me and for getting me started on this project"
+  :author "Joe W. BiMedina <wnetai@yahoo.com>."
   :version "0.1"
-  :description "OpenCV bindings for SBCL"
+  :description "Common Lisp bindings to OpenCV."
   :depends-on (#:cffi
+               ;#:cffi-libffi
                #:swank 
                #:trivial-garbage
+               #:simple-utils
+               #:lisp-executable
                ;Commenting out swank above -> gets rid of - WARNING: Not reloading SWANK.  Package already exists. -
                ;in inferior-lisp at startup - re-add to get live code editing. 
 )

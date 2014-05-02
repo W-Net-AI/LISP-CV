@@ -6,13 +6,19 @@ using namespace std;
 using namespace flann;
 using namespace cvflann;
 
+CvPoint cvPoint_glue(int x, int y);
+
 extern "C" {
+MatExpr* cv_abs(Mat* m);
+Rect* cv_RotatedRect_boundingRect(RotatedRect* self);
+MatExpr* cv_Mat_div(Mat* m1, Mat* m2);
 FeatureDetector* cv_FeatureDetector_create2(FeatureDetector* self, const char* detectorType);
 Scalar* cv_create_morphologyDefaultBorderValue();
 bool cv_findChessboardCorners2(Mat* image, Size* patternSize, vector_Point2f* corners, int flags);
 void cv_cornerSubPix2(Mat* image, vector_Point2f* corners, Size* winSize, Size* zeroZone, TermCriteria* criteria);
 void cv_drawChessboardCorners2(Mat* image, Size* patternSize, vector_Point2f* corners, bool patternWasFound);
-TermCriteria* cv_create_TermCriteria(int type, int maxCount, double epsilon);
+TermCriteria* cv_create_TermCriteria();
+TermCriteria* cv_create_TermCriteria3(int type, int maxCount, double epsilon);
 MatExpr* cv_Mat_sub(Mat* m1, Mat* m2);
 RNG* cv_create_RNG();
 RNG* cv_create_RNG_state(uint64 state);
@@ -31,8 +37,10 @@ Size2f* cv_Size2f_fromPoint2f(Point2f* p);
 float cv_Size2f_area(Size2f* self);
 float cv_Size2f_width(Size2f* self);
 float cv_Size2f_height(Size2f* self);
-void cv_delete_BFMatcher(void* ptr);
-void cv_delete_BRISK(void* ptr);
+void cv_delete_BFMatcher(BFMatcher* ptr);
+void cv_delete_BRISK(BRISK* ptr);
+void cv_delete_CscadeClassifier(CascadeClassifier* self);
+void cv_delete_DMatch(DMatch* ptr);
 void cv_delete_KeyPoint(KeyPoint* self);
 void cv_delete_Point(Point* self);
 void cv_delete_Point2d(Point2d* self);
@@ -42,10 +50,16 @@ void cv_delete_Point3f(Point3f* self);
 void cv_delete_Point3i(Point3i* self);
 void cv_delete_Rect(Rect* self);
 void cv_delete_RNG(RNG* self);
+void cv_delete_RotatedRect(RotatedRect* self);
 void cv_delete_Scalar(Scalar* self);
 void cv_delete_Size(Size* self);
+void cv_delete_Size2f(Size2f* self);
 void cv_delete_SURF(SURF* self);
+void cv_delete_TermCriteria(TermCriteria* self);
 void cv_delete_vector_char(vector_char* self);
+void cv_delete_VideoCapture(VideoCapture* self);
+void cv_delete_VideoWriter(VideoWriter* self);
+
 }
 
 

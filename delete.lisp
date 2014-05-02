@@ -17,22 +17,36 @@
 ;; void operator delete  ( void* ptr )
 ;; void cv_delete_BFMatcher(void* ptr)
 (defcfun ("cv_delete_BFMatcher" del-bf-matcher) :void
-  "Calls delete on a (:POINTER BF-MATCHER)"
-  (ptr :pointer))
+  "Calls delete on (:POINTER BF-MATCHER)"
+  (self :pointer))
 
 
 ;; void operator delete  ( void* ptr )
 ;; void cv_delete_BRISK(void* ptr) 
 (defcfun ("cv_delete_BRISK" del-brisk) :void
-  "Calls delete on a (:POINTER BRISK)"
-  (ptr :pointer))
+  "Calls delete on (:POINTER BRISK)"
+  (self :pointer))
+
+
+;; void operator delete  ( void* ptr )
+;; void cv_delete_CscadeClassifier(void* ptr) 
+(defcfun ("cv_delete_CscadeClassifier" del-casc-class) :void
+  "Calls delete on CASCADE-CLASSIFIER"
+  (self :pointer))
+
+
+;; void operator delete  ( void* ptr )
+;; void cv_delete_DMatch(void* self)
+(defcfun ("cv_delete_DMatch" del-dmatch) :void
+  "Calls delete on DMATCH"
+  (self dmatch))
 
 
 ;; void operator delete  ( void* ptr )
 ;; void cv_delete_KeyPoint(void* self)
 (defcfun ("cv_delete_KeyPoint" del-kp) :void
-  "Calls delete on KeyPoint"
-  (self keypoint))
+  "Calls delete on KEY-POINT"
+  (self key-point))
 
 
 ;; void operator delete  ( void* ptr )
@@ -106,6 +120,13 @@
 
 
 ;; void operator delete  ( void* ptr )
+;; void cv_delete_RotatedRect(void* self)
+(defcfun ("cv_delete_RotatedRect" del-rot-rect) :void
+  "Calls delete on ROTATED-RECT"
+  (self rotated-rect))
+
+
+;; void operator delete  ( void* ptr )
 ;; void cv_delete_Scalar(void* self)
 (defcfun ("cv_delete_Scalar" del-scalar) :void
   "Calls delete on SCALAR"
@@ -120,91 +141,119 @@
 
 
 ;; void operator delete  ( void* ptr )
+;; void cv_delete_Size2f(void* self)
+(defcfun ("cv_delete_Size2f" del-size2f) :void
+  "Calls delete on SIZE2F"
+  (self size2f))
+
+
+;; void operator delete  ( void* ptr )
 ;; void cv_delete_std_string(string* self)
 (defcfun ("cv_delete_std_string" del-std-string) :void
   "Calls delete on *STRING"
-  (ptr *string))
+  (self *string))
 
 
 ;; void operator delete  ( void* ptr )
 ;; void cv_delete_SURF(SURF* self)
 (defcfun ("cv_delete_SURF" del-surf) :void
   "Calls delete on SURF"
-  (ptr surf))
+  (self surf))
+
+
+;; void operator delete  ( void* ptr )
+;; void cv_delete_TermCriteria(TermCriteria* self)
+(defcfun ("cv_delete_TermCriteria" del-term-crit) :void
+  "Calls delete on TERM-CRITERIA"
+  (self term-criteria))
 
 
 ;; void operator delete  ( void* ptr )
 ;; void delete_std_vector##tn( vector_##t * v)
 (defcfun ("delete_std_vectorc" del-vec-char) :void
-  "Calls delete on a VECTOR-CHAR"
-  (self :pointer))
+  "Calls delete on VECTOR-CHAR"
+  (self vector-char))
 
 
 ;; void operator delete  ( void* ptr )
 ;; void delete_std_vector##tn( vector_##t * v)
 (defcfun ("delete_std_vectord" del-vec-dbl) :void
-  "Calls delete on a VECTOR-DOUBLE"
-  (self :pointer))
+  "Calls delete on VECTOR-DOUBLE"
+  (self vector-double))
 
 
 ;; void operator delete  ( void* ptr )
 ;; void delete_std_vector##tn( vector_##t * v)
 (defcfun ("delete_std_vectordm" del-vec-dm) :void
-  "Calls delete on a (:POINTER VECTOR-DMATCH)"
+  "Calls delete on (:POINTER VECTOR-DMATCH)"
   (self :pointer))
 
 
 ;; void operator delete  ( void* ptr )
 ;; void delete_std_vector##tn( vector_##t * v)
 (defcfun ("delete_std_vectorf" del-vec-flt) :void
-  "Calls delete on a (:POINTER VECTOR-FLOAT)"
-  (self :pointer))
+  "Calls delete on VECTOR-FLOAT"
+  (self vector-float))
 
 
 ;; void operator delete  ( void* ptr )
 ;; void delete_std_vector##tn( vector_##t * v)
 (defcfun ("delete_std_vectori" del-vec-int) :void
-  "Calls delete on a (:POINTER VECTOR-INT)"
-  (self :pointer))
+  "Calls delete on VECTOR-INT"
+  (self vector-int))
 
 
 ;; void operator delete  ( void* ptr )
 ;; void delete_std_vector##tn( vector_##t * v)
 (defcfun ("delete_std_vectorkp" del-vec-kp) :void
-  "Calls delete on a (:POINTER VECTOR-KEYPOINT)"
+  "Calls delete on (:POINTER VECTOR-KEY-POINT)"
   (self :pointer))
 
 
 ;; void operator delete  ( void* ptr )
 ;; void delete_std_vector##tn( vector_##t * v)
 (defcfun ("delete_std_vectorm" del-vec-mat) :void
-  "Calls delete on a (:POINTER VECTOR-MAT)"
+  "Calls delete on (:POINTER VECTOR-MAT)"
   (self :pointer))
 
 
 ;; void operator delete  ( void* ptr )
 ;; void delete_std_vector##tn( vector_##t * v)
 (defcfun ("delete_std_vectorp" del-vec-point) :void
-  "Calls delete on a (:POINTER VECTOR-POINT)"
-  (self :pointer))
+  "Calls delete on VECTOR-POINT"
+  (self vector-point))
 
 
 ;; void operator delete  ( void* ptr )
 ;; void delete_std_vector##tn( vector_##t * v)
 (defcfun ("delete_std_vectorp2f" del-vec-point2f) :void
-  "Calls delete on a (:POINTER VECTOR-POINT2F)"
+  "Calls delete on VECTOR-POINT2F"
   (self :pointer))
 
 
 ;; void operator delete  ( void* ptr )
 ;; void delete_std_vector##tn( vector_##t * v)
 (defcfun ("delete_std_vectorr" del-vec-rect) :void
-  "Calls delete on a (:POINTER VECTOR-RECT)"
+  "Calls delete on (:POINTER VECTOR-RECT)"
   (self :pointer))
 
 
 ;; void operator delete  ( void* ptr )
 ;; void delete_std_vector##tn( vector_##t * v)
 (defcfun ("delete_std_vectoru" del-vec-uchar) :void
-  "Calls delete on a (:POINTER VECTOR-UCHAR)"
+  "Calls delete on VECTOR-UCHAR"
   (self :pointer))
+
+
+;; void operator delete  ( void* ptr )
+;; void delete_VideoCapture( vector_##t * v)
+(defcfun ("cv_delete_VideoCapture" del-vid-cap) :void
+  "Calls delete on VIDEO-CAPTURE"
+  (self video-capture))
+
+
+;; void operator delete  ( void* ptr )
+;; void delete_VideoWriter( vector_##t * v)
+(defcfun ("cv_delete_VideoWriter" del-vid-writer) :void
+  "Calls delete on VIDEO-WRITER"
+  (self video-writer))

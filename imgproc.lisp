@@ -69,6 +69,23 @@
        (%erode src dest kernel anchor iterations border-type border-value))
 
 
+;; void filter2D(InputArray src, OutputArray dst, int ddepth, InputArray kernel, Point anchor=Point(-1,-1), double delta=0, 
+;; int borderType=BORDER_DEFAULT )
+;; void cv_filter2D(Mat* src, Mat* dst, int ddepth, Mat* kernel, Point* anchor, double delta, int borderType)
+(defcfun ("cv_filter2D" %filter-2d) :void
+  (src mat)
+  (dest mat)
+  (ddepth :int)
+  (kernel mat)
+  (anchor point)
+  (delta :double)
+  (border-type :int))
+
+(defun filter-2d (src dest ddepth kernel &optional (anchor (point -1 -1)) (delta 0d0) (border-type +border-default+))
+  "Convolves an image with the kernel."
+  (%filter-2d src dest ddepth kernel anchor delta border-type))
+
+
 ;; void GaussianBlur(InputArray src, OutputArray dst, Size ksize, double sigmaX, double sigmaY=0, int borderType=BORDER_DEFAULT )
 ;; void cv_GaussianBlur(Mat* src, Mat* dst, Size* ksize, double sigmaX, double sigmaY, int borderType)
 (defcfun ("cv_GaussianBlur" %gaussian-blur) :void
@@ -83,6 +100,22 @@
 (defun gaussian-blur(src dest ksize sigma-x &optional (sigma-y 0) (border-type +border-default+))
   "Blurs an image using a Gaussian filter."
    (%gaussian-blur src dest ksize sigma-x sigma-y border-type))
+
+
+;; void Laplacian(InputArray src, OutputArray dst, int ddepth, int ksize=1, double scale=1, double delta=0, int borderType=BORDER_DEFAULT )
+;; void cv_Laplacian(Mat* src, Mat* dst, int ddepth, int ksize, double scale, double delta, int borderType)
+(defcfun ("cv_Laplacian" %laplacian) :void
+  (src mat)
+  (dest mat)
+  (ddepth :int)
+  (ksize :int)
+  (scale :double)
+  (delta :double)
+  (border-type :int))
+
+(defun laplacian (src dest ddepth &optional (ksize 1) (scale 1d0) (delta 0d0) (border-type +border-default+))
+       "Calculates the Laplacian of an image."
+       (%laplacian src dest ddepth ksize scale delta border-type))
 
 
 ;;void pyrDown(InputArray src, OutputArray dst, const Size& dstsize=Size(), int borderType=BORDER_DEFAULT )
@@ -174,6 +207,33 @@
 (defun cvt-color (src dest code &optional (dest-cn 0))
   "Converts an image from one cofmisclor space to another."
    (%cvt-color src dest code dest-cn))
+
+
+;; void distanceTransform(InputArray src, OutputArray dst, int distanceType, int maskSize )
+;; void cv_distanceTransform4(Mat* src, Mat* dst, int distanceType, int maskSize)
+(defcfun ("cv_distanceTransform4" distance-transform4) :void
+  (src mat)
+  (dest mat)
+  (distance-type :int)
+  (mask-size :int))
+
+;; void distanceTransform(InputArray src, OutputArray dst, OutputArray labels, int distanceType, int maskSize, 
+;; int labelType=DIST_LABEL_CCOMP )
+;; void cv_distanceTransform(Mat* src, Mat* dst, Mat* labels, int distanceType, int maskSize, int labelType)
+(defcfun ("cv_distanceTransform" %distance-transform) :void
+  (src mat)
+  (dest mat)
+  (*labels mat)
+  (distance-type :int)
+  (mask-size :int)
+  (label-type :int))
+
+(defun distance-transform (arg1 arg2 arg3 arg4 &optional arg5 (arg6 +dist-label-ccomp+))
+  (cond ((eq arg5 nil)
+	 (distance-transform4 arg1 arg2 arg3 arg4))
+	(arg5
+	 (%distance-transform arg1 arg2 arg3 arg4 arg5 arg6))
+	(t nil)))
 
 
 ;; double threshold(InputArray src, OutputArray dst, double thresh, double maxval, int type)

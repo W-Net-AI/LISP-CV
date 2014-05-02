@@ -16,7 +16,6 @@
 (defvar *millis-per-frame* (round (/ 1000 *frames-per-second*)))
 
 
-
 ;; Change default parameters
 
 (defun def-params (width height &optional camera-index fps)
@@ -55,7 +54,7 @@
 
 
 ;; string* std_cstringToString(char* s, size_t len) 
-(defcfun ("cstring_to_std_string" c-string-to-string) (*string :garbage-collect t)
+(defcfun ("cstring_to_std_string" c-string-to-string) *string
   "Converts C string to C++"
   (s :string)
   (len :unsigned-int))
@@ -107,7 +106,7 @@
 ;; float cv_Size2f_area(Size2f* self) 
 (defcfun ("cv_Size2f_area" area2f) :float
   "Gets the area of a SIZE2F construct"
-  (self (:pointer size2f)))
+  (self size2f))
 
 
  ;; Mat* cv_Mat_assignVal(Mat* self, Scalar* s)
@@ -230,6 +229,38 @@
   (m2 mat))
 
 
+;; DMatch::DMatch()
+;; DMatch* cv_create_DMatch() 
+(defcfun ("cv_create_DMatch" dmatch0) dmatch
+	 "DMatch constructor")
+
+;; DMatch( int _queryIdx, int _trainIdx, float _distance ) 
+;; DMatch* cv_create_DMatch3(int _queryIdx, int _trainIdx, float _distance)
+(defcfun ("cv_create_DMatch3" dmatch3) dmatch
+	 "DMatch constructor"
+	 (query-idx :int)
+	 (train-idx :int)
+	 (distance :float))
+
+;; DMatch( int _queryIdx, int _trainIdx, int _imgIdx, float _distance )
+;; DMatch* cv_create_DMatch4(int _queryIdx, int _trainIdx, int _imgIdx, float _distance)
+(defcfun ("cv_create_DMatch4" dmatch4) dmatch
+	 "DMatch constructor"
+	 (query-idx :int)
+	 (train-idx :int)
+	 (img-idx :int)
+	 (distance :float))
+
+(defun dmatch (&rest args)
+       (cond ((eq (first args) nil)
+	      (dmatch0))
+	      ((and (first args) (not (fourth args)))
+	       (dmatch3 (first args) (second args) (third args)))
+	      ((fourth args)
+	       (dmatch4 (first args) (second args) (third args) (fourth args)))
+	       (t nil)))
+
+
 ;; _Tp dot(const Point_& pt) const
 ;; int cv_Point_dot(Point* self, Point* other) 
 (defcfun ("cv_Point2i_dot" dot) :int 
@@ -307,8 +338,33 @@
 ;; _Tp width, height
 ;; float cv_Size2f_height(Size* self) 
 (defcfun ("cv_Size2f_height" height2f) :float
-  "Gets the height of a (:POINTER SIZE2F)"
-  (self (:pointer size2f)))
+  "Gets the height of a SIZE2F"
+  (self size2f))
+
+
+;; KeyPoint::KeyPoint()
+;; KeyPoint* cv_create_KeyPoint()
+(defcfun ("cv_create_KeyPoint" key-point0) key-point
+  "KEY-POINT constructor")
+
+;; KeyPoint::KeyPoint(float x, float y, float _size, float _angle=-1, float _response=0, int _octave=0, int _class_id=-1)
+;; KeyPoint* cv_create_KeyPoint7(float x, float y, float _size, float _angle, float _response, int _octave, int _class_id)
+(defcfun ("cv_create_KeyPoint7" key-point7) key-point
+  "KEY-POINT constructor"
+  (x :float)
+  (y :float)
+  (size :float)
+  (angle :float)
+  (response :float)
+  (octave :int)
+  (class-id :int))
+
+(defun key-point (&optional x y size (angle -1) (response 0) (octave 0) (class-id -1))
+	   (cond ((eq x nil)
+		  (key-point0))
+		 (x
+		  (key-point7 x y size angle response octave class-id))
+		 (t nil)))
 
 
 ;; Mat::Mat()
@@ -774,6 +830,46 @@
   (roi rect))
 
 
+;; RotatedRect(const Point2f& center, const Size2f& size, float angle)
+;; RotatedRect* cv_create_RotatedRect(Point2f* center, Size2f* size, float angle)
+(defcfun ("cv_create_RotatedRect" %rotated-rect) rotated-rect
+  (center point)
+  (size size)
+  (angle :float))
+
+
+;; Rect RotatedRect::boundingRect() const
+;; Rect* cv_RotatedRect_boundingRect(RotatedRect* self)
+(defcfun ("cv_RotatedRect_boundingRect" rotated-rect-bounding-rect) rect
+"Returns the minimal up-right rectangle containing the rotated rectangle"
+  (self rotated-rect))
+
+
+;; Point2f center;
+;; Point* cv_RotatedRect_center(RotatedRect* self) 
+(defcfun ("cv_RotatedRect_center" rotated-rect-center) point
+  (self rotated-rect))
+
+
+;; Size2f size;     
+;; Size* cv_RotatedRect_size(RotatedRect* self) 
+(defcfun ("cv_RotatedRect_size" rotated-rect-size) size
+  (self rotated-rect))
+
+
+(defun rotated-rect (&rest args)
+  (cond
+    ((and (third args) (not (fourth args)))
+     (%rotated-rect (first args) (second args) (third args)))
+    ((or (eq ':c (first args)) (eq ':center (first args)))
+     (rotated-rect-center (second args)))
+    ((or (eq :s (first args)) (eq :size (first args))) 
+     (rotated-rect-size (second args)))
+    ((or (eq :br (first args)) (eq :bounding-rect (first args))) 
+     (rotated-rect-bounding-rect (second args)))
+    (t nil)))
+
+
 ;; Mat Mat::rowRange(int startrow, int endrow) const
 ;; Mat* cv_Mat_getRowRange(Mat* self, int startrow, int endrow)
 (defcfun ("cv_Mat_getRowRange" row-range) mat
@@ -787,7 +883,7 @@
 (defcfun ("cv_Mat_rows" rows) :int
   (self mat))
 
-
+;; Scalar_<_Tp>::Scalar_(_Tp v0, _Tp v1, _Tp v2, _Tp v3)
 ;; Scalar* cv_create_Scalar(double val0, (double val1, double val2, double val3)
 (defcfun ("cv_create_Scalar" %scalar) scalar
   (val0 :double)
@@ -800,7 +896,7 @@
   "SCALAR constructor"
   (%scalar (coerce val0 'double-float) (coerce val1 'double-float) (coerce val2 'double-float) (coerce val3 'double-float)))
 
-
+;; Scalar_<_Tp> Scalar_<_Tp>::all(_Tp v0)
 ;; Scalar* cv_create_scalarAll(double val0123)
 (defcfun ("cv_create_scalarAll" %scalar-all) scalar
   (val0123 :double))
@@ -837,13 +933,13 @@
 
 ;; Size_<float>()
 ;; Size2f* cv_create_Size2f(float width, float height)
-(defcfun ("cv_create_Size2f" size2f0) (:pointer size2f)
+(defcfun ("cv_create_Size2f" size2f0) size2f
   "Size2f constructor")
 
 
 ;; Size_<float>(float width, float height)
 ;; Size2f* cv_create_Size2f(float width, float height)
-(defcfun ("cv_create_Size2f" size2f2) (:pointer size2f)
+(defcfun ("cv_create_Size2f" size2f2) size2f
   "Size2f constructor"
 	 (width :float)
 	 (height :float))
@@ -870,6 +966,27 @@
   (m2 mat))
 
 
+;; TermCriteria::TermCriteria(int type, int maxCount, double epsilon)
+;; TermCriteria* cv_create_TermCriteria(int type, int maxCount, double epsilon) 
+(defcfun ("cv_create_TermCriteria" term-criteria0) term-criteria)
+
+
+;; TermCriteria::TermCriteria(int type, int maxCount, double epsilon)
+;; TermCriteria* cv_create_TermCriteria(int type, int maxCount, double epsilon) 
+(defcfun ("cv_create_TermCriteria3" term-criteria3) term-criteria
+	 (type :int)
+	 (max-count :int)
+	 (epsilon :double))
+
+
+(defun term-criteria (&optional type max-count epsilon)
+	   (cond ((eq type nil)
+		  (term-criteria0))
+		 (type
+		  (term-criteria3 type max-count epsilon))
+		 (t nil)))
+
+
 ;; size_t Mat::total() const
 ;; size_t cv_Mat_total(Mat* self)
 (defcfun ("cv_Mat_total" total) :unsigned-int
@@ -887,8 +1004,11 @@
 ;; _Tp width, height
 ;; float cv_Size2f_width(Size* self) 
 (defcfun ("cv_Size2f_width" width2f) :float
-  "Gets the width of a (:POINTER SIZE2F)"
-  (self (:pointer size2f)))
+  "Gets the width of a SIZE2F"
+  (self size2f))
+
+
+;;; Basic Structures
 
 
 ;;; Operations on Arrays
@@ -997,6 +1117,32 @@
 (defcfun ("cv_determinant" det) :double 
 	 "Returns the determinant of a square floating-point matrix."
 	 (mtx mat))
+
+
+;; void divide(InputArray src1, InputArray src2, OutputArray dst, double scale=1, int dtype=-1)
+;; void cv_divide(Mat* src1, Mat* src2, Mat* dst, double scale, int dtype)
+(defcfun ("cv_divide" divide5) :void
+  (src1 mat)
+  (src2 mat)
+  (dest mat)
+  (scale :double)
+  (dtype :int))
+
+;; void divide(double scale, InputArray src2, OutputArray dst, int dtype=-1)
+;; void cv_divide4(double scale, Mat* src2, Mat* dst, int dtype)
+(defcfun ("cv_divide4" divide4) :void
+  (scale :double)
+  (src2 mat)
+  (dest mat)
+  (dtype :int))
+
+
+(defun divide (&optional arg1 arg2 arg3 (arg4 1d0) (arg5 -1))
+      (cond ((eq (type-of arg1) 'cv-mat)
+	      (divide5 arg1 arg2 arg3 arg4 arg5))
+	      ((eq (type-of arg1) 'double-float)
+	       (divide4 arg1 arg2 arg3 arg5))
+	       (t nil)))
 
 
 ;; void exp(InputArray src, OutputArray dst)
@@ -1252,7 +1398,7 @@
 ;; void cv_ellipse5(Mat* img, RotatedRect* box, Scalar* color, int thickness, int lineType)
 (defcfun ("cv_ellipse5" %ellipse5) :void
   (img mat)
-  (box (:pointer rotated-rect))
+  (box rotated-rect)
   (color scalar)
   (thickness :int) 
   (line-type :int))
@@ -1287,17 +1433,10 @@
   (case (length args)
     ((3 4 5) (apply #'ellipse5 args))
     ((7 8 9 10) (apply #'ellipse10 args))
-    (otherwise (error "Wrong number arguments to ellipse (~A)" (length args)))))
+    (otherwise (error "Wrong number arguments to ELLIPSE (~A)" (length args)))))
 
 
-;; Size getTextSize(const string& text, int fontFace, double fontScale, int thickness, int* baseLine)
-;; Size* cv_getTextSize(String* text, int fontFace, double fontScale, int thickness, int* baseLine)
-(defcfun ("cv_getTextSize" %get-text-size) size
-  (text (:pointer *string))
-  (font-face :int)
-  (font-scale :double)
-  (thickness :int) 
-  (base-line :pointer))
+
 
 (defun get-text-size (text font-face font-scale thickness base-line)
   "Calculates the width and height of a text string."

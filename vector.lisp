@@ -27,8 +27,8 @@
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; t * std_vector##tn##_to_carray( vector_##t * v ) 
-(defcfun ("std_vectordm_to_carray" %vector-dmatch-to-c-array) :pointer 
-  (s (:pointer vector-DMatch)))
+(defcfun ("std_vectordm_to_carray" %vector-dmatch-to-c-array) dmatch
+  (s (:pointer vector-dmatch)))
 
 
 (defun vector-dmatch (&optional arg i n)
@@ -42,34 +42,34 @@
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * create_std_vector##tn()
-(defcfun ("create_std_vectorkp" %vector-keypoint) (:pointer vector-keypoint))
+(defcfun ("create_std_vectorkp" %vector-key-point) (:pointer vector-key-point))
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
-(defcfun ("carray_to_std_vectorkp" %c-arr-to-vector-keypoint) (:pointer vector-keypoint)
-  (a keypoint)
+(defcfun ("carray_to_std_vectorkp" %c-arr-to-vector-key-point) (:pointer vector-key-point)
+  (a :pointer)
   (len :unsigned-int))
 
 (let ((previous nil))
-  (defun c-arr-to-vector-keypoint (a)
+  (defun c-arr-to-vector-key-point (a)
     (unless (equal a (car previous))
       (setf previous (cons a (foreign-alloc :pointer :initial-contents a))))
-    (%c-arr-to-vector-keypoint (cdr previous) (length a))))
+    (%c-arr-to-vector-key-point (cdr previous) (length a))))
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; t * std_vector##tn##_to_carray( vector_##t * v ) 
-(defcfun ("std_vectorkp_to_carray" %vector-Keypoint-to-c-array) keypoint
-  (s (:pointer vector-keypoint)))
+(defcfun ("std_vectorkp_to_carray" %vector-key-point-to-c-array) key-point
+  (s (:pointer vector-key-point)))
 
 
-(defun vector-keypoint (&optional arg i n)
-	   (cond ((eq arg nil) (return-from vector-keypoint (%vector-keypoint)))
+(defun vector-key-point (&optional arg i n)
+	   (cond ((eq arg nil) (return-from vector-key-point (%vector-key-point)))
 		 ((listp arg)
-		  (return-from vector-keypoint (c-arr-to-vector-keypoint arg)))
-		 ((and (pointerp arg) i (not n)) (mem-aref (%vector-keypoint-to-c-array arg) :pointer i))
-		 ((and (pointerp arg) i n) (mem-aref (mem-aref (%vector-keypoint-to-c-array arg) :pointer i) :float n))
+		  (return-from vector-key-point (c-arr-to-vector-key-point arg)))
+		 ((and (pointerp arg) i (not n)) (mem-aref (%vector-key-point-to-c-array arg) :pointer i))
+		 ((and (pointerp arg) i n) (mem-aref (mem-aref (%vector-key-point-to-c-array arg) :pointer i) :float n))
 		 (t nil)))
 
 
@@ -104,27 +104,30 @@
 
 (defun vector-double (&rest args)
   (cond
+    ((third args)
+     (error "odd number of args to VECTOR-DOUBLE"))
     ((null (first args))
-     (return-from vector-double (%vector-double)))
+     (%vector-double))
     ((listp (first args))
      (c-arr-to-vector-double (first args)))
     ((eq :size (second args))
      (%vector-double-size (first args)))
-    ((pointerp (first args))
+    ((eq (type-of (first args)) 'std-vector-double)
      (if (null (second args))
 	 (mem-aref (%vector-double-to-c-array (first args)) :double) 
 	 (mem-aref (%vector-double-to-c-array (first args)) :double (second args))))
-    (t nil)))
+    ((not (eq (type-of (first args)) 'std-vector-double))
+     (error "The value ~a is not of type (STD-VECTOR-DOUBLE)." (first args)))))
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * create_std_vector##tn()
-(defcfun ("create_std_vectorf" %vector-float) (:pointer vector-float))
+(defcfun ("create_std_vectorf" %vector-float) vector-float)
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
-(defcfun ("carray_to_std_vectorf" %c-arr-to-vector-float) (:pointer vector-float)
+(defcfun ("carray_to_std_vectorf" %c-arr-to-vector-float) vector-float
   (a :pointer)
   (len :unsigned-int))
 
@@ -138,27 +141,30 @@
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; t * std_vector##tn##_to_carray( vector_##t * v ) 
 (defcfun ("std_vectorf_to_carray" %vector-float-to-c-array) :pointer 
-  (s (:pointer vector-float)))
+  (s vector-float))
 
 
 ;; size_t std_vectorf_length(vector_float* self)
 (defcfun ("std_vectorf_length" %vector-float-size) :unsigned-int
-  (self (:pointer vector-float)))
+  (self vector-float))
 
 
 (defun vector-float (&rest args)
   (cond
+    ((third args)
+     (error "odd number of args to VECTOR-FLOAT"))
     ((null (first args))
-     (return-from vector-float (%vector-float)))
+     (%vector-float))
     ((listp (first args))
      (c-arr-to-vector-float (first args)))
     ((eq :size (second args))
      (%vector-float-size (first args)))
-    ((pointerp (first args))
+    ((eq (type-of (first args)) 'std-vector-float)
      (if (null (second args))
 	 (mem-aref (%vector-float-to-c-array (first args)) :float) 
 	 (mem-aref (%vector-float-to-c-array (first args)) :float (second args))))
-    (t nil)))
+    ((not (eq (type-of (first args)) 'std-vector-float))
+     (error "The value ~a is not of type (STD-VECTOR-FLOAT)." (first args)))))
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
@@ -192,8 +198,10 @@
 
 (defun vector-char (&rest args)
   (cond
+    ((third args)
+     (error "odd number of args to VECTOR-CHAR"))
     ((null (first args))
-     (return-from vector-char (%vector-char)))
+     (%vector-char))
     ((listp (first args))
      (c-arr-to-vector-char (first args)))
     ((eq :size (second args))
@@ -202,17 +210,19 @@
      (if (null (second args))
 	 (mem-aref (%vector-char-to-c-array (first args)) :char) 
 	 (mem-aref (%vector-char-to-c-array (first args)) :char (second args))))
-    (t nil)))
+    ((not (eq (type-of (first args)) 'std-vector-char))
+     (error "The value ~a is not of type (STD-VECTOR-CHAR)." (first args)))))
+
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * create_std_vector##tn()
-(defcfun ("create_std_vectori" %vector-int) (:pointer vector-int))
+(defcfun ("create_std_vectori" %vector-int) vector-int)
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
-(defcfun ("carray_to_std_vectori" %c-arr-to-vector-int) (:pointer vector-int)
+(defcfun ("carray_to_std_vectori" %c-arr-to-vector-int) vector-int
   (a :pointer)
   (len :unsigned-int))
 
@@ -226,27 +236,31 @@
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; t * std_vector##tn##_to_carray( vector_##t * v ) 
 (defcfun ("std_vectori_to_carray" %vector-int-to-c-array) :pointer 
-  (s (:pointer vector-int)))
+  (s vector-int))
 
 
 ;; size_t std_vector_length(vector_int* self)
 (defcfun ("std_vectori_length" %vector-int-size) :unsigned-int
-  (self (:pointer vector-int)))
+  (self vector-int))
 
 
 (defun vector-int (&rest args)
   (cond
+    ((third args)
+     (error "odd number of args to VECTOR-INT"))
     ((null (first args))
-     (return-from vector-int (%vector-int)))
+     (%vector-int))
     ((listp (first args))
      (c-arr-to-vector-int (first args)))
     ((eq :size (second args))
      (%vector-int-size (first args)))
-    ((pointerp (first args))
+    ((eq (type-of (first args)) 'std-vector-int)
      (if (null (second args))
 	 (mem-aref (%vector-int-to-c-array (first args)) :int) 
 	 (mem-aref (%vector-int-to-c-array (first args)) :int (second args))))
-    (t nil)))
+    ((not (eq (type-of (first args)) 'std-vector-int))
+     (error "The value ~a is not of type (STD-VECTOR-INT)." (first args)))))
+
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
@@ -349,12 +363,12 @@
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * create_std_vector##tn()
-(defcfun ("create_std_vectoru" %vector-uchar) (:pointer vector-uchar))
+(defcfun ("create_std_vectoru" %vector-uchar) vector-uchar)
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
-(defcfun ("carray_to_std_vectoru" %c-arr-to-vector-uchar) (:pointer vector-uchar)
+(defcfun ("carray_to_std_vectoru" %c-arr-to-vector-uchar) vector-uchar
   (a :pointer)
   (len :unsigned-int))
 
@@ -368,27 +382,31 @@
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; t * std_vector##tn##_to_carray( vector_##t * v ) 
 (defcfun ("std_vectoru_to_carray" %vector-uchar-to-c-array) :pointer 
-  (s (:pointer vector-uchar)))
+  (s vector-uchar))
 
 
 ;; size_t std_vectorr_length(vector_uchar* self)
 (defcfun ("std_vectoru_length" %vector-uchar-size) :unsigned-int
-  (self (:pointer vector-uchar)))
+  (self vector-uchar))
 
 
 (defun vector-uchar (&rest args)
   (cond
+    ((third args)
+     (error "odd number of args to VECTOR-UCHAR"))
     ((null (first args))
-     (return-from vector-uchar (%vector-uchar)))
+     (%vector-uchar))
     ((listp (first args))
      (c-arr-to-vector-uchar (first args)))
     ((eq :size (second args))
      (%vector-uchar-size (first args)))
-    ((pointerp (first args))
+    ((eq (type-of (first args)) 'std-vector-uchar)
      (if (null (second args))
 	 (mem-aref (%vector-uchar-to-c-array (first args)) :uchar) 
 	 (mem-aref (%vector-uchar-to-c-array (first args)) :uchar (second args))))
-    (t nil)))
+    ((not (eq (type-of (first args)) 'std-vector-uchar))
+     (error "The value ~a is not of type (STD-VECTOR-UCHAR)." (first args)))))
+
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector

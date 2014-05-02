@@ -41,37 +41,12 @@
 (defcfun ("cv_FeatureDetector_detect3" %feat-detector-detect) :void
   (self feature-detector)
   (image mat)
-  (keypoints (:pointer vector-keypoint))
+  (key-points (:pointer vector-key-point))
   (mask mat))
 
 (defun feat-detector-detect (self image keypoints &optional (mask (mat)))
   "Detects keypoints in an image."
    (%feat-detector-detect self image keypoints mask))
-
-
-;; KeyPoint::KeyPoint()
-;; KeyPoint* cv_create_KeyPoint()
-(defcfun ("cv_create_KeyPoint" keypoint0) keypoint
-  "Keypoint constructor")
-
-;; KeyPoint::KeyPoint(float x, float y, float _size, float _angle=-1, float _response=0, int _octave=0, int _class_id=-1)
-;; KeyPoint* cv_create_KeyPoint7(float x, float y, float _size, float _angle, float _response, int _octave, int _class_id)
-(defcfun ("cv_create_KeyPoint7" keypoint7) keypoint
-  "Keypoint constructor"
-  (x :float)
-  (y :float)
-  (_size :float)
-  (_angle :float)
-  (_response :float)
-  (_octave :int)
-  (_class_id :int))
-
-(defun keypoint (&optional x y _size (_angle -1) (_response 0) (_octave 0) (_class_id -1))
-	   (cond ((eq x nil)
-		  (keypoint0))
-		 (x
-		  (keypoint7 x y _size _angle _response _octave _class_id))
-		 (t nil)))
 
 
 
@@ -84,7 +59,7 @@
   "Computes the descriptors for a set of keypoints detected in an image."
   (self (:pointer feature-2d))
   (image mat)
-  (keypoints (:pointer vector-keypoint))
+  (keypoints (:pointer vector-key-point))
   (descriptors mat))
 
 
@@ -140,9 +115,9 @@
 
 (defcfun ("cv_drawMatches" %draw-matches) :void
   (img1 mat)
-  (keypoints1 (:pointer vector-keypoint))
+  (keypoints1 (:pointer vector-key-point))
   (img2 mat)
-  (keypoints2 (:pointer vector-keypoint))
+  (keypoints2 (:pointer vector-key-point))
   (matches1to2 (:pointer vector-dmatch))
   (outimg mat)
   (match-color scalar)

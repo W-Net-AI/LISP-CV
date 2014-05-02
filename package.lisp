@@ -1,8 +1,8 @@
 ;;; -*- mode: lisp; indent-tabs: nil -*-
 
 (defpackage :lisp-cv
-  (:nicknames #:lisp-cv #:lcv)
-  (:use #:common-lisp #:cffi)
+  (:nicknames #:lisp-cv #:lcv #:cv)
+  (:use #:cffi #:common-lisp #:swank #:trivial-garbage #:lisp-executable) 
   (:export 
 
 ;; Default parameters
@@ -26,6 +26,17 @@
 
    #:continuable
    #:update-swank
+
+;; Macros
+
+   #:$
+   #:?
+   #:alloc
+   #:d
+   #:free
+   #:print-mat
+   #:size-of
+
 
 ;; Extra OpenCV constants
 
@@ -62,10 +73,26 @@
 
    #:del-bf-matcher
    #:del-brisk
+   #:del-casc-class
+   #:del-dmatch
+   #:del-kp
    #:del-mat
    #:del-mat-expr
    #:del-point
+   #:del-point2d
+   #:del-point2f
+   #:del-point3d
+   #:del-point3f
+   #:del-point3i
    #:del-rect
+   #:del-rng
+   #:del-rotated-rect
+   #:del-scalar
+   #:del-size
+   #:del-size2f
+   #:del-std-string
+   #:del-surf
+   #:del-term-crit
    #:del-vec-char
    #:del-vec-dbl
    #:del-vec-dm
@@ -77,27 +104,47 @@
    #:del-vec-point2f
    #:del-vec-rect
    #:del-vec-uchar
+   #:del-vid-cap
+   #:del-vid-writer
 
 
 ;; WITH-MACROS
 
    #:with-bf-matcher
    #:with-brisk
+   #:with-cascade-classifier
+   #:with-dmatch
+   #:with-keypoint
    #:with-mat
    #:with-mat-expr
-   #:with-rect
+   #:with-object
    #:with-point
+   #:with-point2d
+   #:with-point2f
+   #:with-point3d
+   #:with-point3f
+   #:with-point3i
+   #:with-rect
+   #:with-rng
+   #:with-rotated-rect
+   #:with-scalar
+   #:with-size
+   #:with-size2f
+   #:with-surf
+   #:with-term-criteria
    #:with-vec-char
    #:with-vec-dbl
    #:with-vec-dmatch
    #:with-vec-flt
    #:with-vec-int
-   #:with-vec-keypoint
+   #:with-vec-key-point
    #:with-vec-mat
    #:with-vec-point
    #:with-vec-point2f
    #:with-vec-rect
    #:with-vec-uchar
+   #:with-video-capture
+   #:with-video-writer
 
 
 ;; DEFCTYPE's
@@ -109,7 +156,7 @@
    #:dmatch
    #:feature-2d
    #:feature-detector
-   #:keypoint
+   #:key-point
    #:mat
    #:mat-expr
    #:mouse-callback
@@ -122,6 +169,9 @@
    #:rect
    #:rng
    #:rotated-rect
+   #:rotated-rect-bounding-rect
+   #:rotated-rect-center
+   #:rotated-rect-size
    #:scalar
    #:size
    #:size2f
@@ -131,27 +181,12 @@
    #:svm-params
    #:term-criteria
    #:trackbar-callback
-   #:vec2b
-   #:vec2d
-   #:vec2f
-   #:vec2i
-   #:vec2s
-   #:vec3b
-   #:vec3d
-   #:vec3f
-   #:vec3i
-   #:vec3s
-   #:vec4b
-   #:vec4d
-   #:vec4f
-   #:vec4i
-   #:vec4s
    #:vector-char
    #:vector-dmatch
    #:vector-double
    #:vector-float
    #:vector-int
-   #:vector-keypoint
+   #:vector-key-point
    #:vector-mat
    #:vector-point
    #:vector-point2f
@@ -353,6 +388,7 @@
    #:bitwise-xor
    #:convert-scale-abs
    #:det
+   #:divide
    #:flip
    #:in-range-s
    #:inv
@@ -499,7 +535,9 @@
    #:copy-make-border
    #:erode
    #:dilate
+   #:filter-2d
    #:gaussian-blur
+   #:laplacian
    #:pyr-down
    #:pyr-up
    #:sobel
@@ -720,7 +758,7 @@
    #:+thresh-trunc+
    #:+thresh-tozero+
    #:+thresh-tozero-inv+
-   #:+adaptive-thresh-mean-c+
+   #:+adaptitor-doubve-thresh-mean-c+
    #:+adaptive-thresh-gaussian-c+
    #:+dist-l1+ 
    #:+dist-l2+
@@ -733,6 +771,7 @@
 
    #:adaptive-threshold 
    #:cvt-color
+   #:distance-transform
    #:threshold
    
 ;; imgproc - Histograms
@@ -783,9 +822,11 @@
    #:create-trackbar
    #:destroy-all-windows
    #:destroy-window
+   #:get-trackbar-pos
    #:imshow
    #:move-window
    #:set-mouse-callback
+   #:set-trackbar-pos
    #:named-window
    #:wait-key
    #:with-named-window
@@ -838,6 +879,8 @@
    #:video-writer-is-open
    #:video-writer-write
    #:with-capture
+   #:with-captured-camera
+   #:with-captured-file
 
 ;; highgui - Qt New Functions
 
@@ -925,4 +968,5 @@
 
    #:apply-color-map
 ))
+
 

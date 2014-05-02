@@ -75,19 +75,12 @@
 	     (t `(foreign-alloc ,type ,:initial-element ,value))))
 
 
-(defmacro with-alloc ((var alloc) &body body)
-  "Ensures FOREIGN-FREE gets called on 
-   when ALLOC goes out of scope."
-  `(let ((,var ,alloc))
-     (unwind-protect
-	 (progn ,@body)
-       (foreign-free ,var))))
-
-
 ;; Macro for FOREIGN-FREE
+
 
 (defmacro free (ptr)
   `(foreign-free ,ptr))
+
 
 ;; Macro for MEM-AREF
 
@@ -95,3 +88,29 @@
        (cond (type
 	      `(mem-aref ,ptr ,type , index))
 	     (t nil)))
+
+
+;; Macro for printing a matrix 
+
+(defmacro print-mat (mat type)
+  `(dotimes (i (rows ,mat))
+    (dotimes (j (cols ,mat))
+      (format t "~a" (at ,mat i j ,type))
+      (princ #\Space))
+    (princ #\Newline)))
+
+
+;; Macro to build and run executable(not implemented all the way yet)
+;; To use place the ~/quicklisp/dists/quicklisp/software/lisp-cv-master/extras/lisp-executable-example.asd 
+;; file in the ~/quicklisp/dists/quicklisp/software/lisp-executable-20140113-git/example directory.  
+;; This directory was installed when you built LISP-CV. Then take open the main.lisp file in that directory 
+;; and edit it with your LISP-CV code. The main.lisp file must stay in that directory. An example main.lisp
+;; file that shows the camera feed in a window is in the <lisp-cv-source-dir>/extras folder. Edit it to your 
+;; liking and run: (RUN) at the REPL. The macro (RUN) will build the executable. It will be placed it in the
+;; ~/quicklisp/dists/quicklisp/software/lisp-executable-20140113-git/example directory. Then it will run it.
+;; Building an executable from your LISP-CV code will will knock about 33% off the run time.  
+
+(defmacro run ()
+(asdf:oos 'lisp-executable:create-executables-op "lisp-executable-example")
+(su:run-program "~/quicklisp/dists/quicklisp/software/lisp-executable-20140113-git/example/example-program"))
+

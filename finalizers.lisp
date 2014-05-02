@@ -13,7 +13,7 @@
 ;; C++ INTTEROP TYPES
 
 
-;; STRING
+;; *STRING
 
 
 (define-foreign-type *string ()
@@ -28,9 +28,10 @@
 
 
 (defmethod translate-to-foreign ((lisp-value c-string) (c-type *string))
-  (c-pointer lisp-value))
+  (values  (c-pointer lisp-value) lisp-value))
 
 
+    
 (defmethod translate-from-foreign (c-pointer (c-type *string))
   (let ((string  (make-instance 'c-string :c-pointer c-pointer)))
     (when (garbage-collect c-type)
@@ -54,7 +55,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value std-vector-char) (c-type vector-char))
-  (c-pointer lisp-value))
+  (values  (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vector-char))
@@ -62,6 +63,7 @@
     (when (garbage-collect c-type)
       (tg:finalize vector-char (lambda () (del-vec-char c-pointer))))
     vector-char))
+
 
 
 ;; VECTOR-DOUBLE
@@ -79,7 +81,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value std-vector-double) (c-type vector-double))
-  (c-pointer lisp-value))
+  (values  (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vector-double))
@@ -90,32 +92,156 @@
 
 
 
-;; CORE
+;; VECTOR-FLOAT
 
 
-;; KEYPOINT
-
-
-(define-foreign-type keypoint ()
+(define-foreign-type vector-float ()
   ((garbage-collect  :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
-  (:simple-parser keypoint))
+  (:simple-parser vector-float))
 
 
-(defclass cv-keypoint ()
+(defclass std-vector-float ()
   ((c-pointer :reader c-pointer :initarg :c-pointer)))
 
 
-(defmethod translate-to-foreign ((lisp-value cv-keypoint) (c-type keypoint))
-  (c-pointer lisp-value))
+(defmethod translate-to-foreign ((lisp-value std-vector-float) (c-type vector-float))
+  (values  (c-pointer lisp-value) lisp-value))
 
 
-(defmethod translate-from-foreign (c-pointer (c-type keypoint))
-  (let ((keypoint  (make-instance 'cv-keypoint :c-pointer c-pointer)))
+(defmethod translate-from-foreign (c-pointer (c-type vector-float))
+  (let ((vector-float  (make-instance 'std-vector-float :c-pointer c-pointer)))
     (when (garbage-collect c-type)
-      (tg:finalize keypoint (lambda () (del-kp c-pointer))))
-    keypoint))
+      (tg:finalize vector-float (lambda () (del-vec-flt c-pointer))))
+    vector-float))
+
+
+
+;; VECTOR-INT
+
+
+(define-foreign-type vector-int ()
+  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+                     :garbage-collect))
+  (:actual-type :pointer)
+  (:simple-parser vector-int))
+
+
+(defclass std-vector-int ()
+  ((c-pointer :reader c-pointer :initarg :c-pointer)))
+
+
+(defmethod translate-to-foreign ((lisp-value std-vector-int) (c-type vector-int))
+  (values  (c-pointer lisp-value) lisp-value))
+
+
+(defmethod translate-from-foreign (c-pointer (c-type vector-int))
+  (let ((vector-int  (make-instance 'std-vector-int :c-pointer c-pointer)))
+    (when (garbage-collect c-type)
+      (tg:finalize vector-int (lambda () (del-vec-int c-pointer))))
+    vector-int))
+
+
+;; VECTOR-POINT
+
+
+(define-foreign-type vector-point ()
+  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+                     :garbage-collect))
+  (:actual-type :pointer)
+  (:simple-parser vector-point))
+
+
+(defclass std-vector-point ()
+  ((c-pointer :reader c-pointer :initarg :c-pointer)))
+
+
+(defmethod translate-to-foreign ((lisp-value std-vector-point) (c-type vector-point))
+  (values  (c-pointer lisp-value) lisp-value))
+
+
+(defmethod translate-from-foreign (c-pointer (c-type vector-point))
+  (let ((vector-point  (make-instance 'std-vector-point :c-pointer c-pointer)))
+    (when (garbage-collect c-type)
+      (tg:finalize vector-point (lambda () (del-vec-point c-pointer))))
+    vector-point))
+
+
+;; VECTOR-UCHAR
+
+
+(define-foreign-type vector-uchar ()
+  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+                     :garbage-collect))
+  (:actual-type :pointer)
+  (:simple-parser vector-uchar))
+
+
+(defclass std-vector-uchar ()
+  ((c-pointer :reader c-pointer :initarg :c-pointer)))
+
+
+(defmethod translate-to-foreign ((lisp-value std-vector-uchar) (c-type vector-uchar))
+  (values  (c-pointer lisp-value) lisp-value))
+
+
+(defmethod translate-from-foreign (c-pointer (c-type vector-uchar))
+  (let ((vector-uchar  (make-instance 'std-vector-uchar :c-pointer c-pointer)))
+    (when (garbage-collect c-type)
+      (tg:finalize vector-uchar (lambda () (del-vec-uchar c-pointer))))
+    vector-uchar))
+
+
+;; CORE
+
+;; DMATCH
+
+(define-foreign-type dmatch ()
+  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+                     :garbage-collect))
+  (:actual-type :pointer)
+  (:simple-parser dmatch))
+
+
+(defclass cv-dmatch ()
+  ((c-pointer :reader c-pointer :initarg :c-pointer)))
+
+
+(defmethod translate-to-foreign ((lisp-value cv-dmatch) (c-type dmatch))
+  (values  (c-pointer lisp-value) lisp-value))
+
+
+(defmethod translate-from-foreign (c-pointer (c-type dmatch))
+  (let ((dmatch  (make-instance 'cv-dmatch :c-pointer c-pointer)))
+    (when (garbage-collect c-type)
+      (tg:finalize dmatch (lambda () (del-dmatch c-pointer))))
+    dmatch))
+
+
+;; KEY-POINT
+
+
+(define-foreign-type key-point ()
+  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+                     :garbage-collect))
+  (:actual-type :pointer)
+  (:simple-parser key-point))
+
+
+(defclass cv-key-point ()
+  ((c-pointer :reader c-pointer :initarg :c-pointer)))
+
+
+(defmethod translate-to-foreign ((lisp-value cv-key-point) (c-type key-point))
+  (values  (c-pointer lisp-value) lisp-value))
+
+
+(defmethod translate-from-foreign (c-pointer (c-type key-point))
+  (let ((key-point  (make-instance 'cv-key-point :c-pointer c-pointer)))
+    (when (garbage-collect c-type)
+      (tg:finalize key-point (lambda () (del-kp c-pointer))))
+    key-point))
 
 
 
@@ -134,7 +260,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-mat) (c-type mat))
-  (c-pointer lisp-value))
+  (values  (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type mat))
@@ -160,7 +286,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value matrix-expressions) (c-type mat-expr))
-  (c-pointer lisp-value))
+  (values  (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type mat-expr))
@@ -185,8 +311,8 @@
   ((c-pointer :reader c-pointer :initarg :c-pointer)))
 
 
-(defmethod translate-to-foreign ((lisp-value cv-point) (c-type point))
-  (c-pointer lisp-value))
+ (defmethod translate-to-foreign ((lisp-value cv-point) (c-type point))
+    (values  (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type point))
@@ -211,7 +337,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-point2d) (c-type point2d))
-  (c-pointer lisp-value))
+  (values  (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type point2d))
@@ -219,6 +345,7 @@
     (when (garbage-collect c-type)
       (tg:finalize point2d (lambda () (del-point2d c-pointer))))
     point2d))
+
 
 
 ;; POINT2F
@@ -236,7 +363,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-point2f) (c-type point2f))
-  (c-pointer lisp-value))
+  (values  (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type point2f))
@@ -261,7 +388,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-point3d) (c-type point3d))
-  (c-pointer lisp-value))
+  (values  (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type point3d))
@@ -286,7 +413,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-point3f) (c-type point3f))
-  (c-pointer lisp-value))
+  (values  (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type point3f))
@@ -311,7 +438,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-point3i) (c-type point3i))
-  (c-pointer lisp-value))
+  (values  (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type point3i))
@@ -336,7 +463,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-rect) (c-type rect))
-  (c-pointer lisp-value))
+  (values  (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type rect))
@@ -361,7 +488,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-rng) (c-type rng))
-  (c-pointer lisp-value))
+  (values  (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type rng))
@@ -369,6 +496,32 @@
     (when (garbage-collect c-type)
       (tg:finalize rng (lambda () (del-rng c-pointer))))
     rng))
+
+
+;; ROTATED-RECT
+
+
+(define-foreign-type rotated-rect ()
+  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+                     :garbage-collect))
+  (:actual-type :pointer)
+  (:simple-parser rotated-rect))
+
+
+(defclass cv-rotated-rect ()
+  ((c-pointer :reader c-pointer :initarg :c-pointer)))
+
+
+(defmethod translate-to-foreign ((lisp-value cv-rotated-rect) (c-type rotated-rect))
+  (values  (c-pointer lisp-value) lisp-value))
+
+
+(defmethod translate-from-foreign (c-pointer (c-type rotated-rect))
+  (let ((rotated-rect (make-instance 'cv-rotated-rect :c-pointer c-pointer)))
+    (when (garbage-collect c-type)
+      (tg:finalize rotated-rect (lambda () (del-rot-rect c-pointer))))
+    rotated-rect))
+
 
 
 ;; SCALAR
@@ -386,7 +539,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-scalar) (c-type scalar))
-  (c-pointer lisp-value))
+   (values  (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type scalar))
@@ -412,7 +565,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-size) (c-type size))
-  (c-pointer lisp-value))
+  (values  (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type size))
@@ -422,10 +575,112 @@
     size))
 
 
+;; SIZE2F
+
+
+(define-foreign-type size2f ()
+  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+                     :garbage-collect))
+  (:actual-type :pointer)
+  (:simple-parser size2f))
+
+
+(defclass cv-size2f ()
+  ((c-pointer :reader c-pointer :initarg :c-pointer)))
+
+
+(defmethod translate-to-foreign ((lisp-value cv-size2f) (c-type size2f))
+  (values  (c-pointer lisp-value) lisp-value))
+
+
+(defmethod translate-from-foreign (c-pointer (c-type size2f))
+  (let ((size2f (make-instance 'cv-size2f :c-pointer c-pointer)))
+    (when (garbage-collect c-type)
+      (tg:finalize size2f (lambda () (del-size2f c-pointer))))
+    size2f))
+
+
+
+;; TERM-CRITERIA
+
+
+(define-foreign-type term-criteria ()
+  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+                     :garbage-collect))
+  (:actual-type :pointer)
+  (:simple-parser term-criteria))
+
+
+(defclass cv-term-criteria ()
+  ((c-pointer :reader c-pointer :initarg :c-pointer)))
+
+
+(defmethod translate-to-foreign ((lisp-value cv-term-criteria) (c-type term-criteria))
+  (values  (c-pointer lisp-value) lisp-value))
+
+
+(defmethod translate-from-foreign (c-pointer (c-type term-criteria))
+  (let ((term-criteria (make-instance 'cv-term-criteria :c-pointer c-pointer)))
+    (when (garbage-collect c-type)
+      (tg:finalize term-criteria (lambda () (del-term-crit c-pointer))))
+    term-criteria))
+
+
 ;; IMGPROC
 
 
 ;; HIGHGUI
+
+
+
+;; VIDEO-CAPTURE
+
+
+(define-foreign-type video-capture ()
+  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+                     :garbage-collect))
+  (:actual-type :pointer)
+  (:simple-parser video-capture))
+
+
+(defclass cv-video-capture ()
+  ((c-pointer :reader c-pointer :initarg :c-pointer)))
+
+
+(defmethod translate-to-foreign ((lisp-value cv-video-capture) (c-type video-capture))
+  (values  (c-pointer lisp-value) lisp-value))
+
+
+(defmethod translate-from-foreign (c-pointer (c-type video-capture))
+  (let ((video-capture (make-instance 'cv-video-capture :c-pointer c-pointer)))
+    (when (garbage-collect c-type)
+      (tg:finalize video-capture (lambda () (del-vid-cap c-pointer))))
+    video-capture))
+
+
+;; VIDEO-WRITER
+
+
+(define-foreign-type video-writer ()
+  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+                     :garbage-collect))
+  (:actual-type :pointer)
+  (:simple-parser video-writer))
+
+
+(defclass cv-video-writer ()
+  ((c-pointer :reader c-pointer :initarg :c-pointer)))
+
+
+(defmethod translate-to-foreign ((lisp-value cv-video-writer) (c-type video-writer))
+  (values  (c-pointer lisp-value) lisp-value))
+
+
+(defmethod translate-from-foreign (c-pointer (c-type video-writer))
+  (let ((video-writer (make-instance 'cv-video-writer :c-pointer c-pointer)))
+    (when (garbage-collect c-type)
+      (tg:finalize video-writer (lambda () (del-vid-writer c-pointer))))
+    video-writer))
 
 
 ;; CALIB3D
@@ -449,7 +704,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-feature-detector) (c-type feature-detector))
-  (c-pointer lisp-value))
+  (values  (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type feature-detector))
@@ -474,7 +729,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-surf) (c-type surf))
-  (c-pointer lisp-value))
+  (values  (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type surf))
@@ -485,6 +740,32 @@
 
 
 ;; OBJDETECT
+
+
+;; CASCADE-CLASSIFEIER
+
+
+(define-foreign-type cascade-classifier ()
+  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+                     :garbage-collect))
+  (:actual-type :pointer)
+  (:simple-parser cascade-classifier))
+
+
+(defclass cv-cascade-classifier ()
+  ((c-pointer :reader c-pointer :initarg :c-pointer)))
+
+
+(defmethod translate-to-foreign ((lisp-value cv-cascade-classifier) (c-type cascade-classifier))
+  (values  (c-pointer lisp-value) lisp-value))
+
+
+(defmethod translate-from-foreign (c-pointer (c-type cascade-classifier))
+  (let ((cascade-classifier (make-instance 'cv-cascade-classifier :c-pointer c-pointer)))
+    (when (garbage-collect c-type)
+      (tg:finalize cascade-classifier (lambda () (del-casc-class c-pointer))))
+    cascade-classifier))
+
 
 
 ;; NONFREE

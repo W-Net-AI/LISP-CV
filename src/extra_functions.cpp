@@ -8,7 +8,28 @@ typedef vector<Rect> vector_Rect;
 
 #include <opencv2/c/extra_functions.hpp>
 
+
+CvPoint cvPoint_glue(int x, int y)
+
+{
+
+    return cvPoint(x, y);
+
+}
+
 extern "C" {
+
+MatExpr* cv_abs(Mat* m) {
+	return new MatExpr(cv::abs(*m));
+}
+
+Rect* cv_RotatedRect_boundingRect(RotatedRect* self) {
+    return new Rect(self->boundingRect());
+}
+
+MatExpr* cv_Mat_div(Mat* m1, Mat* m2) {
+    return new MatExpr(*m1 / *m2);
+}
 
 Scalar* cv_create_morphologyDefaultBorderValue() { 
     return new Scalar(Scalar::all(DBL_MAX)); 
@@ -26,7 +47,11 @@ void cv_drawChessboardCorners2(Mat* image, Size* patternSize, vector_Point2f* co
 	cv::drawChessboardCorners(*image, *patternSize, *corners, patternWasFound);
 }
 
-TermCriteria* cv_create_TermCriteria(int type, int maxCount, double epsilon) {
+TermCriteria* cv_create_TermCriteria() {
+    return new TermCriteria();
+}
+
+TermCriteria* cv_create_TermCriteria3(int type, int maxCount, double epsilon) {
     return new TermCriteria(type, maxCount, epsilon);
 }
 
@@ -103,12 +128,20 @@ float cv_Size2f_height(Size2f* self) {
     return self->height;
 }
 
-void cv_delete_BRISK(void* ptr) {
-    delete (BRISK*)ptr;
+void cv_delete_BRISK(BRISK* self) {
+    delete self;
 }
 
-void cv_delete_BFMatcher(void* ptr) {
-    delete (BFMatcher*)ptr;
+void cv_delete_BFMatcher(BFMatcher* self) {
+    delete self;
+}
+
+void cv_delete_CscadeClassifier(CascadeClassifier* self) {
+     delete self;
+}
+
+void cv_delete_DMatch(DMatch* self) {
+    delete self;
 }
 
 void cv_delete_KeyPoint(KeyPoint* self) {
@@ -147,6 +180,10 @@ void cv_delete_RNG(RNG* self) {
      delete self;
 }
 
+void cv_delete_RotatedRect(RotatedRect* self) {
+     delete self;
+}
+
 void cv_delete_Scalar(Scalar* self) {
      delete self;
 }
@@ -155,11 +192,29 @@ void cv_delete_Size(Size* self) {
      delete self;
 }
 
+void cv_delete_Size2f(Size2f* self) {
+     delete self;
+}
+
 void cv_delete_SURF(SURF* self) {
+     delete self;
+}
+
+void cv_delete_TermCriteria(TermCriteria* self) {
      delete self;
 }
 
 void cv_delete_vector_char(vector_char* self) {
      delete self;
 }
+
+void cv_delete_VideoCapture(VideoCapture* self) {
+     delete self;
+}
+
+void cv_delete_VideoWriter(VideoWriter* self) {
+     delete self;
+}
+
+
 }

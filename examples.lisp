@@ -880,7 +880,7 @@ LISP-CV: (KEY-POINT) => KEY-POINT
 
 C++: KeyPoint::KeyPoint(float x, float y, float _size, float _angle=-1, float _response=0, int _octave=0, int _class_id=-1)
 
-LISP-CV: (KEY-POINT (X :FLOAT) (Y :FLOAT) (SIZE :FLOAT) &OPTIONAL ((ANGLE :FLOAT) -1) ((RESPONSE :FLOAT) 0) ((OCTAVE :INT) 0) 
+LISP-CV: (KEY-POINT (X :FLOAT) (Y :FLOAT) (SIZE :FLOAT) ((ANGLE :FLOAT) -1) ((RESPONSE :FLOAT) 0) ((OCTAVE :INT) 0) 
         ((CLASS-ID :INT) -1)) => KEY-POINT
 
 
@@ -912,7 +912,7 @@ index, and distance between descriptors.
 
 Example:
 
-TODO(Write example using DRAW KEYPOINTS to draw random keypoints)
+TODO(Write an example showing how to create DMatch manually, add to vector and send to DRAW-MATCHES)
 
 
 LOCATE-ROI
@@ -1020,24 +1020,39 @@ value, back to type MAT with the function (FORCE), (or the shorthand version (>>
 functions. 
 
 
+
 (defun mul-example ()
 
   "In this example, MUL is used to find 
-   the product of matrix, M1 and M2."
+   the product of two matrices. The con-
+   tent of the first matrix(M1), the se-
+   cond matrix(M2) and result(RESULT) a-
+   re printed."
 
-  (with-object (data (alloc :float '(1.0f0 2.0f0 3.0f0 
-				     4.0f0 5.0f0 6.0f0 
-				     7.0f0 8.0f0 9.0f0)))
-    (with-mat (m1 (mat-data 3 3 +32f+ data))
-      (with-mat  (m2 (mat-data 3 3 +32f+ data))
-	(with-mat-expr (result (mul m1 m2))
-	  (format t "~%M1 = ~%~%")
-	  (print-mat m1 :float)
-	  (format t "~%~%M2 = ~%~%")
-	  (print-mat m2 :float)
-	  (format t "~%RESULT ~%~%")
-	  (print-mat (>> result) :float)
-	  (format t "~%"))))))
+  (let* ((data (alloc :float '(1.0f0 2.0f0 3.0f0 4.0f0 5.0f0 
+			       6.0f0 7.0f0 8.0f0 9.0f0)))
+	 (m1 (mat-data 3 3 +32f+ data))
+         (m2 (mat-data 3 3 +32f+ data))
+         (result (mul m1 m2)))
+    (dotimes (i (rows m1))
+      (dotimes (j (cols m1))
+	(format t "~a" (at m1 i j :float))
+	(princ #\Space))
+      (princ #\Newline))
+    (format t "~%~%")
+    (dotimes (i (rows m2))
+      (dotimes (j (cols m2))
+	(format t "~a" (at m2 i j :float))
+	(princ #\Space))
+      (princ #\Newline))
+    (format t "~%~%")
+    (dotimes (i 3)
+      (dotimes (j 3)
+	(format t "~a" (at (>> result) i j :float))
+	(princ #\Space))
+      (princ #\Newline))
+    (free data)))
+
 
 
 POINT
@@ -1504,7 +1519,7 @@ Changes the shape and/or the number of channels of a 2D matrix without copying t
 
 C++: Mat Mat::reshape(int cn, int rows=0) const
 
-LISP-CV: (RESHAPE (SELF MAT) (CN :INT) &OPTIONAL ((ROWS :INT) 0)) => MAT
+LISP-CV: (RESHAPE (SELF MAT) (CN :INT) (ROWS :INT)) => MAT
 
 
     Parameters:	
@@ -1557,52 +1572,6 @@ and/or different number of channels. Any combination is possible if:
     (imshow window-name-4 (reshape img 1))
     (loop while (not (= (wait-key 0) 27)))
     (destroy-all-windows)))
-
-
-
-
-RotatedRect
-
-
-
-This function creates rotated (i.e. not up-right) rectangles on a plane. Each rectangle is specified 
-by the center point (mass center), length of each side (represented by cv::Size2f structure) and the 
-rotation angle in degrees.
-
-C++: RotatedRect::RotatedRect(const Point2f& center, const Size2f& size, float angle)
-
-        Parameters:	
-
-            center - The rectangle mass center.
-
-            size - Width and height of the rectangle.
-
-            angle - The rotation angle in a clockwise direction. When the angle is 0, 90, 180, 270 etc., the rectangle becomes an up-right rectangle.
-
-            box - The rotated rectangle parameters as the obsolete CvBox2D structure.
-
-   
-The sample below demonstrates how to use RotatedRect:
-
-Mat image(200, 200, CV_8UC3, Scalar(0));
-RotatedRect rRect = RotatedRect(Point2f(100,100), Size2f(100,50), 30);
-
-Point2f vertices[4];
-rRect.points(vertices);
-for (int i = 0; i < 4; i++)
-    line(image, vertices[i], vertices[(i+1)%4], Scalar(0,255,0));
-
-Rect brect = rRect.boundingRect();
-rectangle(image, brect, Scalar(255,0,0));
-
-imshow("rectangles", image);
-waitKey(0);
-
-../../../_images/rotatedrect.png
-
-See also:
-
-(CAM-SHIFT) , (FIT-ELLIPSE) , (MIN-AREA-RECT)
 
 
 
@@ -1771,39 +1740,6 @@ tion is named STEP*, because the name STEP conflicts with a Lisp Macro.
 
 
 
-TERM-CRITERIA
-
-TERM-CRITERIA constructors.
-
-C++: TermCriteria::TermCriteria()
-
-LISP-CV: (TERM-CRITERIA) => TERM-CRITERIA
-
-C++: TermCriteria::TermCriteria(int type, int maxCount, double epsilon)
-
-LISP-CV: (TERM-CRITERIA (TYPE :INT) (MAX-COUNT :INT) (EPSILON :INT)) => TERM-CRITERIA
-
-
-
-    Parameters:	
-
-        TYPE - The type of termination criteria: +COUNT+, +EPS+ or (+ +COUNT+ +EPS+).  
-
-               Note: The above constants are part of the TermCriteria class in C++. 
-               In the OpenCV documentation the above constants are as follows:
-
-               TermCriteria::COUNT, TermCriteria::EPS or TermCriteria::COUNT + TermCriteria::EPS
-
-        MAX-COUNT - The maximum number of iterations or elements to compute.
-
-        EPSILON - The desired accuracy or change in parameters at which the iterative algorithm stops.
-
-
-Example:
-
-TODO(Reference example of function that uses TERM-CRITERIA)
-
-
 
 CORE - OPERATIONS ON ARRAYS:
 
@@ -1839,21 +1775,52 @@ See also:
 Matrix Expressions(MAT-EXPR), (ABS-DIFF), (CONVERT-SCALE-ABS)
 
 
-(defun *abs-example ()
 
-  ;;Allocate data and create a 2x2 matrix.
-  (with-object (data (alloc :float '(4f0 -7f0 2f0 -3f0)))
-    (with-mat (mat (mat-data 2 2 +32f+ data))
-      ;;Print MAT.
-      (format t "~%MAT = ~%~%")
-      (print-mat mat :float)
-      ;;Find absolute value of all MAT elements.
-      (with-mat-expr (abs-val (*abs mat))
-	(with-mat (forced-abs-val (>> abs-val))
-	  ;;Print MAT's absolute value.
-          (format t "~%The absolute of MAT = ~%~%")
-	  (print-mat forced-abs-val :float)
-	  (format t "~%"))))))
+(defun *abs-example (&optional 
+		      (camera-index *camera-index*))
+  ;;Set Camera feed to CAP.
+  (with-capture (cap (video-capture camera-index))
+    (let* ((window-name "~ABS Example")
+           ;;Allocate data and create a 2x2 matrix.
+	   (data (alloc :float '(4f0 -7f0 2f0 -3f0)))
+	   (mat (mat-data 2 2 +32f+ data))
+           ;;Find absolute value of all MAT elements.
+           (abs-val (>> (*abs mat))))
+      (if (not (cap-is-open cap)) 
+	  (return-from *abs-example 
+	    (format t "Cannot open the video camera")))
+      ;;Print MAT's absolute value.
+      (dotimes (i (cols abs-val))
+	(dotimes (j (rows abs-val))
+	  (princ (at abs-val i j :float))
+	  (princ #\Space))
+	(princ #\Newline))
+      (named-window window-name +window-normal+)
+      (move-window window-name 759 175)
+      (do* ((frame 0)
+	    (clone 0))
+	   ((plusp (wait-key *millis-per-frame*)) 
+	    (format t "Key is pressed by user"))
+        ;;Read camera feed, set to FRAME.
+	(setf frame (mat))
+	(cap-read cap frame)
+	;;Clone FRAME(CLONE).
+	(setf clone (clone frame))
+        ;;Assign each element of CLONE 
+        ;;a 3 channel scalar value.
+	(assgn-val clone (scalar 255 0 255 ))
+	;;Subtract CLONE from frame to remove all color 
+	;;values but green. Then calculate the absolute 
+	;;value of FRAME before showing output in a win-
+	;;dow. Negative matrix elements in FRAME would 
+	;;cause an unhandled memory fault error.
+	(setf abs-val (*abs (>> (sub frame clone))))
+	(imshow window-name (>> abs-val))
+        ;;Clean up used memory.
+	(del-mat-expr abs-val)
+	(del-mat clone))
+      (destroy-window window-name))))
+
 
 
 *EXP
@@ -1947,7 +1914,7 @@ See also:
     (imshow window-name-1 image)
     ;Convert IMAGE to 1 channel
     (cvt-color image image +bgr2gray+)
-    ;Convert IMAGE to double float
+    ;Convert IMAGE to double floatwith-call-gui-thread
     ;and show image in window
     (convert-to image image +64f+)
     (imshow window-name-2 image)
@@ -2766,82 +2733,6 @@ See also:
       (free data-2)))
 
 
-
-
-DIVIDE
-
-Performs per-element division of two arrays or a scalar by an array.
-
-
-C++: void divide(InputArray src1, InputArray src2, OutputArray dst, double scale=1, int dtype=-1)
-
-LISP-CV: (DIVIDE (SRC1 MAT) (SRC2 MAT) (DEST MAT) &OPTIONAL ((SCALE :DOUBLE) 1) ((DTYPE :INT) -1)) => :VOID
-
-C++: void divide(double scale, InputArray src2, OutputArray dst, int dtype=-1)
-
-LISP-CV: (DIVIDE (SCALE :DOUBLE) (SRC2 MAT) (DEST MAT) &OPTIONAL ((DTYPE :INT) -1)) => :VOID
-
-
-    Parameters:	
-
-        SRC1 - First input array.
-
-        SRC2 - Second input array of the same size and type as SRC2.
-
-        SCALE - Scalar factor.
-
-        DST - Output array of the same size and type as SRC2.
-
-        DTYPE - Optional depth of the output array; if -1, DEST will have depth (DEPTH SRC2), but in 
-                case of an array-by-array division, you can only pass -1 when (EQ (DEPTH SRC1) (DEPTH SRC2)).
-
-
-See OpenCv documenetation:
-
-http://docs.opencv.org/trunk/modules/core/doc/operations_on_arrays.html?highlight=divide#divide
-
-for a description and formulae:
-
-
-See also:
-
-(MULTIPLY), (ADD), (SUBTRACT), Matrix Expressions(MAT-EXPR)
-
-
-(defun divide-example ()
-
-  "In this example, DIVIDE is used to find 
-   the per element quotient of M1 and M2,
-   Then DIVIDE is used to find the per ele-
-   ment quotient of a scalar and a new M1."
-
-  (with-scalar (scalar (scalar 5))
-  (with-mat (m1 (mat-ones 3 3 +32f+))
-    (with-mat (m2 (assgn-val 
-		   (mat-ones 3 3 +32f+) 
-		   scalar))
-      (with-mat (result (mat-typed 3 3 +32f+))
-	(divide m1 m2 result)
-	(format t "~%M1 = ~%~%")
-	(print-mat m1 :float)
-	(format t "~%~%M2 = ~%~%")
-	(print-mat m2 :float)
-	(format t "~%RESULT ~%~%")
-	(print-mat result :float)
-	(format t "~%"))))
-  (with-mat (m1 (assgn-val 
-		 (mat-ones 3 3 +32f+) 
-		 scalar))
-    (with-mat (result (mat-typed 3 3 +32f+))
-      (divide 7d0 m1 result)
-      (format t "~%M1 = ~%~%")
-      (print-mat m1 :float)
-      (format t "~%RESULT ~%~%")
-      (print-mat result :float)
-      (format t "~%")))))
-
-
-
 FLIP
 
 Flips a 2D array around vertical, horizontal, or both axes.
@@ -3568,7 +3459,7 @@ Calculates the per-element difference between two arrays or array and a scalar.
 
 C++: void subtract(InputArray src1, InputArray src2, OutputArray dst, InputArray mask=noArray(), int dtype=-1)
 
-LISP-CV: (SUBTRACT (SRC1 MAT) (SRC2 MAT) (DEST MAT) &OPTIONAL ((MASK MAT) (MAT)) 
+LISP-CV: (SUBTRACT (SRC1 MAT) (SRC2 MAT) (DEST MAT) ((MASK MAT) (MAT)) 
          ((DTYPE :INT) -1) => :VOID
 
 
@@ -3872,97 +3763,67 @@ C++: void ellipse(Mat& img, const RotatedRect& box, const Scalar& color, int thi
 
 
 The functions ELLIPSE with less parameters draws an ellipse outline, a filled ellipse, an elliptic 
-arc, or a filled ellipse sector. A piecewise-linear curve is used to approximate the elliptic arc 
-boundary. If you need more control of the ellipse rendering, you can retrieve the curve using the 
-function (ELLIPSE-2-POLY) and then render it with the function (POLYLINES) or fill it with the 
-function (FILL-POLY) . If you use the first variant of the function and you want to draw the whole 
-ellipse, not an arc, pass (EQ START-ANGLE 0) and (END-ANGLE 360).
+arc, or a filled ellipse sector. A piecewise-linear curve is used to approximate the elliptic arc b-
+oundary. If you need more control of the ellipse rendering, you can retrieve the curve using the fu-
+nction (ELLIPSE-2-POLY) and then render it with the function (POLYLINES) or fill it with the functi-
+on (FILL-POLY) . If you use the first variant of the function and want to draw the whole ellipse, n-
+ot an arc, pass (EQ START-ANGLE 0) and (END-ANGLE 360).
 
 
-Example 1:
-
+Example:
 
 (defun random-color (rng &optional (icolor 0))
   (setf icolor rng)
   (return-from random-color (scalar (uniform rng 0 255) 
 				    (uniform rng 0 255) (uniform rng 0 255))))
+
+
 
 (defun ellipse-example-1 ()
 
   (let ((window-name "ELLIPSE Example 1")
-	(angle 0d0))
+					;Initialize random number generator
+	(rng (rng #xFFFFFFFF))
+	;;Declare MAT
+	(mat 0))
     ;;Create a window
-    (with-named-window (window-name +window-normal+)
-      ;;Set window to fullscreen
-      (set-window-property window-name +wnd-prop-fullscreen+ 
-			   +window-fullscreen+)
-      (if (equal 1.0d0 (get-window-property window-name +wnd-prop-fullscreen+)) 
-	  (set-window-property window-name +wnd-prop-aspectratio+ 
-			       +window-freeratio+))
-      ;Initialize random number generator
-      (with-rng (rng (rng #xFFFFFFFF))
-	(loop
-	   ;; Set BOX location and size to random values
-	   (with-point (center (point (uniform rng 0 640) (uniform rng 0 480)))
-	     (with-size (axes (size (coerce (uniform rng 0 420) 'double-float) 
-				    (coerce (uniform rng 0 420) 'double-float)))
-	       ;; Create a black background, MAT
-	       (with-mat (mat (mat-zeros 640 480 +8uc3+))
-		 (dotimes (n 10)
-		   ;;Draw multiple ellipses with varied parameters
-		   (ellipse mat center axes angle 0.0d0 
-			    (coerce (uniform rng 0 360) 'double-float)
-			    (random-color rng) (uniform rng -1 9) +aa+)
-		   (sleep .015)
-		   ;; Show and then delete MAT
-		   (imshow window-name mat)))
-	       (let ((c (wait-key 33)))
-		 (when (= c 27)
-		   (return))))))))))
+    (named-window window-name +window-normal+)
+    ;; Set window to fullscreen
+    (set-window-property window-name +wnd-prop-fullscreen+ 
+			 +window-fullscreen+)
+    (if (equal 1.0d0 (get-window-property window-name +wnd-prop-fullscreen+)) 
+	(set-window-property window-name +wnd-prop-aspectratio+ 
+			     +window-freeratio+))
+    ;;Initialize line type and thickness variables
+    (do* ((line-type +aa+)
+	  (thickness -1)
+	  ;;Initialize value for the ellipse center
+	  (center (point 240 300))
+	  ;;Initialize value equaling to half of the ellipse main 
+          ;;axes
+	  (axes 0)
+	  ;;Initialize value for the ellipse rotation angle
+          (angle 0))
+	 ((plusp (wait-key 1)) 
+	  (format t "Key is pressed by user"))
+      ;;Create a black background using MAT-ZEROS
+      (setf mat (mat-zeros 640 480 +8uc3+))
+      (dotimes (n 1)
+	;;Set the ellipse axes to random values
+	(setf axes (size (coerce (uniform rng 0 240) 'double-float) 
+			 (coerce (uniform rng 0 240) 'double-float)))
+        ;;Set the ellipse angle to random values
+	(setf angle (coerce (uniform rng 0 180) 'double-float))
+	;;Draw multiple ellipses with varied parameters
+	(ellipse10 mat center axes angle 0.0d0 (coerce (uniform rng 0 360) 'double-float)
+		   (random-color rng) (uniform rng thickness 9) line-type))
+      (sleep .14)
+      ;; Show output
+      (imshow window-name mat)
+      (del-mat mat))
+    (destroy-window window-name)))
 
 
-
-Example 2:
-
-
-(defun random-color (rng &optional (icolor 0))
-  (setf icolor rng)
-  (return-from random-color (scalar (uniform rng 0 255) 
-				    (uniform rng 0 255) (uniform rng 0 255))))
-
-(defun ellipse-example-2 ()
-  (let ((window-name "ELLIPSE Example 2")
-	(box-angle 0f0))
-    ;;Create a window
-    (with-named-window (window-name +window-normal+)
-      ;;Set window to fullscreen
-      (set-window-property window-name +wnd-prop-fullscreen+ 
-			   +window-fullscreen+)
-      (if (equal 1.0d0 (get-window-property window-name +wnd-prop-fullscreen+)) 
-	  (set-window-property window-name +wnd-prop-aspectratio+ 
-			       +window-freeratio+))
-      ;Initialize random number generator
-      (with-rng (rng (rng #xFFFFFFFF))
-	(loop
-	   ;; Set BOX location and size to random values
-	   (with-point (box-loc (point (uniform rng 0 640) (uniform rng 0 480)))
-	     (with-size (box-size (size (coerce (uniform rng 0 420) 'double-float) 
-					(coerce (uniform rng 0 420) 'double-float)))
-	       (setf box-angle (coerce (uniform rng 0 360) 'float))
-	       ;; Create BOX
-	       (with-rotated-rect (box (rotated-rect box-loc box-size box-angle))
-		 ;; Create a black background, MAT
-		 (with-mat (mat (mat-zeros 640 480 +8uc3+))
-		   (dotimes (n 10)
-		     ;;Draw multiple ellipses with varied parameters
-		     (ellipse mat box (random-color rng) (uniform rng -1 9) 
-			       +aa+)
-		     (sleep .01)
-		     ;; Show and then delete MAT
-		     (imshow window-name mat)))
-		 (let ((c (wait-key 33)))
-		   (when (= c 27)
-		     (return)))))))))))
 
 
 
@@ -3972,8 +3833,8 @@ Draws a line segment connecting two points.
 
 C++: void line(Mat& img, Point pt1, Point pt2, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
 
-LISP-CV: (LINE (IMG MAT) (PT1 POINT) (PT2 POINT) (COLOR SCALAR) &OPTIONAL ((THICKNESS :INT) 1) ((LINE-TYPE :INT) 8) 
-         ((SHIFT :INT) 0)) => :VOID
+LISP-CV: (LINE (IMG MAT) (PT1 POINT) (PT2 POINT) (COLOR SCALAR) &OPTIONAL 
+((THICKNESS :INT) 1) ((LINE-TYPE :INT) 8) ((SHIFT :INT) 0)) => :VOID
 
     Parameters:	
 
@@ -4048,13 +3909,13 @@ Example:
 
 PUT-TEXT
 
-Draws a text string.
+Draws a text string.with-call-gui-thread
 
 C++: void putText(Mat& img, const string& text, Point org, int fontFace, double fontScale, Scalar color, int thickness=1, 
      int lineType=8, bool bottomLeftOrigin=false )
 
 LISP-CV: (PUT-TEXT (IMG MAT) (TEXT *STRING) (ORG POINT) (FONT-FACE :INT) (FONT-SCALE :DOUBLE)  
-             (COLOR SCALAR) &OPTIONAL (THICKNESS :INT) (LINE-TYPE :INT) (BOTTOM-LEFT-ORIGN :BOOLEAN)) => :VOID
+             (COLOR SCALAR) (THICKNESS :INT) (LINE-TYPE :INT) (BOTTOM-LEFT-ORIGN :BOOLEAN)) => :VOID
  
     Parameters:	
 
@@ -4161,8 +4022,8 @@ Draws a simple, thick, or filled up-right rectangle.
 
 C++: void rectangle(Mat& img, Point pt1, Point pt2, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
 
-LISP-CV: (RECTANGLE (IMG MAT) (PT1 POINT) (PT2 POINT) (COLOR SCALAR) &OPTIONAL ((THICKNESS :INT) 1) ((LINE-TYPE :INT) 8) 
-         ((SHIFT :INT) 0)) => :VOID
+LISP-CV: (RECTANGLE (IMG MAT) (PT1 POINT) (PT2 POINT) (COLOR SCALAR) &OPTIONAL 
+             ((THICKNESS :INT) 1) ((LINE-TYPE :INT) 8) ((SHIFT :INT) 0)) => :VOID
 
 
     Parameters:	
@@ -4194,53 +4055,51 @@ LISP-CV: (RECTANGLE (IMG MAT) (PT1 POINT) (PT2 POINT) (COLOR SCALAR) &OPTIONAL (
 The function rectangle draws a rectangle outline or a filled rectangle whose two opposite corners a-
 re PT1 and PT2.
 
-
 Example:
-
 
 (defun random-color (rng &optional (icolor 0))
   (setf icolor rng)
   (return-from random-color (scalar (uniform rng 0 255) 
-				    (uniform rng 0 255) 
-				    (uniform rng 0 255))))
+				    (uniform rng 0 255) (uniform rng 0 255))))
 
 (defun rectangle-example ()
-  (with-rng (rng (rng #xFFFFFFFF))
-    (let* ((window-name "RECTANGLE Example")
-	   (window-width 640)
-	   (window-height 480)
-	   ;; Set line type and thickness
-	   (line-type +aa+)
-	   (thickness (uniform rng -3 10))
-	   ;; Initialize rectangle position variables
-	   (x-1 (/ (* window-width -1) 2))
-	   (x-2 (/ (* window-width 3) 2))
-	   (y-1 (/ (* window-width -1) 2))
-	   (y-2 (/ (* window-width 3) 2)))
-      ;; Create a window
-      (with-named-window 
-	  (window-name +window-normal+)
-	;; Set window to fullscreen
-	(set-window-property window-name +wnd-prop-fullscreen+ 
-			     +window-fullscreen+)
+
+  (let* ((window-name "RECTANGLE Example")
+	 (window-width 640)
+	 (window-height 480)
+	 ;; Initialize random number generator
+	 (rng (rng #xFFFFFFFF))
+	 ;; Create a black background
+	 (mat (mat-zeros window-width window-height +8uc3+)))
+    ;; Create a window
+    (named-window window-name +window-normal+)
+    ;; Set window to fullscreen
+    (set-window-property window-name +wnd-prop-fullscreen+ 
+			 +window-fullscreen+)
+    (if (equal 1.0d0 (get-window-property window-name +wnd-prop-fullscreen+)) 
 	(set-window-property window-name +wnd-prop-aspectratio+ 
-			     +window-freeratio+)
-	;; Initialize random number generator
-	;; Create a black background
-	(with-mat 
-	    (mat (mat-zeros window-width window-height +8uc3+))
-	  (loop
-	     ;; Print randomly colored rectangles to screen
-	     (with-point 
-		 (pt1 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
-	       (with-point 
-		   (pt2 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
-		 (rectangle mat pt1 pt2 (random-color rng) thickness line-type)
-		 ;; Show result in window
-		 (imshow window-name mat)
-		 (let ((c (wait-key 33)))
-		   (when (= c 27)
-		     (return)))))))))))
+			     +window-freeratio+))
+    ;; Set line type and thickness
+    (do* ((line-type +aa+)
+          (thickness (uniform rng -3 10))
+	  ;; Initialize rectangle position variables
+          (x-1 (/ (* window-width -1) 2))
+	  (x-2 (/ (* window-width 3) 2))
+          (y-1 (/ (* window-width -1) 2))
+          (y-2 (/ (* window-width 3) 2))
+          (pt1 0)
+	  (pt2 0))
+	 ((plusp (wait-key 1)) 
+	  (format t "Key is pressed by user"))
+      ;; Print randomly colored rectangles to screen
+      (setf pt1 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
+      (setf pt2 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
+      (rectangle mat pt1 pt2 (random-color rng) thickness line-type)
+      ;; Show result in window
+      (imshow window-name mat))
+    (destroy-window window-name)))
+
+
 
 
 RGB
@@ -4270,7 +4129,7 @@ Here RGB supplies a red color value.
 
 CIRCLE IMAGE POINT RADIUS (RGB 255 0 0) +FILLED+ +AA+ 0) 
 
-
+with-call-gui-thread
 UTILITY AND SYSTEM FUNCTIONS AND MACROS:
 
 
@@ -4456,7 +4315,7 @@ tion time in seconds:
    a Quad-Core Processor."
 
   (let* ((t1 0)
-	 (t2 0)
+	 (t2 0)with-call-gui-thread
 	 (time-calc 0))
     (setf t1 (coerce (get-tick-count) 'double-float))
     (sleep 5)
@@ -4535,10 +4394,10 @@ COPY-MAKE-BORDER
 Forms a border around an image.
 
 C++: void copyMakeBorder(InputArray src, OutputArray dst, int top, int bottom, int left, int right, int borderType, 
-     const Scalar& value=Scalar() )
+     const Scalar& value=Scalar() )ning: deleting ‘void*’ is undefined [enabled by default]
 
 LISP-CV: (COPY-MAKE-BORDER (SRC MAT) (DEST MAT) (TOP :INT) (BOTTOM :INT) (LEFT :INT) (RIGHT :INT) 
-         (BORDER-TYPE :INT) &OPTIONAL ((VALUE SCALAR) (SCALAR))) => :VOID
+         (BORDER-TYPE :INT) (VALUE SCALAR)) => :VOID
 
     Parameters:	
 
@@ -4584,42 +4443,50 @@ See also:
 (BORDER-INTERPOLATE)
 
 
-(defun copy-make-border-example (&optional (cam 0) 
+(defun copy-make-border-example (&optional (camera-index *camera-index*)
 				   (width *default-width*)
 				   (height *default-height*))
   "Forms a border around FRAME"
 
-  (with-captured-camera (cap cam :width width :height height)
-    (let* ((window-name "COPY-MAKE-BORDER Example")
+  (with-capture (cap (video-capture camera-index))
+    (let* ((window-name-1 "FRAME - COPY-MAKE-BORDER Example")
+	   (window-name-2 "BORDERED - COPY-MAKE-BORDER Example")
 	   (border 100)
+           ;Create a matrix big enough to accommodate 
+           ;a 100 pixel border on all sides
            (border-width (+ (* 2  border) width))
-           (border-height (+ (* 2  border) height)))
-      (with-named-window (window-name +window-normal+)
-	(move-window window-name 759 175)
-	(loop
-	   ;Create a matrix big enough to accommodate 
-	   ;a 100 pixel border on all sides
-	   (with-mat (rgb (mat-typed border-height border-width +8uc3+))
-	     (with-mat (frame (mat))
-	       (cap-read cap frame)
-	       ;Make a border around FRAME
-	       (copy-make-border frame rgb border border border border  
-				 +border-replicate+ (scalar-all 75))
-	       (imshow window-name rgb)
-	       (let ((c (wait-key 33)))
-		 (when (= c 27)
-		   (return))))))))))
+           (border-height (+ (* 2  border) height))
+	   (rgb (mat-typed border-height border-width +8uc3+)))
+      (cap-set cap +cap-prop-frame-width+ width)
+      (cap-set cap +cap-prop-frame-height+ height)
+      (named-window window-name-1 +window-normal+)
+      (named-window window-name-2 +window-normal+)
+      (move-window window-name-1 533 175)
+      (move-window window-name-2 984 175)
+      (do* ((frame 0))
+	   ((plusp (wait-key *millis-per-frame*)) 
+	    (format t "Key is pressed by user"))
+	(setf frame (mat))
+	(cap-read cap frame)
+        ;Make a border around FRAME set to BORDERED
+	(copy-make-border frame rgb border border border border  
+			  +border-replicate+ (scalar-all 75))
+	(imshow window-name-1 gray)
+	(imshow window-name-2 rgb)) 
+      (destroy-all-windows))))
+
+
 
 
 DILATE
 
 Dilates an image by using a specific structuring element.
 
-C++: void dilate(InputArray src, OutputArray dst, InputArray kernel, Point anchor=Point(-1,-1), int iterations=1, 
-     int borderType=BORDER_CONSTANT, const Scalar& borderValue=morphologyDefaultBorderValue() )
+C++: void dilate(InputArray src, OutputArray dst, InputArray kernel, Point anchor=Point(-1,-1), int iterations=1, int borderType=BORDER_CONSTANT, const Scalar& borderValue=morphologyDefaultBorderValue() )
 
-LISP-CV: (DILATE (SRC MAT) (DEST MAT) (KERNEL MAT) &OPTIONAL ((ANCHOR POINT) (POINT -1 -1)) ((ITERATIONS :INT) 1) 
-         ((BORDER-TYPE :INT) +BORDER-CONSTANT+) ((BORDER-VALUE SCALAR) (MORPHOLOGY-DEFAULT-BORDER-VALUE+))) => :VOID
+LISP-CV: (DILATEE (SRC MAT) (DEST MAT) (KERNEL MAT) ((ANCHOR POINT) (POINT -1 -1)) 
+         ((ITERATIONS :INT) 1) ((BORDER-TYPE :INT) +BORDER-CONSTANT+) 
+         ((BORDER-VALUE SCALAR) (MORPHOLOGY-DEFAULT-BORDER-VALUE+))) => :VOID
 
     Parameters:	
 
@@ -4835,171 +4702,6 @@ Example:
 
 
 
-FILTER-2D
-
-Convolves an image with the kernel.
-
-C++: void filter2D(InputArray src, OutputArray dst, int ddepth, InputArray kernel, Point anchor=Point(-1,-1), double delta=0, 
-     int borderType=BORDER_DEFAULT )
-
-LISP-CV: (FILTER-2D (SRC MAT) (DEST MAT) (DDEPTH :INT) (KERNEL MAT) &OPTIONAL ((ANCHOR POINT) (POINT -1 -1)) ((DELTA :DOUBLE) 0D0) 
-         ((BORDER-TYPE :INT) +BORDER-DEFAULT+)) => :VOID
-
-    Parameters:	
-
-        SRC - Input image.
-
-        DEST - Output image of the same size and the same number of channels as SRC.
-
-        DDEPTH - Desired depth of the destination image; if it is negative, it will be the same as
-                (DEPTH SRC); 
-
-The following combinations of (DEPTH SRC) and ddepth are supported:
-
-                (EQ (DEPTH SRC) +8U+): (EQ DDEPTH (OR -1 +16S+ +32F+ +64F+))
-
-                (EQ (DEPTH SRC) (OR +16U+ +16S+)) -> (EQ DDEPTH (OR -1 +32F+ +64F+))
-
-                (EQ (DEPTH SRC) +32F+) -> (EQ DDEPTH (OR -1 +32F+ +64F+))
-
-                (EQ (DEPTH SRC) +64F+) -> (EQ DDEPTH (OR -1 +64F+))
-
-        when (EQ DDEPTH -1), the output image will have the same depth as the source.
-     
-        KERNEL - Convolution kernel (or rather a correlation kernel), a single-channel floating point 
-                 matrix; if you want to apply different kernels to different channels, split the image 
-                 into separate color planes using (SPLIT) and process them individually.
-
-        ANCHOR - Anchor of the kernel that indicates the relative position of a filtered point within 
-                 the kernel; the anchor should lie within the kernel; default value (-1,-1) means that 
-                 the anchor is at the kernel center.
-
-        DELTA - Optional value added to the filtered pixels before storing them in DEST.
-
-        BORDER-TYPE - Border type, one of the +BORDER-*+ constants, except 
-                      for +BORDER-TRANSPARENT+ and +BORDER-ISOLATED+.
-
-
-The function applies an arbitrary linear filter to an image. In-place operation is supported. When 
-the aperture is partially outside the image, the function interpolates outlier pixel values according 
-to the specified border mode.
-
-See OpenCV documentation:
-
-http://docs.opencv.org/trunk/modules/imgproc/doc/filtering.html?highlight=filter2#filter2d
-
-for further description and formulae.
-
-See also:
-
-(SEP-FILTER-2D), (CREATE-LINEAR-FILTER), (DFT), (MATCH-TEMPLATE)
-
-
-
-(defun filter-2d-example (filename)
-
-  (let ((window-name "FILTER-2D Example")
-	(ind 0)
-       ;Initialize filter parameters
-	(delta 0d0)
-	(ddepth  -1)
-	(kernel-size 0))
-    (with-point (anchor (point -1 -1))
-     ;Load an image
-      (with-mat (img (imread filename +load-image-color+))
-	(with-named-window (window-name +window-autosize+)
-	  (move-window window-name (cols img) 175)
-	  (with-mat (dest (mat))
-	   ;The loop filters the image with 5 different 
-	   ;kernel sizes, each lasting 0.5 seconds
-	    (loop 
-	      ;Update kernel size for a normalized box filter
-	       (setf kernel-size (+ (* (mod ind 5) 2) 3))
-	       (with-mat (temp (mat-ones kernel-size kernel-size +32f+))
-		 (with-scalar (scalar (scalar (* kernel-size kernel-size)))
-		   (convert-to (assgn-val temp scalar) temp +32f+)
-		   (with-mat (kernel (mat-ones kernel-size kernel-size +32f+))
-		     (divide kernel temp kernel)
-		    ;Apply filter
-		     (filter-2d img dest ddepth kernel anchor delta +border-default+)
-		     (imshow window-name dest)
-		     (incf ind)
-		     (let ((c (wait-key 500)))
-		       (when (= c 27)
-			 (return)))))))))))))
-
-
-
-LAPLACIAN
-
-Calculates the Laplacian of an image.
-
-C++: void Laplacian(InputArray src, OutputArray dst, int ddepth, int ksize=1, double scale=1, double delta=0, 
-     int borderType=BORDER_DEFAULT )
-
-LISP-CV: (LAPLACIAN (SRC MAT) (DEST MAT) (DDEPTH :INT) &OPTIONAL ((KSIZE :INT) -1) ((SCALE :DOUBLE) 1D0) ((DELTA :DOUBLE) 0D0) 
-         ((BORDER-TYPE :INT) +BORDER-DEFAULT+)) => :VOID
-
-    Parameters:	
-
-        SRC - Source image.
-
-        DEST - Destination image of the same size and the same number of channels as SRC.
-
-        DDEPTH - Desired depth of the destination image.
-
-        KSIZE - Aperture size used to compute the second-derivative filters. See (GET-DERIV-KERNELS) 
-                for details. The size must be positive and odd.
-
-        SCALE - Optional scale factor for the computed Laplacian values. By default, no scaling is applied. 
-                See (GET-DERIV-KERNELS) for details.
-
-        DELTA - Optional delta value that is added to the results prior to storing them in DEST.
-
-        BORDER-TYPE - Border type, one of the +BORDER-*+ constants, except 
-                      for +BORDER-TRANSPARENT+ and +BORDER-ISOLATED+.
-
-
-The function calculates the Laplacian of the source image by adding up the second x and y derivatives 
-calculated using the Sobel operator:
-
-
-See OpenCV documentation:
-
-http://docs.opencv.org/trunk/modules/imgproc/doc/filtering.html?highlight=laplace#laplacian 
-
-for further description and formulae.
-
-
-See also:
-
-(SOBEL), (SCHARR)
-
-
-(defun laplacian-example (&optional (cam *camera-index*))
-
-  (with-captured-camera (cap cam :width 640 :height 480)
-    (let* ((window-name  "LAPLACIAN Example")) 
-      (with-named-window (window-name +window-normal+)
-	(set-window-property window-name +wnd-prop-fullscreen+ 
-			     +window-fullscreen+)
-	(set-window-property window-name +wnd-prop-aspectratio+ 
-			     +window-freeratio+)
-	(loop
-	   (with-mat (frame (mat))
-	     (cap-read cap frame)
-	     (with-mat (cvt (mat-typed (rows frame) (cols frame) +8u+))
-	       (with-mat (src (mat-typed (rows frame) (cols frame) +8u+))
-		 (with-mat (tmp (mat-typed (rows frame) (cols frame) +8u+))
-		   (cvt-color frame cvt +bgr2gray+)
-		   (imshow window-name (progn
-					 (laplacian cvt tmp +64f+ 3)
-					 (convert-scale-abs tmp src) src)))))
-	     (let ((c (wait-key 33)))
-	       (when (= c 27)
-		 (return)))))))))
-
-
 PYR-DOWN
 
 Blurs an image and downsamples it.
@@ -5139,7 +4841,7 @@ zero rows and columns and then convolves the result with the same kernel as in (
       (destroy-all-windows)))
 
   (main filename))
-
+ning: deleting ‘void*’ is undefined [enabled by default]
 
 
 SOBEL
@@ -5163,13 +4865,13 @@ LISP-CV: (SOBEL (SRC MAT) (DEST MAT) (DDEPTH :INT) (DX :INT) (DY :INT) &OPTIONAL
 
         Output image depth; the following combinations of (DEPTH SRC) and DDEPTH are supported:
 
-                (EQ (DEPTH SRC) +8U+): (EQ DDEPTH (OR -1 +16S+ +32F+ +64F+))
+                (DEPTH SRC) = +8U+, DDEPTH = -1/+16S+/+32F+/+64F+
 
-                (EQ (DEPTH SRC) (OR +16U+ +16S+)) -> (EQ DDEPTH (OR -1 +32F+ +64F+))
+                (DEPTH SRC) = +16U+/+16S+, DDEPTH = -1/+32F+/+64F+
 
-                (EQ (DEPTH SRC) +32F+) -> (EQ DDEPTH (OR -1 +32F+ +64F+))
+                (DEPTH SRC) = +32F+, DDEPTH = -1/+32F+/+64F+
 
-                (EQ (DEPTH SRC) +64F+) -> (EQ DDEPTH (OR -1 +64F+))
+                (DEPTH SRC) = +64F+, DDEPTH = -1/+64F+
 
         when (EQ DDEPTH -1), the destination image will have the same depth as the source; in the 
         case of 8-bit input images it will result in truncated derivatives.
@@ -5200,80 +4902,69 @@ for a description and formulae.
 
 See also:
 
-(SCHARR), (LAPLACIAN), (SEP-FILTER2D), FILTER-2D), (GAUSSIAN-BLUR), (CART-TO-POLAR)
+(SCHARR), (LAPLACIAN), (SEP-FILTER2D), FILTER2D), (GAUSSIAN-BLUR), (CART-TO-POLAR)
 
 
-Example 1:
+(defun sobel-example (&optional (camera-index *camera-index*) 
+			(width *default-width*)
+			(height *default-height*))
 
-(defun sobel-example-1 (&optional (cam *camera-index*))
+  "One of the most basic and important convolutions is the 
+   computation of derivatives (or approximations to them). 
+   There are many ways to do this, but only a few are well 
+   suited to a given situation. In general, the most common 
+   operator used to represent differentiation is the Sobel 
+   derivative [Sobel68] operator. 
 
-  (with-captured-camera (cap cam :width 640 :height 480)
-    (let* ((window-name  "SOBEL Example 1")
-           (ddepth +32f+)) 
-      (with-named-window (window-name +window-normal+)
-       	(set-window-property window-name +wnd-prop-fullscreen+ 
-			     +window-fullscreen+)
-	(set-window-property window-name +wnd-prop-aspectratio+ 
-			     +window-freeratio+)
-	(with-mat (gray (mat))
-	  (with-mat (sobelx (mat))
-	    (with-object (minval (alloc :double 0d0))
-	      (with-object (maxval (alloc :double 0d0))
-		(with-mat (draw (mat))
-		  (loop
-		     (with-mat (frame (mat))
-		       (cap-read cap frame)
-		       ;Show original camera 
-                       ;output in a window
-		       (imshow window-name frame)
-		       ;Convert camera output, a 3 channel 
-                       ;matrix, to 1 channel matrix
-		       (cvt-color frame gray +bgr2gray+)
-		       ;Compute Sobel x derivative and set 
-		       ;to destination matrix SOBELX
-		       (sobel gray sobelx ddepth 0 1 -7))
-		     ;Find minimum and maximum intensities
-		     (min-max-loc sobelx minval maxval)
-		     (format t "MINVAL: ~a~%~%" (mem-aref minval :double 0))
-		     (format t "MAXVAL: ~a~%~%" (mem-aref maxval :double 0))
-		     ;+32F+ image needs to be converted to +8U+ type
-		     (convert-to sobelx draw +8u+ (/ 255d0 (- (? maxval :double) 
-							      (? minval :double))) 
-				 (* (* (? minval :double) -1.283)  
-				    (/ 255.d0 (- (? maxval :double) 
-						 
-						 (? minval :double)))))
-		     (imshow window-name draw)
-		     (let ((c (wait-key 33)))
-		       (when (= c 27)
-			 (return)))))))))))))
+   Sobel operators exist for any order of derivative as well 
+   as for mixed partial derivatives. The second window shows 
+   the effect of the Sobel operator when used to approximate 
+   a first derivative in the x-dimension. The first window s-
+   hows the original camera output, FRAME.
 
+   In a nutshell, this example uses SOBEL to detect edges in
+   a sequence of camera frames(FRAME)."
 
-Example 2:
+  (with-capture (cap (video-capture camera-index))
+    (let* ((window-name-1 "FRAME - SOBEL Example")
+           (window-name-2 "DRAW - SOBEL Example")
+	   (gray (mat))
+           (sobelx (mat))
+           (minval (alloc :double 0d0))
+           (maxval (alloc :double 0d0))
+           (ddepth +32f+)
+           (draw (mat)))
+      (cap-set cap +cap-prop-frame-width+ width)
+      (cap-set cap +cap-prop-frame-height+ height)
+      (named-window window-name-1 +window-normal+)
+      (named-window window-name-2 +window-normal+)
+      (move-window window-name-1 533 175)
+      (move-window window-name-2 984 175)
+      (do* ((frame 0))
+	   ((plusp (wait-key *millis-per-frame*)) 
+	    (format t "Key is pressed by user"))
+	(setf frame (mat))
+	(cap-read cap frame)
+	;Show original camera output in window
+	(imshow window-name-1 frame)
+	;Convert camera output, a 3 channel 
+	;matrix, to 1 channel matrix
+	(cvt-color frame gray +bgr2gray+)
+	;Compute Sobel x derivative and set 
+        ;to destination matrix SOBELX
+	(sobel gray sobelx ddepth 1 0)
+	;Find minimum and maximum intensities
+	(min-max-loc sobelx minval maxval)
+	(format t "MINVAL: ~a~%~%" (mem-aref minval :double 0))
+	(format t "MAXVAL: ~a~%~%" (mem-aref maxval :double 0))
+        ;;+32F+ image needs to be converted to +8U+ type
+	(convert-to sobelx draw +8u+ (/ 255d0 (- (? maxval :double) (? minval :double))) 
+		    (* (* (? minval :double) -1)  (/ 255.d0 (- (? maxval :double) 
+							       (? minval :double)))))
+	(imshow window-name-2 draw))
+      (free minval) (free maxval)
+      (destroy-all-windows))))
 
-
-(defun sobel-example-2 (&optional (cam *camera-index*))
-
-  (with-captured-camera (cap cam :width 640 :height 480)
-    (let* ((window-name  "SOBEL Example")) 
-      (with-named-window (window-name +window-normal+)
-	(set-window-property window-name +wnd-prop-fullscreen+ 
-			     +window-fullscreen+)
-	(set-window-property window-name +wnd-prop-aspectratio+ 
-			     +window-freeratio+)
-	(loop
-	   (with-mat (frame (mat))
-	     (cap-read cap frame)
-	     (with-mat (cvt (mat-typed (rows frame) (cols frame) +8u+))
-	       (with-mat (src (mat-typed (rows frame) (cols frame) +8u+))
-		 (with-mat (tmp (mat-typed (rows frame) (cols frame) +8u+))
-		   (cvt-color frame cvt +bgr2gray+)
-		   (imshow window-name (progn
-					 (sobel cvt tmp +32f+ 0 1 -1)
-					 (convert-scale-abs tmp src) src)))))
-	     (let ((c (wait-key 33)))
-	       (when (= c 27)
-		 (return)))))))))
 
 
 IMGPROC - GEOMETRIC IMAGE TRANSFORMATIONS:
@@ -5336,7 +5027,7 @@ If you want to decimate the image by factor of 2 in each direction, you can call
 
 
 ;; Specify FX and FY and let the function compute the destination image size.
-
+with-call-gui-thread
 
 (RESIZE SRC DEST (SIZE) 0.5d0 0.5d0 INTERPOLATION)
 
@@ -5438,6 +5129,7 @@ See also:
 (THRESHOLD), (BLUR), (GAUSSIAN-BLUR)
 
 
+
 (defun adaptive-threshold-example (&optional (cam 0))
   (let ((window-name "ADAPTIVE-THRESHOLD Example"))
     (with-named-window (window-name +window-autosize+)
@@ -5448,140 +5140,13 @@ See also:
 	     (cap-read cap frame)
 	     (with-mat (img (mat-typed (rows frame) (cols frame) +8u+))
 	       (cvt-color frame img +bgr2gray+)
-	       (adaptive-threshold img img 240d0 
+	       (adaptive-threshold img img 245d0 
 				   +adaptive-thresh-mean-c+ 
-				   +thresh-binary+ 3 5d0)
+				   +thresh-binary+ 9 3.75d0)
 	       (imshow window-name img)))
 	   (let ((c (wait-key 33)))
 	     (when (= c 27)
 	       (return))))))))
-
-
-
-
-
-DISTANCE-TRANSFORM
-
-Calculates the distance to the closest zero pixel for each pixel of the source image.
-
-C++: void distanceTransform(InputArray src, OutputArray dst, int distanceType, int maskSize, int dstType=CV_32F )
-
-LISP-CV: (DISTANCE-TRANSFORM (SRC MAT) (DEST MAT) (DISTANCE-TYPE :INT) (MASK-SIZE :INT)) => :VOID
-
-C++: void distanceTransform(InputArray src, OutputArray dst, OutputArray labels, int distanceType, int maskSize, 
-     int labelType=DIST_LABEL_CCOMP )
-
-LISP-CV: (DISTANCE-TRANSFORM (SRC MAT) (DEST MAT) (*LABELS MAT) (DISTANCE-TYPE :INT) (MASK-SIZE :INT) &OPTIONAL 
-         ((LABEL-TYPE :INT) +DIST-LABEL-CCOMP+))
-
-    Parameters:	
-
-        SRC - 8-bit, single-channel (binary) source image.
-
-        DST - Output image with calculated distances. It is a 8-bit or 32-bit floating-point, 
-              single-channel image of the same size as SRC.
-
-        DISTANCE-TYPE - Type of distance. It can be +DIST-L1+, +DIST-L2+ , or +DIST-C+ .
-
-        MASK-SIZE - Size of the distance transform mask. It can be 3, 5, or +DIST-MASK-PRECISE+ (the 
-                    latter option is only supported by the first function). In case of the +DIST-L1+ 
-                    or +DIST-C+ distance type, the parameter is forced to 3 because a 3 X 3 mask gives 
-                    the same result as 5 X 5 or any larger aperture.
-
-        DST-TYPE - Type of output image. It can be +8U+ or +32F+. Type +8U+ can be used only for the 
-                   first variant of the function and (EQ DISTANCE-TYPE +DIST-L1+).
-
-        LABELS - Optional output 2D array of labels (the discrete Voronoi diagram). It has the type 
-                 +32SC1+ and the same size as SRC . See the details below.
-
-        LABELTYPE - Type of the label array to build. If (EQ LABEL-TYPE +DIST-LABEL-CCOMP+) then each 
-                    connected component of zeros in SRc (as well as all the non-zero pixels closest 
-                    to the connected component) will be assigned the same label. If (EQ label-Type 
-                    +DIST-LABEL-PIXEL+ then each zero pixel (and all the non-zero pixels closest to 
-                    it) gets its own label.
-
-The DISTANCE-TRANSFORM functions calculate the approximate or precise distance from every binary image 
-pixel to the nearest zero pixel. For zero image pixels, the distance will obviously be zero.
-
-When (EQ MASK-SIZE +DIST-MASK-PRECISE+) and (EQ DISTANCE-TYPE +DIST-L2+) , the function runs the algorithm 
-described in [Felzenszwalb04]. This algorithm is parallelized with the TBB library.
-
-In other cases, the algorithm [Borgefors86] is used. This means that for a pixel the function finds the 
-shortest path to the nearest zero pixel consisting of basic shifts: horizontal, vertical, diagonal, or 
-knight’s move (the latest is available for a 5 x 5 mask). The overall distance is calculated as a sum of 
-these basic distances. Since the distance function should be symmetric, all of the horizontal and vertical 
-shifts must have the same cost (denoted as a ), all the diagonal shifts must have the same cost (denoted as 
-b ), and all knight’s moves must have the same cost (denoted as c ). For the +DIST-C+ and +DIST-L1+ types, 
-the distance is calculated precisely, whereas for +DIST-L2+ (Euclidean distance) the distance can be calcu-
-lated only with a relative error (a 5 x 5 mask gives more accurate results). For a,``b`` , and c , OpenCV 
-uses the values suggested in the original paper:
-
-+DIST-C+ 	(3 x 3) 	(EQ A 1), (EQ B 1)
-+DIST-L1+ 	(3 x 3) 	(EQ A 1), (EQ B 1)
-+DIST-L2+ 	(3 x 3) 	(EQ A 0.955), (EQ B 1.3693)
-+DIST-L2+ 	(5 x 5) 	(EQ A 1), (EQ B 1.4), (EQ C 2.1969)
-
-Typically, for a fast, coarse distance estimation +DIST-L2+, a 3 x 3 mask is used. For a more accurate 
-distance estimation +DIST-L2+, a 5 x 5 mask or the precise algorithm is used. Note that both the precise 
-and the approximate algorithms are linear on the number of pixels.
-
-The second variant of the function does not only compute the minimum distance for each pixel (x, y) 
-but also identifies the nearest connected component consisting of zero pixels (EQ LABEL-TYPE +DIST-
-LABEL-CCOMP+) or the nearest zero pixel (EQ LABEL-TYPE +DIST-LABEL-PIXEL+). Index of the component/
-pixel is stored (LABELS X Y) . When (EQ LABEL-TYPE +DIST-LABEL-CCOMP+), the function automatically 
-finds connected components of zero pixels in the input image and marks them with distinct labels. 
-When (EQ LABEL-TYPE +DIST-LABEL-CCOMP+), the function scans through the input image and marks all 
-the zero pixels with distinct labels.
-
-In this mode, the complexity is still linear, the function provides a very fast way to compute the 
-Voronoi diagram for a binary image. The second variant can use only the approximate distance transform 
-algorithm currently,  i.e. (EQ MASK-SIZE +DIST-MASK-PRECISE+) is not supported yet.
-
-
-(defun distance-transform-example (&optional (cam 0) 
-				     (width *default-width*)
-				     (height *default-height*))
-
-  "I came up with an amazing 3D visual effect that changes as you move 
-   in front of the camera. I used the functions CANNY, THRESHOLD, DIST-
-   ANCE-TRANSFORM and NORMALIZE to do this. I left the trackbar locati-
-   ons at the position of my discovery. Try retracing my steps using t-
-   he trackbars to get a better idea of how these functions are working 
-   together to create this effect."
-
-  (let ((window-name "DISTANCE-TRANSFORM Example"))
-    (with-named-window (window-name +window-normal+)
-      (set-window-property window-name +wnd-prop-fullscreen+ 
-			   +window-fullscreen+)
-      (set-window-property window-name +wnd-prop-aspectratio+ 
-			   +window-freeratio+)
-      (with-captured-camera (cap cam :width width :height height)
-	(with-mat (src (mat-typed height width +8u+))
-	  (with-mat (dst (mat-typed height width +8u+))
-	    (with-mat (final (mat-typed height width +32f+))
-	      (with-object (canny-1 (alloc :int 471))
-		(with-object (canny-2 (alloc :int 128))
-		  (with-object (threshold (alloc :int +thresh-binary-inv+))
-		    (with-object (dist-trans (alloc :int +dist-c+))
-		      (loop
-			 (cv:with-mat (frame (mat))
-			   (cap-read cap frame)
-			   (cvt-color frame src +bgr2gray+)
-			   (create-trackbar "canny-1" window-name canny-1 500)
-			   (create-trackbar "canny-2" window-name canny-2 500)
-			   (create-trackbar "threshold" window-name threshold 4)
-			   (create-trackbar "dist-trans" window-name dist-trans 3)
-			   (canny src dst (coerce (? canny-1 :int) 'double-float) 
-				  (coerce (? canny-2 :int) 'double-float))
-			   (threshold dst dst 1d0 255d0 (? threshold :int))
-			   (if (< (get-trackbar-pos "dist-trans" window-name) 1) 
-			       (set-trackbar-pos "dist-trans" window-name 1) nil)
-			   (distance-transform dst final (? dist-trans :int) 3)
-                           (normalize final final 0.0d0 1.0d0 +norm-minmax+)
-			   (imshow window-name final))
-			 (let ((c (wait-key 33)))
-			   (when (= c 27)
-			     (return)))))))))))))))
 
 
 
@@ -5789,12 +5354,11 @@ largest value is used to find initial segments of strong edges.
 See: http://en.wikipedia.org/wiki/Canny_edge_detector
 
 
-;Define global parameters
-
+;;Define global parameters
 (defparameter n 0)
 (defparameter i 5)
 (defparameter low-thresh 10d0) 
-(defparameter high-thresh 50d0)
+(defparameter high-thresh 100d0)
 (defparameter aperture-size 3)
 (defparameter l2-gradient nil)
 
@@ -5833,38 +5397,44 @@ See: http://en.wikipedia.org/wiki/Canny_edge_detector
 		   (format t "L2-GRADIENT = ~a~%~%" l2-gradient))))))
 
 
-(defun canny-example (&optional (cam *camera-index*))
-
-  (with-captured-camera (cap cam :width 640 :height 480)
-    (let* ((window-name  "CANNY Example")) 
-      (with-named-window (window-name +window-normal+)
-	(set-window-property window-name +wnd-prop-fullscreen+ 
-			     +window-fullscreen+)
-	(set-window-property window-name +wnd-prop-aspectratio+ 
-			     +window-freeratio+)
-	(loop
-	   (with-mat (frame (mat))
-	     (cap-read cap frame)
-	     ;Clone FRAME
-	     (with-mat (clone (clone frame))
-	       ;Create destination matrix, half the size of FRAME.
-	       (with-mat (out (mat-typed 
-			       (/ (cols frame) 2) 
-			       (/ (rows frame) 2) 
-			       +8uc3+))
-		 ;Convert CLONE to a 1 channel grayscale image.
-		 (cvt-color clone clone +bgr2gray+)
-		 ;Blur and downsample CLONE.
-		 (pyr-down clone out)
-		 ;Detect edges in camera feed, The parameters can be changed 
-	         ;by clicking the mouse button in the window and pressing a 
-		 ;key. See the callback function above for how to use. 
-		 (canny out out low-thresh high-thresh aperture-size l2-gradient)
-		 (set-mouse-callback window-name (callback call-back-func))
-		 (imshow window-name out)	     
-		 (let ((c (wait-key 33)))
-		   (when (= c 27)
-		     (return)))))))))))
+(defun canny-example (&optional (camera-index *camera-index*))
+  "Finds edges in an image using the [Canny86] algorithm.
+   Canny only handles gray scale images"
+  (with-capture (cap (video-capture camera-index))
+    (let* ((window-name "OUT - CANNY Example"))
+      (named-window window-name +window-normal+)
+      (move-window window-name 305 300)
+      ;Set window to fullscreen with stretched aspect ratio.
+      (set-window-property window-name +wnd-prop-fullscreen+ 
+			   +window-fullscreen+)
+      (if (equal 1.0d0 (get-window-property window-name +wnd-prop-fullscreen+)) 
+	  (set-window-property window-name +wnd-prop-aspectratio+ 
+			       +window-freeratio+))
+      (do* ((frame 0)
+	    (clone 0)
+	    (out 0))
+	   ((eq 27 (wait-key *millis-per-frame*)) 
+	    (format t "Key is pressed by user"))
+	;Set camera feed to FRAME.
+	(setf frame (mat))
+	(cap-read cap frame)
+	;Clone FRAME
+	(setf clone (clone frame))
+	;Create destination matrix, half the size of FRAME.
+	(setf out (mat-typed (/ (cols frame) 2) (/ (rows frame) 2) +8uc3+))
+	;Convert CLONE to a 1 channel grayscale image.
+	(cvt-color clone clone +bgr2gray+)
+	;Blur and downsample CLONE.
+	(pyr-down clone out)
+	;Detect edges in camera feed, The parameters can be changed 
+	;by clicking the mouse button in the window and pressing a 
+	;key. See the callback function above for how to use. 
+	(canny out out low-thresh high-thresh aperture-size l2-gradient)
+	(set-mouse-callback window-name (callback call-back-func))
+	(imshow window-name out)
+	(del-mat clone)
+	(del-mat out))
+      (destroy-all-windows))))
 
 
 IMGPROC - OBJECT DETECTION:
@@ -6258,7 +5828,7 @@ The methods are automatically called by subsequent (CAP-OPEN) and by VIDEO-CAPTU
    KEY function by pressing the Escape key while the window is 
    active the DO loop is exited and CAP-RELEASE is called clos-
    ing the structure used to read and show the video stream. 
-   Note: If you use the macro WITH-CAPTURE, CAP-RELEASErot will b-
+   Note: If you use the macro WITH-CAPTURE, CAP-RELEASE will b-
    e called automatically. See WITH-CAPTURE EXAMPLE for usage."
   
   (let ((cap (video-capture camera-index))
@@ -6630,8 +6200,7 @@ LISP-CV: (VIDEO-CAPTURE &OPTIONAL (SRC :POINTER STRING*)) => VIDEO-CAPTURE
 WITH-CAPTURE
 
 
-Ensures CAP-RELEASE and DEL-VID-CAP gets called automatically when capture goes out of scope.
-
+Ensures CAP-RELEASE and DEL-VID-CAP gets called on captures.
 
 LISP-CV: (WITH-CAPTURE (CAPTURE-VAR CAP)) &BODY BODY)
 
@@ -6641,10 +6210,79 @@ Parameters:
          CAPTURE-VAR - A variable representing the function used to open video file or a capturing 
                        device. Similar to the variable in a LET statement.
 
-         CAP - The function used to open video file or a capturing device for video capturing, as in 
-               (video-capture (DEVICE :INT)). See WITH-CAPTURE example.
+         CAP - The function used to open video file or a capturing device for video capturing, as i-
+               n (video-capture (DEVICE :INT)). See WITH-CAPTURE example.
     
          BODY - The body of the code to be executed once the video file or capturing device is open.
+
+
+WITH-CAPTURE is a macro that basically ensures CAP-RELEASE and DEL-VID-CAP gets called on the capture 
+autpomatically, when it goes out of scope. The function CAP-RELEASE closes the capturing device and 
+DEL-VID-CAP deallocates its memory. 
+
+
+
+See CAP-RELEASE example to see how to release the capture structure without calling WITH-CAPTURE.
+
+
+(defun with-capture-example (&optional 
+			       (camera-index *camera-index*))
+
+  "WITH-CAPTURE is a macro that basically ensures 
+   CAP-RELEASE gets called on all captures. CAP-R-
+   ELEASE is a function that releases the capture 
+   structure created by video-capture, autom-
+   atically, when the code exits. Using it is not 
+   neccesary, but it does make the code a bit mor-
+   eelegant. See CAP-RELEASE example to see how t-
+   o release the capture structure without callin-
+   g WITH-CAPTURE."
+
+  (with-capture (cap (video-capture camera-index))
+    (let ((window-name "WITH-CAPTURE Example"))
+      (if (not (cap-is-open cap)) 
+	  (return-from with-capture-example 
+	    (format t "Cannot open the video camera")))
+      (named-window window-name +window-normal+)
+      (do* ((frame 0))
+	   ((plusp (wait-key *millis-per-frame*)) 
+	    (format t "Key is pressed by user"))
+	(setf frame (mat))
+	(cap-read cap frame)
+	(imshow window-name frame))
+      (destroy-window window-name))))
+
+
+
+WITH-CAPTURED-CAMERA
+
+
+Ensures CAP-RELEASE and DEL-VID-CAP gets called on camera captures. Also sets capture width/height 
+in function.
+
+
+LISP-CV: (WITH-CAPTURED-CAMERA ((CAPTURE-VAR (DEV-INDEX :INT) &KEY (WIDTH :INT) (HEIGHT :INT)) &BODY BODY)) => VIDEO-CAPTURE
+
+
+Parameters:	
+
+         CAPTURE-VAR - A variable representing the function used to open video file or a capturing 
+                       device. Similar to the variable in a LET statement.
+
+         DEV-INDEX - Id of the opened video capturing device (e.g. a camera index). If there is a 
+                     single camera connected, just pass 0.
+
+         WIDTH - Width of the frames in the video stream.
+
+         HEIGHT - Height of the frames in the video stream.
+    
+         BODY - The body of the code to be executed once the video file or capturing device is open.
+
+
+WITH-CAPTURE is a macro that basically ensures CAP-RELEASE and DEL-VID-CAP gets called on the capture 
+autpomatically, when it goes out of scope. The function CAP-RELEASE closes the capturing device and 
+DEL-VID-CAP deallocates its memory.  This function includes the functionality of CAP-SET, to set the 
+width and height of the camera capture, via user parameters.
 
 
 (defun with-capture-example (&optional 
@@ -6667,38 +6305,11 @@ Parameters:
 
 
 
-WITH-CAPTURED-CAMERA
-
-
-Ensures CAP-RELEASE and DEL-VID-CAP gets called on captures. Also sets capture width/height in function.
-
-
-LISP-CV: (WITH-CAPTURED-CAMERA ((CAPTURE-VAR (DEV-INDEX :INT) &KEY (WIDTH :INT) (HEIGHT :INT)) &BODY BODY)) => VIDEO-CAPTURE
-
-
-Parameters:	
-
-         CAPTURE-VAR - A variable representing the function used to open video file or a capturing 
-                       device. Similar to the variable in a LET statement.
-
-         DEV-INDEX - Id of the opened video capturing device (e.g. a camera index). If there is a 
-                     single camera connected, just pass 0.
-
-         WIDTH - Width of the frames in the video stream.
-
-         HEIGHT - Height of the frames in the video stream.
-    
-         BODY - The body of the code to be executed once the video file or capturing device is open.
-
-
-
-
-
-
 WITH-CAPTURED-FILE
 
 
-Ensures CAP-RELEASE and DEL-VID-CAP gets called on captures. Also sets capture width/height in function.
+Ensures CAP-RELEASE and DEL-VID-CAP gets called on video file captures, Also sets capture width/height 
+in function.
 
 
 LISP-CV: (WITH-CAPTURED-FILE ((CAPTURE-VAR (FILE-PATH :INT) &KEY (WIDTH :INT) (HEIGHT :INT)) &BODY BODY))
@@ -6719,6 +6330,12 @@ Parameters:
          BODY - The body of the code to be executed once the video file or capturing device is open.
 
 
+WITH-CAPTURE is a macro that basically ensures CAP-RELEASE and DEL-VID-CAP gets called on the capture 
+autpomatically, when it goes out of scope. The function CAP-RELEASE closes the capturing device and 
+DEL-VID-CAP deallocates its memory.  This function includes the functionality of CAP-SET, to set the 
+width and height of the camera capture, via user parameters.
+
+
 
 (defun with-captured-file-example (file-path)
   (let ((window-name "WITH-CAPTURED-FILE Example"))
@@ -6736,6 +6353,55 @@ Parameters:
 
 
 HIGHGUI - USER INTERFACE:
+
+
+
+IMSHOW
+
+Displays an image in the specified window.
+
+C++: void imshow(const string& winname, InputArray mat)
+
+LISP-CV: (IMSHOW (WINNAME *STRING) (MAT MAT)) => :void
+
+    Parameters:	
+
+        WINNAME - Name of the window.
+
+        MAT - Image to be shown.
+
+
+The function IMSHOW displays an image in the specified window. If the window was created with the 
++WINDOW-AUTOSIZE+ flag, the image is shown with its original size. Otherwise, the image is scaled 
+to fit the window. The function may scale the image, depending on its depth:
+
+        If the image is 8-bit unsigned, it is displayed as is.
+
+        If the image is 16-bit unsigned or 32-bit integer, the pixels are divided by 256. That is, 
+        the value range [0,255*256] is mapped to [0,255].
+
+        If the image is 32-bit floating-point, the pixel values are multiplied by 255. That is, the
+        value range [0,1] is mapped to [0,255].
+
+If window was created with OpenGL support, IMSHOW also support ogl::Buffer , ogl::Texture2D and gpu::GpuMat as input. todo
+
+
+(defun imshow-example (filename)
+
+  "Opens the image FILENAME and shows it 
+   in a window with IMSHOW."
+
+  (let* ((image (imread filename 1))
+	 (window-name "IMSHOW Example"))
+    (if (empty image) 
+	(return-from imshow-example 
+	  (format t "Image not loaded")))
+    (named-window window-name +window-normal+)
+    (move-window window-name 759 175)
+    (imshow window-name image)
+    (loop while (not (= (wait-key 0) 27)))
+    (destroy-window window-name)))
+
 
 
 DESTROY-WINDOW
@@ -6820,103 +6486,6 @@ The function DESTROY-ALL-WINDOWS destroys all of the opened HighGUI windows.
     ;; DESTROY 12 WINDOWS!!!
     (loop while (not (= (wait-key 0) 27)))
     (destroy-all-windows)))
-    
-
-GET-TRACKBAR-POS
-
-Returns the trackbar position.
-
-C++: int getTrackbarPos(const String& trackbarname, const String& winname)
-
-LISP-CV: (GET-TRACKBAR-POS (TRACKBARNAME *STRING) (WINNAME *STRING)) => :INT
-
-
-    Parameters:	
-
-        TRACKBARNAME - Name of the trackbar.
-        
-        WINNAME - Name of the window that is the parent of the trackbar.
-        
-
-The function returns the current position of the specified trackbar.
-
-
-(defun get-trackbar-pos-example (filename)
-  (let ((window-name "See trackbars curre")
-	(text 0)
-	(pos 0)
-        (scale 0.70d0)
-	(thickness 1))
-    ;; read in image supplied by filename parameter
-    (with-mat (img (imread filename 1))
-      (if (empty img) 
-	  (return-from get-trackbar-pos-example
-	    (format t "Image not loaded")))
-      (with-named-window (window-name +window-autosize+)
-	(move-window window-name (cols img) 0)
-	(with-point (org (point 0 25))
-	  (with-scalar (color (scalar 255 255 255))
-	    (with-object (unused-val (alloc :int 0))
-	      (loop
-		 (with-mat (clone (clone img))
-		   (create-trackbar "Position" window-name unused-val 100)
-		   (setf pos (get-trackbar-pos "Position" window-name))
-		   (setf text (concatenate 'string "Current trackbar position: " 
-					   (write-to-string pos)))
-		   (put-text clone text org +font-hershey-triplex+
-			     scale  color thickness +aa+)
-		   (imshow window-name clone))
-		 (let ((c (wait-key 33)))
-		   (when (= c 27)
-		     (return)))))))))))
-
-    
-    
-IMSHOW
-
-Displays an image in the specified window.
-
-C++: void imshow(const string& winname, InputArray mat)
-
-LISP-CV: (IMSHOW (WINNAME *STRING) (MAT MAT)) => :void
-
-    Parameters:	
-
-        WINNAME - Name of the window.
-
-        MAT - Image to be shown.
-
-
-The function IMSHOW displays an image in the specified window. If the window was created with the 
-+WINDOW-AUTOSIZE+ flag, the image is shown with its original size. Otherwise, the image is scaled 
-to fit the window. The function may scale the image, depending on its depth:
-
-        If the image is 8-bit unsigned, it is displayed as is.
-
-        If the image is 16-bit unsigned or 32-bit integer, the pixels are divided by 256. That is, 
-        the value range [0,255*256] is mapped to [0,255].
-
-        If the image is 32-bit floating-point, the pixel values are multiplied by 255. That is, the
-        value range [0,1] is mapped to [0,255].
-
-
-
-(defun imshow-example (filename)
-
-  "Opens the image FILENAME and shows it 
-   in a window with IMSHOW."
-
-  (let* ((image (imread filename 1))
-	 (window-name "IMSHOW Example"))
-    (if (empty image) 
-	(return-from imshow-example 
-	  (format t "Image not loaded")))
-    (named-window window-name +window-normal+)
-    (move-window window-name 759 175)
-    (imshow window-name image)
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name)))
-
 
 
 MOVE-WINDOW
@@ -6997,7 +6566,7 @@ Qt backend supports additional flags:
         eas +WINDOW-AUTOSIZE adjusts automatically the window size to fit the displayed image (see 
         (IMSHOW) ), and you cannot change the window size manually.
 
-        +WINDOW-FREERATIO+ or +WINDOW-KEEPRATIO+: +WINDOW-FREERATIO+ adjusts the image with no resp-
+        +WINDOW-FREERATIO+ or +with-call-gui-threadWINDOW-KEEPRATIO+: +WINDOW-FREERATIO+ adjusts the image with no resp-
         ect to its ratio, whereas +WINDOW-KEEPRATIO keeps the image ratio. 
         
         +GUI-NORMAL+ or +GUI-EXPANDED+: +GUI-NORMAL+ is the old way to draw the window without stat-
@@ -7017,72 +6586,6 @@ By default, (= FLAGS (LOGIOR +WINDOW-AUTOSIZE+  +WINDOW-KEEPRATIO+  +GUI-EXPANDE
     (loop while (not (= (wait-key 0) 27)))
     (destroy-window window-name)))
 
-
-
-
-SET-TRACKBAR-POS
-
-Sets the trackbar position.
-
-C++: void setTrackbarPos(const String& trackbarname, const String& winname, int pos)
-
-LISP-CV: (SET-TRACKBAR-POS (trackbarname *string) (winname *string) (pos :int)) => :VOID
-
-
-    Parameters:	
-
-        TRACKBARNAME - Name of the trackbar.
-        
-        WINNAME - Name of the window that is the parent of trackbar.
-        
-        POS - New position.
-        
-
-The function sets the position of the specified trackbar in the specified window.
-
-
-(defun set-trackbar-pos-example (filename)
-  (let ((window-name "SET-TRACKBAR-POS Example")
-	(text 0)
-        (pos 0)
-        (scale 0.70d0)
-	(thickness 1))
-    ;; Read in image
-    (with-mat (img (imread filename 1))
-      (if (empty img) 
-	  (return-from set-trackbar-pos-example
-	    (format t "Image not loaded")))
-      (with-named-window (window-name +window-autosize+)
-	(move-window window-name (cols img) 0)
-	(with-point (org (point 0 25))
-	  (with-scalar (color (scalar 255 255 255))
-	    (with-object (unused-val (alloc :int 0))
-	      (loop
-		 (with-mat (clone (clone img))
-		   ;Create primary trackbar
-		   (create-trackbar "Primary" window-name unused-val 100)
-		   ;Set primary trackbar position to POS
-		   (setf pos (get-trackbar-pos "Primary" window-name))
-		   ;Print primary trackbar position on window
-		   (setf text (concatenate 'string "Primary trackbar position: " 
-					   (write-to-string pos)))
-		   (put-text clone text org +font-hershey-triplex+
-			     scale  color thickness +aa+)
-		   ;Create 4 slave trackbars
-		   (create-trackbar "Slave 1" window-name unused-val 100)
-		   (create-trackbar "Slave 2" window-name unused-val 100)
-		   (create-trackbar "Slave 3" window-name unused-val 100)
-		   (create-trackbar "Slave 4" window-name unused-val 100)
-		   ;Set slave trackbars position to POS
-		   (set-trackbar-pos "Slave 1" window-name pos)
-		   (set-trackbar-pos "Slave 2" window-name pos)
-		   (set-trackbar-pos "Slave 3" window-name pos)
-		   (set-trackbar-pos "Slave 4" window-name pos)
-		   (imshow window-name clone))
-		 (let ((c (wait-key 33)))
-		   (when (= c 27)
-		     (return)))))))))))
-		     
 
 
 WAIT-KEY
@@ -8230,11 +7733,12 @@ VIDEO-WRITER constructors
 
 C++: VideoWriter::VideoWriter()
 
-LISP-CV: (VIDEO-WRITER) => VIDEO-WRITER
+LISP-CV: (VIDEO-WRITER)
 
 C++: VideoWriter::VideoWriter(const string& filename, int fourcc, double fps, Size frameSize, bool isColor=true)
 
-LISP-CV: (VIDEO-WRITER (FILENAME *STRING) (FOURCC :INT) (FPS :DOUBLE) (FRAME-SIZE SIZE) ((IS-COLOR :INT) T)) => VIDEO-WRITER
+LISP-CV: (VIDEO-WRITER (FILENAME *STRING) (FOURCC :INT) (FPS :DOUBLE) 
+              (FRAME-SIZE SIZE) ((IS-COLOR :INT) T)) => (:POINTER VIDEO-WRITER)
 
 
     Parameters:	
@@ -8255,39 +7759,55 @@ The constructors/functions initialize video writers. On Linux FFMPEG is used to 
 ndows FFMPEG or VFW is used; on MacOSX QTKit is used.
 
 
-(defun video-writer-example (filename &optional	
-					(cam 0) 
-					(width *default-width*)
-					(height *default-height*))
-  (with-captured-camera (cap cam :width width :height height)
+(defun video-writer-example (filename &optional 
+					(camera-index *camera-index*))
+
+  (with-capture (cap (video-capture camera-index)) ; Open the video camera no. 0
     (let* ((filename filename)
 	   (window-name "VIDEO-WRITER Example")
+
+			    ; Get the width of frames of the video
+	   (dwidth (rational (cap-get cap +cap-prop-frame-width+)))
+
+			     ; Get the width of frames of the video
 	   (dheight (rational (cap-get cap +cap-prop-frame-height+)))
-	   (dwidth (rational (cap-get cap +cap-prop-frame-width+))))
-      ;; Initialize the VIDEO-WRITER object 
-      (with-video-writer (o-video-writer (video-writer filename 1196444237 ; todo
-						       20.0d0 (size width height) 1)) 
-	(if (not (cap-is-open cap))
+
+			  ; Initialize the VideoWriter object 
+	   (o-video-writer (video-writer filename 1196444237 ; todo
+					 20.0d0 (size 640 480) 1))) 
+      
+      (if (not (cap-is-open cap)) ; If not success, exit program
+	  (return-from video-writer-example 
+	    (format t "ERROR: Cannot open the video file")))
+
+     ; If VideoWriter isn't initialized successfully, exit the program
+      (if (not (video-writer-is-open o-video-writer)) 
+	  (return-from video-writer-example 
+	    (format t "ERROR: Failed to write the video"))) 
+
+    ;; Print video width and height
+      (format t "Frame Size : ~ax~a~%~%" dwidth dheight)
+
+      (named-window window-name +window-normal+) ; Create a window
+      (move-window window-name 759 175)
+      (do* ((frame 0))
+
+	          ; Wait for 'esc' key press for 30ms. 
+                  ; If 'esc' key is pressed, break loop
+	   ((plusp (wait-key *millis-per-frame*)) 
+	    (format t "Key is pressed by user"))
+	(setf frame (mat))
+
+	(cap-read cap frame) ; read a new frame from video
+
+	(if (not frame) ; If not success, break loop
 	    (return-from video-writer-example 
-	      (format t "ERROR: Cannot open the video file")))
-	(if (not (video-writer-is-open o-video-writer)) 
-	    (return-from video-writer-example 
-	      (format t "ERROR: Failed to write the video"))) 
-	(format t "Frame Size : ~ax~a~%~%" dwidth dheight)     
-	(with-named-window (window-name +window-normal+)
-	  (move-window window-name 759 175)
-	  (loop
-	     (with-mat (frame (mat))	
-	       (cap-read cap frame)
-	       (if (not frame) 
-		   (return-from video-writer-example 
-		     (format t "ERROR: Cannot read video file")))
-	       ;; Write a frame into the file
-	       (video-writer-write o-video-writer frame)
-	       (imshow window-name frame)
-	       (let ((c (wait-key 33)))
-		 (when (= c 27)
-		   (return))))))))))
+	      (format t "ERROR: Cannot read a frame from video file")))
+
+	(video-writer-write o-video-writer frame) ; Write the frame into the file
+
+	(imshow window-name frame)) ; Show the frame in window
+      (destroy-window window-name))))
 
 
 
@@ -8299,7 +7819,7 @@ Returns true if video writer has been successfully initialized.
 
 C++: bool VideoWriter::isOpened()
 
-LISP-CV: (VIDEO-WRITER-IS-OPEN (SELF VIDEO-WRITER)) :BOOLEAN
+LISP-CV: (VIDEO-WRITER-IS-OPEN (SELF (:POINTER VIDEO-WRITER)))
 
 
 (defun video-writer-is-open-example (filename &optional (camera-index *camera-index*))
@@ -8321,7 +7841,7 @@ Writes the next video frame
 
 C++: VideoWriter& VideoWriter::operator<<(const Mat& image)
 
-LISP-CV: (VIDEO-WRITER-WRITE (SELF VIDEO-WRITER) (IMAGE MAT)) => VIDEO-WRITER
+LISP-CV: (VIDEO-WRITER-WRITE (SELF (:POINTER VIDEO-WRITER)) (IMAGE MAT))
 
     Parameters:	
 

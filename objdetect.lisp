@@ -10,15 +10,14 @@
 ;;; Cascade Classification
 
 
-
 ;; CascadeClassifier::CascadeClassifier()
 ;; CascadeClassifier* cv_create_CascadeClassifier() 
-(defcfun ("cv_create_CascadeClassifier" cascade-classifier0) (:pointer cascade-classifier)
+(defcfun ("cv_create_CascadeClassifier" cascade-classifier0) cascade-classifier
   "CASCADE-CLASSIFIER construct.")
 
 ;; CascadeClassifier::CascadeClassifier(const string& filename)
 ;; CascadeClassifier* cv_create_CascadeClassifier1(String* filename)
-(defcfun ("cv_create_CascadeClassifier1" cascade-classifier1) (:pointer cascade-classifier)
+(defcfun ("cv_create_CascadeClassifier1" cascade-classifier1) cascade-classifier
   "Loads a classifier from a file."
   (filename *string))
 
@@ -34,7 +33,7 @@
 ;; bool cv_CascadeClassifier_load1(CascadeClassifier* self, String* filename) 
 (defcfun ("cv_CascadeClassifier_load1" %cascade-classifier-load) :boolean
   "Loads a classifier from a file."
-  (self (:pointer cascade-classifier))
+  (self cascade-classifier)
   (filename *string))
 
 (defun cascade-classifier-load (self filename)
