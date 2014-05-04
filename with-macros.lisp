@@ -8,318 +8,317 @@
 
 
 
-(defmacro with-bf-matcher ((bf-matcher-var bf-matcher) &body body)
+(defmacro with-bf-matcher (bind &body body)
   "Ensures DEL-BF-MATCHER gets called 
    when BF-MATCHER goes out of scope."
-  `(let* ((,bf-matcher-var ,bf-matcher))
-     (unwind-protect
-	 (progn ,@body)
-       (del-bf-matcher ,bf-matcher-var))))
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-bf-matcher %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
 
 
-(defmacro with-brisk ((brisk-var brisk) &body body)
+(defmacro with-brisk (bind &body body)
   "Ensures DEL-BRISK gets called 
    when BRISK goes out of scope."
-  `(let* ((,brisk-var ,brisk))
-     (unwind-protect
-	 (progn ,@body)
-       (del-brisk ,brisk-var))))
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-brisk %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
 
 
-(defmacro with-cascade-classifier ((casc-class-var casc-class) &body body)
-  "Ensures DEL-CASC-CLASS gets called when
-   CASCADE-CLASSIFIER goes out of scope."
-  `(let* ((,casc-class-var ,casc-class))
-     (unwind-protect
-	 (progn ,@body)
-       (del-casc-class ,casc-class-var))))
+(defmacro with-cascade-classifier (bind &body body)
+  "Ensures DEL-CASC-CLASS gets called 
+   when CASCADE-CLASSIFIER goes out of scope."
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-casc-class %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
 
 
-(defmacro with-dmatch ((dmatch-var dmatch) &body body)
+(defmacro with-dmatch (bind &body body)
   "Ensures DEL-DMATCH gets called 
    when DMATCH goes out of scope."
-  `(let* ((,dmatch-var ,dmatch))
-     (unwind-protect
-	 (progn ,@body)
-       (del-dmatch ,dmatch-var))))
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-dmatch %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
 
 
-(defmacro with-key-point ((key-point-var key-point) &body body)
-  "Ensures DEL-KP gets called when 
-   KEY-POINT goes out of scope."
-  `(let* ((,key-point-var ,key-point))
-     (unwind-protect
-	 (progn ,@body)
-       (del-kp ,key-point-var))))
+(defmacro with-keypoint (bind &body body)
+  "Ensures DEL-KP gets called 
+   when KEYPOINT goes out of scope."
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-kp %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
 
 
-(defmacro with-mat ((mat-var mat) &body body)
+(defmacro with-mat (bind &body body)
   "Ensures DEL-MAT gets called 
    when MAT goes out of scope."
-  `(let* ((,mat-var ,mat))
-     (unwind-protect
-	 (progn ,@body)
-       (del-mat ,mat-var))))
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-mat %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
 
 
-(defmacro with-mat-expr ((mat-expr-var mat-expr) &body body)
+(defmacro with-mat-expr (bind &body body)
   "Ensures DEL-MAT-EXPR gets called 
    when MAT-EXPR goes out of scope."
-  `(let* ((,mat-expr-var ,mat-expr))
-     (unwind-protect
-	 (progn ,@body)
-       (del-mat-expr ,mat-expr-var))))
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-mat-expr %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
 
 
-(defmacro with-object ((object-var object) &body body)
-  "Ensures DEL gets called when 
-   OBJECT goes out of scope."
-  `(let* ((,object-var ,object))
-     (unwind-protect
-	 (progn ,@body)
-       (del ,object-var))))
+(defmacro with-object (bind &body body)
+  "Ensures DEL-OBJECT gets called 
+   when OBJECT goes out of scope."
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
 
 
-(defmacro with-point ((point-var point) &body body)
+(defmacro with-point (bind &body body)
   "Ensures DEL-POINT gets called 
    when POINT goes out of scope."
-  `(let* ((,point-var ,point))
-     (unwind-protect
-	 (progn ,@body)
-       (del-point ,point-var))))
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-point %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
 
 
-(defmacro with-point2d ((point2d-var point2d) &body body)
+(defmacro with-point2d (bind &body body)
   "Ensures DEL-POINT2D gets called 
    when POINT2D goes out of scope."
-  `(let* ((,point2d-var ,point2d))
-     (unwind-protect
-	 (progn ,@body)
-       (del-point2d ,point2d-var))))
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-point2d %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
 
 
-(defmacro with-point2f ((point2f-var point2f) &body body)
+(defmacro with-point2f (bind &body body)
   "Ensures DEL-POINT2F gets called 
    when POINT2F goes out of scope."
-  `(let* ((,point2f-var ,point2f))
-     (unwind-protect
-	 (progn ,@body)
-       (del-point2f ,point2f-var))))
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-point2f %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
 
 
-(defmacro with-point3d ((point3d-var point3d) &body body)
+(defmacro with-point3d (bind &body body)
   "Ensures DEL-POINT3D gets called 
    when POINT3D goes out of scope."
-  `(let* ((,point3d-var ,point3d))
-     (unwind-protect
-	 (progn ,@body)
-       (del-point3d ,point3d-var))))
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-point3d %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
 
 
-(defmacro with-point3f ((point3f-var point3f) &body body)
+(defmacro with-point3f (bind &body body)
   "Ensures DEL-POINT3F gets called 
    when POINT3F goes out of scope."
-  `(let* ((,point3f-var ,point3f))
-     (unwind-protect
-	 (progn ,@body)
-       (del-point3f ,point3f-var))))
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-point3f %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
 
 
-(defmacro with-point3i ((point3i-var point3i) &body body)
+(defmacro with-point3i (bind &body body)
   "Ensures DEL-POINT3I gets called 
    when POINT3I goes out of scope."
-  `(let* ((,point3i-var ,point3i))
-     (unwind-protect
-	 (progn ,@body)
-       (del-point3i ,point3i-var))))
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-point3i %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
 
 
-(defmacro with-rect ((rect-var rect) &body body)
+(defmacro with-rect (bind &body body)
   "Ensures DEL-RECT gets called 
    when RECT goes out of scope."
-  `(let* ((,rect-var ,rect))
-     (unwind-protect
-	 (progn ,@body)
-       (del-rect ,rect-var))))
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-rect %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
 
 
-(defmacro with-rng ((rng-var rng) &body body)
+(defmacro with-rng (bind &body body)
   "Ensures DEL-RNG gets called 
    when RNG goes out of scope."
-  `(let* ((,rng-var ,rng))
-     (unwind-protect
-	 (progn ,@body)
-       (del-rng ,rng-var))))
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-rng %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
 
 
-(defmacro with-rotated-rect ((rot-rect-var rot-rect) &body body)
-  "Ensures DEL-ROT-RECT gets called when 
-   ROTATED-RECT goes out of scope."
-  `(let* ((,rot-rect-var ,rot-rect))
-     (unwind-protect
-	 (progn ,@body)
-       (del-rot-rect ,rot-rect-var))))
+(defmacro with-rotated-rect (bind &body body)
+  "Ensures DEL-ROT-RECT gets called 
+   when ROTATED-RECT goes out of scope."
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-rot-rect %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
 
 
-(defmacro with-scalar ((scalar-var scalar) &body body)
+(defmacro with-scalar (bind &body body)
   "Ensures DEL-SCALAR gets called 
    when SCALAR goes out of scope."
-  `(let* ((,scalar-var ,scalar))
-     (unwind-protect
-	 (progn ,@body)
-       (del-scalar ,scalar-var))))
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-scalar %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
 
 
-(defmacro with-size ((size-var size) &body body)
+(defmacro with-size (bind &body body)
   "Ensures DEL-SIZE gets called 
    when SIZE goes out of scope."
-  `(let* ((,size-var ,size))
-     (unwind-protect
-	 (progn ,@body)
-       (del-size ,size-var))))
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-size %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
 
 
-(defmacro with-size2f ((size2f-var size2f) &body body)
+(defmacro with-size2f (bind &body body)
   "Ensures DEL-SIZE2F gets called 
    when SIZE2F goes out of scope."
-  `(let* ((,size2f-var ,size2f))
-     (unwind-protect
-	 (progn ,@body)
-       (del-size2f ,size2f-var))))
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-size2f %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
 
 
-(defmacro with-surf ((surf-var surf) &body body)
+(defmacro with-surf (bind &body body)
   "Ensures DEL-SURF gets called 
    when SURF goes out of scope."
-  `(let* ((,surf-var ,surf))
-     (unwind-protect
-	 (progn ,@body)
-       (del-surf ,surf-var))))
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-surf %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
 
 
-(defmacro with-term-criteria ((term-crit-var term-crit) &body body)
+(defmacro with-term-criteria (bind &body body)
   "Ensures DEL-TERM-CRITERIA gets called 
    when TERM-CRITERIA goes out of scope."
-  `(let* ((,term-crit-var ,term-crit))
-     (unwind-protect
-	 (progn ,@body)
-       (del-term-crit ,term-crit-var))))
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-term-crit %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
 
 
-(defmacro with-vec-char ((vec-char-var vec-char) &body body)
-  "Ensures DEL-VEC-CHAR gets called when 
-   VECTOR-CHAR goes out of scope."
-  `(let* ((,vec-char-var ,vec-char))
-     (unwind-protect
-	 (progn ,@body)
-       (del-vec-char ,vec-char-var))))
+(defmacro with-vector-char (bind &body body)
+  "Ensures DEL-VEC-CHAR gets called 
+   when VECTOR-CHAR goes out of scope."
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-vec-char %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
 
 
-(defmacro with-vec-dbl ((vec-dbl-var vec-dbl) &body body)
-  "Ensures DEL-VEC-DBL gets called when 
-   VECTOR-DOUBLE goes out of scope."
-  `(let* ((,vec-dbl-var ,vec-dbl))
-     (unwind-protect
-	 (progn ,@body)
-       (del-vec-dbl ,vec-dbl-var))))
+(defmacro with-vector-double (bind &body body)
+  "Ensures DEL-VEC-DBL gets called 
+   when VECTOR-DOUBLE goes out of scope."
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-vec-dbl %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
 
 
-(defmacro with-vec-dmatch ((vec-dmatch-var vec-dmatch) &body body)
-  "Ensures DEL-VEC-DM gets called when 
-   VECTOR-DMATCH goes out of scope."
-  `(let* ((,vec-dmatch-var ,vec-dmatch))
-     (unwind-protect
-	 (progn ,@body)
-       (del-vec-dm ,vec-dmatch-var))))
+(defmacro with-vector-dmatch (bind &body body)
+  "Ensures DEL-VEC-DM gets called 
+   when VECTOR-DMATCH goes out of scope."
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-vec-dm %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
 
 
-(defmacro with-vec-flt ((vec-flt-var vec-flt) &body body)
-  "Ensures DEL-VEC-FLT gets called when 
-   VECTOR-FLOAT goes out of scope."
-  `(let* ((,vec-flt-var ,vec-flt))
-     (unwind-protect
-	 (progn ,@body)
-       (del-vec-flt ,vec-flt-var))))
+(defmacro with-vector-float (bind &body body)
+  "Ensures DEL-VEC-FLT gets called 
+   when VECTOR-FLOAT goes out of scope."
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-vec-flt %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
 
 
-(defmacro with-vec-int ((vec-int-var vec-int) &body body)
-  "Ensures DEL-VEC-INT gets called when 
-   VECTOR-INT goes out of scope."
-  `(let* ((,vec-int-var ,vec-int))
-     (unwind-protect
-	 (progn ,@body)
-       (del-vec-int ,vec-int-var))))
+(defmacro with-vector-int (bind &body body)
+  "Ensures DEL-VEC-INT gets called 
+   when VECTOR-INT goes out of scope."
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-vec-int %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
 
 
-(defmacro with-vec-key-point ((vec-key-point-var vec-key-point) &body body)
-  "Ensures DEL-VEC-KP gets called when 
-   VECTOR-KEY-POINT goes out of scope."
-  `(let* ((,vec-key-point-var ,vec-key-point))
-     (unwind-protect
-	 (progn ,@body)
-       (del-vec-kp ,vec-key-point-var))))
+(defmacro with-vector-key-point (bind &body body)
+  "Ensures DEL-VEC-KP gets called 
+   when VECTOR-KEY-POINT goes out of scope."
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-vec-kp %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
 
 
-(defmacro with-vec-mat ((vec-mat-var vec-mat) &body body)
-  "Ensures DEL-VEC-MAT gets called when 
-   VECTOR-MAT goes out of scope."
-  `(let* ((,vec-mat-var ,vec-mat))
-     (unwind-protect
-	 (progn ,@body)
-       (del-vec-mat ,vec-mat-var))))
+(defmacro with-vector-mat (bind &body body)
+  "Ensures DEL-VEC-MAT gets called 
+   when VECTOR-MAT goes out of scope."
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-vec-mat %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
 
 
-(defmacro with-vec-point ((vec-point-var vec-point) &body body)
-  "Ensures DEL-VEC-POINT gets called when 
-   VECTOR-POINT goes out of scope."
-  `(let* ((,vec-point-var ,vec-point))
-     (unwind-protect
-	 (progn ,@body)
-       (del-vec-point ,vec-point-var))))
+(defmacro with-vector-point (bind &body body)
+  "Ensures DEL-VEC-POINT gets called 
+   when VECTOR-POINT goes out of scope."
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-vec-point %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
 
 
-(defmacro with-vec-point2f ((vec-point2f-var vec-point2f) &body body)
-  "Ensures DEL-VEC-POINT2F gets called when 
-   VECTOR-POINT2F goes out of scope."
-  `(let* ((,vec-point2f-var ,vec-point2f))
-     (unwind-protect
-	 (progn ,@body)
-       (del-vec-point2f ,vec-point2f-var))))
+(defmacro with-vector-point2f (bind &body body)
+  "Ensures DEL-VEC-POINT2F gets called 
+   when VECTOR-POINT2F goes out of scope."
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-vec-point2f %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
 
 
-(defmacro with-vec-rect ((vec-rect-var vec-rect) &body body)
-  "Ensures DEL-VEC-RECT gets called
+(defmacro with-vector-rect (bind &body body)
+  "Ensures DEL-VEC-RECT gets called 
    when VECTOR-RECT goes out of scope."
-  `(let* ((,vec-rect-var ,vec-rect))
-     (unwind-protect
-	 (progn ,@body)
-       (del-vec-rect ,vec-rect-var))))
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-vec-rect %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
 
 
-(defmacro with-vec-uchar ((vec-uchar-var vec-uchar) &body body)
+(defmacro with-vector-uchar (bind &body body)
   "Ensures DEL-VEC-UCHAR gets called 
    when VECTOR-UCHAR goes out of scope."
-  `(let* ((,vec-uchar-var ,vec-uchar))
-     (unwind-protect
-	 (progn ,@body)
-       (del-vec-uchar ,vec-uchar-var))))
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-vec-uchar %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
 
 
-(defmacro with-video-capture ((vid-cap-var vid-cap) &body body)
-  "Ensures DEL-VIDEO-CAPTURE gets called 
+(defmacro with-video-capture (bind &body body)
+  "Ensures DEL-VID-CAP gets called 
    when VIDEO-CAPTURE goes out of scope."
-  `(let* ((,vid-cap-var ,vid-cap))
-     (unwind-protect
-	 (progn ,@body)
-       (del-vid-cap ,vid-cap-var))))
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-vid-cap %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
 
 
-(defmacro with-video-writer ((vid-writer-var vid-writer) &body body)
-  "Ensures DEL-VIDEO-WRITER gets called 
+(defmacro with-video-writer (bind &body body)
+  "Ensures DEL-VID-WRITER gets called 
    when VIDEO-WRITER goes out of scope."
-  `(let* ((,vid-writer-var ,vid-writer))
-     (unwind-protect
-	 (progn ,@body)
-       (del-vid-writer ,vid-writer-var))))
-
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-vid-writer %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
 

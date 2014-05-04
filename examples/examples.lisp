@@ -32,7 +32,7 @@ the camera output in a window using the with-* macro syntax:
       (with-named-window (window-name +window-normal+)
 	(move-window window-name 759 175)
 	(loop
-	   (with-mat (frame (mat))
+	   (with-mat ((frame (mat)))
 	     (cap-read cap frame)
 	     (imshow window-name frame)
 	     (let ((c (wait-key 33)))
@@ -73,32 +73,21 @@ ADD, the return value, back to type MAT with the function (FORCE), (or the short
    function ADD. Matrix M1, M2 and RESULT are t-
    hen printed."
 
-  (with-alloc (data (alloc :uint '(1 2 3 4 5 6 7 8 9)))
-    (with-mat (m1 (mat-data 3 3 +32s+ data))
-      (with-mat (m2 (mat-data 3 3 +32s+ data))
-	(with-mat-expr (result (add m1 m2))
-	  (format t "~%M1 =~%~%")
-	  (dotimes (i (rows m1))
-	    (dotimes (j (cols m1))
-	      (format t "~a" (at m1 i j :int))
-	      (princ #\Space))
-	    (princ #\Newline))
-	  (format t "~%M2 = ~%~%")
-	  (dotimes (i (rows m2))
-	    (dotimes (j (cols m2))
-	      (format t "~a" (at m2 i j :int))
-	      (princ #\Space))
-	    (princ #\Newline))
-	  (format t "~%RESULT = ~%~%")
-	  (dotimes (i 3)
-	    (dotimes (j 3)
-	      (format t "~a" (at (>> result) i j :int))
-	      (princ #\Space))
-	    (princ #\Newline))
+  (with-object ((data (alloc :uint '(1 2 3 4 5 6 7 8 9))))
+    (with-mat ((m1 (mat-data 3 3 +32s+ data))
+	       (m2 (mat-data 3 3 +32s+ data)))
+      (with-mat-expr ((result (add m1 m2)))
+	(format t "~%M1 =~%~%")
+	(print-mat m1 :int)
+	(format t "~%M2 = ~%~%")
+	(print-mat m2 :int)
+	(format t "~%RESULT = ~%~%")
+	(with-mat ((forced-result (>> result)))
+	  (print-mat forced-result :int)
 	  (format t "~%"))))))
 
 
-****
+
 ADJUST-ROI
 
 Adjusts a submatrix size and position within the parent matrix.
@@ -521,29 +510,28 @@ shape and type as operands.
 
 (defun cross-example ()
 
-  (with-alloc (data1 (alloc :double '(7d0 3d0 -4d0)))
-    (with-alloc (data2 (alloc :double '(1d0 0d0 6d0)))
-      (with-mat (vec1 (mat-data 1 3 +64f+ data1))
-	(with-mat (vec2 (mat-data 1 3 +64f+ data2))
-	  ;Print VEC1
-	  (format t "~%VEC1 = ~%~%")
-	  (dotimes (j (cols vec1))
-	    (format t "~a" (at vec1 0 j :double))
-	    (princ #\Space))
-	  ;Print VEC2
-	  (format t "~%~%VEC2 = ~%~%")
-	  (dotimes (j (cols vec2))
-	    (format t "~a" (at vec2 0 j :double))
-	    (princ #\Space))
-	  ;Find and print cross product 
-	  ;of VEC1 and VEC2
-	  (with-mat (cp (cross vec1 vec2))
-	    (format t "~%~%The cross product is: ~%~%")
-	    (dotimes (j (cols cp))
-	      (format t "~a" (at cp 0 j :double))
-	      (princ #\Space))
-	    (format t "~%~%")))))))
-
+  (with-object ((data1 (alloc :double '(7d0 3d0 -4d0)))
+		(data2 (alloc :double '(1d0 0d0 6d0))))
+    (with-mat ((vec1 (mat-data 1 3 +64f+ data1))
+	       (vec2 (mat-data 1 3 +64f+ data2)))
+					;Print VEC1
+      (format t "~%VEC1 = ~%~%")
+      (dotimes (j (cols vec1))
+	(format t "~a" (at vec1 0 j :double))
+	(princ #\Space))
+					;Print VEC2
+      (format t "~%~%VEC2 = ~%~%")
+      (dotimes (j (cols vec2))
+	(format t "~a" (at vec2 0 j :double))
+	(princ #\Space))
+					;Find and print cross product 
+					;of VEC1 and VEC2
+      (with-mat ((cp (cross vec1 vec2)))
+	(format t "~%~%The cross product is: ~%~%")
+	(dotimes (j (cols cp))
+	  (format t "~a" (at cp 0 j :double))
+	  (princ #\Space))
+	(format t "~%~%")))))
 
 
 DEPTH
@@ -1025,18 +1013,19 @@ functions.
   "In this example, MUL is used to find 
    the product of matrix, M1 and M2."
 
-  (with-object (data (alloc :float '(1.0f0 2.0f0 3.0f0 
-				     4.0f0 5.0f0 6.0f0 
-				     7.0f0 8.0f0 9.0f0)))
-    (with-mat (m1 (mat-data 3 3 +32f+ data))
-      (with-mat  (m2 (mat-data 3 3 +32f+ data))
-	(with-mat-expr (result (mul m1 m2))
-	  (format t "~%M1 = ~%~%")
-	  (print-mat m1 :float)
-	  (format t "~%~%M2 = ~%~%")
-	  (print-mat m2 :float)
-	  (format t "~%RESULT ~%~%")
-	  (print-mat (>> result) :float)
+  (with-object ((data (alloc :float '(1.0f0 2.0f0 3.0f0 
+				      4.0f0 5.0f0 6.0f0 
+				      7.0f0 8.0f0 9.0f0))))
+    (with-mat ((m1 (mat-data 3 3 +32f+ data))
+	       (m2 (mat-data 3 3 +32f+ data)))
+      (with-mat-expr ((result (mul m1 m2)))
+	(format t "~%M1 = ~%~%")
+	(print-mat m1 :float)
+	(format t "~%~%M2 = ~%~%")
+	(print-mat m2 :float)
+	(format t "~%RESULT ~%~%")
+	(with-mat ((forced-result (>> result)))
+	  (print-mat forced-result :float)
 	  (format t "~%"))))))
 
 
@@ -1842,14 +1831,14 @@ Matrix Expressions(MAT-EXPR), (ABS-DIFF), (CONVERT-SCALE-ABS)
 (defun *abs-example ()
 
   ;;Allocate data and create a 2x2 matrix.
-  (with-object (data (alloc :float '(4f0 -7f0 2f0 -3f0)))
-    (with-mat (mat (mat-data 2 2 +32f+ data))
+  (with-object ((data (alloc :float '(4f0 -7f0 2f0 -3f0))))
+    (with-mat ((mat (mat-data 2 2 +32f+ data)))
       ;;Print MAT.
       (format t "~%MAT = ~%~%")
       (print-mat mat :float)
       ;;Find absolute value of all MAT elements.
-      (with-mat-expr (abs-val (*abs mat))
-	(with-mat (forced-abs-val (>> abs-val))
+      (with-mat-expr ((abs-val (*abs mat)))
+	(with-mat ((forced-abs-val (>> abs-val)))
 	  ;;Print MAT's absolute value.
           (format t "~%The absolute of MAT = ~%~%")
 	  (print-mat forced-abs-val :float)
@@ -2623,7 +2612,7 @@ Scales, calculates absolute values, and converts the result to 8-bit.
 
 C++: void convertScaleAbs(InputArray src, OutputArray dst, double alpha=1, double beta=0)
 
-LISP-CV: (CONVERT-SCALE-ABS  (SRC MAT) (DEST MAT) &OPTIONAL ((ALPHA :INT) 1.0D0) ((BETA :INT) 0.0D0)) => :VOID
+LISP-CV: (CONVERT-SCALE-ABS  (SRC MAT) (DEST MAT) &OPTIONAL ((ALPHA :DOUBLE) 1.0D0) ((BETA :DOUBLE) 0.0D0)) => :VOID
 
     Parameters:	
 
@@ -2815,12 +2804,10 @@ See also:
    Then DIVIDE is used to find the per ele-
    ment quotient of a scalar and a new M1."
 
-  (with-scalar (scalar (scalar 5))
-  (with-mat (m1 (mat-ones 3 3 +32f+))
-    (with-mat (m2 (assgn-val 
-		   (mat-ones 3 3 +32f+) 
-		   scalar))
-      (with-mat (result (mat-typed 3 3 +32f+))
+  (with-scalar ((scalar (scalar 5)))
+    (with-mat ((m1 (mat-ones 3 3 +32f+))
+	       (m2 (assgn-val (mat-ones 3 3 +32f+) scalar)))
+      (with-mat ((result (mat-typed 3 3 +32f+)))
 	(divide m1 m2 result)
 	(format t "~%M1 = ~%~%")
 	(print-mat m1 :float)
@@ -2828,18 +2815,17 @@ See also:
 	(print-mat m2 :float)
 	(format t "~%RESULT ~%~%")
 	(print-mat result :float)
-	(format t "~%"))))
-  (with-mat (m1 (assgn-val 
-		 (mat-ones 3 3 +32f+) 
-		 scalar))
-    (with-mat (result (mat-typed 3 3 +32f+))
+	(format t "~%")))
+    (with-mat ((m1 (assgn-val 
+		    (mat-ones 3 3 +32f+) 
+		    scalar))
+	       (result (mat-typed 3 3 +32f+)))
       (divide 7d0 m1 result)
       (format t "~%M1 = ~%~%")
       (print-mat m1 :float)
       (format t "~%RESULT ~%~%")
       (print-mat result :float)
-      (format t "~%")))))
-
+      (format t "~%"))))
 
 
 FLIP
@@ -2979,6 +2965,7 @@ singular or non-square, the function calculates the pseudo-inverse matrix (the D
 
 In case of the +DECOMP-LU+ method, the function returns non-zero value if the inverse has been successfully 
 calculated and 0 if SRC is singular.
+
 
 In case of the +DECOMP-SVD+ method, the function returns the inverse condition number of SRC (the 
 ratio of the smallest singular value to the largest singular value) and 0 if SRC is singular. The 
@@ -3882,6 +3869,7 @@ ellipse, not an arc, pass (EQ START-ANGLE 0) and (END-ANGLE 360).
 Example 1:
 
 
+
 (defun random-color (rng &optional (icolor 0))
   (setf icolor rng)
   (return-from random-color (scalar (uniform rng 0 255) 
@@ -3899,22 +3887,22 @@ Example 1:
       (if (equal 1.0d0 (get-window-property window-name +wnd-prop-fullscreen+)) 
 	  (set-window-property window-name +wnd-prop-aspectratio+ 
 			       +window-freeratio+))
-      ;Initialize random number generator
-      (with-rng (rng (rng #xFFFFFFFF))
+      ;;Initialize random number generator
+      (with-rng ((rng (rng #xFFFFFFFF)))
 	(loop
 	   ;; Set BOX location and size to random values
-	   (with-point (center (point (uniform rng 0 640) (uniform rng 0 480)))
-	     (with-size (axes (size (coerce (uniform rng 0 420) 'double-float) 
-				    (coerce (uniform rng 0 420) 'double-float)))
-	       ;; Create a black background, MAT
-	       (with-mat (mat (mat-zeros 640 480 +8uc3+))
+	   (with-point ((center (point (uniform rng 0 640) (uniform rng 0 480))))
+	     (with-size ((axes (size (coerce (uniform rng 0 420) 'double-float) 
+				     (coerce (uniform rng 0 420) 'double-float))))
+	       ;;Create a black background, MAT
+	       (with-mat ((mat (mat-zeros 640 480 +8uc3+)))
 		 (dotimes (n 10)
 		   ;;Draw multiple ellipses with varied parameters
 		   (ellipse mat center axes angle 0.0d0 
 			    (coerce (uniform rng 0 360) 'double-float)
 			    (random-color rng) (uniform rng -1 9) +aa+)
 		   (sleep .015)
-		   ;; Show and then delete MAT
+		   ;;Show and then delete MAT
 		   (imshow window-name mat)))
 	       (let ((c (wait-key 33)))
 		 (when (= c 27)
@@ -3933,37 +3921,36 @@ Example 2:
 (defun ellipse-example-2 ()
   (let ((window-name "ELLIPSE Example 2")
 	(box-angle 0f0))
-    ;;Create a window
+    ;; Create a window
     (with-named-window (window-name +window-normal+)
-      ;;Set window to fullscreen
+      ;; Set window to fullscreen
       (set-window-property window-name +wnd-prop-fullscreen+ 
 			   +window-fullscreen+)
       (if (equal 1.0d0 (get-window-property window-name +wnd-prop-fullscreen+)) 
 	  (set-window-property window-name +wnd-prop-aspectratio+ 
 			       +window-freeratio+))
-      ;Initialize random number generator
-      (with-rng (rng (rng #xFFFFFFFF))
+      ;; Initialize random number generator
+      (with-rng ((rng (rng #xFFFFFFFF)))
 	(loop
 	   ;; Set BOX location and size to random values
-	   (with-point (box-loc (point (uniform rng 0 640) (uniform rng 0 480)))
-	     (with-size (box-size (size (coerce (uniform rng 0 420) 'double-float) 
-					(coerce (uniform rng 0 420) 'double-float)))
+	   (with-point ((box-loc (point (uniform rng 0 640) (uniform rng 0 480))))
+	     (with-size ((box-size (size (coerce (uniform rng 0 420) 'double-float) 
+					 (coerce (uniform rng 0 420) 'double-float))))
 	       (setf box-angle (coerce (uniform rng 0 360) 'float))
 	       ;; Create BOX
-	       (with-rotated-rect (box (rotated-rect box-loc box-size box-angle))
+	       (with-rotated-rect ((box (rotated-rect box-loc box-size box-angle)))
 		 ;; Create a black background, MAT
-		 (with-mat (mat (mat-zeros 640 480 +8uc3+))
+		 (with-mat ((mat (mat-zeros 640 480 +8uc3+)))
 		   (dotimes (n 10)
 		     ;;Draw multiple ellipses with varied parameters
 		     (ellipse mat box (random-color rng) (uniform rng -1 9) 
-			       +aa+)
+			      +aa+)
 		     (sleep .01)
 		     ;; Show and then delete MAT
 		     (imshow window-name mat)))
 		 (let ((c (wait-key 33)))
 		   (when (= c 27)
 		     (return)))))))))))
-
 
 
 LINE
@@ -4205,7 +4192,7 @@ Example:
 				    (uniform rng 0 255))))
 
 (defun rectangle-example ()
-  (with-rng (rng (rng #xFFFFFFFF))
+  (with-rng ((rng (rng #xFFFFFFFF)))
     (let* ((window-name "RECTANGLE Example")
 	   (window-width 640)
 	   (window-height 480)
@@ -4228,19 +4215,19 @@ Example:
 	;; Initialize random number generator
 	;; Create a black background
 	(with-mat 
-	    (mat (mat-zeros window-width window-height +8uc3+))
+	    ((mat (mat-zeros window-width window-height +8uc3+)))
 	  (loop
 	     ;; Print randomly colored rectangles to screen
 	     (with-point 
-		 (pt1 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
-	       (with-point 
-		   (pt2 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
-		 (rectangle mat pt1 pt2 (random-color rng) thickness line-type)
-		 ;; Show result in window
-		 (imshow window-name mat)
-		 (let ((c (wait-key 33)))
-		   (when (= c 27)
-		     (return)))))))))))
+		 ((pt1 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2)))
+		  
+		  (pt2 (point (uniform rng x-1 x-2) (uniform rng y-1 y-2))))
+	       (rectangle mat pt1 pt2 (random-color rng) thickness line-type)
+	       ;; Show result in window
+	       (imshow window-name mat)
+	       (let ((c (wait-key 33)))
+		 (when (= c 27)
+		   (return))))))))))
 
 
 RGB
@@ -4597,18 +4584,19 @@ See also:
       (with-named-window (window-name +window-normal+)
 	(move-window window-name 759 175)
 	(loop
-	   ;Create a matrix big enough to accommodate 
-	   ;a 100 pixel border on all sides
-	   (with-mat (rgb (mat-typed border-height border-width +8uc3+))
-	     (with-mat (frame (mat))
-	       (cap-read cap frame)
-	       ;Make a border around FRAME
-	       (copy-make-border frame rgb border border border border  
-				 +border-replicate+ (scalar-all 75))
-	       (imshow window-name rgb)
-	       (let ((c (wait-key 33)))
-		 (when (= c 27)
-		   (return))))))))))
+	  ;Create a matrix big enough to accommodate 
+	  ;a 100 pixel border on all sides
+	   (with-mat ((rgb (mat-typed border-height border-width +8uc3+))
+		      (frame (mat)))
+	     (cap-read cap frame)
+	     ;Make a border around FRAME
+	     (copy-make-border frame rgb border border border border  
+			       +border-replicate+ (scalar-all 75))
+	     (imshow window-name rgb)
+	     (let ((c (wait-key 33)))
+	       (when (= c 27)
+		 (return)))))))))
+
 
 
 DILATE
@@ -4685,11 +4673,11 @@ Example:
 	  (if (eq 2 (? dilation-elem :int)) (setf dilation-type +morph-ellipse+))))
   ;; Specify the shape of the kernel used 
   ;; to perform the dilation operation
-  (with-object (element (get-structuring-element 
-			 dilation-type 
-			 (size (+ (* (? dilation-size :int) 2) 1)
-			       (+ (* (? dilation-size :int) 2) 1)) 
-			 (point (? dilation-size :int) (? dilation-size :int))))
+  (with-mat ((element (get-structuring-element 
+		       dilation-type 
+		       (size (+ (* (? dilation-size :int) 2) 1)
+			     (+ (* (? dilation-size :int) 2) 1)) 
+		       (point (? dilation-size :int) (? dilation-size :int)))))
     ;; Apply the dilation operation
     (dilate src dilation-dest element)
     (imshow window-name dilation-dest)))
@@ -4699,7 +4687,7 @@ Example:
   (if (empty src) 
       (return-from dilate-example
 	(format t "Image not loaded")))
-      ;; Create window
+  ;; Create window
   (with-named-window (window-name 1)
     (move-window window-name (cols src) 0)
     (imshow window-name src)
@@ -4717,8 +4705,8 @@ Example:
 	 (when (= c 27)
  	   (del-mat src)
 	   (del-mat dilation-dest)
-	   (free dilation-elem)
-	   (free dilation-size)
+	   (del dilation-elem)
+	   (del dilation-size)
 	   (return))))))
 
 
@@ -4779,7 +4767,7 @@ Example:
 ;; Global variables
 (defparameter window-name "EROSION-DEST - ERODE Example")
 ;; Load an image
-(defparameter src (imread "/home/w/100_0229.JPG" 1))
+(defparameter src (imread "~/MyPic.jpg" 1))
 (defparameter erosion-dest (mat))
 (defparameter erosion-elem (alloc :int 0))
 (defparameter erosion-size (alloc :int 0))
@@ -4797,11 +4785,11 @@ Example:
 	  (if (eq 2 (? erosion-elem :int)) (setf erosion-type +morph-ellipse+))))
   ;; Specify the shape of the kernel used 
   ;; to perform the erosion operation
-  (with-object (element (get-structuring-element 
-			 erosion-type 
-			 (size (+ (* (? erosion-size :int) 2) 1)
-			       (+ (* (? erosion-size :int) 2) 1)) 
-			 (point (? erosion-size :int) (? erosion-size :int))))
+  (with-mat ((element (get-structuring-element 
+		       erosion-type 
+		       (size (+ (* (? erosion-size :int) 2) 1)
+			     (+ (* (? erosion-size :int) 2) 1)) 
+		       (point (? erosion-size :int) (? erosion-size :int)))))
     ;; Apply the erosion operation
     (erode src erosion-dest element)
     (imshow window-name erosion-dest)))
@@ -4829,8 +4817,8 @@ Example:
 	 (when (= c 27)
 	   (del-mat src)
 	   (del-mat erosion-dest)
-	   (free erosion-elem)
-	   (free erosion-size)
+	   (del erosion-elem)
+	   (del erosion-size)
 	   (return))))))
 
 
@@ -4895,7 +4883,6 @@ See also:
 (SEP-FILTER-2D), (CREATE-LINEAR-FILTER), (DFT), (MATCH-TEMPLATE)
 
 
-
 (defun filter-2d-example (filename)
 
   (let ((window-name "FILTER-2D Example")
@@ -4904,21 +4891,21 @@ See also:
 	(delta 0d0)
 	(ddepth  -1)
 	(kernel-size 0))
-    (with-point (anchor (point -1 -1))
+    (with-point ((anchor (point -1 -1)))
      ;Load an image
-      (with-mat (img (imread filename +load-image-color+))
+      (with-mat ((img (imread filename +load-image-color+)))
 	(with-named-window (window-name +window-autosize+)
 	  (move-window window-name (cols img) 175)
-	  (with-mat (dest (mat))
+	  (with-mat ((dest (mat)))
 	   ;The loop filters the image with 5 different 
 	   ;kernel sizes, each lasting 0.5 seconds
 	    (loop 
 	      ;Update kernel size for a normalized box filter
 	       (setf kernel-size (+ (* (mod ind 5) 2) 3))
-	       (with-mat (temp (mat-ones kernel-size kernel-size +32f+))
-		 (with-scalar (scalar (scalar (* kernel-size kernel-size)))
+	       (with-mat ((temp (mat-ones kernel-size kernel-size +32f+)))
+		 (with-scalar ((scalar (scalar (* kernel-size kernel-size))))
 		   (convert-to (assgn-val temp scalar) temp +32f+)
-		   (with-mat (kernel (mat-ones kernel-size kernel-size +32f+))
+		   (with-mat ((kernel (mat-ones kernel-size kernel-size +32f+)))
 		     (divide kernel temp kernel)
 		    ;Apply filter
 		     (filter-2d img dest ddepth kernel anchor delta +border-default+)
@@ -4986,18 +4973,121 @@ See also:
 	(set-window-property window-name +wnd-prop-aspectratio+ 
 			     +window-freeratio+)
 	(loop
-	   (with-mat (frame (mat))
+	   (with-mat ((frame (mat)))
 	     (cap-read cap frame)
-	     (with-mat (cvt (mat-typed (rows frame) (cols frame) +8u+))
-	       (with-mat (src (mat-typed (rows frame) (cols frame) +8u+))
-		 (with-mat (tmp (mat-typed (rows frame) (cols frame) +8u+))
-		   (cvt-color frame cvt +bgr2gray+)
-		   (imshow window-name (progn
-					 (laplacian cvt tmp +64f+ 3)
-					 (convert-scale-abs tmp src) src)))))
-	     (let ((c (wait-key 33)))
-	       (when (= c 27)
-		 (return)))))))))
+	     (with-mat ((cvt (mat-typed (rows frame) (cols frame) +8u+))
+			(src (mat-typed (rows frame) (cols frame) +8u+))
+			(tmp (mat-typed (rows frame) (cols frame) +8u+)))
+	       (cvt-color frame cvt +bgr2gray+)
+	       (imshow window-name (progn
+				     (laplacian cvt tmp +64f+ 3)
+				     (convert-scale-abs tmp src) src))))
+	   (let ((c (wait-key 33)))
+	     (when (= c 27)
+	       (return))))))))
+
+
+
+MORPHOLOGY-EX
+
+Performs advanced morphological transformations.
+
+C++: void morphologyEx(InputArray src, OutputArray dst, int op, InputArray kernel, Point anchor=Point(-1,-1), int iterations=1, 
+     int borderType=BORDER_CONSTANT, const Scalar& borderValue=morphologyDefaultBorderValue() )
+
+LISP-CV: (MORPHOLOGY-EX (SRC MAT) (DEST MAT) (OP :INT) (KERNEL MAT) &OPTIONAL ((ANCHOR POINT) (POINT -1 -1)) ((ITERATIONS :INT) 1) 
+        ((BORDER-TYPE :INT) +BORDER-CONSTANT+) ((BORDER-VALUE SCALAR) (MORPHOLOGY-DEFAULT-BORDER-VALUE))) => :VOID
+
+    Parameters:	
+
+        SRC - Source image. The number of channels can be arbitrary. The depth should be one of +8U+, 
+              +16U+, +16S+, +32F+ or +64F+.
+
+        DST - Destination image of the same size and type as SRC.
+
+        KERNEL - Structuring element. It can be created using (GET-STRUCTURING-ELEMENT).
+
+        ANCHOR - Anchor position with the kernel. Negative values mean that the anchor is at the kernel center.
+
+        OP -
+
+        Type of a morphological operation that can be one of the following:
+
+            +MORPH-OPEN+ - An opening operation
+
+            +MORPH-CLOSE+ - a closing operation
+
+            +MORPH-GRADIENT+ - a morphological gradient
+
+            +MORPH-TOPHAT+ - “top hat”
+
+            +MORPH-BLACKHAT+ - “black hat”
+
+
+        ITERATIONS - Number of times erosion and dilation are applied.
+
+        BORDER-TYPE - Border type, one of the +BORDER-*+ constants, except 
+                      for +BORDER-TRANSPARENT+ and +BORDER-ISOLATED+.
+
+        BORDERVALUE - Border value in case of a constant border. The default value has a special 
+                      meaning. See (CREATE-MORPHOLOGY-FILTER) for details.
+
+
+The function can perform advanced morphological transformations using an erosion and dilation as basic operations.
+
+
+See OpenCv documentation:
+
+http://docs.opencv.org/trunk/modules/imgproc/doc/filtering.html?highlight=morphologyex#morphologyex
+
+for a description and formulae.
+
+
+
+(defun morphology-ex-example (filename)
+
+   "This example basically converts text to a binary image. 
+    The binary image can be used in further OCR operations. 
+    A good image to use for this example is:
+
+       <lisp-cv-source-dir>/images/webpage-1.png"
+
+  (let ((window-name "MORPHOLOGY-EX Example"))
+    (with-named-window (window-name +window-normal+)
+      (set-window-property window-name +wnd-prop-fullscreen+ 
+			   +window-fullscreen+) 
+      (set-window-property window-name +wnd-prop-aspectratio+ 
+			   +window-freeratio+)
+      (with-mat ((image (imread filename 0)))
+	(if (empty image) 
+	    (return-from morphology-ex-example 
+	      (format t "Image not loaded")))
+	;Divide the image by its morphologically closed counterpart
+	(with-size ((size (size 19 19)))
+	  (with-mat ((kernel (get-structuring-element +morph-ellipse+ size)))
+	    (with-mat ((closed (mat)))
+	      (morphology-ex image closed +morph-close+ kernel)
+	      ;Divide requires floating-point
+	      (convert-to image image +32f+)
+	      (divide image closed image 1d0 +32f+)
+	      (normalize image image 0d0 255d0 +norm-minmax+)
+	      ;Convert back to unsigned int
+	      (convert-to image image +8u+)
+	      ;Threshold each block (3x3 grid) of the image separately to
+	      (dotimes (i 3)
+		(dotimes (j 3)
+		  (with-mat ((block (col-range 
+				     (row-range image (* (round (/ (rows image) 3)) i) 
+                                     (* (round (/ (rows image) 3)) (+ i 1))) 
+				     (* (round (/ (cols image) 3)) j) 
+				     (* (round (/ (cols image) 3)) (+ j 1)))))
+		    (threshold block block -1d0 255d0(+ +thresh-binary-inv+ +thresh-otsu+)))
+		  (imshow window-name image)
+		  (loop
+		     (let ((c (wait-key 33)))
+		       (when (= c 27)
+			 (return)))))))))))))
+
 
 
 PYR-DOWN
@@ -5142,6 +5232,131 @@ zero rows and columns and then convolves the result with the same kernel as in (
 
 
 
+SCHARR
+
+Calculates the first x- or y- image derivative.
+
+C++: void Scharr(InputArray src, OutputArray dst, int ddepth, int dx, int dy, double scale=1, double delta=0, 
+     int borderType=BORDER_DEFAULT )
+
+LISP-CV: (SCHARR (SRC MAT) (DEST MAT) (DDEPTH :INT) (DX :INT) (DY :INT) &OPTIONAL ((SCALE :DOUBLE) 1) ((DELTA :DOUBLE) 1D0) 
+         ((BORDER-TYPE :INT) +BORDER-DEFAULT+)) => :VOID
+
+
+    Parameters:	
+
+        SRC - Input image.
+
+        DST - Output image of the same size and the same number of channels as SRC.
+
+        DDEPTH - Output image depth (see SOBEL for the list of supported combination of (DEPTH SRC) and DDEPTH).
+
+        DX - Order of the derivative x.
+
+        DX - Order of the derivative y.
+
+        SCALE - Optional scale factor for the computed derivative values; by default, no scaling is 
+                applied (see (GET-DERIV-KERNELS) for details).
+
+        DELTA - Optional delta value that is added to the results prior to storing them in DEST.
+
+        BORDER-TYPE - Pixel extrapolation method, one of the +BORDER-*+ constants, except for 
+                      +BORDER-TRANSPARENT+ and +BORDER-ISOLATED+. 
+
+
+The function SCHARR computes the first x- or y- spatial image derivative.
+
+
+See OpenCV documentation: 
+
+http://docs.opencv.org/trunk/modules/imgproc/doc/filtering.html?highlight=scharr#scharr
+
+for description and formulae.
+
+
+See also:
+
+(CART-TO-POLAR)
+
+
+(defun scharr-example (&optional (cam 0))
+
+  "In this example, we compare the code for the SOBEL function with the 
+   same code for the SCHARR function. The SOBEL version is shown in the 
+   left window and the SCHARR version in the right. This example should 
+   give an idea of how this function works."
+
+  (with-captured-camera (cap cam :width 640 :height 480)
+    (let* ((window-name-1 "SOBEL - SCHARR Example")
+	   (window-name-2 "SCHARR - SCHARR Example")
+	   ;Declare variables 
+           (scale 1d0)
+	   (delta 0d0)
+	   (ddepth +16s+))
+      (with-named-window (window-name-1 +window-normal+)
+	(with-named-window (window-name-2 +window-normal+)
+	  (move-window window-name-1 533 175)
+	  (move-window window-name-2 984 175)
+	  (loop
+	     ;Load camera feed
+	     (with-mat ((frame (mat)))
+	       (cap-read cap frame)
+	       ;Declare more variables 
+	       (with-size ((size (size 3 3)))
+		 (with-mat ((src-gray (mat))
+			    (grad (mat))
+			    (grad-x (mat))
+			    (grad-y (mat))
+			    (abs-grad-x (mat))
+			    (abs-grad-y (mat)))
+
+		   ;SOBEL version:
+		   
+		   ;First, we apply a GAUSSIAN-BLUR to 
+		   ;our image to reduce the noise 
+		   (gaussian-blur frame frame  size 0d0 0d0)
+		   ;Now we convert camera feed to grayscale
+		   (cvt-color frame src-gray +bgr2gray+)
+
+		   ;Then, we calculate the “derivatives” 
+		   ;in x and y directions, using SOBEL
+
+		   ;Gradient x  
+		   (sobel src-gray grad-x ddepth 1 0 3 scale delta +border-default+)
+		   ;Gradient y
+		   (sobel src-gray grad-y ddepth 0 1 3 scale delta +border-default+)
+		   ;We convert our partial 
+		   ;results back to +8U+
+                   (convert-scale-abs grad-x abs-grad-x)
+		   (convert-scale-abs grad-y abs-grad-y)
+		   ;Add both directional gradients
+		   (add-weighted abs-grad-x 0.5d0 abs-grad-y 0.5d0 0d0 grad)
+		   ;Then, show SOBEL version in a window
+		   (imshow window-name-1 grad)
+
+	           ;SCHARR version:
+
+		   ;Apply a GAUSSIAN-BLUR
+		   (gaussian-blur frame frame  size 0d0 0d0)
+		   ;Convert camera feed to grayscale
+		   (cvt-color frame src-gray +bgr2gray+)
+		   ;Calculate the “derivatives" in the 
+		   ;x and y directions, using SCHARR
+		   (scharr src-gray grad-x ddepth 1 0 scale delta +border-default+)
+                   (scharr src-gray grad-y ddepth 0 1 scale delta +border-default+)
+		   ;Convert results back to +8U+      
+		   (convert-scale-abs grad-x abs-grad-x)
+		   (convert-scale-abs grad-y abs-grad-y)
+		   ;Add both directional gradients
+		   (add-weighted abs-grad-x 0.5d0 abs-grad-y 0.5d0 0d0 grad)
+		   ;Show SCHARR version in a window
+		   (imshow window-name-2 grad)
+		   (let ((c (wait-key 33)))
+		     (when (= c 27)
+		       (return))))))))))))
+
+
+
 SOBEL
 
 Calculates the first, second, third, or mixed image derivatives using an extended Sobel operator.
@@ -5205,6 +5420,7 @@ See also:
 
 Example 1:
 
+
 (defun sobel-example-1 (&optional (cam *camera-index*))
 
   (with-captured-camera (cap cam :width 640 :height 480)
@@ -5215,38 +5431,39 @@ Example 1:
 			     +window-fullscreen+)
 	(set-window-property window-name +wnd-prop-aspectratio+ 
 			     +window-freeratio+)
-	(with-mat (gray (mat))
-	  (with-mat (sobelx (mat))
-	    (with-object (minval (alloc :double 0d0))
-	      (with-object (maxval (alloc :double 0d0))
-		(with-mat (draw (mat))
-		  (loop
-		     (with-mat (frame (mat))
-		       (cap-read cap frame)
-		       ;Show original camera 
-                       ;output in a window
-		       (imshow window-name frame)
-		       ;Convert camera output, a 3 channel 
-                       ;matrix, to 1 channel matrix
-		       (cvt-color frame gray +bgr2gray+)
-		       ;Compute Sobel x derivative and set 
-		       ;to destination matrix SOBELX
-		       (sobel gray sobelx ddepth 0 1 -7))
-		     ;Find minimum and maximum intensities
-		     (min-max-loc sobelx minval maxval)
-		     (format t "MINVAL: ~a~%~%" (mem-aref minval :double 0))
-		     (format t "MAXVAL: ~a~%~%" (mem-aref maxval :double 0))
-		     ;+32F+ image needs to be converted to +8U+ type
-		     (convert-to sobelx draw +8u+ (/ 255d0 (- (? maxval :double) 
-							      (? minval :double))) 
-				 (* (* (? minval :double) -1.283)  
-				    (/ 255.d0 (- (? maxval :double) 
-						 
-						 (? minval :double)))))
-		     (imshow window-name draw)
-		     (let ((c (wait-key 33)))
-		       (when (= c 27)
-			 (return)))))))))))))
+	(with-mat ((gray (mat))
+		   (sobelx (mat)))
+	  (with-object ((minval (alloc :double 0d0))
+			(maxval (alloc :double 0d0)))
+	    (with-mat ((draw (mat)))
+	      (loop
+		 (with-mat ((frame (mat)))
+		   (cap-read cap frame)
+		   ;Show original camera 
+		   ;output in a window
+		   (imshow window-name frame)
+		   ;Convert camera output, a 3 channel 
+		   ;matrix, to 1 channel matrix
+		   (cvt-color frame gray +bgr2gray+)
+		   ;Compute Sobel x derivative and set 
+		   ;to destination matrix SOBELX
+		   (sobel gray sobelx ddepth 0 1 -7))
+		 ;Find minimum and maximum intensities
+		 (min-max-loc sobelx minval maxval)
+		 (format t "MINVAL: ~a~%~%" (mem-aref minval :double 0))
+		 (format t "MAXVAL: ~a~%~%" (mem-aref maxval :double 0))
+		 ;+32F+ image needs to be converted to +8U+ type
+		 (convert-to sobelx draw +8u+ (/ 255d0 (- (? maxval :double) 
+							  (? minval :double))) 
+			     (* (* (? minval :double) -1.283)  
+				(/ 255.d0 (- (? maxval :double) 
+					     
+					     (? minval :double)))))
+		 (imshow window-name draw)
+		 (let ((c (wait-key 33)))
+		   (when (= c 27)
+		     (return)))))))))))
+
 
 
 Example 2:
@@ -5262,18 +5479,19 @@ Example 2:
 	(set-window-property window-name +wnd-prop-aspectratio+ 
 			     +window-freeratio+)
 	(loop
-	   (with-mat (frame (mat))
+	   (with-mat ((frame (mat)))
 	     (cap-read cap frame)
-	     (with-mat (cvt (mat-typed (rows frame) (cols frame) +8u+))
-	       (with-mat (src (mat-typed (rows frame) (cols frame) +8u+))
-		 (with-mat (tmp (mat-typed (rows frame) (cols frame) +8u+))
-		   (cvt-color frame cvt +bgr2gray+)
-		   (imshow window-name (progn
-					 (sobel cvt tmp +32f+ 0 1 -1)
-					 (convert-scale-abs tmp src) src)))))
-	     (let ((c (wait-key 33)))
-	       (when (= c 27)
-		 (return)))))))))
+	     (with-mat ((cvt (mat-typed (rows frame) (cols frame) +8u+))
+			(src (mat-typed (rows frame) (cols frame) +8u+))
+			(tmp (mat-typed (rows frame) (cols frame) +8u+)))
+	       (cvt-color frame cvt +bgr2gray+)
+	       (imshow window-name (progn
+				     (sobel cvt tmp +32f+ 0 1 -1)
+				     (convert-scale-abs tmp src) src))))
+	(let ((c (wait-key 33)))
+	  (when (= c 27)
+	    (return))))))))
+
 
 
 IMGPROC - GEOMETRIC IMAGE TRANSFORMATIONS:
@@ -5424,12 +5642,9 @@ LISP-CV: (ADAPTIVE-THRESHOLD (SRC MAT) (DEST MAT) (MAX-VALUE :DOUBLE) (ADAPTIVE-
 
 The function transforms a grayscale image to a binary image according to the formulae:
 
-
 See OpenCV documentation for a description and formulae:
 
-http://docs.opencv.org/trunk/modules/imgproc/doc/miscellaneous_transformations.
-html?highlight=adaptivethresh#adaptivethreshold
-
+http://docs.opencv.org/trunk/modules/imgproc/doc/miscellaneous_transformations.html?highlight=adaptiveth#adaptivethreshold
 
 The function can process the image in-place.
 
@@ -5438,24 +5653,7 @@ See also:
 (THRESHOLD), (BLUR), (GAUSSIAN-BLUR)
 
 
-(defun adaptive-threshold-example (&optional (cam 0))
-  (let ((window-name "ADAPTIVE-THRESHOLD Example"))
-    (with-named-window (window-name +window-autosize+)
-      (move-window window-name 640 100)
-      (with-captured-camera (cap cam :width 640 :height 480)
-	(loop
-	   (with-mat (frame (mat))
-	     (cap-read cap frame)
-	     (with-mat (img (mat-typed (rows frame) (cols frame) +8u+))
-	       (cvt-color frame img +bgr2gray+)
-	       (adaptive-threshold img img 240d0 
-				   +adaptive-thresh-mean-c+ 
-				   +thresh-binary+ 3 5d0)
-	       (imshow window-name img)))
-	   (let ((c (wait-key 33)))
-	     (when (= c 27)
-	       (return))))))))
-
+;;Example in process
 
 
 
@@ -5464,7 +5662,7 @@ DISTANCE-TRANSFORM
 
 Calculates the distance to the closest zero pixel for each pixel of the source image.
 
-C++: void distanceTransform(InputArray src, OutputArray dst, int distanceType, int maskSize, int dstType=CV_32F )
+C++: void fscalardistanceTransform(InputArray src, OutputArray dst, int distanceType, int maskSize, int dstType=CV_32F )
 
 LISP-CV: (DISTANCE-TRANSFORM (SRC MAT) (DEST MAT) (DISTANCE-TYPE :INT) (MASK-SIZE :INT)) => :VOID
 
@@ -5538,6 +5736,7 @@ Voronoi diagram for a binary image. The second variant can use only the approxim
 algorithm currently,  i.e. (EQ MASK-SIZE +DIST-MASK-PRECISE+) is not supported yet.
 
 
+
 (defun distance-transform-example (&optional (cam 0) 
 				     (width *default-width*)
 				     (height *default-height*))
@@ -5556,32 +5755,32 @@ algorithm currently,  i.e. (EQ MASK-SIZE +DIST-MASK-PRECISE+) is not supported y
       (set-window-property window-name +wnd-prop-aspectratio+ 
 			   +window-freeratio+)
       (with-captured-camera (cap cam :width width :height height)
-	(with-mat (src (mat-typed height width +8u+))
-	  (with-mat (dst (mat-typed height width +8u+))
-	    (with-mat (final (mat-typed height width +32f+))
-	      (with-object (canny-1 (alloc :int 471))
-		(with-object (canny-2 (alloc :int 128))
-		  (with-object (threshold (alloc :int +thresh-binary-inv+))
-		    (with-object (dist-trans (alloc :int +dist-c+))
-		      (loop
-			 (cv:with-mat (frame (mat))
-			   (cap-read cap frame)
-			   (cvt-color frame src +bgr2gray+)
-			   (create-trackbar "canny-1" window-name canny-1 500)
-			   (create-trackbar "canny-2" window-name canny-2 500)
-			   (create-trackbar "threshold" window-name threshold 4)
-			   (create-trackbar "dist-trans" window-name dist-trans 3)
-			   (canny src dst (coerce (? canny-1 :int) 'double-float) 
-				  (coerce (? canny-2 :int) 'double-float))
-			   (threshold dst dst 1d0 255d0 (? threshold :int))
-			   (if (< (get-trackbar-pos "dist-trans" window-name) 1) 
-			       (set-trackbar-pos "dist-trans" window-name 1) nil)
-			   (distance-transform dst final (? dist-trans :int) 3)
-                           (normalize final final 0.0d0 1.0d0 +norm-minmax+)
-			   (imshow window-name final))
-			 (let ((c (wait-key 33)))
-			   (when (= c 27)
-			     (return)))))))))))))))
+	(with-mat ((src (mat-typed height width +8u+))
+		   (dst (mat-typed height width +8u+))
+		   (final (mat-typed height width +32f+)))
+	  (with-object ((canny-1 (alloc :int 471))
+			(canny-2 (alloc :int 128))
+			(threshold (alloc :int +thresh-binary-inv+))
+			(dist-trans (alloc :int +dist-c+)))
+	    (loop
+	       (with-mat ((frame (mat)))
+		 (cap-read cap frame)
+		 (cvt-color frame src +bgr2gray+)
+		 (create-trackbar "canny-1" window-name canny-1 500)
+		 (create-trackbar "canny-2" window-name canny-2 500)
+		 (create-trackbar "threshold" window-name threshold 4)
+		 (create-trackbar "dist-trans" window-name dist-trans 3)
+		 (canny src dst (coerce (? canny-1 :int) 'double-float) 
+			(coerce (? canny-2 :int) 'double-float))
+		 (threshold dst dst 1d0 255d0 (? threshold :int))
+		 (if (< (get-trackbar-pos "dist-trans" window-name) 1) 
+		     (set-trackbar-pos "dist-trans" window-name 1) nil)
+		 (distance-transform dst final (? dist-trans :int) 3)
+		 (normalize final final 0.0d0 1.0d0 +norm-minmax+)
+		 (imshow window-name final))
+	       (let ((c (wait-key 33)))
+		 (when (= c 27)
+		   (return))))))))))
 
 
 
@@ -5644,40 +5843,40 @@ See also:
       (with-named-window (window-name +window-autosize+)
 	(move-window window-name 333 175)
 	(loop
-	  ;Set camera feed to FRAME
-	   (with-mat (frame (mat))
+	   ;Set camera feed to FRAME
+	   (with-mat ((frame (mat)))
 	     (cap-read cap frame)
-	     (with-mat (grayscale (mat-typed height width +8u+))
-	       (with-mat (threshold (mat-typed height width +8u+))
-		 (with-mat (threshold3 (mat-typed height width +8uc3+))
-	          ;Create a double wide window to show the camera 
-		  ;output and a thresholded camera output in
-		   (with-mat (window (mat-typed height (* width 2) +8uc3+))
-		    ;Convert FRAME to a 1 channel grayscale 
-		    ;image and assign to GRAYSCALE
-		     (cvt-color frame grayscale +bgr2gray+)
-		     ;Apply a fixed-level threshold to 
-		     ;each array element of GRAYSCALE
-		     (threshold grayscale threshold 128d0 255d0 +thresh-binary+)
-		     ;Convert threshold back to a 3 channel 
-		     ;BGR image and assign to THRESHOLD3
-		     (cvt-color threshold threshold3 +gray2bgr+)
-		     ;Set WINDOW roi to the left half
-		     (with-mat (a (adjust-roi window 0 0 0 (* (cols threshold3) -1)))
-		       ;Copy original camera feed(FRAME) to WINDOW 
-		       (copy-to frame window)
-		       ;Set WINDOW roi to the right half
-		       (with-mat (b (adjust-roi window 0 0 (* (cols frame) -1) 
-						(cols threshold3)))
-			 ;Copy thresholded camera feed to WINDOW
-			 (copy-to threshold3 window)
-			 ;Restore original roi
-			 (with-mat (c (adjust-roi window 0 0 (cols frame) 0))
-			   ;Show WINDOW in a window
-			   (imshow window-name window)
-			   (let ((c (wait-key 33)))
-			     (when (= c 27)
-			       (return))))))))))))))))
+	     (with-mat ((grayscale (mat-typed height width +8u+))
+			(threshold (mat-typed height width +8u+))
+			(threshold3 (mat-typed height width +8uc3+))
+			;Create a double wide window to show the camera 
+			;output and a thresholded camera output in
+			(window (mat-typed height (* width 2) +8uc3+)))
+	       ;Convert FRAME to a 1 channel grayscale 
+	       ;image and assign to GRAYSCALE
+	       (cvt-color frame grayscale +bgr2gray+)
+	       ;Apply a fixed-level threshold to 
+	       ;each array element of GRAYSCALE
+	       (threshold grayscale threshold 128d0 255d0 +thresh-binary+)
+	       ;Convert threshold back to a 3 channel 
+               ;BGR image and assign to THRESHOLD3
+	       (cvt-color threshold threshold3 +gray2bgr+)
+	       ;Set WINDOW roi to the left half
+	       (with-mat ((a (adjust-roi window 0 0 0 (* (cols threshold3) -1))))
+		 ;Copy original camera feed(FRAME) to WINDOW 
+		 (copy-to frame window)
+		 ;Set WINDOW roi to the right half
+		 (with-mat ((b (adjust-roi window 0 0 (* (cols frame) -1) 
+					   (cols threshold3))))
+		   ;Copy thresholded camera feed to WINDOW
+		   (copy-to threshold3 window)
+		   ;Restore original roi
+		   (with-mat ((c (adjust-roi window 0 0 (cols frame) 0)))
+		     ;Show WINDOW in a window
+		     (imshow window-name window)
+		     (let ((c (wait-key 33)))
+		       (when (= c 27)
+			 (return)))))))))))))
 
 
 
@@ -5718,8 +5917,7 @@ http://docs.opencv.org/modules/imgproc/doc/histograms.html?highlight=equalizeh#e
   (with-capture (cap (video-capture camera-index))
     (let* ((window-name-1 "Original FRAME - EQUALIZE-HIST Example")
            (window-name-2 "1 channel FRAME - EQUALIZE-HIST Example")
-           (window-name-3 "Equalized FRAME - EQUALIZE-HIST Example")
-	   (frame-gray (mat)))
+           (window-name-3 "Equalized FRAME - EQUALIZE-HIST Example"))
       (if (not (cap-is-open cap)) 
 	  (return-from equalize-hist-example 
 	    (format t "Cannot open the video camera")))
@@ -5728,29 +5926,30 @@ http://docs.opencv.org/modules/imgproc/doc/histograms.html?highlight=equalizeh#e
       (format t "Frame Size : ~ax~a~%~%" 
 	      (cap-get cap +cap-prop-frame-width+)
 	      (cap-get cap +cap-prop-frame-height+))
-      (with-named-window (window-name-1 +window-normal+)
-	(with-named-window (window-name-2 +window-normal+)
-	  (with-named-window (window-name-3 +window-normal+)
-	    (move-window window-name-1 310 175)
-	    (move-window window-name-2 760 175)
-	    (move-window window-name-3 1210 175)
+      (with-named-window (window-name-1 +window-autosize+)
+	(with-named-window (window-name-2 +window-autosize+)
+	  (with-named-window (window-name-3 +window-autosize+)
+	    (move-window window-name-1 184 175)
+	    (move-window window-name-2 634 175)
+	    (move-window window-name-3 1084 175)
 	    (loop
-	       (with-mat (frame (mat))
+	       (with-mat ((frame (mat)))
 		 (cap-read cap frame)
-		 ;Show FRAME in a window
-		 (imshow window-name-1 frame)
-		 ;Convert FRAME to 1 channel 
-		 ;image, FRAME-GRAY
-		 (cvt-color frame frame-gray +bgr2gray+)
-		 ;Show FRAME-GRAY in a window
-		 (imshow window-name-2 frame-gray)
-	         ;Run EQUALIZE-HIST on FRAME-GRAY
-		 (equalize-hist frame-gray frame-gray)
-		 ;Show FRAME-GRAY in a window
-		 (imshow window-name-3 frame-gray)
-		 (let ((c (wait-key 33)))
-		   (when (= c 27)
-		     (return)))))))))))
+		 (with-mat ((frame-gray (mat)))
+		   ;Show FRAME in a window
+		   (imshow window-name-1 frame)
+		   ;Convert FRAME to 1 channel 
+		   ;image, FRAME-GRAY
+		   (cvt-color frame frame-gray +bgr2gray+)
+		   ;Show FRAME-GRAY in a window
+		   (imshow window-name-2 frame-gray)
+		   ;Run EQUALIZE-HIST on FRAME-GRAY
+		   (equalize-hist frame-gray frame-gray)
+		   ;Show FRAME-GRAY in a window
+		   (imshow window-name-3 frame-gray)
+		   (let ((c (wait-key 33)))
+		     (when (= c 27)
+		       (return))))))))))))
 
 
 
@@ -5789,82 +5988,50 @@ largest value is used to find initial segments of strong edges.
 See: http://en.wikipedia.org/wiki/Canny_edge_detector
 
 
-;Define global parameters
-
-(defparameter n 0)
-(defparameter i 5)
-(defparameter low-thresh 10d0) 
-(defparameter high-thresh 50d0)
-(defparameter aperture-size 3)
-(defparameter l2-gradient nil)
-
-
-
-(defcallback call-back-func :void ((event :int) (x :int) (y :int) (flags :int))
-  ;This callback function is called by the SET-MOUSE CALLBACK function in 
-  ;the MAIN function below. It captures button clicks and keypresses.
-
-  ;Mouse position
-  (format t "Mouse position = (~a, ~a)~%~%" x y)
-  
-  ;If left mouse button and shift pressed, 
-  ;increment the CANNY, LOW-THRESH parameter.
-  (if (= flags (+ +event-flag-shiftkey+ +event-flag-lbutton+))
-      (progn (incf low-thresh i) (format t "low-thresh = ~a~%~%" low-thresh)))
-  ;If left mouse button and ctrl pressed, deccrement 
-  ;the CANNY, LOW-THRESH parameter.
-  (if (= flags (+ +event-flag-ctrlkey+ +event-flag-lbutton+))
-      (progn (decf low-thresh i) (format t "low-thresh = ~a~%~%" low-thresh)))
-  ;If middle mouse button and shift pressed, 
-  ;increment the CANNY, HIGH-THRESH parameter.
-  (if (= flags (+ +event-flag-shiftkey+ +event-flag-mbutton+))
-      (progn (incf high-thresh i) (format t "high-thresh = ~a~%~%" high-thresh)))
-  ;If middle mouse button and ctrl pressed, 
-  ;deccrement the CANNY, HIGH-THRESH parameter.
-  (if (= flags (+ +event-flag-ctrlkey+ +event-flag-mbutton+))
-      (progn (decf high-thresh i) (format t "high-thresh = ~a~%~%" high-thresh)))
-  ;If right mouse button double clicked, toggle L2-GRADIENT.
-  (if (= event +event-rbuttondblclk+)
-      (progn (if (eq n 0) (progn 
-			    (setf l2-gradient t) (setf n 1) 
-			    (format t "L2-GRADIENT = ~a~%~%" l2-gradient)) 
-		 (progn 
-		   (setf l2-gradient nil) (setf n 0) 
-		   (format t "L2-GRADIENT = ~a~%~%" l2-gradient))))))
-
-
 (defun canny-example (&optional (cam *camera-index*))
 
   (with-captured-camera (cap cam :width 640 :height 480)
-    (let* ((window-name  "CANNY Example")) 
+    (let* ((window-name  "CANNY Example")
+	   (aperture-size 3)
+           (l2-gradient nil)) 
       (with-named-window (window-name +window-normal+)
 	(set-window-property window-name +wnd-prop-fullscreen+ 
 			     +window-fullscreen+)
 	(set-window-property window-name +wnd-prop-aspectratio+ 
 			     +window-freeratio+)
-	(loop
-	   (with-mat (frame (mat))
-	     (cap-read cap frame)
-	     ;Clone FRAME
-	     (with-mat (clone (clone frame))
-	       ;Create destination matrix, half the size of FRAME.
-	       (with-mat (out (mat-typed 
-			       (/ (cols frame) 2) 
-			       (/ (rows frame) 2) 
-			       +8uc3+))
+	;Allocate int pointers for trackbars to adjust
+	(with-object ((low-thresh (alloc :int 50)) 
+		      (high-thresh (alloc :int 60))
+		      (l2-gradient-switch (alloc :int 0)))
+	  (loop
+	     (with-mat ((frame (mat)))
+	       (cap-read cap frame)
+	       ;Clone FRAME
+	       (with-mat ((clone (clone frame))
+		          ;Create destination matrix 
+                          ;half the size of FRAME
+			  (out (mat-typed (/ (cols frame) 2) 
+					  (/ (rows frame) 2) +8uc3+)))
+		 (create-trackbar "LOW-THRESH" window-name low-thresh 500)                         
+		 (create-trackbar "HIGH-THRESH" window-name high-thresh 500)
+		 (create-trackbar "L2-GRADIENT" window-name l2-gradient-switch 1)
+		 (if (eq (? l2-gradient-switch :int) 1) (setf l2-gradient t) 
+		     (setf l2-gradient nil))
 		 ;Convert CLONE to a 1 channel grayscale image.
 		 (cvt-color clone clone +bgr2gray+)
-		 ;Blur and downsample CLONE.
+		 ;Blur and downsample CLONE
 		 (pyr-down clone out)
-		 ;Detect edges in camera feed, The parameters can be changed 
-	         ;by clicking the mouse button in the window and pressing a 
-		 ;key. See the callback function above for how to use. 
-		 (canny out out low-thresh high-thresh aperture-size l2-gradient)
-		 (set-mouse-callback window-name (callback call-back-func))
-		 (imshow window-name out)	     
-		 (let ((c (wait-key 33)))
-		   (when (= c 27)
-		     (return)))))))))))
+		 ;Detect edges in camera feed. The LOW-THRESH, 
+		 ;HIGH-THRESH and L2-GRADIENT parameters can 
+		 ;be changed by sliding the trackbars
+		 (canny out out (coerce (? low-thresh :int) 'double-float) 
+			(coerce (? high-thresh :int) 'double-float) 
+			aperture-size l2-gradient)
+		 ;Show result in window
+		 (imshow window-name out)))	     
+	     (let ((c (wait-key 33)))
+	       (when (= c 27)
+		 (return)))))))))
 
 
 IMGPROC - OBJECT DETECTION:
@@ -6480,7 +6647,7 @@ Example using WITH-* macros for memory/window managemant:
   (let ((window-name "IMREAD Example 2"))
     (with-named-window (window-name +window-normal+)
       (move-window window-name 759 175)
-      (with-mat (image (imread filename 1))
+      (with-mat ((image (imread filename 1)))
 	(if (empty image) 
 	    (return-from imread-example-2 
 	      (format t "Image not loaded")))
@@ -6489,7 +6656,6 @@ Example using WITH-* macros for memory/window managemant:
 	   (let ((c (wait-key 33)))
 	     (when (= c 27)
 	       (return))))))))
-
 
 
 IMWRITE
@@ -6658,7 +6824,7 @@ Parameters:
       (with-named-window( window-name +window-normal+)
 	(move-window window-name 759 175)
 	(loop 
-	   (with-mat (frame (mat))
+	   (with-mat ((frame (mat)))
 	     (cap-read cap frame)
 	     (imshow window-name frame))
 	   (let ((c (wait-key 33)))
@@ -6681,7 +6847,7 @@ Parameters:
          CAPTURE-VAR - A variable representing the function used to open video file or a capturing 
                        device. Similar to the variable in a LET statement.
 
-         DEV-INDEX - Id of the opened video capturing device (e.g. a camera index). If there is a 
+         DEV-INDEX - ID of the opened video capturing device (e.g. a camera index). If there is a 
                      single camera connected, just pass 0.
 
          WIDTH - Width of the frames in the video stream.
@@ -6722,20 +6888,22 @@ Parameters:
 
 (defun with-captured-file-example (file-path)
   (let ((window-name "WITH-CAPTURED-FILE Example"))
-    (with-named-window (window-name +window-autosize+)
-      (move-window window-name 640 100)
-      (with-captured-file (cap file-path :width 640 :height 480)
+    (with-named-window (window-name +window-normal+)
+      (move-window window-name 759 175)
+      (with-captured-file (cap file-path 
+			       :width 640 
+			       :height 480)
 	(loop
-	   (with-mat (frame (mat))
+	   (with-mat ((frame (mat)))
 	     (cap-read cap frame)
-	       (imshow window-name frame))
+	     (imshow window-name frame))
 	   (let ((c (wait-key 33)))
 	     (when (= c 27)
 	       (return))))))))
 
 
 
-HIGHGUI - USER INTERFACE:
+HIGHGUI - USER INTERFACE
 
 
 DESTROY-WINDOW
@@ -6847,19 +7015,21 @@ The function returns the current position of the specified trackbar.
 	(pos 0)
         (scale 0.70d0)
 	(thickness 1))
-    ;; read in image supplied by filename parameter
-    (with-mat (img (imread filename 1))
+    ;Read in image 
+    (with-mat ((img (imread filename 1)))
       (if (empty img) 
 	  (return-from get-trackbar-pos-example
 	    (format t "Image not loaded")))
       (with-named-window (window-name +window-autosize+)
 	(move-window window-name (cols img) 0)
-	(with-point (org (point 0 25))
-	  (with-scalar (color (scalar 255 255 255))
-	    (with-object (unused-val (alloc :int 0))
+	(with-point ((org (point 0 25)))
+	  (with-scalar ((color (scalar 255 255 255)))
+	    (with-object ((unused-val (alloc :int 0)))
 	      (loop
-		 (with-mat (clone (clone img))
+		 (with-mat ((clone (clone img)))
 		   (create-trackbar "Position" window-name unused-val 100)
+		   ;Get trackbar position and 
+		   ;print it to window
 		   (setf pos (get-trackbar-pos "Position" window-name))
 		   (setf text (concatenate 'string "Current trackbar position: " 
 					   (write-to-string pos)))
@@ -7047,18 +7217,18 @@ The function sets the position of the specified trackbar in the specified window
         (pos 0)
         (scale 0.70d0)
 	(thickness 1))
-    ;; Read in image
-    (with-mat (img (imread filename 1))
+    ;Read in image
+    (with-mat ((img (imread filename 1)))
       (if (empty img) 
 	  (return-from set-trackbar-pos-example
 	    (format t "Image not loaded")))
       (with-named-window (window-name +window-autosize+)
 	(move-window window-name (cols img) 0)
-	(with-point (org (point 0 25))
-	  (with-scalar (color (scalar 255 255 255))
-	    (with-object (unused-val (alloc :int 0))
+	(with-point ((org (point 0 25)))
+	  (with-scalar ((color (scalar 255 255 255)))
+	    (with-object ((unused-val (alloc :int 0)))
 	      (loop
-		 (with-mat (clone (clone img))
+		 (with-mat ((clone (clone img)))
 		   ;Create primary trackbar
 		   (create-trackbar "Primary" window-name unused-val 100)
 		   ;Set primary trackbar position to POS
@@ -7082,7 +7252,7 @@ The function sets the position of the specified trackbar in the specified window
 		 (let ((c (wait-key 33)))
 		   (when (= c 27)
 		     (return)))))))))))
-		     
+
 
 
 WAIT-KEY
@@ -7312,14 +7482,14 @@ code applies all 11 color map types to an image based on the position of a track
     (with-named-window (window-name +window-normal+)
       (move-window window-name 759 175)
       ;Load image as grayscale - Color is okay too
-      (with-object (img0 (imread filename 0))
+      (with-mat ((img0 (imread filename 0)))
 	(if (empty img0) 
 	    (return-from apply-color-map-example
 	      (format t "Image not loaded")))
-        (with-object (cm-img0 (mat))
+        (with-mat ((cm-img0 (mat)))
 	  (loop
-	     ;In a loop apply one of 11 color map 
-	     ;types based on trackbar position
+	    ;In a loop apply one of 11 color map 
+	    ;types based on trackbar position
 	     (apply-color-map img0 cm-img0 (? i :int))
 	     (imshow window-name cm-img0)
 	     (create-trackbar "Color Map" window-name i 11)
@@ -7549,20 +7719,21 @@ VAL0 is required, the rest are optional. The function SCALAR-ALL returns a point
 with all elements having the same value.
 
 
+;; Still gets errors mem-reffing SCALAR-1 and SCALAR-2, willl be fixed soon
 
 (defun scalar-example ()
 
-  (with-scalar (scalar-1 (scalar 0 255 0))
-    (with-scalar (scalar-2 (scalar-all 255))
-      (format t "~%SCALAR-1 = (~a, ~a, ~a)~%~%" 
-	      (? scalar-1 :double 0)
-	      (? scalar-1 :double 1)
-	      (? scalar-1 :double 2))
-      (format t "~%SCALAR-2 = (~a, ~a, ~a, ~a)~%~%" 
-	      (? scalar-2 :double 0)
-	      (? scalar-2 :double 1)
-	      (? scalar-2 :double 2)
-	      (? scalar-2 :double 3)))))
+(with-scalar ((scalar-1 (scalar 0 255 0))
+	     (scalar-2 (scalar-all 255)))
+		(format t "~%SCALAR-1 = (~a, ~a, ~a)~%~%" 
+			(? scalar-1 :double 0)
+			(? scalar-1 :double 1)
+			(? scalar-1 :double 2))
+		(format t "~%SCALAR-2 = (~a, ~a, ~a, ~a)~%~%" 
+			(? scalar-2 :double 0)
+			(? scalar-2 :double 1)
+			(? scalar-2 :double 2)
+			(? scalar-2 :double 3))))
 
 
 
@@ -8265,8 +8436,8 @@ ndows FFMPEG or VFW is used; on MacOSX QTKit is used.
 	   (dheight (rational (cap-get cap +cap-prop-frame-height+)))
 	   (dwidth (rational (cap-get cap +cap-prop-frame-width+))))
       ;; Initialize the VIDEO-WRITER object 
-      (with-video-writer (o-video-writer (video-writer filename 1196444237 ; todo
-						       20.0d0 (size width height) 1)) 
+      (with-video-writer ((o-video-writer (video-writer filename 1196444237 ; todo
+						       20.0d0 (size width height) 1))) 
 	(if (not (cap-is-open cap))
 	    (return-from video-writer-example 
 	      (format t "ERROR: Cannot open the video file")))
@@ -8277,7 +8448,7 @@ ndows FFMPEG or VFW is used; on MacOSX QTKit is used.
 	(with-named-window (window-name +window-normal+)
 	  (move-window window-name 759 175)
 	  (loop
-	     (with-mat (frame (mat))	
+	     (with-mat ((frame (mat)))	
 	       (cap-read cap frame)
 	       (if (not frame) 
 		   (return-from video-writer-example 
@@ -9713,46 +9884,46 @@ Example:
     (with-named-window (window-name +window-autosize+)
       (move-window window-name 759 175)
       ;; allocate two :int pointers that trackbar can adjust
-      (with-object (slider-1-value (alloc :int '(50)))
-	(with-object (slider-2-value (alloc :int '(50)))
-	  ;; data to be passed to HELLO-WORLD-BRIGHTNESS callback function
-	  (with-object (userdata-1 (alloc :string "Brightness =  "))
-	    ;; data to be passed to HELLO-WORLD-CONTRAST callback function
-	    (with-object (userdata-2 (alloc :string "Contrast = "))
-	      (loop
-		 ;; read in image supplied by filename parameter
-		 (with-mat (src (imread filename 1))
-		   (if (empty src) 
-		       (return-from create-trackbar-example
-			 (format t "Image not loaded")))
-		   ;; Clone the source image to dest
-		   (with-mat  (dest (clone src))
-		     ;; create Trackbar with name, 'Brightness'
-		     (create-trackbar "Brightness" window-name slider-1-value 100
-				      ;; pointer to a callback function to be called every 
-				      ;; time the trackbar slider changes position 
-				      (callback hello-world-brightness) 
-				      ;; user data that is passed to 
-				      ;; the callback function           
-				      userdata-1)
-		     ;; create trackbar with name, 'Contrast'
-		     (create-trackbar  "Contrast" window-name slider-2-value 100
-				       ;; again,a callback function pointer 
-				       (callback hello-world-contrast) 
-				       ;; user data
-				       userdata-2)
-		     ;; when the top trackbar is moved, adjust brightness variable
-		     (setf brightness (- (mem-ref slider-1-value :int) 50))
-		     ;; when the bottom Trackbar is moved, adjust contrast variable
-		     (setf contrast (/ (mem-ref slider-2-value :int) 50))
-		     ;; apply brightness and contrast settings to the destination image
-		     (convert-to src dest -1 (coerce contrast 'double-float)  
-				 (coerce brightness 'double-float))
-		     ;; show adjusted image in a window
-		     (imshow window-name dest)
-		     (let ((c (wait-key 33)))
-		       (when (= c 27)
-			 (return)))))))))))))
+      (with-object ((slider-1-value (alloc :int '(50)))
+		    (slider-2-value (alloc :int '(50)))
+		    ;; data to be passed to HELLO-WORLD-BRIGHTNESS callback function
+		    (userdata-1 (alloc :string "Brightness =  "))
+		    ;; data to be passed to HELLO-WORLD-CONTRAST callback function
+		    (userdata-2 (alloc :string "Contrast = ")))
+	(loop
+	   ;; read in image supplied by filename parameter
+	   (with-mat ((src (imread filename 1)))
+	     (if (empty src) 
+		 (return-from create-trackbar-example
+		   (format t "Image not loaded")))
+	     ;; Clone the source image to dest
+	     (with-mat  ((dest (clone src)))
+	       ;; create Trackbar with name, 'Brightness'
+	       (create-trackbar "Brightness" window-name slider-1-value 100
+				;; pointer to a callback function to be called every 
+				;; time the trackbar slider changes position 
+				(callback hello-world-brightness) 
+				;; user data that is passed to 
+				;; the callback function           
+				userdata-1)
+	       ;; create trackbar with name, 'Contrast'
+	       (create-trackbar  "Contrast" window-name slider-2-value 100
+				 ;; again,a callback function pointer 
+				 (callback hello-world-contrast) 
+				 ;; user data
+				 userdata-2)
+	       ;; when the top trackbar is moved, adjust brightness variable
+	       (setf brightness (- (mem-ref slider-1-value :int) 50))
+	       ;; when the bottom Trackbar is moved, adjust contrast variable
+	       (setf contrast (/ (mem-ref slider-2-value :int) 50))
+	       ;; apply brightness and contrast settings to the destination image
+	       (convert-to src dest -1 (coerce contrast 'double-float)  
+			   (coerce brightness 'double-float))
+	       ;; show adjusted image in a window
+	       (imshow window-name dest)
+	       (let ((c (wait-key 33)))
+		 (when (= c 27)
+		   (return))))))))))
 
 
 

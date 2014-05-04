@@ -493,6 +493,7 @@
 		  (point0))
 		 ((and x y)
 		  (point2 x y))
+
 		 (t nil)))
 
 
@@ -594,6 +595,7 @@
 (defcfun ("cv_create_Point3d" point3d2) point3d 
   "Point3d constructor"
   (x :double)
+
   (y :double)
   (z :double))
 
@@ -883,18 +885,31 @@
 (defcfun ("cv_Mat_rows" rows) :int
   (self mat))
 
+
 ;; Scalar_<_Tp>::Scalar_(_Tp v0, _Tp v1, _Tp v2, _Tp v3)
 ;; Scalar* cv_create_Scalar(double val0, (double val1, double val2, double val3)
-(defcfun ("cv_create_Scalar" %scalar) scalar
+(defcfun ("cv_create_Scalar" %scalar) scalar 
   (val0 :double)
   (val1 :double)
   (val2 :double)
   (val3 :double))
 
+;; Scalar_<_Tp>::Scalar_(_Tp v0, _Tp v1, _Tp v2, _Tp v3)
+;; Scalar* cv_create_Scalar(double val0, (double val1, double val2, double val3)
+(defcfun ("cv_create_Scalar" %%scalar) (scalar :garbage-collect t)
+  (val0 :double)
+  (val1 :double)
+  (val2 :double)
+  (val3 :double))
 
-(defun scalar (val0 &optional (val1 0) (val2 0) (val3 0))
+(defun scalar (&optional (arg1 0d0) (arg2 0d0) (arg3 0d0) (arg4 0d0) (arg5 0d0))
   "SCALAR constructor"
-  (%scalar (coerce val0 'double-float) (coerce val1 'double-float) (coerce val2 'double-float) (coerce val3 'double-float)))
+  (cond ((not (eq :t arg1))
+	 (%scalar (coerce arg1 'double-float) (coerce arg2 'double-float) (coerce arg3 'double-float) (coerce arg4 'double-float)))
+	((eq :t arg1)
+	 (%%scalar (coerce arg2 'double-float) (coerce arg3 'double-float) (coerce arg4 'double-float) (coerce arg5 'double-float)))
+	(t nil)))
+
 
 ;; Scalar_<_Tp> Scalar_<_Tp>::all(_Tp v0)
 ;; Scalar* cv_create_scalarAll(double val0123)
@@ -1045,6 +1060,22 @@
   (src1 mat)
   (src2 mat)
   (dest mat))
+
+
+;; void addWeighted(InputArray src1, double alpha, InputArray src2, double beta, double gamma, OutputArray dst, int dtype=-1)
+;; void cv_addWeighted(Mat* src1, double alpha, Mat* src2, double beta, double gamma, Mat* dst, int dtype)
+(cffi:defcfun ("cv_addWeighted" %add-weighted) :void
+  (src1 mat)
+  (alpha :double)
+  (src2 mat)
+  (beta :double)
+  (gamma :double)
+  (dest mat)
+  (dtype :int))
+
+(defun add-weighted (src1 alpha src2 beta gamma dest &optional (dtype -1))
+       "Calculates the weighted sum of two arrays."
+       (%add-weighted src1 alpha src2 beta gamma dest dtype))
 
 
 ;; void bitwise_and(InputArray src1, InputArray src2, OutputArray dst, InputArray mask=noArray())

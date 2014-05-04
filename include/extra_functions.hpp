@@ -9,6 +9,7 @@ using namespace cvflann;
 CvPoint cvPoint_glue(int x, int y);
 
 extern "C" {
+void cv_displayOverlay(String* winname, String* text, int delayms);
 MatExpr* cv_abs(Mat* m);
 Rect* cv_RotatedRect_boundingRect(RotatedRect* self);
 MatExpr* cv_Mat_div(Mat* m1, Mat* m2);

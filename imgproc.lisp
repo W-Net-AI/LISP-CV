@@ -102,6 +102,38 @@
    (%gaussian-blur src dest ksize sigma-x sigma-y border-type))
 
 
+;; void morphologyEx(InputArray src, OutputArray dst, int op, InputArray kernel, Point anchor=Point(-1,-1), int iterations=1, 
+;; int borderType=BORDER_CONSTANT, const Scalar& borderValue=morphologyDefaultBorderValue() )
+;; void cv_morphologyEx(Mat* src, Mat* dst, int op, Mat* kernel, Point* anchor, int iterations, int borderType, Scalar* borderValue)
+(defcfun ("cv_morphologyEx" %morphology-ex) :void
+  (src mat)
+  (dest mat)
+  (op :int)
+  (kernel mat)
+  (anchor point)
+  (iterations :int)
+  (border-type :int)
+  (border-value scalar))
+
+(defun morphology-ex (src dest op kernel &optional (anchor (point -1 -1)) (iterations 1) (border-type +border-constant+) 
+                     (border-value (morphology-default-border-value)))
+  "Performs advanced morphological transformations."
+  (%morphology-ex src dest op kernel anchor iterations border-type border-value))
+
+
+;; Mat getStructuringElement(int shape, Size ksize, Point anchor=Point(-1,-1))
+;; Mat* cv_getStructuringElement(int shape, Size* ksize, Point* anchor)
+(defcfun ("cv_getStructuringElement" %get-structuring-element) mat
+  (shape :int)
+  (ksize size)
+  (kernel point))
+
+(defun get-structuring-element (shape ksize &optional (kernel (point -1 -1))) 
+       "Returns a structuring element of the specified 
+        size and shape for morphological operations."
+       (%get-structuring-element shape ksize kernel))
+
+
 ;; void Laplacian(InputArray src, OutputArray dst, int ddepth, int ksize=1, double scale=1, double delta=0, int borderType=BORDER_DEFAULT )
 ;; void cv_Laplacian(Mat* src, Mat* dst, int ddepth, int ksize, double scale, double delta, int borderType)
 (defcfun ("cv_Laplacian" %laplacian) :void
@@ -142,6 +174,23 @@
 (defun pyr-up (src dest &optional (dstsize (size)) (border-type +border-default+))
   "Upsamples an image and then blurs it."
   (%pyr-up src dest dstsize border-type))
+
+
+;; void Scharr(InputArray src, OutputArray dst, int ddepth, int dx, int dy, double scale=1, double delta=0, int borderType=BORDER_DEFAULT )
+;; void cv_Scharr(Mat* src, Mat* dst, int ddepth, int dx, int dy, double scale, double delta, int borderType)
+(defcfun ("cv_Scharr" %scharr) :void
+  (src mat)
+  (dest mat)
+  (ddepth :int)
+  (dx :int)
+  (dy :int)
+  (scale :double)
+  (delta :double)
+  (border-type :int))
+
+(defun scharr (src dest ddepth dx dy &optional (scale 1) (delta 1d0) (border-type +border-default+))
+       "Calculates the first x- or y- image derivative using Scharr operator."
+       (%scharr src dest ddepth dx dy scale delta border-type))
 
 
 ;; void Sobel(InputArray src, OutputArray dst, int ddepth, int dx, int dy, int ksize=3, double scale=1, double delta=0, 

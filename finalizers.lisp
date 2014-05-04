@@ -531,7 +531,7 @@
   ((garbage-collect  :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
-  (:simple-parser scalar))
+  (:simple-parser scfalar))
 
 
 (defclass cv-scalar ()

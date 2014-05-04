@@ -242,7 +242,7 @@
 ;; void delete_std_vector##tn( vector_##t * v)
 (defcfun ("delete_std_vectoru" del-vec-uchar) :void
   "Calls delete on VECTOR-UCHAR"
-  (self :pointer))
+  (self vector-uchar))
 
 
 ;; void operator delete  ( void* ptr )

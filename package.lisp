@@ -382,6 +382,7 @@
    #:*max
    #:*min
    #:abs-diff
+   #:add-weighted
    #:bitwise-and
    #:bitwise-not
    #:bitwise-or
@@ -538,8 +539,10 @@
    #:filter-2d
    #:gaussian-blur
    #:laplacian
+   #:morphology-ex
    #:pyr-down
    #:pyr-up
+   #:scharr
    #:sobel
 
 

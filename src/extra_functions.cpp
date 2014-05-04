@@ -19,6 +19,10 @@ CvPoint cvPoint_glue(int x, int y)
 
 extern "C" {
 
+void cv_displayOverlay(String* winname, String* text, int delayms) {
+	cv::displayOverlay(*winname, *text, delayms);
+}
+
 MatExpr* cv_abs(Mat* m) {
 	return new MatExpr(cv::abs(*m));
 }
