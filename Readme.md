@@ -287,7 +287,7 @@ and then this:
 If all went as planned an empty window should open up.
 
 
-Note: you can place:
+Note: You can place:
 
 
 (asdf:operate 'asdf:load-op :lisp-cv)
