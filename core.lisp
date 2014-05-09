@@ -19,34 +19,34 @@
 ;; Change default parameters
 
 (defun def-params (width height &optional camera-index fps)
-  (setf *default-width* width)
-  (setf *default-height* height)
-  (if camera-index (setf *camera-index* camera-index))
-  (if fps (setf *frames-per-second* fps))
-  (format t "*default-width* = ~a~%" width)
-  (format t "*default-height* = ~a~%" height)
-  (if camera-index (format t "*camera-index* = ~a~%" camera-index)
-    (format t "*camera-index* = ~a~%" *camera-index*))
-  (if fps (format t "*frames-per-second* = ~a~%" fps)
-    (format t "*frames-per-second* = ~a~%" *frames-per-second*)))
+       (setf *default-width* width)
+       (setf *default-height* height)
+       (if camera-index (setf *camera-index* camera-index))
+       (if fps (setf *frames-per-second* fps))
+       (format t "*default-width* = ~a~%" width)
+       (format t "*default-height* = ~a~%" height)
+       (if camera-index (format t "*camera-index* = ~a~%" camera-index)
+	   (format t "*camera-index* = ~a~%" *camera-index*))
+	   (if fps (format t "*frames-per-second* = ~a~%" fps)
+	       (format t "*frames-per-second* = ~a~%" *frames-per-second*)))
 
 
 
 ;; Live code editing
 
 (defmacro continuable (&body body)
-  `(restart-case
-    (progn ,@body)
-    (continue () :report "Continue"  )))
+	  `(restart-case
+	    (progn ,@body)
+	    (continue () :report "Continue"  )))
 
 (defun update-swank ()
-  "Grabs SWANK connections and tells it to handle requests. 
+       "Grabs SWANK connections and tells it to handle requests. 
    Call this every loop in the main loop of your program"
-  (continuable
-   (let ((connection (or swank::*emacs-connection*
-			 (swank::default-connection))))
-     (when connection
-       (swank::handle-requests connection t)))))
+   (continuable
+    (let ((connection (or swank::*emacs-connection*
+			  (swank::default-connection))))
+			  (when connection
+			    (swank::handle-requests connection t)))))
 
 
 
@@ -63,18 +63,18 @@
 ;;; Basic Structures
 
 
-;; MatExpr* promote(Mat* m) 
-(defcfun ("promote" <<) mat-expr
-  "Converts a MAT to a MAT-EXPR.
-   This is a shorthand version of the PROMOTE function." 
-  (mat mat))
-
-
 ;; Mat* force(MatExpr* expr)
 (defcfun ("force" >>) mat
   "Coerces a MAT-EXPR to a MAT. 
    This is a shorthand version of the FORCE function."
-  (mat-expr mat-expr))
+   (mat-expr mat-expr))
+
+
+;; MatExpr* promote(Mat* m) 
+(defcfun ("promote" <<) mat-expr
+  "Converts a MAT to a MAT-EXPR.
+   This is a shorthand version of the PROMOTE function." 
+   (mat mat))
 
 
 ;; MatExpr + operator
@@ -87,12 +87,12 @@
 ;; Mat& Mat::adjustROI(int dtop, int dbottom, int dleft, int dright)
 ;; Mat* cv_Mat_adjustROI(Mat* self, int dtop, int dbottom, int dleft, int dright) 
 (defcfun ("cv_Mat_adjustROI" adjust-roi) mat
-	 "Adjusts a submatrix size and position within the parent matrix."
-	 (self mat)
-	 (dtop :int)
-	 (dbottom :int)
-	 (dleft :int)
-	 (dright :int))
+  "Adjusts a submatrix size and position within the parent matrix."
+  (self mat)
+  (dtop :int)
+  (dbottom :int)
+  (dleft :int)
+  (dright :int))
 
 
 ;; _Tp area() const
@@ -109,7 +109,7 @@
   (self size2f))
 
 
- ;; Mat* cv_Mat_assignVal(Mat* self, Scalar* s)
+;; Mat* cv_Mat_assignVal(Mat* self, Scalar* s)
 (defcfun ("cv_Mat_assignVal" assgn-val) mat
   "Assign a scalar value to a matrix."
   (self mat)
@@ -118,14 +118,7 @@
 ;; uchar* ptr(int i0=0)
 ;; uchar* cv_Mat_ptr_index(Mat* self, int i)
 (defmacro at (&optional self i j type)
-	       `(mem-aref (%ptr ,self ,i) ,type ,j))
-
-
-;; Point_<_Tp> br() const
-;; Point* cv_Rect_br(Rect* self) 
-(defcfun ("cv_Rect_br" rect-br) point 
-  "Retrievies the bottom-right corner of a rectangle."
-  (self rect))
+	  `(mem-aref (%ptr ,self ,i) ,type ,j))
 
 
 ;; int cv_Mat_channels(Mat* self)
@@ -164,8 +157,8 @@
   (beta :double))
 
 (defun convert-to (self m rtype &optional (alpha 1.0d0) (beta 0.0d0))
-  "Converts an array to another data type with optional scaling."
-  (%convert-to self m rtype alpha beta))
+       "Converts an array to another data type with optional scaling."
+       (%convert-to self m rtype alpha beta))
 
 
 ;; void Mat::copyTo(OutputArray m) const
@@ -184,9 +177,9 @@
 
 
 (defun copy-to (&optional mat m mask)
-  (cond ((eq mask nil)
-	 (copy-to2 mat m))
-	(t (copy-to3 mat m mask))))
+       (cond ((eq mask nil)
+	      (copy-to2 mat m))
+	      (t (copy-to3 mat m mask))))
 
 
 ;; Mat Mat::cross(InputArray m) const
@@ -210,7 +203,6 @@
 	 (self mat))
 
 
-;; Mat Mat::diag(int d=0 ) const
 ;; Mat* cv_Mat_diag_d(Mat* self, int d)
 (defcfun ("cv_Mat_diag_d" %diag) mat
   "Extracts a diagonal from a matrix."
@@ -218,8 +210,8 @@
   (d :int))
 
 (defun diag (self &optional (d 0))
-  "Extracts a diagonal from a matrix."
-  (%diag self d))
+       "Extracts a diagonal from a matrix."
+       (%diag self d))
 
 
 ;; MatExpr / operator
@@ -232,41 +224,41 @@
 ;; DMatch::DMatch()
 ;; DMatch* cv_create_DMatch() 
 (defcfun ("cv_create_DMatch" dmatch0) dmatch
-	 "DMatch constructor")
+  "DMatch constructor")
 
 ;; DMatch( int _queryIdx, int _trainIdx, float _distance ) 
 ;; DMatch* cv_create_DMatch3(int _queryIdx, int _trainIdx, float _distance)
 (defcfun ("cv_create_DMatch3" dmatch3) dmatch
-	 "DMatch constructor"
-	 (query-idx :int)
-	 (train-idx :int)
-	 (distance :float))
+  "DMatch constructor"
+  (query-idx :int)
+  (train-idx :int)
+  (distance :float))
 
 ;; DMatch( int _queryIdx, int _trainIdx, int _imgIdx, float _distance )
 ;; DMatch* cv_create_DMatch4(int _queryIdx, int _trainIdx, int _imgIdx, float _distance)
 (defcfun ("cv_create_DMatch4" dmatch4) dmatch
-	 "DMatch constructor"
-	 (query-idx :int)
-	 (train-idx :int)
-	 (img-idx :int)
-	 (distance :float))
+  "DMatch constructor"
+  (query-idx :int)
+  (train-idx :int)
+  (img-idx :int)
+  (distance :float))
 
 (defun dmatch (&rest args)
        (cond ((eq (first args) nil)
 	      (dmatch0))
 	      ((and (first args) (not (fourth args)))
 	       (dmatch3 (first args) (second args) (third args)))
-	      ((fourth args)
-	       (dmatch4 (first args) (second args) (third args) (fourth args)))
-	       (t nil)))
+	       ((fourth args)
+		(dmatch4 (first args) (second args) (third args) (fourth args)))
+		(t nil)))
 
 
 ;; _Tp dot(const Point_& pt) const
 ;; int cv_Point_dot(Point* self, Point* other) 
 (defcfun ("cv_Point2i_dot" dot) :int 
-  "Finds the dot product of a point."
-  (self point)
-  (other point))
+	 "Finds the dot product of a point."
+	 (self point)
+	 (other point))
 
 
 ;; _Tp dot(const Point_& pt) const
@@ -288,9 +280,9 @@
 ;; _Tp dot(const Point3_& pt) const
 ;; double cv_Point3d_dot(Point3d* self, Point3d* other)
 (defcfun ("cv_Point3d_dot" dot3d) :double 
-  "Finds the dot product of a point3d."
-  (self point3d)
-  (other point3d))
+	 "Finds the dot product of a point3d."
+	 (self point3d)
+	 (other point3d))
 
 
 ;; bool Mat::isContinuous() const
@@ -302,17 +294,17 @@
 ;; _Tp dot(const Point3_& pt) const
 ;; float cv_Point3f_dot(Point3f* self, Point3f* other)
 (defcfun ("cv_Point3f_dot" dot3f) :float 
-  "Finds the dot product of a point3f."
-  (self point3f)
-  (other point3f))
+	 "Finds the dot product of a point3f."
+	 (self point3f)
+	 (other point3f))
 
 
 ;; _Tp dot(const Point3_& pt) const
 ;; int cv_Point3i_dot(Point3i* self, Point3i* other)
 (defcfun ("cv_Point3i_dot" dot3i) :int 
-  "Finds the dot product of a point3i."
-  (self point3i)
-  (other point3i))
+	 "Finds the dot product of a point3i."
+	 (self point3i)
+	 (other point3i))
 
 
 ;; bool Mat::empty() const
@@ -360,36 +352,38 @@
   (class-id :int))
 
 (defun key-point (&optional x y size (angle -1) (response 0) (octave 0) (class-id -1))
-	   (cond ((eq x nil)
-		  (key-point0))
-		 (x
-		  (key-point7 x y size angle response octave class-id))
-		 (t nil)))
-
+       (cond ((eq x nil)
+	      (key-point0))
+	      (x
+	       (key-point7 x y size angle response octave class-id))
+	       (t nil)))
 
 ;; Mat::Mat()
 ;; Mat* cv_create_Mat()
 (defcfun ("cv_create_Mat" %mat) mat
-  "MAT constructor")
+	 "MAT constructor")
 
 ;; Mat::Mat()
 ;; Mat* cv_create_Mat()
 (defcfun ("cv_create_Mat" %%mat) (mat :garbage-collect t)
-  "MAT constructor")
-
-(defun mat (&rest args)
-  (cond ((eq (first args) nil) (%mat))
-	((eq :t (car args)) (%%mat))
-	(t nil)))
+	 "MAT constructor")
 
 
 ;; Mat::Mat(int rows, int cols, int type, void* data) 
 ;; Mat* cv_create_Mat_with_data(int rows, int cols, int type, void* data)
-(defcfun ("cv_create_Mat_with_data" mat-data) mat
-  (rows :int)
-  (cols :int)
-  (type :int)
-  (data :pointer))
+(defcfun ("cv_create_Mat_with_data" %mat-data) mat
+	 (rows :int)
+	 (cols :int)
+	 (type :int)
+	 (data :pointer))
+
+
+(let ((previous nil))
+     (defun %%mat-data (rows cols type &rest args)
+	    (unless (equal (second args) (car previous))
+		    (setf previous (cons (second args) (foreign-alloc (first args) 
+								      :initial-contents (second args)))))
+								      (%mat-data rows cols type (cdr previous))))
 
 
 ;; Mat::t
@@ -431,6 +425,12 @@
   (self mat))
 
 
+;; int Mat::type() const
+;; int cv_Mat_type(Mat* self)
+(defcfun ("cv_Mat_type" mat-type) :int
+  (self mat))
+
+
 ;; MatExpr * operator
 ;; MatExpr* cv_Mat_scale(MatExpr* m, double alpha)
 (defcfun ("cv_Mat_scale" scale) mat-expr
@@ -438,15 +438,9 @@
   (alpha :double))
 
 
-;; int Mat::type() const 
-;; int cv_Mat_type(Mat* self) 
-(defcfun ("cv_Mat_type" mat-type) :int
-  (self mat))
-
-
 ;; Mat::Mat(int rows, int cols, int type)
 ;; Mat* cv_create_Mat_typed(int rows, int cols, int type)
-(defcfun ("cv_create_Mat_typed" mat-typed)  mat
+(defcfun ("cv_create_Mat_typed" %mat-typed) mat
   "MAT constructor with a row, column and type parameter."
   (rows :int)
   (cols :int)
@@ -455,15 +449,62 @@
 
 ;; Mat::Mat(int rows, int cols, int type, const Scalar& s)
 ;; Mat* cv_create_Mat_with_value(int rows, int cols, int type, Scalar* s)
-(defcfun ("cv_create_Mat_with_value" mat-value) mat
-  (rows :int)
-  (cols :int)
-  (type :int)
-  (s scalar))
+(defcfun ("cv_create_Mat_with_value" %mat-value) mat
+	 (rows :int)
+	 (cols :int)
+	 (type :int)
+	 (s scalar))
+
+
+(let ((previous nil))
+     (defun %%mat-value (rows cols type s)
+	    (unless (equal s (car previous))
+		    (setf previous (cons s (scalar (if (first s) (first s) 0) 
+						   (if (second s) (second s) 0) 
+						   (if (third s) (third s) 0) 
+						   (if (fourth s) (fourth s) 0)))))
+						   (%mat-value rows cols type (cdr previous))))
+
+
+
+;;; MAT
+
+(defun mat (&rest args)
+       
+       "MAT constructor"  
+       
+       (cond ((eq (first args) nil) (%mat))
+	     
+	     ((and (eq (fourth args) nil) (first args)) 
+	      (%mat-typed (first args) (second args) (third args)))
+	       
+	       ((eq (type-of (fourth args)) 'cv-scalar)
+		(%mat-value (first args) (second args) (third args) (fourth args)))
+		
+		((listp (fourth args))
+		 (%%mat-value (first args) (second args) (third args) (fourth args)))
+		   
+		   ((pointerp (fourth args))
+		    (%mat-data (first args) (second args) (third args) (fourth args)))
+		    
+		    ((listp (fifth args))
+		     (%%mat-data (first args) (second args) (third args) (fourth args) (fifth args)))
+		       
+		       (t nil)))
+
+;;; MAT
+
 
 ;; static MatExpr Mat::zeros(int rows, int cols, int type)
 ;; Mat* cv_create_zeros(int rows, int cols, int type)
 (defcfun ("cv_create_zeros" mat-zeros) mat
+  (rows :int)
+  (cols :int)
+  (type :int))
+
+;; static MatExpr Mat::zeros(int rows, int cols, int type)
+;; Mat* cv_create_zeros(int rows, int cols, int type)
+(defcfun ("cv_create_zeros" %mat-zeros) mat
   (rows :int)
   (cols :int)
   (type :int))
@@ -474,6 +515,7 @@
 (defcfun ("cv_Mat_mult" mul) mat-expr
   (m1 mat)
   (m2 mat))
+
 
 ;; Point_()
 ;; Point2##t * cv_create_Point2##t ( tn x,  tn y)
@@ -489,48 +531,48 @@
 
 
 (defun point (&optional x y)
-	   (cond ((eq (or x y) nil)
-		  (point0))
-		 ((and x y)
-		  (point2 x y))
-
-		 (t nil)))
+       (cond ((eq (or x y) nil)
+	      (point0))
+	      ((and x y)
+	       (point2 x y))
+	       
+	       (t nil)))
 
 
 ;; _Tp x, y
 ;; int cv_Point_getX(Point* self) 
 (defcfun ("cv_Point2i_getX" point-x) :int 
-  "Retrieves X coordinate of a point"
-  (self point))
+	 "Retrieves X coordinate of a point"
+	 (self point))
 
 
 ;; _Tp x, y
 ;; int cv_Point_getY(Point* self)
 (defcfun ("cv_Point2i_getY" point-y) :int 
-  "Retrieves y coordinate of a point"
-  (self point))
+	 "Retrieves y coordinate of a point"
+	 (self point))
 
 
 ;; typedef Point_<double> Point2d
 ;; Point2##t * cv_create_Point2##t ( tn x,  tn y) 
 (defcfun ("cv_create_Point2d" point2d0) point2d 
-  "Point2d constructor")
+	 "Point2d constructor")
 
 
 ;; typedef Point_<double> Point2d
 ;; Point2##t * cv_create_Point2##t ( tn x,  tn y)  
 (defcfun ("cv_create_Point2d" point2d2) point2d 
-  "Point2d constructor"
-  (x :double)
-  (y :double))
+	 "Point2d constructor"
+	 (x :double)
+	 (y :double))
 
 
 (defun point2d (&optional x y)
-	   (cond ((eq (or x y) nil)
-		  (point2d0))
-		 ((and x y)
-		  (point2d2 x y))
-		 (t nil)))
+       (cond ((eq (or x y) nil)
+	      (point2d0))
+	      ((and x y)
+	       (point2d2 x y))
+	       (t nil)))
 
 
 ;; _Tp x, y
@@ -550,24 +592,24 @@
 ;; typedef Point_<float> Point2f
 ;; tn cv_Point2##t##_getX( Point2##t * self) 
 (defcfun ("cv_create_Point2f" point2f0) point2f 
-  "Point2f constructor")
+	 "Point2f constructor")
 
 
 
 ;; typedef Point_<float> Point2f
 ;; Point2##t * cv_create_Point2##t ( tn x,  tn y)  
 (defcfun ("cv_create_Point2f" point2f2) point2f 
-  "Point2f constructor"
-  (x :float)
-  (y :float))
+	 "Point2f constructor"
+	 (x :float)
+	 (y :float))
 
 
 (defun point2f (&optional x y)
-	   (cond ((eq (or x y) nil)
-		  (point2f0))
-		 ((and x y)
-		  (point2f2 x y))
-		 (t nil)))
+       (cond ((eq (or x y) nil)
+	      (point2f0))
+	      ((and x y)
+	       (point2f2 x y))
+	       (t nil)))
 
 
 ;; _Tp x, y;
@@ -587,25 +629,24 @@
 ;; typedef Point3_<double> Point3d
 ;; Point3##t * cv_create_Point3##t ( tn x,  tn y,  tn z) 
 (defcfun ("cv_create_Point3d" point3d0) point3d 
-  "Point3d constructotr")
+	 "Point3d constructotr")
 
 
 ;; typedef Point3_<double> Point3d
 ;; Point3##t * cv_create_Point3##t ( tn x,  tn y,  tn z) 
 (defcfun ("cv_create_Point3d" point3d2) point3d 
-  "Point3d constructor"
-  (x :double)
-
-  (y :double)
-  (z :double))
+	 "Point3d constructor"
+	 (x :double)
+	 (y :double)
+	 (z :double))
 
 
 (defun point3d (&optional x y z)
-	   (cond ((eq (or x y) nil)
-		  (point3d0))
-		 ((and x y)
-		  (point3d2 x y z))
-		 (t nil)))
+       (cond ((eq (or x y) nil)
+	      (point3d0))
+	      ((and x y)
+	       (point3d2 x y z))
+	       (t nil)))
 
 
 ;; _Tp x, y, z
@@ -632,24 +673,24 @@
 ;; typedef Point3_<double> Point3d
 ;; Point3##t * cv_create_Point3##t ( tn x,  tn y,  tn z)  
 (defcfun ("cv_create_Point3f" point3f0) point3f 
-  "Point3f constructor")
+	 "Point3f constructor")
 
 
 ;; typedef Point3_<double> Point3d
 ;; Point3##t * cv_create_Point3##t ( tn x,  tn y,  tn z)  
 (defcfun ("cv_create_Point3f" point3f2) point3f 
-  "Point3f constructor"
-  (x :float)
-  (y :float)
-  (z :float))
+	 "Point3f constructor"
+	 (x :float)
+	 (y :float)
+	 (z :float))
 
 
 (defun point3f (&optional x y z)
-	   (cond ((eq (or x y) nil)
-		  (point3f0))
-		 ((and x y)
-		  (point3f2 x y z))
-		 (t nil)))
+       (cond ((eq (or x y) nil)
+	      (point3f0))
+	      ((and x y)
+	       (point3f2 x y z))
+	       (t nil)))
 
 
 ;; _Tp x, y, z
@@ -676,31 +717,31 @@
 ;; typedef Point3_<double> Point3d
 ;; Point3##t * cv_create_Point3##t ( tn x,  tn y,  tn z)  
 (defcfun ("cv_create_Point3i" point3i0) point3i 
-  "Poin3i constructor")
+	 "Point3i constructor")
 
 
 ;; typedef Point3_<double> Point3d
 ;; Point3##t * cv_create_Point3##t ( tn x,  tn y,  tn z)  
 (defcfun ("cv_create_Point3i" point3i2) point3i 
-  "Poin3i constructor"
-  (x :int)
-  (y :int)
-  (z :int))
+	 "Point3i constructor"
+	 (x :int)
+	 (y :int)
+	 (z :int))
 
 
 (defun point3i (&optional x y z)
-	   (cond ((eq (or x y) nil)
-		  (point3i0))
-		 ((and x y)
-		  (point3i2 x y z))
-		 (t nil)))
+       (cond ((eq (or x y) nil)
+	      (point3i0))
+	      ((and x y)
+	       (point3i2 x y z))
+	       (t nil)))
 
 
 ;; _Tp x, y, z
 ;; int cv_Point3i_getX(Point3i* self) 
 (defcfun ("cv_Point3i_getX" point3i-x) :int 
-  "Retrieves y coordinate of a point3i"
-  (self point3i))
+	 "Retrieves y coordinate of a point3i"
+	 (self point3i))
 
 
 ;; _Tp x, y, z
@@ -722,6 +763,7 @@
   "Converts a MAT to a MAT-EXPR."
   (mat mat))
 
+
 ;; uchar* Mat::ptr(int i0=0)
 ;; uchar* cv_Mat_ptr_index(Mat* self, int i)
 (defcfun ("cv_Mat_ptr_index" %ptr) :pointer 
@@ -736,7 +778,7 @@
 ;; Rect_()
 ;; Rect* cv_create_Rect() 
 (defcfun ("cv_create_Rect" rect0) rect 
-  "RECT constructor.")
+	 "RECT constructor.")
 
 
 ;; Rect_(_Tp _x, _Tp _y, _Tp _width, _Tp _height)
@@ -749,12 +791,18 @@
   (height :int))
 
 (defun rect (&optional x y width height)
-	   (cond ((eq (or x y) nil)
-		  (rect0))
-		 ((and x y)
-		  (rect4 x y width height))
-		 (t nil)))
+       (cond ((eq (or x y) nil)
+	      (rect0))
+	      ((and x y)
+	       (rect4 x y width height))
+	       (t nil)))
 
+
+;; Point_<_Tp> br() const
+;; Point* cv_Rect_br(Rect* self) 
+(defcfun ("cv_Rect_br" rect-br) point 
+	 "Retrievies the bottom-right corner of a rectangle."
+	 (self rect))
 
 
 ;; Rect_(_Tp _x, _Tp _y, _Tp _width, _Tp _height)
@@ -773,15 +821,15 @@
 ;; Size_<_Tp> size() const
 ;; Size* cv_Rect_size(Rect* self)  
 (defcfun ("cv_Rect_size" rect-size) size 
-  "Size (width, height) of the rectangle."
-  (self rect))
+	 "Size (width, height) of the rectangle."
+	 (self rect))
 
 
 ;; Point_<_Tp> tl() const
 ;; Point* cv_Rect_tl(Rect* self) 
 (defcfun ("cv_Rect_tl" rect-tl) point 
-  "Retrievies the top-left corner of a rectangle."
-  (self rect))
+	 "Retrievies the top-left corner of a rectangle."
+	 (self rect))
 
 
 ;; _Tp x, y, width, height
@@ -817,19 +865,19 @@
 
 
 (defun reshape (&optional self cn (rows 0))
-	   (cond ((eq rows 0)
-		  (%reshape self cn))
-		 ((> rows 0)
-		  (reshape-rows self cn rows))
-		 (t nil)))
+       (cond ((eq rows 0)
+	      (%reshape self cn))
+	      ((> rows 0)
+	       (reshape-rows self cn rows))
+	       (t nil)))
 
 
 ;; Mat::Mat(const Mat& m, const Rect& roi)
 ;; Mat* cv_Mat_get_ROI(Mat* self, Rect* roi)
 (defcfun ("cv_Mat_get_ROI" roi) mat 
-  "Returns matrix header corresponding to the rectangular sub-array of input MAT."
-  (self mat)
-  (roi rect))
+	 "Returns matrix header corresponding to the rectangular sub-array of input MAT."
+	 (self mat)
+	 (roi rect))
 
 
 ;; RotatedRect(const Point2f& center, const Size2f& size, float angle)
@@ -843,7 +891,7 @@
 ;; Rect RotatedRect::boundingRect() const
 ;; Rect* cv_RotatedRect_boundingRect(RotatedRect* self)
 (defcfun ("cv_RotatedRect_boundingRect" rotated-rect-bounding-rect) rect
-"Returns the minimal up-right rectangle containing the rotated rectangle"
+  "Returns the minimal up-right rectangle containing the rotated rectangle"
   (self rotated-rect))
 
 
@@ -860,16 +908,16 @@
 
 
 (defun rotated-rect (&rest args)
-  (cond
-    ((and (third args) (not (fourth args)))
-     (%rotated-rect (first args) (second args) (third args)))
-    ((or (eq ':c (first args)) (eq ':center (first args)))
-     (rotated-rect-center (second args)))
-    ((or (eq :s (first args)) (eq :size (first args))) 
-     (rotated-rect-size (second args)))
-    ((or (eq :br (first args)) (eq :bounding-rect (first args))) 
-     (rotated-rect-bounding-rect (second args)))
-    (t nil)))
+       (cond
+	((and (third args) (not (fourth args)))
+	 (%rotated-rect (first args) (second args) (third args)))
+	 ((or (eq ':c (first args)) (eq ':center (first args)))
+	  (rotated-rect-center (second args)))
+	  ((or (eq :s (first args)) (eq :size (first args))) 
+	   (rotated-rect-size (second args)))
+	   ((or (eq :br (first args)) (eq :bounding-rect (first args))) 
+	    (rotated-rect-bounding-rect (second args)))
+	    (t nil)))
 
 
 ;; Mat Mat::rowRange(int startrow, int endrow) const
@@ -889,26 +937,15 @@
 ;; Scalar_<_Tp>::Scalar_(_Tp v0, _Tp v1, _Tp v2, _Tp v3)
 ;; Scalar* cv_create_Scalar(double val0, (double val1, double val2, double val3)
 (defcfun ("cv_create_Scalar" %scalar) scalar 
-  (val0 :double)
-  (val1 :double)
-  (val2 :double)
-  (val3 :double))
+	 (val0 :double)
+	 (val1 :double)
+	 (val2 :double)
+	 (val3 :double))
 
-;; Scalar_<_Tp>::Scalar_(_Tp v0, _Tp v1, _Tp v2, _Tp v3)
-;; Scalar* cv_create_Scalar(double val0, (double val1, double val2, double val3)
-(defcfun ("cv_create_Scalar" %%scalar) (scalar :garbage-collect t)
-  (val0 :double)
-  (val1 :double)
-  (val2 :double)
-  (val3 :double))
 
-(defun scalar (&optional (arg1 0d0) (arg2 0d0) (arg3 0d0) (arg4 0d0) (arg5 0d0))
-  "SCALAR constructor"
-  (cond ((not (eq :t arg1))
-	 (%scalar (coerce arg1 'double-float) (coerce arg2 'double-float) (coerce arg3 'double-float) (coerce arg4 'double-float)))
-	((eq :t arg1)
-	 (%%scalar (coerce arg2 'double-float) (coerce arg3 'double-float) (coerce arg4 'double-float) (coerce arg5 'double-float)))
-	(t nil)))
+(defun scalar (&optional (val1 0d0) (val2 0d0) (val3 0d0) (val4 0d0))
+       "SCALAR constructor"
+	      (%scalar (coerce val1 'double-float) (coerce val2 'double-float) (coerce val3 'double-float) (coerce val4 'double-float)))
 
 
 ;; Scalar_<_Tp> Scalar_<_Tp>::all(_Tp v0)
@@ -918,8 +955,8 @@
 
 
 (defun scalar-all (val0123)
-  "SCALAR conctctor - initializes all of the scalar values 0...3 with val0123"
-  (%scalar-all (coerce val0123 'double-float)))
+       "SCALAR conctctor - initializes all of the scalar values 0...3 with val0123"
+       (%scalar-all (coerce val0123 'double-float)))
 
 
 ;; Size_()
@@ -937,13 +974,29 @@
 
 
 (defun size (&optional arg1 arg2)
-  (cond ((eq (or arg1 arg2) nil)
-	 (size0))
-	((numberp (or arg1 arg2)) 
-	 (size2 (coerce arg1 'double-float) 
-		(coerce arg2 'double-float)))
-	((eq (type-of arg1) 'cv-mat) (mat-size arg1))
-	(t nil)))
+       (cond ((eq (or arg1 arg2) nil)
+	      (size0))
+	     
+	     ((numberp (or arg1 arg2)) 
+	      (size2 (coerce arg1 'double-float) 
+		     (coerce arg2 'double-float)))
+	     
+	     ((eq (type-of arg1) 'cv-mat) (mat-size arg1))
+	     (t nil)))
+
+
+;; Size* cv_Size_assignTo(Size* self, Size* other) 
+(defcfun ("cv_Size_assignTo" size-assgn-to) size
+  "Assign data from one SIZE object to another,
+   OTHER to SELF."
+  (self size)
+  (other size))
+
+
+;; Size* cv_Size_fromPoint(Point* p)
+(defcfun ("cv_Size_fromPoint" size-from-point) size
+  "Create a SIZE object from POINT data."
+  (p point))
 
 
 ;; Size_<float>()
@@ -956,20 +1009,20 @@
 ;; Size2f* cv_create_Size2f(float width, float height)
 (defcfun ("cv_create_Size2f" size2f2) size2f
   "Size2f constructor"
-	 (width :float)
-	 (height :float))
+  (width :float)
+  (height :float))
 
 
 (defun size2f (&optional (width nil) (height nil))
-	   (cond ((eq (or width height) nil)
-		  (size2f0))
-		 ((and width height)
-		  (size2f2 width height))
-		 (t nil)))
+       (cond ((eq (or width height) nil)
+	      (size2f0))
+	      ((and width height)
+	       (size2f2 width height))
+	       (t nil)))
 
 
 ;; size_t cv_Mat_get_Step(Mat* self) 
-(defcfun ("cv_Mat_get_Step" step*) :unsigned-int
+(defcfun ("cv_Mat_get_Step" *step) :unsigned-int
   "Used to compute address of a matrix element"
   (self mat))
 
@@ -989,17 +1042,17 @@
 ;; TermCriteria::TermCriteria(int type, int maxCount, double epsilon)
 ;; TermCriteria* cv_create_TermCriteria(int type, int maxCount, double epsilon) 
 (defcfun ("cv_create_TermCriteria3" term-criteria3) term-criteria
-	 (type :int)
-	 (max-count :int)
-	 (epsilon :double))
+  (type :int)
+  (max-count :int)
+  (epsilon :double))
 
 
 (defun term-criteria (&optional type max-count epsilon)
-	   (cond ((eq type nil)
-		  (term-criteria0))
-		 (type
-		  (term-criteria3 type max-count epsilon))
-		 (t nil)))
+       (cond ((eq type nil)
+	      (term-criteria0))
+	      (type
+	       (term-criteria3 type max-count epsilon))
+	       (t nil)))
 
 
 ;; size_t Mat::total() const
@@ -1038,19 +1091,19 @@
 ;; void max(InputArray src1, InputArray src2, OutputArray dst)
 ;; void cv_max(Mat* src1, Mat* src2, Mat* dst)
 (defcfun ("cv_max" *max) :void 
-  "Calculates per-element maximum of two arrays."
-  (src1 mat)
-  (src2 mat)
-  (dest mat))
+	 "Calculates per-element maximum of two arrays."
+	 (src1 mat)
+	 (src2 mat)
+	 (dest mat))
 
 
 ;; void min(InputArray src1, InputArray src2, OutputArray dst)
 ;; void cv_min(Mat* src1, Mat* src2, Mat* dst)
 (defcfun ("cv_min" *min) :void 
-  "Calculates per-element minimum of two arrays."
-  (src1 mat)
-  (src2 mat)
-  (dest mat))
+	 "Calculates per-element minimum of two arrays."
+	 (src1 mat)
+	 (src2 mat)
+	 (dest mat))
 
 
 ;; C++: void absdiff(InputArray src1, InputArray src2, OutputArray dst)
@@ -1083,24 +1136,24 @@
 (defcfun ("cv_bitwise_and" %bitwise-and) :void 
 	 (src1 mat)
 	 (src2 mat)
-     (dest mat)
+	 (dest mat)
 	 (mask mat))
 
 (defun bitwise-and (src1 src2 dest &optional (mask (mat)))
-  "Calculates the per-element bit-wise conjunction of two arrays."
-  (%bitwise-or src1 src2 dest mask))
+       "Calculates the per-element bit-wise conjunction of two arrays."
+       (%bitwise-or src1 src2 dest mask))
 
 
 ;; void bitwise_not(InputArray src, OutputArray dst, InputArray mask=noArray())
 ;; void cv_bitwise_not(Mat* src, Mat* dst, Mat* mask)
 (defcfun ("cv_bitwise_not" %bitwise-not) :void 
 	 (src mat)
-     (dest mat)
+	 (dest mat)
 	 (mask mat))
 
 (defun bitwise-not (src dest &optional (mask (mat)))
-  "Inverts every bit of an array."
-  (%bitwise-not src dest mask))
+       "Inverts every bit of an array."
+       (%bitwise-not src dest mask))
 
 
 ;; void bitwise_or(InputArray src1, InputArray src2, OutputArray dst, InputArray mask=noArray())
@@ -1108,12 +1161,12 @@
 (defcfun ("cv_bitwise_or" %bitwise-or) :void 
 	 (src1 mat)
 	 (src2 mat)
-     (dest mat)
+	 (dest mat)
 	 (mask mat))
 
 (defun bitwise-or (src1 src2 dest &optional (mask (mat)))
-  "Calculates the per-element bit-wise disjunction of two arrays."
-  (%bitwise-or src1 src2 dest mask))
+       "Calculates the per-element bit-wise disjunction of two arrays."
+       (%bitwise-or src1 src2 dest mask))
 
 
 ;; void bitwise_xor(InputArray src1, InputArray src2, OutputArray dst, InputArray mask=noArray())
@@ -1126,8 +1179,8 @@
   (mask mat))
 
 (defun bitwise-xor (src1 src2 dest &optional (mask (mat)))
-  "Calculates the per-element bit-wise disjunction of two arrays."
-  (%bitwise-xor src1 src2 dest mask))
+       "Calculates the per-element bit-wise disjunction of two arrays."
+       (%bitwise-xor src1 src2 dest mask))
 
 
 ;; void convertScaleAbs(InputArray src, OutputArray dst, double alpha=1, double beta=0)
@@ -1139,8 +1192,8 @@
   (beta :double))
 
 (defun convert-scale-abs (src dest &optional (alpha 1d0) (beta 0d0))
-  "Scales, calculates absolute values, and converts the result to 8-bit."
-   (%convert-scale-abs src dest alpha beta))
+       "Scales, calculates absolute values, and converts the result to 8-bit."
+       (%convert-scale-abs src dest alpha beta))
 
 
 ;; double determinant(InputArray mtx)
@@ -1169,7 +1222,7 @@
 
 
 (defun divide (&optional arg1 arg2 arg3 (arg4 1d0) (arg5 -1))
-      (cond ((eq (type-of arg1) 'cv-mat)
+       (cond ((eq (type-of arg1) 'cv-mat)
 	      (divide5 arg1 arg2 arg3 arg4 arg5))
 	      ((eq (type-of arg1) 'double-float)
 	       (divide4 arg1 arg2 arg3 arg5))
@@ -1219,8 +1272,8 @@
   (flags :int))
 
 (defun invert (src dest &optional (flags +decomp-lu+))
-  "Finds the inverse or pseudo-inverse of a matrix."
-   (%invert src dest flags))
+       "Finds the inverse or pseudo-inverse of a matrix."
+       (%invert src dest flags))
 
 
 ;; void log(InputArray src, OutputArray dst)
@@ -1239,8 +1292,8 @@
   (mask mat))
 
 (defun mean (src &optional (mask (mat)))
-  "Calculates an average (mean) of array elements."
-  (%mean src mask))
+       "Calculates an average (mean) of array elements."
+       (%mean src mask))
 
 
 ;; void minMaxLoc(InputArray src, double* minVal, double* maxVal=0, Point* minLoc=0, Point* maxLoc=0, InputArray mask=noArray())
@@ -1268,8 +1321,8 @@
   (dtype :int))
 
 (defun multiply (src1 src2 dest &optional (scale 1.0d0) (dtype -1))
-  "Calculates the per-element scaled product of two arrays."
-   (%multiply src1 src2 dest scale dtype))
+       "Calculates the per-element scaled product of two arrays."
+       (%multiply src1 src2 dest scale dtype))
 
 
 ;; void normalize(InputArray src, OutputArray dst, double alpha=1, double beta=0, int norm_type=NORM_L2, int dtype=-1, 
@@ -1309,21 +1362,21 @@
 
 ;; RNG::RNG()
 (defcfun ("cv_create_RNG" %rng) rng 
-  "RNG constructor")
+	 "RNG constructor")
 
 
 ;; RNG::RNG(uint64 state)
 ;; RNG* cv_create_RNG_state(uint64 state)
 (defcfun ("cv_create_RNG_state" rng-state) rng 
-  "RNG constructor -  sets the RNG state to the specified value."
-  (state :uint64))
+	 "RNG constructor -  sets the RNG state to the specified value."
+	 (state :uint64))
 
 
 (defun rng (&optional (state nil))
-  (cond ((eq state nil)
-         (%rng))
-	((integerp state) (rng-state state))
-        (t nil)))
+       (cond ((eq state nil)
+	      (%rng))
+	      ((integerp state) (rng-state state))
+	      (t nil)))
 
 
 ;; void scaleAdd(InputArray src1, double alpha, InputArray src2, OutputArray dst)
@@ -1384,12 +1437,12 @@
   (b :int))
 
 (defun uniform  (rng a b)
-  (cond ((or (eq (type-of (and a b)) 'FIXNUM)
-	     (integerp (and a b)))
-         (uniform-i rng a b))
-	((eq (type-of (and a b)) 'SINGLE-FLOAT) (uniform-f rng a b))
-	((eq (type-of (and a b)) 'DOUBLE-FLOAT) (uniform-d rng a b))
-        (t nil)))
+       (cond ((or (eq (type-of (and a b)) 'FIXNUM)
+		  (integerp (and a b)))
+	      (uniform-i rng a b))
+	      ((eq (type-of (and a b)) 'SINGLE-FLOAT) (uniform-f rng a b))
+	      ((eq (type-of (and a b)) 'DOUBLE-FLOAT) (uniform-d rng a b))
+	      (t nil)))
 
 
 ;;; Drawing Functions
@@ -1398,15 +1451,15 @@
 ;; BGR value constructor macro 
 
 (defmacro bgr (b g r)
-  "BGR value constructor macro"
-  `(scalar ,b ,g ,r))
+	  "BGR value constructor macro"
+	  `(scalar ,b ,g ,r))
 
 
 ;; RGB value constructor macro 
 
 (defmacro rgb (r g b)
-  "BGR value constructor macro"
-  `(scalar ,b ,g ,r))
+	  "BGR value constructor macro"
+	  `(scalar ,b ,g ,r))
 
 
 ;; void circle(Mat& img, Point center, int radius, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
@@ -1421,8 +1474,8 @@
   (shift :int))
 
 (defun circle (img center radius color &optional (thickness 1) (line-type 8) (shift 0))
-  "Draws a circle."
-  (%circle img center radius color thickness line-type shift))
+       "Draws a circle."
+       (%circle img center radius color thickness line-type shift))
 
 
 ;; void ellipse(Mat& img, const RotatedRect& box, const Scalar& color, int thickness=1, int lineType=8)
@@ -1456,22 +1509,22 @@
   (shift :int))
 
 (defun ellipse10 (img center axes angle start-angle end-angle color &optional (thickness 1) (line-type 8) (shift 0))
-  "Draws a simple or thick elliptic arc."
-  (%ellipse10 img center axes angle start-angle end-angle color thickness line-type shift))
+       "Draws a simple or thick elliptic arc."
+       (%ellipse10 img center axes angle start-angle end-angle color thickness line-type shift))
 
 
 (defun ellipse (&rest args)
-  (case (length args)
-    ((3 4 5) (apply #'ellipse5 args))
-    ((7 8 9 10) (apply #'ellipse10 args))
-    (otherwise (error "Wrong number arguments to ELLIPSE (~A)" (length args)))))
+       (case (length args)
+	     ((3 4 5) (apply #'ellipse5 args))
+	     ((7 8 9 10) (apply #'ellipse10 args))
+	     (otherwise (error "Wrong number arguments to ELLIPSE (~A)" (length args)))))
 
 
 
-
+;;todo
 (defun get-text-size (text font-face font-scale thickness base-line)
-  "Calculates the width and height of a text string."
-  (%get-text-size text font-face font-scale thickness base-line))
+       "Calculates the width and height of a text string."
+       (%get-text-size text font-face font-scale thickness base-line))
 
 
 ;; void line(Mat& img, Point pt1, Point pt2, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
@@ -1486,8 +1539,8 @@
   (shift :int))
 
 (defun line (img pt1 pt2 color &optional (thickness 1) (line-type 8) (shift 0))
-  "Draws a line segment connecting two points."
-  (%line img pt1 pt2 color thickness line-type shift))
+       "Draws a line segment connecting two points."
+       (%line img pt1 pt2 color thickness line-type shift))
 
 
 ;; void putText(Mat& img, const string& text, Point org, int fontFace, double fontScale, Scalar color, int thickness=1, int lineType=8, 
@@ -1507,8 +1560,8 @@
   (bottom-left-orign :boolean))
 
 (defun put-text (img text org font-face font-scale color &optional (thickness 1) (line-type 8) (bottom-left-origin nil))
-  "Draws a text string."
-  (%put-text img (c-string-to-string text (length text)) org font-face font-scale color thickness line-type bottom-left-origin))
+       "Draws a text string."
+       (%put-text img (c-string-to-string text (length text)) org font-face font-scale color thickness line-type bottom-left-origin))
 
 
 ;; void rectangle(Mat& img, Point pt1, Point pt2, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
@@ -1524,8 +1577,8 @@
 
 
 (defun rectangle (img pt1 pt2 color &optional (thickness 1) (line-type 8) (shift 0))
-  "Draws a simple, thick, or filled up-right rectangle."
-  (%rectangle img pt1 pt2 color thickness line-type shift))
+       "Draws a simple, thick, or filled up-right rectangle."
+       (%rectangle img pt1 pt2 color thickness line-type shift))
 
 
 
@@ -1549,9 +1602,9 @@
 ;; float fastAtan2(float y, float x)
 ;; float cv_fastAtan2(float y, float x)
 (defcfun ("cv_fastAtan2" fast-atan2) :float 
-  "Calculates the angle of a 2D vector in degrees."
-  (x :float)
-  (y :float))
+	 "Calculates the angle of a 2D vector in degrees."
+	 (x :float)
+	 (y :float))
 
 
 ;; int64 getTickCount()
@@ -1572,3 +1625,4 @@
   "Calculates a square root of array elements."
   (src mat)
   (dest mat))
+

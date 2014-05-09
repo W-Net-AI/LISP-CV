@@ -331,12 +331,12 @@
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * create_std_vector##tn()
-(defcfun ("create_std_vectorm" %vector-mat) (:pointer vector-mat))
+(defcfun ("create_std_vectorm" %vector-mat) vector-mat)
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
-(defcfun ("carray_to_std_vectorm" %c-arr-to-vector-mat) (:pointer vector-mat)
+(defcfun ("carray_to_std_vectorm" %c-arr-to-vector-mat) vector-mat
   (a :pointer)
   (len :unsigned-int))
 
@@ -350,7 +350,7 @@
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; t * std_vector##tn##_to_carray( vector_##t * v ) 
 (defcfun ("std_vectorm_to_carray" %vector-mat-to-c-array) :pointer 
-  (s (:pointer vector-mat)))
+  (s vector-mat))
 
 
 (defun vector-mat (&optional arg i n)

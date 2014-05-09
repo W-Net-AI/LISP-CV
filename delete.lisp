@@ -213,15 +213,8 @@
 ;; void operator delete  ( void* ptr )
 ;; void delete_std_vector##tn( vector_##t * v)
 (defcfun ("delete_std_vectorm" del-vec-mat) :void
-  "Calls delete on (:POINTER VECTOR-MAT)"
-  (self :pointer))
-
-
-;; void operator delete  ( void* ptr )
-;; void delete_std_vector##tn( vector_##t * v)
-(defcfun ("delete_std_vectorp" del-vec-point) :void
-  "Calls delete on VECTOR-POINT"
-  (self vector-point))
+  "Calls delete on VECTOR-MAT"
+  (self vector-mat))
 
 
 ;; void operator delete  ( void* ptr )

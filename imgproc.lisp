@@ -3,11 +3,12 @@
 ;;;; OpenCV bindings
 ;;;; Image Processing
 
+
 (in-package :lisp-cv)
 
 
-;;; Macros
 
+;;; Macros
 
 ;; static inline Scalar morphologyDefaultBorderValue() { return Scalar::all(DBL_MAX); }
 ;; Scalar* cv_create_morphologyDefaultBorderValue()
@@ -16,6 +17,36 @@
 
 
 ;;; Image Filtering
+
+
+;; void bilateralFilter(InputArray src, OutputArray dst, int d, double sigmaColor, double sigmaSpace, int borderType=BORDER_DEFAULT )
+;; void cv_bilateralFilter(Mat* src, Mat* dst, int d, double sigmaColor, double sigmaSpace, int borderType)
+(defcfun ("cv_bilateralFilter" %bilateral-filter) :void
+  (src mat)
+  (dest mat)
+  (d :int)
+  (sigma-color :double)
+  (sigma-space :double)
+  (border-type :int))
+
+(defun bilateral-filter (src dest d sigma-color sigma-space &optional (border-type +border-default+))
+       "Applies the bilateral filter to an image."
+       (%bilateral-filter src dest d sigma-color sigma-space border-type))
+
+
+;; void blur(InputArray src, OutputArray dst, Size ksize, Point anchor=Point(-1,-1), int borderType=BORDER_DEFAULT )
+;; cv_blur(Mat* src, Mat* dst, Size* ksize, Point* anchor, int borderType)
+(defcfun ("cv_blur" %blur) :void
+  (src mat)
+  (dest mat)
+  (ksize size)
+  (anchor point)
+  (border-type :int))
+
+(with-point ((src (point -1 -1)))
+(defun blur (src dest ksize &optional (anchor src) (border-type +border-default+))
+       "Blurs an image using the normalized box filter."
+       (%blur src dest ksize anchor border-type)))
 
 
 ;; void copyMakeBorder(InputArray src, OutputArray dst, int top, int bottom, int left, int right, int borderType, 
@@ -100,6 +131,15 @@
 (defun gaussian-blur(src dest ksize sigma-x &optional (sigma-y 0) (border-type +border-default+))
   "Blurs an image using a Gaussian filter."
    (%gaussian-blur src dest ksize sigma-x sigma-y border-type))
+
+
+;; void medianBlur(InputArray src, OutputArray dst, int ksize)
+;; void cv_medianBlur(Mat* src, Mat* dst, int ksize)
+(defcfun ("cv_medianBlur" median-blur) :void
+  "Blurs an image using the median filter."
+  (src mat)
+  (dest mat)
+  (ksize :int))
 
 
 ;; void morphologyEx(InputArray src, OutputArray dst, int op, InputArray kernel, Point anchor=Point(-1,-1), int iterations=1, 
@@ -213,6 +253,23 @@
 
 
 ;;; Geometric Image Transformations
+
+
+
+;; void remap(InputArray src, OutputArray dst, InputArray map1, InputArray map2, int interpolation, int borderMode=BORDER_CONSTANT, const Scalar& borderValue=Scalar())
+;; void cv_remap(Mat* src, Mat* dst, Mat* map1, Mat* map2, int interpolation, int borderMode, Scalar* borderValue) 
+(defcfun ("cv_remap" %remap) :void
+  "Sets all or some of the array elements to the specified value."
+  (src mat)
+  (dest mat)
+  (map1 mat)
+  (map2 mat)
+  (iterpolation :int)
+  (border-mode :int)
+  (border-value scalar))
+
+(defun remap (src dest map1 map2 interpolation &optional (border-mode +border-constant+) (border-value (scalar)))
+  (%remap src dest map1 map2 interpolation border-mode border-value))
 
 
 ;; void resize(InputArray src, OutputArray dst, Size dsize, double fx=0, double fy=0, int interpolation=INTER_LINEAR )

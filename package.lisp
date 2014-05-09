@@ -175,7 +175,7 @@
    #:scalar
    #:size
    #:size2f
-   #:string*
+   #:*string
    #:surf
    #:svm
    #:svm-params
@@ -249,32 +249,36 @@
    #:copy-to
    #:data
    #:depth
+   #:diag
    #:div
+   #:dmatch
    #:dot
    #:dot2d
    #:dot2f
    #:dot3d
    #:dot3f
    #:dot3i
+   #:elem-size
+   #:elem-size1
    #:empty
    #:force
    #:height
    #:inv
    #:height2f
    #:is-continuous
+   #:keypoint
    #:locate-roi
-   #:mat-diag
+   #:mat
    #:mat-expr-t
-   #:mat-expr-s
    #:mat-eye
    #:mat-ones
-   #:mat-value
+   #:mat-size
    #:mat-type
-   #:mat-typed
    #:mat-zeros
    #:mul
    #:point
-   #:point-init
+   #:point-x
+   #:point-y
    #:point2d
    #:point2d-x
    #:point2d-y
@@ -303,24 +307,27 @@
    #:rect-x
    #:rect-y
    #:reshape
+   #:reshape-rows
    #:roi
+   #:rotated-rect
    #:row-range
    #:rows
    #:scalar
    #:scalar-all
+   #:scale
    #:size
+   #:size-assgn-to
+   #:size-from-point
    #:size2f
-   #:mat-size
+   #:step1
    #:width
    #:width2f
-   #:step*
+   #:*step
    #:sub
    #:rect-tl
    #:total
-   #:x
-   #:y
 
-   #:ipl-image
+
    #:+ipl-depth-1u+
    #:+ipl-depth-8u+
    #:+ipl-depth-16u+
@@ -388,7 +395,7 @@
    #:bitwise-or
    #:bitwise-xor
    #:convert-scale-abs
-   #:det
+   #:determinant
    #:divide
    #:flip
    #:in-range-s
@@ -412,8 +419,6 @@
 
 ;; core - Drawing Functions
    #:+aa+
-   #:circle
-
    #:+font-hershey-simplex+
    #:+font-hershey-plain+
    #:+font-hershey-duplex+
@@ -424,9 +429,11 @@
    #:+font-hershey-script-complex+
    #:+font-italic+ 
 
-   #:line
+
+   #:circle
    #:ellipse
    #:get-text
+   #:line
    #:put-text
 
 ;; core - Utility and System Functions and Macros
@@ -489,7 +496,7 @@
    #:+stsoutofrange+ 
    #:+stsparseerror+ 
    #:+stsnotimplemented+
-   #:+stsbadmemblock+
+   #:+stsbadmembreshapelock+
    #:+stsassert+ 
    #:+gpunotsupported+ 
    #:+gpuapicallerror+ 
@@ -505,7 +512,6 @@
 
 ;; imgproc - Image Filtering
 
-   #:ipl-conv-kernel
    #:+ipl-border-constant+
    #:+ipl-border-replicate+
    #:+border-constant+
@@ -533,12 +539,15 @@
    #:+scharr+
    #:morphology-default-border-value
 
+   #:bilateral-filter
+   #:blur
    #:copy-make-border
    #:erode
    #:dilate
    #:filter-2d
    #:gaussian-blur
    #:laplacian
+   #:median-blur
    #:morphology-ex
    #:pyr-down
    #:pyr-up
@@ -557,6 +566,7 @@
    #:+inter-area+ 
    #:+inter-lanczos4+ 
 
+   #:remap
    #:resize
 
 ;; imgproc - Miscellaneous Image Transformations
@@ -878,7 +888,6 @@
    #:imwrite
    #:video-capture
    #:video-writer
-   #:video-writer-init
    #:video-writer-is-open
    #:video-writer-write
    #:with-capture
@@ -894,6 +903,7 @@
    #:+wnd-prop-autosize+ 
    #:+wnd-prop-aspectratio+
 
+   #:display-overlay 
    #:get-window-property
    #:set-window-property
 
@@ -924,8 +934,6 @@
 ;; features2d - Common Interfaces of Descriptor Matchers
 
    #:bf-matcher
-   #:del-bfmatcher
-   #:delete-brisk
    #:descrip-matcher-create 
    #:descrip-matcher-match
 
@@ -951,8 +959,7 @@
 
 ;;; nonfree - Feature Detection and Description
 
-   #:surf0
-   #:surf5
+   #:surf
 
 ;;; contrib - ColorMaps in OpenCV
 

@@ -6,8 +6,6 @@ using namespace std;
 using namespace flann;
 using namespace cvflann;
 
-CvPoint cvPoint_glue(int x, int y);
-
 extern "C" {
 void cv_displayOverlay(String* winname, String* text, int delayms);
 MatExpr* cv_abs(Mat* m);

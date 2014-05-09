@@ -238,6 +238,8 @@ Open Emacs and run this at the REPL:
 
 (asdf:operate 'asdf:load-op :lisp-cv)
 
+(asdf:operate 'asdf:load-op :gc)
+
 
 Lisp-Cv will load.
 
@@ -285,6 +287,17 @@ and then this:
 If all went as planned an empty window should open up.
 
 
+Note: you can place:
+
+
+(asdf:operate 'asdf:load-op :lisp-cv)
+
+(asdf:operate 'asdf:load-op :gc)
+
+(in-package #:lisp-cv)
+
+In your Lisp implementations initialization file(e.g. .sbclrc or .clisprc) to start LISP-CV
+automatically.
 
 --------------------------------------------------------------------------------
 

@@ -307,6 +307,20 @@
 
 ;;; Qt New Functions
 
+
+;; void displayOverlay(const String& winname, const String& text, int delayms=0 )
+;; void cv_displayOverlay(String* winname, String* text, int delayms)
+(cffi:defcfun ("cv_displayOverlay" %display-overlay) :void
+  (winname *string)
+  (text *string)
+  (flags :int))
+
+(defun display-overlay (winname text &optional (delayms 0))
+  "Displays a text on a window image as an overlay for a specified duration."
+  (%display-overlay (c-string-to-string winname (length winname)) (c-string-to-string text (length text)) delayms))
+
+
+
 ;; double cv_getWindowProperty(String* winname, int prop_id) 
 (defcfun ("cv_getWindowProperty" %get-window-property) :double
   (winname *string)

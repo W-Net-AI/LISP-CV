@@ -305,7 +305,7 @@
   (+morph-rect+ 0)
   (+morph-cross+ 1)
   (+morph-ellipse+ 2)
-  (+cv-shape-custom+ 100)
+  (+shape-custom+ 100)
   (+gaussian-5x5+ 7)
   (+blur-no-scale+ 0)
   (+blur+ 1)

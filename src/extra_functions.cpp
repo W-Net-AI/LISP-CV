@@ -4,18 +4,9 @@ using namespace std;
 using namespace flann;
 using namespace cvflann;
 
-typedef vector<Rect> vector_Rect;
 
 #include <opencv2/c/extra_functions.hpp>
 
-
-CvPoint cvPoint_glue(int x, int y)
-
-{
-
-    return cvPoint(x, y);
-
-}
 
 extern "C" {
 

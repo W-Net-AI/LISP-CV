@@ -6,12 +6,13 @@
 
 There are 3 major types of memory management, manual, with-* macros and Trivial Garbage finalizers
 Most examples so far use manual memory management, which is unsafe, but long-lived and fast. I'll 
-be adding some examples from now on, using the new with-* macro syntax, because with-* macros are 
-safe, scoped and they are also fast. Trivial Garbage finalizers automatically free memory without 
-having to use with-* macros or manual memory management, but, though they are long-lived and safe, 
-they a little slower than the aforementoned forms of memory management. I will likely be offering 
-all three forms of memory management in this library. For reference, here is an example that shows 
-the camera output in a window using the with-* macro syntax:
+be adding some examples from now on, using the new with-* macro syntax as well as examples that use 
+Trivial Garbage finalizers. Trivial Garbage finalizers automatically free memory without having to 
+use with-* macros or manual memory management, but, though they are long-lived and safe, are a little 
+slower than with-* macros or manual MM. I'll be offering all three forms of memory management in this 
+library as well as provide many, many examples of each type. For reference, here is an example that 
+shows the camera output in a window using the with-* macro syntax(See MAT-EXAMPLE in this file for 
+an example that uses TG finalizers):
 
 
 (defun with-macro-example (&optional 
@@ -74,8 +75,8 @@ ADD, the return value, back to type MAT with the function (FORCE), (or the short
    hen printed."
 
   (with-object ((data (alloc :uint '(1 2 3 4 5 6 7 8 9))))
-    (with-mat ((m1 (mat-data 3 3 +32s+ data))
-	       (m2 (mat-data 3 3 +32s+ data)))
+    (with-mat ((m1 (mat 3 3 +32s+ data))
+	       (m2 (mat 3 3 +32s+ data)))
       (with-mat-expr ((result (add m1 m2)))
 	(format t "~%M1 =~%~%")
 	(print-mat m1 :int)
@@ -281,7 +282,7 @@ The example below initializes a Hilbert matrix:
 
 
 (defun at-example ()
-  (let ((h (mat-typed 5 5 +64f+)))
+  (let ((h (mat 5 5 +64f+)))
     (dotimes (i (rows h))
       (dotimes (j (cols h))
 	(setf (at h i j :double) (/ 1.0d0 (+ i j 1)))
@@ -366,7 +367,7 @@ The method makes a new header for the specified column span of the matrix. Simil
         ;Create matrix data
   (let* ((data (alloc :uchar '(1 2 3 4 5 6 7 8 9)))
          ;Create matrix
-	 (mat (mat-data 3 3 +8u+ data)))
+	 (mat (mat 3 3 +8u+ data)))
     (princ #\Newline)
     ;Print matrix normally by 
     ;accessing entire matrix
@@ -387,6 +388,35 @@ The method makes a new header for the specified column span of the matrix. Simil
       (princ #\Newline))
       (format t "~%")
       (free data)))
+
+
+
+COLS
+
+Returns number or cols in MAT.
+
+C++: int rows, cols
+
+LISP-CV:  (COLS (SELF MAT)) => :INT
+
+
+    Parameters:	
+
+        SELF - A matrix(MAT).
+
+
+The function COLS finds the number of columns in a matrix or -1 when the array has more than 2 dime-
+nsions. 
+
+
+(defun cols-example ()
+
+  "Uses COLS to find the number of columns in the matrix MAT"
+
+  (with-mat ((mat (mat 3 4 +64f+ (scalar 5))))
+    (format t "~%The number of columns in MAT = ~a~%~%" (cols mat))))
+
+
 
 
 COPY-TO
@@ -428,10 +458,10 @@ ces. When the operation mask is specified, and the (CREATE) call shown above rea
   ;; initialize data for matrices
   (let* ((data (alloc :int '(10 20 30 40)))
          ;; initialize MAT-1 with DATA.
-         (mat-1 (mat-data 2 2 +32s+ data))
+         (mat-1 (mat 2 2 +32s+ data))
          ;; initialize MAT-2, a second, 
          ;; identical matrix
-         (mat-2 (mat-data 2 2 +32s+ data))
+         (mat-2 (mat 2 2 +32s+ data))
          ;; create empty matrices M-1 and M-2
          (m-1 (mat))
 	 (m-2 (mat))
@@ -512,8 +542,8 @@ shape and type as operands.
 
   (with-object ((data1 (alloc :double '(7d0 3d0 -4d0)))
 		(data2 (alloc :double '(1d0 0d0 6d0))))
-    (with-mat ((vec1 (mat-data 1 3 +64f+ data1))
-	       (vec2 (mat-data 1 3 +64f+ data2)))
+    (with-mat ((vec1 (mat 1 3 +64f+ data1))
+	       (vec2 (mat 1 3 +64f+ data2)))
 					;Print VEC1
       (format t "~%VEC1 = ~%~%")
       (dotimes (j (cols vec1))
@@ -565,7 +595,8 @@ types contains the following values:
 
 Example:
 
-LISP-CV> (DEFPARAMETER A (MAT-TYPED 3 3 +8SC1+)) ;Initialize 1 channel matrix of 8-bit signed integer type
+
+LISP-CV> (DEFPARAMETER A (MAT 3 3 +8SC1+)) ;Initialize 1 channel matrix of 8-bit signed integer type
 
 A
 
@@ -578,7 +609,7 @@ LISP-CV> (DEPTH A)
 1   ;The type of the matrix elements are 1(+8S+) - 8-bit signed integer
 
 
-LISP-CV> (DEFPARAMETER A (MAT-TYPED 3 3 +8SC3+)) ;Initialize 3 channel matrix of 8-bit signed integer type
+LISP-CV> (DEFPARAMETER A (MAT 3 3 +8SC3+)) ;Initialize 3 channel matrix of 8-bit signed integer type
 
 A
 
@@ -630,6 +661,59 @@ index, and distance between descriptors.
 Example:
 
 TODO(Write an example showing how to create DMatch manually, add to vector and send to DRAW-MATCHES)
+
+
+
+ELEM-SIZE
+
+
+Returns the matrix element size in bytes.
+
+
+C++: size_t Mat::elemSize() const
+
+LISP-CV: (ELEM-SIZE (SELF MAT)) => :UNSIGNED-INT
+
+
+    Parameters: 
+
+        SELF - A matrix.
+
+
+The method returns the matrix element size in bytes. For example, if the matrix type is +16SC3+ , the 
+method returns 3*sizeof(short) or 6.
+
+
+Example:
+
+See STEP1 example.
+
+
+
+ELEM-SIZE1
+
+
+Returns the size of each matrix element channel in bytes.
+
+
+C++: size_t Mat::elemSize1() const
+
+LISP-CV: (ELEM-SIZE1 (SELF MAT)) => :UNSIGNED-INT
+
+
+    Parameters:
+
+        SELF - A matrix
+
+
+The method returns the matrix element channel size in bytes, that is, it ignores the number of channels. 
+For example, if the matrix type is +16SC3+ , the method returns (SIZE-OF :SHORT) or 2.
+
+
+Example:
+
+See STEP1 example.
+
 
 
 EMPTY
@@ -706,9 +790,9 @@ back to type MAT with the function (FORCE), (or the shorthand version (>>)) to u
 	 (data-1 (alloc :float '(1f0 2f0 3f0 3f0 2f0 1f0 2f0 1f0 3f0)))
 	 (data-2 (alloc :float '(4f0 5f0 6f0 6f0 5f0 4f0 4f0 6f0 5f0)))
 	 ;Create numerator matrix
-         (numerator (mat-data 3 3 +32f+ data-1))
+         (numerator (mat 3 3 +32f+ data-1))
 	 ;Create divisor matrix
-         (divisor (mat-data 3 3 +32f+ data-2)) 
+         (divisor (mat 3 3 +32f+ data-2)) 
 	 ;Find determinant of DIVISOR       
 	 (determinant (det divisor)) 
 	 (divisor-inv 0)
@@ -811,7 +895,7 @@ no longer have this property.
   (let* (;;Allocate matrix data
 	 (data (alloc :uchar '(1 2 3 4 5 6 7 8 9)))
 	 ;;Create initialized matrix
-	 (mat (mat-data 3 3 +8u+ data))
+	 (mat (mat 3 3 +8u+ data))
          ;;Extract a 2x2 roi of MAT
 	 (mat-roi (roi mat (rect 0 0 2 2)))
 	 ;;Read in image
@@ -984,6 +1068,106 @@ submatrix within the original matrix. The function LOCATE-ROI does exactly that.
       (destroy-all-windows))))
 
 
+MAT
+
+Creates a matrix
+
+C++: Mat::Mat()
+
+LISP-CV: (MAT) => MAT
+
+C++: Mat::Mat(int rows, int cols, int type)
+
+LISP-CV: (MAT (ROWS :INT) (COLS :INT) (TYPE :INT)) => MAT
+
+C++: Mat::Mat(int rows, int cols, int type, const Scalar& s)
+
+LISP-CV: (MAT (ROWS :INT) (COLS :INT) (TYPE :INT) (S SCALAR)) => MAT
+
+C++: Mat::Mat(int rows, int cols, int type, void* data, size_t step=AUTO_STEP)
+
+LISP-CV: (MAT (ROWS :INT) (COLS :INT) (TYPE :INT) (DATA :POINTER)) => MAT
+
+
+    Parameters:	
+
+        ROWS - The number of rows
+    
+        COLS - The number of colounns
+
+        TYPE - The type of the matrix
+
+        S - A scalar
+
+        DATA - A pointer to an array of numbers
+
+
+Speed notes:
+
+The speed of the function will improve as I fine tune it's operation. I time how long 2,592,000 runs
+of (MAT :t) takes in the example below. 2,592,000 is the number of matrices that would be created, if 
+you created 1 matrix for every 30fps video frame in a 24 hour period. (MAT :t) is the finalized version 
+of (MAT) and finalizers are the slowest of the three forms of MM in this library. You can get a 33% speed 
+increase in this library by compiling your programs to an executable before you run them(See the RUN macro 
+in <lisp-cv-source-dir>/macros.lisp for details on that. Also, try looking into Paralella boards, a cheaper 
+solution for mind blowing processing speed(I know, sounds like a commercial...but trust me:)).
+
+
+
+(defun mat-example ()
+
+  "In this example, I show how all the different MAT 
+   types are used. I use some finalizer versions of 
+   the MAT functions here. Their memory is automatic-
+   ally managed so you don't need WITH-* macros or m-
+   anual memory management to clean up. They are slo-
+   wer though. The gc: prefix, signals automatic mem-
+   ory management is activated. I prove it is activa-
+   ted by creating millions of MAT objects at the en-
+   d of the example. You should notice your RAM fluc-
+   tuate, but not rise to any dangerous level. You c-
+   an also use the shorter t: prefix(finalizer true) 
+   to enable automatic GC in functions that support 
+   it. All functions in this library that need to be 
+   memory managed have a finalized version.
+
+   Note: Automatic memory management is the slowest, 
+         WITH-* macros are the quickest, and manual 
+         MM is part way between the two."
+
+  (with-object ((data (alloc :double '(1d0 2d0 3d0 4d0 5d0 
+				       6d0 7d0 8d0 9d0))))
+	  ;Create matrices
+    (let* ((mat (gc:mat))
+	   (mat-typed (gc:mat 4 4 +32s+))
+	   (mat-value1 (gc:mat 3 3 +32f+ (scalar 255)))
+	   (mat-value2 (gc:mat 3 3 +32f+ '(255)))
+	   (mat-data1 (gc:mat 3 3 +64f+ data))
+	   (mat-data2 (gc:mat 3 3 +64f+ :double 
+			       '(1d0 2d0 3d0 4d0 5d0 
+				 6d0 7d0 8d0 9d0))))
+      ;Print matrices, gcc:: must be added to the front 
+      ;of the PRINT-MAT function if you are printing a 
+      ;finalizer 
+      (format t "~%~%MAT = ~%~%")
+      (print-mat mat :uchar)
+      (format t "~%~%MAT-TYPED = ~%~%")
+      (print-mat mat-typed :int)
+      (format t "~%~%MAT-VALUE1 = ~%~%")
+      (print-mat mat-value1 :float)
+      (format t "~%~%MAT-VALUE2 = ~%~%")
+      (print-mat mat-value2 :float)
+      (format t "~%~%MAT-DATA1 = ~%~%")
+      (print-mat mat-data1 :double)
+      (format t "~%~%MAT-DATA2 = ~%~%")
+      (print-mat mat-data2 :double)
+      (format t "~%~%")
+      ;Time how long it takes to create 2,592,000
+      ;finalized matrices using the CL:TIME macro 
+      ;`$`. I use the 't:' prefix here to enable 
+      ;finalization.
+     ($ (t:mat) 2592000))))
+
 
 MUL
 
@@ -1016,8 +1200,8 @@ functions.
   (with-object ((data (alloc :float '(1.0f0 2.0f0 3.0f0 
 				      4.0f0 5.0f0 6.0f0 
 				      7.0f0 8.0f0 9.0f0))))
-    (with-mat ((m1 (mat-data 3 3 +32f+ data))
-	       (m2 (mat-data 3 3 +32f+ data)))
+    (with-mat ((m1 (mat 3 3 +32f+ data))
+	       (m2 (mat 3 3 +32f+ data)))
       (with-mat-expr ((result (mul m1 m2)))
 	(format t "~%M1 = ~%~%")
 	(print-mat m1 :float)
@@ -1184,7 +1368,7 @@ NT2F-Y are used to extract the x,y coordinates the point.
 
 POINT3D
 
-
+when
 POINT3D constructor.
 
 
@@ -1406,7 +1590,7 @@ LISP-CV: (PTR (SELF MAT) &OPTIONAL ((I0 :INT) 0)) => :POINTER
 
 This function returns a pointer to the specified matrix row.
 
-
+when
 
 ;;Must supply a filename parameter for the image you 
 ;;will be using in this example and one for the file 
@@ -1523,7 +1707,7 @@ and/or different number of channels. Any combination is possible if:
          ;;Allocate matrix data
          (data (alloc :uchar '(1 2 3 4 5 6 7 8 9)))
          ;;Create initialized matrix
-         (mat (mat-data 3 3 +8u+ data))
+         (mat (mat 3 3 +8u+ data))
          (window-name-1 "3x3 Matrix - RESHAPE Example")
          (window-name-2 "1x9 Vector - RESHAPE Example")
 	 (window-name-3 "Original image - RESHAPE Example")
@@ -1621,7 +1805,7 @@ functions, this is an O(1) operation.
         ;Create matrix data
   (let* ((data (alloc :uchar '(1 2 3 4 5 6 7 8 9)))
          ;Create matrix
-	 (mat (mat-data 3 3 +8u+ data)))
+	 (mat (mat 3 3 +8u+ data)))
     (princ #\Newline)
     ;Print matrix normally by 
     ;accessing entire matrix
@@ -1645,6 +1829,33 @@ functions, this is an O(1) operation.
 
 
 
+ROWS
+
+
+Returns number or rows in MAT.
+
+C++: int rows, cols
+
+LISP-CV: (ROWS (SELF MAT)) => :INT
+
+    Parameters:	
+
+        SELF - A MAT construct.
+
+
+The function ROWS finds the number of rows in a matrix or -1 when the array has more than 2 dimensi-
+ons. 
+
+
+(defun rows-example ()
+
+  "Uses ROWS to find the number of rows in the matrix MAT"
+
+  (let* ((mat (mat 3 4 +64f+ (scalar 100)) ))
+          (format t "The number of rows in MAT = ~a" (rows mat))))
+
+
+
 SIZE
 
 SIZE constructor
@@ -1661,7 +1872,11 @@ LISP-CV: (WIDTH (SELF SIZE)) => :INT
 
 C++: _Tp width, height
 
+C: Size* self, other;
 
+   *self = *other;
+
+LISP-CV: (SIZE-ASSGN-TO (SELF SIZE) (OTHER SIZE)) => SIZE
 
 
     Parameters:	
@@ -1681,8 +1896,8 @@ The function HEIGHT Finds the height of a SIZE construct.
 
 
 The function SIZE contains the functionality of both the OpenCV class Size_ and the OpenCV MAT class 
-method size. It can return a pointer to an uninitialized SIZE construct, an initialized SIZE construct 
-holding (WIDTH, HEIGHT) values and also determines the SIZE value of any MAT construct passed to it, When 
+method size. It can return a pointer to an uninitialized SIZE construct, an initialized SIZE object 
+holding (WIDTH, HEIGHT) values and also determines the SIZE value of any MAT object passed to it, When 
 returning a MAT size the columns are listed first and  the rows are listed second(COLS, ROWS). For a tiny
 bit faster matrix size accessor choose the MAT-SIZE Dfunction.
 
@@ -1695,7 +1910,7 @@ bit faster matrix size accessor choose the MAT-SIZE Dfunction.
    Then an uninitialized and an initialized SIZE constr-
    uct are created. Their values are also printed."
   
-  (let* ((mat (mat-value 5 5 +8u+ (scalar 100 100 100)))
+  (let* ((mat (mat 5 5 +8u+ (scalar 100 100 100)))
 	 (mat-size (size mat))
 	 (size-un-init (size))
 	 (size (size 640d0 480d0)))
@@ -1707,6 +1922,99 @@ bit faster matrix size accessor choose the MAT-SIZE Dfunction.
                ~%" size-un-init) 
     (format t "Width of SIZE = ~a~%" (width size))
     (format t "Height of SIZE = ~a~%~%" (height size))))
+
+
+
+SIZE-ASSGN-TO
+
+
+Create a SIZE object from another SIZE objects data.
+
+
+C: Size* cv_Size_assignTo(Size* self, Size* other)
+
+LISP-CV: (SIZE-ASSGN-TO (SELF SIZE) (OTHER SIZE)) => SIZE
+
+
+    Parameters: 
+
+        SELF - A SIZE object
+
+        OTHER - A SIZE object
+
+
+Example:
+
+
+LISP-CV> (DEFPARAMETER A (SIZE 640 480))
+
+A
+
+LISP-CV> A
+
+#<CV-SIZE {10042FE323}>
+
+LISP-CV> (DEFPARAMETER B (SIZE))
+
+B
+
+LISP-CV> B
+
+#<CV-SIZE {100431E313}>
+
+LISP-CV> (DEFPARAMETER C (SIZE-ASSGN-TO B A))
+
+C
+
+LISP-CV> C
+
+#<CV-SIZE {1004345E93}>
+
+LISP-CV> (WIDTH C)
+
+640.0d0
+
+LISP-CV> (HEIGHT C)
+
+480.0d0
+
+
+
+SIZE-FROM-POINT
+
+
+Create a SIZE object from POINT data.
+
+
+C: Size* cv_Size_fromPoint(Point* p)
+
+LISP-CV: (SIZE-FROM-POINT (P POINT)) => SIZE
+
+
+    Parameters: 
+
+        P - A POINT object
+
+
+Example:
+
+
+LISP-CV> (DEFPARAMETER A (POINT 1 2))
+
+A
+
+LISP-CV> (DEFPARAMETER B (SIZE-FROM-POINT A))
+
+B
+
+LISP-CV> (WIDTH B)
+
+1.0d0
+
+LISP-CV> (HEIGHT B)
+
+2.0d0
+
 
 
 
@@ -1760,9 +2068,94 @@ tion is named STEP*, because the name STEP conflicts with a Lisp Macro.
 
 
 
+STEP1
+
+Returns a normalized step.
+
+
+C++: size_t Mat::step1(int i=0 ) const
+
+LISP-CV: (STEP1 (SELF MAT)) => :UNSIGNED-INT
+
+
+The method returns a matrix step divided by (ELEM-SIZE1) . It can be useful to quickly access an 
+arbitrary matrix element.
+
+
+Example:
+
+
+LISP-CV> (DEFPARAMETER M (MAT 7 2 +8UC1+))
+
+M
+
+LISP-CV> (ELEM-SIZE M) 
+
+1
+
+LISP-CV> (ELEM-SIZE1 M) 
+
+1
+
+LISP-CV> (STEP1 M)
+
+7
+
+LISP-CV> (DEFPARAMETER M (MAT 7 2 +8UC1+))
+
+M
+
+LISP-CV> (ELEM-SIZE M) 
+
+1
+
+LISP-CV> (ELEM-SIZE1 M) 
+
+1
+
+LISP-CV> (STEP1 M)
+
+7
+
+LISP-CV> (DEFPARAMETER M (MAT 7 2 +32FC1+))
+
+M
+
+LISP-CV> (ELEM-SIZE M) 
+
+4
+
+LISP-CV> (ELEM-SIZE1 M) 
+
+4
+
+LISP-CV> (STEP1 M)
+
+7
+
+LISP-CV> (DEFPARAMETER M (MAT 7 2 +32FC3+))
+
+M
+
+LISP-CV> (ELEM-SIZE M) 
+
+12
+
+LISP-CV> (ELEM-SIZE1 M) 
+
+4
+
+LISP-CV> (STEP1 M)
+
+21
+
+
+
 TERM-CRITERIA
 
+
 TERM-CRITERIA constructors.
+
 
 C++: TermCriteria::TermCriteria()
 
@@ -1832,7 +2225,7 @@ Matrix Expressions(MAT-EXPR), (ABS-DIFF), (CONVERT-SCALE-ABS)
 
   ;;Allocate data and create a 2x2 matrix.
   (with-object ((data (alloc :float '(4f0 -7f0 2f0 -3f0))))
-    (with-mat ((mat (mat-data 2 2 +32f+ data)))
+    (with-mat ((mat (mat 2 2 +32f+ data)))
       ;;Print MAT.
       (format t "~%MAT = ~%~%")
       (print-mat mat :float)
@@ -1884,13 +2277,13 @@ See also:
   (let* ((data (alloc :double '(1d0 2d0 3d0 4d0 5d0 
                                6d0 7d0 8d0 9d0)))
          ;Create double float matrix
-	 (mat (mat-data 3 3 +64f+ data))
+	 (mat (mat 3 3 +64f+ data))
 	 (window-name-1 "Original Image - *EXP Example")
 	 (window-name-2 "Image after CONVERT-TO - *EXP Example")
 	 (window-name-3 "Image after LOG - *EXP Example")
 	 (window-name-4 "Image after EXP and LOG - *EXP Example")
          (image (imread filename 1))
-         (dest (mat-typed 3 3 +64f+)))
+         (dest (mat 3 3 +64f+)))
       (named-window window-name-1 +window-normal+)
       (named-window window-name-2 +window-normal+)
       (named-window window-name-3 +window-normal+)
@@ -1997,7 +2390,7 @@ See also:
   (let* ((data (alloc :double '(1d0 2d0 3d0 4d0 5d0 
                                6d0 7d0 8d0 9d0)))
          ;Create double float matrix
-	 (mat (mat-data 3 3 +64f+ data))
+	 (mat (mat 3 3 +64f+ data))
 	 (window-name-1 "Original Image - *LOG Example")
 	 (window-name-2 "Natural logarithm of image - *LOG Example")
          (image (imread filename 1)))
@@ -2029,7 +2422,7 @@ See also:
     (imshow window-name-1 image)
     ;Convert IMAGE to 1 channel
     (cvt-color image image +bgr2gray+)
-    ;Convert IMAGE to double float
+    ;Convert IMAGE to double floatwhen
     (convert-to image image +64f+)
     ;Find natural logarithm of each element of 
     ;IMAGE, just to see what it looks like
@@ -2070,7 +2463,7 @@ See also:
 (*MIN), (COMPARE), (INRANGE), (MIN-MAX-LOC), Matrix Expressions(MAT-EXPR)
 
 
-(defun *max-example (&optional (camera-index 0)
+(defun *max-example (&optional (cam 0)
 		       (width *default-width*)
 		       (height *default-height*))
 
@@ -2081,89 +2474,75 @@ See also:
    rackbar changes the scalar value the ASSGN-VAL function us-
    es to decide what to set each element of MAT-3 to."
 
-  (with-capture (cap (video-capture camera-index))   
-       ;Create two matrices: MAT-1 and MAT-2(used to show how *MAX works)
-    (let* ((mat-1 (mat-data 3 3 +32s+ (alloc :int '(1 2 3 4 5 6 7 8 9))))
-	   (mat-2 (mat-data 3 3 +32s+ (alloc :int '(9 8 7 6 5 4 3 2 1))))
-           ;Create destination matrix of same size and type: DEST
-           (dest (mat-typed 3 3 +32s+))
-           ;Create 3 matrices used to hold 
-           ;data we use later in the example
-           (mat-3 (mat-typed height width +8u+))
-           (mat-4 (mat-typed height width +8u+))
-           (mat-5 (mat-typed height width +8u+))
-           ;Allocate :int pointer for trackbar to change
-           (val (alloc :int '(128)))
-	   (window-name-1 "MAT-3 after THRESHOLD - *MAX-Example")
+  ;Create camera capture, CAP, set CAP to default width and height
+  (with-captured-camera (cap cam :width width :height height)  
+    (let* ((window-name-1 "MAT-3 after THRESHOLD - *MAX-Example")
 	   (window-name-2 "MAT-5 after ASSGN-VAL - *MAX-Example")
-	   (window-name-3 "MAT-4 after *MAX - *MAX-Example")) 
-      ;Set CAP to default width and height
-      (cap-set cap +cap-prop-frame-width+ width)
-      (cap-set cap +cap-prop-frame-height+ height)
-      ;Create windows and move to specified locations
-      (named-window window-name-1 +window-normal+)
-      (named-window window-name-2 +window-normal+)
-      (named-window window-name-3 +window-normal+)
-      (move-window window-name-1 310 175)
-      (move-window window-name-2 760 175)
-      (move-window window-name-3 1210 175)
-      ;Print MAT-1
-      (format t "MAT-1:~%~%")
-      (dotimes (i (cols mat-1))
-	(dotimes (j (rows mat-1))
-	  (princ (at mat-1 i j :int))
-	  (princ #\Space))
-	(princ #\Newline))
-      (format t "~%~%")
-      ;Print MAT-2
-      (format t "MAT-2:~%~%")
-      (dotimes (i (cols mat-2))
-	(dotimes (j (rows mat-2))
-	  (princ (at mat-2 i j :int))
-	  (princ #\Space))
-	(princ #\Newline))
-      (format t "~%~%")
-      ;Find per element maximum of 
-      ;MAT-1 and MAT-2, set to DEST
-      (*max mat-1 mat-2 dest)
-      ;Print DEST
-      (format t "Per element maximum of MAT-1 and  MAT-2:~%~%")
-      (dotimes (i (cols dest))
-	(dotimes (j (rows dest))
-	  (princ (at dest i j :int))
-	  (princ #\Space))
-	(princ #\Newline))
-      (format t "~%~%")
-      (do* ((frame 0))
-	   ((plusp (wait-key *millis-per-frame*)) 
-	    (format t "Key is pressed by user"))
-        ;Set camera feed to FRAME
-	(setf frame (mat))
-	(cap-read cap frame)
-        ;Convert FRAME to 1 channel 
-        ;grayscale image, set to mat-1
-        ;FRAME stays the same
-	(cvt-color frame mat-3 +bgr2gray+)
-        ;Convert FRAME to 1 channel 
-        ;grayscale image, set to mat-4
-        ;FRAME stays the same
-	(cvt-color frame mat-4  +bgr2gray+)
-        ;Apply a fixed-level threshold to 
-        ;each array element of mat-3
-	(threshold mat-3 mat-3 128d0 255d0 +thresh-binary-inv+)
-        ;Create trackbar on middle window which changes 
-        ;the scalar value ASSGN-VAL uses in the next step
-        (create-trackbar "Value of mat-3" window-name-2 val 255)
-        ;Assign each element of mat-5 a scalar value
-	(assgn-val mat-5 (scalar (mem-aref val :int)))
-        ;Find the maximum of each element 
-        ;of mat-4 AND mat-5, set to mat-4
-        (*max mat-4 mat-5 mat-4)
-        ;Show mat-3, mat-5 and mat-4 in windows
-	(imshow window-name-1 mat-3)
-	(imshow window-name-2 mat-5)
-	(imshow window-name-3 mat-4)) 
-      (destroy-all-windows))))
+	   (window-name-3 "MAT-4 after *MAX - *MAX-Example"))
+      ;Create two matrices: MAT-1 and MAT-2(used to show how *MAX works)
+      (with-mat ((mat-1 (mat 3 3 +32s+ (alloc :int '(1 2 3 4 5 6 7 8 9))))
+		 (mat-2 (mat 3 3 +32s+ (alloc :int '(9 8 7 6 5 4 3 2 1))))
+		 ;Create destination matrix of same size and type: DEST
+		 (dest (mat 3 3 +32s+))
+		;Create 3 matrices used to hold 
+		;data we use later in the example
+		 (mat-3 (mat height width +8u+))
+		 (mat-4 (mat height width +8u+))
+		 (mat-5 (mat height width +8u+))) 
+        ;Create windows and move to specified locations
+	(with-named-window (window-name-1 +window-normal+)
+	  (with-named-window (window-name-2 +window-normal+)
+	    (with-named-window (window-name-3 +window-normal+)
+	      (move-window window-name-1 310 175)
+	      (move-window window-name-2 760 175)
+	      (move-window window-name-3 1210 175)
+	      ;Print MAT-1
+	      (format t "MAT-1:~%~%")
+	      (print-mat mat-1 :int)
+	      (format t "~%~%")
+	      ;Print MAT-2
+	      (format t "MAT-2:~%~%")
+	      (print-mat mat-2 :int)
+	      (format t "~%~%")
+	      ;Find per element maximum of 
+	      ;MAT-1 and MAT-2, set to DEST
+	      (*max mat-1 mat-2 dest)
+	      ;Print DEST
+	      (format t "Per element maximum of MAT-1 and  MAT-2:~%~%")
+	      (print-mat dest :int)
+	      (format t "~%~%")
+	      ;Allocate :int pointer for trackbar to change
+	      (with-object ((val (alloc :int 67)))
+	        ;Create trackbar on middle window which changes 
+	        ;the scalar value ASSGN-VAL uses in loop
+		(create-trackbar "Value of mat-3" window-name-2 val 255)
+		(loop
+		   ;Set camera feed to FRAME
+		   (with-mat ((frame (mat)))
+		     (cap-read cap frame)
+		     ;Convert FRAME to 1 channel 
+		     ;grayscale image, set to mat-1
+		     ;FRAME stays the same
+		     (cvt-color frame mat-3 +bgr2gray+)
+		     ;Convert FRAME to 1 channel 
+		     ;grayscale image, set to MAT-4
+		     ;FRAME stays the same
+		     (cvt-color frame mat-4  +bgr2gray+)
+		     ;Apply a fixed-level threshold to 
+		     ;each array element of MAT-3
+		     (threshold mat-3 mat-3 128d0 255d0 +thresh-binary-inv+)
+		     ;Assign each element of MAT-5 a scalar value
+		     (assgn-val mat-5 (scalar (mem-aref val :int)))
+		     ;Find the maximum of each element 
+		     ;of MAT-4 and MAT-5, set to MAT-4
+		     (*max mat-4 mat-5 mat-4)
+		     ;Show MAT-3, MAT-5 and MAT-4 in windows
+		     (imshow window-name-1 mat-3)
+		     (imshow window-name-2 mat-5)
+		     (imshow window-name-3 mat-4)
+		     (let ((c (wait-key 33)))
+		       (when (= c 27)
+			 (return)))))))))))))
 
 
 
@@ -2210,15 +2589,15 @@ See also:
 
   (with-capture (cap (video-capture camera-index))   
        ;Create two matrices: MAT-1 and MAT-2(used to show how *MIN works)
-    (let* ((mat-1 (mat-data 3 3 +32s+ (alloc :int '(1 2 3 4 5 6 7 8 9))))
-	   (mat-2 (mat-data 3 3 +32s+ (alloc :int '(9 8 7 6 5 4 3 2 1))))
+    (let* ((mat-1 (mat 3 3 +32s+ (alloc :int '(1 2 3 4 5 6 7 8 9))))
+	   (mat-2 (mat 3 3 +32s+ (alloc :int '(9 8 7 6 5 4 3 2 1))))
            ;Create destination matrix of same size and type: DEST
-           (dest (mat-typed 3 3 +32s+))
+           (dest (mat 3 3 +32s+))
            ;Create 3 matrices used to hold 
            ;data we use later in the example
-           (mat-3 (mat-typed height width +8u+))
-           (mat-4 (mat-typed height width +8u+))
-           (mat-5 (mat-typed height width +8u+))
+           (mat-3 (mat height width +8u+))
+           (mat-4 (mat height width +8u+))
+           (mat-5 (mat height width +8u+))
            ;Allocate :int pointer for trackbar to change
            (val (alloc :int '(128)))
 	   (window-name-1 "MAT-3 after THRESHOLD - *MIN-Example")
@@ -2345,7 +2724,7 @@ See also:
    nteresting effect."
 
   (with-capture (cap (video-capture camera-index))
-    (let ((scalar (mat-value 1 1 +64f+ (scalar 128 128 128)))
+    (let ((scalar (mat 1 1 +64f+ (scalar 128 128 128)))
 	  (window-name "ABSDIFF Example"))
       (if (not (cap-is-open cap)) 
 	  (return-from absdiff-example 
@@ -2362,6 +2741,86 @@ See also:
 	(absdiff frame scalar frame)
 	(imshow window-name frame))
       (destroy-window window-name))))
+
+
+
+ADD-WEIGHTED
+
+Calculates the weighted sum of two arrays.
+
+C++: void addWeighted(InputArray src1, double alpha, InputArray src2, double beta, double gamma, OutputArray dst, int dtype=-1)
+
+LISP-CV: (ADD-WEIGHTED (SRC1 MAT) (ALPHA :DOUBLE) (SRC2 MAT) (BETA :DOUBLE) (GAMMA :DOUBLE) (DEST MAT) &OPTIONAL ((DTYPE :INT) -1)) 
+          => :VOID
+
+    Parameters:	
+
+        SRC1 - First input array.
+
+        ALPHA - Weight of the first array elements.
+
+        SRC2 - Second input array of the same size and channel number as SRC1.
+
+        BETA - Weight of the second array elements.
+
+        DEST - Output array that has the same size and number of channels as the input arrays.
+
+        GAMMA- Scalar added to each sum.
+
+        DTYPE - Optional depth of the output array; when both input arrays have the same depth, DTYPE 
+                can be set to -1, which will be equivalent to (DEPTH SRC1).
+
+
+The function ADD-WEIGHTED calculates the weighted sum of two arrays as follows:
+
+
+See OpenCV documentation for a description and formula:
+
+http://docs.opencv.org/modules/core/doc/operations_on_arrays.html?highlight=addwe#addweighted
+
+
+See also:
+
+(ADD), (SUBTRACT), (SCALE-ADD), (CONVERT-TO), Matrix Expressions(MAT-EXPR)
+
+
+
+(defun add-weighted-example (filename1 filename2)
+
+  "Try using the <lisp-cv-source-directory>/ubuntu-logo.jpg 
+   and the <lisp-cv-source-directory>/blue.jpg to get a nic-
+   e effect on this example."
+
+  (let ((window-name "Linear Blend - ADD-WEIGHTED Example"))
+    (with-named-window (window-name +window-normal+)
+      (set-window-property window-name +wnd-prop-fullscreen+ 
+			   +window-fullscreen+)
+      (set-window-property window-name +wnd-prop-aspectratio+ 
+			   +window-freeratio+)
+      (with-object ((alpha (alloc :int 62))
+		    (beta (alloc :int 175))
+		    (gamma (alloc :int 0)))
+	(create-trackbar "Alpha" window-name alpha 150)
+	(create-trackbar "Beta" window-name beta 1500)
+	(create-trackbar "Gamma" window-name gamma 215)
+	(with-mat ((src1 (imread filename1))
+		   (src2 (imread filename2))
+		   (dest (mat)))
+	  (if (empty src1) 
+	      (return-from add-weighted-example 
+		(format t "~%Error loading SRC1~%~%")))
+	  (if (empty src2) 
+	      (return-from add-weighted-example 
+		(format t "~%Error loading SRC2~%~%")))
+	  (loop
+	     (add-weighted src1 (coerce (/ (? alpha :int) 100) 'double-float) 
+                           src2 (coerce (/  (? beta :int) 100) 'double-float) 
+			   (coerce (? gamma :int) 'double-float) dest)
+	     (imshow window-name dest)
+	     (let ((c (wait-key 33)))
+	       (when (= c 27)
+		 (return)))))))))
+
 
 
 BITWISE-AND
@@ -2402,7 +2861,7 @@ independently.
 
   (let* ((image-1 (imread filename-1 1))
 	 (image-2 (imread filename-2 1))
-	 (dest (mat-typed (rows image-1) (cols image-1) +8uc3+))
+	 (dest (mat (rows image-1) (cols image-1) +8uc3+))
 	 (window-name-1 "IMAGE-1 - BITWISE-AND Example")
 	 (window-name-2 "IMAGE-2 - BITWISE-AND Example")
 	 (window-name-3 "DEST - BITWISE-AND Example"))
@@ -2458,8 +2917,8 @@ In case of multi-channel arrays, each channel is processed independently.
 
   (let* ((image-1 (imread filename-1 1))
 	 (image-2 (imread filename-2 1))
-	 (dest-1 (mat-typed (rows image-1) (cols image-1) +8uc3+))
-         (dest-2 (mat-typed (rows image-2) (cols image-2) +8uc3+))
+	 (dest-1 (mat (rows image-1) (cols image-1) +8uc3+))
+         (dest-2 (mat (rows image-2) (cols image-2) +8uc3+))
 	 (window-name-1 "IMAGE-1 - BITWISE-NOT Example")
 	 (window-name-2 "IMAGE-2 - BITWISE-NOT Example")
 	 (window-name-3 "DEST-1 - BITWISE-NOT Example")
@@ -2495,7 +2954,7 @@ C++: void bitwise_or(InputArray src1, InputArray src2, OutputArray dst, InputArr
 
 LISP-CV: (BITWISE-OR (SRC1 MAT) (SRC2 MAT) (DEST MAT) &OPTIONAL ((MASK MAT) (MAT))) => :VOID
 
-
+when
     Parameters:	
 
         SRC1 - First input array.
@@ -2525,7 +2984,7 @@ independently.
 
   (let* ((image-1 (imread filename-1 1))
 	 (image-2 (imread filename-2 1))
-	 (dest (mat-typed (rows image-1) (cols image-1) +8uc3+))
+	 (dest (mat (rows image-1) (cols image-1) +8uc3+))
 	 (window-name-1 "IMAGE-1 - BITWISE-OR Example")
 	 (window-name-2 "IMAGE-2 - BITWISE-OR Example")
 	 (window-name-3 "DEST - BITWISE-OR Example"))
@@ -2584,7 +3043,7 @@ arrays, each channel is processed independently.
 
   (let* ((image-1 (imread filename-1 1))
 	 (image-2 (imread filename-2 1))
-	 (dest (mat-typed (rows image-1) (cols image-1) +8uc3+))
+	 (dest (mat (rows image-1) (cols image-1) +8uc3+))
 	 (window-name-1 "IMAGE-1 - BITWISE-XOR Example")
 	 (window-name-2 "IMAGE-2 - BITWISE-XOR Example")
 	 (window-name-3 "DEST - BITWISE-XOR Example"))
@@ -2705,9 +3164,9 @@ See also:
   (let* ((data-1 (alloc :float '(1f0 2f0 3f0 4f0 5f0 6f0 5f0 7f0 9f0)))
 	 (data-2 (alloc :float '(4f0 5f0 6f0 6f0 5f0 4f0 4f0 6f0 5f0)))
 	;Create matrix with zero determinant.
-         (zero-det-mat (mat-data 3 3 +32f+ data-1))
+         (zero-det-mat (mat 3 3 +32f+ data-1))
 	;Create matrix with non-zero determinant.
-         (mat (mat-data 3 3 +32f+ data-2))      
+         (mat (mat 3 3 +32f+ data-2))      
 	 (zero-det-mat-inv 0)
          (mat-inv 0))
 	;Print MAT.
@@ -2807,7 +3266,7 @@ See also:
   (with-scalar ((scalar (scalar 5)))
     (with-mat ((m1 (mat-ones 3 3 +32f+))
 	       (m2 (assgn-val (mat-ones 3 3 +32f+) scalar)))
-      (with-mat ((result (mat-typed 3 3 +32f+)))
+      (with-mat ((result (mat 3 3 +32f+)))
 	(divide m1 m2 result)
 	(format t "~%M1 = ~%~%")
 	(print-mat m1 :float)
@@ -2819,7 +3278,7 @@ See also:
     (with-mat ((m1 (assgn-val 
 		    (mat-ones 3 3 +32f+) 
 		    scalar))
-	       (result (mat-typed 3 3 +32f+)))
+	       (result (mat 3 3 +32f+)))
       (divide 7d0 m1 result)
       (format t "~%M1 = ~%~%")
       (print-mat m1 :float)
@@ -2884,7 +3343,7 @@ See also:
 	   ;;Allocate matrix data
 	   (data (alloc :uchar '(1 2 3 4 5 6 7 8 9)))
 	   ;;Create a data matrix, MAT
-	   (mat (mat-data 3 3 +8u+ data))
+	   (mat (mat 3 3 +8u+ data))
            ;;Create array of MAT clones
            (mat-clone-arr (make-array 3 :initial-contents 
 				      (list 
@@ -2986,10 +3445,10 @@ See also:
   (with-capture (cap (video-capture camera-index))
     ;;Allocate matrix data and create a square matrix
     (let* ((data (alloc :float '(4f0 -7f0 2f0 -3f0)))
-	   (mat (mat-data 2 2 +32f+ data))
+	   (mat (mat 2 2 +32f+ data))
            ;;Create a destination matrix 
            ;;the same size/type as MAT
-	   (dest-1 (mat-typed 2 2 +32f+))
+	   (dest-1 (mat 2 2 +32f+))
 	   (invert-return 0)
 	   (identity-mat 0)
            ;;Create an array of window names
@@ -3259,14 +3718,14 @@ See also:
 	 (uchar-data (alloc :uchar '(1 2 3 4 5 6 7 8 9)))
 	 ;;Create 2 identical src matrices and 
 	 ;;1 dest matrix for each data type
-	 (int-mat-1 (mat-data 3 3 +32s+ int-data))
-         (int-mat-2 (mat-data 3 3 +32s+ int-data))
+	 (int-mat-1 (mat 3 3 +32s+ int-data))
+         (int-mat-2 (mat 3 3 +32s+ int-data))
          (dest1 (mat))
-	 (double-mat-1 (mat-data 3 3 +64f+ double-data))
-         (double-mat-2 (mat-data 3 3 +64f+ double-data))
+	 (double-mat-1 (mat 3 3 +64f+ double-data))
+         (double-mat-2 (mat 3 3 +64f+ double-data))
          (dest2 (mat))
-	 (uchar-mat-1 (mat-data 3 3 +8u+ uchar-data))
-         (uchar-mat-2 (mat-data 3 3 +8u+ uchar-data))
+	 (uchar-mat-1 (mat 3 3 +8u+ uchar-data))
+         (uchar-mat-2 (mat 3 3 +8u+ uchar-data))
          (dest3 (mat)))
     ;;Multiply int matrix by identical matrix using 
     ;;a default dtype(destination type) parameter
@@ -3411,7 +3870,7 @@ See also:
 (defun randu-example ()
   (let* ((data (alloc :float '(1.0f0 2.0f0 3.0f0 4.0f0 5.0f0 
 			       6.0f0 7.0f0 8.0f0 9.0f0)))
-	 (m (mat-data 3 3 +32f+ data)))
+	 (m (mat 3 3 +32f+ data)))
     (format t "Print matrix M:~%~%")
     (dotimes (i (rows m))
       (dotimes (j (cols m))
@@ -3518,7 +3977,7 @@ See also:
 
   (let* ((image-1 (imread filename-1 1))
 	 (image-2 (imread filename-2 1))
-	 (dest (mat-typed (rows image-1) (cols image-1) +8uc3+))
+	 (dest (mat (rows image-1) (cols image-1) +8uc3+))
 	 (alpha-val (alloc :int '(0))) 
 	 (window-name-1 "IMAGE-1 - SCALE-ADD Example")
 	 (window-name-2 "IMAGE-2 - SCALE-ADD Example")
@@ -3590,8 +4049,8 @@ See also:
 
   (with-capture (cap (video-capture camera-index))
     (let* ((window-name "Frame Subtract - SUBTRACT Example")
-	   (last-frame (mat-typed height width +8uc3+))
-	   (dest (mat-typed height width +8uc3+)))
+	   (last-frame (mat height width +8uc3+))
+	   (dest (mat height width +8uc3+)))
       (cap-set cap +cap-prop-frame-width+ width)
       (cap-set cap +cap-prop-frame-height+ height)
       (named-window window-name)
@@ -3630,7 +4089,7 @@ See also:
 
 (defun sum-example ()
         ;Create matrix
-  (let* ((mat (mat-typed 4 4 +8u+))
+  (let* ((mat (mat 4 4 +8u+))
          ;Initialize random number generator
          (rng (rng #xFFFFFFFF)))
     (format t "~%")
@@ -3678,7 +4137,7 @@ LISP-CV: (UNIFORM (RNG (:POINTER RNG)) (A :INT) (B :INT)) => :INT
 
     Parameters:	
 
-        RNG - An RNG construct
+        RNG - An RNG object
 
         A - lower inclusive boundary of the returned random numbers.
 
@@ -3745,7 +4204,7 @@ That is, the following code renders some text, the tight box surrounding it, and
 	 (font-face +font-hershey-script-simplex+)
 	 (font-scale 2d0)
 	 (thickness 3)
-	 (img (mat-value 600 800 +8uc3+ (scalar-all 0)))
+	 (img (mat 600 800 +8uc3+ (scalar-all 0)))
 	 (base-line (alloc :int 0))
 	 (text-size 0)
 	 (text-org 0))
@@ -4494,8 +4953,8 @@ See also:
 
   (let* ((data (alloc :float '(53.0f0 62.0f0 85.0f0 64.0f0 23.0f0 
 			       97.0f0 52.0f0 16.0f0 12.0f0)))
-	 (m (mat-data 3 3 +32f+ data))
-         (dest (mat-typed 3 3 +32f+)))
+	 (m (mat 3 3 +32f+ data))
+         (dest (mat 3 3 +32f+)))
     (format t "M = ~%~%")
     (dotimes (i (rows m))
       (dotimes (j (cols m))
@@ -4515,6 +4974,196 @@ See also:
 
 
 IMGPROC - IMAGE FILTERING:
+
+
+
+
+BILATERAL-FILTER
+
+Applies the bilateral filter to an image.
+
+C++: void bilateralFilter(InputArray src, OutputArray dst, int d, double sigmaColor, double sigmaSpace, int borderType=BORDER_DEFAULT )
+
+LISP-CV (BILATERAL-FILTER (SRC MAT) (DEST MAT) (D :INT) (SIGMA-COLOR :DOUBLE) (SIGMA-SPACE :DOUBLE) &OPTIONAL
+        ((BORDER-TYPE :INT) +BORDER-DEFAULT+)) => :VOID
+
+    Parameters:	
+
+        SRC - Source 8-bit or floating-point, 1-channel or 3-channel image.
+
+        DST - Destination image of the same size and type as SRC.
+
+        D - Diameter of each pixel neighborhood that is used during filtering. If it is non-positive, 
+            it is computed from sigma-Space.
+
+        SIGMA-COLOR - Filter sigma in the color space. A larger value of the parameter means that 
+                      farther colors within the pixel neighborhood (see SIGMA-SPACE) will be mixed 
+                      together, resulting in larger areas of semi-equal color.
+
+        SIGMA-SPACE - Filter sigma in the coordinate space. A larger value of the parameter means that 
+                      farther pixels will influence each other as long as their colors are close enough 
+                      (see SIGMA-COLOR). When (> d 0) , it specifies the neighborhood size regardless of 
+                      SIGMA-SPACE . Otherwise, D is proportional to SIGMA-SPACE .
+
+The function applies bilateral filtering to the input image, as described in:
+
+http://www.dai.ed.ac.uk/CVonline/LOCAL_COPIES/MANDUCHI1/Bilateral_Filtering.html 
+
+BILATERAL-FILTER can reduce unwanted noise very well while keeping edges fairly sharp. However, it is 
+very slow compared to most filters.
+
+Sigma values: For simplicity, you can set the 2 sigma values to be the same. If they are small (< 10), 
+the filter will not have much effect, whereas if they are large (> 150), they will have a very strong 
+effect, making the image look “cartoonish”.
+
+Filter size: Large filters (> D 5) are very slow, so it is recommended to use (= D 5) for real-time 
+applications, and perhaps (= D 9) for offline applications that need heavy noise filtering.
+
+This filter does not work inplace.
+
+Example:
+
+See BLUR-EXAMPLE in this file.
+
+
+
+BLUR
+
+Blurs an image using the normalized box filter.
+
+
+C++: void blur(InputArray src, OutputArray dst, Size ksize, Point anchor=Point(-1,-1), int borderType=BORDER_DEFAULT )
+
+LISP-CV: (BLUR (SRC MAT) (DEST MAT) (KSIZE SIZE) &OPTIONAL ((ANCHOR POINT) (POINT -1 -1)) ((BORDER-TYPE :INT) +BORDER-DEFAULT+)) => :VOID
+
+
+    Parameters:	
+
+        SRC - Input image; it can have any number of channels, which are processed independently, but 
+              the depth should be +8U+, +16U+, +16S+, +32F+ or +64F+.
+
+        DST - Output image of the same size and type as SRC.
+
+        KSIZE - Blurring kernel size.
+
+        ANCHOR - Anchor point; default value (POINT -1,-1) means that the anchor is at the kernel center.
+
+        BORDER-TYPE - Border mode used to extrapolate pixels outside of the image.
+
+
+The function smoothes an image using the kernel:
+
+See OpenCV documentation for the formula:
+
+http://docs.opencv.org/trunk/modules/imgproc/doc/filtering.html?highlight=blur#blur
+
+
+See also:
+
+(BOX-FILTER), (BILATERAL-FILTER), (GAUSSIAN-BLUR), (MEDIAN-BLUR)
+
+
+Example:
+
+
+;;; Global Variables
+
+(defparameter delay-caption 1500)
+(defparameter delay-blur 100)
+(defparameter max-kernel-length 31)
+
+;;; Load the source image
+(defparameter src (gc:imread "/d1" 1))
+
+(defparameter dst (gc:mat))
+(defparameter window-name "GAUSSIAN-BLUR Example")
+
+
+(defun display-caption (caption &optional c)
+  (setf dst (gc:mat-zeros (rows src) (cols src) (mat-type src)))
+  (put-text dst caption (gc:point (round (/ (cols src) 4)) 
+			       (round (/ (rows src) 2))) 
+	    +font-hershey-complex+
+	    1d0 (gc:scalar 255 255 255))
+  (imshow window-name dst)
+  (setf c (wait-key delay-caption))
+  (if (>= c 0) (return-from display-caption -1)
+      (return-from display-caption 0)))
+
+
+(defun display-dst (delay &optional c)
+  (imshow window-name dst)
+  (setf c (wait-key delay))
+  (if (>= c 0) (return-from display-dst -1)
+      (return-from display-dst 0)))
+
+
+
+(defun blur-example ()
+
+  (with-named-window (window-name +window-autosize+)
+    (move-window window-name (cols src) 0)
+    
+    (if (not (eq 0 (display-caption "Original Image"))) 
+	(return-from blur-example 0))
+
+    (setf dst (gc:clone src))
+
+    (if (not (eq 0 (display-dst delay-caption))) 
+	(return-from blur-example 0))
+
+        ;;; Applying Homogeneous blur
+    (if (not (eq 0 (display-caption "Homogeneous Blur"))) 
+	(return-from blur-example 0))
+
+    (do ((i 1 (+ i 2)))
+	((> i max-kernel-length))
+      (blur src dst (gc:size i i) (gc:point -1 -1))
+
+      (if (not (eq 0 (display-dst delay-blur))) 
+	  (return-from blur-example 0)))
+
+        ;;; Applying Gaussian blur
+    (if (not (eq 0 (display-caption "Gaussian Blur"))) 
+	(return-from blur-example 0))
+
+    (do ((i 1 (+ i 2)))
+	((> i max-kernel-length))
+      (gaussian-blur src dst (gc:size i i) 0d0 0d0)
+
+      (if (not (eq 0 (display-dst delay-blur))) 
+	  (return-from blur-example 0)))
+
+        ;;; Applying Median blur
+    (if (not (eq 0 (display-caption "Median Blur"))) 
+	(return-from blur-example 0))
+
+    (do ((i 1 (+ i 2)))
+	((> i max-kernel-length))
+      (median-blur src dst i)
+
+      (if (not (eq 0 (display-dst delay-blur))) 
+	  (return-from blur-example 0)))
+
+        ;;; Applying Bilateral Filter
+    (if (not (eq 0 (display-caption "Bilateral Blur"))) 
+	(return-from blur-example 0))
+
+    (do ((i 1 (+ i 2)))
+	((> i max-kernel-length))
+      (bilateral-filter src dst i (coerce (* i 2) 'double-float) 
+			(coerce (round (/ i 2)) 'double-float))
+
+      (if (not (eq 0 (display-dst delay-blur))) 
+	  (return-from blur-example 0)))
+
+       ;;; Wait until user press a key
+    (display-caption "End: Press a key!")
+    (loop
+       (let ((c (wait-key 27)))
+	 (when (>= c 0)
+	   (return))))))
+
 
 
 COPY-MAKE-BORDER
@@ -4586,7 +5235,7 @@ See also:
 	(loop
 	  ;Create a matrix big enough to accommodate 
 	  ;a 100 pixel border on all sides
-	   (with-mat ((rgb (mat-typed border-height border-width +8uc3+))
+	   (with-mat ((rgb (mat border-height border-width +8uc3+))
 		      (frame (mat)))
 	     (cap-read cap frame)
 	     ;Make a border around FRAME
@@ -4917,6 +5566,146 @@ See also:
 
 
 
+GAUSSIAN-BLUR
+
+Blurs an image using a Gaussian filter.
+
+C++: void GaussianBlur(InputArray src, OutputArray dst, Size ksize, double sigmaX, double sigmaY=0,
+     int borderType=BORDER_DEFAULT )                   
+
+Commom Lisp: (GAUSSIAN-BLUR (SRC MAT) (DEST MAT) (KSIZE SIZE) (SIGMA-X :DOUBLE) &OPTIONAL ((SIGMA-Y :DOUBLE) 0) 
+             ((BORDER-TYPE :INT) +BORDER-DEFAULT+))
+
+    Parameters:	
+
+        SRC - input image; the image can have any number of channels, which are processed independently, 
+              but the depth should be +8U+, +16U+, +16S+, +32F+ or +64F+.
+
+        DST - output image of the same size and type as SRC.
+
+        KSIZE - Gaussian kernel size KSIZE width and KSIZE height can differ but they both must be 
+                positive and odd. Or, they can be zero’s and then they are computed from sigma.
+
+        SIGMAX - Gaussian kernel standard deviation in X direction.
+
+        SIGMAY - Gaussian kernel standard deviation in Y direction; if SIGMAY is zero, it is set to 
+                 be equal to SIGMAX, if both sigmas are zeros, they are computed from KSIZE width and 
+                 KSIZE height , respectively (see (GET-GAUSSIAN-KERNEL) for details); to fully control 
+                 the result regardless of possible future modifications of all this semantics, it is 
+                 recommended To specify all of KSIZE, SIGMA-X, AND SIGMA-Y.
+
+        BORDER-TYPE - Pixel extrapolation method, one of the +BORDER-*+ constants, except for 
+                      +BORDER-TRANSPARENT+ and +BORDER-ISOLATED+.
+
+
+The function convolves the source image with the specified Gaussian kernel. In-place filtering is s-
+upported.
+
+See also:
+
+(SEP-FILTER-2D), FILTER-2D), (BLUR), (BOX-FILTER), (BILATERAL-FILTER), (MEDIAN-BLUR)
+
+
+Example:
+
+See BLUR-EXAMPLE in this file.
+
+
+
+GET-STRUCTURING-ELEMENT
+
+Returns a structuring element of the specified size and shape for morphological operations.
+
+C++: Mat getStructuringElement(int shape, Size ksize, Point anchor=Point(-1,-1))
+
+LISP-CV: (GET-STRUCTURING-ELEMENT (SHAPE :INT) (KSIZE SIZE) &OPTIONAL ((KERNEL POINT) (POINT -1 -1))) => MAT
+
+    Parameters:	
+
+        SHAPE - Element shape that could be one of the following:
+
+            +MORPH-RECT+ - A rectangular structuring element:
+
+            +MORPH-ELLIPSE+ - An elliptic structuring element, that is, a filled ellipse inscribed 
+                              into the rectangle.
+
+            +MORPH-CROSS+ - A cross-shaped structuring element:
+
+
+        KSIZE - Size of the structuring element.
+
+
+        ANCHOR - Anchor position within the element. The default value (-1 -1) means that the anchor 
+                 is at the center. Note that only the shape of a cross-shaped element depends on the 
+                 anchor position. In other cases the anchor just regulates how much the result of the 
+                 morphological operation is shifted.
+
+The function constructs and returns the structuring element that can be further passed to (CREATE-MORPHOLOGY-FILTER), 
+(ERODE), (DILATE) or (MORPHOLOGY-EX) . But you can also construct an arbitrary binary mask yourself 
+and use it as the structuring element.
+
+
+
+;;; Global variables
+
+(defparameter window-name "GET-STRUCTURING-ELEMENT Example")
+;;; Load an image - The <lisp-cv-source-dir>/images/baboon.jpg works great with this example
+(defparameter src (gc:imread "~/quicklisp/dists/quicklisp/software/lisp-cv-master/images/baboon.jpg"))
+(defparameter dest (gc:clone src))
+(defparameter morph-elem (alloc :int 0))
+(defparameter morph-size (alloc :int 0))
+(defparameter morph-operator (alloc :int 0))
+
+
+;;; Callback function MORPHOLOGY-OPERATIONS
+(defcallback morphology-operations :void ((operation :int) (element mat))
+
+  (setf operation (+ (? morph-operator :int) 2))
+  ;;; ELEMENT is the kernel to be used. We use the function 
+  ;;; GET-STRUCTURING-ELEMENT to define our own structure.
+  (setf element 
+	(gc:get-structuring-element (? morph-elem :int) 
+				    (size 
+				     (+ (* (? morph-size :int) 2) 1) 
+				     (+ (* (? morph-size :int) 2) 1)) 
+				    (point 
+				     (? morph-size :int) 
+				     (? morph-size :int)))) 
+  ;;; Apply the specified morphology operation
+  (morphology-ex src dest operation element)
+  (imshow window-name dest))
+
+
+(defun get-structuring-element-example ()
+
+  (let ((window-name "GET-STRUCTURING-ELEMENT Example")
+        (max-operator 4)
+        (max-elem 2)
+        (max-kernel-size 21))
+    ;;; Create window
+    (with-named-window (window-name +window-autosize+)
+      (move-window window-name 759 175)
+      ;;; Create Trackbar to select Morphology operation
+      (create-trackbar "Operator: -> 0: Opening - 1: Closing - 2: Gradient - 3: Top Hat - 4: Black Hat" 
+		       window-name morph-operator max-operator (callback morphology-operations))
+       ;;; Create Trackbar to select kernel type
+      (create-trackbar "Element: -> 0: Rect - 1: Cross - 2: Ellipse" 
+		       window-name morph-elem max-elem (callback morphology-operations))
+      ;;; Create Trackbar to choose kernel size
+      (create-trackbar "Kernel size:\n 2n +1" 
+		       window-name morph-size max-kernel-size (callback morphology-operations))
+      (loop
+         ;;; Default start
+	 (imshow window-name dest)
+	 (let ((c (wait-key 33)))
+	   (when (= c 27)
+	     (free morph-elem)
+	     (free morph-size)
+	     (free morph-operator)
+	     (return)))))))
+
+
+
 LAPLACIAN
 
 Calculates the Laplacian of an image.
@@ -4975,9 +5764,9 @@ See also:
 	(loop
 	   (with-mat ((frame (mat)))
 	     (cap-read cap frame)
-	     (with-mat ((cvt (mat-typed (rows frame) (cols frame) +8u+))
-			(src (mat-typed (rows frame) (cols frame) +8u+))
-			(tmp (mat-typed (rows frame) (cols frame) +8u+)))
+	     (with-mat ((cvt (mat (rows frame) (cols frame) +8u+))
+			(src (mat (rows frame) (cols frame) +8u+))
+			(tmp (mat (rows frame) (cols frame) +8u+)))
 	       (cvt-color frame cvt +bgr2gray+)
 	       (imshow window-name (progn
 				     (laplacian cvt tmp +64f+ 3)
@@ -4985,6 +5774,41 @@ See also:
 	   (let ((c (wait-key 33)))
 	     (when (= c 27)
 	       (return))))))))
+
+
+
+MEDIAN-BLUR
+
+
+Blurs an image using the median filter.
+
+
+C++: void medianBlur(InputArray src, OutputArray dst, int ksize)
+
+LISP-CV: (MEDIAN-BLUR (SRC MAT) (DEST MAT) (KSIZE :INT)) => :VOID
+
+
+    Parameters:	
+
+        SRC - Input 1, 3, or 4 channel image; when KSIZE is 3 or 5, the image depth should be +8U+, 
+              +16U+, or +32F+, for larger aperture sizes, it can only be +8U+.
+
+        DEST - Destination array of the same size and type as SRC.
+
+        KSIZE - Aperture linear size; it must be odd and greater than 1, for example: 3, 5, 7 ...
+
+
+The function smoothes an image using the median filter with the (* KSIZE KSIZE) aperture. Each channel 
+of a multi-channel image is processed independently. In-place operation is supported.
+
+See also:
+
+(BILATERAL-FILTER), (BLUR), (BOX-FILTER), (GAUSSIAN-BLUR)
+
+
+Example:
+
+See BLUR-EXAMPLE in this file.
 
 
 
@@ -5126,7 +5950,7 @@ the source image with the kernel, then, it downsamples the image by rejecting ev
     (let* ((in-size (size in)) 
            (in-height (round (height in-size)))
 	   (in-width (round (width in-size)))
-	   (out (mat-typed (/ in-height 2) (/ in-width 2) +8uc3+)))
+	   (out (mat (/ in-height 2) (/ in-width 2) +8uc3+)))
       ;;Make sure input image is divisible by two."
       (assert (and (equal (mod in-height 2) 0)
 		   (equal (mod in-width 2) 0))
@@ -5196,7 +6020,7 @@ zero rows and columns and then convolves the result with the same kernel as in (
     (let* ((in-size (size in)) 
 	   (in-width (round (width in-size)))
 	   (in-height (round (height in-size)))
-	   (out (mat-typed (/ in-width 2) (/ in-height 2) +8uc3+)))
+	   (out (mat (/ in-width 2) (/ in-height 2) +8uc3+)))
       ;;Make sure input image is divisible by two."
       (assert (and (equal (mod in-width 2) 0)
 		   (equal (mod in-height 2) 0))
@@ -5481,9 +6305,9 @@ Example 2:
 	(loop
 	   (with-mat ((frame (mat)))
 	     (cap-read cap frame)
-	     (with-mat ((cvt (mat-typed (rows frame) (cols frame) +8u+))
-			(src (mat-typed (rows frame) (cols frame) +8u+))
-			(tmp (mat-typed (rows frame) (cols frame) +8u+)))
+	     (with-mat ((cvt (mat (rows frame) (cols frame) +8u+))
+			(src (mat (rows frame) (cols frame) +8u+))
+			(tmp (mat (rows frame) (cols frame) +8u+)))
 	       (cvt-color frame cvt +bgr2gray+)
 	       (imshow window-name (progn
 				     (sobel cvt tmp +32f+ 0 1 -1)
@@ -5495,6 +6319,135 @@ Example 2:
 
 
 IMGPROC - GEOMETRIC IMAGE TRANSFORMATIONS:
+
+
+
+REMAP
+
+Applies a generic geometrical transformation to an image.
+
+C++: void remap(InputArray src, OutputArray dst, InputArray map1, InputArray map2, int interpolation, int borderMode=BORDER_CONSTANT, const Scalar& borderValue=Scalar())
+
+LISP-CV: (REMAP (SRC MAT) (DEST MAT) (MAP1 MAT) (MAP2 MAT) (INTERPOLATION :INT) &OPTIONAL ((BORDER-MODE :INT) +BORDER-CONSTANT+) 
+         ((BORDER-VALUE SCALAR) (SCALAR))) => :VOID
+
+    Parameters:	
+
+        SRC - Source image.
+
+        DST - Destination image. It has the same size as MAP1 and the same type as SRC.
+
+        MAP1 - The first map of either (x,y) points or just x values having the type +16SC2+, +32FC1+, 
+               or +32FC2+ . See (CONVERT-MAPS) for details on converting a floating point representation 
+               to fixed-point for speed.
+
+        MAP2 - The second map of y values having the type +16UC1+ , +32FC1+ , or none (empty map if 
+               MAP1 is (x,y) points), respectively.
+
+        INTERPOLATION - Interpolation method (see (RESIZE)). The method +INTER-AREA+ is not supported by this function.
+
+        BORDER-MODE - Pixel extrapolation method (see (BORDER-INTERPOLATE)). 
+
+           When (EQ BORDER-MODE +BORDER-TRANSPARENT+) , it means that the pixels in the destination 
+           image that corresponds to the “outliers” in the source image are not modified by the 
+           function.
+
+        BORDER-VALUE - Value used in case of a constant border. By default, it is 0.
+
+
+The function remap transforms the source image using the specified map:
+
+see OpenCV documentation:
+
+http://docs.opencv.org/trunk/modules/imgproc/doc/geometric_transformations.html?highlight=remap#remap
+
+for description and formula:
+
+This function cannot operate in-place.
+
+
+Example:
+
+
+;Global variables
+
+(defparameter remap-window "REMAP Example")
+(defparameter ind 0)
+
+;Load the image
+(defparameter src (imread "/home/w/Pictures/smiley face.jpeg" 1))
+
+;Create DST, MAP-X and MAP-Y with the same size as SRC
+(defparameter dst (gc:mat (rows src) (cols src) (mat-type src)))
+
+(defparameter map-x (gc:mat (rows src) (cols src) +32f+))
+(defparameter map-y (gc:mat (rows src) (cols src) +32f+))
+
+
+;Fill the MAP-X and MAP-Y matrices 
+;with 4 types of mappings
+(defun update-map () 
+  
+  (setf ind (mod ind 4))
+
+  (dotimes (j (rows src))
+    (dotimes (i (cols src))
+
+      (cond ((= 0 ind)
+
+             (if (and (> i (* (cols src) 0.25)) 
+                      (< i (* (cols src) 0.75)) 
+		      (> j (* (rows src) 0.25)) 
+                      (< j (* (rows src) 0.75)))
+		 
+                 (progn (setf (at map-x j i :float) 
+			      (+ (* 2 (- i (* (cols src) 0.25))) 0.5)) 
+			(setf (at map-y j i :float) 
+			      (+ (* 2 (- j (* (rows src) 0.25))) 0.5))) 
+		 
+		 (progn (setf (at map-x j i :float) 0f0)
+			(setf (at map-y j i :float) 0f0))))
+	    
+	    ((= 1 ind)
+
+	     (progn (setf (at map-x j i :float) 
+			  (coerce i 'float))
+		    (setf (at map-y j i :float) 
+			  (-  (coerce (rows src) 'float)  j))))
+
+	    ((= 2 ind)
+
+	     (progn (setf (at map-x j i :float) 
+			  (- (coerce (cols src) 'float) i))
+		    (setf (at map-y j i :float) 
+			  (coerce j 'float))))
+
+	    ((= 3 ind) 
+
+	     (progn (setf (at map-x j i :float) 
+			  (- (coerce (cols src) 'float) i))
+		    (setf (at map-y j i :float) 
+			  (- (coerce (rows src) 'float) j)))))))
+  (incf ind))
+
+
+(defun remap-example ()
+
+  (with-named-window (remap-window +window-normal+)
+    (move-window remap-window (cols src) 175)
+
+    (loop
+       ;Update MAP-X and MAP-Y. Then apply REMAP
+       (update-map)
+       (remap src dst map-x map-y +inter-linear+ 
+	      +border-constant+ (gc:scalar 0 0 0))
+       ;Display results
+       (imshow remap-window dst)
+       ;Each 1 sec. Press ESC to exit the program
+       (let ((c (wait-key 1000)))
+	 (when (= c 27)
+	   (return))))))
+
 
 
 RESIZE
@@ -5569,7 +6522,6 @@ See also:
 (WARP-AFFINE), (WARP-PERSPECTIVE), (REMAP)
 
 
-
 (defun resize-example (&optional (camera-index *camera-index*) 
 			 (width 640)
 			 (height 480))
@@ -5581,7 +6533,7 @@ See also:
   (with-capture (cap (video-capture camera-index))
     (let* ((window-name-1 "Original FRAME - RESIZE Example")
 	   (window-name-2 "RESIZED - RESIZE Example")
-	   (resized (mat-typed (round (* height 1.5)) (round (* width 1.35)) +8uc3+)))
+	   (resized (mat (round (* height 1.5)) (round (* width 1.35)) +8uc3+)))
       (cap-set cap +cap-prop-frame-width+ width)
       (cap-set cap +cap-prop-frame-height+ height)
       (named-window window-name-1 +window-autosize+)
@@ -5755,9 +6707,9 @@ algorithm currently,  i.e. (EQ MASK-SIZE +DIST-MASK-PRECISE+) is not supported y
       (set-window-property window-name +wnd-prop-aspectratio+ 
 			   +window-freeratio+)
       (with-captured-camera (cap cam :width width :height height)
-	(with-mat ((src (mat-typed height width +8u+))
-		   (dst (mat-typed height width +8u+))
-		   (final (mat-typed height width +32f+)))
+	(with-mat ((src (mat height width +8u+))
+		   (dst (mat height width +8u+))
+		   (final (mat height width +32f+)))
 	  (with-object ((canny-1 (alloc :int 471))
 			(canny-2 (alloc :int 128))
 			(threshold (alloc :int +thresh-binary-inv+))
@@ -5846,12 +6798,12 @@ See also:
 	   ;Set camera feed to FRAME
 	   (with-mat ((frame (mat)))
 	     (cap-read cap frame)
-	     (with-mat ((grayscale (mat-typed height width +8u+))
-			(threshold (mat-typed height width +8u+))
-			(threshold3 (mat-typed height width +8uc3+))
+	     (with-mat ((grayscale (mat height width +8u+))
+			(threshold (mat height width +8u+))
+			(threshold3 (mat height width +8uc3+))
 			;Create a double wide window to show the camera 
 			;output and a thresholded camera output in
-			(window (mat-typed height (* width 2) +8uc3+)))
+			(window (mat height (* width 2) +8uc3+)))
 	       ;Convert FRAME to a 1 channel grayscale 
 	       ;image and assign to GRAYSCALE
 	       (cvt-color frame grayscale +bgr2gray+)
@@ -5950,7 +6902,7 @@ http://docs.opencv.org/modules/imgproc/doc/histograms.html?highlight=equalizeh#e
 		   (let ((c (wait-key 33)))
 		     (when (= c 27)
 		       (return))))))))))))
-
+imread-ex
 
 
 IMGPROC - FEATURE DETECTION:
@@ -6010,7 +6962,7 @@ See: http://en.wikipedia.org/wiki/Canny_edge_detector
 	       (with-mat ((clone (clone frame))
 		          ;Create destination matrix 
                           ;half the size of FRAME
-			  (out (mat-typed (/ (cols frame) 2) 
+			  (out (mat (/ (cols frame) 2) 
 					  (/ (rows frame) 2) +8uc3+)))
 		 (create-trackbar "LOW-THRESH" window-name low-thresh 500)                         
 		 (create-trackbar "HIGH-THRESH" window-name high-thresh 500)
@@ -6075,10 +7027,12 @@ function can take a color template and a color image. The result will still be a
 which is easier to analyze.
 
 
+Example 1:
 
-(defun match-template-example (&optional (camera-index *camera-index*) 
-				 (width *default-width*)
-				 (height *default-height*))
+
+(defun match-template-example-1 (&optional (camera-index *camera-index*) 
+				   (width *default-width*)
+				   (height *default-height*))
 
   "Here a template image extracted from a frame of the camera feed i-
    s compared to that frame to find the area most similiar to the te-
@@ -6107,26 +7061,22 @@ which is easier to analyze.
    moving the trackbar sliders in the bottom-leftmost window"
 
   (with-capture (cap (video-capture camera-index))
-     ;Create array of window names
+    ;Create array of window names
     (let* ((window-name-arr (make-array 8 :initial-contents 
-					(list "SRC - MATCH-TEMPLATE-EXAMPLE"
-					      "FRAME - MATCH-TEMPLATE-EXAMPLE"
-					      "SQDIFF - MATCH-TEMPLATE-EXAMPLE"
-					      "SQDIFF-NORMED - MATCH-TEMPLATE-EXAMPLE"
-					      "CCORR - MATCH-TEMPLATE-EXAMPLE"
-					      "CCORR-NORMED - MATCH-TEMPLATE-EXAMPLE"
-					      "COEFF - MATCH-TEMPLATE-EXAMPLE"
-					      "COEFF-NORMED - MATCH-TEMPLATE-EXAMPLE")))
+					(list "SRC - MATCH-TEMPLATE-EXAMPLE-1"
+					      "FRAME - MATCH-TEMPLATE-EXAMPLE-1"
+					      "SQDIFF - MATCH-TEMPLATE-EXAMPLE-1"
+					      "SQDIFF-NORMED - MATCH-TEMPLATE-EXAMPLE-1"
+					      "CCORR - MATCH-TEMPLATE-EXAMPLE-1"
+					      "CCORR-NORMED - MATCH-TEMPLATE-EXAMPLE-1"
+					      "COEFF - MATCH-TEMPLATE-EXAMPLE-1"
+					      "COEFF-NORMED - MATCH-TEMPLATE-EXAMPLE-1")))
+	   ;Initialize size parameters 
+	   ;for the matches
+	   (iwidth 0)
+	   (iheight 0)
 	   (arr (make-array '(6)))
-           (n 10)
-            ;Allocate int pointers for the trackbars to 
-            ;adjust which will set the template image a-
-            ;nd the guiding rectangle location and boun-
-            ;daries
-	   (rect-x (alloc :int '(0)))
-	   (rect-y (alloc :int '(0)))
-	   (rect-width (alloc :int (list (round (/ width n)))))
-	   (rect-height (alloc :int (list (round (/ height n))))))      
+           (n 10))      
       (cap-set cap +cap-prop-frame-width+ width)
       (cap-set cap +cap-prop-frame-width+ height)
       ;;Create array of windows
@@ -6141,116 +7091,243 @@ which is easier to analyze.
       (move-window (aref window-name-arr 5) 968 400)
       (move-window (aref window-name-arr 6) 1385 0)
       (move-window (aref window-name-arr 7) 1385 400)
-      (do* ((frame 0)
-            ;Set rectangle to green
-            (color (scalar 0 255 0))
-            (roi 0)
-	    (img 0)
-            (src 0)
-            ;Initialize other rectangle 
-            ;location/size parameters
-	    (point-1 0)
-	    (point-2 0) 
-            ;Initialize size parameters 
-            ;for the matches
-            (iwidth 0)
-	    (iheight 0))
-	   ((plusp (wait-key *millis-per-frame*)) 
-	    (format t "Key is pressed by user"))
-        ;Set camera feed to FRAME
-	(setf frame (mat))
-	(cap-read cap frame)
-        ;Print location and size of the 
-        ;template used to do the matchi-
-        ;ng and the rectangle
-	(format t "RECT-X: ~a~%~%" (mem-ref rect-x :int))
-	(format t "RECT-Y: ~a~%~%" (mem-ref rect-y :int))
-	(format t "RECT-WIDTH: ~a~%~%" (mem-ref rect-width :int))
-	(format t "RECT-HEIGHT: ~a~%~%" (mem-ref rect-height :int))
-         ;Create trackbars used to adjust template and rectangle position
-       	(create-trackbar "RECT-X" (aref window-name-arr 1) rect-x (cols frame))
-	(create-trackbar "RECT-Y" (aref window-name-arr 1) rect-y (rows frame))
-	(create-trackbar "RECT-WIDTH" (aref window-name-arr 1) rect-width 
-			 (cols frame))
-	(create-trackbar "RECT-HEIGHT" (aref window-name-arr 1) rect-height 
-			 (rows frame))
-        ;Instantiate logic used to move the 
-        ;template and the rectangle as one
-	(if (< (mem-ref rect-x :int) (mem-ref rect-width :int)) 
-	    (setf (mem-ref rect-x :int) 1))
-	(if (> (mem-ref rect-x :int) 
-	       (- (cols frame) (mem-ref rect-width :int))) 
-	    (setf (mem-ref rect-x :int) 
-		  (- (cols frame) (mem-ref rect-width :int))))
-	(if (< (mem-ref rect-y :int) (mem-ref rect-height :int)) 
-	    (setf (mem-ref rect-y :int) 1))
-	(if (> (mem-ref rect-y :int) 
-	       (- (rows frame) (mem-ref rect-height :int))) 
-	    (setf (mem-ref rect-y :int) 
-		  (- (rows frame) (mem-ref rect-height :int))))
-	(if (< (mem-ref rect-width :int) 1) 
-	    (setf (mem-ref rect-width :int) 1))
-        (if (< (mem-ref rect-height :int) 1) 
-	    (setf (mem-ref rect-height :int) 1))
-        ;Set template position and location parameters
-	(setf roi (rect (mem-ref rect-x :int)
-			(mem-ref rect-y :int)
-			(mem-ref rect-width :int)
-			(mem-ref rect-height :int)))
-	(setf img (mat))
-	(setf src (mat))
-        ;Create 2 clones of FRAME, IMG will be where the 
-        ;rectangle is moved to choose the template. SRC 
-        ;is MATCH-TEMPLATE IMAGE parameter. FRAME will b-
-        ;e the template image 
-        (copy-to frame img)
-	(copy-to frame src)
-        ;Create template image from FRAME 
-        ;to use in MATCH-TEMPLATE. Set to 
-        ;FRAME
-     	(setf frame (roi frame roi))
-        ;Set rectangle location parameters
-	(setf point-1 (point (mem-ref rect-x :int) 
-                             (mem-ref rect-y :int)))
-	(setf point-2 (point (+ (mem-ref rect-x :int) 
-                                (mem-ref rect-width :int)) 
-			     (+ (mem-ref rect-y :int) 
-                                (mem-ref rect-height :int)))) 
-        ;Create rectangle on IMG at same 
-        ;position as the template
-        (rectangle img point-1 point-2 color 5 4 0)
-    	(imshow (aref window-name-arr 0) img)
-	(del-mat img)
-        ;Set width and height of matrices 
-        ;we will create in next step
-	(setf iwidth (+ (- (cols src) (cols frame)) 1))
-	(setf iheight (+ (- (rows src) (rows frame)) 1))
-        ;Create array of matrices to 
-        ;hold all of the matches
-        (dotimes (i 6)
-	  (setf (aref arr i) (mat-typed iheight iwidth +32f+)))
-        ;Run all versions of MATCH-TEMPLATE 
-        ;and run NORMALIZE on each match 
+      ;Allocate int pointers for the trackbars to 
+      ;adjust which will set the template image a-
+      ;nd the guiding rectangle location and boun-
+      ;daries
+      (with-object ((rect-x (alloc :int '(0))))
+	(with-object ((rect-y (alloc :int '(0))))
+	  (with-object ((rect-width (alloc :int (list (round (/ width n))))))
+	    (with-object ((rect-height (alloc :int (list (round (/ height n))))))
+	     ;Create trackbars used to adjust template and rectangle position
+	      (create-trackbar "RECT-X" (aref window-name-arr 1) rect-x width)
+	      (create-trackbar "RECT-Y" (aref window-name-arr 1) rect-y height)
+	      (create-trackbar "RECT-WIDTH" (aref window-name-arr 1) rect-width 
+			       width)
+	      (create-trackbar "RECT-HEIGHT" (aref window-name-arr 1) rect-height 
+			       height)
+	      ;Set rectangle color
+	      (with-scalar ((color (scalar 0 255 0)))
+		(loop
+		   ;Set camera feed to FRAME
+		   (with-mat ((frame (mat)))
+		     (cap-read cap frame)
+		     ;Print location and size of the 
+		     ;template used to do the matchi-
+		     ;ng and the rectangle
+		     (format t "RECT-X: ~a~%~%" (mem-ref rect-x :int))
+		     (format t "RECT-Y: ~a~%~%" (mem-ref rect-y :int))
+		     (format t "RECT-WIDTH: ~a~%~%" (mem-ref rect-width :int))
+		     (format t "RECT-HEIGHT: ~a~%~%" (mem-ref rect-height :int))
+		     ;Instantiate logic used to move the 
+		     ;template and the rectangle as one
+		     (if (< (mem-ref rect-x :int) (round (/ (mem-ref rect-width :int) 128))) 
+			 (setf (mem-ref rect-x :int) 1))
+		     (if (> (mem-ref rect-x :int) 
+			    (- (cols frame) (mem-ref rect-width :int))) 
+			 (setf (mem-ref rect-x :int) imread-ex
+			       (- (cols frame) (mem-ref rect-width :int))))
+		     (if (< (mem-ref rect-y :int) (round (/ (mem-ref rect-height :int) 128))) 
+			 (setf (mem-ref rect-y :int) 1))
+		     (if (> (mem-ref rect-y :int) 
+			    (- (rows frame) (mem-ref rect-height :int))) 
+			 (setf (mem-ref rect-y :int) 
+			       (- (rows frame) (mem-ref rect-height :int))))
+		     (if (< (mem-ref rect-width :int) 1) 
+			 (setf (mem-ref rect-width :int) 1))
+		     (if (< (mem-ref rect-height :int) 1) 
+			 (setf (mem-ref rect-height :int) 1))
+		     (with-mat ((img (mat)))
+		       (with-mat ((src (mat)))
+		         ;Create 2 clones of FRAME, IMG will be where the 
+			 ;rectangle is moved to choose the template. SRC 
+		         ;is MATCH-TEMPLATE IMAGE parameter. FRAME will b-
+		         ;e the template image 
+			 (copy-to frame img)
+			 (copy-to frame src)
+			 ;Set template position and location parameters
+			 (with-rect ((roi (rect (mem-ref rect-x :int)
+						(mem-ref rect-y :int)
+						(mem-ref rect-width :int)
+						(mem-ref rect-height :int))))
+			   ;Create template image from FRAME 
+			   ;to use in MATCH-TEMPLATE. Set to 
+			   ;FRAME
+			   (copy-to (roi frame roi) frame))
+			 ;Set rectangle location parameters
+			 (with-point ((point-1 (point (mem-ref rect-x :int) 
+						      (mem-ref rect-y :int)))
+				      (point-2 (point (+ (mem-ref rect-x :int) 
+							 (mem-ref rect-width :int)) 
+						      (+ (mem-ref rect-y :int) 
+							 (mem-ref rect-height :int))))) 
+			   ;Create rectangle on IMG at same 
+			   ;position as the template
+			   (rectangle img point-1 point-2 color 5 4 0)
+			   (imshow (aref window-name-arr 0) img))
+			 ;Set width and height of matrices 
+			 ;we will create in next step
+			 (setf iwidth (+ (- (cols src) (cols frame)) 1))
+			 (setf iheight (+ (- (rows src) (rows frame)) 1))
+			 ;Create an array of finalized matrices 
+                         ;to hold all of the matches. All of the
+                         ;functions with automatic GC are in the
+                         ;gc.lisp file and can be used by adding
+                         ;the 'gc' prefix to the function name.    
+			 (dotimes (i 6)
+			   (setf (aref arr i) (gc:mat iheight iwidth +32f+)))
+			 ;Run all versions of MATCH-TEMPLATE 
+			 ;and run NORMALIZE on each match 
+			 (dotimes (i 6)
+			   (match-template src frame (aref arr i) i)
+			   (normalize (aref arr i) (aref arr i) 1d0 0d0 +norm-minmax+)) 
+			 ;Show template(FRAME) in a window
+			 (imshow (aref window-name-arr 1) frame)
+			 ;Show matches
+			 (dotimes (i 6)
+			   (imshow (aref window-name-arr (+ i 2)) (aref arr i)))))
+		     ;Reset ROI
+		     (with-rect ((roi (rect 0 0 (cols frame) (rows frame))))
+		       (copy-to (roi frame roi) frame)))
+		   (let ((c (wait-key 33)))
+		     (when (= c 27)
+		       (destroy-all-windows)
+		       (return))))))))))))
+
+
+Example 2:
+
+(defun match-template-example-2 (&optional (camera-index *camera-index*) 
+				   (width *default-width*)
+				   (height *default-height*))
+
+  "This is just like the MATCH-TEMPLATE-EXAMPLE-1 but just shows just one 
+   MATCH-TEMPLATE method result in a window, +TM-CCOEFF-NORMED+. I wrote 
+   this example, because in the MATCH-TEMPLATE-EXAMPLE-1 this block of co-
+   de takes about half a second to run:
+
 	(dotimes (i 6)
 	  (match-template src frame (aref arr i) i)
 	  (normalize (aref arr i) (aref arr i) 1d0 0d0 +norm-minmax+))
-        ;Show template(FRAME) in a window
-	(imshow (aref window-name-arr 1) frame)
-        ;Show matches
-        (dotimes (i 6)
-	  (imshow (aref window-name-arr (+ i 2)) (aref arr i)))
-        ;Clean up used matrices
-	(dotimes (i 6)        
-	  (del-mat (aref arr i)))
-	(del-mat src)
-        ;Reset ROI
-	(setf roi (rect 0 0 (cols frame) (rows frame)))
-	(setf frame (roi frame roi)))
-      (free rect-x)
-      (free rect-y)
-      (free rect-width)
-      (free rect-height)
-      (destroy-all-windows))))
+
+   The normal frame rate for videos is 0.033333333 second per frame. 
+   This example should fill in any cracks left by the other one."
+
+  (with-capture (cap (video-capture camera-index))
+					;Create array of window names
+    (let* ((window-name-arr (make-array 3 :initial-contents 
+					(list "SRC - MATCH-TEMPLATE-EXAMPLE-2"
+					      "FRAME - MATCH-TEMPLATE-EXAMPLE-2"
+					      "SQDIFF - MATCH-TEMPLATE-EXAMPLE-2")))
+           ;Initialize size parameters 
+	   ;for the matches
+           (iwidth 0)
+	   (iheight 0)
+           (n 10))      
+      (cap-set cap +cap-prop-frame-width+ width)
+      (cap-set cap +cap-prop-frame-width+ height)
+      ;;Create windows
+      (with-named-window ((aref window-name-arr 0) +window-normal+)
+	(with-named-window ((aref window-name-arr 1) +window-normal+)
+	  (with-named-window ((aref window-name-arr 2) +window-autosize+)   
+	    ;Move windows to specified locations     
+	    (move-window (aref window-name-arr 0) 253 0)
+	    (move-window (aref window-name-arr 1) 253 400)
+	    (move-window (aref window-name-arr 2) 670 150)
+	    ;Allocate int pointers for the trackbars to 
+	    ;adjust which will set the template image a-
+	    ;nd the guiding rectangle location and boun-
+	    ;daries
+	    (with-object ((rect-x (alloc :int '(0))))
+	      (with-object ((rect-y (alloc :int '(0))))
+		(with-object ((rect-width (alloc :int (list (round (/ width n))))))
+		  (with-object ((rect-height (alloc :int (list (round (/ height n))))))
+		    ;Create trackbars used to adjust template and rectangle position
+		    (create-trackbar "RECT-X" (aref window-name-arr 1) rect-x width)
+		    (create-trackbar "RECT-Y" (aref window-name-arr 1) rect-y height)
+		    (create-trackbar "RECT-WIDTH" (aref window-name-arr 1) rect-width 
+				     width)
+		    (create-trackbar "RECT-HEIGHT" (aref window-name-arr 1) rect-height 
+				     height)
+		    ;Set rectangle color
+		    (with-scalar ((color (scalar 0 255 0)))
+		      (loop
+			 ;Set camera feed to FRAME
+			 (with-mat ((frame (mat)))
+			   (cap-read cap frame)
+			  ;Print location and size of the 
+			  ;template used to do the matchi-
+			  ;ng and the rectangle
+			  (format t "RECT-X: ~a~%~%" (mem-ref rect-x :int))
+			  (format t "RECT-Y: ~a~%~%" (mem-ref rect-y :int))
+			  (format t "RECT-WIDTH: ~a~%~%" (mem-ref rect-width :int))
+			  (format t "RECT-HEIGHT: ~a~%~%" (mem-ref rect-height :int))
+			  ;Instantiate logic used to move the 
+			  ;template and the rectangle as one
+			  (if (< (mem-ref rect-x :int) (round (/ (mem-ref rect-width :int) 128))) 
+			      (setf (mem-ref rect-x :int) 1))
+			  (if (> (mem-ref rect-x :int) 
+				 (- (cols frame) (mem-ref rect-width :int))) 
+			      (setf (mem-ref rect-x :int) 
+				    (- (cols frame) (mem-ref rect-width :int))))
+			  (if (< (mem-ref rect-y :int) (round (/ (mem-ref rect-height :int) 128))) 
+			      (setf (mem-ref rect-y :int) 1))
+			  (if (> (mem-ref rect-y :int) 
+				 (- (rows frame) (mem-ref rect-height :int))) 
+			      (setf (mem-ref rect-y :int) 
+				    (- (rows frame) (mem-ref rect-height :int))))
+			  (if (< (mem-ref rect-width :int) 1) 
+			      (setf (mem-ref rect-width :int) 1))
+			  (if (< (mem-ref rect-height :int) 1) 
+			      (setf (mem-ref rect-height :int) 1))
+			  (with-mat ((img (mat)))
+			    (with-mat ((src (mat)))
+			     ;Create 2 copies of FRAME, IMG will be where the 
+			     ;rectangle is moved to choose the template. SRC 
+			     ;is MATCH-TEMPLATE IMAGE parameter. FRAME will b-
+			     ;e the template image 
+			      (copy-to frame img)
+			      (copy-to frame src)
+			      ;Set template position and location parameters
+			      (with-rect ((roi (rect (mem-ref rect-x :int)
+						     (mem-ref rect-y :int)
+						     (mem-ref rect-width :int)
+						     (mem-ref rect-height :int))))
+			       ;Create template image from FRAME 
+			       ;to use in MATCH-TEMPLATE. Set to 
+			       ;FRAME
+				(copy-to (roi frame roi) frame))
+			      ;Set rectangle location parameters
+			      (with-point ((point-1 (point (mem-ref rect-x :int) 
+							   (mem-ref rect-y :int)))
+					   (point-2 (point (+ (mem-ref rect-x :int) 
+							      (mem-ref rect-width :int)) 
+							   (+ (mem-ref rect-y :int) 
+							      (mem-ref rect-height :int))))) 
+				;Create rectangle on IMG at same 
+				;position as the template
+				(rectangle img point-1 point-2 color 5 4 0)
+				(imshow (aref window-name-arr 0) img))
+			      ;Set width and height of matrices 
+			      ;we will create in next step
+			      (setf iwidth (+ (- (cols src) (cols frame)) 1))
+			      (setf iheight (+ (- (rows src) (rows frame)) 1))
+			      ;Create  matrix to hold all of the matches
+			      (with-mat ((matches (mat iheight iwidth +32f+)))
+				;Run all versions of MATCH-TEMPLATE 
+				;and run NORMALIZE on each match 
+				(match-template src frame matches 5)
+				(normalize matches matches 1d0 0d0 +norm-minmax+)
+			        ;Show template(FRAME) in a window
+				(imshow (aref window-name-arr 1) frame)
+				;Show matches
+				(imshow (aref window-name-arr 2) matches)
+			        ;Reset ROI
+				(with-rect ((roi (rect 0 0 (cols frame) (rows frame))))
+				  (copy-to (roi frame roi) frame))
+				(let ((c (wait-key 33)))
+				  (when (= c 27)
+				    (return)))))))))))))))))))
 
 
 
@@ -6288,7 +7365,7 @@ LISP-CV: (CAP-GET (SELF VIDEO-CAPTURE) (PROP-ID :INT))
             +CAP-PROP-FPS+ Frame rate.
 
             +CAP-PROP-FOURCC+ 4-character code of codec.
-
+imread-ex
             +CAP-PROP-FRAME-COUNT+ Number of frames in the video file.
 
             +CAP-PROP-FORMAT+ Format of the Mat objects returned by retrieve() .
@@ -7300,217 +8377,63 @@ f there are several HighGUI windows, any of them can be active.
     (destroy-window window-name)))
 
 
-FEATURES2D - COMMON INTERFACES OF DESCRIPTOR MATCHERS
+
+HIGHGUI - QT NEW FUNCTIONS
 
 
 
-DESCRIP-MATCHER-MATCH
+DISPLAY-OVERLAY
 
-Finds the best match for each descriptor from a query set.
+Displays a text on a window image as an overlay for a specified duration.
 
-C++: void DescriptorMatcher::match(InputArray queryDescriptors, InputArray trainDescriptors, vector<DMatch>& matches, 
-     InputArray mask=noArray() ) const
+C++: void displayOverlay(const String& winname, const String& text, int delayms=0 )
 
-LISP-CV: (DESCRIP-MATCHER-MATCH (SELF (:POINTER DESCRIPTOR-MATCHER)) (QUERY-DESCRIPTORS MAT) (TRAIN-DESCRIPTORS MAT) 
-         (MATCHES (:POINTER VECTOR-DMATCH)) (MASK MAT)) => :VOID
-
-    Parameters:	
-
-        SELF - A DESCRIPTOR-MATCHER contruct e.g. BF-MATCHER
-
-        QUERY-DESCRIPTORS - Query set of descriptors.
-
-        TRAIN-DESCRIPTORS - Train set of descriptors. This set is not added to the train descriptors 
-                            collection stored in the class object.
-
-        MATCHES - Matches. If a query descriptor is masked out in mask , no match is added for this 
-                  descriptor. So, matches size may be smaller than the query descriptors count.
-
-        MASK - Mask specifying permissible matches between an input query and train matrices of descriptors.
-
-
-In this function the train descriptors are passed as an input argument. An optional mask can be passed 
-to specify which query and training descriptors can be matched. Namely, (QUERY-DESCRIPTORS I) can be 
-matched with (TRAIN-DESCRIPTORS J) only if (AT MASK I J :UCHAR) is non-zero.
-
-
-Example:
-
-
-
-
-
-OBJDETECT - CASCADE CLASSIFICATION:
-
-
-
-CASCADE-CLASSIFIER
-
-
-Creates a CASCADE-CLASSIFIER construct or loads a classifier from a file.
-
-
-C++: CascadeClassifier::CascadeClassifier()
-
-C++: CascadeClassifier::CascadeClassifier(const string& filename)
-
-LISP-CV: (CASCADE-CLASSIFIER) => CASCADE-CLASSIFIER
-
-LISP-CV: (CASCADE-CLASSIFIER (FILENAME *STRING)) => CASCADE-CLASSIFIER
+LISP-CV: (DISPLAY-OVERLAY (WINNAME *STRING) (TEXT *STRING) &OPTIONAL ((DELAYMS :INT) 0)) => :VOID
 
 
     Parameters:	
 
-        SELF - A CASCADE-CLASSIFIER construct
+        NAME - Name of the window.
 
-        FILENAME - Name of the file from which the classifier is loaded.
+        TEXT - Overlay text to write on a window image.
 
+        DELAYMS - The period (in milliseconds), during which the overlay text is displayed. If this 
+                  function is called before the previous overlay text timed out, the timer is restarted 
+                  and the text is updated. If this value is zero, the text never disappears.
 
-Example:
-
-
-;Create an uninitialized CASCADE-CLASSIFIER construct
-
-LISP-CV> (DEFPARAMETER FACE-CASCADE (CASCADE-CLASSIFIER))
-
-FACE-CASCADE
+The function DISPLAY-OVERLAY displays useful information/tips on top of the window for a certain amount 
+of time delayms. The function does not modify the image, displayed in the window, that is, after the 
+specified delay the original content of the window is restored.
 
 
-;Create a CASCADE-CLASSIFIER construct initialized with an XML classifier 
+(defun display-overlay-example (filename &optional (cap 0))
 
-LISP-CV> (DEFPARAMETER FACE-CASCADE-NAME "<opencv_source_directory>/data/haarcascades/haarcascade_frontalface_alt.xml")
-
-FACE-CASCADE-NAME
-
-LISP-CV> (DEFPARAMETER FACE-CASCADE (CASCADE-CLASSIFIER FACE-CASCADE-NAME))
-
-FACE-CASCADE
-
-
-
-
-CASCADE-CLASSIFIER-LOAD
-
-Loads a classifier from a file.
-
-C++: bool CascadeClassifier::load(const string& filename)
-
-LISP-CV: (CASCADE-CLASSIFIER-LOAD (SELF CASCADE-CLASSIFIER) (FILENAME *STRING)) => :BOOLEAN
-
-
-    Parameters:	
-
-        SELF - A CASCADE-CLASSIFIER construct
-
-        FILENAME - Name of the file from which the classifier is loaded. The file may contain an old 
-                   HAAR classifier trained by the haartraining application or a new cascade classifier 
-                   trained by the traincascade application.
-
-
-Example:
-
-
-LISP-CV> (DEFPARAMETER FACE-CASCADE-NAME "<opencv_source_directory>/data/haarcascades/haarcascade_frontalface_alt.xml")
-
-FACE-CASCADE-NAME
-
-LISP-CV> (DEFPARAMETER FACE-CASCADE (CASCADE-CLASSIFIER)) ;Create CASCADE-CLASSIFIER construct 
-
-FACE-CASCADE
-
-LISP-CV> (CASCADE-CLASSIFIER-LOAD FACE-CASCADE FACE-CASCADE-NAME)  ;Load the Classifier
-
-T ;<--- Operation successful
-
-
-CONTRIB - COLORMAPS IN OPENCV
-
-
-
-APPLY-COLOR-MAP
-
-Applies a GNU Octave/MATLAB equivalent colormap on a given image.
-
-C++: void applyColorMap(InputArray src, OutputArray dst, int colormap)
-
-LISP-CV: (APPLY-COLOR-MAP (SRC MAT) (DEST MAT) (COLORMAP :INT)) => :VOID
-
-    Parameters:	
-
-        SRC - The source image, grayscale or colored does not matter.
-
-        DEST - The result is the colormapped source image. Note: In the OpenCV code Mat::create() 
-               is called on DEST.
-
-        COLORMAP - The colormap to apply, see the list of available colormaps below.
-
-
-Currently the following GNU Octave/MATLAB equivalent colormaps are implemented:
-
-
-(defanonenum 
-
-  (+colormap-autumn+ 0)
-  (+colormap-bone+ 1)
-  (+colormap-jet+ 2)
-  (+colormap-winter+ 3)
-  (+colormap-rainbow+ 4)
-  (+colormap-ocean+ 5)
-  (+colormap-summer+ 6)
-  (+colormap-spring+ 7)
-  (+colormap-cool+ 8)
-  (+colormap-hsv+ 9)
-  (+colormap-pink+ 10)
-  (+colormap-hot+ 11))
-
-
-Description:
-
-The human perception isn’t built for observing fine changes in grayscale images. Human eyes are more 
-sensitive to observing changes between colors, so you often need to recolor your grayscale images to 
-get a clue about them. OpenCV now comes with various colormaps to enhance the visualization in your 
-computer vision application.
-
-In Lisp-cv you only need (APPLY-COLOR-MAP) to apply a colormap on a given image. The following example 
-code applies all 11 color map types to an image based on the position of a trackbar.
-
-
-(defun apply-color-map-example (filename)
-
-  (let ((window-name "APPLY-COLOR-MAP Example")
-        (i (alloc :int 0)))
-    (with-named-window (window-name +window-normal+)
-      (move-window window-name 759 175)
-      ;Load image as grayscale - Color is okay too
-      (with-mat ((img0 (imread filename 0)))
-	(if (empty img0) 
-	    (return-from apply-color-map-example
-	      (format t "Image not loaded")))
-        (with-mat ((cm-img0 (mat)))
+  (with-capture (cap (video-capture cap))
+    (let ((window-name "DISPLAY-OVERLAY Example"))
+      (with-named-window (window-name +window-normal+)
+	(move-window window-name 759 175)
+	(with-mat ((image (imread filename 1)))
+	  (if (empty image) 
+	      (return-from display-overlay-example
+		(format t "Image not loaded")))
 	  (loop
-	    ;In a loop apply one of 11 color map 
-	    ;types based on trackbar position
-	     (apply-color-map img0 cm-img0 (? i :int))
-	     (imshow window-name cm-img0)
-	     (create-trackbar "Color Map" window-name i 11)
-	     (let ((c (wait-key 33)))
-	       (when (= c 27)
-		 (return)))))))))
+	     (with-mat ((frame (mat)))
+	       (cap-read cap frame)
+	       (display-overlay window-name "This is a test" 1)
+	       (imshow window-name frame)
+	       (let ((c (wait-key 33)))
+		 (when (= c 27)
+		   (return))))))))))
 
-
-
-See OpenCv documentation for applyColorMap:
-
-http://docs.opencv.org/trunk/modules/contrib/doc/facerec/colormaps.html?highlight=colormap#applycolormap
-
-for the color scales for each of the available colormaps.
 
 
 
 
 GET-WINDOW-PROPERTY
 
+
 Provides parameters of a window.
+
 
 C++: double getWindowProperty(const string& winname, int prop_id)
 
@@ -7541,7 +8464,6 @@ Note: See (SET-WINDOW-PROPERTY) to know the meaning of the returned values.
 
 
 The function GET-WINDOW-PROPERTY returns properties of a window.
-
 
 
 (defun get-window-property-example (filename)
@@ -7636,6 +8558,213 @@ The function SET-WINDOW-PROPERTY enables changing properties of a window.
     (loop while (not (= (wait-key 0) 27)))
     (del-mat image)
     (destroy-window window-name)))
+
+
+
+FEATURES2D - COMMON INTERFACES OF DESCRIPTOR MATCHERS
+
+
+
+DESCRIP-MATCHER-MATCH
+
+Finds the best match for each descriptor from a query set.
+
+C++: void DescriptorMatcher::match(InputArray queryDescriptors, InputArray trainDescriptors, vector<DMatch>& matches, 
+     InputArray mask=noArray() ) const
+
+LISP-CV: (DESCRIP-MATCHER-MATCH (SELF (:POINTER DESCRIPTOR-MATCHER)) (QUERY-DESCRIPTORS MAT) (TRAIN-DESCRIPTORS MAT) 
+         (MATCHES (:POINTER VECTOR-DMATCH)) (MASK MAT)) => :VOID
+
+    Parameters:	
+
+        SELF - A DESCRIPTOR-MATCHER contruct e.g. BF-MATCHER
+
+        QUERY-DESCRIPTORS - Query set of descriptors.
+
+        TRAIN-DESCRIPTORS - Train set of descriptors. This set is not added to the train descriptors 
+                            collection stored in the class object.
+
+        MATCHES - Matches. If a query descriptor is masked out in mask , no match is added for this 
+                  descriptor. So, matches size may be smaller than the query descriptors count.
+
+        MASK - Mask specifying permissible matches between an input query and train matrices of descriptors.
+
+
+In this function the train descriptors are passed as an input argument. An optional mask can be passed 
+to specify which query and training descriptors can be matched. Namely, (QUERY-DESCRIPTORS I) can be 
+matched with (TRAIN-DESCRIPTORS J) only if (AT MASK I J :UCHAR) is non-zero.
+
+
+Example:
+
+
+
+
+
+OBJDETECT - CASCADE CLASSIFICATION:
+
+
+
+CASCADE-CLASSIFIER
+
+
+Creates a CASCADE-CLASSIFIER object or loads a classifier from a file.
+
+
+C++: CascadeClassifier::CascadeClassifier()
+
+C++: CascadeClassifier::CascadeClassifier(const string& filename)
+
+LISP-CV: (CASCADE-CLASSIFIER) => CASCADE-CLASSIFIER
+
+LISP-CV: (CASCADE-CLASSIFIER (FILENAME *STRING)) => CASCADE-CLASSIFIER
+
+
+    Parameters:	
+
+        SELF - A CASCADE-CLASSIFIER object
+
+        FILENAME - Name of the file from which the classifier is loaded.
+
+
+Example:
+
+
+;Create an uninitialized CASCADE-CLASSIFIER object
+
+LISP-CV> (DEFPARAMETER FACE-CASCADE (CASCADE-CLASSIFIER))
+
+FACE-CASCADE
+
+
+;Create a CASCADE-CLASSIFIER object initialized with an XML classifier 
+
+LISP-CV> (DEFPARAMETER FACE-CASCADE-NAME "<opencv_source_directory>/data/haarcascades/haarcascade_frontalface_alt.xml")
+
+FACE-CASCADE-NAME
+
+LISP-CV> (DEFPARAMETER FACE-CASCADE (CASCADE-CLASSIFIER FACE-CASCADE-NAME))
+
+FACE-CASCADE
+
+
+
+
+CASCADE-CLASSIFIER-LOAD
+
+Loads a classifier from a file.
+
+C++: bool CascadeClassifier::load(const string& filename)
+
+LISP-CV: (CASCADE-CLASSIFIER-LOAD (SELF CASCADE-CLASSIFIER) (FILENAME *STRING)) => :BOOLEAN
+
+
+    Parameters:	
+
+        SELF - A CASCADE-CLASSIFIER object
+
+        FILENAME - Name of the file from which the classifier is loaded. The file may contain an old 
+                   HAAR classifier trained by the haartraining application or a new cascade classifier 
+                   trained by the traincascade application.
+
+
+Example:
+
+
+LISP-CV> (DEFPARAMETER FACE-CASCADE-NAME "<opencv_source_directory>/data/haarcascades/haarcascade_frontalface_alt.xml")
+
+FACE-CASCADE-NAME
+
+LISP-CV> (DEFPARAMETER FACE-CASCADE (CASCADE-CLASSIFIER)) ;Create CASCADE-CLASSIFIER object 
+
+FACE-CASCADE
+
+LISP-CV> (CASCADE-CLASSIFIER-LOAD FACE-CASCADE FACE-CASCADE-NAME)  ;Load the Classifier
+
+T ;<--- Operation successful
+
+
+CONTRIB - COLORMAPS IN OPENCV
+
+
+
+APPLY-COLOR-MAP
+
+Applies a GNU Octave/MATLAB equivalent colormap on a given image.
+
+C++: void applyColorMap(InputArray src, OutputArray dst, int colormap)
+
+LISP-CV: (APPLY-COLOR-MAP (SRC MAT) (DEST MAT) (COLORMAP :INT)) => :VOID
+
+    Parameters:	
+
+        SRC - The source image, grayscale or colored does not matter.
+
+        DEST - The result is the colormapped source image. Note: In the OpenCV code Mat::create() 
+               is called on DEST.
+
+        COLORMAP - The colormap to apply, see the list of available colormaps below.
+
+
+Currently the following GNU Octave/MATLAB equivalent colormaps are implemented:
+
+
+(defanonenum 
+
+  (+colormap-autumn+ 0)
+  (+colormap-bone+ 1)
+  (+colormap-jet+ 2)
+  (+colormap-winter+ 3)
+  (+colormap-rainbow+ 4)
+  (+colormap-ocean+ 5)
+  (+colormap-summer+ 6)
+  (+colormap-spring+ 7)
+  (+colormap-cool+ 8)
+  (+colormap-hsv+ 9)
+  (+colormap-pink+ 10)
+  (+colormap-hot+ 11))
+
+
+Description:
+
+The human perception isn’t built for observing fine changes in grayscale images. Human eyes are more 
+sensitive to observing changes between colors, so you often need to recolor your grayscale images to 
+get a clue about them. OpenCV now comes with various colormaps to enhance the visualization in your 
+computer vision application.
+
+In Lisp-cv you only need (APPLY-COLOR-MAP) to apply a colormap on a given image. The following example 
+code applies all 11 color map types to an image based on the position of a trackbar.
+
+
+(defun apply-color-map-example (filename)
+
+  (let ((window-name "APPLY-COLOR-MAP Example")
+        (i (alloc :int 0)))
+    (with-named-window (window-name +window-normal+)
+      (move-window window-name 759 175)
+      ;Load image as grayscale - Color is okay too
+      (with-mat ((img0 (imread filename 0)))
+	(if (empty img0) 
+	    (return-from apply-color-map-example
+	      (format t "Image not loaded")))
+        (with-mat ((cm-img0 (mat)))
+	  (loop
+	    ;In a loop apply one of 11 color map 
+	    ;types based on trackbar position
+	     (apply-color-map img0 cm-img0 (? i :int))
+	     (imshow window-name cm-img0)
+	     (create-trackbar "Color Map" window-name i 11)
+	     (let ((c (wait-key 33)))
+	       (when (= c 27)
+		 (return)))))))))
+
+
+
+See OpenCv documentation for applyColorMap:
+
+http://docs.opencv.org/trunk/modules/contrib/doc/facerec/colormaps.html?highlight=colormap#applycolormap
+
+for the color scales for each of the available colormaps.
 
 
 
@@ -7749,70 +8878,20 @@ The function MAT-SIZE returns SIZE, a matrix size pointer in which the columns a
 d the rows second. When the matrix is more than 2-dimensional, the returned size is (-1 -1).
 
 
+Note: This example uses TG finalizers for memory management.
+
 (defun mat-size-example ()
-  
-  "In the code below the (COLS, ROWS) values of MAT are 
-   accessed and stored in a SIZE construct. Their value-
-   s are accessed with the WIDTH and HEIGHT functions."
-  
-  (let* ((mat (mat-value 5 5 +8u+ (scalar 100 100 100)))
-	 (mat-size (size mat)))
-    (format t "MAT (COLS,ROWS) = (~a ~a)~%" 
-	    ;;The '?' is a macro for CFFI:MEM-AREF
-	    (? mat-size :int)
-	    (? mat-size :int 1))))
-
-
-
-ROWS
-
-Returns number or rows in MAT.
-
-C++: int rows, cols
-
-LISP-CV: (ROWS (SELF MAT)) => :INT
-
-    Parameters:	
-
-        SELF - A MAT construct.
-
-
-The function ROWS finds the number of rows in a matrix or -1 when the array has more than 2 dimensi-
-ons. 
-
-
-(defun rows-example ()
-
-  "Uses ROWS to find the number of rows in the matrix MAT"
-
-  (let* ((mat (mat-value 3 4 +64f+ (scalar 100)) ))
-          (format t "The number of rows in MAT = ~a" (rows mat))))
-
-
-COLS
-
-Returns number or cols in MAT.
-
-C++: int rows, cols
-
-LISP-CV:  (COLS (SELF MAT)) => :INT
-
-    Parameters:	
-
-        SELF - A matrix(MAT).
-
-
-The function COLS finds the number of columns in a matrix or -1 when the array has more than 2 dime-
-nsions. 
-
-
-(defun cols-example ()
-
-  "Uses COLS to find the number of columns in the matrix MAT"
-
-  (let* ((mat (mat-value 3 4 +64f+ (scalar 5)) ))
-          (format t "The number of columns in MAT = ~a" (cols mat))))
-
+       
+  "In the code below the (COLS, ROWS) values of MAT are
+   accessed and stored in a SIZE object. Their values a-
+   re accessed with the WIDTH and HEIGHT functions."
+       
+       (let* ((mat (gc:mat 5 5 +8u+ (gc:scalar 100 100 100)))
+	      (mat-size (gc:size mat)))
+	 (format t "~%MAT (COLS,ROWS) = (~a ~a)~%~%" 
+		 ;;The '?' is a macro for CFFI:MEM-AREF
+		 (width mat-size)
+		 (height mat-size))))
 
 
 MAT-TYPE
@@ -7821,15 +8900,17 @@ Returns the type of a matrix element.
 
 C++: int Mat::type() const
 
-LISP-CV: (CV-TYPE (SELF MAT))
+LISP-CV: (MAT-TYPE (SELF MAT))
 
     Parameters:	
 
         SELF - A matrix(MAT)
 
 The method returns a matrix element type. This is an identifier compatible with OpenCV's CvMat type
-system, like CV_16SC3(+16SC3+ in LISP-CV) or 16-bit signed 3-channel array, and so on. You can also 
-get matrix size with the SIZE function e.g. (SIZE MAT)
+system, like CV_16SC3(+16SC3+ in LISP-CV) or 16-bit signed 3-channel array, and so on.
+
+
+Note: This example uses TG finalizers for memory management
 
 
 (defun mat-type-example ()
@@ -7837,11 +8918,11 @@ get matrix size with the SIZE function e.g. (SIZE MAT)
   "This function uses MAT-TYPE to find 
    the type of MAT-ONE and MAT-TWO."
 
-  (let* ((mat-one (mat-zeros 1 2 +32f+))
-	 (mat-two (mat-zeros 2 4 +64f+)))
-    (format t "MAT-ONE type is ~a(+32f+). It is a Single Precision Floating Point Matrix.~%" 
+  (let* ((mat-one (gc:mat-zeros 1 2 +32f+))
+	 (mat-two (gc:mat-zeros 2 4 +64f+)))
+    (format t "~%MAT-ONE type is ~a(+32f+). It is a Single Precision Floating Point Matrix.~%" 
 	    (mat-type mat-one))
-    (format t "~MAT-TWO type is ~a(+64f+). It is a Double Precision Floating Point Matrix." 
+    (format t "~%MAT-TWO type is ~a(+64f+). It is a Double Precision Floating Point Matrix.~%~%" 
 	    (mat-type mat-two))))
 
 
@@ -8205,36 +9286,6 @@ shorthand version of the FORCE function supplied for ease of use.
 
 
 
-
-mat-typed
-
-Creates an empty matrix of type TYPE.
-
-LISP-CV: (mat-typed) (ROWS :INT) (COLS :INT) (TYPE :INT)) => MAT
-
-    Parameters:	
-
-        ROWS - The number of rows.
-    
-        COLS - The number of colounns
-
-        TYPE - The type of the matrix
-
-
-(defun mat-typed-example ()
-
-  "In this example an 8-bit unsigned matrix is 
-   created and the empty matrix is shown in a 
-   window."
-
-  (let* ((mat (mat-typed 4 4 +32s+))
-	 (window-name "mat-typed Example"))
-    (named-window window-name +window-normal+)
-    (move-window window-name 759 175)
-    (imshow window-name mat)
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name)))
-
          
 DIAG
 
@@ -8277,7 +9328,7 @@ single-column matrix. Similarly to (ROW) and (COL) , this is an O(1) operation.
    is represented as a single-column matrix."
 
   (let* ((data (alloc :int '(1 2 3 4 5 6 7 8 9)))
-	 (mat (mat-data 3 3 +32s+ data))
+	 (mat (mat 3 3 +32s+ data))
 	 (diag (diag mat 0)))
     (dotimes (i 3)
       (format t "~a" (at-int diag i 0))
@@ -8315,8 +9366,8 @@ to type MAT with the function (FORCE), (or the shorthand version (>>)) to use in
 
   (let* ((m1-data (alloc :uint '(53 62 85 64 23 97 52 16 12)))
 	 (m2-data (alloc :uint '(64 22 64 15 11 17 42 16 88)))
-	 (m1 (mat-data 3 3 +32s+ m1-data))
-         (m2 (mat-data 3 3 +32s+ m2-data))
+	 (m1 (mat 3 3 +32s+ m1-data))
+         (m2 (mat 3 3 +32s+ m2-data))
          (result (sub m1 m2)))
     (dotimes (i (rows m1))
       (dotimes (j (cols m1))
@@ -8370,8 +9421,8 @@ the function (FORCE), (or the shorthand version (>>)) to use in other functions.
 				  97.0f0 52.0f0 16.0f0 12.0f0)))
 	 (m2-data (alloc :float '(64.0f0 22.0f0 64.0f0 15.0f0 11.0f0 
 				  17.0f0 42.0f0 16.0f0 88.0f0)))
-	 (m1 (mat-data 3 3 +32f+ m1-data))
-         (m2 (mat-data 3 3 +32f+ m2-data))
+	 (m1 (mat 3 3 +32f+ m1-data))
+         (m2 (mat 3 3 +32f+ m2-data))
          (result (div m1 m2)))
     (dotimes (i (rows m1))
       (dotimes (j (cols m1))
@@ -8554,7 +9605,7 @@ The method creates a full copy of the array. The original TODO step[] is not tak
   (let* ((m1-data (alloc :float '(53.0f0 62.0f0 85.0f0 64.0f0 23.0f0 
 				   97.0f0 52.0f0 16.0f0 12.0f0)))
          ; Create matrix M1 and fill it with data
-	 (m1 (mat-data 3 3 +32f+ m1-data))
+	 (m1 (mat 3 3 +32f+ m1-data))
          ; Create a clone of matrix M1 called M2
          (m2 (clone m1)))
     ; Print the elements of natrix M2 in a loop
@@ -8566,19 +9617,6 @@ The method creates a full copy of the array. The original TODO step[] is not tak
 	(princ #\Space))
       (princ #\Newline))
       (free m1-data)))
-
-
-MAT-STEP1
-
-Returns a normalized step.
-
-C++: size_t Mat::step1(int i=0 ) const
-
-LISP-CV: (STEP1 (SELF MAT)) => :UNSIGNED-INT
-
-The method returns a matrix step divided by (ELEM-SIZE1) . It can be useful to quickly access an ar
-bitrary matrix element.
-
 
 
 TOTAL
@@ -8605,8 +9643,8 @@ e).
    number of array elements in MAT1 and MAT2"
 
    (let* ((data (alloc :int '(1 2 3 4)))
-	  (mat1 (mat-data 2 2 +32s+ data))
-	  (mat2 (mat-typed 100 100 +32s+))
+	  (mat1 (mat 2 2 +32s+ data))
+	  (mat2 (mat 100 100 +32s+))
 	  (total1 (total mat1))
 	  (total2 (total mat2)))
      (format t "Total mumber of elements in MAT1 = ~a~%~%" total1)
@@ -9000,81 +10038,6 @@ All the arrays must have the same type, except the destination, and the same siz
       (destroy-window window-name-2))))
 
 
-GAUSSIAN-BLUR
-
-Blurs an image using a Gaussian filter.
-
-C++: void GaussianBlur(InputArray src, OutputArray dst, Size ksize, double sigmaX, double sigmaY=0,
-     int borderType=BORDER_DEFAULT )                   
-
-Commom Lisp: (GAUSSIAN-BLUR (SRC MAT) (DEST MAT) (KSIZE SIZE) (SIG
-              MA-X :DOUBLE) &OPTIONAL ((SIGMA-Y :DOUBLE) 0) ((BORDER-TYPE :INT) +BORDER-DEFAULT+))
-
-    Parameters:	
-
-        SRC - input image; the image can have any number of channels, which are processed independe-
-              ntly, but the depth should be +8U+, +16U+, +16S+, +32F+ or +64F+.
-
-        DST - output image of the same size and type as SRC.
-
-        KSIZE - Gaussian kernel size KSIZE width and KSIZE height can differ but they both must be 
-                positive and odd. Or, they can be zero’s and then they are computed from sigma.
-
-        SIGMAX - Gaussian kernel standard deviation in X direction.
-
-        SIGMAY - Gaussian kernel standard deviation in Y direction; if SIGMAY is zero, it is set to 
-                 be equal to SIGMAX, if both sigmas are zeros, they are computed from KSIZE width a-
-                 nd KSIZE height , respectively (see (GET-GAUSSIAN-KERNEL) for details); to fully c-
-                 ontrol the result regardless of possible future modifications of all this semantics, 
-                 it is recommended To specify all of KSIZE, SIGMA-X, AND SIGMA-Y.
-
-        BORDER-TYPE - pixel extrapolation method, one of the +BORDER-*+ constants, except for 
-                      +BORDER-TRANSPARENT+ and +BORDER-ISOLATED+.
-
-
-The function convolves the source image with the specified Gaussian kernel. In-place filtering is s-
-upported.
-
-See also:
-
-(SEP-FILTER-2D), FILTER-2D), (BLUR), (BOX-FILTER), (BILATERAL-FILTER), (MEDIAN-BLUR)
-
-
-(defun gaussian-blur-example (&optional (camera-index *camera-index*) 
-				(width 640)
-				(height 480))
-  "In this example the function GAUSSIAN-BLUR is used 
-   to blur an image using a Gaussian filter. The orig-
-   inal image FRAME and the blurred image SRC are sho-
-   wn in separate windows."
-  (with-capture (cap (video-capture camera-index))
-    (let ((window-name-1 "Original - GAUSSIAN-BLUR Example")
-	  (window-name-2 "Blurred output - GAUSSIAN-BLUR Example")
-	  (src 0))
-      (if (not (cap-is-open cap)) 
-	  (return-from gaussian-blur-example 
-	    (format t "Cannot open the video camera")))
-      (cap-set cap +cap-prop-frame-width+ width)
-      (cap-set cap +cap-prop-frame-height+ height)
-      (format t "Frame Size : ~ax~a~%~%" 
-	      (cap-get cap +cap-prop-frame-width+)
-	      (cap-get cap +cap-prop-frame-height+))
-      (named-window window-name-1 +window-normal+)
-      (named-window window-name-2 +window-normal+)
-      (move-window window-name-1 533 175)
-      (move-window window-name-2 984 175)
-      (do* ((frame 0))
-	   ((plusp (wait-key *millis-per-frame*)) 
-	    (format t "Key is pressed by user"))
-	(setf frame (mat))
-	(cap-read cap frame)
-	(setf src (clone frame))
-	(gaussian-blur src src (size 19 19) 0.0d0 0.0d0)
-	(imshow window-name-1 frame)
-	(imshow window-name-2 src)
-	(del-mat frame) (del-mat src))
-      (destroy-window window-name-1)
-      (destroy-window window-name-2))))
 
 
 CVT-COLOR
@@ -9328,7 +10291,7 @@ before passing to SCALE.
 
   (let* ((data (alloc :float '(1.0f0 2.0f0 3.0f0 4.0f0 5.0f0 
                                6.0f0 7.0f0 8.0f0 9.0f0)))
-	 (mat (mat-data 3 3 +32f+ data))
+	 (mat (mat 3 3 +32f+ data))
 	 (scaled-mat (scale (<< mat) (/ 1d0 10d0))))
     (dotimes (i 3)
       (dotimes (j 3)
@@ -9513,7 +10476,7 @@ LISP-CV: (BRISK &OPTIONAL ((THRESH :INT) 30) ((OCTAVES :INT) 3) ((PATTERN-SCALE 
 
         PATTERN-SCALE - apply this scale to the pattern used for sampling the neighbourhood of a keypoint.
 
-BRISK is a construct implementing the BRISK keypoint detector and descriptor extractor, described in [LCS11]:
+BRISK is a object implementing the BRISK keypoint detector and descriptor extractor, described in [LCS11]:
 
 http://docs.opencv.org/modules/features2d/doc/feature_detection_and_description.html?highlight=brisk#lcs11
 

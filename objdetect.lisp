@@ -17,7 +17,7 @@
 
 ;; CascadeClassifier::CascadeClassifier(const string& filename)
 ;; CascadeClassifier* cv_create_CascadeClassifier1(String* filename)
-(defcfun ("cv_create_CascadeClassifier1" cascade-classifier1) cascade-classifier
+(defcfun ("cv_create_CascadeClassifier1" cascade-classifier1) (cascade-classifier :garbage-collect t)
   "Loads a classifier from a file."
   (filename *string))
 

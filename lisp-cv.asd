@@ -1,6 +1,5 @@
 ;;; -*- mode: lisp; indent-tabs: nil -*-
 
-;;(ql:quickload "ieee-floats")
 (asdf:defsystem #:lisp-cv
   :name "lisp-cv"
   :author "Joe W. BiMedina <wnetai@yahoo.com>."

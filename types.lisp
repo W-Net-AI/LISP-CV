@@ -6,8 +6,6 @@
 (in-package :lisp-cv)
 
 
-
-
 ;; BFMatcher*
 (defctype bf-matcher :pointer)
 
@@ -37,9 +35,6 @@
 
 ;; vector_KeyPoint*
 (defctype vector-key-point :pointer)
-
-;; vector_Mat*
-(defctype vector-mat :pointer)
 
 ;; vector_Point2f*
 (defctype vector-point2f :pointer)

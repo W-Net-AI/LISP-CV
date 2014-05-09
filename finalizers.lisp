@@ -168,6 +168,32 @@
     vector-point))
 
 
+;; VECTOR-MAT
+
+
+(define-foreign-type vector-mat ()
+  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+                     :garbage-collect))
+  (:actual-type :pointer)
+  (:simple-parser vector-mat))
+
+
+(defclass std-vector-mat ()
+  ((c-pointer :reader c-pointer :initarg :c-pointer)))
+
+
+(defmethod translate-to-foreign ((lisp-value std-vector-mat) (c-type vector-mat))
+  (values  (c-pointer lisp-value) lisp-value))
+
+
+(defmethod translate-from-foreign (c-pointer (c-type vector-mat))
+  (let ((vector-mat  (make-instance 'std-vector-mat :c-pointer c-pointer)))
+    (when (garbage-collect c-type)
+      (tg:finalize vector-mat (lambda () (del-vec-point c-pointer))))
+    vector-mat))
+
+
+
 ;; VECTOR-UCHAR
 
 
@@ -275,8 +301,8 @@
 
 
 (define-foreign-type mat-expr ()
-  ((garbage-collect  :reader garbage-collect :initform nil 
-                     :initarg :garbage-collect))
+  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+                     :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser mat-expr))
 
@@ -294,7 +320,6 @@
     (when (garbage-collect c-type)
       (tg:finalize matrix-expressions (lambda () (del-mat-expr c-pointer))))
     matrix-expressions))
-
 
 
 ;; POINT
@@ -531,7 +556,7 @@
   ((garbage-collect  :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
-  (:simple-parser scfalar))
+  (:simple-parser scalar))
 
 
 (defclass cv-scalar ()
@@ -539,7 +564,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-scalar) (c-type scalar))
-   (values  (c-pointer lisp-value) lisp-value))
+  (values  (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type scalar))
