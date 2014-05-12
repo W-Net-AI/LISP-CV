@@ -37,11 +37,11 @@
   (self vector-char))
 
 
-(defmacro vec-char-to-lisp-list (c-arr)
+(defmacro vec-char-to-lisp-list (vec)
   (let ((x (gensym))
         (y (gensym))
         (z (gensym)))
-    `(let* ((,x ,c-arr)
+    `(let* ((,x ,vec)
 	    (,y (vec-char-length ,x))
             (,z (list)))
        (dotimes (i ,y)
@@ -49,11 +49,11 @@
        (reverse ,z))))
 
 
-(defmacro vec-char-to-lisp-vec (c-arr)
+(defmacro vec-char-to-lisp-vec (vec)
   (let ((x (gensym))
         (y (gensym))
         (z (gensym)))
-    `(let* ((,x ,c-arr)
+    `(let* ((,x ,vec)
 	    (,y (vec-char-length ,x))
             (,z (make-array ,y :element-type t :fill-pointer 0
 			    :initial-element   
@@ -121,11 +121,11 @@
   (self vector-dmatch))
 
 
-(defmacro vec-dmatch-to-lisp-list (c-arr)
+(defmacro vec-dmatch-to-lisp-list (vec)
   (let ((x (gensym))
         (y (gensym))
         (z (gensym)))
-    `(let* ((,x ,c-arr)
+    `(let* ((,x ,vec)
 	    (,y (vec-dmatch-length ,x))
             (,z (list)))
        (dotimes (i ,y)
@@ -133,11 +133,11 @@
        (reverse ,z))))
 
 
-(defmacro vec-dmatch-to-lisp-vec (c-arr)
+(defmacro vec-dmatch-to-lisp-vec (vec)
   (let ((x (gensym))
         (y (gensym))
         (z (gensym)))
-    `(let* ((,x ,c-arr)
+    `(let* ((,x ,vec)
 	    (,y (vec-dmatch-length ,x))
             (,z (make-array ,y :element-type t :fill-pointer 0
 			    :initial-element   
@@ -211,11 +211,11 @@
   (self vector-double))
 
 
-(defmacro vec-double-to-lisp-list (c-arr)
+(defmacro vec-double-to-lisp-list (vec)
   (let ((x (gensym))
         (y (gensym))
         (z (gensym)))
-    `(let* ((,x ,c-arr)
+    `(let* ((,x ,vec)
 	    (,y (vec-double-length ,x))
             (,z (list)))
        (dotimes (i ,y)
@@ -223,11 +223,11 @@
        (reverse ,z))))
 
 
-(defmacro vec-double-to-lisp-vec (c-arr)
+(defmacro vec-double-to-lisp-vec (vec)
   (let ((x (gensym))
         (y (gensym))
         (z (gensym)))
-    `(let* ((,x ,c-arr)
+    `(let* ((,x ,vec)
 	    (,y (vec-double-length ,x))
             (,z (make-array ,y :element-type t :fill-pointer 0
 			    :initial-element   
@@ -295,11 +295,11 @@
   (self vector-float))
 
 
-(defmacro vec-float-to-lisp-list (c-arr)
+(defmacro vec-float-to-lisp-list (vec)
   (let ((x (gensym))
         (y (gensym))
         (z (gensym)))
-    `(let* ((,x ,c-arr)jessemorris77
+    `(let* ((,x ,vec)
 	    (,y (vec-float-length ,x))
             (,z (list)))
        (dotimes (i ,y)
@@ -307,11 +307,11 @@
        (reverse ,z))))
 
 
-(defmacro vec-float-to-lisp-vec (c-arr)
+(defmacro vec-float-to-lisp-vec (vec)
   (let ((x (gensym))
         (y (gensym))
         (z (gensym)))
-    `(let* ((,x ,c-arr)
+    `(let* ((,x ,vec)
 	    (,y (vec-float-length ,x))
             (,z (make-array ,y :element-type t :fill-pointer 0
 			    :initial-element   
@@ -379,11 +379,11 @@
   (self vector-int))
 
 
-(defmacro vec-int-to-lisp-list (c-arr)
+(defmacro vec-int-to-lisp-list (vec)
   (let ((x (gensym))
         (y (gensym))
         (z (gensym)))
-    `(let* ((,x ,c-arr)
+    `(let* ((,x ,vec)
 	    (,y (vec-int-length ,x))
             (,z (list)))
        (dotimes (i ,y)
@@ -391,11 +391,11 @@
        (reverse ,z))))
 
 
-(defmacro vec-int-to-lisp-vec (c-arr)
+(defmacro vec-int-to-lisp-vec (vec)
   (let ((x (gensym))
         (y (gensym))
         (z (gensym)))
-    `(let* ((,x ,c-arr)
+    `(let* ((,x ,vec)
 	    (,y (vec-int-length ,x))
             (,z (make-array ,y :element-type t :fill-pointer 0
 			    :initial-element   
@@ -463,11 +463,11 @@
   (self vector-key-point))
 
 
-(defmacro vec-key-point-to-lisp-list (c-arr)
+(defmacro vec-key-point-to-lisp-list (vec)
   (let ((x (gensym))
         (y (gensym))
         (z (gensym)))
-    `(let* ((,x ,c-arr)
+    `(let* ((,x ,vec)
 	    (,y (vec-key-point-length ,x))
             (,z (list)))
        (dotimes (i ,y)
@@ -475,11 +475,11 @@
        (reverse ,z))))
 
 
-(defmacro vec-key-point-to-lisp-vec (c-arr)
+(defmacro vec-key-point-to-lisp-vec (vec)
   (let ((x (gensym))
         (y (gensym))
         (z (gensym)))
-    `(let* ((,x ,c-arr)
+    `(let* ((,x ,vec)
 	    (,y (vec-key-point-length ,x))
             (,z (make-array ,y :element-type t :fill-pointer 0
 			    :initial-element   
@@ -553,11 +553,11 @@
   (self vector-point))
 
 
-(defmacro vec-point-to-lisp-list (c-arr)
+(defmacro vec-point-to-lisp-list (vec)
   (let ((x (gensym))
         (y (gensym))
         (z (gensym)))
-    `(let* ((,x ,c-arr)
+    `(let* ((,x ,vec)
 	    (,y (vec-point-length ,x))
             (,z (list)))
        (dotimes (i ,y)
@@ -565,11 +565,11 @@
        (reverse ,z))))
 
 
-(defmacro vec-point-to-lisp-vec (c-arr)
+(defmacro vec-point-to-lisp-vec (vec)
   (let ((x (gensym))
         (y (gensym))
         (z (gensym)))
-    `(let* ((,x ,c-arr)
+    `(let* ((,x ,vec)
 	    (,y (vec-point-length ,x))
             (,z (make-array ,y :element-type t :fill-pointer 0
 			    :initial-element   
@@ -639,11 +639,11 @@
   (self vector-point-2f))
 
 
-(defmacro vec-point-2f-to-lisp-list (c-arr)
+(defmacro vec-point-2f-to-lisp-list (vec)
   (let ((x (gensym))
         (y (gensym))
         (z (gensym)))
-    `(let* ((,x ,c-arr)
+    `(let* ((,x ,vec)
 	    (,y (vec-point-2f-length ,x))
             (,z (list)))
        (dotimes (i ,y)
@@ -651,11 +651,11 @@
        (reverse ,z))))
 
 
-(defmacro vec-point-2f-to-lisp-vec (c-arr)
+(defmacro vec-point-2f-to-lisp-vec (vec)
   (let ((x (gensym))
         (y (gensym))
         (z (gensym)))
-    `(let* ((,x ,c-arr)
+    `(let* ((,x ,vec)
 	    (,y (vec-point-2f-length ,x))
             (,z (make-array ,y :element-type t :fill-pointer 0
 			    :initial-element   
@@ -725,11 +725,11 @@
   (self vector-rect))
 
 
-(defmacro vec-rect-to-lisp-list (c-arr)
+(defmacro vec-rect-to-lisp-list (vec)
   (let ((x (gensym))
         (y (gensym))
         (z (gensym)))
-    `(let* ((,x ,c-arr)
+    `(let* ((,x ,vec)
 	    (,y (vec-rect-length ,x))
             (,z (list)))
        (dotimes (i ,y)
@@ -737,11 +737,11 @@
        (reverse ,z))))
 
 
-(defmacro vec-rect-to-lisp-vec (c-arr)
+(defmacro vec-rect-to-lisp-vec (vec)
   (let ((x (gensym))
         (y (gensym))
         (z (gensym)))
-    `(let* ((,x ,c-arr)
+    `(let* ((,x ,vec)
 	    (,y (vec-rect-length ,x))
             (,z (make-array ,y :element-type t :fill-pointer 0
 			    :initial-element   
@@ -811,11 +811,11 @@
   (self vector-uchar))
 
 
-(defmacro vec-uchar-to-lisp-list (c-arr)
+(defmacro vec-uchar-to-lisp-list (vec)
   (let ((x (gensym))
         (y (gensym))
         (z (gensym)))
-    `(let* ((,x ,c-arr)
+    `(let* ((,x ,vec)
 	    (,y (vec-uchar-length ,x))
             (,z (list)))
        (dotimes (i ,y)
@@ -823,11 +823,11 @@
        (reverse ,z))))
 
 
-(defmacro vec-uchar-to-lisp-vec (c-arr)
+(defmacro vec-uchar-to-lisp-vec (vec)
   (let ((x (gensym))
         (y (gensym))
         (z (gensym)))
-    `(let* ((,x ,c-arr)
+    `(let* ((,x ,vec)
 	    (,y (vec-uchar-length ,x))
             (,z (make-array ,y :element-type t :fill-pointer 0
 			    :initial-element   
