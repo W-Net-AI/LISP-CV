@@ -1,26 +1,40 @@
 /*
- * =====================================================================================
- *
- *       Filename:  mat.cpp
- *
- *    Description:  
- *
- *        Version:  1.0
- *        Created:  09/24/13 20:12:17
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  YOUR NAME (), 
- *   Organization:  
- *
- * =====================================================================================
- */
+* =====================================================================================
+*
+* Filename: mat.cpp
+*
+* Description:
+*
+* Version: 1.0
+* Created: 09/24/13 20:12:17
+* Revision: none
+* Compiler: g++
+*
+* Author: Arjun Comar
+* Organization:
+*
+* =====================================================================================
+*/
 #include <opencv2/c/mat.hpp>
 
 extern "C" {
+
 Mat* cv_create_Mat() {
     return new Mat();
 }
+
+Mat* cv_create_Mat_typed(int rows, int cols, int type) {
+    return new Mat(rows, cols, type);
+}
+
+Mat* cv_create_Mat_with_data(int rows, int cols, int type, void* data) {
+    return new Mat(rows, cols, type, data);
+}
+
+Mat* cv_create_Mat_with_value(int rows, int cols, int type, Scalar* s) {
+    return new Mat(rows, cols, type, *s);
+}
+
 
 Mat* cv_Mat_assign(Mat* self, Mat* m) {
     *self = *m;
@@ -80,6 +94,10 @@ void cv_Mat_assignTo_t(Mat*self, Mat* m, int t) {
     self->assignTo(*m, t);
 }
 
+void cv_Mat_convertTo(Mat* self,Mat* m, int rtype, double alpha, double beta) {
+    self->convertTo(*m, rtype, alpha, beta);
+}
+
 Mat* cv_Mat_setTo(Mat* self, Scalar* value) {
     Mat* m = new Mat;
     *m = *value;
@@ -93,11 +111,11 @@ Mat* cv_Mat_setTo_masked(Mat* self, Scalar* value, Mat* mask) {
 }
 
 Mat* cv_Mat_reshape(Mat* self, int cn) {
-   return new Mat(self->reshape(cn)); 
+   return new Mat(self->reshape(cn));
 }
 
 Mat* cv_Mat_reshape_rows(Mat* self, int cn, int rows) {
-   return new Mat(self->reshape(cn, rows)); 
+   return new Mat(self->reshape(cn, rows));
 }
 
 size_t cv_Mat_elemSize(Mat* self) {
@@ -142,6 +160,10 @@ int cv_Mat_empty(Mat* self) {
 
 Size* cv_Mat_size(Mat* self) {
     return new Size(self->size());
+}
+
+size_t cv_Mat_get_Step(Mat* self) {
+    return self->step;
 }
 
 size_t cv_Mat_step1(Mat* self) {
@@ -213,5 +235,26 @@ void cv_Mat_locateROI(Mat* self, Size* s, Point* p) {
 Mat* cv_Mat_adjustROI(Mat* self, int dtop, int dbottom, int dleft, int dright) {
     return new Mat(self->adjustROI(dtop, dbottom, dleft, dright));
 }
+
+void cv_delete_Mat(Mat* self) {
+     delete self;
+}
+
+void cv_destruct_Mat(Mat* self) {
+     self->~Mat();
+}
+
+void cv_delete_MatExpr(MatExpr* self) {
+     delete self;
+}
+
+void cv_destruct_MatExpr(MatExpr* self) {
+     self->~MatExpr();
+}
+
+void cv_delete(char* self) {
+     delete self;
+}
+
 
 }

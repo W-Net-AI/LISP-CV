@@ -1340,6 +1340,41 @@
        (%multiply src1 src2 dest scale dtype))
 
 
+;;double norm(InputArray src1, int normType=NORM_L2, InputArray mask=noArray())
+;;double cv_norm(Mat* src1, int normType, Mat* mask) 
+(defcfun ("cv_norm" %norm3) :void 
+  (src1 mat)
+  (norm-type :int)
+  (mask mat))
+
+;;double norm(InputArray src1, InputArray src2, int normType=NORM_L2, InputArray mask=noArray())
+;;double cv_norm4(Mat* src1, Mat* src2, int normType, Mat* mask)
+(defcfun ("cv_norm4" %norm4) :void 
+  (src1 mat)
+  (src2 mat)
+  (norm-type :int)
+  (mask mat))
+
+(defun %%norm3 (src1 &optional (norm-type +norm-l2+) mask)
+  (if (not mask)
+      (with-mat ((m (mat)))
+	(%norm3 src1 norm-type m))
+      (%norm3 src1 norm-type mask)))
+
+(defun %%norm4 (src1 src2 &optional (norm-type +norm-l2+) mask)
+  (if (not mask)
+      (with-mat ((m (mat)))
+	(%norm4 src1 src2 norm-type m))
+      (%norm4 src1 src2 norm-type mask)))
+
+(defun norm (&rest args)
+  "Calculates an absolute array norm, an absolute 
+   difference norm, or a relative difference norm."
+  (if (eq (type-of (second args)) 'cv-mat)
+      (apply #'%%norm4 args)
+      (apply #'%%norm3 args)))
+
+
 ;; void normalize(InputArray src, OutputArray dst, double alpha=1, double beta=0, int norm_type=NORM_L2, int dtype=-1, 
 ;; InputArray mask=noArray() )
 ;; void cv_normalize(Mat* src, Mat* dst, double alpha, double beta, int norm_type, int dtype, Mat* mask)

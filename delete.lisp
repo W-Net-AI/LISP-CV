@@ -219,6 +219,13 @@
 
 ;; void operator delete  ( void* ptr )
 ;; void delete_std_vector##tn( vector_##t * v)
+(defcfun ("delete_std_vectorp" del-vec-point) :void
+  "Calls delete on VECTOR-POINT"
+  (self :pointer))
+
+
+;; void operator delete  ( void* ptr )
+;; void delete_std_vector##tn( vector_##t * v)
 (defcfun ("delete_std_vectorp2f" del-vec-point-2f) :void
   "Calls delete on VECTOR-POINT-2F"
   (self :pointer))

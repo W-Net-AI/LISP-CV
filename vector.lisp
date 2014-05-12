@@ -693,7 +693,6 @@
   ~%See VEC-POINT-2F documentation in <LISP-CV-SOURCE-DIR>/EXAMPLES.LISP~%"))))))
 
 
-
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * create_std_vector##tn()
 (defcfun ("create_std_vectorr" %vec-rect) vector-rect)

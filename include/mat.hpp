@@ -74,5 +74,4 @@ void cv_delete_Mat(Mat* self);
 void cv_destruct_Mat(Mat* self);
 void cv_delete_MatExpr(MatExpr* self);
 void cv_destruct_MatExpr(MatExpr* self);
-void cv_delete(char* self);
 }

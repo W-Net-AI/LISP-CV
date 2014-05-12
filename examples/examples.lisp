@@ -3720,7 +3720,7 @@ See also
    Probably good to be in a well lighted room."
 
   (with-captured-camera (cap cam :width 640 :height 480) 
-	  ;Create array of window names
+	  ;Create windows
     (let* ((window-name-1 "TPL - MIN-MAX-LOC Example")
 	   (window-name-2 "FRAME - MIN-MAX-LOC Example")
 	   (window-name-3 "MATCHES - MIN-MAX-LOC Example")
@@ -3862,6 +3862,124 @@ See also:
     (free double-data)
     (free uchar-data)))
 
+
+
+
+NORM
+
+Calculates an absolute array norm, an absolute difference norm, or a relative difference norm.
+
+C++: double norm(InputArray src1, int normType=NORM_L2, InputArray mask=noArray())
+
+LISP-CV: (NORM (SRC1 MAT) &OPTIONAL ((NORM-TYPE :INT) +NORM-L2+) ((MASK MAT) (MAT))) => :DOUBLE
+
+C++: double norm(InputArray src1, InputArray src2, int normType=NORM_L2, InputArray mask=noArray() )
+
+LISP-CV: (NORM (SRC1 MAT) (SRC2 MAT) &OPTIONAL ((NORM-TYPE :INT) +NORM-L2+) ((MASK MAT) (MAT))) => :DOUBLE
+
+
+    Parameters:	
+
+        SRC1 - First input array.
+
+        SRC2 - Second input array of the same size and the same type as SRC1.
+
+        NORM-TYPE - Type of the norm (see the details below).
+
+        MASK - Optional operation mask; it must have the same size as SRC1 and +8UC1+ type.
+
+The functions NORM calculate an absolute norm of SRC1 (when there is no SRC2):
+
+See OpenCV documentation:
+
+http://docs.opencv.org/trunk/modules/core/doc/operations_on_arrays.html?highlight=norm#norm
+
+for a description and formulae
+
+
+(defun norm-example (filename &optional (cam 0))
+
+  "This example is an improvement on the way MIN-MAX-LOC tracks 
+   an object in the MIN-MAX-LOC example, in a couple ways. Firs
+   t, if you use the 'resized-checkerboard.png' in the Lisp-CV 
+   IMAGES directory, you'll notice the result of MIN-MAX-LOC is 
+   better defined in the MATCHES window as a result of NORM bei-
+   ng used instead of NORMALIZE. You'll still have to play with 
+   the distance you hold the object from the camera to get a go-
+   od track. However, you can improve the objects track if you 
+   adjusting the Brightness and Contrast sliders. Also, if you 
+   look at the MATCHES window while trying to get a track, you 
+   notice the visual clues will aid you toward that endeavor."
+
+  (with-captured-camera (cap cam :width 640 :height 480) 
+					;Create windows
+    (let* ((window-name-1 "TEMPL - NORM Example")
+	   (window-name-2 "FRAME - NORM Example")
+	   (window-name-3 "Move Trackbars to change Brightness and Contrast - NORM Example")
+	   (window-name-4 "MATCHES - NORM Example")
+					;Initialize size parameters 
+					;for the matches
+           (iwidth 0)
+	   (iheight 0)
+	   (brightness 0)
+	   (contrast 0))      
+      ;;Create windows
+      (with-named-window (window-name-1 +window-autosize+)
+	(with-named-window (window-name-2 +window-autosize+) 
+	  (with-named-window (window-name-3 +window-autosize+) 
+	    (with-named-window (window-name-4 +window-autosize+) 
+	      ;Move windows to specified locations     
+	      (move-window window-name-1 250 29)
+	      (move-window window-name-2 99 260)
+	      (move-window window-name-3 743 260)
+	      (move-window window-name-4 1387 260)
+	      (with-point ((minloc (point))
+			   (maxloc (point)))
+		(with-object ((minval (alloc :double 0d0))
+			      (maxval (alloc :double 0d0))
+			      (val1 (alloc :int 50))
+			      (val2 (alloc :int 50)))
+		  ;Set rectangle color
+		  (with-scalar ((color (scalar 0 0 255)))
+		    ;Load template image
+		    (with-mat ((templ (imread filename 1))
+			       (dest (mat)))
+		      (create-trackbar "Brightness" window-name-3 val1 100)
+		      (create-trackbar  "Contrast" window-name-3 val2 100)
+		      (loop
+			 ;Set camera feed to FRAME
+			 (with-mat ((frame (mat)))
+			   (cap-read cap frame)
+			   ;Set brightness and contrast values 
+			   ;based on trackbar input
+			   (setf brightness (- (mem-ref val1 :int) 50))
+			   (setf contrast (/ (mem-ref val2 :int) 50))
+			   (copy-to frame dest)
+			   (convert-to frame dest -1 (coerce contrast 'double-float)  
+				       (coerce brightness 'double-float))
+			   (setf iwidth (+ (- (cols frame) (cols templ)) 1))
+			   (setf iheight (+ (- (rows frame) (rows templ)) 1))
+			   ;Create  matrix to hold all of the matches
+			   (with-mat ((matches (mat iheight iwidth +32f+)))
+			     ;Run MATCH-TEMPLATE on each frame of the camera 
+			     ;feed and run NORM on each match 
+			     (match-template dest templ matches +tm-ccoeff-normed+)
+			     (norm matches matches +norm-l2+)
+			     ;Run MIN-MAX-LOC to set point 
+			     ;coordinates for each match
+			     (min-max-loc matches minval maxval minloc maxloc)
+			     (rectangle frame (gc:point (point-x minloc) (point-y minloc)) 
+					(gc:point (+ (point-x minloc) (cols templ)) 
+						  (+ (point-y minloc) (rows templ))) 
+					color 10 0 0)
+			     ;Show image, template and matches and DEST in a window
+			     (imshow window-name-1 templ)
+			     (imshow window-name-2 frame)
+			     (imshow window-name-3 dest)
+			     (imshow window-name-4 matches)
+			     (let ((c (wait-key 33)))
+			       (when (= c 27)
+				 (return)))))))))))))))))
 
 
 
@@ -11462,6 +11580,34 @@ And also retrieve the length of the vector:
 2  <--- Vector a length,
 
 
+
+Note: For VEC-DMATCH. When accessing the numerical content of of the objects in a VECTOR-DMATCH, 
+you must supply the type of the element you are attempting to access as the last parameter e.g.
+
+
+CV> (DEFPARAMETER A (VEC-DMATCH (VECTOR (DMATCH 1 2 3F0) (DMATCH 1 2 3F0))))
+
+A
+
+CV> (VEC-DMATCH A 0 0 :INT)
+
+1
+
+CV> (VEC-DMATCH A 0 1 :INT)
+
+2
+
+CV> (VEC-DMATCH A 0 2 :FLOAT)  
+    
+#<SINGLE-FLOAT quiet NaN>                                
+
+CV> (VEC-DMATCH A 0 2 :INT)
+
+-1
+
+CV> (VEC-DMATCH A 0 3 :FLOAT)  <--- If a VECTOR-DMATCH contains a 3 element DMATCH, the value you entered 
+                                    as the 3rd parameter will be accessible at the 4th index. 
+3.0
 
 
 

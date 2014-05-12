@@ -377,6 +377,8 @@
    #:+decomp-cholesky+ 
    #:+decomp-qr+ 
    #:+decomp-normal+
+   #:+l1+
+   #:+l2+
    #:+norm-inf+
    #:+norm-l1+
    #:+norm-l2+
@@ -406,13 +408,10 @@
    #:in-range-s
    #:inv
    #:invert
-
-   #:+l1+
-   #:+l2+
-
    #:mean
    #:min-max-loc
    #:multiply
+   #:norm
    #:normalize
    #:pow
    #:randu
