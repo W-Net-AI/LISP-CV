@@ -227,7 +227,7 @@
   (img mat)
   (params vector-int))
 
-(defun imwrite (filename img &optional (params (vector-int)))
+(defun imwrite (filename img &optional (params (vec-int)))
        "Saves an image to a specified file."
        (%imwrite filename img params))
 

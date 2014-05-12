@@ -11,12 +11,12 @@
 
 ;; SURF::SURF()
 ;; SURF* cv_create_SURF() 
-(defcfun ("cv_create_SURF" surf0) surf)
+(defcfun ("cv_create_SURF" surf0) feature-2d)
 
 
 ;; SURF::SURF(double hessianThreshold, int nOctaves=4, int nOctaveLayers=2, bool extended=true, bool upright=false )
 ;; SURF* cv_create_SURF5(double hessianThreshold, int nOctaves, int nOctaveLayers, bool extended, bool upright)
-(defcfun ("cv_create_SURF5" surf5) surf
+(defcfun ("cv_create_SURF5" surf5) feature-2d
   (hessian-threshold :double)
   (n-octaves :int)
   (n-octave-layers :int)

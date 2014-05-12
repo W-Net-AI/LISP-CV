@@ -127,15 +127,15 @@ void cv_delete_BRISK(BRISK* self) {
     delete self;
 }
 
-void cv_delete_BFMatcher(BFMatcher* self) {
-    delete self;
-}
-
 void cv_delete_CscadeClassifier(CascadeClassifier* self) {
      delete self;
 }
 
 void cv_delete_DMatch(DMatch* self) {
+    delete self;
+}
+
+void cv_delete_Feature2D(Feature2D* self) {
     delete self;
 }
 

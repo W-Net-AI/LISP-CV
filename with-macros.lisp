@@ -7,16 +7,6 @@
 (in-package :lisp-cv)
 
 
-
-(defmacro with-bf-matcher (bind &body body)
-  "Ensures DEL-BF-MATCHER gets called 
-   when BF-MATCHER goes out of scope."
-  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
-     (unwind-protect (progn ,@body)
-       (mapcar #!(del-bf-matcher %1) ,(cons 'list (mapcar #!(car %1) bind)))
-       (values))))
-
-
 (defmacro with-brisk (bind &body body)
   "Ensures DEL-BRISK gets called 
    when BRISK goes out of scope."
@@ -41,6 +31,15 @@
   `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
      (unwind-protect (progn ,@body)
        (mapcar #!(del-dmatch %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
+
+
+(defmacro with-feature-2d (bind &body body)
+  "Ensures DEL-FEATURE-2D gets called 
+   when FEATURE-2D goes out of scope."
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-feature-2d %1) ,(cons 'list (mapcar #!(car %1) bind)))
        (values))))
 
 
@@ -89,48 +88,48 @@
        (values))))
 
 
-(defmacro with-point2d (bind &body body)
-  "Ensures DEL-POINT2D gets called 
-   when POINT2D goes out of scope."
+(defmacro with-point-2d (bind &body body)
+  "Ensures DEL-POINT-2D gets called 
+   when POINT-2D goes out of scope."
   `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
      (unwind-protect (progn ,@body)
-       (mapcar #!(del-point2d %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (mapcar #!(del-point-2d %1) ,(cons 'list (mapcar #!(car %1) bind)))
        (values))))
 
 
-(defmacro with-point2f (bind &body body)
-  "Ensures DEL-POINT2F gets called 
-   when POINT2F goes out of scope."
+(defmacro with-point-2f (bind &body body)
+  "Ensures DEL-POINT-2F gets called 
+   when POINT-2F goes out of scope."
   `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
      (unwind-protect (progn ,@body)
-       (mapcar #!(del-point2f %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (mapcar #!(del-point-2f %1) ,(cons 'list (mapcar #!(car %1) bind)))
        (values))))
 
 
-(defmacro with-point3d (bind &body body)
-  "Ensures DEL-POINT3D gets called 
-   when POINT3D goes out of scope."
+(defmacro with-point-3d (bind &body body)
+  "Ensures DEL-POINT-3D gets called 
+   when POINT-3D goes out of scope."
   `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
      (unwind-protect (progn ,@body)
-       (mapcar #!(del-point3d %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (mapcar #!(del-point-3d %1) ,(cons 'list (mapcar #!(car %1) bind)))
        (values))))
 
 
-(defmacro with-point3f (bind &body body)
-  "Ensures DEL-POINT3F gets called 
-   when POINT3F goes out of scope."
+(defmacro with-point-3f (bind &body body)
+  "Ensures DEL-POINT-3F gets called 
+   when POINT-3F goes out of scope."
   `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
      (unwind-protect (progn ,@body)
-       (mapcar #!(del-point3f %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (mapcar #!(del-point-3f %1) ,(cons 'list (mapcar #!(car %1) bind)))
        (values))))
 
 
-(defmacro with-point3i (bind &body body)
-  "Ensures DEL-POINT3I gets called 
-   when POINT3I goes out of scope."
+(defmacro with-point-3i (bind &body body)
+  "Ensures DEL-POINT-3I gets called 
+   when POINT-3I goes out of scope."
   `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
      (unwind-protect (progn ,@body)
-       (mapcar #!(del-point3i %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (mapcar #!(del-point-3i %1) ,(cons 'list (mapcar #!(car %1) bind)))
        (values))))
 
 
@@ -278,12 +277,12 @@
        (values))))
 
 
-(defmacro with-vector-point2f (bind &body body)
-  "Ensures DEL-VEC-POINT2F gets called 
-   when VECTOR-POINT2F goes out of scope."
+(defmacro with-vector-point-2f (bind &body body)
+  "Ensures DEL-VEC-POINT-2F gets called 
+   when VECTOR-POINT-2F goes out of scope."
   `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
      (unwind-protect (progn ,@body)
-       (mapcar #!(del-vec-point2f %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (mapcar #!(del-vec-point-2f %1) ,(cons 'list (mapcar #!(car %1) bind)))
        (values))))
 
 

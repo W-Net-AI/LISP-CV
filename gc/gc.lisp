@@ -11,9 +11,9 @@
 
 ;; string* std_cstringToString(char* s, size_t len) 
 (defcfun ("cstring_to_std_string" c-string-to-string) (cv::*string :garbage-collect t)
-  "Converts C string to C++"
-  (s :string)
-  (len :unsigned-int))
+	 "Converts C string to C++"
+	 (s :string)
+	 (len :unsigned-int))
 
 
 ;;; CORE - Basic Structures
@@ -21,14 +21,14 @@
 
 ;; Mat* force(MatExpr* expr)
 (defcfun ("force" >>) (cv::mat :garbage-collect t)
-  "Coerces a MAT-EXPR to a MAT. 
+	 "Coerces a MAT-EXPR to a MAT. 
    This is a shorthand version of the FORCE function."
    (mat-expr cv::mat-expr))
 
 
 ;; MatExpr* promote(Mat* m) 
 (defcfun ("promote" <<) (cv::mat-expr :garbage-collect t)
-  "Converts a MAT to a MAT-EXPR.
+	 "Converts a MAT to a MAT-EXPR.
    This is a shorthand version of the PROMOTE function." 
    (mat cv::mat))
 
@@ -36,50 +36,50 @@
 ;; MatExpr + operator
 ;; MatExpr* cv_Mat_add(Mat* m1, Mat* m2)
 (defcfun ("cv_Mat_add" add) (cv::mat-expr :garbage-collect t)
-  (m1 cv::mat)
-  (m2 cv::mat))
+	 (m1 cv::mat)
+	 (m2 cv::mat))
 
 
 ;; Mat& Mat::adjustROI(int dtop, int dbottom, int dleft, int dright)
 ;; Mat* cv_Mat_adjustROI(Mat* self, int dtop, int dbottom, int dleft, int dright) 
 (defcfun ("cv_Mat_adjustROI" adjust-roi) (cv::mat :garbage-collect t)
-  "Adjusts a submatrix size and position within the parent matrix."
-  (self cv::mat)
-  (dtop :int)
-  (dbottom :int)
-  (dleft :int)
-  (dright :int))
+	 "Adjusts a submatrix size and position within the parent matrix."
+	 (self cv::mat)
+	 (dtop :int)
+	 (dbottom :int)
+	 (dleft :int)
+	 (dright :int))
 
 
 ;; Mat Mat::clone() const
 ;; Mat* cv_Mat_clone(Mat* self) 
 (defcfun ("cv_Mat_clone" clone) (cv::mat :garbage-collect t)
-  "Creates a full copy of the array and the underlying data."
-  (self cv::mat))
+	 "Creates a full copy of the array and the underlying data."
+	 (self cv::mat))
 
 
 ;; Mat Mat::colRange(int startcol, int endcol) const
 ;; Mat* cv_Mat_getColRange(Mat* self, int startcol, int endrow)
 (defcfun ("cv_Mat_getColRange" col-range) (cv::mat :garbage-collect t)
-  "Creates a matrix header for the specified column span."
-  (self cv::mat)
-  (startcol :int)
-  (endcol :int))
+	 "Creates a matrix header for the specified column span."
+	 (self cv::mat)
+	 (startcol :int)
+	 (endcol :int))
 
 
 ;; Mat Mat::cross(InputArray m) const
 ;; Mat* cv_Mat_cross(Mat* self, Mat* m)
 (defcfun ("cv_Mat_cross" cross) (cv::mat :garbage-collect t)
-  "Computes a cross-product of two 3-element vectors."
-  (self cv::mat)
-  (m cv::mat))
+	 "Computes a cross-product of two 3-element vectors."
+	 (self cv::mat)
+	 (m cv::mat))
 
 
 ;; Mat* cv_Mat_diag_d(Mat* self, int d)
 (defcfun ("cv_Mat_diag_d" %diag) (cv::mat :garbage-collect t)
-  "Extracts a diagonal from a matrix."
-  (self cv::mat)
-  (d :int))
+	 "Extracts a diagonal from a matrix."
+	 (self cv::mat)
+	 (d :int))
 
 (defun diag (self &optional (d 0))
        "Extracts a diagonal from a matrix."
@@ -89,31 +89,31 @@
 ;; MatExpr / operator
 ;; MatExpr* cv_Mat_div(Mat* m1, Mat* m2)
 (defcfun ("cv_Mat_div" div) (cv::mat-expr :garbage-collect t)
-  (m1 cv::mat)
-  (m2 cv::mat))
+	 (m1 cv::mat)
+	 (m2 cv::mat))
 
 
 ;; DMatch::DMatch()
 ;; DMatch* cv_create_DMatch() 
 (defcfun ("cv_create_DMatch" dmatch0) (cv::dmatch :garbage-collect t)
-  "DMatch constructor")
+	 "DMatch constructor")
 
 ;; DMatch( int _queryIdx, int _trainIdx, float _distance ) 
 ;; DMatch* cv_create_DMatch3(int _queryIdx, int _trainIdx, float _distance)
 (defcfun ("cv_create_DMatch3" dmatch3) (cv::dmatch :garbage-collect t)
-  "DMatch constructor"
-  (query-idx :int)
-  (train-idx :int)
-  (distance :float))
+	 "DMatch constructor"
+	 (query-idx :int)
+	 (train-idx :int)
+	 (distance :float))
 
 ;; DMatch( int _queryIdx, int _trainIdx, int _imgIdx, float _distance )
 ;; DMatch* cv_create_DMatch4(int _queryIdx, int _trainIdx, int _imgIdx, float _distance)
 (defcfun ("cv_create_DMatch4" dmatch4) (cv::dmatch :garbage-collect t)
-  "DMatch constructor"
-  (query-idx :int)
-  (train-idx :int)
-  (img-idx :int)
-  (distance :float))
+	 "DMatch constructor"
+	 (query-idx :int)
+	 (train-idx :int)
+	 (img-idx :int)
+	 (distance :float))
 
 (defun dmatch (&rest args)
        (cond ((eq (first args) nil)
@@ -127,26 +127,26 @@
 
 ;; Mat* force(MatExpr* expr)
 (defcfun ("force" force) (cv::mat :garbage-collect t)
-  "Coerces a MAT-EXPR to a MAT."
-  (mat-expr cv::mat-expr))
+	 "Coerces a MAT-EXPR to a MAT."
+	 (mat-expr cv::mat-expr))
 
 
 ;; KeyPoint::KeyPoint()
 ;; KeyPoint* cv_create_KeyPoint()
 (defcfun ("cv_create_KeyPoint" key-point0) (cv::key-point :garbage-collect t)
-  "KEY-POINT constructor")
+	 "KEY-POINT constructor")
 
 ;; KeyPoint::KeyPoint(float x, float y, float _size, float _angle=-1, float _response=0, int _octave=0, int _class_id=-1)
 ;; KeyPoint* cv_create_KeyPoint7(float x, float y, float _size, float _angle, float _response, int _octave, int _class_id)
 (defcfun ("cv_create_KeyPoint7" key-point7) (cv::key-point :garbage-collect t)
-  "KEY-POINT constructor"
-  (x :float)
-  (y :float)
-  (size :float)
-  (angle :float)
-  (response :float)
-  (octave :int)
-  (class-id :int))
+	 "KEY-POINT constructor"
+	 (x :float)
+	 (y :float)
+	 (size :float)
+	 (angle :float)
+	 (response :float)
+	 (octave :int)
+	 (class-id :int))
 
 (defun key-point (&optional x y size (angle -1) (response 0) (octave 0) (class-id -1))
        (cond ((eq x nil)
@@ -182,47 +182,47 @@
 ;; Mat::t
 ;; MatExpr* cv_Mat_transpose_mat(Mat* self) 
 (defcfun ("cv_Mat_transpose_mat" mat-expr-t) (cv::mat-expr :garbage-collect t)
-  "Transposes a matrix."
-  (self cv::mat))
+	 "Transposes a matrix."
+	 (self cv::mat))
 
 
 ;; static MatExpr Mat::eye(int rows, int cols, int type) 
 ;; Mat* cv_create_identity(int rows, int cols, int type)
 (defcfun ("cv_create_identity" mat-eye) (cv::mat :garbage-collect t)
-  "Returns an identity matrix of the specified size and type."
-  (rows :int)
-  (cols :int)
-  (type :int))
+	 "Returns an identity matrix of the specified size and type."
+	 (rows :int)
+	 (cols :int)
+	 (type :int))
 
 
 ;; static MatExpr Mat::ones(int rows, int cols, int type)
 ;; Mat* cv_create_ones(int rows, int cols, int type)
 (defcfun ("cv_create_ones" mat-ones) (cv::mat :garbage-collect t)
-  (rows :int)
-  (cols :int)
-  (type :int))
+	 (rows :int)
+	 (cols :int)
+	 (type :int))
 
 
 ;; Size Mat::size() const
 ;; Size* cv_Mat_size(Mat* self)
 (defcfun ("cv_Mat_size" mat-size) (cv::size :garbage-collect t)
-  (self cv::mat))
+	 (self cv::mat))
 
 
 ;; MatExpr * operator
 ;; MatExpr* cv_Mat_scale(MatExpr* m, double alpha)
 (defcfun ("cv_Mat_scale" scale) (cv::mat-expr :garbage-collect t)
-  (m cv::mat-expr)
-  (alpha :double))
+	 (m cv::mat-expr)
+	 (alpha :double))
 
 
 ;; Mat::Mat(int rows, int cols, int type)
 ;; Mat* cv_create_Mat_typed(int rows, int cols, int type)
 (defcfun ("cv_create_Mat_typed" %mat-typed) (cv::mat :garbage-collect t)
-  "MAT constructor with a row, column and type parameter."
-  (rows :int)
-  (cols :int)
-  (type :int))
+	 "MAT constructor with a row, column and type parameter."
+	 (rows :int)
+	 (cols :int)
+	 (type :int))
 
 
 ;; Mat::Mat(int rows, int cols, int type, const Scalar& s)
@@ -254,20 +254,20 @@
 	     
 	     ((and (eq (fourth args) nil) (first args)) 
 	      (%mat-typed (first args) (second args) (third args)))
+	      
+	      ((eq (type-of (fourth args)) 'cv::cv-scalar)
+	       (%mat-value (first args) (second args) (third args) (fourth args)))
 	       
-	       ((eq (type-of (fourth args)) 'cv::cv-scalar)
-		(%mat-value (first args) (second args) (third args) (fourth args)))
+	       ((listp (fourth args))
+		(%%mat-value (first args) (second args) (third args) (fourth args)))
 		
-		((listp (fourth args))
-		 (%%mat-value (first args) (second args) (third args) (fourth args)))
-		   
-		   ((pointerp (fourth args))
-		    (%mat-data (first args) (second args) (third args) (fourth args)))
-		    
-		    ((listp (fifth args))
-		     (%%mat-data (first args) (second args) (third args) (fourth args) (fifth args)))
-		       
-		       (t nil)))
+		((pointerp (fourth args))
+		 (%mat-data (first args) (second args) (third args) (fourth args)))
+		 
+		 ((listp (fifth args))
+		  (%%mat-data (first args) (second args) (third args) (fourth args) (fifth args)))
+		  
+		  (t nil)))
 
 ;;; MAT
 
@@ -275,29 +275,29 @@
 ;; static MatExpr Mat::zeros(int rows, int cols, int type)
 ;; Mat* cv_create_zeros(int rows, int cols, int type)
 (defcfun ("cv_create_zeros" mat-zeros) (cv::mat :garbage-collect t)
-  (rows :int)
-  (cols :int)
-  (type :int))
+	 (rows :int)
+	 (cols :int)
+	 (type :int))
 
 
 ;; MatExpr * operator
 ;; MatExpr* cv_Mat_mult(Mat* m1, Mat* m2)
 (defcfun ("cv_Mat_mult" mul) (cv::mat-expr :garbage-collect t)
-  (m1 cv::mat)
-  (m2 cv::mat))
+	 (m1 cv::mat)
+	 (m2 cv::mat))
 
 
 ;; Point_()
 ;; Point2##t * cv_create_Point2##t ( tn x,  tn y)
 (defcfun ("cv_create_Point2i" point0) (cv::point :garbage-collect t)
-  "Point constructor")
+	 "Point constructor")
 
 ;; Point_(_Tp _x, _Tp _y)
 ;; Point2##t * cv_create_Point2##t ( tn x,  tn y) 
 (defcfun ("cv_create_Point2i" point2) (cv::point :garbage-collect t)
-  "Point constructor"
-  (x :int)
-  (y :int))
+	 "Point constructor"
+	 (x :int)
+	 (y :int))
 
 
 (defun point (&optional x y)
@@ -324,213 +324,213 @@
 
 ;; typedef Point_<double> Point2d
 ;; Point2##t * cv_create_Point2##t ( tn x,  tn y) 
-(defcfun ("cv_create_Point2d" point2d0) (cv::point2d :garbage-collect t) 
+(defcfun ("cv_create_Point2d" point-2d0) (cv::point-2d :garbage-collect t) 
 	 "Point2d constructor")
 
 
 ;; typedef Point_<double> Point2d
 ;; Point2##t * cv_create_Point2##t ( tn x,  tn y)  
-(defcfun ("cv_create_Point2d" point2d2) (cv::point2d :garbage-collect t) 
+(defcfun ("cv_create_Point2d" point-2d2) (cv::point-2d :garbage-collect t) 
 	 "Point2d constructor"
 	 (x :double)
 	 (y :double))
 
 
-(defun point2d (&optional x y)
+(defun point-2d (&optional x y)
        (cond ((eq (or x y) nil)
-	      (point2d0))
+	      (point-2d0))
 	      ((and x y)
-	       (point2d2 x y))
+	       (point-2d2 x y))
 	       (t nil)))
 
 
 ;; _Tp x, y
 ;; double cv_Point2d_getX(Point2d* self) 
-(defcfun ("cv_Point2d_getX" point2d-x) :double
-  "Retrieves x coordinate of a point2d"
-  (self cv::point2d))
+(defcfun ("cv_Point2d_getX" point-2d-x) :double
+  "Retrieves x coordinate of a point-2d"
+  (self cv::point-2d))
 
 
 ;; _Tp x, y
 ;; double cv_Point2d_getY(Point2d* self) 
-(defcfun ("cv_Point2d_getY" point2d-y) :double
-  "Retrieves y coordinate of a point2d"
-  (self cv::point2d))
+(defcfun ("cv_Point2d_getY" point-2d-y) :double
+  "Retrieves y coordinate of a point-2d"
+  (self cv::point-2d))
 
 
 ;; typedef Point_<float> Point2f
 ;; tn cv_Point2##t##_getX( Point2##t * self) 
-(defcfun ("cv_create_Point2f" point2f0) (cv::point2f :garbage-collect t) 
+(defcfun ("cv_create_Point2f" point-2f0) (cv::point-2f :garbage-collect t) 
 	 "Point2f constructor")
 
 
 
 ;; typedef Point_<float> Point2f
 ;; Point2##t * cv_create_Point2##t ( tn x,  tn y)  
-(defcfun ("cv_create_Point2f" point2f2) (cv::point2f :garbage-collect t) 
+(defcfun ("cv_create_Point2f" point-2f2) (cv::point-2f :garbage-collect t) 
 	 "Point2f constructor"
 	 (x :float)
 	 (y :float))
 
 
-(defun point2f (&optional x y)
+(defun point-2f (&optional x y)
        (cond ((eq (or x y) nil)
-	      (point2f0))
+	      (point-2f0))
 	      ((and x y)
-	       (point2f2 x y))
+	       (point-2f2 x y))
 	       (t nil)))
 
 
 ;; _Tp x, y;
 ;; float cv_Point2f_getX(Point2f* self) 
-(defcfun ("cv_Point2f_getX" point2f-x) :float
-  "Retrieves x coordinate of a point2f"
-  (self cv::point2f))
+(defcfun ("cv_Point2f_getX" point-2f-x) :float
+  "Retrieves x coordinate of a point-2f"
+  (self cv::point-2f))
 
 
 ;; _Tp x, y;
 ;; float cv_Point2f_getY(Point2f* self) 
-(defcfun ("cv_Point2f_getY" point2f-y) :float
-  "Retrieves y coordinate of a point2f"
-  (self cv::point2f))
+(defcfun ("cv_Point2f_getY" point-2f-y) :float
+  "Retrieves y coordinate of a point-2f"
+  (self cv::point-2f))
 
 
 ;; typedef Point3_<double> Point3d
 ;; Point3##t * cv_create_Point3##t ( tn x,  tn y,  tn z) 
-(defcfun ("cv_create_Point3d" point3d0) (cv::point3d :garbage-collect t) 
+(defcfun ("cv_create_Point3d" point-3d0) (cv::point-3d :garbage-collect t) 
 	 "Point3d constructotr")
 
 
 ;; typedef Point3_<double> Point3d
 ;; Point3##t * cv_create_Point3##t ( tn x,  tn y,  tn z) 
-(defcfun ("cv_create_Point3d" point3d2) (cv::point3d :garbage-collect t) 
+(defcfun ("cv_create_Point3d" point-3d2) (cv::point-3d :garbage-collect t) 
 	 "Point3d constructor"
 	 (x :double)
 	 (y :double)
 	 (z :double))
 
 
-(defun point3d (&optional x y z)
+(defun point-3d (&optional x y z)
        (cond ((eq (or x y) nil)
-	      (point3d0))
+	      (point-3d0))
 	      ((and x y)
-	       (point3d2 x y z))
+	       (point-3d2 x y z))
 	       (t nil)))
 
 
 ;; _Tp x, y, z
 ;; double cv_Point3d_getX(Point3d* self) 
-(defcfun ("cv_Point3d_getX" point3d-x) :double
-  "Retrieves x coordinate of a point3d"
-  (self cv::point3d))
+(defcfun ("cv_Point3d_getX" point-3d-x) :double
+  "Retrieves x coordinate of a point-3d"
+  (self cv::point-3d))
 
 
 ;; _Tp x, y, z
 ;; double cv_Point3d_getY(Point3d* self) 
-(defcfun ("cv_Point3d_getY" point3d-y) :double
-  "Retrieves y coordinate of a point3d"
-  (self cv::point3d))
+(defcfun ("cv_Point3d_getY" point-3d-y) :double
+  "Retrieves y coordinate of a point-3d"
+  (self cv::point-3d))
 
 
 ;; _Tp x, y, z
 ;; double cv_Point3d_getZ(Point3d* self) 
-(defcfun ("cv_Point3d_getZ" point3d-z) :double
-  "Retrieves z coordinate of a point3d"
-  (self cv::point3d))
+(defcfun ("cv_Point3d_getZ" point-3d-z) :double
+  "Retrieves z coordinate of a point-3d"
+  (self cv::point-3d))
 
 
 ;; typedef Point3_<double> Point3d
 ;; Point3##t * cv_create_Point3##t ( tn x,  tn y,  tn z)  
-(defcfun ("cv_create_Point3f" point3f0) (cv::point3f :garbage-collect t) 
+(defcfun ("cv_create_Point3f" point-3f0) (cv::point-3f :garbage-collect t) 
 	 "Point3f constructor")
 
 
 ;; typedef Point3_<double> Point3d
 ;; Point3##t * cv_create_Point3##t ( tn x,  tn y,  tn z)  
-(defcfun ("cv_create_Point3f" point3f2) (cv::point3f :garbage-collect t)
+(defcfun ("cv_create_Point3f" point-3f2) (cv::point-3f :garbage-collect t)
 	 "Point3f constructor"
 	 (x :float)
 	 (y :float)
 	 (z :float))
 
 
-(defun point3f (&optional x y z)
+(defun point-3f (&optional x y z)
        (cond ((eq (or x y) nil)
-	      (point3f0))
+	      (point-3f0))
 	      ((and x y)
-	       (point3f2 x y z))
+	       (point-3f2 x y z))
 	       (t nil)))
 
 
 ;; _Tp x, y, z
 ;; float cv_Point3f_getX(Point3f* self) 
-(defcfun ("cv_Point3f_getX" point3f-x) :float
-  "Retrieves x coordinate of a point3f"
-  (self cv::point3f))
+(defcfun ("cv_Point3f_getX" point-3f-x) :float
+  "Retrieves x coordinate of a point-3f"
+  (self cv::point-3f))
 
 
 ;; _Tp x, y, z
 ;; float cv_Point3f_getY(Point3f* self) 
-(defcfun ("cv_Point3f_getY" point3f-y) :float
-  "Retrieves y coordinate of a point3f"
-  (self cv::point3f))
+(defcfun ("cv_Point3f_getY" point-3f-y) :float
+  "Retrieves y coordinate of a point-3f"
+  (self cv::point-3f))
 
 
 ;; _Tp x, y, z
 ;; float cv_Point3f_getZ(Point3f* self) 
-(defcfun ("cv_Point3f_getZ" point3f-z) :float
-  "Retrieves z coordinate of a point3f"
-  (self cv::point3f))
+(defcfun ("cv_Point3f_getZ" point-3f-z) :float
+  "Retrieves z coordinate of a point-3f"
+  (self cv::point-3f))
 
 
 ;; typedef Point3_<double> Point3d
 ;; Point3##t * cv_create_Point3##t ( tn x,  tn y,  tn z)  
-(defcfun ("cv_create_Point3i" point3i0) (cv::point3i :garbage-collect t) 
+(defcfun ("cv_create_Point3i" point-3i0) (cv::point-3i :garbage-collect t) 
 	 "Point3i constructor")
 
 
 ;; typedef Point3_<double> Point3d
 ;; Point3##t * cv_create_Point3##t ( tn x,  tn y,  tn z)  
-(defcfun ("cv_create_Point3i" point3i2) (cv::point3i :garbage-collect t)
+(defcfun ("cv_create_Point3i" point-3i2) (cv::point-3i :garbage-collect t)
 	 "Point3i constructor"
 	 (x :int)
 	 (y :int)
 	 (z :int))
 
 
-(defun point3i (&optional x y z)
+(defun point-3i (&optional x y z)
        (cond ((eq (or x y) nil)
-	      (point3i0))
+	      (point-3i0))
 	      ((and x y)
-	       (point3i2 x y z))
+	       (point-3i2 x y z))
 	       (t nil)))
 
 
 ;; _Tp x, y, z
 ;; int cv_Point3i_getX(Point3i* self) 
-(defcfun ("cv_Point3i_getX" point3i-x) :int 
-	 "Retrieves y coordinate of a point3i"
-	 (self cv::point3i))
+(defcfun ("cv_Point3i_getX" point-3i-x) :int 
+	 "Retrieves y coordinate of a point-3i"
+	 (self cv::point-3i))
 
 
 ;; _Tp x, y, z
 ;; int cv_Point3i_getY(Point3i* self) 
-(defcfun ("cv_Point3i_getY" point3i-y) :int
-  "Retrieves y coordinate of a point3i"
-  (self cv::point3i))
+(defcfun ("cv_Point3i_getY" point-3i-y) :int
+  "Retrieves y coordinate of a point-3i"
+  (self cv::point-3i))
 
 
 ;; _Tp x, y, z
 ;; int cv_Point3i_getZ(Point3i* self) 
-(defcfun ("cv_Point3i_getZ" point3i-z) :int
-  "Retrieves z coordinate of a point3i"
-  (self cv::point3i))
+(defcfun ("cv_Point3i_getZ" point-3i-z) :int
+  "Retrieves z coordinate of a point-3i"
+  (self cv::point-3i))
 
 
 ;; MatExpr* promote(Mat* m) 
 (defcfun ("promote" promote) (cv::mat-expr :garbage-collect t)
-  "Converts a MAT to a MAT-EXPR."
-  (mat cv::mat))
+	 "Converts a MAT to a MAT-EXPR."
+	 (mat cv::mat))
 
 
 ;; uchar* Mat::ptr(int i0=0)
@@ -553,11 +553,11 @@
 ;; Rect_(_Tp _x, _Tp _y, _Tp _width, _Tp _height)
 ;; Rect* cv_create_Rect4(int x, int y, int width, int height) 
 (defcfun ("cv_create_Rect4" rect4) (cv::rect :garbage-collect t)
-  "RECT constructor."
-  (x :int)
-  (y :int)
-  (width :int)
-  (height :int))
+	 "RECT constructor."
+	 (x :int)
+	 (y :int)
+	 (width :int)
+	 (height :int))
 
 (defun rect (&optional x y width height)
        (cond ((eq (or x y) nil)
@@ -578,7 +578,7 @@
 ;; _Tp x, y, width, height
 ;; Rect* cv_Rect_clone(Rect* self)
 (defcfun ("cv_Rect_clone" rect-clone) (cv::rect :garbage-collect t)
-  (self cv::rect))
+	 (self cv::rect))
 
 
 ;; Size_<_Tp> size() const
@@ -598,15 +598,15 @@
 ;; Mat Mat::reshape(int cn, int rows=0) const
 ;; Mat* cv_Mat_reshape(Mat* self, int cn) 
 (defcfun ("cv_Mat_reshape" %reshape) (cv::mat :garbage-collect t)
-  (self cv::mat)
-  (cn :int))
+	 (self cv::mat)
+	 (cn :int))
 
 ;; Mat Mat::reshape(int cn, int rows=0) const
 ;; Mat* cv_Mat_reshape_rows(Mat* self, int cn, int rows) 
 (defcfun ("cv_Mat_reshape_rows" reshape-rows) (cv::mat :garbage-collect t)
-  (self cv::mat)
-  (cn :int)
-  (roms :int))
+	 (self cv::mat)
+	 (cn :int)
+	 (roms :int))
 
 
 (defun reshape (&optional self cn (rows 0))
@@ -628,28 +628,28 @@
 ;; RotatedRect(const Point2f& center, const Size2f& size, float angle)
 ;; RotatedRect* cv_create_RotatedRect(Point2f* center, Size2f* size, float angle)
 (defcfun ("cv_create_RotatedRect" %rotated-rect) (cv::rotated-rect :garbage-collect t)
-  (center cv::point)
-  (size cv::size)
-  (angle :float))
+	 (center cv::point)
+	 (size cv::size)
+	 (angle :float))
 
 
 ;; Rect RotatedRect::boundingRect() const
 ;; Rect* cv_RotatedRect_boundingRect(RotatedRect* self)
 (defcfun ("cv_RotatedRect_boundingRect" rotated-rect-bounding-rect) (cv::rotated-rect :garbage-collect t)
-  "Returns the minimal up-right rectangle containing the rotated rectangle"
-  (self cv::rotated-rect))
+	 "Returns the minimal up-right rectangle containing the rotated rectangle"
+	 (self cv::rotated-rect))
 
 
 ;; Point2f center;
 ;; Point* cv_RotatedRect_center(RotatedRect* self) 
 (defcfun ("cv_RotatedRect_center" rotated-rect-center) (cv::point :garbage-collect t)
-  (self cv::rotated-rect))
+	 (self cv::rotated-rect))
 
 
 ;; Size2f size;     
 ;; Size* cv_RotatedRect_size(RotatedRect* self) 
 (defcfun ("cv_RotatedRect_size" rotated-rect-size) (cv::size :garbage-collect t)
-  (self cv::rotated-rect))
+	 (self cv::rotated-rect))
 
 
 (defun rotated-rect (&rest args)
@@ -668,10 +668,10 @@
 ;; Mat Mat::rowRange(int startrow, int endrow) const
 ;; Mat* cv_Mat_getRowRange(Mat* self, int startrow, int endrow)
 (defcfun ("cv_Mat_getRowRange" row-range) (cv::mat :garbage-collect t)
-  "Creates a matrix header for the specified row span."
-  (self cv::mat)
-  (startrow :int)
-  (endrow :int))
+	 "Creates a matrix header for the specified row span."
+	 (self cv::mat)
+	 (startrow :int)
+	 (endrow :int))
 
 
 ;; Scalar_<_Tp>::Scalar_(_Tp v0, _Tp v1, _Tp v2, _Tp v3)
@@ -685,13 +685,13 @@
 
 (defun scalar (&optional (val1 0d0) (val2 0d0) (val3 0d0) (val4 0d0))
        "SCALAR constructor"
-	      (%scalar (coerce val1 'double-float) (coerce val2 'double-float) (coerce val3 'double-float) (coerce val4 'double-float)))
+       (%scalar (coerce val1 'double-float) (coerce val2 'double-float) (coerce val3 'double-float) (coerce val4 'double-float)))
 
 
 ;; Scalar_<_Tp> Scalar_<_Tp>::all(_Tp v0)
 ;; Scalar* cv_create_scalarAll(double val0123)
 (defcfun ("cv_create_scalarAll" %scalar-all) (cv::scalar :garbage-collect t)
-  (val0123 :double))
+	 (val0123 :double))
 
 
 (defun scalar-all (val0123)
@@ -702,55 +702,55 @@
 ;; Size_()
 ;; Size* cv_create_Size() 
 (defcfun ("cv_create_Size" size0) (cv::size :garbage-collect t)
-  "Create SIZE construct")
+	 "Create SIZE construct")
 
 
 ;; Size_(_Tp _width, _Tp _height)
 ;; cv_create_Size2(double width, double height)
 (defcfun ("cv_create_Size2" size2) (cv::size :garbage-collect t)
-  "SIZE constructor"
-  (width :double)
-  (height :double))
+	 "SIZE constructor"
+	 (width :double)
+	 (height :double))
 
 
 (defun size (&optional arg1 arg2)
        (cond ((eq (or arg1 arg2) nil)
 	      (size0))
-	     
-	     ((numberp (or arg1 arg2)) 
-	      (size2 (coerce arg1 'double-float) 
-		     (coerce arg2 'double-float)))
-	     
-	     ((eq (type-of arg1) 'cv::cv-mat) (mat-size arg1))
-	     (t nil)))
+	      
+	      ((numberp (or arg1 arg2)) 
+	       (size2 (coerce arg1 'double-float) 
+		      (coerce arg2 'double-float)))
+		      
+		      ((eq (type-of arg1) 'cv::cv-mat) (mat-size arg1))
+		      (t nil)))
 
 
 ;; Size* cv_Size_assignTo(Size* self, Size* other) 
 (defcfun ("cv_Size_assignTo" size-assgn-to) (cv::size :garbage-collect t)
-  "Assign data from one SIZE construct to another,
+	 "Assign data from one SIZE construct to another,
    OTHER to SELF."
-  (self cv::size)
-  (other cv::size))
+   (self cv::size)
+   (other cv::size))
 
 
 ;; Size* cv_Size_fromPoint(Point* p)
 (defcfun ("cv_Size_fromPoint" size-from-point) (cv::size :garbage-collect t)
-  "Create a SIZE construct from POINT data."
-  (p cv::point))
+	 "Create a SIZE construct from POINT data."
+	 (p cv::point))
 
 
 ;; Size_<float>()
 ;; Size2f* cv_create_Size2f(float width, float height)
 (defcfun ("cv_create_Size2f" size2f0) (cv::size2f :garbage-collect t)
-  "Size2f constructor")
+	 "Size2f constructor")
 
 
 ;; Size_<float>(float width, float height)
 ;; Size2f* cv_create_Size2f(float width, float height)
 (defcfun ("cv_create_Size2f" size2f2) (cv::size2f :garbage-collect t)
-  "Size2f constructor"
-  (width :float)
-  (height :float))
+	 "Size2f constructor"
+	 (width :float)
+	 (height :float))
 
 
 (defun size2f (&optional (width nil) (height nil))
@@ -764,8 +764,8 @@
 ;; MatExpr - operator
 ;; MatExpr* cv_Mat_sub(Mat* m1, Mat* m2)
 (defcfun ("cv_Mat_sub" sub) (cv::mat-expr :garbage-collect t)
-  (m1 cv::mat)
-  (m2 cv::mat))
+	 (m1 cv::mat)
+	 (m2 cv::mat))
 
 
 ;; TermCriteria::TermCriteria(int type, int maxCount, double epsilon)
@@ -776,9 +776,9 @@
 ;; TermCriteria::TermCriteria(int type, int maxCount, double epsilon)
 ;; TermCriteria* cv_create_TermCriteria(int type, int maxCount, double epsilon) 
 (defcfun ("cv_create_TermCriteria3" term-criteria3) (cv::term-criteria :garbage-collect t)
-  (type :int)
-  (max-count :int)
-  (epsilon :double))
+	 (type :int)
+	 (max-count :int)
+	 (epsilon :double))
 
 
 (defun term-criteria (&optional type max-count epsilon)
@@ -798,7 +798,7 @@
 ;; MatExpr abs(const Mat& m)
 ;; MatExpr* cv_abs(Mat* m)
 (defcfun ("cv_abs" *abs) (cv::mat-expr :garbage-collect t)
-  (m cv::mat))
+	 (m cv::mat))
 
 
 ;; MatExpr Mat::inv(int method=DECOMP_LU) const
@@ -812,13 +812,16 @@
 ;; Scalar mean(InputArray src, InputArray mask=noArray())
 ;; Scalar* cv_mean(Mat* src, Mat* mask)
 (defcfun ("cv_mean" %mean) (cv::scalar :garbage-collect t)
-  "Calculates an average (mean) of array elements."
-  (src cv::mat)
-  (mask cv::mat))
+	 "Calculates an average (mean) of array elements."
+	 (src cv::mat)
+	 (mask cv::mat))
 
-(defun mean (src &optional (mask (cv::mat)))
+(defun mean (src &optional mask)
        "Calculates an average (mean) of array elements."
-       (%mean src mask))
+       (if (not mask)
+	   (cv::with-mat ((m (cv::mat)))
+			 (%mean src m))
+			 (%mean src mask)))
 
 
 ;; RNG::RNG()
@@ -843,8 +846,8 @@
 ;; Scalar sum(InputArray src)
 ;; Scalar* cv_sum(Mat* src)
 (defcfun ("cv_sum" sum) (cv::scalar :garbage-collect t) 
-  "Calculates the sum of array elements."
-  (src cv::mat))
+	 "Calculates the sum of array elements."
+	 (src cv::mat))
 
 
 ;;; CORE - Drawing Functions
@@ -881,14 +884,14 @@
 ;; Mat getStructuringElement(int shape, Size ksize, Point anchor=Point(-1,-1))
 ;; Mat* cv_getStructuringElement(int shape, Size* ksize, Point* anchor)
 (defcfun ("cv_getStructuringElement" %get-structuring-element) (cv::mat :garbage-collect t)
-  (shape :int)
-  (ksize cv::size)
-  (kernel cv::point))
+	 (shape :int)
+	 (ksize cv::size)
+	 (kernel cv::point))
 
 (defun get-structuring-element (shape ksize &optional (kernel (point -1 -1))) 
        "Returns a structuring element of the specified 
         size and shape for morphological operations."
-       (%get-structuring-element shape ksize kernel))
+	(%get-structuring-element shape ksize kernel))
 
 
 ;;; HIGHGUI
@@ -932,8 +935,8 @@
 ;; Mat imread(const string& filename, int flags=1)
 ;; mat cv_imread (const char* filename, int flags)
 (defcfun ("cv_imread" %imread) (cv::mat :garbage-collect t)
-  (filename cv::*string)
-  (flags :int))
+	 (filename cv::*string)
+	 (flags :int))
 
 (defun imread (filename &optional (flags 1))
        (%imread (c-string-to-string filename (length filename)) flags))
@@ -968,6 +971,30 @@
 ;;; FEATURES2D - Feature Detection and Description
 
 
+;; BFMatcher::BFMatcher(int normType=NORM_L2, bool crossCheck=false )
+;; BFMatcher* cv_create_BFMatcher(int normType, bool crossCheck) 
+(defcfun ("cv_create_BFMatcher" %bf-matcher) (cv::feature-2d :garbage-collect t)
+	 (norm-type :int)
+	 (cross-check :boolean))
+
+(defun bf-matcher (&optional (norm-type cv::+norm-l2+) (cross-check nil))
+       "Brute-force matcher constructor."
+       (%bf-matcher norm-type cross-check))
+
+
+;; BRISK::BRISK(int thresh=30, int octaves=3, float patternScale=1.0f)
+;; BRISK* cv_create_BRISK(int thresh, int octaves, float patternScale)
+(defcfun ("cv_create_BRISK" %brisk) (cv::feature-2d :garbage-collect t)
+	 (thresh :int)
+	 (octaves :int)
+	 (pattern-scale :float))
+
+
+(defun brisk (&optional (thresh 30) (octaves 3) (pattern-scale 1.0f0))
+       "The BRISK constructor"
+       (%brisk thresh octaves pattern-scale))
+
+
 ;;; FEATURES2D - Common Interfaces of Feature Detectors
 
 
@@ -983,45 +1010,536 @@
 ;; CascadeClassifier::CascadeClassifier()
 ;; CascadeClassifier* cv_create_CascadeClassifier() 
 (defcfun ("cv_create_CascadeClassifier" cascade-classifier0) (cv::cascade-classifier :garbage-collect t)
-  "CASCADE-CLASSIFIER construct.")
+	 "CASCADE-CLASSIFIER construct.")
 
 ;; CascadeClassifier::CascadeClassifier(const string& filename)
 ;; CascadeClassifier* cv_create_CascadeClassifier1(String* filename)
 (defcfun ("cv_create_CascadeClassifier1" cascade-classifier1) (cv::cascade-classifier :garbage-collect t)
-  "Loads a classifier from a file."
-  (filename cv::*string))
+	 "Loads a classifier from a file."
+	 (filename cv::*string))
 
 (defun cascade-classifier (&optional filename)
-  (cond ((eq filename nil)
-	 (cascade-classifier0))
-	(filename
-	 (cascade-classifier1 (c-string-to-string filename (length filename))))
-	(t nil)))
+       (cond ((eq filename nil)
+	      (cascade-classifier0))
+	      (filename
+	       (cascade-classifier1 (c-string-to-string filename (length filename))))
+	       (t nil)))
 
 
 
-;;; Feature Detection and Description
+;;; NON-FREE - Feature Detection and Description
 
 
 ;; SURF::SURF()
 ;; SURF* cv_create_SURF() 
-(defcfun ("cv_create_SURF" surf0) (cv::surf :garbage-collect t))
+(defcfun ("cv_create_SURF" surf0) (cv::feature-2d :garbage-collect t))
 
 
 ;; SURF::SURF(double hessianThreshold, int nOctaves=4, int nOctaveLayers=2, bool extended=true, bool upright=false )
 ;; SURF* cv_create_SURF5(double hessianThreshold, int nOctaves, int nOctaveLayers, bool extended, bool upright)
-(defcfun ("cv_create_SURF5" surf5) (cv::surf :garbage-collect t)
-  (hessian-threshold :double)
-  (n-octaves :int)
-  (n-octave-layers :int)
-  (extended :boolean)
-  (upright :boolean))
+(defcfun ("cv_create_SURF5" surf5) (cv::feature-2d :garbage-collect t)
+	 (hessian-threshold :double)
+	 (n-octaves :int)
+	 (n-octave-layers :int)
+	 (extended :boolean)
+	 (upright :boolean))
 
 
 (defun surf (&optional hessian-threshold (n-octaves 4) (n-octave-layers 2) (extended t) (upright nil))
-	   (cond ((eq hessian-threshold nil)
-		  (surf0))
-		 (hessian-threshold
-		  (surf5 hessian-threshold n-octaves n-octave-layers extended upright))
-		 (t nil)))
+       (cond ((eq hessian-threshold nil)
+	      (surf0))
+	      (hessian-threshold
+	       (surf5 hessian-threshold n-octaves n-octave-layers extended upright))
+	       (t nil)))
+
+
+;;; VECTORS
+
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_##t * create_std_vector##tn()
+(defcfun ("create_std_vectorc" %vec-char) (cv::vector-char :garbage-collect t))
+
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
+(defcfun ("carray_to_std_vectorc" c-arr-to-vec-char) (cv::vector-char :garbage-collect t)
+  (a :pointer)
+  (len :unsigned-int))
+
+
+(let ((previous nil))
+  (defun arr-to-vec-char (a)
+    (unless (equal a (car previous))
+      (setf previous (cons a (foreign-alloc :char :initial-contents 
+					    (coerce a 'list)))))
+    (c-arr-to-vec-char (cdr previous) (length a))))
+
+
+(defmacro vec-char (&rest args)
+  (if (third args)
+      (error "odd number of args to VEC-CHAR")
+      nil)
+  (let ((x (gensym))
+        (y (gensym)))
+    `(let ((,x (first (list ,@args)))
+	   (,y (second (list ,@args))))
+       (cond ((eq ,x nil)
+	      (%vec-char))
+	     ((or (vectorp ,x) (listp ,x))
+	      (arr-to-vec-char ,x))
+	     ((eq :length ,x)
+	      (cv::vec-char-length ,y))
+	     ((and (eq :to-lisp-list ,x))
+	      (cv::vec-char-to-lisp-list ,y))
+	     ((and (eq :to-lisp-vec ,x))
+	      (cv::vec-char-to-lisp-vec ,y))
+	     ((typep ,x 'cv::std-vector-char)
+	      (if (eq ,y nil)
+		  (mem-aref (cv::vec-char-to-c-arr ,x) :char) 
+		  (mem-aref (cv::vec-char-to-c-arr ,x) :char ,y)))
+	     (t (error "incorrect input. 
+                   ~%See VEC-CHAR documentation in <LISP-CV-SOURCE-DIR>/EXAMPLES.LISP~%"))))))
+
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_##t * create_std_vector##tn()
+(defcfun ("create_std_vectordm" %vec-dmatch) (cv::vector-dmatch :garbage-collect t))
+
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
+(defcfun ("carray_to_std_vectordm" c-arr-to-vec-dmatch) (cv::vector-dmatch :garbage-collect t)
+  (a :pointer)
+  (len :unsigned-int))
+
+
+(let ((previous nil))
+  (defun arr-to-vec-dmatch (a)
+    (unless (equal a (car previous))
+      (setf previous (cons a (foreign-alloc :pointer :initial-contents
+					    (mapcar #!(cv::c-pointer %1) (coerce a 'list))))))
+    (c-arr-to-vec-dmatch (cdr previous) (length a))))
+
+
+(defmacro vec-dmatch (&rest args)
+  (if (fifth args)
+      (error "odd number of args to VECTOR-DMATCH")
+      nil)
+  (let ((x (gensym))
+        (y (gensym))
+        (z (gensym))
+        (type (gensym)))
+    `(let ((,x (first (list ,@args)))
+	   (,y (second (list ,@args)))
+           (,z (third (list ,@args)))
+           (,type (fourth (list ,@args))))
+       (cond ((eq ,x nil)
+	      (%vec-dmatch))
+	     ((or (vectorp ,x) (listp ,x))
+	      (arr-to-vec-dmatch ,x))
+	     ((eq :length ,x)
+	      (cv::vec-dmatch-length ,y))
+	     ((and (eq :to-lisp-list ,x))
+	      (cv::vec-dmatch-to-lisp-list ,y))
+	     ((and (eq :to-lisp-vec ,x))
+	      (cv::vec-dmatch-to-lisp-vec ,y))
+	     ((and (typep ,x 'cv::std-vector-dmatch) ,y)
+	      (if (eq ,z nil)
+		  (mem-aref (cv::vec-dmatch-to-c-arr ,x) 'cv::dmatch ,y)
+		  (if (null ,type)
+		      (mem-aref (cv::c-pointer (mem-aref (cv::vec-dmatch-to-c-arr ,x) 'cv::dmatch ,y)) :int ,z)
+		      (mem-aref (cv::c-pointer (mem-aref (cv::vec-dmatch-to-c-arr ,x) 'cv::dmatch ,y)) ,type ,z)))) 
+	     (t (error "incorrect input. 
+  ~%See VEC-DMATCH documentation in <LISP-CV-SOURCE-DIR>/EXAMPLES.LISP~%"))))))
+
+
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_##t * create_std_vector##tn()
+(defcfun ("create_std_vectord" %vec-double) (cv::vector-double :garbage-collect t))
+
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
+(defcfun ("carray_to_std_vectord" c-arr-to-vec-double) (cv::vector-double :garbage-collect t)
+  (a :pointer)
+  (len :unsigned-int))
+
+
+(let ((previous nil))
+  (defun arr-to-vec-double (a)
+    (unless (equal a (car previous))
+      (setf previous (cons a (foreign-alloc :double :initial-contents 
+					    (coerce a 'list)))))
+    (c-arr-to-vec-double (cdr previous) (length a))))
+
+
+(defmacro vec-double (&rest args)
+  (if (third args)
+      (error "odd number of args to VEC-DOUBLE")
+      nil)
+  (let ((x (gensym))
+        (y (gensym)))
+    `(let ((,x (first (list ,@args)))
+	   (,y (second (list ,@args))))
+       (cond ((eq ,x nil)
+	      (%vec-double))
+	     ((or (vectorp ,x) (listp ,x))
+	      (arr-to-vec-double ,x))
+	     ((eq :length ,x)
+	      (cv::vec-double-length ,y))
+	     ((and (eq :to-lisp-list ,x))
+	      (cv::vec-double-to-lisp-list ,y))
+	     ((and (eq :to-lisp-vec ,x))
+	      (cv::vec-double-to-lisp-vec ,y))
+	     ((typep ,x 'cv::std-vector-double)
+	      (if (eq ,y nil)
+		  (mem-aref (cv::vec-double-to-c-arr ,x) :double) 
+		  (mem-aref (cv::vec-double-to-c-arr ,x) :double ,y)))
+	     (t (error "incorrect input. 
+                   ~%See VEC-DOUBLE documentation in <LISP-CV-SOURCE-DIR>/EXAMPLES.LISP~%"))))))
+
+
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_##t * create_std_vector##tn()
+(defcfun ("create_std_vectorf" %vec-float) (cv::vector-float :garbage-collect t))
+
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
+(defcfun ("carray_to_std_vectorf" c-arr-to-vec-float) (cv::vector-float :garbage-collect t)
+  (a :pointer)
+  (len :unsigned-int))
+
+
+(let ((previous nil))
+  (defun arr-to-vec-float (a)
+    (unless (equal a (car previous))
+      (setf previous (cons a (foreign-alloc :float :initial-contents 
+					    (coerce a 'list)))))
+    (c-arr-to-vec-float (cdr previous) (length a))))
+
+
+(defmacro vec-float (&rest args)
+  (if (third args)
+      (error "odd number of args to VEC-FLOAT")
+      nil)
+  (let ((x (gensym))
+        (y (gensym)))
+    `(let ((,x (first (list ,@args)))
+	   (,y (second (list ,@args))))
+       (cond ((eq ,x nil)
+	      (%vec-float))
+	     ((or (vectorp ,x) (listp ,x))
+	      (arr-to-vec-float ,x))
+	     ((eq :length ,x)
+	      (cv::vec-float-length ,y))
+	     ((and (eq :to-lisp-list ,x))
+	      (cv::vec-float-to-lisp-list ,y))
+	     ((and (eq :to-lisp-vec ,x))
+	      (cv::vec-float-to-lisp-vec ,y))
+	     ((typep ,x 'cv::std-vector-float)
+	      (if (eq ,y nil)
+		  (mem-aref (cv::vec-float-to-c-arr ,x) :float) 
+		  (mem-aref (cv::vec-float-to-c-arr ,x) :float ,y)))
+	     (t (error "incorrect input. 
+                   ~%See VEC-FLOAT documentation in <LISP-CV-SOURCE-DIR>/EXAMPLES.LISP~%"))))))
+
+
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_##t * create_std_vector##tn()
+(defcfun ("create_std_vectori" %vec-int) (cv::vector-int :garbage-collect t))
+
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
+(defcfun ("carray_to_std_vectori" c-arr-to-vec-int) (cv::vector-int :garbage-collect t)
+  (a :pointer)
+  (len :unsigned-int))
+
+
+(let ((previous nil))
+  (defun arr-to-vec-int (a)
+    (unless (equal a (car previous))
+      (setf previous (cons a (foreign-alloc :int :initial-contents 
+					    (coerce a 'list)))))
+    (c-arr-to-vec-int (cdr previous) (length a))))
+
+
+(defmacro vec-int (&rest args)
+  (if (third args)
+      (error "odd number of args to VEC-INT")
+      nil)
+  (let ((x (gensym))
+        (y (gensym)))
+    `(let ((,x (first (list ,@args)))
+	   (,y (second (list ,@args))))
+       (cond ((eq ,x nil)
+	      (%vec-int))
+	     ((or (vectorp ,x) (listp ,x))
+	      (arr-to-vec-int ,x))
+	     ((eq :length ,x)
+	      (cv::vec-int-length ,y))
+	     ((and (eq :to-lisp-list ,x))
+	      (cv::vec-int-to-lisp-list ,y))
+	     ((and (eq :to-lisp-vec ,x))
+	      (cv::vec-int-to-lisp-vec ,y))
+	     ((typep ,x 'cv::std-vector-int)
+	      (if (eq ,y nil)
+		  (mem-aref (cv::vec-int-to-c-arr ,x) :int) 
+		  (mem-aref (cv::vec-int-to-c-arr ,x) :int ,y)))
+	     (t (error "incorrect input. 
+                   ~%See VEC-INT documentation in <LISP-CV-SOURCE-DIR>/EXAMPLES.LISP~%"))))))
+
+
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_##t * create_std_vector##tn()
+(defcfun ("create_std_vectorkp" %vec-key-point) (cv::vector-key-point :garbage-collect t))
+
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
+(defcfun ("carray_to_std_vectorkp" c-arr-to-vec-key-point) (cv::vector-key-point :garbage-collect t)
+  (a :pointer)
+  (len :unsigned-int))
+
+
+(let ((previous nil))
+  (defun arr-to-vec-key-point (a)
+    (unless (equal a (car previous))
+      (setf previous (cons a (foreign-alloc :pointer :initial-contents
+					    (mapcar #!(cv::c-pointer %1) (coerce a 'list))))))
+    (c-arr-to-vec-key-point (cdr previous) (length a))))
+
+
+(defmacro vec-key-point (&rest args)
+  (if (fourth args)
+      (error "odd number of args to VECTOR-KEY-POINT")
+      nil)
+  (let ((x (gensym))
+        (y (gensym))
+        (z (gensym)))
+    `(let ((,x (first (list ,@args)))
+	   (,y (second (list ,@args)))
+           (,z (third (list ,@args))))
+       (cond ((eq ,x nil)
+	      (%vec-key-point))
+	     ((or (vectorp ,x) (listp ,x))
+	      (arr-to-vec-key-point ,x))
+	     ((eq :length ,x)
+	      (cv::vec-key-point-length ,y))
+	     ((and (eq :to-lisp-list ,x))
+	      (cv::vec-key-point-to-lisp-list ,y))
+	     ((and (eq :to-lisp-vec ,x))
+	      (cv::vec-key-point-to-lisp-vec ,y))
+	     ((and (typep ,x 'cv::std-vector-key-point) ,y)
+	      (if (eq ,z nil)
+		  (mem-aref (cv::vec-key-point-to-c-arr ,x) 'cv::key-point ,y)
+		  (if (< ,z 5)  (mem-aref (cv::c-pointer 
+					   (mem-aref (cv::vec-key-point-to-c-arr ,x) 
+						     'cv::key-point ,y)) :float ,z)
+		      (mem-aref (cv::c-pointer 
+				 (mem-aref (cv::vec-key-point-to-c-arr ,x) 'cv::key-point ,y)) :int ,z))))
+	     (t (error "incorrect input. 
+  ~%See VEC-KEY-POINT documentation in <LISP-CV-SOURCE-DIR>/EXAMPLES.LISP~%"))))))
+
+
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_##t * create_std_vector##tn()
+(defcfun ("create_std_vectorp" %vec-point) (cv::vector-point :garbage-collect t))
+
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
+(defcfun ("carray_to_std_vectorp" c-arr-to-vec-point) (cv::vector-point :garbage-collect t)
+  (a :pointer)
+  (len :unsigned-int))
+
+
+(let ((previous nil))
+  (defun arr-to-vec-point (a)
+    (unless (equal a (car previous))
+      (setf previous (cons a (foreign-alloc :pointer :initial-contents
+					    (mapcar #!(cv::c-pointer %1) (coerce a 'list))))))
+    (c-arr-to-vec-point (cdr previous) (length a))))
+
+
+(defmacro vec-point (&rest args)
+  (if (fourth args)
+      (error "odd number of args to VECTOR-POINT")
+      nil)
+  (let ((x (gensym))
+        (y (gensym))
+        (z (gensym)))
+    `(let ((,x (first (list ,@args)))
+	   (,y (second (list ,@args)))
+           (,z (third (list ,@args))))
+       (cond ((eq ,x nil)
+	      (%vec-point))
+	     ((or (vectorp ,x) (listp ,x))
+	      (arr-to-vec-point ,x))
+	     ((eq :length ,x)
+	      (cv::vec-point-length ,y))
+	     ((and (eq :to-lisp-list ,x))
+	      (cv::vec-point-to-lisp-list ,y))
+	     ((and (eq :to-lisp-vec ,x))
+	      (cv::vec-point-to-lisp-vec ,y))
+	     ((and (typep ,x 'cv::std-vector-point) ,y)
+	      (if (eq ,z nil)
+		  (mem-aref (cv::vec-point-to-c-arr ,x) 'cv::point ,y)
+		  (mem-aref (cv::c-pointer (mem-aref (cv::vec-point-to-c-arr ,x) 'cv::point ,y)) :int ,z)))
+	     (t (error "incorrect input. 
+  ~%See VEC-POINT documentation in <LISP-CV-SOURCE-DIR>/EXAMPLES.LISP~%"))))))
+
+
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_##t * create_std_vector##tn()
+(defcfun ("create_std_vectorp2f" %vec-point-2f) (cv::vector-point-2f :garbage-collect t))
+
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
+(defcfun ("carray_to_std_vectorp2f" c-arr-to-vec-point-2f) (cv::vector-point-2f :garbage-collect t)
+  (a :pointer)
+  (len :unsigned-int))
+
+
+(let ((previous nil))
+  (defun arr-to-vec-point-2f (a)
+    (unless (equal a (car previous))
+      (setf previous (cons a (foreign-alloc :pointer :initial-contents
+					    (mapcar #!(cv::c-pointer %1) (coerce a 'list))))))
+    (c-arr-to-vec-point-2f (cdr previous) (length a))))
+
+
+(defmacro vec-point-2f (&rest args)
+  (if (fourth args)
+      (error "odd number of args to VECTOR-POINT-2F")
+      nil)
+  (let ((x (gensym))
+        (y (gensym))
+        (z (gensym)))
+    `(let ((,x (first (list ,@args)))
+	   (,y (second (list ,@args)))
+           (,z (third (list ,@args))))
+       (cond ((eq ,x nil)
+	      (%vec-point-2f))
+	     ((or (vectorp ,x) (listp ,x))
+	      (arr-to-vec-point-2f ,x))
+	     ((eq :length ,x)
+	      (cv::vec-point-2f-length ,y))
+	     ((and (eq :to-lisp-list ,x))
+	      (cv::vec-point-2f-to-lisp-list ,y))
+	     ((and (eq :to-lisp-vec ,x))
+	      (cv::vec-point-2f-to-lisp-vec ,y))
+	     ((and (typep ,x 'cv::std-vector-point-2f) ,y)
+	      (if (eq ,z nil)
+		  (mem-aref (cv::vec-point-2f-to-c-arr ,x) 'cv::point-2f ,y)
+		  (mem-aref (cv::c-pointer (mem-aref (cv::vec-point-2f-to-c-arr ,x) 'cv::point-2f ,y)) :float ,z)))
+	     (t (error "incorrect input. 
+  ~%See VEC-POINT-2F documentation in <LISP-CV-SOURCE-DIR>/EXAMPLES.LISP~%"))))))
+
+
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_##t * create_std_vector##tn()
+(defcfun ("create_std_vectorr" %vec-rect) (cv::vector-rect :garbage-collect t))
+
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
+(defcfun ("carray_to_std_vectorr" c-arr-to-vec-rect) (cv::vector-rect :garbage-collect t)
+  (a :pointer)
+  (len :unsigned-int))
+
+
+(let ((previous nil))
+  (defun arr-to-vec-rect (a)
+    (unless (equal a (car previous))
+      (setf previous (cons a (foreign-alloc :pointer :initial-contents
+					    (mapcar #!(cv::c-pointer %1) (coerce a 'list))))))
+    (c-arr-to-vec-rect (cdr previous) (length a))))
+
+
+(defmacro vec-rect (&rest args)
+  (if (fourth args)
+      (error "odd number of args to VECTOR-RECT")
+      nil)
+  (let ((x (gensym))
+        (y (gensym))
+        (z (gensym)))
+    `(let ((,x (first (list ,@args)))
+	   (,y (second (list ,@args)))
+           (,z (third (list ,@args))))
+       (cond ((eq ,x nil)
+	      (%vec-rect))
+	     ((or (vectorp ,x) (listp ,x))
+	      (arr-to-vec-rect ,x))
+	     ((eq :length ,x)
+	      (cv::vec-rect-length ,y))
+	     ((and (eq :to-lisp-list ,x))
+	      (cv::vec-rect-to-lisp-list ,y))
+	     ((and (eq :to-lisp-vec ,x))
+	      (cv::vec-rect-to-lisp-vec ,y))
+	     ((and (typep ,x 'cv::std-vector-rect) ,y)
+	      (if (eq ,z nil)
+		  (mem-aref (cv::vec-rect-to-c-arr ,x) 'cv::rect ,y)
+		  (mem-aref (cv::c-pointer (mem-aref (cv::vec-rect-to-c-arr ,x) 'cv::rect ,y)) :int ,z)))
+	     (t (error "incorrect input. 
+  ~%See VEC-RECT documentation in <LISP-CV-SOURCE-DIR>/EXAMPLES.LISP~%"))))))
+
+
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_##t * create_std_vector##tn()
+(defcfun ("create_std_vectoru" %vec-uchar) (cv::vector-uchar :garbage-collect t))
+
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
+(defcfun ("carray_to_std_vectoru" c-arr-to-vec-uchar) (cv::vector-uchar :garbage-collect t)
+  (a :pointer)
+  (len :unsigned-int))
+
+
+(let ((previous nil))
+  (defun arr-to-vec-uchar (a)
+    (unless (equal a (car previous))
+      (setf previous (cons a (foreign-alloc :uchar :initial-contents 
+					    (coerce a 'list)))))
+    (c-arr-to-vec-uchar (cdr previous) (length a))))
+
+
+(defmacro vec-uchar (&rest args)
+  (if (third args)
+      (error "odd number of args to VEC-UCHAR")
+      nil)
+  (let ((x (gensym))
+        (y (gensym)))
+    `(let ((,x (first (list ,@args)))
+	   (,y (second (list ,@args))))
+       (cond ((eq ,x nil)
+	      (%vec-uchar))
+	     ((or (vectorp ,x) (listp ,x))
+	      (arr-to-vec-uchar ,x))
+	     ((eq :length ,x)
+	      (cv::vec-uchar-length ,y))
+	     ((and (eq :to-lisp-list ,x))
+	      (cv::vec-uchar-to-lisp-list ,y))
+	     ((and (eq :to-lisp-vec ,x))
+	      (cv::vec-uchar-to-lisp-vec ,y))
+	     ((typep ,x 'cv::std-vector-uchar)
+	      (if (eq ,y nil)
+		  (mem-aref (cv::vec-uchar-to-c-arr ,x) :uchar) 
+		  (mem-aref (cv::vec-uchar-to-c-arr ,x) :uchar ,y)))
+	     (t (error "incorrect input. 
+                   ~%See VEC-UCHAR documentation in <LISP-CV-SOURCE-DIR>/EXAMPLES.LISP~%"))))))
+
+
 

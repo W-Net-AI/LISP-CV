@@ -11,7 +11,7 @@
 
 ;; BRISK::BRISK(int thresh=30, int octaves=3, float patternScale=1.0f)
 ;; BRISK* cv_create_BRISK(int thresh, int octaves, float patternScale)
-(defcfun ("cv_create_BRISK" %brisk) (:pointer brisk)
+(defcfun ("cv_create_BRISK" %brisk) feature-2d
   (thresh :int)
   (octaves :int)
   (pattern-scale :float))
@@ -27,8 +27,8 @@
 
 ;; Ptr<FeatureDetector> FeatureDetector::create(const string& detectorType)
 ;; FeatureDetector* cv_FeatureDetector_create2(FeatureDetector* self, String* detectorType) 
-(defcfun ("cv_FeatureDetector_create2" %feat-detector-create) feature-detector 
-  (self feature-detector)
+(defcfun ("cv_FeatureDetector_create2" %feat-detector-create) feature-2d 
+  (self feature-2d)
   (detector-type :string))
 
 (defun feat-detector-create (self detector-type)
@@ -39,15 +39,17 @@
 ;; void FeatureDetector::detect(const Mat& image, vector<KeyPoint>& keypoints, const Mat& mask=Mat() ) const
 ;; void cv_FeatureDetector_detect3(FeatureDetector* self, Mat* image, vector_KeyPoint* keypoints, Mat* mask)
 (defcfun ("cv_FeatureDetector_detect3" %feat-detector-detect) :void
-  (self feature-detector)
+  (self feature-2d)
   (image mat)
-  (key-points (:pointer vector-key-point))
+  (key-points vector-key-point)
   (mask mat))
 
-(defun feat-detector-detect (self image keypoints &optional (mask (mat)))
+(defun feat-detector-detect (self image keypoints &optional mask)
   "Detects keypoints in an image."
-   (%feat-detector-detect self image keypoints mask))
-
+  (if (not mask)
+      (with-mat ((m (mat)))
+	(%feat-detector-detect self image keypoints m))
+      (%feat-detector-detect self image keypoints mask)))
 
 
 ;;; Common Interfaces of Descriptor Extractors
@@ -55,11 +57,11 @@
 
 ;; void DescriptorExtractor::compute(const Mat& image, vector<KeyPoint>& keypoints, Mat& descriptors) const
 ;; void cv_Feature2D_compute3(Feature2D* self, Mat* image, vector_KeyPoint* keypoints, Mat* descriptors) {
-(defcfun ("cv_Feature2D_compute3" feat-2d-compute) (:pointer feature-2d)
+(defcfun ("cv_Feature2D_compute3" feat-2d-compute) feature-2d
   "Computes the descriptors for a set of keypoints detected in an image."
-  (self (:pointer feature-2d))
+  (self feature-2d)
   (image mat)
-  (keypoints (:pointer vector-key-point))
+  (keypoints vector-key-point)
   (descriptors mat))
 
 
@@ -68,7 +70,7 @@
 
 ;; BFMatcher::BFMatcher(int normType=NORM_L2, bool crossCheck=false )
 ;; BFMatcher* cv_create_BFMatcher(int normType, bool crossCheck) 
-(defcfun ("cv_create_BFMatcher" %bf-matcher) (:pointer bf-matcher)
+(defcfun ("cv_create_BFMatcher" %bf-matcher) feature-2d
   (norm-type :int)
   (cross-check :boolean))
 
@@ -78,8 +80,8 @@
 
 ;; Ptr<DescriptorMatcher> DescriptorMatcher::create(const string& descriptorMatcherType)
 ;; DescriptorMatcher* cv_DescriptorMatcher_create1_2(DescriptorMatcher* self, String* descriptorMatcherType) 
-(defcfun ("cv_DescriptorMatcher_create1_2" %descrip-matcher-create) (:pointer descriptor-matcher)
-  (self (:pointer descriptor-matcher))
+(defcfun ("cv_DescriptorMatcher_create1_2" %descrip-matcher-create) feature-2d
+  (self feature-2d)
   (descriptor-matcher-type *string))
 
 (defun descrip-matcher-create (self descriptor-matcher-type)
@@ -91,16 +93,18 @@
 ;; vector<DMatch>& matches, const Mat& mask=Mat() ) const
 ;;void cv_DescriptorMatcher_match(DescriptorMatcher* self, Mat* queryDescriptors, Mat* trainDescriptors, vector_DMatch* matches, Mat* mask)
 (defcfun ("cv_DescriptorMatcher_match" %descrip-matcher-match) :void
-  (self (:pointer descriptor-matcher))
+  (self feature-2d)
   (query-descriptors mat)
   (train-descriptors mat)
-  (matches (:pointer vector-dmatch))
+  (matches vector-dmatch)
   (mask mat))
 
-(defun descrip-matcher-match (self query-descriptors train-descriptors matches &optional (mask (mat)))
+(defun descrip-matcher-match (self query-descriptors train-descriptors matches &optional mask)
   "Finds the best match for each descriptor from a query set."
-   (%descrip-matcher-match self query-descriptors train-descriptors matches mask))
-
+  (if (not mask)
+      (with-mat ((m (mat)))
+	(%descrip-matcher-match self query-descriptors train-descriptors matches m))
+      (%descrip-matcher-match self query-descriptors train-descriptors matches mask)))
 
 
 ;;; Drawing Function of Keypoints and Matches
@@ -115,31 +119,18 @@
 
 (defcfun ("cv_drawMatches" %draw-matches) :void
   (img1 mat)
-  (keypoints1 (:pointer vector-key-point))
+  (keypoints1 vector-key-point)
   (img2 mat)
-  (keypoints2 (:pointer vector-key-point))
-  (matches1to2 (:pointer vector-dmatch))
+  (keypoints2 vector-key-point)
+  (matches1to2 vector-dmatch)
   (outimg mat)
   (match-color scalar)
   (single-point-color scalar)
   (matches-mask vector-char)
   (flags :int))
 
-(defun draw-matches (img1 keypoints1 img2 keypoints2 matches1to2 outimg &optional (match-color (scalar-all -1)) (single-point-color (scalar-all -1)) (matches-mask (vector-char)) (flags +default+))
+(defun draw-matches (img1 keypoints1 img2 keypoints2 matches1to2 outimg &optional (match-color (scalar-all -1)) (single-point-color (scalar-all -1)) (matches-mask (vec-char)) (flags +default+))
   "Draws the found matches of keypoints from two images."
    (%draw-matches img1 keypoints1 img2 keypoints2 matches1to2 outimg match-color single-point-color matches-mask flags))
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

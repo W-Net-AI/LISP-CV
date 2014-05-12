@@ -15,17 +15,10 @@
 
 
 ;; void operator delete  ( void* ptr )
-;; void cv_delete_BFMatcher(void* ptr)
-(defcfun ("cv_delete_BFMatcher" del-bf-matcher) :void
-  "Calls delete on (:POINTER BF-MATCHER)"
-  (self :pointer))
-
-
-;; void operator delete  ( void* ptr )
 ;; void cv_delete_BRISK(void* ptr) 
 (defcfun ("cv_delete_BRISK" del-brisk) :void
   "Calls delete on (:POINTER BRISK)"
-  (self :pointer))
+  (self feature-2d))
 
 
 ;; void operator delete  ( void* ptr )
@@ -40,6 +33,13 @@
 (defcfun ("cv_delete_DMatch" del-dmatch) :void
   "Calls delete on DMATCH"
   (self dmatch))
+
+
+;; void operator delete  ( void* ptr )
+;; void cv_delete_Feature2D(void* self)
+(defcfun ("cv_delete_KeyPoint" del-feature-2d) :void
+  "Calls delete on FEATURE-2D"
+  (self feature-2d))
 
 
 ;; void operator delete  ( void* ptr )
@@ -72,37 +72,37 @@
 
 ;; void operator delete  ( void* ptr )
 ;; void cv_delete_Point2d(void* self)
-(defcfun ("cv_delete_Point2d" del-point2d) :void
-  "Calls delete on POINT2D"
-  (self point2d))
+(defcfun ("cv_delete_Point2d" del-point-2d) :void
+  "Calls delete on POINT-2D"
+  (self point-2d))
 
 
 ;; void operator delete  ( void* ptr )
 ;; void cv_delete_Point2f(void* self)
-(defcfun ("cv_delete_Point2f" del-point2f) :void
-  "Calls delete on POINT2F"
-  (self point2f))
+(defcfun ("cv_delete_Point2f" del-point-2f) :void
+  "Calls delete on POINT-2F"
+  (self point-2f))
 
 
 ;; void operator delete  ( void* ptr )
 ;; void cv_delete_Point3d(void* self)
-(defcfun ("cv_delete_Point3d" del-point3d) :void
-  "Calls delete on POINT3D"
-  (self point3d))
+(defcfun ("cv_delete_Point3d" del-point-3d) :void
+  "Calls delete on POINT-3D"
+  (self point-3d))
 
 
 ;; void operator delete  ( void* ptr )
 ;; void cv_delete_Point3f(void* self)
-(defcfun ("cv_delete_Point3f" del-point3f) :void
-  "Calls delete on POINT3F"
-  (self point3f))
+(defcfun ("cv_delete_Point3f" del-point-3f) :void
+  "Calls delete on POINT-3F"
+  (self point-3f))
 
 
 ;; void operator delete  ( void* ptr )
 ;; void cv_delete_Point3i(void* self)
-(defcfun ("cv_delete_Point3i" del-point3i) :void
-  "Calls delete on POINT3I"
-  (self point3i))
+(defcfun ("cv_delete_Point3i" del-point-3i) :void
+  "Calls delete on POINT-3I"
+  (self point-3i))
 
 
 ;; void operator delete  ( void* ptr )
@@ -185,8 +185,8 @@
 ;; void operator delete  ( void* ptr )
 ;; void delete_std_vector##tn( vector_##t * v)
 (defcfun ("delete_std_vectordm" del-vec-dm) :void
-  "Calls delete on (:POINTER VECTOR-DMATCH)"
-  (self :pointer))
+  "Calls delete on VECTOR-DMATCH"
+  (self vector-dmatch))
 
 
 ;; void operator delete  ( void* ptr )
@@ -206,8 +206,8 @@
 ;; void operator delete  ( void* ptr )
 ;; void delete_std_vector##tn( vector_##t * v)
 (defcfun ("delete_std_vectorkp" del-vec-kp) :void
-  "Calls delete on (:POINTER VECTOR-KEY-POINT)"
-  (self :pointer))
+  "Calls delete on VECTOR-KEY-POINT"
+  (self vector-key-point))
 
 
 ;; void operator delete  ( void* ptr )
@@ -219,15 +219,15 @@
 
 ;; void operator delete  ( void* ptr )
 ;; void delete_std_vector##tn( vector_##t * v)
-(defcfun ("delete_std_vectorp2f" del-vec-point2f) :void
-  "Calls delete on VECTOR-POINT2F"
+(defcfun ("delete_std_vectorp2f" del-vec-point-2f) :void
+  "Calls delete on VECTOR-POINT-2F"
   (self :pointer))
 
 
 ;; void operator delete  ( void* ptr )
 ;; void delete_std_vector##tn( vector_##t * v)
 (defcfun ("delete_std_vectorr" del-vec-rect) :void
-  "Calls delete on (:POINTER VECTOR-RECT)"
+  "Calls delete on VECTOR-RECT"
   (self :pointer))
 
 

@@ -114,3 +114,19 @@
 (asdf:oos 'lisp-executable:create-executables-op "lisp-executable-example")
 (su:run-program "~/quicklisp/dists/quicklisp/software/lisp-executable-20140113-git/example/example-program"))
 
+
+
+
+
+
+;;; CORE
+
+;; Macros for retrieving/setting the x/y value of any point/2d/2f/2i/3d/3f/3i object
+
+(defmacro x (&optional type self)
+	  `(mem-aref (c-pointer ,self) ,type))
+
+(defmacro y (&optional type self)
+	  `(mem-aref (c-pointer ,self) ,type 1))
+
+

@@ -11,53 +11,40 @@
    #:alloc
 
 
-;; Types
+;; Vectors
 
-   #:bf-matcher
-   #:brisk
-   #:cascade-classifier
-   #:descriptor-matcher
-   #:dmatch
-   #:feature-2d
-   #:feature-detector
-   #:key-point
-   #:mat
-   #:mat-expr
-   #:mouse-callback
-   #:point
-   #:point2d
-   #:point2f
-   #:point3d
-   #:point3f
-   #:point3i
-   #:rect
-   #:rng
-   #:rotated-rect
-   #:rotated-rect-bounding-rect
-   #:rotated-rect-center
-   #:rotated-rect-size
-   #:scalar
-   #:size
-   #:size2f
-   #:*string
-   #:surf
-   #:svm
-   #:svm-params
-   #:term-criteria
-   #:trackbar-callback
-   #:vector-char
-   #:vector-dmatch
-   #:vector-double
-   #:vector-float
-   #:vector-int
-   #:vector-key-point
-   #:vector-mat
-   #:vector-point
-   #:vector-point2f
-   #:vector-rect
-   #:vector-uchar
-   #:video-capture
-   #:video-writer
+   #:vec-char
+   #:c-arr-to-vec-char
+   #:arr-to-vec-char
+   #:vec-dmatch
+   #:c-arr-to-vec-dmatch
+   #:arr-to-vec-dmatch
+   #:vec-double
+   #:c-arr-to-vec-double
+   #:arr-to-vec-double
+   #:vec-float
+   #:c-arr-to-vec-float
+   #:arr-to-vec-float
+   #:vec-int
+   #:c-arr-to-vec-int
+   #:arr-to-vec-int
+   #:vec-key-point
+   #:c-arr-to-vec-key-point
+   #:arr-to-vec-key-point
+   #:vec-point
+   #:c-arr-to-vec-point
+   #:arr-to-vec-point
+   #:vec-point-2f
+   #:c-arr-to-vec-point-2f
+   #:arr-to-vec-point-2f
+   #:vec-rect
+   #:c-arr-to-vec-rect
+   #:arr-to-vec-rect
+   #:vec-uchar
+   #:c-arr-to-vec-uchar
+   #:arr-to-vec-uchar
+
+
 
 
 ;; core - Basic Structures
@@ -85,24 +72,24 @@
    #:mul
    #:point
    #:point-init
-   #:point2d
-   #:point2d-x
-   #:point2d-y
-   #:point2f
-   #:point2f-x
-   #:point2f-y
-   #:point3d
-   #:point3d-x
-   #:point3d-y
-   #:point3d-z
-   #:point3f
-   #:point3f-x
-   #:point3f-y
-   #:point3f-z
-   #:point3i
-   #:point3i-x
-   #:point3i-y
-   #:point3i-z
+   #:point-2d
+   #:point-2d-x
+   #:point-2d-y
+   #:point-2f
+   #:point-2f-x
+   #:point-2f-y
+   #:point-3d
+   #:point-3d-x
+   #:point-3d-y
+   #:point-3d-z
+   #:point-3f
+   #:point-3f-x
+   #:point-3f-y
+   #:point-3f-z
+   #:point-3i
+   #:point-3i-x
+   #:point-3i-y
+   #:point-3i-z
    #:promote
    #:rect
    #:rect-br
@@ -127,6 +114,7 @@
 
 ;; core - Operations on Arrays
 
+   #:mean
    #:sum
 
 ;; core - Drawing Functions

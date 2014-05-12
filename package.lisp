@@ -71,19 +71,18 @@
 
 ;; DELETE
 
-   #:del-bf-matcher
-   #:del-brisk
+   #:del
    #:del-casc-class
    #:del-dmatch
    #:del-kp
    #:del-mat
    #:del-mat-expr
    #:del-point
-   #:del-point2d
-   #:del-point2f
-   #:del-point3d
-   #:del-point3f
-   #:del-point3i
+   #:del-point-2d
+   #:del-point-2f
+   #:del-point-3d
+   #:del-point-3f
+   #:del-point-3i
    #:del-rect
    #:del-rng
    #:del-rotated-rect
@@ -91,7 +90,6 @@
    #:del-size
    #:del-size2f
    #:del-std-string
-   #:del-surf
    #:del-term-crit
    #:del-vec-char
    #:del-vec-dbl
@@ -101,7 +99,7 @@
    #:del-vec-kp
    #:del-vec-mat
    #:del-vec-point
-   #:del-vec-point2f
+   #:del-vec-point-2f
    #:del-vec-rect
    #:del-vec-uchar
    #:del-vid-cap
@@ -110,27 +108,25 @@
 
 ;; WITH-MACROS
 
-   #:with-bf-matcher
-   #:with-brisk
    #:with-cascade-classifier
    #:with-dmatch
+   #:with-feature-2d
    #:with-keypoint
    #:with-mat
    #:with-mat-expr
    #:with-object
    #:with-point
-   #:with-point2d
-   #:with-point2f
-   #:with-point3d
-   #:with-point3f
-   #:with-point3i
+   #:with-point-2d
+   #:with-point-2f
+   #:with-point-3d
+   #:with-point-3f
+   #:with-point-3i
    #:with-rect
    #:with-rng
    #:with-rotated-rect
    #:with-scalar
    #:with-size
    #:with-size2f
-   #:with-surf
    #:with-term-criteria
    #:with-vec-char
    #:with-vec-dbl
@@ -140,7 +136,7 @@
    #:with-vec-key-point
    #:with-vec-mat
    #:with-vec-point
-   #:with-vec-point2f
+   #:with-vec-point-2f
    #:with-vec-rect
    #:with-vec-uchar
    #:with-video-capture
@@ -149,23 +145,19 @@
 
 ;; DEFCTYPE's
 
-   #:bf-matcher
-   #:brisk
    #:cascade-classifier
-   #:descriptor-matcher
    #:dmatch
    #:feature-2d
-   #:feature-detector
    #:key-point
    #:mat
    #:mat-expr
    #:mouse-callback
    #:point
-   #:point2d
-   #:point2f
-   #:point3d
-   #:point3f
-   #:point3i
+   #:point-2d
+   #:point-2f
+   #:point-3d
+   #:point-3f
+   #:point-3i
    #:rect
    #:rng
    #:rotated-rect
@@ -176,7 +168,6 @@
    #:size
    #:size2f
    #:*string
-   #:surf
    #:svm
    #:svm-params
    #:term-criteria
@@ -189,13 +180,27 @@
    #:vector-key-point
    #:vector-mat
    #:vector-point
-   #:vector-point2f
+   #:vector-point-2f
    #:vector-rect
    #:vector-uchar
    #:video-capture
    #:video-writer
 
 
+
+;; Vectors
+
+   #:vec-char
+   #:vec-dmatch
+   #:vec-double
+   #:vec-float
+   #:vec-int
+   #:vec-key-point
+   #:vec-mat
+   #:vec-point
+   #:vec-point-2f
+   #:vec-rect
+   #:vec-uchar
 
 
 ;; core - Basic Structures
@@ -279,24 +284,24 @@
    #:point
    #:point-x
    #:point-y
-   #:point2d
-   #:point2d-x
-   #:point2d-y
-   #:point2f
-   #:point2f-x
-   #:point2f-y
-   #:point3d
-   #:point3d-x
-   #:point3d-y
-   #:point3d-z
-   #:point3f
-   #:point3f-x
-   #:point3f-y
-   #:point3f-z
-   #:point3i
-   #:point3i-x
-   #:point3i-y
-   #:point3i-z
+   #:point-2d
+   #:point-2d-x
+   #:point-2d-y
+   #:point-2f
+   #:point-2f-x
+   #:point-2f-y
+   #:point-3d
+   #:point-3d-x
+   #:point-3d-y
+   #:point-3d-z
+   #:point-3f
+   #:point-3f-x
+   #:point-3f-y
+   #:point-3f-z
+   #:point-3i
+   #:point-3i-x
+   #:point-3i-y
+   #:point-3i-z
    #:promote
    #:ptr
    #:rect

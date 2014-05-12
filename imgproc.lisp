@@ -43,10 +43,12 @@
   (anchor point)
   (border-type :int))
 
-(with-point ((src (point -1 -1)))
-(defun blur (src dest ksize &optional (anchor src) (border-type +border-default+))
-       "Blurs an image using the normalized box filter."
-       (%blur src dest ksize anchor border-type)))
+(defun blur (src dest ksize &optional anchor (border-type +border-default+))
+  "Blurs an image using the normalized box filter."
+  (if (not anchor)
+      (with-point ((p (point -1 -1)))
+	(%blur src dest ksize p border-type))
+      (%blur src dest ksize anchor border-type)))
 
 
 ;; void copyMakeBorder(InputArray src, OutputArray dst, int top, int bottom, int left, int right, int borderType, 
@@ -76,10 +78,19 @@
   (border-type :int)
   (border-value scalar))
 
-(defun dilate (src dest kernel &optional (anchor (point -1 -1)) (iterations 1) (border-type +border-constant+) 
-              (border-value (morphology-default-border-value)))
-       "Dilates an image by using a specific structuring element."
-       (%dilate src dest kernel anchor iterations border-type border-value))
+(defun dilate (src dest kernel &optional anchor (iterations 1) (border-type +border-constant+) border-value)
+  "Dilates an image by using a specific structuring element."
+  (with-scalar ((s (morphology-default-border-value)))
+    (with-point ((p (point -1 -1)))
+
+      (cond (border-value
+	     (%dilate src dest kernel anchor iterations border-type border-value))
+
+	    ((not border-value)
+	     (if (not anchor)
+		 (%dilate src dest kernel p iterations border-type s)
+		 (%dilate src dest kernel anchor iterations border-type s)))))))
+
 
 
 ;; void erode(InputArray src, OutputArray dst, InputArray kernel, Point anchor=Point(-1,-1), int iterations=1, 
@@ -94,10 +105,18 @@
   (border-type :int)
   (border-value scalar))
 
-(defun erode (src dest kernel &optional (anchor (point -1 -1)) (iterations 1) (border-type +border-constant+) 
-             (border-value (morphology-default-border-value)))
-       "Erodes an image by using a specific structuring element."
-       (%erode src dest kernel anchor iterations border-type border-value))
+(defun erode (src dest kernel &optional anchor (iterations 1) (border-type +border-constant+) border-value)
+  "Dilates an image by using a specific structuring element."
+  (with-scalar ((s (morphology-default-border-value)))
+    (with-point ((p (point -1 -1)))
+
+      (cond (border-value
+	     (%erode src dest kernel anchor iterations border-type border-value))
+
+	    ((not border-value)
+	     (if (not anchor)
+		 (%erode src dest kernel p iterations border-type s)
+		 (%erode src dest kernel anchor iterations border-type s)))))))
 
 
 ;; void filter2D(InputArray src, OutputArray dst, int ddepth, InputArray kernel, Point anchor=Point(-1,-1), double delta=0, 
@@ -112,9 +131,12 @@
   (delta :double)
   (border-type :int))
 
-(defun filter-2d (src dest ddepth kernel &optional (anchor (point -1 -1)) (delta 0d0) (border-type +border-default+))
+(defun filter-2d (src dest ddepth kernel &optional anchor (delta 0d0) (border-type +border-default+))
   "Convolves an image with the kernel."
-  (%filter-2d src dest ddepth kernel anchor delta border-type))
+  (if (not anchor)
+      (with-point ((p (point -1 -1)))
+	(%filter-2d src dest ddepth kernel p delta border-type))
+      (%filter-2d src dest ddepth kernel anchor delta border-type)))
 
 
 ;; void GaussianBlur(InputArray src, OutputArray dst, Size ksize, double sigmaX, double sigmaY=0, int borderType=BORDER_DEFAULT )
@@ -155,10 +177,13 @@
   (border-type :int)
   (border-value scalar))
 
-(defun morphology-ex (src dest op kernel &optional (anchor (point -1 -1)) (iterations 1) (border-type +border-constant+) 
-                     (border-value (morphology-default-border-value)))
+(defun morphology-ex (src dest op kernel &optional anchor (iterations 1) (border-type +border-constant+) 
+					   (border-value (morphology-default-border-value)))
   "Performs advanced morphological transformations."
-  (%morphology-ex src dest op kernel anchor iterations border-type border-value))
+  (if (not anchor)
+      (with-point ((p (point -1 -1)))
+	(%morphology-ex src dest op kernel p iterations border-type border-value))
+      (%morphology-ex src dest op kernel anchor iterations border-type border-value)))
 
 
 ;; Mat getStructuringElement(int shape, Size ksize, Point anchor=Point(-1,-1))
@@ -169,9 +194,12 @@
   (kernel point))
 
 (defun get-structuring-element (shape ksize &optional (kernel (point -1 -1))) 
-       "Returns a structuring element of the specified 
+  "Returns a structuring element of the specified 
         size and shape for morphological operations."
-       (%get-structuring-element shape ksize kernel))
+  (if (not kernel)
+      (with-point ((p (point -1 -1)))
+	(%get-structuring-element shape ksize p))
+      (%get-structuring-element shape ksize kernel)))
 
 
 ;; void Laplacian(InputArray src, OutputArray dst, int ddepth, int ksize=1, double scale=1, double delta=0, int borderType=BORDER_DEFAULT )
@@ -198,9 +226,12 @@
 	 (dstsize size)
 	 (border-type :int))
 
-(defun pyr-down (src dest &optional (dstsize (size)) (border-type +border-default+))
+(defun pyr-down (src dest &optional dstsize (border-type +border-default+))
   "Blurs an image and downsamples it."
-  (%pyr-down src dest dstsize border-type))
+  (if (not dstsize)
+      (with-size ((s (size)))
+	(%pyr-down src dest s border-type))
+      (%pyr-down src dest dstsize border-type)))
 
 
 ;;void pyrUp(InputArray src, OutputArray dst, const Size& dstsize=Size(), int borderType=BORDER_DEFAULT )
@@ -211,9 +242,12 @@
   (dstsize size)
   (border-type :int))
 
-(defun pyr-up (src dest &optional (dstsize (size)) (border-type +border-default+))
+(defun pyr-up (src dest &optional dstsize (border-type +border-default+))
   "Upsamples an image and then blurs it."
-  (%pyr-up src dest dstsize border-type))
+  (if (not dstsize)
+      (with-size ((s (size)))
+	(%pyr-up src dest s border-type))
+      (%pyr-up src dest dstsize border-type)))
 
 
 ;; void Scharr(InputArray src, OutputArray dst, int ddepth, int dx, int dy, double scale=1, double delta=0, int borderType=BORDER_DEFAULT )
@@ -269,7 +303,11 @@
   (border-value scalar))
 
 (defun remap (src dest map1 map2 interpolation &optional (border-mode +border-constant+) (border-value (scalar)))
-  (%remap src dest map1 map2 interpolation border-mode border-value))
+  "Sets all or some of the array elements to the specified value."
+  (if (not border-value)
+      (with-scalar ((s (scalar)))
+	(%remap src dest map1 map2 interpolation border-mode s))
+      (%remap src dest map1 map2 interpolation border-mode border-value)))
 
 
 ;; void resize(InputArray src, OutputArray dst, Size dsize, double fx=0, double fy=0, int interpolation=INTER_LINEAR )

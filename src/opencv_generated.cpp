@@ -1408,6 +1408,7 @@ bool cv_VideoCapture_read(VideoCapture* self, Mat* image) {
 int cv_recoverPose(Mat* E, Mat* points1, Mat* points2, Mat* R, Mat* t, double focal, Point2d* pp, Mat* mask) {
 	return cv::recoverPose(*E, *points1, *points2, *R, *t, focal, *pp, *mask);
 }
+void cv_rectangle(Mat* img, Point* pt1, Point* pt2, Scalar* color, int thickness, int lineType, int shift) {
 	cv::rectangle(*img, *pt1, *pt2, *color, thickness, lineType, shift);
 }
 float cv_rectify3Collinear(Mat* cameraMatrix1, Mat* distCoeffs1, Mat* cameraMatrix2, Mat* distCoeffs2, Mat* cameraMatrix3, Mat* distCoeffs3, vector_Mat* imgpt1, vector_Mat* imgpt3, Size* imageSize, Mat* R12, Mat* T12, Mat* R13, Mat* T13, Mat* R1, Mat* R2, Mat* R3, Mat* P1, Mat* P2, Mat* P3, Mat* Q, double alpha, Size* newImgSize, Rect* roi1, Rect* roi2, int flags) {

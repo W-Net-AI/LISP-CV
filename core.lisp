@@ -264,25 +264,25 @@
 ;; _Tp dot(const Point_& pt) const
 ;; double cv_Point2d_dot(Point2d* self, Point2d* other) 
 (defcfun ("cv_Point2d_dot" dot2d) :double
-  "Finds the dot product of a point2d."
-  (self point2d)
-  (other point2d))
+  "Finds the dot product of a point-2d."
+  (self point-2d)
+  (other point-2d))
 
 
 ;; _Tp dot(const Point_& pt) const
 ;; float cv_Point2f_dot(Point2f* self, Point2f* other)
 (defcfun ("cv_Point2f_dot" dot2f) :float
-  "Finds the dot product of a point2f."
-  (self point2f)
-  (other point2f))
+  "Finds the dot product of a point-2f."
+  (self point-2f)
+  (other point-2f))
 
 
 ;; _Tp dot(const Point3_& pt) const
 ;; double cv_Point3d_dot(Point3d* self, Point3d* other)
 (defcfun ("cv_Point3d_dot" dot3d) :double 
-	 "Finds the dot product of a point3d."
-	 (self point3d)
-	 (other point3d))
+	 "Finds the dot product of a point-3d."
+	 (self point-3d)
+	 (other point-3d))
 
 
 ;; bool Mat::isContinuous() const
@@ -294,17 +294,17 @@
 ;; _Tp dot(const Point3_& pt) const
 ;; float cv_Point3f_dot(Point3f* self, Point3f* other)
 (defcfun ("cv_Point3f_dot" dot3f) :float 
-	 "Finds the dot product of a point3f."
-	 (self point3f)
-	 (other point3f))
+	 "Finds the dot product of a point-3f."
+	 (self point-3f)
+	 (other point-3f))
 
 
 ;; _Tp dot(const Point3_& pt) const
 ;; int cv_Point3i_dot(Point3i* self, Point3i* other)
 (defcfun ("cv_Point3i_dot" dot3i) :int 
-	 "Finds the dot product of a point3i."
-	 (self point3i)
-	 (other point3i))
+	 "Finds the dot product of a point-3i."
+	 (self point-3i)
+	 (other point-3i))
 
 
 ;; bool Mat::empty() const
@@ -555,207 +555,207 @@
 
 ;; typedef Point_<double> Point2d
 ;; Point2##t * cv_create_Point2##t ( tn x,  tn y) 
-(defcfun ("cv_create_Point2d" point2d0) point2d 
+(defcfun ("cv_create_Point2d" point-2d0) point-2d 
 	 "Point2d constructor")
 
 
 ;; typedef Point_<double> Point2d
 ;; Point2##t * cv_create_Point2##t ( tn x,  tn y)  
-(defcfun ("cv_create_Point2d" point2d2) point2d 
+(defcfun ("cv_create_Point2d" point-2d2) point-2d 
 	 "Point2d constructor"
 	 (x :double)
 	 (y :double))
 
 
-(defun point2d (&optional x y)
+(defun point-2d (&optional x y)
        (cond ((eq (or x y) nil)
-	      (point2d0))
+	      (point-2d0))
 	      ((and x y)
-	       (point2d2 x y))
+	       (point-2d2 x y))
 	       (t nil)))
 
 
 ;; _Tp x, y
 ;; double cv_Point2d_getX(Point2d* self) 
-(defcfun ("cv_Point2d_getX" point2d-x) :double
-  "Retrieves x coordinate of a point2d"
-  (self point2d))
+(defcfun ("cv_Point2d_getX" point-2d-x) :double
+  "Retrieves x coordinate of a point-2d"
+  (self point-2d))
 
 
 ;; _Tp x, y
 ;; double cv_Point2d_getY(Point2d* self) 
-(defcfun ("cv_Point2d_getY" point2d-y) :double
-  "Retrieves y coordinate of a point2d"
-  (self point2d))
+(defcfun ("cv_Point2d_getY" point-2d-y) :double
+  "Retrieves y coordinate of a point-2d"
+  (self point-2d))
 
 
 ;; typedef Point_<float> Point2f
 ;; tn cv_Point2##t##_getX( Point2##t * self) 
-(defcfun ("cv_create_Point2f" point2f0) point2f 
+(defcfun ("cv_create_Point2f" point-2f0) point-2f 
 	 "Point2f constructor")
 
 
 
 ;; typedef Point_<float> Point2f
 ;; Point2##t * cv_create_Point2##t ( tn x,  tn y)  
-(defcfun ("cv_create_Point2f" point2f2) point2f 
+(defcfun ("cv_create_Point2f" point-2f2) point-2f 
 	 "Point2f constructor"
 	 (x :float)
 	 (y :float))
 
 
-(defun point2f (&optional x y)
+(defun point-2f (&optional x y)
        (cond ((eq (or x y) nil)
-	      (point2f0))
+	      (point-2f0))
 	      ((and x y)
-	       (point2f2 x y))
+	       (point-2f2 x y))
 	       (t nil)))
 
 
 ;; _Tp x, y;
 ;; float cv_Point2f_getX(Point2f* self) 
-(defcfun ("cv_Point2f_getX" point2f-x) :float
-  "Retrieves x coordinate of a point2f"
-  (self point2f))
+(defcfun ("cv_Point2f_getX" point-2f-x) :float
+  "Retrieves x coordinate of a point-2f"
+  (self point-2f))
 
 
 ;; _Tp x, y;
 ;; float cv_Point2f_getY(Point2f* self) 
-(defcfun ("cv_Point2f_getY" point2f-y) :float
-  "Retrieves y coordinate of a point2f"
-  (self point2f))
+(defcfun ("cv_Point2f_getY" point-2f-y) :float
+  "Retrieves y coordinate of a point-2f"
+  (self point-2f))
 
 
 ;; typedef Point3_<double> Point3d
 ;; Point3##t * cv_create_Point3##t ( tn x,  tn y,  tn z) 
-(defcfun ("cv_create_Point3d" point3d0) point3d 
+(defcfun ("cv_create_Point3d" point-3d0) point-3d 
 	 "Point3d constructotr")
 
 
 ;; typedef Point3_<double> Point3d
 ;; Point3##t * cv_create_Point3##t ( tn x,  tn y,  tn z) 
-(defcfun ("cv_create_Point3d" point3d2) point3d 
+(defcfun ("cv_create_Point3d" point-3d2) point-3d 
 	 "Point3d constructor"
 	 (x :double)
 	 (y :double)
 	 (z :double))
 
 
-(defun point3d (&optional x y z)
+(defun point-3d (&optional x y z)
        (cond ((eq (or x y) nil)
-	      (point3d0))
+	      (point-3d0))
 	      ((and x y)
-	       (point3d2 x y z))
+	       (point-3d2 x y z))
 	       (t nil)))
 
 
 ;; _Tp x, y, z
 ;; double cv_Point3d_getX(Point3d* self) 
-(defcfun ("cv_Point3d_getX" point3d-x) :double
-  "Retrieves x coordinate of a point3d"
-  (self point3d))
+(defcfun ("cv_Point3d_getX" point-3d-x) :double
+  "Retrieves x coordinate of a point-3d"
+  (self point-3d))
 
 
 ;; _Tp x, y, z
 ;; double cv_Point3d_getY(Point3d* self) 
-(defcfun ("cv_Point3d_getY" point3d-y) :double
-  "Retrieves y coordinate of a point3d"
-  (self point3d))
+(defcfun ("cv_Point3d_getY" point-3d-y) :double
+  "Retrieves y coordinate of a point-3d"
+  (self point-3d))
 
 
 ;; _Tp x, y, z
 ;; double cv_Point3d_getZ(Point3d* self) 
-(defcfun ("cv_Point3d_getZ" point3d-z) :double
-  "Retrieves z coordinate of a point3d"
-  (self point3d))
+(defcfun ("cv_Point3d_getZ" point-3d-z) :double
+  "Retrieves z coordinate of a point-3d"
+  (self point-3d))
 
 
 ;; typedef Point3_<double> Point3d
 ;; Point3##t * cv_create_Point3##t ( tn x,  tn y,  tn z)  
-(defcfun ("cv_create_Point3f" point3f0) point3f 
+(defcfun ("cv_create_Point3f" point-3f0) point-3f 
 	 "Point3f constructor")
 
 
 ;; typedef Point3_<double> Point3d
 ;; Point3##t * cv_create_Point3##t ( tn x,  tn y,  tn z)  
-(defcfun ("cv_create_Point3f" point3f2) point3f 
+(defcfun ("cv_create_Point3f" point-3f2) point-3f 
 	 "Point3f constructor"
 	 (x :float)
 	 (y :float)
 	 (z :float))
 
 
-(defun point3f (&optional x y z)
+(defun point-3f (&optional x y z)
        (cond ((eq (or x y) nil)
-	      (point3f0))
+	      (point-3f0))
 	      ((and x y)
-	       (point3f2 x y z))
+	       (point-3f2 x y z))
 	       (t nil)))
 
 
 ;; _Tp x, y, z
 ;; float cv_Point3f_getX(Point3f* self) 
-(defcfun ("cv_Point3f_getX" point3f-x) :float
-  "Retrieves x coordinate of a point3f"
-  (self point3f))
+(defcfun ("cv_Point3f_getX" point-3f-x) :float
+  "Retrieves x coordinate of a point-3f"
+  (self point-3f))
 
 
 ;; _Tp x, y, z
 ;; float cv_Point3f_getY(Point3f* self) 
-(defcfun ("cv_Point3f_getY" point3f-y) :float
-  "Retrieves y coordinate of a point3f"
-  (self point3f))
+(defcfun ("cv_Point3f_getY" point-3f-y) :float
+  "Retrieves y coordinate of a point-3f"
+  (self point-3f))
 
 
 ;; _Tp x, y, z
 ;; float cv_Point3f_getZ(Point3f* self) 
-(defcfun ("cv_Point3f_getZ" point3f-z) :float
-  "Retrieves z coordinate of a point3f"
-  (self point3f))
+(defcfun ("cv_Point3f_getZ" point-3f-z) :float
+  "Retrieves z coordinate of a point-3f"
+  (self point-3f))
 
 
 ;; typedef Point3_<double> Point3d
 ;; Point3##t * cv_create_Point3##t ( tn x,  tn y,  tn z)  
-(defcfun ("cv_create_Point3i" point3i0) point3i 
+(defcfun ("cv_create_Point3i" point-3i0) point-3i 
 	 "Point3i constructor")
 
 
 ;; typedef Point3_<double> Point3d
 ;; Point3##t * cv_create_Point3##t ( tn x,  tn y,  tn z)  
-(defcfun ("cv_create_Point3i" point3i2) point3i 
+(defcfun ("cv_create_Point3i" point-3i2) point-3i 
 	 "Point3i constructor"
 	 (x :int)
 	 (y :int)
 	 (z :int))
 
 
-(defun point3i (&optional x y z)
+(defun point-3i (&optional x y z)
        (cond ((eq (or x y) nil)
-	      (point3i0))
+	      (point-3i0))
 	      ((and x y)
-	       (point3i2 x y z))
+	       (point-3i2 x y z))
 	       (t nil)))
 
 
 ;; _Tp x, y, z
 ;; int cv_Point3i_getX(Point3i* self) 
-(defcfun ("cv_Point3i_getX" point3i-x) :int 
-	 "Retrieves y coordinate of a point3i"
-	 (self point3i))
+(defcfun ("cv_Point3i_getX" point-3i-x) :int 
+	 "Retrieves y coordinate of a point-3i"
+	 (self point-3i))
 
 
 ;; _Tp x, y, z
 ;; int cv_Point3i_getY(Point3i* self) 
-(defcfun ("cv_Point3i_getY" point3i-y) :int
-  "Retrieves y coordinate of a point3i"
-  (self point3i))
+(defcfun ("cv_Point3i_getY" point-3i-y) :int
+  "Retrieves y coordinate of a point-3i"
+  (self point-3i))
 
 
 ;; _Tp x, y, z
 ;; int cv_Point3i_getZ(Point3i* self) 
-(defcfun ("cv_Point3i_getZ" point3i-z) :int
-  "Retrieves z coordinate of a point3i"
-  (self point3i))
+(defcfun ("cv_Point3i_getZ" point-3i-z) :int
+  "Retrieves z coordinate of a point-3i"
+  (self point-3i))
 
 
 ;; MatExpr* promote(Mat* m) 
@@ -1134,39 +1134,48 @@
 ;; void bitwise_and(InputArray src1, InputArray src2, OutputArray dst, InputArray mask=noArray())
 ;; void cv_bitwise_and(Mat* src1, Mat* src2, Mat* dst, Mat* mask)
 (defcfun ("cv_bitwise_and" %bitwise-and) :void 
-	 (src1 mat)
-	 (src2 mat)
-	 (dest mat)
-	 (mask mat))
+  (src1 mat)
+  (src2 mat)
+  (dest mat)
+  (mask mat))
 
-(defun bitwise-and (src1 src2 dest &optional (mask (mat)))
-       "Calculates the per-element bit-wise conjunction of two arrays."
-       (%bitwise-or src1 src2 dest mask))
+(defun bitwise-and (src1 src2 dest &optional mask)
+  "Calculates the per-element bit-wise conjunction of two arrays."
+  (if (not mask)
+      (with-mat ((m (mat)))
+	(%bitwise-and src1 src2 dest m))
+      (%bitwise-and src1 src2 dest mask)))
 
 
 ;; void bitwise_not(InputArray src, OutputArray dst, InputArray mask=noArray())
 ;; void cv_bitwise_not(Mat* src, Mat* dst, Mat* mask)
 (defcfun ("cv_bitwise_not" %bitwise-not) :void 
-	 (src mat)
-	 (dest mat)
-	 (mask mat))
+  (src mat)
+  (dest mat)
+  (mask mat))
 
-(defun bitwise-not (src dest &optional (mask (mat)))
-       "Inverts every bit of an array."
-       (%bitwise-not src dest mask))
+(defun bitwise-not (src dest &optional mask)
+  "Inverts every bit of an array."
+  (if (not mask)
+      (with-mat ((m (mat)))
+	(%bitwise-not src dest m))
+      (%bitwise-not src dest mask)))
 
 
 ;; void bitwise_or(InputArray src1, InputArray src2, OutputArray dst, InputArray mask=noArray())
 ;; void cv_bitwise_or(Mat* src1, Mat* src2, Mat* dst, Mat* mask)
 (defcfun ("cv_bitwise_or" %bitwise-or) :void 
-	 (src1 mat)
-	 (src2 mat)
-	 (dest mat)
-	 (mask mat))
+  (src1 mat)
+  (src2 mat)
+  (dest mat)
+  (mask mat))
 
-(defun bitwise-or (src1 src2 dest &optional (mask (mat)))
-       "Calculates the per-element bit-wise disjunction of two arrays."
-       (%bitwise-or src1 src2 dest mask))
+(defun bitwise-or (src1 src2 dest &optional mask)
+  "Calculates the per-element bit-wise disjunction of two arrays."
+  (if (not mask)
+      (with-mat ((m (mat)))
+	(%bitwise-or src1 src2 dest m))
+      (%bitwise-or src1 src2 dest mask)))
 
 
 ;; void bitwise_xor(InputArray src1, InputArray src2, OutputArray dst, InputArray mask=noArray())
@@ -1179,8 +1188,11 @@
   (mask mat))
 
 (defun bitwise-xor (src1 src2 dest &optional (mask (mat)))
-       "Calculates the per-element bit-wise disjunction of two arrays."
-       (%bitwise-xor src1 src2 dest mask))
+  "Calculates the per-element bit-wise disjunction of two arrays."
+  (if (not mask)
+      (with-mat ((m (mat)))
+	(%bitwise-xor src1 src2 dest m))
+      (%bitwise-xor src1 src2 dest mask)))
 
 
 ;; void convertScaleAbs(InputArray src, OutputArray dst, double alpha=1, double beta=0)
@@ -1291,9 +1303,12 @@
   (src mat)
   (mask mat))
 
-(defun mean (src &optional (mask (mat)))
-       "Calculates an average (mean) of array elements."
-       (%mean src mask))
+(defun mean (src &optional mask)
+  "Calculates an average (mean) of array elements."
+  (if (not mask)
+      (with-mat ((m (mat)))
+	(%mean src m))
+      (%mean src mask)))
 
 
 ;; void minMaxLoc(InputArray src, double* minVal, double* maxVal=0, Point* minLoc=0, Point* maxLoc=0, InputArray mask=noArray())
@@ -1339,8 +1354,11 @@
 
 
 (defun normalize (src dest &optional (alpha 1) (beta 0) (norm-type  +norm-l2+) (dtype -1) (mask (mat)))
-       "Normalizes the norm or value range of an array."
-       (%normalize src dest alpha beta norm-type  dtype  mask))
+  "Normalizes the norm or value range of an array."
+  (if (not mask)
+      (with-mat ((m (mat)))
+	(%normalize src dest alpha beta norm-type  dtype  m))
+      (%normalize src dest alpha beta norm-type  dtype  mask)))
 
 
 ;; void pow(InputArray src, double power, OutputArray dst)
@@ -1400,7 +1418,11 @@
   (dtype :int))
 
 (defun subtract (src1 src2 dest &optional (mask (mat)) (dtype -1))
-       (%subtract src1 src2 dest mask dtype))
+  "Calculates the per-element difference between two arrays or array and a scalar."
+  (if (not mask)
+      (with-mat ((m (mat)))
+	(%subtract src1 src2 dest m dtype))
+      (%subtract src1 src2 dest mask dtype)))
 
 
 ;; Scalar sum(InputArray src)
@@ -1520,11 +1542,18 @@
 	     (otherwise (error "Wrong number arguments to ELLIPSE (~A)" (length args)))))
 
 
+;; Size getTextSize(const string& text, int fontFace, double fontScale, int thickness, int* baseLine)
+;; Size* cv_getTextSize(String* text, int fontFace, double fontScale, int thickness, int* baseLine)
+(defcfun ("cv_getTextSize" %get-text-size) (:pointer size)
+  (text (:pointer *string))
+  (font-face :int)
+  (font-scale :double)
+  (thickness :int) 
+  (base-line :pointer))
 
-;;todo
 (defun get-text-size (text font-face font-scale thickness base-line)
-       "Calculates the width and height of a text string."
-       (%get-text-size text font-face font-scale thickness base-line))
+  "Calculates the width and height of a text string."
+  (%get-text-size (c-string-to-string text (length text)) font-face font-scale thickness base-line))
 
 
 ;; void line(Mat& img, Point pt1, Point pt2, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
