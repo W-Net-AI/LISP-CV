@@ -3,7 +3,7 @@
 	"LISP-EXECUTABLE" "LISP-CV"))
 (in-package "LISP-EXECUTABLE.EXAMPLE")
 
-
+;;See <lisp-cv-src-dir>/macros.lisp for instructions
 
 
 (define-program example-program (&options help)
