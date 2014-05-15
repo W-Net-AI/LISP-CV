@@ -30,32 +30,6 @@
 ;; C++ INTTEROP TYPES.
 
 
-;; *CHAR
-
-
-(define-foreign-type *char ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
-                     :garbage-collect))
-  (:actual-type :pointer)
-  (:simple-parser *char))
-
-
-(defclass std-char ()
-  ((c-pointer :reader c-pointer :initarg :c-pointer)))
-
-
-(defmethod translate-to-foreign ((lisp-value std-char) (c-type *char))
-  (values  (c-pointer lisp-value) lisp-value))
-
-
-    
-(defmethod translate-from-foreign (c-pointer (c-type *char))
-  (let ((char  (make-instance 'std-char :c-pointer c-pointer)))
-    (when (garbage-collect c-type)
-      (tg:finalize char (lambda () (del c-pointer))))
-    char))
-
-
 
 ;; *STRING
 

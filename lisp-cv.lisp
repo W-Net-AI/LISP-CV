@@ -2,6 +2,7 @@
 ;;;; lisp-cv.lisp
 ;;;; OpenCV bindings
 ;;;; Library loading and common code
+
 (in-package :lisp-cv)
 
 ;;; Foreign library setup
@@ -66,7 +67,7 @@
 (use-foreign-library stitching)
 
 (define-foreign-library superres
-    (:unix "/usr/local/lib/libopencv_superres.so.3.0.0" ))
+    (:unix "/usr/local/lib/libopencv_superres.so.3.0.0"))
 (use-foreign-library superres)
 
 (define-foreign-library video
@@ -106,9 +107,7 @@
 ;; cd ~/Documents/opencv-master/modules/c/src
 ;; g++ -Wall -shared -fPIC -o rect.so rect.cpp
 (define-foreign-library rect
-  (:darwin "rect.dylib")
-  (:unix "/usr/local/lib/rect.so")
-  (t (:default "rect")))
+  (:unix "/usr/local/lib/rect.so"))
 (use-foreign-library rect)
 
 ;; On new 3.0.0 OpenCV build

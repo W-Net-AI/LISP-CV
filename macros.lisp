@@ -11,7 +11,11 @@
   `(defparameter ,var ,val))
 
 
-;;sizeof macro
+
+
+;;SIZEOF macro
+
+;;All non CFFI type sizes are the same for now.
 
 (defmacro size-of (val)
   (if
@@ -53,7 +57,44 @@
        (equal val :float)              ; = 4 
        (equal val :double)             ; = 8
        (equal val :long-double)        ; = 16
-       (equal val :pointer))           ; = 8 
+       (equal val :pointer)            ; = 8 
+       (equal val '*string)            ; = 8 
+       (equal val 'rect)               ; = 8 
+       (equal val 'mat)                ; = 8 
+       (equal val 'rect)               ; = 8 
+       (equal val 'size)               ; = 8 
+       (equal val 'mat-expr)           ; = 8 
+       (equal val 'scalar)             ; = 8 
+       (equal val 'dmatch)             ; = 8 
+       (equal val 'key-point)          ; = 8 
+       (equal val 'point)              ; = 8 
+       (equal val 'point-2d)           ; = 8 
+       (equal val 'point-2f)           ; = 8 
+       (equal val 'point-3d)           ; = 8 
+       (equal val 'point-3f)           ; = 8 
+       (equal val 'point-3i)           ; = 8 
+       (equal val 'feature-2d)         ; = 8 
+       (equal val 'vector-char)        ; = 8 
+       (equal val 'vector-double)      ; = 8 
+       (equal val 'vector-dmatch)      ; = 8 
+       (equal val 'vector-int)         ; = 8 
+       (equal val 'vector-key-point)   ; = 8 
+       (equal val 'vector-mat)         ; = 8 
+       (equal val 'vector-point)       ; = 8 
+       (equal val 'vector-point-2f)    ; = 8 
+       (equal val 'vector-rect)        ; = 8 
+       (equal val 'vector-uchar)       ; = 8 
+       (equal val 'video-capture)      ; = 8 
+       (equal val 'video-writer)       ; = 8 
+       (equal val 'mouse-callback)     ; = 8 
+       (equal val 'trackbar-callback)  ; = 8 
+       (equal val 'svm)                ; = 8 
+       (equal val 'svm-params)         ; = 8 
+       (equal val 'rng)                ; = 8 
+       (equal val 'rotated-rect)       ; = 8 
+       (equal val 'term-criteria)      ; = 8 
+       (equal val 'size-2f)            ; = 8 
+       (equal val 'cascade-classifier)); = 8 
 
    `(foreign-type-size ,val) 
 
@@ -61,13 +102,13 @@
 
 
 
-;; Time Macro used to time your functions - see examples.lisp for usage
+;; TIME Macro used to time your functions - see examples.lisp for usage
 
   (defmacro $ (form &optional (count-form 1000000)) `(time (dotimes (_ ,count-form) ((lambda () ,form)))))
 
 
 
-;; Macro for FOREIGN-ALLOC 
+;; FOREIGN-ALLOC macro
 
 (defmacro alloc (&optional type value)
        (cond ((listp value)
@@ -75,14 +116,14 @@
 	     (t `(foreign-alloc ,type ,:initial-element ,value))))
 
 
-;; Macro for FOREIGN-FREE
+;; FOREIGN-FREE macro
 
 
 (defmacro free (ptr)
   `(foreign-free ,ptr))
 
 
-;; Macro for MEM-AREF
+;; MEM-AREF macro
 
  (defmacro ? (ptr type &optional (index 0))
        (cond (type
@@ -100,7 +141,10 @@
     (princ #\Newline)))
 
 
+;; RUN
+
 ;; Macro to build and run executable(not implemented all the way yet)
+
 ;; To use place the ~/quicklisp/dists/quicklisp/software/lisp-cv-master/extras/lisp-executable-example.asd 
 ;; file in the ~/quicklisp/dists/quicklisp/software/lisp-executable-20140113-git/example directory.  
 ;; This directory was installed when you built LISP-CV. Then take open the main.lisp file in that directory 
