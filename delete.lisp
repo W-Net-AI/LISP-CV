@@ -1,7 +1,7 @@
 ;;;; -*- mode: lisp; indent-tabs: nil -*-
 ;;;; delete.lisp
 ;;;; C++ bindings
-;;;; Delete functions
+;;;; Delete functions for GC'ed types
 
 
 (in-package :lisp-cv)
