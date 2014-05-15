@@ -36,7 +36,6 @@ Size2f* cv_Size2f_fromPoint2f(Point2f* p);
 float cv_Size2f_area(Size2f* self);
 float cv_Size2f_width(Size2f* self);
 float cv_Size2f_height(Size2f* self);
-//Delete
 void cv_delete_BRISK(BRISK* self);
 void cv_delete_CscadeClassifier(CascadeClassifier* self);
 void cv_delete_DMatch(DMatch* ptr);

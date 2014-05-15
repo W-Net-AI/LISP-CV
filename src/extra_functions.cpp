@@ -3,7 +3,7 @@ using namespace cv;
 using namespace std;
 using namespace flann;
 using namespace cvflann;
-//Delete
+
 
 #include <opencv2/c/extra_functions.hpp>
 
