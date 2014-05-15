@@ -5,7 +5,7 @@
 
 (in-package :lisp-cv)
 
-
+;note
 ;;; Feature Detection and Description
 
 
