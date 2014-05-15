@@ -5,7 +5,7 @@
   (:use #:cffi #:common-lisp #:swank #:trivial-garbage #:lisp-executable) 
   (:export 
 
-;; Default parameters
+;; Default parameters.
 
    #:*camera-index* 
    #:*default-width*
@@ -41,7 +41,6 @@
 ;; Extra OpenCV constants
 
    #:+max-dim+
-
 
 ;; C Constants
 

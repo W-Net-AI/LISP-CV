@@ -6,12 +6,13 @@
 ) 
   (:export 
 
-;; Macros.
+;; Macros
 
    #:alloc
 
 
 ;; Vectors
+
    #:%mean
    #:vec-char
    #:c-arr-to-vec-char
