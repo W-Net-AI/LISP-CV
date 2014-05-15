@@ -69,10 +69,6 @@
     (:unix "/usr/local/lib/libopencv_superres.so.3.0.0" ))
 (use-foreign-library superres)
 
-;(define-foreign-library ts
-;    (:unix "/usr/local/lib/libopencv_ts.so.2.4.6"))
-;(use-foreign-library ts)
-
 (define-foreign-library video
     (:unix "/usr/local/lib/libopencv_video.so.3.0.0"))
 (use-foreign-library video)

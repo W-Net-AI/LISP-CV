@@ -10,7 +10,7 @@
  *       Revision:  none
  *       Compiler:  g++
  *
- *         Author:  Arjun Comar and Joe W. BiMedina
+ *         Author:  Arjun Comar
  *
  * =====================================================================================
  */

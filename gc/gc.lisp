@@ -812,16 +812,14 @@
 ;; Scalar mean(InputArray src, InputArray mask=noArray())
 ;; Scalar* cv_mean(Mat* src, Mat* mask)
 (defcfun ("cv_mean" %mean) (cv::scalar :garbage-collect t)
-	 "Calculates an average (mean) of array elements."
 	 (src cv::mat)
 	 (mask cv::mat))
 
-(defun mean (src &optional mask)
-       "Calculates an average (mean) of array elements."
-       (if (not mask)
-	   (cv::with-mat ((m (cv::mat)))
-			 (%mean src m))
-			 (%mean src mask)))
+(defun mean (src &optional (mask (cv::mat) given-mask) return)
+  "Calculates an average mean of array elements."
+  (setf return (%mean src mask))
+  (if given-mask nil (cv::del-mat mask))
+  return)
 
 
 ;; RNG::RNG()
@@ -888,10 +886,12 @@
 	 (ksize cv::size)
 	 (kernel cv::point))
 
-(defun get-structuring-element (shape ksize &optional (kernel (point -1 -1))) 
-       "Returns a structuring element of the specified 
-        size and shape for morphological operations."
-	(%get-structuring-element shape ksize kernel))
+(defun get-structuring-element (shape ksize &optional (kernel (cv::point -1 -1) given-kernel) return) 
+  "Returns a structuring element of the specified size and shape for morphological operations."
+  (setf return (%get-structuring-element shape ksize kernel))
+  (if given-kernel nil (cv::del-point kernel)) 
+  return)
+
 
 
 ;;; HIGHGUI

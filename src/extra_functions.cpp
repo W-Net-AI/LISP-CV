@@ -123,6 +123,14 @@ float cv_Size2f_height(Size2f* self) {
     return self->height;
 }
 
+void cv_delete(char* self) {
+    delete self;
+}
+
+void cv_delete_BFMatcher(BFMatcher* self) {
+    delete self;
+}
+
 void cv_delete_BRISK(BRISK* self) {
     delete self;
 }

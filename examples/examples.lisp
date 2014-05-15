@@ -440,8 +440,7 @@ LISP-CV: (COPY-TO (SELF MAT) (M MAT) (MASK MAT)) => :VOID
         M - Destination matrix. If it does not have a proper size or type before the operation, it 
             is reallocated.
 
-        MASK - Operation mask. Its non-zero elements - which matrix elements need to be copi-
-               ed.
+        MASK - Operation mask. Its non-zero elements - which matrix elements need to be copied.
 
 
 The method copies the matrix data to another matrix. Before copying the data, the method invokes:
@@ -449,71 +448,52 @@ The method copies the matrix data to another matrix. Before copying the data, th
 (CREATE (MAT-SIZE THIS) (MAT-TYPE THIS))
 
 So that the destination matrix is reallocated if needed. While (COPY-TO M M) works flawlessly, the 
-function does not handle the case of a partial overlap between the source and the destination matri-
-ces. When the operation mask is specified, and the (CREATE) call shown above reallocated the matrix
-, the newly allocated matrix is initialized with all zeros before copying the data.
+function does not handle the case of a partial overlap between the source and destination matrices. 
+When the operation mask is specified, and the (CREATE) call shown above reallocated the matrix, the 
+newly allocated matrix is initialized with all zeros before copying the data.
 
 
 (defun copy-to-example ()
   ;; initialize data for matrices
-  (let* ((data (alloc :int '(10 20 30 40)))
-         ;; initialize MAT-1 with DATA.
-         (mat-1 (mat 2 2 +32s+ data))
-         ;; initialize MAT-2, a second, 
-         ;; identical matrix
-         (mat-2 (mat 2 2 +32s+ data))
-         ;; create empty matrices M-1 and M-2
-         (m-1 (mat))
-	 (m-2 (mat))
-         ;; create a mask for MAT-2 copy operation,
-         ;; an identity matrix. its non-zero eleme-
-         ;; nts - which matrix elements nee-
-         ;; d to be copied.
-         (mask (mat-eye 2 2 +8u+)))
-    ;; copy data from MAT-1 to M.
-    (copy-to mat-1 m-1)
-    ;; print contents of MAT-1.
-    (format t "MAT-1 =~%~%")
-    (dotimes (i (rows mat-1))
-      (dotimes (j (cols mat-1))
-	(format t "~a" (at mat-1 i j :int))
-	(princ #\Space))
-      (princ #\Newline))
-    (format t "~%")
-    ;; print contents of of M-1.
-    (format t "M-1 =~%~%")
-    (dotimes (i (rows m-1))
-      (dotimes (j (cols m-1))
-	(format t "~a" (at m-1 i j :int))
-	(princ #\Space))
-      (princ #\Newline))
-    (format t "~%")
-    ;; copy data from MAT-2 to M using mask.
-    (copy-to mat-2 m-2 mask)
-    ;; print contents of MAT-2.
-    (format t "MAT-2 =~%~%")
-    (dotimes (i (rows mat-2))
-      (dotimes (j (cols mat-2))
-	(format t "~a" (at mat-2 i j :int))
-	(princ #\Space))
-      (princ #\Newline))
-    (format t "~%")
-    ;; print contents of MASK.
-    (format t "MASK =~%~%")
-    (dotimes (i (rows mask))
-      (dotimes (j (cols mask))
-	(format t "~a" (at mask i j :uchar))
-	(princ #\Space))
-      (princ #\Newline))
-    (format t "~%")
-    ;; print final contents of M-2.
-    (format t "M-2 =~%~%")
-    (dotimes (i (rows m-2))
-      (dotimes (j (cols m-2))
-	(format t "~a" (at m-2 i j :int))
-	(princ #\Space))
-      (princ #\Newline))
-    (format t "~%~%")))
+  (with-object ((data (alloc :int '(10 20 30 40))))
+    ;; initialize MAT-1 with DATA.
+    (with-mat ((mat-1 (mat 2 2 +32s+ data))
+	       ;; initialize MAT-2, a second, 
+	       ;; identical matrix with DATA
+	       (mat-2 (mat 2 2 +32s+ data))
+	       ;; create empty matrices M-1 and M-2
+	       (m-1 (mat))
+	       (m-2 (mat))
+	       ;; create a mask for MAT-2 COPY-TO 
+	       ;; operation, an identity matrix. 
+	       ;; its non-zero elements indicate 
+	       ;; which matrix elements to copy
+	       (mask (mat-eye 2 2 +8u+)))
+      ;; print contents of MAT-1.
+      (format t "~%MAT-1 =~%~%")
+      (print-mat mat-1 :int)
+      (format t "~%")
+      ;; copy data from MAT-1 to M-1.
+      (copy-to mat-1 m-1)
+      ;; print contents of of M-1.
+      (format t "M-1 =~%~%")
+      (print-mat m-1 :int)
+      (format t "~%")
+      ;; print contents of MAT-2.
+      (format t "MAT-2 =~%~%")
+      (print-mat mat-2 :int)
+      (format t "~%")
+      ;; print contents of MASK.
+      (format t "MASK =~%~%")
+      (print-mat mask :uchar)
+      (format t "~%")
+      ;; copy data from MAT-2 
+      ;; to M-2 using mask.
+      (copy-to mat-2 m-2 mask)
+      ;; print final contents of M-2.
+      (format t "M-2 =~%~%")
+      (print-mat m-2 :int)
+      (format t "~%"))))
 
 
 
@@ -2585,7 +2565,19 @@ See also:
    ow. You can change the effect by altering the color of the 
    matrix MAT-3 in the middle window with the trackbar .The t-
    rackbar changes the scalar value the ASSGN-VAL function us-
-   es to decide what to set each element of MAT-3 to."
+   es to decide what to set eac
+
+
+
+
+(defun mean (src &optional (mask (mat) given-mask))
+  "Calculates an average (mean) of array elements."
+  (%mean src mask)
+  (if given-mask nil (progn (princ 1)(del-mat mask))))
+
+
+
+(defun %%detect-multi-scale (self image objects &optional (scale-factor 1.1d0) (min-neighbors 3) (flags 0) (min-size (size) given-min-size) (max-sih element of MAT-3 to."
 
   (with-capture (cap (video-capture camera-index))   
        ;Create two matrices: MAT-1 and MAT-2(used to show how *MIN works)
@@ -3567,7 +3559,7 @@ See also:
 Example:
 
 
-(defun mean-example (&optional (camera-index *camera-index*) 
+(defun mean-example (&optional (cam *camera-index*) 
 		       (width *default-width*)
 		       (height *default-height*))
 
@@ -3578,102 +3570,86 @@ Example:
    the rectangle over some thing red, the rectangle will turn a 
    shade of red. The rectangle starts at 0,0 X,Y coordinates."
 
-  (with-capture (cap (video-capture camera-index))
+  (with-captured-camera (cap cam :width width :height height)
     (let* ((window-name "IMG - MEAN Example")
-           (n 10)
-           ;;Initialize the rectangle location/
-           ;;dimension variables
-	   (rect-x (alloc :int '(0)))
-	   (rect-y (alloc :int '(0)))
-	   (rect-width (alloc :int (list (round (/ width n)))))
-	   (rect-height (alloc :int (list (round (/ height n))))))      
-      (cap-set cap +cap-prop-frame-width+ width)
-      (cap-set cap +cap-prop-frame-height+ height) 
-      ;;Create fullscreen window
-      (named-window window-name +window-normal+)
-      (set-window-property window-name +wnd-prop-fullscreen+ 
-			   +window-fullscreen+)
-      (move-window window-name 624 100)
-      ;;Initialize other variables
-      (do* ((frame 0)
-            (color 0)
-            (roi 0)
-	    (img 0)
-	    (point-1 0)
-	    (point-2 0))
-	   ((plusp (wait-key *millis-per-frame*)) nil)
-        (setf frame (mat))
-        ;;Set FRAME to a frame of the camera feed
-	(cap-read cap frame)
-        ;;Print rectangle location/dimensions
-	(format t "RECT-X: ~a~%~%" (mem-ref rect-x :int))
-	(format t "RECT-Y: ~a~%~%" (mem-ref rect-y :int))
-	(format t "RECT-WIDTH: ~a~%~%" (mem-ref rect-width :int))
-	(format t "RECT-HEIGHT: ~a~%~%" (mem-ref rect-height :int))
-        ;;Create trackbars to control the rectangle location/dimensions
-       	(create-trackbar "RECT-X" window-name rect-x width)
-	(create-trackbar "RECT-Y" window-name rect-y height)
-	(create-trackbar "RECT-WIDTH" window-name rect-width width)
-	(create-trackbar "RECT-HEIGHT" window-name rect-height height)
-        ;;Instantiate logic for the location/dimensions 
-        ;;of the rectangle based on the trackbar input
-	(if (equal (mem-ref rect-x :int) 0) 
-	    (setf (mem-ref rect-x :int) 0))
-	(if (> (mem-ref rect-x :int) 
-	       (- width (mem-ref rect-width :int))) 
-	    (setf (mem-ref rect-x :int) 
-		  (- width (mem-ref rect-width :int))))
-	(if (equal (mem-ref rect-y :int) 0) 
-	    (setf (mem-ref rect-y :int) 1))
-	(if (> (mem-ref rect-y :int) 
-	       (- height (mem-ref rect-height :int))) 
-	    (setf (mem-ref rect-y :int) 
-		  (- height (mem-ref rect-height :int))))
-	(if (< (mem-ref rect-width :int) 1) 
-	    (setf (mem-ref rect-width :int) 1))
-        (if (< (mem-ref rect-height :int) 1) 
-	    (setf (mem-ref rect-height :int) 1))
-	;;Set region of interest of FRAME to the rectangle 
-	;;location/dimensions we specified
-	(setf roi (rect (mem-ref rect-x :int) (mem-ref rect-y :int)
-			(mem-ref rect-width :int) (mem-ref rect-height :int)))
-        ;;Create an empty matrix
-	(setf img (mat))
-        ;;Make a copy of FRAME, IMG, to use 
-        ;;for the fullscreen camera output
-        (copy-to frame img)
-        ;;Set region of interest of FRAME to ROI. This region of 
-        ;;interest is the where we find the mean of the pixels. 
-	(setf frame (roi frame roi))
-        ;;Set position parameters of the RECTANGLE we will create, 
-        ;;that will be the color of the mean of the pixels in FRAME, 
-        ;;to that of the position of the region of interest of FRAME
-	(setf point-1 (point (mem-ref rect-x :int) 
-                             (mem-ref rect-y :int)))
-	(setf point-2 (point (+ (mem-ref rect-x :int) 
-                                (mem-ref rect-width :int)) 
-			     (+ (mem-ref rect-y :int) 
-                                (mem-ref rect-height :int))))
-        ;;Find mean of FRAME and set to 
-        ;;COLOR parameter of RECTANGLE
-        (setf color (mean frame)) 
-        ;;Create a rectangle the color of 
-        ;;the mean of the pixels it covers
-        (rectangle img point-1 point-2 color +filled+ 4 0)
-    	(imshow window-name img)
-        ;;Clean up used matrices
-	(del-mat img)
-        (del-mat frame))
-      ;;Free memory as program ends
-      (free rect-x)
-      (free rect-y)
-      (free rect-width)
-      (free rect-height)
-      (destroy-all-windows))))
+           (n 10))
+      ;;Initialize the rectangle location/
+      ;;dimension variables
+      (with-rect ((rect-x (alloc :int '(0)))
+		  (rect-y (alloc :int '(0)))
+		  (rect-width (alloc :int (list (round (/ width n)))))
+		  (rect-height (alloc :int (list (round (/ height n))))))      
+	;;Create fullscreen window
+	(with-named-window (window-name +window-autosize+)
+	  (set-window-property window-name +wnd-prop-fullscreen+ 
+			       +window-fullscreen+)
+	  (move-window window-name 624 100)
+	  (loop
+	     (with-mat ((frame (mat)))
+	       ;;Set FRAME to a frame of the camera feed
+	       (cap-read cap frame)
+	       ;;Print rectangle location/dimensions
+	       (format t "RECT-X: ~a~%~%" (mem-ref rect-x :int))
+	       (format t "RECT-Y: ~a~%~%" (mem-ref rect-y :int))
+	       (format t "RECT-WIDTH: ~a~%~%" (mem-ref rect-width :int))
+	       (format t "RECT-HEIGHT: ~a~%~%" (mem-ref rect-height :int))
+	       ;;Create trackbars to control the rectangle location/dimensions
+	       (create-trackbar "RECT-X" window-name rect-x width)
+	       (create-trackbar "RECT-Y" window-name rect-y height)
+	       (create-trackbar "RECT-WIDTH" window-name rect-width width)
+	       (create-trackbar "RECT-HEIGHT" window-name rect-height height)
+	       ;;Instantiate logic for the location/dimensions 
+	       ;;of the rectangle based on the trackbar input
+	       (if (equal (mem-ref rect-x :int) 0) 
+		   (setf (mem-ref rect-x :int) 0))
+	       (if (> (mem-ref rect-x :int) 
+		      (- width (mem-ref rect-width :int))) 
+		   (setf (mem-ref rect-x :int) 
+			 (- width (mem-ref rect-width :int))))
+	       (if (equal (mem-ref rect-y :int) 0) 
+		   (setf (mem-ref rect-y :int) 1))
+	       (if (> (mem-ref rect-y :int) 
+		      (- height (mem-ref rect-height :int))) 
+		   (setf (mem-ref rect-y :int) 
+			 (- height (mem-ref rect-height :int))))
+	       (if (< (mem-ref rect-width :int) 1) 
+		   (setf (mem-ref rect-width :int) 1))
+	       (if (< (mem-ref rect-height :int) 1) 
+		   (setf (mem-ref rect-height :int) 1))
+	       ;;Create an empty matrix
+	       (with-mat ((img (mat)))
+		 ;;Make a copy of FRAME, IMG, to use 
+		 ;;for the fullscreen camera output
+		 (copy-to frame img)
+		 ;;Set position parameters of the RECTANGLE we will create, 
+		 ;;that will be the color of the mean of the pixels in FRAME, 
+		 ;;to that of the position of the region of interest of FRAME
+		 (with-point ((point-1 (point (mem-ref rect-x :int) 
+					      (mem-ref rect-y :int)))
+			      (point-2 (point (+ (mem-ref rect-x :int) 
+						 (mem-ref rect-width :int)) 
+					      (+ (mem-ref rect-y :int) 
+						 (mem-ref rect-height :int)))))
+		 ;;Set region of interest of FRAME to the rectangle 
+		 ;;location/dimensions we specified
+		 (with-rect ((roi (rect (mem-ref rect-x :int) (mem-ref rect-y :int)
+					(mem-ref rect-width :int) (mem-ref rect-height :int))))
+		   ;;Set region of interest of FRAME to ROI. This region of 
+		   ;;interest is the where we find the mean of the pixels. 
+		   (with-mat ((frame (roi frame roi)))
+		   ;;Find mean of FRAME and set to 
+		   ;;COLOR parameter of RECTANGLE
+		  (with-scalar ((color (mean frame (mat))))
+		     ;;Create a rectangle the color of 
+		     ;;the mean of the pixels it covers
+		     (rectangle img point-1 point-2 color +filled+ 4 0)
+		 (imshow window-name img)))))))
+    	     (let ((c (wait-key 33)))
+	       (when (= c 27)
+		 (return)))))))))
 
 
-
-MINMAXLOC
+MIN-MAX-LOC
 
 Finds the global minimum and maximum in an array.
 
@@ -5542,7 +5518,7 @@ Example:
 	  (if (eq 2 (? dilation-elem :int)) (setf dilation-type +morph-ellipse+))))
   ;; Specify the shape of the kernel used 
   ;; to perform the dilation operation
-  (with-mat ((element (get-structuring-element 
+  (with-mat ((element (%get-structuring-element 
 		       dilation-type 
 		       (size (+ (* (? dilation-size :int) 2) 1)
 			     (+ (* (? dilation-size :int) 2) 1)) 
@@ -5560,17 +5536,17 @@ Example:
   ;; Create window
   (with-named-window (window-name 1)
     (move-window window-name (cols src) 0)
+    ;; Create trackbar that, adjusts the GET-STRUCTURING-ELEMENT 
+    ;; SHAPE parameter and calls the DILATION callback function, 
+    ;; every time it is moved
+    (create-trackbar "SHAPE" window-name dilation-elem max-elem (callback dilation))
+    ;; Create trackbar that, adjusts the GET-STRUCTURING-ELEMENT 
+    ;; KSIZE and KERNEL parameters and calls the DILATION callback 
+    ;; function, every time it is moved
+    (create-trackbar  "KERNEL/KSIZE" window-name dilation-size max-kernel-size 
+		      (callback dilation))
     (imshow window-name src)
     (loop
-       ;; Create trackbar that, adjusts the GET-STRUCTURING-ELEMENT 
-       ;; SHAPE parameter and calls the DILATION callback function, 
-       ;; every time it is moved
-       (create-trackbar "SHAPE" window-name dilation-elem max-elem (callback dilation))
-       ;; Create trackbar that, adjusts the GET-STRUCTURING-ELEMENT 
-       ;; KSIZE and KERNEL parameters and calls the DILATION callback 
-       ;; function, every time it is moved
-       (create-trackbar  "KERNEL/KSIZE" window-name dilation-size max-kernel-size 
-			 (callback dilation))
        (let ((c (wait-key 33)))
 	 (when (= c 27)
  	   (del-mat src)
@@ -5637,7 +5613,7 @@ Example:
 ;; Global variables
 (defparameter window-name "EROSION-DEST - ERODE Example")
 ;; Load an image
-(defparameter src (imread "~/MyPic.jpg" 1))
+(defparameter src (imread "/d1" 1))
 (defparameter erosion-dest (mat))
 (defparameter erosion-elem (alloc :int 0))
 (defparameter erosion-size (alloc :int 0))
@@ -5669,20 +5645,20 @@ Example:
   (if (empty src) 
       (return-from erode-example
 	(format t "Image not loaded")))
-					; Create window
+  ;; Create window
   (with-named-window (window-name 1)
     (move-window window-name (cols src) 0)
+    ;; Create trackbar that, adjusts the GET-STRUCTURING-ELEMENT 
+    ;; SHAPE parameter and calls the EROSION callback function, 
+    ;; every time it is moved
+    (create-trackbar "SHAPE" window-name erosion-elem max-elem (callback erosion))
+    ;; Create trackbar that, adjusts the GET-STRUCTURING-ELEMENT 
+    ;; KSIZE and KERNEL parameters and calls the EROSION callback 
+    ;; function, every time it is moved
+    (create-trackbar  "KERNEL/KSIZE" window-name erosion-size max-kernel-size 
+		      (callback erosion))
     (imshow window-name src)
     (loop
-       ;; Create trackbar that, adjusts the GET-STRUCTURING-ELEMENT 
-       ;; SHAPE parameter and calls the EROSION callback function, 
-       ;; every time it is moved
-       (create-trackbar "SHAPE" window-name erosion-elem max-elem (callback erosion))
-       ;; Create trackbar that, adjusts the GET-STRUCTURING-ELEMENT 
-       ;; KSIZE and KERNEL parameters and calls the EROSION callback 
-       ;; function, every time it is moved
-       (create-trackbar  "KERNEL/KSIZE" window-name erosion-size max-kernel-size 
-			 (callback erosion))
        (let ((c (wait-key 33)))
 	 (when (= c 27)
 	   (del-mat src)
@@ -5690,7 +5666,6 @@ Example:
 	   (del erosion-elem)
 	   (del erosion-size)
 	   (return))))))
-
 
 
 FILTER-2D
@@ -5867,13 +5842,13 @@ The function constructs and returns the structuring element that can be further 
 and use it as the structuring element.
 
 
-
 ;;; Global variables
 
 (defparameter window-name "GET-STRUCTURING-ELEMENT Example")
+
 ;;; Load an image - The <lisp-cv-source-dir>/images/baboon.jpg works great with this example
-;;; You may need to change the tilde in the filename to '/home/user'
-(defparameter src (gc:imread "~/quicklisp/dists/quicklisp/software/lisp-cv-master/images/baboon.jpg"))
+
+(defparameter src (gc:imread "/home/w/quicklisp/dists/quicklisp/software/lisp-cv-master/images/baboon.jpg"))
 (defparameter dest (gc:clone src))
 (defparameter morph-elem (alloc :int 0))
 (defparameter morph-size (alloc :int 0))
@@ -5881,19 +5856,23 @@ and use it as the structuring element.
 
 
 ;;; Callback function MORPHOLOGY-OPERATIONS
+
 (defcallback morphology-operations :void ((operation :int) (element mat))
 
   (setf operation (+ (? morph-operator :int) 2))
+
   ;;; ELEMENT is the kernel to be used. We use the function 
   ;;; GET-STRUCTURING-ELEMENT to define our own structure.
+
   (setf element 
 	(gc:get-structuring-element (? morph-elem :int) 
-				    (size 
-				     (+ (* (? morph-size :int) 2) 1) 
-				     (+ (* (? morph-size :int) 2) 1)) 
-				    (point 
-				     (? morph-size :int) 
-				     (? morph-size :int)))) 
+				 (size 
+				  (+ (* (? morph-size :int) 2) 1) 
+				  (+ (* (? morph-size :int) 2) 1)) 
+				 (point 
+				  (? morph-size :int) 
+				  (? morph-size :int))))
+
   ;;; Apply the specified morphology operation
   (morphology-ex src dest operation element)
   (imshow window-name dest))
@@ -5905,18 +5884,37 @@ and use it as the structuring element.
         (max-operator 4)
         (max-elem 2)
         (max-kernel-size 21))
+
     ;;; Create window
     (with-named-window (window-name +window-autosize+)
       (move-window window-name 759 175)
-      ;;; Create Trackbar to select Morphology operation
-      (create-trackbar "Operator: -> 0: Opening - 1: Closing - 2: Gradient - 3: Top Hat - 4: Black Hat" 
-		       window-name morph-operator max-operator (callback morphology-operations))
-       ;;; Create Trackbar to select kernel type
-      (create-trackbar "Element: -> 0: Rect - 1: Cross - 2: Ellipse" 
-		       window-name morph-elem max-elem (callback morphology-operations))
+
+      ;;; Create Trackbar to select
+      ;;; Morphology operation:
+
+      ;;; 0: Opening 
+      ;;; 1: Closing
+      ;;; 2: Gradient 
+      ;;; 3: Top Hat 
+      ;;; 4: Black Hat
+
+      (create-trackbar "Operator: " window-name morph-operator max-operator 
+		       (callback morphology-operations))
+
+       ;;; Create Trackbar to 
+       ;;; select kernel type:
+
+       ;;; 0: Rect 
+       ;;; 1: Cross 
+       ;;; 2: Ellipse
+
+      (create-trackbar "Element: " window-name morph-elem max-elem 
+		       (callback morphology-operations))
+
       ;;; Create Trackbar to choose kernel size
-      (create-trackbar "Kernel size:\n 2n +1" 
-		       window-name morph-size max-kernel-size (callback morphology-operations))
+
+      (create-trackbar "Kernel size:"  window-name morph-size max-kernel-size 
+		       (callback morphology-operations))
       (loop
          ;;; Default start
 	 (imshow window-name dest)
@@ -6173,39 +6171,47 @@ the source image with the kernel, then, it downsamples the image by rejecting ev
     (let* ((in-size (size in)) 
            (in-height (round (height in-size)))
 	   (in-width (round (width in-size)))
-	   (out (mat (/ in-height 2) (/ in-width 2) +8uc3+)))
+	   (out (gc:mat (/ in-height 2) (/ in-width 2) +8uc3+)))
+
       ;;Make sure input image is divisible by two."
       (assert (and (equal (mod in-height 2) 0)
 		   (equal (mod in-width 2) 0))
 	      (in-height in-width)
 	      "~S or ~S are not divisible by two" in-width in-height)
+
       ;;Blur and downsample image
       (pyr-down in out)
       out))
 
   (defun main (filename)
     
-    (let* ((img-1 (imread filename 1))
-	   (img-2 0)
+    (let* ((img-2 0)
 	   (window-name-1 "Original image - PYR-DOWN Example")
 	   (window-name-2 "Downsampled blurred Image - PYR-DOWN Example"))
-      (named-window window-name-1 +window-autosize+)
-      (named-window window-name-2 +window-autosize+)
-      (move-window window-name-1 533 175)
-      (move-window window-name-2 984 175)
-      (format t "~%Image size before downsampling = (~a, ~a)
+      (with-mat ((img-1 (imread filename 1)))
+	(if (empty img-1) 
+	    (return-from main
+	      (format t "Image not loaded")))
+	(with-named-window (window-name-1 +window-autosize+)
+	  (with-named-window (window-name-2 +window-autosize+)
+	    (move-window window-name-1 533 175)
+	    (move-window window-name-2 984 175)
+	    (format t "~%Image size before downsampling = (~a, ~a)
        ~%~%"(rows img-1) (cols img-1))
-      ;;Show original image in window
-      (imshow window-name-1 img-1)
-      (setf img-2 (do-pyr-down img-1))
-      (format t "Image size after downsampling = (~a, ~a)
+	    ;;Show original image in window
+	    (imshow window-name-1 img-1)
+	    (setf img-2 (do-pyr-down img-1))
+	    (format t "Image size after downsampling = (~a, ~a)
        ~%~%"(rows img-2)(cols img-2))
-      ;;Show blurred downsampled image in window
-      (imshow window-name-2 img-2)
-      (loop while (not (= (wait-key 0) 27)))
-      (destroy-all-windows)))
+	    ;;Show blurred downsampled image in window
+	    (imshow window-name-2 img-2)
+	    (loop
+	       (let ((c (wait-key 33)))
+		 (when (= c 27)
+		   (return)))))))))
 
   (main filename))
+
 
 
 PYR-UP
@@ -6236,43 +6242,51 @@ be used to construct the Laplacian pyramid. First, it upsamples the source image
 zero rows and columns and then convolves the result with the same kernel as in (PYR-DOWN) multiplied by 4.
 
 
+
 (defun pyr-up-example (filename)
 
   (defun do-pyr-up (in)
     (let* ((in-size (size in)) 
+           (in-height (round (height in-size)))
 	   (in-width (round (width in-size)))
-	   (in-height (round (height in-size)))
-	   (out (mat (/ in-width 2) (/ in-height 2) +8uc3+)))
+	   (out (gc:mat (/ in-height 2) (/ in-width 2) +8uc3+)))
+
       ;;Make sure input image is divisible by two."
-      (assert (and (equal (mod in-width 2) 0)
-		   (equal (mod in-height 2) 0))
-	      (in-width in-height)
+      (assert (and (equal (mod in-height 2) 0)
+		   (equal (mod in-width 2) 0))
+	      (in-height in-width)
 	      "~S or ~S are not divisible by two" in-width in-height)
-      ;;Blur and downsample image
+
+      ;;Blur and upsample image
       (pyr-up in out)
       out))
 
   (defun main (filename)
     
-    (let* ((img-1 (imread filename 1))
-	   (img-2 0)
+    (let* ((img-2 0)
 	   (window-name-1 "Original image - PYR-UP Example")
-	   (window-name-2 "Upsampled blurred image - PYR-UP Example"))
-      (named-window window-name-1 +window-autosize+)
-      (named-window window-name-2 +window-autosize+)
-      (move-window window-name-1 450 0)
-      (move-window window-name-2 985 0)
-      (format t "~%Image size before upsampling = (~a, ~a)
-       ~%~%"(cols img-1) (rows img-1))
-      ;;Show original image in window
-      (imshow window-name-1 img-1)
-      (setf img-2 (do-pyr-up img-1))
-      (format t "Image size after upsampling = (~a, ~a)
-       ~%~%"(cols img-2) (rows img-2))
-      ;;Show blurred upsampled image in window
-      (imshow window-name-2 img-2)
-      (loop while (not (= (wait-key 0) 27)))
-      (destroy-all-windows)))
+	   (window-name-2 "Upsampled blurred Image - PYR-UP Example"))
+      (with-mat ((img-1 (imread filename 1)))
+	(if (empty img-1) 
+	    (return-from main
+	      (format t "Image not loaded")))
+	(with-named-window (window-name-1 +window-autosize+)
+	  (with-named-window (window-name-2 +window-autosize+)
+	    (move-window window-name-1 533 175)
+	    (move-window window-name-2 984 175)
+	    (format t "~%Image size before upsampling = (~a, ~a)
+       ~%~%"(rows img-1) (cols img-1))
+	    ;;Show original image in window
+	    (imshow window-name-1 img-1)
+	    (setf img-2 (do-pyr-up img-1))
+	    (format t "Image size after upsampling = (~a, ~a)
+       ~%~%"(rows img-2)(cols img-2))
+	    ;;Show blurred upsampled image in window
+	    (imshow window-name-2 img-2)
+	    (loop
+	       (let ((c (wait-key 33)))
+		 (when (= c 27)
+		   (return)))))))))
 
   (main filename))
 
@@ -6655,7 +6669,7 @@ Example:
 
 (defun remap-example ()
 
-  (with-named-window (remap-window +window-normal+)
+  (with-named-window (remap-window +window-autosize+)
     (move-window remap-window (cols src) 175)
 
     (loop
@@ -7124,7 +7138,7 @@ http://docs.opencv.org/modules/imgproc/doc/histograms.html?highlight=equalizeh#e
 		   (let ((c (wait-key 33)))
 		     (when (= c 27)
 		       (return))))))))))))
-imread-ex
+
 
 
 IMGPROC - FEATURE DETECTION:
@@ -7347,7 +7361,7 @@ Example 1:
 			 (setf (mem-ref rect-x :int) 1))
 		     (if (> (mem-ref rect-x :int) 
 			    (- (cols frame) (mem-ref rect-width :int))) 
-			 (setf (mem-ref rect-x :int) imread-ex
+			 (setf (mem-ref rect-x :int) 
 			       (- (cols frame) (mem-ref rect-width :int))))
 		     (if (< (mem-ref rect-y :int) (round (/ (mem-ref rect-height :int) 128))) 
 			 (setf (mem-ref rect-y :int) 1))
@@ -7588,7 +7602,7 @@ LISP-CV: (CAP-GET (SELF VIDEO-CAPTURE) (PROP-ID :INT))
             +CAP-PROP-FPS+ Frame rate.
 
             +CAP-PROP-FOURCC+ 4-character code of codec.
-imread-ex
+
             +CAP-PROP-FRAME-COUNT+ Number of frames in the video file.
 
             +CAP-PROP-FORMAT+ Format of the Mat objects returned by retrieve() .
@@ -7998,30 +8012,35 @@ It is possible to store PNG images with an alpha channel using this function. To
 have alpha set to 0, fully opaque pixels should have alpha set to 255/65535. 
 
 
-(defun imwrite-example (filename-1 out-file)
-       ;;Read in image
-  (let* ((image (imread filename-1 1))
-	 (window-name-1 "Original image - IMWRITE Example")
+(defun imwrite-example (filename out-file)
+  
+  (let* ((window-name-1 "Original image - IMWRITE Example")
          (window-name-2 "Flipped image - IMWRITE Example"))
-    (if (empty image) 
-	(return-from imwrite-example 
-	  (format t "Image not loaded")))
-    (named-window window-name-1 +window-normal+)
-    (named-window window-name-2 +window-normal+)
-    (move-window window-name-1 533 175)
-    (move-window window-name-2 984 175)
-    ;;Show original IMAGE in window
-    (imshow window-name-1 image)
-    ;;Flip IMAGE around the x-axis
-    (flip image image -1)
-    ;;Show flipped image in window
-    (imshow window-name-2 image)
-    ;;Write flipped image to filename specified 
-    ;;by the OUT-FILE parameter 
-    (imwrite out-file image (vec-int 
-			     (list +imwrite-jpeg-quality+ 99)))
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-all-windows)))
+    ;;Read in image
+    (with-mat ((image (imread filename 1)))
+      (if (empty image) 
+	  (return-from imwrite-example 
+	    (format t "Image not loaded")))
+      (with-named-window (window-name-1 +window-normal+)
+	(with-named-window (window-name-2 +window-normal+)
+	  (move-window window-name-1 533 175)
+	  (move-window window-name-2 984 175)
+	  ;;Show original IMAGE in window
+	  (imshow window-name-1 image)
+	  ;;Flip IMAGE around the x-axis
+	  (flip image image -1)
+	  ;;Show flipped image in window
+	  (imshow window-name-2 image)
+	  ;;Write flipped image to filename specified 
+	  ;;by the OUT-FILE parameter 
+	  (imwrite out-file image 
+		   (vec-int 
+		    (list +imwrite-jpeg-quality+ 
+			  99)))
+	  (loop 
+    	     (let ((c (wait-key 33)))
+	       (when (= c 27)
+		 (return)))))))))
 
 
 
@@ -8795,12 +8814,12 @@ Finds the best match for each descriptor from a query set.
 C++: void DescriptorMatcher::match(InputArray queryDescriptors, InputArray trainDescriptors, vector<DMatch>& matches, 
      InputArray mask=noArray() ) const
 
-LISP-CV: (DESCRIP-MATCHER-MATCH (SELF (:POINTER DESCRIPTOR-MATCHER)) (QUERY-DESCRIPTORS MAT) (TRAIN-DESCRIPTORS MAT) 
+LISP-CV: (DESCRIP-MATCHER-MATCH (SELF FEATURE-2D) (QUERY-DESCRIPTORS MAT) (TRAIN-DESCRIPTORS MAT) 
          (MATCHES VECTOR-DMATCH) (MASK MAT)) => :VOID
 
     Parameters:	
 
-        SELF - A DESCRIPTOR-MATCHER contruct e.g. BF-MATCHER
+        SELF - A FEATURE-2D contruct e.g. BF-MATCHER
 
         QUERY-DESCRIPTORS - Query set of descriptors.
 
@@ -8820,7 +8839,7 @@ matched with (TRAIN-DESCRIPTORS J) only if (AT MASK I J :UCHAR) is non-zero.
 
 Example:
 
-
+See BRISK-EXAMPLE
 
 
 
@@ -8905,6 +8924,203 @@ FACE-CASCADE
 LISP-CV> (CASCADE-CLASSIFIER-LOAD FACE-CASCADE FACE-CASCADE-NAME)  ;Load the Classifier
 
 T ;<--- Operation successful
+
+
+
+
+DETECT-MULTI-SCALE
+
+Detects objects of different sizes in the input image. The detected objects are returned as a list of rectangles.
+
+C++: void CascadeClassifier::detectMultiScale(InputArray image, vector<Rect>& objects, double scaleFactor=1.1, 
+                                              int minNeighbors=3, int flags=0, Size minSize=Size(), 
+                                              Size maxSize=Size())
+
+LISP-CV: (DETECT-MULTI-SCALE (SELF CASCADE-CLASSIFIER) (IMAGE MAT) (OBJECTS VECTOR-RECT) &OPTIONAL 
+                            ((SCALE-FACTOR :DOUBLE) 1.1D0) ((MIN-NEIGHBORS :INT) 3) ((FLAGS :INT) 0) 
+                           ((MIN-SIZE SIZE) (SIZE)) ((MAX-SIZE SIZE) (SIZE))) => :VOID
+
+C++: void CascadeClassifier::detectMultiScale(InputArray image, vector<Rect>& objects, vector<int>& numDetections, 
+                                              double scaleFactor=1.1, int minNeighbors=3, int flags=0, 
+                                              Size minSize=Size(), Size maxSize=Size())
+
+LISP-CV: (DETECT-MULTI-SCALE (SELF CASCADE-CLASSIFIER) (IMAGE MAT) (OBJECTS VECTOR-RECT) (NUM-DETECTIONS VECTOR-INT) 
+                              &OPTIONAL (SCALE-FACTOR :DOUBLE) 1.1D0) ((MIN-NEIGHBORS :INT) 3) ((FLAGS :INT) 0)
+                            ((MIN-SIZE SIZE) (SIZE)) ((MAX-SIZE SIZE) (SIZE))) => :VOID
+
+C++: void CascadeClassifier::detectMultiScale(const Mat& image, vector<Rect>& objects, std::vector<int>& rejectLevels, 
+                                              vector<double>& levelWeights, double scaleFactor = 1.1, int minNeighbors = 3, 
+                                              int flags = 0, Size minSize = Size(), Size maxSize = Size(), 
+                                              bool outputRejectLevels = false )
+
+LISP-CV: (DETECT-MULTI-SCALE (SELF CASCADE-CLASSIFIER) (IMAGE MAT) (OBJECTS VECTOR-RECT) (NUM-DETECTIONS VECTOR-INT) &OPTIONAL 
+         (SCALE-FACTOR :DOUBLE) 1.1D0) ((MIN-NEIGHBORS :INT) 3) ((FLAGS :INT) 0) ((MIN-SIZE SIZE) (SIZE)) 
+         ((MAX-SIZE SIZE) (SIZE))) => :VOID
+
+
+    Parameters:	
+
+        SELF - A CASCADE-CLASSIFIER object
+
+        IMAGE - Matrix of the type +8U+ containing an image where objects are detected.
+
+        OBJECTS - Vector of rectangles where each rectangle contains the detected object, the rectangles
+                  may be partially outside the original image.
+
+        NUM-DETECTIONS - Vector of detection numbers for the corresponding objects. An object’s number 
+                         of detections is the number of neighboring positively classified rectangles 
+                         that were joined together to form the object.
+
+        SCALE-FACTOR - Parameter specifying how much the image size is reduced at each image scale.
+
+        MINN-EIGHBORS - Parameter specifying how many neighbors each candidate rectangle should have to retain it.
+
+        FLAGS - Can be one of the following:
+
+                              +CASCADE-DO-CANNY-PRUNING+ 
+
+                              +CASCADE-SCALE-IMAGE+ 
+
+                              +CASCADE-FIND-BIGGEST-OBJECT+ 
+
+                              +CASCADE-DO-ROUGH-SEARCH+  
+
+        MIN-SIZE - Minimum possible object size. Objects smaller than that are ignored.
+
+        MAX-SIZE - Maximum possible object size. Objects larger than that are ignored.
+
+This function is parallelized with the TBB library.
+
+Example:
+
+
+;Global variables
+
+(defparameter face-cascade-name "<opencv-source-dir>/data/haarcascades/haarcascade_frontalface_alt.xml")
+
+;Create CASCADE-CLASSIFIER object
+(defparameter face-cascade (cascade-classifier))
+;Number of file to be saved
+(defparameter filenumber 0)
+;Name of file to be saved 
+(defparameter filename 0) 
+(defparameter crop (mat))
+
+
+
+(defun detect-and-display (frame)
+
+  (let ((text 0)
+        (num-buffers 2)
+        (size-factor 1.1d0)
+	(area-current 0) 
+	(index-biggest 0)
+	(area-biggest 0) 
+	(faces-list 0))
+    (with-vector-rect ((faces (vec-rect)))
+      (with-mat ((frame-gray (mat))
+		 (res (mat))
+		 (gray (mat)))
+	(cvt-color frame frame-gray +bgr2gray+)
+	(equalize-hist frame-gray frame-gray)
+	;Detect faces
+	(with-size ((face-size (size 30 30)))
+	  (detect-multi-scale face-cascade frame-gray faces size-factor 
+			      +cascade-do-canny-pruning+ num-buffers face-size))
+	;Convert VECTOR-RECT to a Lisp list for speed
+	(setf faces-list (vec-rect :to-lisp-list faces))
+	;Set Region of Interest...
+	(with-rect ((roi (rect)))
+	  ;Iterate through all current elements (detected faces)
+	  (dotimes (index-current (length faces-list))
+	    ;Get the area of current element (detected face)
+            ;AREA-CURRENT is area of current element
+	    (setf area-current (* (rect-width (nth index-current faces-list))  ;AREA-CURRENT is area 
+   				  (rect-height (nth index-current faces-list)))) ;of current element
+            ;INDEX-BIGGEST is index of the biggest element
+	    (setf roi (rect-clone (nth index-biggest faces-list))) 
+
+	    ;Get the area of biggest element, at the 
+            ;beginning it is same as current element
+        
+            ;AREA-BIGGEST is area of the biggest element
+	    (setf area-biggest (* (rect-width (nth index-biggest faces-list)) 
+                                  (rect-height (nth index-biggest faces-list)))) 
+            (if (> area-current area-biggest)
+		(progn 
+		  (setf index-biggest index-current)
+		  (setf roi (rect-clone (nth index-biggest faces-list)))) nil)
+
+	    (setf crop (gc:roi frame roi))
+	    ;This will be needed later while saving images
+	    (resize crop res (size 128 128) 0d0 0d0 +inter-linear+)
+	    ;Convert cropped image to Grayscale
+	    (cvt-color crop gray +bgr2gray+)
+	    ;Form a filename
+	    (setf filename (concatenate 'string "/home/user/Pictures/my-face/my-face-" 
+					(write-to-string filenumber) ".png"))
+	    (incf filenumber)
+
+	    (imwrite filename gray)
+	    ;Display detected faces on main window - live stream from camera
+	    (with-point ((pt1 (point (rect-x (nth index-current faces-list)) 
+				     (rect-y (nth index-current faces-list))))
+			 (pt2 (point (+ (rect-x (nth index-current faces-list)) 
+					(rect-height (nth index-current faces-list)))
+				     (+ (rect-y (nth index-current faces-list)) 
+					(rect-width (nth index-current faces-list))))))
+	      (with-scalar ((color1 (scalar 0 255 0)))
+		(rectangle frame pt1 pt2 color1 2 8 0))))
+
+	(setf text (concatenate 'string "Crop area size: " 
+				(write-to-string (rect-width roi)) "x" 
+				(write-to-string (rect-height roi)) " Filename: " 
+				(write-to-string filename))))
+	(with-point ((org (point 30 30)))
+	  (with-scalar ((color2 (scalar 0 0 255)))	
+	    (put-text frame text org +font-hershey-complex-small+ 
+		      0.8d0 color2 1 +aa+)))))))
+
+
+
+(defun detect-multi-scale-example (&optional 
+				     (cam *camera-index*) 
+				     (width *default-width*)
+				     (height *default-height*))
+
+  ;Setting width/height to 2 less than default width-height vastly
+  ;improves the speed of DETECT-MULTI-SCALE in this example
+  (with-captured-camera (cap cam :width (- width 2) :height (- height 2))
+    (let ((window-name "Original - DETECT-MULTI-SCALE Example"))
+      ;Check if camera is opened
+      (if (not (cap-is-open cap)) 
+	  (return-from detect-multi-scale-example 
+	    (format t "Cannot open the video camera")))
+      ;Load the cascade
+      (if (not (cascade-classifier-load face-cascade face-cascade-name))
+	  (format t "~%Error loading~%") nil)
+      (with-named-window (window-name +window-autosize+)
+	  (move-window window-name 0 300)
+	  (loop
+             ;Read the video stream
+	     (with-mat ((frame (mat)))
+	       (cap-read cap frame)
+	       (if (not (empty frame)) 
+                   ;Apply the classifier to the frame
+		   (detect-and-display frame)
+		   (format t "No captured frame: Break!"))
+	       ;Show camera feed
+	       (imshow window-name frame)
+	       ;Show image
+	       (if (not (empty crop)) 
+		   (progn (imshow "Detected" crop)
+			  (setf crop (gc:mat)))
+		   (destroy-window "Detected"))
+	       (let ((c (wait-key 33)))
+		 (when (= c 27)
+		   (destroy-window "Detected")
+		   (return)))))))))
+
 
 
 CONTRIB - COLORMAPS IN OPENCV
@@ -10612,7 +10828,6 @@ two keypoints (circles). The FLAGS parameters are defined as follows:
 	 (briskd (brisk thresh octaves pattern-scale))
          ;; declare matcher
 	 (matcher (bf-matcher))
-
 	 (matches (vec-dmatch))
 	 (all-matches (mat))
 	 (window-name-1 "RANDOM * RANDOM * +DEFAULT+")
@@ -10666,21 +10881,22 @@ two keypoints (circles). The FLAGS parameters are defined as follows:
 		  +draw-rich-keypoints+)
     ;; show the matches in a window 
     (imshow window-name-4 all-matches)
-      (del-mat object)
-	 (del-mat image)
-	 (del-vec-kp keypoints-a)
-	 (del-vec-kp keypoints-b)
-	 (del-mat descriptors-a)
-	 (del-mat descriptors-b)
-         (del briskd)
-         (del matcher)
-         (del-vec-dm matches)
-         (del-mat all-matches)
+    (del-mat object)
+    (del-mat image)
+    (del-vec-kp keypoints-a)
+    (del-vec-kp keypoints-b)
+    (del-mat descriptors-a)
+    (del-mat descriptors-b)
+    (del-feature-2d briskd)
+    (del-feature-2d matcher)
+    (del-vec-dm matches)
+    (del-mat all-matches)
     (loop while (not (= (wait-key 0) 27)))
     (destroy-window window-name-1)
     (destroy-window window-name-2)
     (destroy-window window-name-3)
     (destroy-window window-name-4)))
+
 
 
 BRISK
@@ -10712,15 +10928,15 @@ http://docs.opencv.org/modules/features2d/doc/feature_detection_and_description.
    start this program with a good amount of available RAM.
 
    Don't let this example make you nervous it's basically 12 
-   FEAT-DETECT-CREATE-EXAMPLES, stacked, in one. Here I'm ba-
-   sically just showing, in a quick easy to see fashion, how 
-   the THRESH, OUTPUT and PATTERN-SCALE parameters of the fu-
-   nction BRISK affect it's output. Each of the 12 windows h-
-   as the function call used to set those parameters printed 
-   on the titlebar, so you don't have to look through the co-
-   de to get the effect of this example. For example, if you 
-   see this on the titlebar of the window: (BRISK 0 0 0.0f0) 
-   Then you know the BRISK parameter set for that window is: 
+   FEAT-DETECTOR-CREATE-EXAMPLES, stacked, in one. Here I am 
+   basically just showing, in a quick easy to see fashion, h-
+   ow the THRESH, OUTPUT and PATTERN-SCALE parameters of the 
+   function BRISK affect it's output. Each of the 12 windows 
+   has the function call used to set those parameters printe-
+   d on the titlebar, so you don't have to look through the 
+   code to get the effect of this example. For example, if y-
+   ou see this on the windows titlebar: (BRISK 0 0 0.0f0), t-
+   hen you know the BRISK parameter set for that window is: 
 
        THRESH = 0, OCTAVES  = 0, PATTERN-SCALE = 0.0f0.
 
@@ -10831,7 +11047,7 @@ http://docs.opencv.org/modules/features2d/doc/feature_detection_and_description.
 		    +draw-rich-keypoints+)
       ;; show the 12 different matches in 12 windows
       (imshow (aref window-name-arr i) (aref all-matches-arr i))
-      (del-brisk (aref brisk-arr i)))
+      (del-feature-2d (aref brisk-arr i)))
     ;; after 'esc' key is pressed destroy all 12 windows
     (loop while (not (= (wait-key 0) 27)))
     (dotimes (i 12)
@@ -10887,51 +11103,55 @@ Also a combined format is supported: feature detector adapter name:
    understanding of this example the first time you ru-
    n it."
 
-  ;; read some images in grayscale -> The object you want to track
-  (let* ((gray-a (imread filename-1 +load-image-grayscale+))
-	 ;; The image the object is a part of
-	 (gray-b (imread filename-2 +load-image-grayscale+)) 
-	 (keypoints-a (vec-key-point))
-	 (keypoints-b (vec-key-point))
-	 (descriptors-a (mat))
-	 (descriptors-b (mat))
-         ;; set brisk parameters
-	 (thresh 60)
+  ;; set brisk parameters
+  (let* ((thresh 60)
 	 (octaves 4)
 	 (pattern-scale 2.0f0)
-         ;; declare a variable BRISKD
-         ;; of the type FEATURE-2D
-	 (briskd (brisk thresh octaves pattern-scale))
-         ;; declare matcher
-	 (matcher (bf-matcher))
-	 (matches (vec-dmatch))
-	 (all-matches (mat))
 	 (window-name "All Matches - FEAT-DETECT-CREATE Example"))
-    (if (empty (or gray-a gray-b)) 
-	(return-from feat-detect-create-example 
-	  (format t "Both images were not loaded")))
-    ;; create a feature detector
-    (feat-detector-create briskd "STAR")
-    ;; detect keypoints in the image GRAY-A
-    (feat-detector-detect briskd gray-a keypoints-a)
-    ;; Compute the descriptors for a set of keypoints detected in GRAY-A
-    (feat-2d-compute briskd gray-a keypoints-a descriptors-a)
-    ;; detect keypoints in the image GRAY-B
-    (feat-detector-detect briskd gray-b keypoints-b)
-    ;; Compute the descriptors for a set of keypoints detected in GRAY-B
-    (feat-2d-compute briskd gray-b keypoints-b descriptors-b)
-    ;; find the best match for each descriptor
-    (descrip-matcher-match matcher descriptors-a descriptors-b matches)
-    (named-window window-name +window-normal+)
-    (move-window window-name 759 175)
-    ;; draw the found matches
-    (draw-matches gray-a keypoints-a gray-b keypoints-b matches all-matches 
-		  (scalar-all -1) (scalar-all -1) (vec-char) 
-		  +not-draw-single-points+)
-    ;; show the matches in a window 
-    (imshow window-name all-matches)
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name)))
+    ;; read some images in grayscale -> The object you want to track
+    (with-mat ((gray-a (imread filename-1 +load-image-grayscale+))
+	       ;; The image the object is a part of
+	       (gray-b (imread filename-2 +load-image-grayscale+)) 
+	       (descriptors-a (mat))
+	       (descriptors-b (mat))
+	       (all-matches (mat)))
+      (if (empty (or gray-a gray-b)) 
+	  (return-from feat-detect-create-example 
+	    (format t "Both images were not loaded")))
+      (with-vector-key-point ((keypoints-a (vec-key-point))
+			      (keypoints-b (vec-key-point)))
+	;; declare a variable BRISKD of the type FEATURE-2D
+	(with-feature-2d ((briskd (brisk thresh octaves pattern-scale))
+			  ;; declare matcher
+			  (matcher (bf-matcher)))
+	  (with-vector-dmatch ((matches (vec-dmatch)))
+	    ;; create a feature detector
+	    (feat-detector-create briskd "STAR")
+	    ;; detect keypoints in the image GRAY-A
+	    (feat-detector-detect briskd gray-a keypoints-a)
+	    ;; Compute the descriptors for a set of keypoints detected in GRAY-A
+	    (feat-2d-compute briskd gray-a keypoints-a descriptors-a)
+	    ;; detect keypoints in the image GRAY-B
+	    (feat-detector-detect briskd gray-b keypoints-b)
+	    ;; Compute the descriptors for a set of keypoints detected in GRAY-B
+	    (feat-2d-compute briskd gray-b keypoints-b descriptors-b)
+	    ;; find the best match for each descriptor
+	    (descrip-matcher-match matcher descriptors-a descriptors-b matches)
+	    (with-named-window (window-name +window-normal+)
+	      (move-window window-name 759 175)
+	      (with-scalar ((scalar (scalar-all -1)))
+		;; draw the found matches
+		(with-vector-char ((matches-mask (vec-char)))
+		  (draw-matches gray-a keypoints-a gray-b keypoints-b matches all-matches 
+				scalar scalar matches-mask
+				+not-draw-single-points+)
+		  ;; show the matches in a window 
+		  (imshow window-name all-matches)
+		  (loop 
+		     (let ((c (wait-key 33)))
+		       (when (= c 27)
+			 (return)))))))))))))
+
 
 
 SURF
@@ -11877,52 +12097,51 @@ DEL-*
 
 Deletes allocated memory
 
-C++: void operator delete ( void* ptr )
+LISP-CV: (DEL-FEATURE-2D (PTR FEATURE-2D)) => :VOID
 
-LISP-CV: (DEL-KP (PTR :POINTER)) => :VOID
+LISP-CV: (DEL-KP (PTR KEY-POINT)) => :VOID
 
-LISP-CV: (DEL-MAT (PTR :POINTER)) => :VOID
+LISP-CV: (DEL-MAT (PTR MAT)) => :VOID
 
-LISP-CV: (DEL-MAT-EXPR (PTR :POINTER)) => :VOID
+LISP-CV: (DEL-MAT-EXPR (PTR MAT-EXPR)) => :VOID
 
-LISP-CV: (DEL-POINT (PTR :POINTER)) => :VOID
+LISP-CV: (DEL-POINT (PTR POINT)) => :VOID
 
-LISP-CV: (DEL-POINT-2D (PTR :POINTER)) => :VOID
+LISP-CV: (DEL-POINT-2D (PTR POINT-2D)) => :VOID
 
-LISP-CV: (DEL-POINT-2F (PTR :POINTER)) => :VOID
+LISP-CV: (DEL-POINT-2F (PTR POINT-2F)) => :VOID
 
-LISP-CV: (DEL-POINT-3D (PTR :POINTER)) => :VOID
+LISP-CV: (DEL-POINT-3D (PTR POINT-3D)) => :VOID
 
-LISP-CV: (DEL-POINT-3F (PTR :POINTER)) => :VOID
+LISP-CV: (DEL-POINT-3F (PTR POINT-3F)) => :VOID
 
-LISP-CV: (DEL-POINT-3I (PTR :POINTER)) => :VOID
+LISP-CV: (DEL-POINT-3I (PTR POINT-3I)) => :VOID
 
-LISP-CV: (DEL-RECT (PTR :POINTER)) => :VOID
+LISP-CV: (DEL-RECT (PTR RECT)) => :VOID
 
-LISP-CV: (DEL-SIZE (PTR :POINTER)) => :VOID
+LISP-CV: (DEL-SIZE (PTR SIZE)) => :VOID
 
-LISP-CV: (DEL-VEC-CHAR (PTR :POINTER)) => :VOID
+LISP-CV: (DEL-VEC-CHAR (PTR VECTOR-CHAR)) => :VOID
 
-LISP-CV: (DEL-VEC-DBL (PTR :POINTER)) => :VOID
+LISP-CV: (DEL-VEC-DBL (PTR VECTOR-DOUBLE)) => :VOID
 
-LISP-CV: (DEL-VEC-DM (PTR :POINTER)) => :VOID
+LISP-CV: (DEL-VEC-DM (PTR VECTOR-DMATCH)) => :VOID
 
-LISP-CV: (DEL-VEC-FLT (PTR :POINTER)) => :VOID
+LISP-CV: (DEL-VEC-FLT (PTR VECTOR-FLOAT)) => :VOID
 
-LISP-CV: (DEL-VEC-INT (PTR :POINTER)) => :VOID
+LISP-CV: (DEL-VEC-INT (PTR VECTOR-INT)) => :VOID
 
-LISP-CV: (DEL-VEC-KP (PTR :POINTER)) => :VOID
+LISP-CV: (DEL-VEC-KP (PTR VECTOR-KEY-POINT)) => :VOID
 
-LISP-CV: (DEL-VEC-MAT (PTR :POINTER)) => :VOID
+LISP-CV: (DEL-VEC-MAT (PTR VECTOR-MAT)) => :VOID
 
-LISP-CV: (DEL-VEC-POINT (PTR :POINTER)) => :VOID
+LISP-CV: (DEL-VEC-POINT (PTR VECTOR-POINT)) => :VOID
 
-LISP-CV: (DEL-VEC-POINT-2F (PTR :POINTER)) => :VOID
+LISP-CV: (DEL-VEC-POINT-2F (PTR VECTOR-POINT-2F)) => :VOID
 
-LISP-CV: (DEL-VEC-RECT (PTR :POINTER)) => :VOID
+LISP-CV: (DEL-VEC-RECT (PTR VECTOR-RECT)) => :VOID
 
-LISP-CV: (DEL-VEC-UCHAR (PTR :POINTER)) => :VOID
-
+LISP-CV: (DEL-VEC-UCHAR (PTR VECTOR-UCHAR)) => :VOID
 
   Parameters:	
 
@@ -11963,27 +12182,27 @@ The function DEL-POINT-3I deletes a POINT-3I
 
 The function DEL-RECT deletes a RECT
 
-The function DEL-VEC-CHAR deletes a VEC-CHAR
+The function DEL-VEC-CHAR deletes a VECTOR-CHAR
 
-The function DEL-VEC-DBL deletes a VEC-DOUBLE
+The function DEL-VEC-DBL deletes a VECTOR-DOUBLE
 
-The function DEL-VEC-DM deletes a VEC-DMATCH
+The function DEL-VEC-DM deletes a VECTOR-DMATCH
 
-The function DEL-VEC-FLT deletes a VEC-FLOAT
+The function DEL-VEC-FLT deletes a VECTOR-FLOAT
 
-The function DEL-VEC-INT deletes a VEC-INT
+The function DEL-VEC-INT deletes a VECTOR-INT
 
-The function DEL-VEC-KP deletes a VEC-KEY-POINT
+The function DEL-VEC-KP deletes a VECTOR-KEY-POINT
 
-The function DEL-VEC-MAT deletes a (:POINTER VEC-MAT)
+The function DEL-VEC-MAT deletes a VECTOR-MAT
 
-The function DEL-VEC-POINT deletes a VEC-POINT
+The function DEL-VEC-POINT deletes a VECTOR-POINT
 
-The function DEL-VEC-POINT-2F deletes a VEC-POINT-2F
+The function DEL-VEC-POINT-2F deletes a VECTOR-POINT-2F
 
-The function DEL-VEC-RECT deletes a VEC-RECT
+The function DEL-VEC-RECT deletes a VECTOR-RECT
 
-The function DEL-VEC-UCHAR deletes a VEC-UCHAR
+The function DEL-VEC-UCHAR deletes a VECTOR-UCHAR
 
 
 Example:

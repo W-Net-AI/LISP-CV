@@ -1139,12 +1139,10 @@
   (dest mat)
   (mask mat))
 
-(defun bitwise-and (src1 src2 dest &optional mask)
+(defun bitwise-and (src1 src2 dest &optional (mask (mat) given-mask))
   "Calculates the per-element bit-wise conjunction of two arrays."
-  (if (not mask)
-      (with-mat ((m (mat)))
-	(%bitwise-and src1 src2 dest m))
-      (%bitwise-and src1 src2 dest mask)))
+  (%bitwise-and src1 src2 dest mask)
+  (if given-mask nil (del-mat mask)))
 
 
 ;; void bitwise_not(InputArray src, OutputArray dst, InputArray mask=noArray())
@@ -1154,12 +1152,10 @@
   (dest mat)
   (mask mat))
 
-(defun bitwise-not (src dest &optional mask)
+(defun bitwise-not (src dest &optional (mask (mat) given-mask))
   "Inverts every bit of an array."
-  (if (not mask)
-      (with-mat ((m (mat)))
-	(%bitwise-not src dest m))
-      (%bitwise-not src dest mask)))
+  (%bitwise-not src dest mask)
+  (if given-mask nil (del-mat mask)))
 
 
 ;; void bitwise_or(InputArray src1, InputArray src2, OutputArray dst, InputArray mask=noArray())
@@ -1170,12 +1166,10 @@
   (dest mat)
   (mask mat))
 
-(defun bitwise-or (src1 src2 dest &optional mask)
+(defun bitwise-or (src1 src2 dest &optional (mask (mat) given-mask))
   "Calculates the per-element bit-wise disjunction of two arrays."
-  (if (not mask)
-      (with-mat ((m (mat)))
-	(%bitwise-or src1 src2 dest m))
-      (%bitwise-or src1 src2 dest mask)))
+  (%bitwise-or src1 src2 dest mask)
+  (if given-mask nil (del-mat mask)))
 
 
 ;; void bitwise_xor(InputArray src1, InputArray src2, OutputArray dst, InputArray mask=noArray())
@@ -1187,12 +1181,10 @@
   (dest mat)
   (mask mat))
 
-(defun bitwise-xor (src1 src2 dest &optional (mask (mat)))
+(defun bitwise-xor (src1 src2 dest &optional (mask (mat) given-mask))
   "Calculates the per-element bit-wise disjunction of two arrays."
-  (if (not mask)
-      (with-mat ((m (mat)))
-	(%bitwise-xor src1 src2 dest m))
-      (%bitwise-xor src1 src2 dest mask)))
+  (%bitwise-xor src1 src2 dest mask)
+  (if given-mask nil (del-mat mask)))
 
 
 ;; void convertScaleAbs(InputArray src, OutputArray dst, double alpha=1, double beta=0)
@@ -1299,16 +1291,14 @@
 ;; Scalar mean(InputArray src, InputArray mask=noArray())
 ;; Scalar* cv_mean(Mat* src, Mat* mask)
 (defcfun ("cv_mean" %mean) scalar
-  "Calculates an average (mean) of array elements."
   (src mat)
   (mask mat))
 
-(defun mean (src &optional mask)
-  "Calculates an average (mean) of array elements."
-  (if (not mask)
-      (with-mat ((m (mat)))
-	(%mean src m))
-      (%mean src mask)))
+(defun mean (src &optional (mask (mat) given-mask))
+  "Calculates an average mean of array elements."
+  (let ((return (%mean src mask)))
+  (if given-mask nil (del-mat mask))
+  return))
 
 
 ;; void minMaxLoc(InputArray src, double* minVal, double* maxVal=0, Point* minLoc=0, Point* maxLoc=0, InputArray mask=noArray())
@@ -1321,9 +1311,10 @@
   (max-loc point)
   (mask mat))
 
-(defun min-max-loc (src min-val &optional (max-val (null-pointer)) (min-loc (null-pointer)) (max-loc (null-pointer)) (mask (mat)))
-       "Finds the global minimum and maximum in an array."
-       (%min-max-loc src min-val max-val min-loc max-loc mask))
+(defun min-max-loc (src min-val &optional (max-val (null-pointer)) (min-loc (null-pointer)) (max-loc (null-pointer)) (mask (mat) given-mask))
+  "Finds the global minimum and maximum in an array."
+  (%min-max-loc src min-val max-val min-loc max-loc mask)
+  (if given-mask nil (del-mat mask)))
 
 
 ;; void multiply(InputArray src1, InputArray src2, OutputArray dst, double scale=1, int dtype=-1 )
@@ -1342,37 +1333,36 @@
 
 ;;double norm(InputArray src1, int normType=NORM_L2, InputArray mask=noArray())
 ;;double cv_norm(Mat* src1, int normType, Mat* mask) 
-(defcfun ("cv_norm" %norm3) :void 
+(defcfun ("cv_norm" %%norm3) :void 
   (src1 mat)
   (norm-type :int)
   (mask mat))
 
 ;;double norm(InputArray src1, InputArray src2, int normType=NORM_L2, InputArray mask=noArray())
 ;;double cv_norm4(Mat* src1, Mat* src2, int normType, Mat* mask)
-(defcfun ("cv_norm4" %norm4) :void 
+(defcfun ("cv_norm4" %%norm4) :void 
   (src1 mat)
   (src2 mat)
   (norm-type :int)
   (mask mat))
 
-(defun %%norm3 (src1 &optional (norm-type +norm-l2+) mask)
-  (if (not mask)
-      (with-mat ((m (mat)))
-	(%norm3 src1 norm-type m))
-      (%norm3 src1 norm-type mask)))
+(defun %norm3 (src1 &optional (norm-type +norm-l2+) (mask (mat) given-mask) return) 
+  (setf return (%%norm3 src1 norm-type mask))
+  (if given-mask nil (del-mat mask)) 
+  return)
 
-(defun %%norm4 (src1 src2 &optional (norm-type +norm-l2+) mask)
-  (if (not mask)
-      (with-mat ((m (mat)))
-	(%norm4 src1 src2 norm-type m))
-      (%norm4 src1 src2 norm-type mask)))
+(defun %norm4 (src1 src2 &optional (norm-type +norm-l2+) (mask (mat) given-mask) return)
+  (%%norm4 src1 src2 norm-type mask)
+  (if given-mask nil (del-mat mask)) 
+  return)
+
 
 (defun norm (&rest args)
   "Calculates an absolute array norm, an absolute 
    difference norm, or a relative difference norm."
   (if (eq (type-of (second args)) 'cv-mat)
-      (apply #'%%norm4 args)
-      (apply #'%%norm3 args)))
+      (apply #'%norm4 args)
+      (apply #'%norm3 args)))
 
 
 ;; void normalize(InputArray src, OutputArray dst, double alpha=1, double beta=0, int norm_type=NORM_L2, int dtype=-1, 
@@ -1387,13 +1377,10 @@
   (dtype :int)
   (mask mat))
 
-
-(defun normalize (src dest &optional (alpha 1) (beta 0) (norm-type  +norm-l2+) (dtype -1) (mask (mat)))
+(defun normalize (src dest &optional (alpha 1) (beta 0) (norm-type  +norm-l2+) (dtype -1) (mask (mat) given-mask))
   "Normalizes the norm or value range of an array."
-  (if (not mask)
-      (with-mat ((m (mat)))
-	(%normalize src dest alpha beta norm-type  dtype  m))
-      (%normalize src dest alpha beta norm-type  dtype  mask)))
+  (%normalize src dest alpha beta norm-type  dtype  mask)
+  (if given-mask nil (del-mat mask)))
 
 
 ;; void pow(InputArray src, double power, OutputArray dst)
@@ -1452,12 +1439,10 @@
   (mask mat)
   (dtype :int))
 
-(defun subtract (src1 src2 dest &optional (mask (mat)) (dtype -1))
+(defun subtract (src1 src2 dest &optional (mask (mat) given-mask) (dtype -1))
   "Calculates the per-element difference between two arrays or array and a scalar."
-  (if (not mask)
-      (with-mat ((m (mat)))
-	(%subtract src1 src2 dest m dtype))
-      (%subtract src1 src2 dest mask dtype)))
+  (%subtract src1 src2 dest mask dtype)
+  (if given-mask nil (del-mat mask)))
 
 
 ;; Scalar sum(InputArray src)
@@ -1690,4 +1675,3 @@
   (src mat)
   (dest mat))
 
-;

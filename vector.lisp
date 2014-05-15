@@ -49,28 +49,33 @@
        (reverse ,z))))
 
 
-(defmacro vec-char-to-lisp-vec (vec)
-  (let ((x (gensym))
+(defmacro vec-char-to-lisp-vec (vec length)
+  (let ((w (gensym))
+        (x (gensym))
         (y (gensym))
         (z (gensym)))
-    `(let* ((,x ,vec)
-	    (,y (vec-char-length ,x))
-            (,z (make-array ,y :element-type t :fill-pointer 0
+    `(let* ((,w ,vec)
+	    (,x (vec-char-length ,w))
+	    (,y (if ,length ,length ,x))
+	    (,z (make-array ,y :element-type t :fill-pointer 0
 			    :initial-element   
 			    nil)))
-       (dotimes (i ,y)
-	 (vector-push (mem-aref (vec-char-to-c-arr ,x) :char i) ,z))
+
+       (dotimes (i ,x)
+	 (vector-push (mem-aref (vec-char-to-c-arr ,w) :char i) ,z))
        ,z)))
 
 
 (defmacro vec-char (&rest args)
-  (if (third args)
+  (if (fourth args)
       (error "odd number of args to VEC-CHAR")
       nil)
   (let ((x (gensym))
-        (y (gensym)))
+        (y (gensym))
+        (z (gensym)))
     `(let ((,x (first (list ,@args)))
-	   (,y (second (list ,@args))))
+	   (,y (second (list ,@args)))
+           (,z (third (list ,@args))))
        (cond ((eq ,x nil)
 	      (%vec-char))
 	     ((or (vectorp ,x) (listp ,x))
@@ -80,7 +85,7 @@
 	     ((and (eq :to-lisp-list ,x))
 	      (vec-char-to-lisp-list ,y))
 	     ((and (eq :to-lisp-vec ,x))
-	      (vec-char-to-lisp-vec ,y))
+	      (vec-char-to-lisp-vec ,y ,z))
 	     ((typep ,x 'std-vector-char)
 	      (if (eq ,y nil)
 		  (mem-aref (vec-char-to-c-arr ,x) :char) 
@@ -693,6 +698,7 @@
   ~%See VEC-POINT-2F documentation in <LISP-CV-SOURCE-DIR>/EXAMPLES.LISP~%"))))))
 
 
+
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * create_std_vector##tn()
 (defcfun ("create_std_vectorr" %vec-rect) vector-rect)
@@ -732,22 +738,26 @@
 	    (,y (vec-rect-length ,x))
             (,z (list)))
        (dotimes (i ,y)
-	 (push (mem-aref (vec-rect-to-c-arr ,x) 'rect i) ,z))
+	 (push (mem-aref (c-pointer ,x) 'rect i) ,z))
        (reverse ,z))))
 
 
-(defmacro vec-rect-to-lisp-vec (vec)
-  (let ((x (gensym))
+(defmacro vec-rect-to-lisp-vec (vec length)
+  (let ((w (gensym))
+        (x (gensym))
         (y (gensym))
         (z (gensym)))
-    `(let* ((,x ,vec)
-	    (,y (vec-rect-length ,x))
-            (,z (make-array ,y :element-type t :fill-pointer 0
+    `(let* ((,w ,vec)
+	    (,x (vec-rect-length ,w))
+	    (,y (if ,length ,length ,x))
+	    (,z (make-array ,y :element-type t :fill-pointer 0
 			    :initial-element   
 			    nil)))
-       (dotimes (i ,y)
-	 (vector-push (mem-aref (vec-rect-to-c-arr ,x) 'rect i) ,z))
+
+       (dotimes (i ,x)
+	 (vector-push (mem-aref (vec-rect-to-c-arr ,w) 'rect i) ,z))
        ,z)))
+
 
 
 (defmacro vec-rect (&rest args)
@@ -769,7 +779,7 @@
 	     ((and (eq :to-lisp-list ,x))
 	      (vec-rect-to-lisp-list ,y))
 	     ((and (eq :to-lisp-vec ,x))
-	      (vec-rect-to-lisp-vec ,y))
+	      (vec-rect-to-lisp-vec ,y ,z))
 	     ((and (typep ,x 'std-vector-rect) ,y)
 	      (if (eq ,z nil)
 		  (mem-aref (vec-rect-to-c-arr ,x) 'rect ,y)

@@ -43,12 +43,10 @@
   (anchor point)
   (border-type :int))
 
-(defun blur (src dest ksize &optional anchor (border-type +border-default+))
+(defun blur (src dest ksize &optional (anchor (point -1 -1) given-anchor) (border-type +border-default+))
   "Blurs an image using the normalized box filter."
-  (if (not anchor)
-      (with-point ((p (point -1 -1)))
-	(%blur src dest ksize p border-type))
-      (%blur src dest ksize anchor border-type)))
+  (%blur src dest ksize anchor border-type)
+  (if given-anchor nil (del-point anchor))) 
 
 
 ;; void copyMakeBorder(InputArray src, OutputArray dst, int top, int bottom, int left, int right, int borderType, 
@@ -78,19 +76,10 @@
   (border-type :int)
   (border-value scalar))
 
-(defun dilate (src dest kernel &optional anchor (iterations 1) (border-type +border-constant+) border-value)
+(defun dilate (src dest kernel &optional (anchor (point -1 -1) given-anchor) (iterations 1) (border-type +border-constant+) (border-value (morphology-default-border-value) given-border-value))
   "Dilates an image by using a specific structuring element."
-  (with-scalar ((s (morphology-default-border-value)))
-    (with-point ((p (point -1 -1)))
-
-      (cond (border-value
-	     (%dilate src dest kernel anchor iterations border-type border-value))
-
-	    ((not border-value)
-	     (if (not anchor)
-		 (%dilate src dest kernel p iterations border-type s)
-		 (%dilate src dest kernel anchor iterations border-type s)))))))
-
+  (%dilate src dest kernel anchor iterations border-type border-value)
+  (if given-anchor nil (del-point anchor)) (if given-border-value nil (del-scalar border-value)))
 
 
 ;; void erode(InputArray src, OutputArray dst, InputArray kernel, Point anchor=Point(-1,-1), int iterations=1, 
@@ -105,18 +94,10 @@
   (border-type :int)
   (border-value scalar))
 
-(defun erode (src dest kernel &optional anchor (iterations 1) (border-type +border-constant+) border-value)
+(defun erode (src dest kernel &optional (anchor (point -1 -1) given-anchor) (iterations 1) (border-type +border-constant+) (border-value (morphology-default-border-value) given-border-value))
   "Dilates an image by using a specific structuring element."
-  (with-scalar ((s (morphology-default-border-value)))
-    (with-point ((p (point -1 -1)))
-
-      (cond (border-value
-	     (%erode src dest kernel anchor iterations border-type border-value))
-
-	    ((not border-value)
-	     (if (not anchor)
-		 (%erode src dest kernel p iterations border-type s)
-		 (%erode src dest kernel anchor iterations border-type s)))))))
+  (%erode src dest kernel anchor iterations border-type border-value)
+  (if given-anchor nil (del-point anchor)) (if given-border-value nil (del-scalar border-value)))
 
 
 ;; void filter2D(InputArray src, OutputArray dst, int ddepth, InputArray kernel, Point anchor=Point(-1,-1), double delta=0, 
@@ -131,12 +112,10 @@
   (delta :double)
   (border-type :int))
 
-(defun filter-2d (src dest ddepth kernel &optional anchor (delta 0d0) (border-type +border-default+))
+(defun filter-2d (src dest ddepth kernel &optional (anchor (point -1 -1) given-anchor) (delta 0d0) (border-type +border-default+))
   "Convolves an image with the kernel."
-  (if (not anchor)
-      (with-point ((p (point -1 -1)))
-	(%filter-2d src dest ddepth kernel p delta border-type))
-      (%filter-2d src dest ddepth kernel anchor delta border-type)))
+  (%filter-2d src dest ddepth kernel anchor delta border-type)
+  (if given-anchor nil (del-point anchor)))
 
 
 ;; void GaussianBlur(InputArray src, OutputArray dst, Size ksize, double sigmaX, double sigmaY=0, int borderType=BORDER_DEFAULT )
@@ -177,13 +156,11 @@
   (border-type :int)
   (border-value scalar))
 
-(defun morphology-ex (src dest op kernel &optional anchor (iterations 1) (border-type +border-constant+) 
+(defun morphology-ex (src dest op kernel &optional (anchor (point -1 -1) given-anchor) (iterations 1) (border-type +border-constant+) 
 					   (border-value (morphology-default-border-value)))
   "Performs advanced morphological transformations."
-  (if (not anchor)
-      (with-point ((p (point -1 -1)))
-	(%morphology-ex src dest op kernel p iterations border-type border-value))
-      (%morphology-ex src dest op kernel anchor iterations border-type border-value)))
+  (%morphology-ex src dest op kernel anchor iterations border-type border-value)
+  (if given-anchor nil (del-point anchor)))
 
 
 ;; Mat getStructuringElement(int shape, Size ksize, Point anchor=Point(-1,-1))
@@ -193,13 +170,11 @@
   (ksize size)
   (kernel point))
 
-(defun get-structuring-element (shape ksize &optional (kernel (point -1 -1))) 
-  "Returns a structuring element of the specified 
-        size and shape for morphological operations."
-  (if (not kernel)
-      (with-point ((p (point -1 -1)))
-	(%get-structuring-element shape ksize p))
-      (%get-structuring-element shape ksize kernel)))
+(defun get-structuring-element (shape ksize &optional (kernel (point -1 -1) given-kernel) return) 
+  "Returns a structuring element of the specified size and shape for morphological operations."
+  (setf return (%get-structuring-element shape ksize kernel))
+  (if given-kernel nil (del-point kernel)) 
+  return)
 
 
 ;; void Laplacian(InputArray src, OutputArray dst, int ddepth, int ksize=1, double scale=1, double delta=0, int borderType=BORDER_DEFAULT )
@@ -226,12 +201,10 @@
 	 (dstsize size)
 	 (border-type :int))
 
-(defun pyr-down (src dest &optional dstsize (border-type +border-default+))
+(defun pyr-down (src dest &optional (dstsize (size) given-dstsize) (border-type +border-default+))
   "Blurs an image and downsamples it."
-  (if (not dstsize)
-      (with-size ((s (size)))
-	(%pyr-down src dest s border-type))
-      (%pyr-down src dest dstsize border-type)))
+  (%pyr-down src dest dstsize border-type)
+  (if given-dstsize nil (del-size dstsize)))
 
 
 ;;void pyrUp(InputArray src, OutputArray dst, const Size& dstsize=Size(), int borderType=BORDER_DEFAULT )
@@ -242,12 +215,10 @@
   (dstsize size)
   (border-type :int))
 
-(defun pyr-up (src dest &optional dstsize (border-type +border-default+))
+(defun pyr-up (src dest &optional (dstsize (size) given-dstsize) (border-type +border-default+))
   "Upsamples an image and then blurs it."
-  (if (not dstsize)
-      (with-size ((s (size)))
-	(%pyr-up src dest s border-type))
-      (%pyr-up src dest dstsize border-type)))
+  (%pyr-up src dest dstsize border-type)
+  (if given-dstsize nil (del-size dstsize)))
 
 
 ;; void Scharr(InputArray src, OutputArray dst, int ddepth, int dx, int dy, double scale=1, double delta=0, int borderType=BORDER_DEFAULT )
@@ -302,12 +273,10 @@
   (border-mode :int)
   (border-value scalar))
 
-(defun remap (src dest map1 map2 interpolation &optional (border-mode +border-constant+) (border-value (scalar)))
+(defun remap (src dest map1 map2 interpolation &optional (border-mode +border-constant+) (border-value (scalar) given-border-value))
   "Sets all or some of the array elements to the specified value."
-  (if (not border-value)
-      (with-scalar ((s (scalar)))
-	(%remap src dest map1 map2 interpolation border-mode s))
-      (%remap src dest map1 map2 interpolation border-mode border-value)))
+  (%remap src dest map1 map2 interpolation border-mode border-value)
+  (if given-border-value nil (del-scalar border-value)))
 
 
 ;; void resize(InputArray src, OutputArray dst, Size dsize, double fx=0, double fy=0, int interpolation=INTER_LINEAR )
@@ -353,18 +322,21 @@
    (%cvt-color src dest code dest-cn))
 
 
-;; void distanceTransform(InputArray src, OutputArray dst, int distanceType, int maskSize )
-;; void cv_distanceTransform4(Mat* src, Mat* dst, int distanceType, int maskSize)
-(defcfun ("cv_distanceTransform4" distance-transform4) :void
+;; void distanceTransform( InputArray src, OutputArray dst, int distanceType, int maskSize, int dstType=CV_32F)
+;; void cv_distanceTransform5(Mat* src, Mat* dst, int distanceType, int maskSize, int dstType)
+(defcfun ("cv_distanceTransform5" %distance-transform5) :void
+  "Computes the distance transform map"
   (src mat)
   (dest mat)
   (distance-type :int)
-  (mask-size :int))
+  (mask-size :int)
+  (dst-type :int))
 
 ;; void distanceTransform(InputArray src, OutputArray dst, OutputArray labels, int distanceType, int maskSize, 
 ;; int labelType=DIST_LABEL_CCOMP )
 ;; void cv_distanceTransform(Mat* src, Mat* dst, Mat* labels, int distanceType, int maskSize, int labelType)
-(defcfun ("cv_distanceTransform" %distance-transform) :void
+(defcfun ("cv_distanceTransform" %%distance-transform) :void
+  "Builds the discrete Voronoi diagram"
   (src mat)
   (dest mat)
   (*labels mat)
@@ -372,12 +344,16 @@
   (mask-size :int)
   (label-type :int))
 
-(defun distance-transform (arg1 arg2 arg3 arg4 &optional arg5 (arg6 +dist-label-ccomp+))
-  (cond ((eq arg5 nil)
-	 (distance-transform4 arg1 arg2 arg3 arg4))
-	(arg5
-	 (%distance-transform arg1 arg2 arg3 arg4 arg5 arg6))
-	(t nil)))
+(defun %distance-transform (src dest *labels distance-type mask-size &optional (label-type +dist-lable-ccomp+))
+  (%%distance-transform src dest *labels distance-type mask-size label-type))
+
+(defun distance-transform5 (src dest distance-type mask-size &optional (dst-type +32f+))
+  (%distance-transform5 src dest distance-type mask-size dst-type))
+
+(defun distance-transform (&rest args)
+  (if (typep (third args) 'cv-mat)
+      (apply #'%distance-transform args)
+      (apply #'distance-transform5 args)))
 
 
 ;; double threshold(InputArray src, OutputArray dst, double thresh, double maxval, int type)

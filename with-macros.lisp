@@ -7,15 +7,6 @@
 (in-package :lisp-cv)
 
 
-(defmacro with-brisk (bind &body body)
-  "Ensures DEL-BRISK gets called 
-   when BRISK goes out of scope."
-  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
-     (unwind-protect (progn ,@body)
-       (mapcar #!(del-brisk %1) ,(cons 'list (mapcar #!(car %1) bind)))
-       (values))))
-
-
 (defmacro with-cascade-classifier (bind &body body)
   "Ensures DEL-CASC-CLASS gets called 
    when CASCADE-CLASSIFIER goes out of scope."

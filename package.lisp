@@ -960,6 +960,7 @@
 
    #:cascade-classifier
    #:cascade-classifier-load
+   #:detect-multi-scale
 
 ;;; nonfree - Feature Detection and Description
 

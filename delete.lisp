@@ -15,17 +15,10 @@
 
 
 ;; void operator delete  ( void* ptr )
-;; void cv_delete_BRISK(void* ptr) 
-(defcfun ("cv_delete_BRISK" del-brisk) :void
-  "Calls delete on (:POINTER BRISK)"
-  (self feature-2d))
-
-
-;; void operator delete  ( void* ptr )
 ;; void cv_delete_CscadeClassifier(void* ptr) 
 (defcfun ("cv_delete_CscadeClassifier" del-casc-class) :void
   "Calls delete on CASCADE-CLASSIFIER"
-  (self :pointer))
+  (self cascade-classifier))
 
 
 ;; void operator delete  ( void* ptr )
@@ -37,7 +30,7 @@
 
 ;; void operator delete  ( void* ptr )
 ;; void cv_delete_Feature2D(void* self)
-(defcfun ("cv_delete_KeyPoint" del-feature-2d) :void
+(defcfun ("cv_delete_Feature2D" del-feature-2d) :void
   "Calls delete on FEATURE-2D"
   (self feature-2d))
 
@@ -221,21 +214,21 @@
 ;; void delete_std_vector##tn( vector_##t * v)
 (defcfun ("delete_std_vectorp" del-vec-point) :void
   "Calls delete on VECTOR-POINT"
-  (self :pointer))
+  (self vector-point))
 
 
 ;; void operator delete  ( void* ptr )
 ;; void delete_std_vector##tn( vector_##t * v)
 (defcfun ("delete_std_vectorp2f" del-vec-point-2f) :void
   "Calls delete on VECTOR-POINT-2F"
-  (self :pointer))
+  (self vector-point-2f))
 
 
 ;; void operator delete  ( void* ptr )
 ;; void delete_std_vector##tn( vector_##t * v)
 (defcfun ("delete_std_vectorr" del-vec-rect) :void
   "Calls delete on VECTOR-RECT"
-  (self :pointer))
+  (self vector-rect))
 
 
 ;; void operator delete  ( void* ptr )

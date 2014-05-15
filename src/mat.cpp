@@ -1,20 +1,20 @@
 /*
-* =====================================================================================
-*
-* Filename: mat.cpp
-*
-* Description:
-*
-* Version: 1.0
-* Created: 09/24/13 20:12:17
-* Revision: none
-* Compiler: g++
-*
-* Author: Arjun Comar
-* Organization:
-*
-* =====================================================================================
-*/
+ * =====================================================================================
+ *
+ *       Filename:  mat.cpp
+ *
+ *    Description:  
+ *
+ *        Version:  1.0
+ *        Created:  09/24/13 20:12:17
+ *       Revision:  none
+ *       Compiler:  g++
+ *
+ *         Author:  Arjun Comar 
+ *   Organization:  
+ *
+ * =====================================================================================
+ */
 #include <opencv2/c/mat.hpp>
 
 extern "C" {
@@ -111,11 +111,11 @@ Mat* cv_Mat_setTo_masked(Mat* self, Scalar* value, Mat* mask) {
 }
 
 Mat* cv_Mat_reshape(Mat* self, int cn) {
-   return new Mat(self->reshape(cn));
+   return new Mat(self->reshape(cn)); 
 }
 
 Mat* cv_Mat_reshape_rows(Mat* self, int cn, int rows) {
-   return new Mat(self->reshape(cn, rows));
+   return new Mat(self->reshape(cn, rows)); 
 }
 
 size_t cv_Mat_elemSize(Mat* self) {
@@ -251,10 +251,5 @@ void cv_delete_MatExpr(MatExpr* self) {
 void cv_destruct_MatExpr(MatExpr* self) {
      self->~MatExpr();
 }
-
-void cv_delete(char* self) {
-     delete self;
-}
-
 
 }

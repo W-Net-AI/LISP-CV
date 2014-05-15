@@ -12,7 +12,7 @@
 
 
 ;; Vectors
-
+   #:%mean
    #:vec-char
    #:c-arr-to-vec-char
    #:arr-to-vec-char

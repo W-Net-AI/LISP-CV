@@ -1,19 +1,19 @@
 /*
-* =====================================================================================
-*
-* Filename: mat.hpp
-*
-* Description: Wrappers for the OpenCV Matrix class
-*
-* Version: 1.0
-* Created: 09/24/13 20:01:07
-* Revision: none
-* Compiler: g++
-*
-* Author: Arjun Comar
-*
-* =====================================================================================
-*/
+ * =====================================================================================
+ *
+ *       Filename:  mat.hpp
+ *
+ *    Description:  Wrappers for the OpenCV Matrix class
+ *
+ *        Version:  1.0
+ *        Created:  09/24/13 20:01:07
+ *       Revision:  none
+ *       Compiler:  g++
+ *
+ *         Author:  Arjun Comar
+ *
+ * =====================================================================================
+ */
 
 #include <opencv2/c/opencv_generated.hpp>
 
@@ -52,7 +52,7 @@ int cv_Mat_rows(Mat* self);
 int cv_Mat_cols(Mat* self);
 int cv_Mat_empty(Mat* self);
 Size* cv_Mat_size(Mat* self);
-size_t cv_Mat_get_Step(Mat* self);
+size_t cv_Mat_get_Step(Mat* self); 
 size_t cv_Mat_step1(Mat* self);
 uchar* cv_Mat_ptr(Mat* self);
 uchar* cv_Mat_ptr_index(Mat* self, int i);

@@ -131,10 +131,9 @@
 (defcfun ("cv_waitKey" %wait-key) :int
   (delay :int))
 
-
 (defun wait-key (&optional (delay 0))
-       "Waits for a pressed key."
-       (%wait-key delay))
+  "Waits for a pressed key."
+  (%wait-key delay))
 
 
 ;;; Reading and Writing Images and Video
@@ -143,7 +142,7 @@
 ;; VideoCapture::VideoCapture()
 ;; VideoCapture* cv_create_VideoCapture() 
 (defcfun ("cv_create_VideoCapture" video-capture0) video-capture 
-	 "VideoCapture constructor")
+  "VideoCapture constructor")
 
 
 ;; VideoCapture::VideoCapture(int device)
@@ -227,9 +226,11 @@
   (img mat)
   (params vector-int))
 
-(defun imwrite (filename img &optional (params (vec-int)))
-       "Saves an image to a specified file."
-       (%imwrite filename img params))
+(defun imwrite (filename img &optional (params (vec-int) given-params) return)
+  "Saves an image to a specified file."
+  (setf return (%imwrite filename img params))
+  (if given-params nil (del-vec-int params))
+  return)
 
 
 ;; VideoWriter* cv_create_VideoWriter() 

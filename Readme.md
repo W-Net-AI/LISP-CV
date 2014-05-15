@@ -253,7 +253,7 @@ Then run this at the REPL
 Your REPL will change to look like this:
 
 
-LCV>
+CV>
 
 
 Now you are all finished!

@@ -28,7 +28,7 @@
 	           (:file "imgproc" :depends-on ("package" "lisp-cv" "constants" "types" "finalizers"))
 	           (:file "highgui" :depends-on ("package" "lisp-cv" "constants" "types" "finalizers"))
                (:file "calib3d" :depends-on ("package" "lisp-cv" "constants" "types" "finalizers"))
-               (:file "objdetect" :depends-on ("package" "lisp-cv" "constants" "types" "finalizers"))
+               (:file "objdetect" :depends-on ("package" "lisp-cv" "constants" "types" "finalizers" "core"))
                (:file "features2d" :depends-on ("package" "lisp-cv" "constants" "types" "finalizers"))
                (:file "nonfree" :depends-on ("package" "lisp-cv" "constants" "types" "finalizers"))
                (:file "contrib" :depends-on ("package" "lisp-cv" "constants" "types" "finalizers"))

@@ -3,7 +3,7 @@
 #include <opencv2/c/opencv_generated.hpp>
 
 extern "C" {
-    Size2f* cv_create_Size2f(float width, float height);
+    Size2f* cv_create_Size2f(float width, float height); 
     Size* cv_create_Size();
     Size* cv_create_Size2(double width, double height);
     Size* cv_Size_assignTo(Size* self, Size* other);
@@ -13,5 +13,4 @@ extern "C" {
     double cv_Size_height(Size* self);
 }
 #endif
-
 

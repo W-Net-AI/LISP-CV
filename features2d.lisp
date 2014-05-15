@@ -44,12 +44,10 @@
   (key-points vector-key-point)
   (mask mat))
 
-(defun feat-detector-detect (self image keypoints &optional mask)
+(defun feat-detector-detect (self image keypoints &optional (mask (mat) given-mask))
   "Detects keypoints in an image."
-  (if (not mask)
-      (with-mat ((m (mat)))
-	(%feat-detector-detect self image keypoints m))
-      (%feat-detector-detect self image keypoints mask)))
+  (%feat-detector-detect self image keypoints mask)
+  (if given-mask nil (del-mat mask)))
 
 
 ;;; Common Interfaces of Descriptor Extractors
@@ -99,12 +97,11 @@
   (matches vector-dmatch)
   (mask mat))
 
-(defun descrip-matcher-match (self query-descriptors train-descriptors matches &optional mask)
+(defun descrip-matcher-match (self query-descriptors train-descriptors matches &optional (mask (mat) given-mask))
   "Finds the best match for each descriptor from a query set."
-  (if (not mask)
-      (with-mat ((m (mat)))
-	(%descrip-matcher-match self query-descriptors train-descriptors matches m))
-      (%descrip-matcher-match self query-descriptors train-descriptors matches mask)))
+  (%descrip-matcher-match self query-descriptors train-descriptors matches mask)
+  (if given-mask nil (del-mat mask)))
+
 
 
 ;;; Drawing Function of Keypoints and Matches
@@ -129,8 +126,16 @@
   (matches-mask vector-char)
   (flags :int))
 
-(defun draw-matches (img1 keypoints1 img2 keypoints2 matches1to2 outimg &optional (match-color (scalar-all -1)) (single-point-color (scalar-all -1)) (matches-mask (vec-char)) (flags +default+))
+
+(defun draw-matches (img1 keypoints1 img2 keypoints2 matches1to2 outimg &optional 
+									  (match-color (scalar-all -1) given-match-color) 
+									  (single-point-color (scalar-all -1) given-single-point-color) 
+									  (matches-mask (vec-char) given-matches-mask) 
+									  (flags +default+))
   "Draws the found matches of keypoints from two images."
-   (%draw-matches img1 keypoints1 img2 keypoints2 matches1to2 outimg match-color single-point-color matches-mask flags))
+  (%draw-matches img1 keypoints1 img2 keypoints2 matches1to2 outimg match-color single-point-color matches-mask flags)
+  (if given-match-color nil (del-scalar match-color)) 
+  (if given-single-point-color nil (del-scalar single-point-color)) 
+  (if given-matches-mask nil (del-vec-char matches-mask)))
 
 
