@@ -1,7 +1,7 @@
 ;;;; -*- mode: lisp; indent-tabs: nil -*-
 ;;;; imgproc.lisp
 ;;;; OpenCV bindings
-;;;; Image Processing
+;;;; Image Processing.
 
 
 (in-package :lisp-cv)

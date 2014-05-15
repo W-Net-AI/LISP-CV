@@ -7,7 +7,7 @@
 
 
 
-;; C Constants
+;; C Constants.
 
 (defanonenum
   (+char-bit+ 8)           

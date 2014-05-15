@@ -10,7 +10,7 @@
 ;;makes me a winner
 
 ;;Thanks to Arjun Comar for all his help and guidance on my project so far. https://github.com/arjuncomar
-;;He's an amazing programmer and a great guy to work with. Amnther guy I steal my ideas from.
+;;He's an amazing programmer and a great guy to work with. Another guy I steal my ideas from.
 
 ;;Thank you to Jay Bromley for writing CL-OPENCV https://github.com/ryepup/cl-opencv. The knowledge 
 ;;gained from that library helped get started writing this project.
@@ -22,7 +22,7 @@
 ;;Joshua Taylor, berak, acelent, B...,Rainer Joswig, Xach, and much, much, more.
 
 ;;Thanks to byulparan from whose COMMON-CV project: https://github.com/byulparan/common-cv I borrowed 
-;;some writing styles. It's a beautiful project
+;;some writing styles. It's a beautiful project.
 
 ;;Thank you to Willem Rein Oudshoorn from CFFI-DEVEL who has made possible my inclusion of finalizers 
 ;;in this library. He has helped me to iron out a few bugs and has answered quite a few questions of 

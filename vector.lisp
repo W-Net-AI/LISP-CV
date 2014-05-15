@@ -6,7 +6,7 @@
 (in-package :lisp-cv)
 
 
-;; template < class T, class Alloc = allocator<T> > class vector
+;; template < class T, class Alloc = allocator<T> > class vector.
 ;; vector_##t * create_std_vector##tn()
 (defcfun ("create_std_vectorc" %vec-char) vector-char)
 

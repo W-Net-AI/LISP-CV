@@ -2,7 +2,7 @@
 
 (asdf:defsystem #:gc
   :name "gc"
-  :author "Joe W. BiMedina <wnetai@yahoo.com>."
+  :author "Joe W. BiMedina <wnetai@yahoo.com>"
   :version "0.1"
   :description "Lisp-CV garbage collection module"
   :depends-on (#:cffi

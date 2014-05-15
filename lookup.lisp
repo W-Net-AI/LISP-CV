@@ -3,7 +3,7 @@
 ;;;; OpenCV bindings for SBCL
 ;;;; Lookup functions 
 (in-package :lisp-cv)
-;; TODO - This file in process - not functional
+;; TODO - This file in process - not functiona.l
 
 
 ;(defparameter l  '((c .3) (inRange . (|in-range| . |cv_inRange|))))

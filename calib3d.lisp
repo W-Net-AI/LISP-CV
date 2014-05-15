@@ -6,6 +6,6 @@
 
 (in-package :lisp-cv)
 
-;;; Camera Calibration and 3D Reconstruction
+;;;; Camera Calibration and 3D Reconstruction
 
 

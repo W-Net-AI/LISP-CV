@@ -11,7 +11,7 @@
 (in-package :lisp-cv)
 
 
-;; C++ INTTEROP TYPES
+;; C++ INTTEROP TYPES.
 
 
 ;; *CHAR

@@ -1,7 +1,7 @@
 ;;;; -*- mode: lisp; indent-tabs: nil -*-
 ;;;; highgui.lisp
 ;;;; OpenCV bindings for SBCL
-;;;; High-level GUI and Media I/O
+;;;; High-level GUI and Media I/O.
 
 (in-package :lisp-cv)
 

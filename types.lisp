@@ -5,7 +5,7 @@
 
 (in-package :lisp-cv)
 
-;; MouseCallback
+;; MouseCallback.
 (defctype mouse-callback :pointer)
 
 ;; CvSVM*

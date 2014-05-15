@@ -1,7 +1,7 @@
 ;;;; -*- mode: lisp; indent-tabs: nil -*-
 ;;;; gc.lisp
 ;;;; OpenCV bindings
-;;;; Garbage collected versions of functions
+;;;; Garbage collected versions of functions.
 
 (in-package :gc)
 

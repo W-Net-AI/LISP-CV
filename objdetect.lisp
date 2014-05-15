@@ -1,7 +1,7 @@
 ;;;; -*- mode: lisp; indent-tabs: nil -*-
 ;;;; objdetect.lisp
 ;;;; OpenCV bindings
-;;;; Object Detection
+;;;; Object Detection.
 
 
 (in-package :lisp-cv)

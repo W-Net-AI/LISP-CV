@@ -3,12 +3,13 @@ Welcome to my Lisp-Cv repository, My name is Joe BiMedina.
 
 Tested on Ubuntu - all versions 12.04 and up - using SBCL and CLISP and ALLEGRO CL
 
-Warning: This library still in process. Some functions may not work as expected 
-but most functions are fully tested and well documented.
+Warning: This library still in process. Some functions may not work as expected. 
+I test the functions all the time so you have a pretty good shot that almost all 
+of them would work.
 
 --------------------------------------------------------------------------------
 
-INTRODUCTION:
+#INTRODUCTION
  
  Lisp-Cv is a Lisp wrapper for OpenCV's C++ interface, not the C interface. The
 Lisp wrapper wraps around C wrappers which wrap around the OpenCV C++ functions. 
@@ -21,7 +22,7 @@ Don't worry it's easy. This is intended so you can familiarize yourself with how
 everything is put together. As stated previously, Lisp-Cv is known to work on 
 Ubuntu versions 12.04 through 14.04. It should work on any system that OpenCV, 
 SBCL CLISP, ALLEGRO, CFFI, ASDF and QuickLisp can be compiled on.  There is 
-nothing but pure Lisp, and OpenCV C++ and C in the whole project. 
+nothing but Lisp, and OpenCV C++, C and Python in the whole project. 
 
   If you have gotten Lisp-Cv to work on another system and would like to add the
 install instructions to this tutorial just send me an e-mail at wnetai@gmail.com 
@@ -29,54 +30,36 @@ with the install instructions included. They will be added to this file and you
 will be given credit for your addition unless you decline.
 
   If you would like to contribute a function to this project, you will need to 
-first find out if the C wrapper for it is available. Don't worry over 550 C wrappers 
-are available and they can be found in the opencv_generated.cpp, excluded_functions.cpp, 
-mat.cpp, point.cpp ,rect.cpp, scalar.cpp, and size.cpp files. The location of those files 
-and their corresponding .hpp files can be found in the installation section of this file. 
-If there is no C wrapper available and you are familiar with C and C++ feel free to write 
-one, but, if you do, try to do it similarly to the C wrappers already in the aforementioned 
-.cpp files. They C wrappers are going to be included in the main OpenCV repository soon and 
-that is the way they work best with the OpenCV's current development build. If you have a 
-valid point as to how a C wrapper you write, that doesn't fit into the style of what's 
-already there, would be better (more functionality, more speed) feel free to 
-email me wnetai@gmail.com with a writeup of your conclusions. I'm assisting in developing 
-the C wrappers so I can present your case to the others involved. Keep in mind that the 
-C wrappers are still being developed so always be checking the 
-Lisp-Cv repository for the latest versions. I will be keeping those wrappers up 
-to date. Keep in mind though my version of the opencv_generated.cpp, excluded_functions.cpp, 
-mat.cpp, point.cpp, rect.cpp, scalar.cpp, and size.cpp files have all the same functions as 
-the main C wrapper repository at: 
+first find out if the C wrapper for it is available. Don't worry 550+ C bindings
+are available and they can be found in the below files in the <lisp-cv-src-dir>/src 
+folder:
 
-https://github.com/arjuncomar/opencv_contrib 
+opencv_generated.cpp 
+excluded_functions.cpp
+extra_functions.cpp
+interop.cpp
+mat.cpp
+point.cpp 
+rect.cpp 
+scalar.cpp
+size.cpp 
 
-there are a few more as well. They are located in the 
+ If you run into a Lisp function that doesn't work suddenly after compiling the latest 
+.cpp files in lisp-cv-master/src, and it worked before, a change in the C wrappers might 
+be the reason. To circumvent that situation always install my full build (all of the 
+.lisp, .cpp and .hpp files) because I will always make sure it's in good working order. 
 
-"<lisp-cv-directory>/src/extra_functions.cpp 
-file. This is primarily for testing purposes, as the C wrapper module matures those 
-differences will be ironed out.  If you run into a Lisp function that doesn't work 
-suddenly after compiling the latest .cpp files in lisp-cv-master/src, and it worked 
-before, a change in the C wrappers might be the reason. To circumvent that situation 
-always install my full build (all of the .lisp, .cpp and .hpp files) because I will 
-always make sure it's in good working order. 
-
-  I write a code example and documentation for each function I add to the library, so 
+ I write a code example and documentation for each function I add to the library, so 
 it is very well documented. In the lisp-cv-master/examples/examples.lisp folder there 
-are over 5400 lines of code examples and documentation. So, unlike some other Lisp libraries, 
-you WILL be able to EASILY figure out how to use it. If you would like to contribute a Lisp 
-function I ask that you also write an example of how to use it. It doesn't have to be a large 
-example it only has to show what the function does and give an idea how it is used in the most 
-basic way. The code should be commented good enough so that anyone with basic Lisp knowledge 
-could get a basic idea of the usage of it. You do not need to write any documentation for it, however, 
-I will do that and as far as adding constants, I will do that as well. You will be given credit for 
-all your contributions in the contributions.lisp file in the root directory unless you decline. 
-Just, let me know how you would like to be referenced in that file i.e name/username/email/phone# or 
-if you decline reference.
-
-See lisp-cv-master/examples/examples.lisp for an example of the examples I already included.
+are over 12,000 lines of code examples and documentation. If you would like to contribute 
+a Lisp function I ask that you also write an example of how to use it. It doesn't have to 
+be a large example it only has to show what the function does and give an idea how it is 
+used in the most basic way. See <lisp-cv-src-dir>/examples/examples.lisp for an example 
+of the examples I already included.
 
 To add contributions just Fork my repository at:
 
-https://github.com/W-Net-AI/lisp-cv and send me a Pull Request.
+https://github.com/W-Net-AI/LISP-CV and send me a Pull Request.
 
 or send them to me in an e-mail at wnetai@gmail.com. 
 
@@ -84,83 +67,47 @@ or send them to me in an e-mail at wnetai@gmail.com.
 
 --------------------------------------------------------------------------------
 
-INSTALLATION:
+#INSTALLATION
 
-  To use Lisp-Cv you will need to first install GitHub member arjuncomar's  Open-CV 3.0.0 dev. 
-pull of Itseez/OpenCV(the original OpenCV). Then you will need to install Emacs, SBCL, SLIME and 
-QuickLisp, and then finally Lisp-Cv and all of the required .so files.
-
-To install arjuncomars OpenCV go to this link:
-
-https://github.com/arjuncomar/opencv
-
-and download it by clicking the "Download ZIP" button on right side of page.
-
-Then go to this link and follow the instructions, verbatim, to install OpenCV.
-
-http://miloq.blogspot.com/2012/12/install-opencv-ubuntu-linux.html
-
-When you are following the instructions at the above link to install, if you get
-this error when trying to test OpenCV:
-
-g++: error: rt: No such file or directory
-g++: error: pthread: No such file or directory
-g++: error: m: No such file or directory
-g++: error: dl: No such file or directory
-g++: error: tbb: No such file or directory
-
-To fix it run:
-
-gksu gedit /usr/local/lib/pkgconfig/opencv.pc
-
-In the file that opens, put a "-l" without quotes in front of the single occurence of each of these 5 entries:
-
-rt, pthread, m , dl, tbb
+ To use Lisp-Cv you will need to first install the development build of OpenCV here
+https://github.com/Itseez/opencv and GitHub member arjuncomar's fork of opencv_contrib 
+here https://github.com/arjuncomar/opencv_contrib. Instructions to build both are in 
+the Readme.md at the former link. You will need to install Emacs, SBCL (or ACL, CLISP), 
+SLIME and QuickLisp, and then finally Lisp-Cv and all of the required .so files.
 
 
+Now Install Emacs, (SBCL,CLISP,ACL), SLIME, QuickLisp. You should be able to easily find 
+a tutorial online.
 
-Now Install Emacs, (SBCL,CLISP,ACL), SLIME, QuickLisp. You should be able to easily find a tutorial online .
 
-
-
-Now in Emacs, at the CL-USER> prompt (it's correct name is the REPL(Read Eval Pr-
-int Loop), enter the below command to test out your QuickLisp installation and a-
-lso create the ~/quicklisp/dists/quicklisp/software/ directory we will use in a 
-later step:
+Now in Emacs, at the REPL, enter the below command to test out your QuickLisp installation 
+and also create the ~/quicklisp/dists/quicklisp/software/ directory we will use in a later 
+step:
 
 (ql:quickload "ieee-floats")
 
-If QuickLisp is installed correctly you should have this folder in your 
+If QuickLisp is installed correctly you should have this folder now.
 
-~/quicklisp/dists/quicklisp/software/
+~/quicklisp/dists/quicklisp/software/ieee-floats-20140211-git
 
-directory.
-
-ieee-floats-20140211-git
-
-You can remove the ieee-floats-20140211-git directory now if you like and it wil-
-l be effectively uninstalled.
+You can remove the ieee-floats-20140211-git directory now if you like.
 
 
-
-Now to install Lisp-Cv!!!
-
+Now to install Lisp-Cv!!!!
 
 
-Note #1: I will make a Makefile or script to install Lisp-Cv as library progress-
-es but for now this install tutorial is made people who want to work on the proj-
-ect.  So all steps to install must be done by hand so you get familiar how the l-
-ibrary works...don't worry though it's easy.  If you do end up helping on the pr-
-oject you might want to make a script to speed up some of the processes defined 
-below.
-
+Note #1: I will make a Makefile or script to install Lisp-Cv as library progresses but for 
+now this install tutorial is made people who want to work on the project.  So all steps to 
+install must be done by hand so you get familiar how the library works...don't worry though 
+it's easy.  If you do end up helping on the project you might want to make a script to speed 
+up some of the process.
 
 
 Let's get started.
 
 From this link download Lisp-CV:
 
-https://github.com/W-Net-AI/Lisp-Cv
+https://github.com/W-Net-AI/LISP-CV
 
 Extract the:
 
@@ -170,35 +117,42 @@ to:
 
  ~/quicklisp/dists/quicklisp/software
 
-Place the opencv_geenerated.cpp file in the /src folder of the lisp-cv-master directory 
-in the following directory on your machine:
+If you built OpenCV with the extra modules correctly per this link: 
 
-<directory-where-you-installed-opencv>/opencv-master/build/modules/c/src/
+https://github.com/arjuncomar/opencv_contrib. 
 
-backing up first, then overwriting the original opencv_generate.cpp.
+You should have these files present on your machine:
 
-Place all of the other the .cpp files in the /src folder of the lisp-cv-master directory 
-in the following directory:
+<where-you-placed->>/opencv/build/modules/c/src/opencv_generated.cpp
+<where-you-placed->>/opencv_contrib/modules/c/include/opencv2/c/mat.hpp
+<where-you-placed->>/opencv_contrib/modules/c/include/opencv2/c/point.hpp
+<where-you-placed->>/opencv_contrib/modules/c/include/opencv2/c/rect.hpp
+<where-you-placed->>/opencv_contrib/modules/c/include/opencv2/c/scalar.hpp
+<where-you-placed->>/opencv_contrib/modules/c/include/opencv2/c/size.hpp
+<where-you-placed->>/opencv_contrib/modules/c/include/opencv2/c/excluded_functions.hpp
 
-<directory-where-you-installed-opencv>/opencv-master/modules/c/src/
 
-backing up first, then overwriting the originals.
+<where-you-placed->>/opencv/build/modules/c/include/opencv2/c/opencv_generated.hpp
+<where-you-placed->>/opencv_contrib/modules/c/src/mat.cpp
+<where-you-placed->>/opencv_contrib/modules/c/src/point.cpp
+<where-you-placed->>/opencv_contrib/modules/c/src/rect.cpp
+<where-you-placed->>/opencv_contrib/modules/c/src/scalar.cpp
+<where-you-placed->>/opencv_contrib/modules/c/src/size.cpp
+<where-you-placed->>/opencv_contrib/modules/c/src/excluded_functions.cpp
 
-Place all of .hpp files in the /include folder of the lisp-cv-master directory in the following directory:
+You will need to add these files. They can be found in the Lisp-CV src and include directories:
 
-/usr/local/include/opencv2/c/
+<where-you-placed->>/opencv_contrib/modules/c/include/opencv2/c/extra_functions.hpp
+<where-you-placed->>/opencv_contrib/modules/c/src/extra_functions.cpp
 
-backing up first, then overwriting the originals.
+<where-you-placed->>/opencv_contrib/modules/c/include/opencv2/c/interop.hpp
+<where-you-placed->>/opencv_contrib/modules/c/src/interop.cpp
 
-Go to the two directores you placed the .cpp files from the src/ folder and run:
+Build the above files with the below command:
 
 g++ -Wall -shared -fPIC -o <filename>.so <filename>.cpp
 
-(where <filename> stands in for one of each of the .cpp filenames) on each of the .cpp files from the src/ folder, 
-that you place in the directory.
-
 Then take each one of those .so files you created and place in /usr/local/lib.
-
 
 
 Now start Emacs and run:
@@ -225,7 +179,7 @@ Run:
 gksu gedit ~/.sbclrc
 
 
-and add this to the top of your ~/.sbclrc file.
+If you don't have it already, add this to the top of your ~/.sbclrc or ~/.clisprc file.
 
 (require :asdf)
 ;put all subdirectories of quicklisp\software into asdf:*central-registry*
@@ -235,16 +189,12 @@ and add this to the top of your ~/.sbclrc file.
 
 Open Emacs and run this at the REPL:
 
-
 (asdf:operate 'asdf:load-op :lisp-cv)
 
 (asdf:operate 'asdf:load-op :gc)
 
 
-Lisp-Cv will load.
-
-
-Then run this at the REPL
+Lisp-Cv will load. Then run this at the REPL:
 
 
 (in-package #:lisp-cv)
@@ -255,36 +205,40 @@ Your REPL will change to look like this:
 
 CV>
 
-
 Now you are all finished!
 
 
 Run this at the REPL to test:
 
 
-(defun move-window-example ()
+(defun imread-example-2 (filename)
 
-  "Creates a window then uses MOVE-WINDOW 
-   to move the window to (x, y) position 
-   (720, 175)."
+  "Open the image FILENAME with IMREAD 
+   and show it in a window. This examp-
+   le uses with-* macros for memory ma-
+   nagement"
 
-  (let* ((window-name (foreign-alloc 
-		       :string :initial-element 
-		       "MOVE-WINDOW Example")))
-    (named-window window-name +window-normal+)
-    (move-window window-name 720 175)
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name)
-    (foreign-free window-name)))
+  (let ((window-name "IMREAD Example 2"))
+    (with-named-window (window-name +window-normal+)
+      (move-window window-name 759 175)
+      (with-mat ((image (imread filename 1)))
+	(if (empty image) 
+	    (return-from imread-example-2 
+	      (format t "Image not loaded")))
+	(imshow window-name image)
+	(loop
+	   (let ((c (wait-key 33)))
+	     (when (= c 27)
+	       (return))))))))
 
 
 and then this:
 
 
-(move-window-example)
+(imread-example-2  <path-to-image>)
 
 
-If all went as planned an empty window should open up.
+If all went as planned you should see your picture in a window.
 
 
 Note: You can place:
@@ -301,7 +255,7 @@ automatically.
 
 --------------------------------------------------------------------------------
 
-TUTORIAL:
+#TUTORIAL
 
 You can learn to use this library by looking at the examples in:
 
@@ -309,11 +263,10 @@ lisp-cv-master/examples/examples.lisp.
 
 If you want to know if a function has been wrapped and is available, do a search 
 for the C++ function name in the examples.lisp folder. All functions are documented 
-and all have the C++ function declaration above the C function declaration above the 
-Lisp one. Some function names aren't well defined but you can do a search for the class 
-names i.e To find the Lisp equivelant of the Matrix Expressions "*" , "/", "+" or "-" 
-operators just do a search for MatExpr in the examples.lisp file. I'll be making a 
-function to simplify this very soon.
+and all have the C++ function declarations above the Lisp one. Some function names 
+aren't well defined but you can do a search for the class names i.e To find the Lisp 
+equivelant of the Matrix Expressions "*" , "/", "+" or "-" operators just do a search 
+for MatExpr in the examples.lisp file. 
 
 
 You can also learn how to use the library by comparing the OpenCV C++ tutorials 
@@ -324,7 +277,6 @@ http://opencv-srf.blogspot.com/2011/09/capturing-images-videos.html
 to the CAP-FILE and CAP-CAM examples in examples.lisp.
 
 
-
 All the constants are as so:
 
 If a constant in OpenCV's C++ interface is WINDOW_AUTOSIZE
@@ -333,13 +285,13 @@ The Lisp version is +window-autosize+
 
 If a constant in OpenCV's C++ interface is CV_8UC3, it's Lisp version is +8UC3+
 
-I always add the plus signs to both ends,  I always change the underscores to da-
+I always add the plus signs to both ends, I always change the underscores to da-
 shes and I always remove the "CV_", no exceptions.
 
 
 --------------------------------------------------------------------------------
 
-FINALLY:
+#FINALLY
 
 Feel free to e-mail at me wnetai@gmail.com for any of the following reasons:
 

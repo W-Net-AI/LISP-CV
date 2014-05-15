@@ -2,7 +2,7 @@
 
 (asdf:defsystem #:lisp-cv
   :name "lisp-cv"
-  :author "Joe W. BiMedina <wnetai@yahoo.com>."
+  :author "Joe W. BiMedina <wnetai@yahoo.com>"
   :version "0.1"
   :description "Common Lisp bindings to OpenCV."
   :depends-on (#:cffi

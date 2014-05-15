@@ -2018,7 +2018,7 @@ tion is named STEP*, because the name STEP conflicts with a Lisp Macro.
 
 (defun step*-example (filename)
   ;; load image
-  (let* ((img (imread filename 1))
+  (let* ((img (imread filename 1))    (loop while (not (= (wait-key 0) 27)))
 	 ;; variables used to access a pixel value.
          ;; BGR - Blue,Green,Red is the default co-
          ;; lor format in LisP-CV.
@@ -2420,7 +2420,7 @@ Calculates per-element maximum of two arrays.
 
 C++: void max(InputArray src1, InputArray src2, OutputArray dst)
 
-LISP-CV: (*MAX (SRC1 MAT) (SRC2 MAT) (DEST MAT)) => :VOID
+LISP-CV: (*MAX (SRC1 MAT) (SRC2 MAT) (DEST MAT)) => :VOID    (loop while (not (= (wait-key 0) 27)))
 
 
     Parameters:	
@@ -3217,6 +3217,28 @@ C++: void divide(InputArray src1, InputArray src2, OutputArray dst, double scale
 
 LISP-CV: (DIVIDE (SRC1 MAT) (SRC2 MAT) (DEST MAT) &OPTIONAL ((SCALE :DOUBLE) 1) ((DTYPE :INT) -1)) => :VOID
 
+
+					;"/home/w/Pictures/100_0229.JPG"  <---money mike
+
+
+
+;Global variables
+
+
+
+;Number of file to be saved
+(defparameter filenumber 0)
+;Name of file to be saved 
+(defparameter filename 0) 
+(defparameter crop (mat))
+
+
+
+(defun detect-and-draw (img cascade nested-cascade scale)
+
+  (let ((num-buffers 2)
+        (size-factor 1.1d0)
+
 C++: void divide(double scale, InputArray src2, OutputArray dst, int dtype=-1)
 
 LISP-CV: (DIVIDE (SCALE :DOUBLE) (SRC2 MAT) (DEST MAT) &OPTIONAL ((DTYPE :INT) -1)) => :VOID
@@ -3335,7 +3357,7 @@ See also:
 	   ;;Allocate matrix data
 	   (data (alloc :uchar '(1 2 3 4 5 6 7 8 9)))
 	   ;;Create a data matrix, MAT
-	   (mat (mat 3 3 +8u+ data))
+	   (mat (mat 3 3 +8u+ data))    (loop while (not (= (wait-key 0) 27)))
            ;;Create array of MAT clones
            (mat-clone-arr (make-array 3 :initial-contents 
 				      (list 
@@ -3816,7 +3838,7 @@ See also:
     ;;Print results
     (format t "~%")
     (dotimes (i (rows dest1))
-      (dotimes (j (cols dest1))
+      (dotimes (j (cols dest1))    (loop while (not (= (wait-key 0) 27)))
 	(format t "~a" (at dest1 i j :int))
 	(princ #\Space))
       (princ #\Newline))
@@ -7956,7 +7978,7 @@ Example using WITH-* macros for memory/window managemant:
   "Open the image FILENAME with IMREAD 
    and show it in a window. This examp-
    le uses with-* macros for memory ma-
-   nagement"
+   nagement."
 
   (let ((window-name "IMREAD Example 2"))
     (with-named-window (window-name +window-normal+)

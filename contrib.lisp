@@ -6,7 +6,7 @@
 (in-package :lisp-cv)
 
 
-;;; ColorMaps in OpenCV
+;;; ColorMaps in OpenCV.
 
 
 ;; void applyColorMap(InputArray src, OutputArray dst, int colormap)

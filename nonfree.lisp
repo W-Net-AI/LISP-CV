@@ -1,7 +1,7 @@
 ;;;; -*- mode: lisp; indent-tabs: nil -*-
 ;;;; nonfree.lisp
 ;;;; OpenCV bindings
-;;;; Non-free functionality
+;;;; Non-free functionality.
 
 (in-package :lisp-cv)
 

@@ -6,7 +6,7 @@
 ) 
   (:export 
 
-;; Macros
+;; Macros.
 
    #:alloc
 

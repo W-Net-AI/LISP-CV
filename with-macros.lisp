@@ -1,7 +1,7 @@
 ;;;; -*- mode: lisp; indent-tabs: nil -*-
 ;;;; with-macros.lisp
 ;;;; OpenCV bindings
-;;;; WITH-* Macros for memory management.
+;;;; WITH-* Macros for memory management
 
 
 (in-package :lisp-cv)
