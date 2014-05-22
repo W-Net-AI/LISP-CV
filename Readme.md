@@ -31,8 +31,10 @@ will be given credit for your addition unless you decline.
 
   If you would like to contribute a function to this project, you will need to 
 first find out if the C wrapper for it is available. Don't worry 550+ C bindings
-are available and they can be found in the below files in the: ```<lisp_cv_src_dir>/src 
-folder:
+are available and they can be found in the below files in the: 
+```
+
+<lisp_cv_src_dir>/src folder:
 
 opencv_generated.cpp 
 excluded_functions.cpp
@@ -42,7 +44,8 @@ mat.cpp
 point.cpp 
 rect.cpp 
 scalar.cpp
-size.cpp ```
+size.cpp 
+```
 
  If you run into a Lisp function that doesn't work suddenly after compiling the latest 
 .cpp files in lisp-cv-master/src, and it worked before, a change in the C wrappers might 
