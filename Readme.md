@@ -306,7 +306,7 @@ to the SET-MOUSE-CALLBACK example. Comparing the C++ code to the Lisp code will 
 you an idea of how to convert C++ OpenCv code you find online to Lisp.
 
 
-All the constants are as so:
+All the constants are defined as so:
 
 If a constant in OpenCV's C++ interface is WINDOW_AUTOSIZE
 
