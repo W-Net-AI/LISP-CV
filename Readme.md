@@ -272,7 +272,7 @@ automatically.
 You can learn to use this library by looking at the examples in:
 ```
 lisp-cv-master/examples/examples.lisp.
-``
+```
 If you want to know if a function has been wrapped and is available, do a search 
 for the C++ function name in the examples.lisp folder. All functions are documented 
 and all have the C++ function declarations above the Lisp one. Some function names 
@@ -284,7 +284,7 @@ snippets right at your fingertips. Every function provided in this library has a
 example program associated with it and all of the names of the examples are formatted 
 as <function-name>-example.
 
-####FINALLY
+
 You can also learn how to use the library by comparing the OpenCV C++ tutorials 
 at this link:
 
