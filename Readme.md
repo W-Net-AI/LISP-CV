@@ -55,7 +55,7 @@ said issue. You can hasten the fix by sending a bug report.
  I write a code example and documentation for each function I add to the library, so it 
 is very well documented. In the lisp-cv-master/examples/examples.lisp file there are over 
 12,000 lines of code examples and documentation. If you would like to contribute a Lisp 
-function I ask that you also write an example of how to use it. It doesn't have to be a 
+function, I ask that you also write an example of how to use it. It doesn't have to be a 
 large example it only has to show what the function does and give an idea how it is used 
 in the most basic way. See lisp-cv-master/examples/examples.lisp for an example of the 
 examples I already included.
