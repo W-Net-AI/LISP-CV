@@ -70,7 +70,7 @@ or send them to me in an e-mail at wnetai@gmail.com.
 
 --------------------------------------------------------------------------------
 
-#INSTALLATION
+##INSTALLATION
 
  To use Lisp-CV you will need to first install the development build of OpenCV here
 https://github.com/Itseez/opencv and GitHub member arjuncomar's fork of opencv_contrib 
@@ -267,7 +267,7 @@ automatically.
 
 --------------------------------------------------------------------------------
 
-#TUTORIAL
+###TUTORIAL
 
 You can learn to use this library by looking at the examples in:
 ```
@@ -319,7 +319,7 @@ and I always remove the "CV_", no exceptions.
 
 
 
-...Finally,
+####FINALLY
 
 Feel free to e-mail at me wnetai@gmail.com for any of the following reasons:
 
