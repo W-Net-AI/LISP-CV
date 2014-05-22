@@ -315,7 +315,7 @@ The Lisp version is +window-autosize+
 If a constant in OpenCV's C++ interface is CV_8UC3, it's Lisp version is +8UC3+
 
 I always add the plus signs to both ends and I always change the underscores to dashes 
-and I always remove the "CV_" ... no exceptions.
+and I always remove the "CV_" ..... no exceptions.
 
 
 --------------------------------------------------------------------------------
