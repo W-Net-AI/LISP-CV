@@ -186,6 +186,11 @@ Run:
 gksu gedit ~/.sbclrc
 
 ```
+or
+```
+gksu gedit ~/.clisprc
+```
+
 If you don't have it already, add this to the top of your ~/.sbclrc or ~/.clisprc file.
 ```
 (require :asdf)
