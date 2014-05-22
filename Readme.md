@@ -247,7 +247,7 @@ Run this at the REPL to test:
 and then this:
 
 ```
-(imread-example-2  <path-to-image>)
+(imread-example-2  <path-to-an-image>)
 ```
 
 If all went as planned you should see your picture in a window.
