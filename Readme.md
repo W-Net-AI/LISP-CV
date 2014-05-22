@@ -1,4 +1,4 @@
-Welcome to my Lisp-Cv repository, My name is Joe BiMedina.
+Welcome to my Lisp-CV repository, My name is Joe BiMedina.
 
 
 Tested on Ubuntu - all versions 12.04 and up - using SBCL and CLISP and ALLEGRO CL
@@ -11,7 +11,7 @@ of them would work.
 
 #INTRODUCTION
  
- Lisp-Cv is a Lisp wrapper for OpenCV's C++ interface, not the C interface. The
+ Lisp-CV is a Lisp wrapper for OpenCV's C++ interface, not the C interface. The
 Lisp wrapper wraps around C wrappers which wrap around the OpenCV C++ functions. 
 Due to the speediness of C and C++, the speed of the C++ functions compared to 
 the C wappers for them is almost identical.
@@ -19,12 +19,12 @@ the C wappers for them is almost identical.
   This install tutorial is made for people wanting to help work on the project. 
 Thus no build file is included so you'll have to install everything manually. 
 Don't worry it's easy. This is intended so you can familiarize yourself with how 
-everything is put together. As stated previously, Lisp-Cv is known to work on 
+everything is put together. As stated previously, Lisp-CV is known to work on 
 Ubuntu versions 12.04 through 14.04. It should work on any system that OpenCV, 
 SBCL CLISP, ALLEGRO, CFFI, ASDF and QuickLisp can be compiled on.  There is 
 nothing but Lisp, and OpenCV C++, C and Python in the whole project. 
 
-  If you have gotten Lisp-Cv to work on another system and would like to add the
+  If you have gotten Lisp-CV to work on another system and would like to add the
 install instructions to this tutorial just send me an e-mail at wnetai@gmail.com 
 with the install instructions included. They will be added to this file and you 
 will be given credit for your addition unless you decline.
@@ -69,11 +69,11 @@ or send them to me in an e-mail at wnetai@gmail.com.
 
 #INSTALLATION
 
- To use Lisp-Cv you will need to first install the development build of OpenCV here
+ To use Lisp-CV you will need to first install the development build of OpenCV here
 https://github.com/Itseez/opencv and GitHub member arjuncomar's fork of opencv_contrib 
 here https://github.com/arjuncomar/opencv_contrib. Instructions to build both are in 
 the Readme.md at the former link. You will need to install Emacs, SBCL (or ACL, CLISP), 
-SLIME and QuickLisp, and then finally Lisp-Cv and all of the required .so files.
+SLIME and QuickLisp, and then finally Lisp-CV and all of the required .so files.
 
 
 Now Install Emacs, (SBCL,CLISP,ACL), SLIME, QuickLisp. You should be able to easily find 
@@ -93,10 +93,10 @@ If QuickLisp is installed correctly you should have this folder now.
 You can remove the ieee-floats-20140211-git directory now if you like.
 
 
-Now to install Lisp-Cv!!!!
+Now to install Lisp-CV!!!!
 
 
-Note #1: I will make a Makefile or script to install Lisp-Cv as library progresses but for 
+Note #1: I will make a Makefile or script to install Lisp-CV as library progresses but for 
 now this install tutorial is made people who want to work on the project.  So all steps to 
 install must be done by hand so you get familiar how the library works...don't worry though 
 it's easy.  If you do end up helping on the project you might want to make a script to speed 
@@ -161,7 +161,7 @@ Now start Emacs and run:
 (ql:quickload "cffi")
 
 
-To install CFFI, which Lisp-Cv depends on, plus it's dependencies.
+To install CFFI, which Lisp-CV depends on, plus it's dependencies.
 
 
 Then run:
@@ -170,7 +170,7 @@ Then run:
 (ql:quickload "asdf")
 
 
-To install ASDF, a Lisp-Cv dependency.
+To install ASDF, a Lisp-CV dependency.
 
 
 Run:
@@ -194,7 +194,7 @@ Open Emacs and run this at the REPL:
 (asdf:operate 'asdf:load-op :gc)
 
 
-Lisp-Cv will load. Then run this at the REPL:
+Lisp-CV will load. Then run this at the REPL:
 
 
 (in-package #:lisp-cv)
@@ -301,12 +301,12 @@ Feel free to e-mail at me wnetai@gmail.com for any of the following reasons:
 
 *Request for features*
 
-*If you have gotten Lisp-Cv to work on a system other than specified at the top 
+*If you have gotten Lisp-CV to work on a system other than specified at the top 
 of this page* (Remember to include how you got it done!)
 
 *If you have a function and example that you would like to add*
 
-*If you would like add a code sample in the examples(something you made with Lisp-Cv)*
+*If you would like add a code sample in the examples(something you made with Lisp-CV)*
 
 *If you would like to add some other unspecified addition to the library*
 
