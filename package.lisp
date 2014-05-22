@@ -13,6 +13,10 @@
    #:*frames-per-second*
    #:*millis-per-frame*
 
+;; Utilities 
+
+   #:full-pathname 
+
 
 ;; Change default parameters
 
@@ -960,6 +964,23 @@
    #:cascade-classifier
    #:cascade-classifier-load
    #:detect-multi-scale
+
+;;; photo - Non-Photorealistic Rendering
+
+   #:+recurs-filter+
+   #:+normconv-filter+
+   #:+inpaint-ns+
+   #:+inpaint-telea+
+   #:+normal-clone+
+   #:+mixed-clone+
+   #:+monochrome-transfer+ 
+
+   #:detail-enhance
+   #:edge-preserving-filter
+   #:in-paint
+   #:pencil-sketch
+   #:seamless-clone
+   #:stylization
 
 ;;; nonfree - Feature Detection and Description
 

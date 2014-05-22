@@ -5,12 +5,11 @@
 (in-package :lisp-cv)
 
 
+
 ;; DEFPARAMETER macro (to make REPL testing easier)
 
 (defmacro d (var val)
   `(defparameter ,var ,val))
-
-
 
 
 ;;SIZEOF macro

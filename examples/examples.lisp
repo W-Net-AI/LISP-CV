@@ -27,7 +27,7 @@ an example that uses TG finalizers):
 	    (format t "Cannot open the video camera")))
       (cap-set cap +cap-prop-frame-width+ width)
       (cap-set cap +cap-prop-frame-height+ height)
-      (format t "Frame Size : ~ax~a~%~%" 
+      (format t "~%Frame Size : ~ax~a~%~%" 
 	      (cap-get cap +cap-prop-frame-width+)
 	      (cap-get cap +cap-prop-frame-height+))
       (with-named-window (window-name +window-normal+)
@@ -149,7 +149,7 @@ See also
       ;Set width and height of CAP
       (cap-set cap +cap-prop-frame-width+ width)
       (cap-set cap +cap-prop-frame-height+ height)
-      (format t "Frame Size : ~ax~a~%~%" 
+      (format t "~%Frame Size : ~ax~a~%~%" 
 	      (cap-get cap +cap-prop-frame-width+)
 	      (cap-get cap +cap-prop-frame-height+))
       (named-window window-name-1 +window-normal+)
@@ -1005,7 +1005,7 @@ submatrix within the original matrix. The function LOCATE-ROI does exactly that.
       ;Set width and height of CAP
       (cap-set cap +cap-prop-frame-width+ width)
       (cap-set cap +cap-prop-frame-height+ height)
-      (format t "Frame Size : ~ax~a~%~%" 
+      (format t "~%Frame Size : ~ax~a~%~%" 
 	      (cap-get cap +cap-prop-frame-width+)
 	      (cap-get cap +cap-prop-frame-height+))
       ;;Create windows and move to specified positions
@@ -1535,11 +1535,11 @@ Example:
    n of the function PROMOTE << is then used to coer-
    ce MAT to a MAT-EXPR type so it can then be multi-
    plied by the scalar S with the function SCALE. Th-
-   is is necessary since SCALE only accepts MAT-EXPR 
-   types as it's input. The output of SCALE(OUT) is 
-   then coerced back to (:POINTER MAT) with the func-
-   tion FORCE for the opposite reason so it can then 
-   be shown in a window with IMSHOW."
+   is is necessary since SCALE only accepts the MAT-
+   EXPR types as it's input. The output of SCALE is 
+   then coerced back to MAT type, with the function 
+   FORCE, for the opposite reason, so it can then be 
+   shown in a window with IMSHOW."
 
   (let* ((mat (mat-ones 3 3 +8u+))
          (s 255.0d0)
@@ -2565,19 +2565,7 @@ See also:
    ow. You can change the effect by altering the color of the 
    matrix MAT-3 in the middle window with the trackbar .The t-
    rackbar changes the scalar value the ASSGN-VAL function us-
-   es to decide what to set eac
-
-
-
-
-(defun mean (src &optional (mask (mat) given-mask))
-  "Calculates an average (mean) of array elements."
-  (%mean src mask)
-  (if given-mask nil (progn (princ 1)(del-mat mask))))
-
-
-
-(defun %%detect-multi-scale (self image objects &optional (scale-factor 1.1d0) (min-neighbors 3) (flags 0) (min-size (size) given-min-size) (max-sih element of MAT-3 to."
+   es to decide what to set each element of MAT-3 to."
 
   (with-capture (cap (video-capture camera-index))   
        ;Create two matrices: MAT-1 and MAT-2(used to show how *MIN works)
@@ -3403,6 +3391,73 @@ See also:
 	(dotimes (i 3)
 	  (del-mat (aref frame-clone-arr i))))
       (destroy-all-windows))))
+
+
+
+IN-RANGE-S
+
+Checks if array elements lie between the elements of two other arrays.
+
+C++: void inRange(InputArray src, InputArray lowerb, InputArray upperb, OutputArray dst)
+
+LISP-CV: (IN-RANGE-S (SRC MAT) (LOWERB SCALAR) (UPPERB SCALAR) (DEST MAT)) => :VOID
+
+
+    Parameters:	
+
+        SRC - First input array.
+
+        LOWERB - A scalar.
+
+        UPPERB - A scalar.
+
+        DEST - Output array of the same size as SRC and +8U+ type.
+
+
+All the arrays must have the same type, except the destination, and the same size (or ROI size).
+
+
+(defun in-range-s-example (&optional 
+			     (cam *camera-index*) 
+			     (width *default-width*)
+			     (height *default-height*))
+  ;; Set camera feed to CAP and set camera feed width/height
+  (with-captured-camera (cap cam :width width :height height)  
+    (let ((window-name-1 "Original camera feed - IN-RANGE-S Example")
+	  (window-name-2 "Only red objects - IN-RANGE-S Example"))
+      (if (not (cap-is-open cap)) 
+	  (return-from in-range-s-example 
+	    (format t "Cannot open the video camera")))
+      (format t "~%Frame Size : ~ax~a~%~%" 
+	      (cap-get cap +cap-prop-frame-width+)
+	      (cap-get cap +cap-prop-frame-height+))
+      (with-named-window (window-name-1 +window-normal+)
+	(with-named-window (window-name-2 +window-normal+)
+	  (move-window window-name-1 533 175)
+	  (move-window window-name-2 984 175)
+	  ;; Iterate through each frames of the video
+	  (loop
+	     ;; Set camera feed to FRAME
+	     (with-mat ((frame (mat)))
+	       (cap-read cap frame)
+	       (with-mat ((src (clone frame))
+			  (img-hsv (mat))
+			  (img-thresh (mat)))
+		 (with-scalar ((lower-hsv (scalar 170 160 60))
+			       (upper-hsv (scalar 180 2556 256)))
+		   ;; Smooth the original image using Gaussian kernel
+		   (gaussian-blur src src (size 5 5) 0.0d0 0.0d0)
+		   ;; Change the color format from BGR to HSV
+		   (cvt-color src img-hsv +bgr2hsv+)
+		   ;; Threshold the HSV image and create a binary image
+		   (in-range-s img-hsv lower-hsv upper-hsv img-thresh)
+		   ;; Smooth the binary image using Gaussian kernel
+		   (gaussian-blur img-thresh img-thresh (size 5 5) 0.0d0 0.0d0)
+		   (imshow window-name-1 src)
+		   (imshow window-name-2 img-thresh)))
+	       (let ((c (wait-key 33)))
+		 (when (= c 27)
+		   (return))))))))))
 
 
 
@@ -7133,7 +7188,7 @@ http://docs.opencv.org/modules/imgproc/doc/histograms.html?highlight=equalizeh#e
 	    (format t "Cannot open the video camera")))
       (cap-set cap +cap-prop-frame-width+ width)
       (cap-set cap +cap-prop-frame-height+ height)
-      (format t "Frame Size : ~ax~a~%~%" 
+      (format t "~%Frame Size : ~ax~a~%~%" 
 	      (cap-get cap +cap-prop-frame-width+)
 	      (cap-get cap +cap-prop-frame-height+))
       (with-named-window (window-name-1 +window-autosize+)
@@ -7669,7 +7724,7 @@ value 0 is returned.
 	    (format t "Cannot open the video camera")))
       (cap-set cap +cap-prop-frame-width+ width)
       (cap-set cap +cap-prop-frame-height+ height)
-      (format t "Frame Size : ~ax~a~%~%" 
+      (format t "~%Frame Size : ~ax~a~%~%" 
 	      (cap-get cap +cap-prop-frame-width+)
 	      (cap-get cap +cap-prop-frame-height+))
       (named-window window-name +window-normal+)
@@ -7962,23 +8017,25 @@ Example using manual memory management:
     (if (empty image) 
 	(return-from imread-example-1 
 	  (format t "Image not loaded")))
-    (named-window window-name +window-normal+)
-    (move-window window-name 759 175)
-    (imshow window-name image)
-    (loop while (not (= (wait-key 0) 27)))
-    (del-mat image)
-    (destroy-window window-name)))
+    (with-named-window (window-name +window-normal+)
+      (move-window window-name 759 175)
+      (imshow window-name image)
+      (loop
+	 (let ((c (wait-key 33)))
+	   (when (= c 27)
+	     (del-mat image)
+	     (return)))))))
 
 
-Example using WITH-* macros for memory/window managemant:
+Example using a WITH-* macrs for memory/window managemant:
 
 
 (defun imread-example-2 (filename)
 
   "Open the image FILENAME with IMREAD 
    and show it in a window. This examp-
-   le uses with-* macros for memory ma-
-   nagement."
+   le uses a with-* macro for memory m-
+   anagement."
 
   (let ((window-name "IMREAD Example 2"))
     (with-named-window (window-name +window-normal+)
@@ -7992,6 +8049,32 @@ Example using WITH-* macros for memory/window managemant:
 	   (let ((c (wait-key 33)))
 	     (when (= c 27)
 	       (return))))))))
+
+
+
+Example using TG finalizers for memory management:
+
+
+(defun imread-example-3 (filename)
+
+  "Open the image FILENAME with IMREAD 
+   and show it in a window. This examp-
+   le uses a TG finalizer for memory m-
+   anagement"
+
+  (let* ((image (gc:imread filename 1))
+	 (window-name "IMREAD Example 3"))
+    (if (empty image) 
+	(return-from imread-example-3 
+	  (format t "Image not loaded")))
+    (with-named-window (window-name +window-normal+)
+      (move-window window-name 759 175)
+      (imshow window-name image)
+      (loop
+	 (let ((c (wait-key 33)))
+	   (when (= c 27)
+	     (return)))))))
+
 
 
 IMWRITE
@@ -9013,12 +9096,10 @@ LISP-CV: (DETECT-MULTI-SCALE (SELF CASCADE-CLASSIFIER) (IMAGE MAT) (OBJECTS VECT
 
 This function is parallelized with the TBB library.
 
-Example:
-
 
 ;Global variables
 
-(defparameter face-cascade-name "<opencv-source-dir>/data/haarcascades/haarcascade_frontalface_alt.xml")
+(defparameter face-cascade-name "<open-cv-src-dir>/data/haarcascades/haarcascade_frontalface_alt.xml")
 
 ;Create CASCADE-CLASSIFIER object
 (defparameter face-cascade (cascade-classifier))
@@ -9048,7 +9129,7 @@ Example:
 	;Detect faces
 	(with-size ((face-size (size 30 30)))
 	  (detect-multi-scale face-cascade frame-gray faces size-factor 
-			      +cascade-do-canny-pruning+ num-buffers face-size))
+			      num-buffers +cascade-do-canny-pruning+ face-size) 1)
 	;Convert VECTOR-RECT to a Lisp list for speed
 	(setf faces-list (vec-rect :to-lisp-list faces))
 	;Set Region of Interest...
@@ -9120,7 +9201,8 @@ Example:
 	    (format t "Cannot open the video camera")))
       ;Load the cascade
       (if (not (cascade-classifier-load face-cascade face-cascade-name))
-	  (format t "~%Error loading~%") nil)
+	  (return-from detect-multi-scale-example 
+	    (format t "Error Loading")))
       (with-named-window (window-name +window-autosize+)
 	  (move-window window-name 0 300)
 	  (loop
@@ -9142,6 +9224,384 @@ Example:
 		 (when (= c 27)
 		   (destroy-window "Detected")
 		   (return)))))))))
+
+
+
+PHOTO - INPAINTING
+
+
+IN-PAINT
+
+
+Restores the selected region in an image using the region neighborhood.
+
+
+C++: void inpaint(InputArray src, InputArray inpaintMask, OutputArray dst, double inpaintRadius, int flags)
+
+LISP-CV:
+
+    Parameters:	
+
+        SRC - Input 8-bit 1-channel or 3-channel image.
+
+        IN-PAINT-MASK - Inpainting mask, 8-bit 1-channel image. Non-zero pixels indicate the area 
+                        that needs to be inpainted.
+
+        DEST - Output image with the same size and type as SRC.
+
+        IN-PAINT-RADIUS - Radius of a circular neighborhood of each point inpainted that is considered 
+                          by the algorithm.
+
+        FLAGS -
+
+        Inpainting method that could be one of the following:
+
+            +INPAINT-NS+ Navier-Stokes based method [Navier01]
+
+            +INPAINT-TELEA+ Method by Alexandru Telea [Telea04].
+
+The function reconstructs the selected image area from the pixel near the area boundary. The function 
+may be used to remove dust and scratches from a scanned photo, or to remove undesirable objects from 
+still images or video. See http://en.wikipedia.org/wiki/Inpainting for more details.
+
+
+Example:
+
+(defparameter pt 0)
+(defparameter prev-pt 0)
+(defparameter color 0)
+(defparameter img 0)
+(defparameter in-paint-mask 0)
+
+(defun help ()
+
+  (format t "~%Cool inpainting demonstration.")
+  (format t "~%~%Inpainting repairs damage to images by floodfilling")
+  (format t "~%the damage with surrounding image areas.")
+  (format t "~%~%Hot keys:")
+  (format t "~%~%ESC - quit the program")
+  (format t "~%~%r - restore the original image")
+  (format t "~%~%i or SPACE - run inpainting algorithm")
+  (format t "~%~%(before running it, paint something on the image)~%~%"))
+
+
+(defcallback on-mouse :void ((event :int) (x :int) (y :int) (flags :int))
+
+  (if (or (= event +event-lbuttonup+) (zerop (logand flags +event-flag-lbutton+)))
+      (setf prev-pt (gc:point -1 -1))
+      (if (eq event +event-lbuttondown+)
+	  (setf prev-pt (gc:point x y))
+	  (if (and (eq event +event-mousemove+) (logand flags +event-flag-lbutton+))
+	      (progn
+		(setf pt (gc:point x y))
+		(setf color (gc:scalar-all 255))
+		(if (< (point-x prev-pt) 0)
+		    (setf prev-pt pt))
+		(line in-paint-mask prev-pt pt color 5 8 0)
+		(line img prev-pt pt color 5 8 0)
+		(setf prev-pt pt)
+		(imshow "Image - IN-PAINT Example" img))))))
+
+
+(defun in-paint-example (&optional filename)
+  (if (not filename)
+      (return-from in-paint-example 
+	(progn (format t "~%~%Usage:")
+	       (format t "~%~%in-paint-example <image-name> ")
+	       (format t "~%~%Try <lisp-cv-dir>/images/damaged-img-by-glen-luchford.jpeg~%~%"))))
+  (let ((window-name-1 "Image - IN-PAINT Example")
+	(window-name-2 "Inpainted image - IN-PAINT Example"))
+    ;; load image
+    (with-mat ((img (imread filename -1))
+	       (img0 (clone img))    
+	       (in-paint-mask (mat-zeros (rows img) (cols img) +8u+)))
+      (if (empty img) 
+	  (return-from in-paint-example
+	    (format t "Couldn't open the image.")))
+      (help)
+      (with-named-window (window-name-1 +window-normal+)
+	(with-named-window (window-name-2 +window-normal+)
+	  (move-window window-name-1 533 175)
+	  (move-window window-name-2 984 175)
+	  (imshow window-name-1 img)
+	  (imshow window-name-2 img)
+	  (set-mouse-callback window-name-1 (callback on-mouse))
+	  (loop 
+	     (let ((c (wait-key)))
+	       (if (eq c 27)
+		   (return))
+	       (if (eq c 114)
+		   (with-scalar ((zeros (scalar-all 0)))
+		     (assgn-val in-paint-mask zeros)
+		     (copy-to img0 img)
+		     (imshow window-name-1 img)))
+	       (if (or (eq c 105) (eq c 32))
+		   (with-mat ((in-painted (mat)))
+		     (in-paint img in-paint-mask in-painted 3d0 +inpaint-telea+)  
+		     (imshow window-name-2 in-painted))))
+	     (let ((c (wait-key 33)))
+	       (when (= c 27)
+		 (return)))))))))
+
+
+PHOTO - SEAMLESS CLONING
+
+
+SEAMLESS-CLONE
+
+Image editing tasks concern either global changes (color/intensity corrections, filters, deformations) 
+or local changes concerned to a selection. Here we are interested in achieving local changes, ones that 
+are restricted to a region manually selected (ROI), in a seamless and effortless manner. The extent of 
+the changes ranges from slight distortions to complete replacement by novel content.
+
+C++: void seamlessClone(InputArray src, InputArray dst, InputArray mask, Point p, OutputArray blend, int flags)
+
+LISP-CV:  (SEAMLESS-CLONING (SRC MAT) (DEST MAT) (MASK MAT) (P POINT) (BLEND MAT) (FLAGS :INT))  => :VOID
+
+    Parameters:	
+
+        SRC - Input 8-bit 3-channel image.
+
+        DST - Input 8-bit 3-channel image.
+
+        MASK - Input 8-bit 1 or 3-channel image.
+
+        P - Point in DST image where object is placed.
+
+        RESULT - Output image with the same size and type as DST.
+
+        FLAGS -
+
+        Cloning method that could be one of the following:
+
+            +NORMAL-CLONE+ The power of the method is fully expressed when inserting objects with 
+                           complex outlines into a new background.
+
+            +MIXED-CLONE+ The classic method, color-based selection and alpha
+
+                masking might be time consuming and often leaves an undesirable halo. Seamless cloning, 
+                even averaged with the original image, is not effective. Mixed seamless cloning based 
+                on a loose selection proves effective.
+
+            +FEATURE-EXCHANGE+ Feature exchange allows the user to replace easily certain
+                features of one object by alternative features.
+
+
+
+(defparameter *cloning-dir*
+  (cat lisp-cv-src-dir "images/cloning"))
+
+(defun seamless-cloning-example ()
+
+  (let ((window-name-1 "SOURCE - SEAMLESS-CLONING Example")
+        (window-name-2 "DESTINATION -SEAMLESS-CLONING Example")
+	(window-name-3 "MASK -SEAMLESS-CLONING Example")
+	(window-name-4 "RESULT - SEAMLESS-CLONING Example"))
+    (with-named-window (window-name-1 +window-normal+)
+      (with-named-window (window-name-2 +window-normal+)
+	(with-named-window (window-name-3 +window-normal+)
+	  (with-named-window (window-name-4 +window-normal+)
+	    (move-window window-name-1 485 98)
+	    (move-window window-name-2 894 98)
+	    (move-window window-name-3 485 444)
+	    (move-window window-name-4 894 444)
+	    (with-mat ((source (imread (cat *cloning-dir* "/normal-cloning/source.png") 1))
+		       (destination (imread (cat *cloning-dir* "/normal-cloning/destination.png") 1))
+		       (mask (imread (cat *cloning-dir* "/normal-cloning/mask.png") 1))
+		       (result (clone destination)))
+	      (if (or (empty source) (empty destination) (empty mask))
+		  (return-from seamless-cloning-example 
+		    (format t "All images were not loaded")))
+	      (with-point ((p (point 400 100)))
+		(seamless-clone source destination mask p result 1)
+		(imwrite (cat *cloning-dir* "/normal-cloning/cloned.png") result)
+		(imshow window-name-1 source)
+		(imshow window-name-2 destination)
+		(imshow window-name-3 mask)
+		(imshow window-name-4 result)
+		(loop
+		   (let ((c (wait-key 33)))
+		     (when (= c 27)
+		       (return))))))))))))
+
+
+
+PHOTO - NON-PHOTOREALISTIC RENDERING
+
+
+
+DETAIL-ENHANCE
+
+
+This filter enhances the details of a particular image.
+
+
+C++: void detailEnhance(InputArray src, OutputArray dst, float sigma_s=10, float sigma_r=0.15f)
+
+LISP-CV: (DETAIL-ENHANCE (SRC MAT) (DEST MAT) &OPTIONAL ((SIGMA-S :FLOAT) 60F0) ((SIGMA-R :FLOAT) 0.45F0)) => :VOID
+
+
+    Parameters:	
+
+        SRC - Input 8-bit 3-channel image.
+
+        DEST - Output image with the same size and type as SRC.
+
+        SIGMA-S - Range between 0 to 200.
+
+        SIGMA-R - Range between 0 to 1.
+
+
+Example:
+
+See STYLIZATION-EXAMPLE in this file.
+
+
+
+EDGE-PRESERVING-FILTER
+
+
+Filtering is the fundamental operation in image and video processing. Edge-preserving smoothing filters 
+are used in many different applications.
+
+C++: void edgePreservingFilter(InputArray src, OutputArray dst, int flags=1, float sigma_s=60, float sigma_r=0.4f)
+
+LISP-CV: (EDGE-PRESERVING-FILTER (SRC MAT) (DEST MAT) &OPTIONAL ((FLAGS :INT) 1) ((SIGMA-S :FLOAT) 60F0) 
+                                ((SIGMA-R :FLOAT) 0.4F0)) => :VOID
+
+    Parameters:	
+
+        SRC - Input 8-bit 3-channel image.
+
+        DEST - Output 8-bit 3-channel image.
+
+        FLAGS -
+
+        Edge preserving filters:
+
+              +RECURS-FILTER+
+
+              +NORMCONV-FILTER+
+
+        SIGMA-S - Range between 0 to 200.
+
+        SIGMA-R - Range between 0 to 1.
+
+
+Example:
+
+See STYLIZATION-EXAMPLE in this file.
+
+
+
+PENCIL-SKETCH
+
+
+Pencil-like non-photorealistic line drawing
+
+C++: void pencilSketch(InputArray src, OutputArray dst1, OutputArray dst2, float sigma_s=60, float sigma_r=0.07f, 
+                       float shade_factor=0.02f)
+
+LISP-CV: (PENCIL-SKETCH (SRC MAT) (DEST1 MAT) (DEST2 MAT) &OPTIONAL ((SIGMA-S :FLOAT) 60F0) ((SIGMA-R :FLOAT) 0.07F0) 
+                       ((SHADE-FACTOR :FLOAT) 0.02F0)) => :VOID
+
+    Parameters:	
+
+        SRC - Input 8-bit 3-channel image.
+
+        DEST1 - Output 8-bit 1-channel image.
+
+        DEST2 - Output image with the same size and type as SRC.
+
+        SIGMA-S - Range between 0 to 200.
+
+        SIGMA-R - Range between 0 to 1.
+
+        SHADE-FACTOR - Range between 0 to 0.1.
+
+
+Example:
+
+See STYLIZATION-EXAMPLE in this file.
+
+
+
+STYLIZATION
+
+Stylization aims to produce digital imagery with a wide variety of effects not focused on photorealism.
+Edge-aware filters are ideal for stylization, as they can abstract regions of low contrast while preserving, 
+or enhancing, high-contrast features.
+
+C++: void stylization(InputArray src, OutputArray dst, float sigma_s=60, float sigma_r=0.45f)
+
+LISP-CV: (STYLIZATION (SRC MAT) (DEST MAT) &OPTIONAL ((SIGMA-S :FLOAT) 60F0) ((SIGMA-R :FLOAT) 0.45F0)) => :VOID
+
+    Parameters:	
+
+        SRC - Input 8-bit 3-channel image.
+
+        DEST - Output image with the same size and type as src.
+
+        SIGMA-S - Range between 0 to 200.
+
+        SIGMA-R - Range between 0 to 1.
+
+
+
+(defun stylization-example (filename)
+
+  "Note: If you don't get good results, try changing the 
+   parameters or using different picture. Some pictures 
+   don't work well with this example but most look great"
+
+    (with-mat ((i (imread filename 1))
+	       (img (mat))
+	       (img1 (mat)))
+      (if (empty i) 
+	  (return-from stylization-example 
+	    (format t "Image not found")))
+
+      (format t "~%~% Edge Preserve Filter")
+      (format t "~%----------------------")
+
+      (format t "~%Options: ~%~%")
+
+      (format t "~%~%1) Edge Preserve Smoothing")
+      (format t "~%~%  a) Using Normalized convolution Filter")
+      (format t "~%~%  b) Using Recursive Filter")
+      (format t "~%~%2) Detail Enhancement")
+      (format t "~%~%3) Pencil sketch/Color Pencil Drawing")
+      (format t "~%~%4) Stylization~%~%")
+      (format t "~%~%Press number 1-4 to choose from above techniques: ")
+      (format t "~%~%Enter a number: ")
+      (let ((num (read)))
+	(if (eq num 1)
+	    (progn (format t "~%~%Press 1 for Normalized Convolution Filter: ")
+		   (format t "~%~%Press 2 for Recursive Filter: ")
+                   (format t "~%~%Enter a number: ")
+		   (let ((type (read)))
+		     (edge-preserving-filter i img type))
+		   (imshow "Edge Preserve Smoothing" img)
+		   (move-window "Edge Preserve Smoothing" 759 175))
+	    (if (eq num 2)
+		(progn (detail-enhance i img)
+		       (imshow "Detail Enhanced" img)
+		       (move-window "Detail Enhanced" 759 175))
+		(if (eq num 3)
+		    (progn (pencil-sketch i img1 img 10f0 0.1f0 0.03f0)
+			   (imshow "Pencil Sketch" img1)
+			   (imshow "Color Pencil Sketch" img)
+			   (move-window "Pencil Sketch" 533 175)
+			   (move-window "Color Pencil Sketch" 984 175))
+		    (if (eq num 4)
+			(progn (stylization i img)
+			       (imshow "Stylization" img)
+			       (move-window "Stylization" 759 175))))))
+	(loop
+	   (let ((c (wait-key 33)))
+	     (when (= c 27)
+	       (destroy-all-windows)
+	       (return)))))))
 
 
 
@@ -9474,7 +9934,7 @@ CIRCLE-EXAMPLE:
       (if (not (cap-is-open cap)) 
 	  (return-from circle-example 
 	    (format t "Cannot open the video camera")))
-      (format t "Frame Size : ~ax~a~%~%" 
+      (format t "~%Frame Size : ~ax~a~%~%" 
 	      (cap-get cap +cap-prop-frame-width+)
 	      (cap-get cap +cap-prop-frame-height+))
       (named-window window-name +window-normal+)
@@ -9956,7 +10416,7 @@ ndows FFMPEG or VFW is used; on MacOSX QTKit is used.
 	(if (not (video-writer-is-open o-video-writer)) 
 	    (return-from video-writer-example 
 	      (format t "ERROR: Failed to write the video"))) 
-	(format t "Frame Size : ~ax~a~%~%" dwidth dheight)     
+	(format t "~%Frame Size : ~ax~a~%~%" dwidth dheight)     
 	(with-named-window (window-name +window-normal+)
 	  (move-window window-name 759 175)
 	  (loop
@@ -10169,7 +10629,7 @@ returns a pointer to the resultant sub-array header.
       (if (not (cap-is-open cap)) 
 	  (return-from roi-example 
 	    (format t "Cannot open the video camera")))
-      (format t "Frame Size : ~ax~a~%~%" 
+      (format t "~%Frame Size : ~ax~a~%~%" 
 	      (cap-get cap +cap-prop-frame-width+)
 	      (cap-get cap +cap-prop-frame-height+))
       (named-window window-name +window-normal+)
@@ -10424,82 +10884,6 @@ LISP-CV: (DOT3D (SELF POINT) (OTHER POINT)) => :INT
 	    (dot3d p1 p2))))
 
 
-IN-RANGE
-
-Checks if array elements lie between the elements of two other arrays.
-
-C++: void inRange(InputArray src, InputArray lowerb, InputArray upperb, OutputArray dst)
-
-LISP-CV: (IN-RANGE-S (SRC MAT) (LOWERB SCALAR) (UPPERB SCALAR) (DEST MAT) => :VOID
-
-
-    Parameters:	
-
-        SRC - first input array.
-
-        LOWERB - A scalar.
-
-        UPPERB - A scalar.
-
-        DEST - output array of the same size as SRC and +8U+ type.
-
-
-All the arrays must have the same type, except the destination, and the same size (or ROI size).
-
-
-
-(defun in-range-s-example (&optional (camera-index *camera-index*) 
-			     (width 640)
-			     (height 480))
-
-  (with-capture (cap (video-capture camera-index))
-    (let ((window-name-1 "Original camera feed - IN-RANGE-S Example")
-	  (window-name-2 "Only red objects - IN-RANGE-S Example")
-	  (img-hsv 0)
-	  (img-thresh 0)
-	  (src 0))
-      (if (not (cap-is-open cap)) 
-	  (return-from in-range-s-example 
-	    (format t "Cannot open the video camera")))
-      (cap-set cap +cap-prop-frame-width+ width)
-      (cap-set cap +cap-prop-frame-height+ height)
-      (format t "Frame Size : ~ax~a~%~%" 
-	      (cap-get cap +cap-prop-frame-width+)
-	      (cap-get cap +cap-prop-frame-height+))
-      (named-window window-name-1 +window-normal+)
-      (named-window window-name-2 +window-normal+)
-      (move-window window-name-1 533 175)
-      (move-window window-name-2 984 175)
-      ;; Iterate through each frames of the video
-      (do* ((frame 0)
-	    (lower-hsv (scalar 170 160 60))
-	    (upper-hsv (scalar 180 2556 256)))
-           ;; Wait 33mS - If 'esc' is pressed, break the loop
-	   ((plusp (wait-key *millis-per-frame*)) 
-	    (format t "Key is pressed by user"))
-	(setf frame (mat))
-	(cap-read cap frame)
-	(setf src (clone frame))
-	(setf img-hsv (mat))
-	(setf img-thresh (mat))
-	;; Smooth the original image using Gaussian kernel
-	(gaussian-blur src src (size 5 5) 0.0d0 0.0d0)
-	;; Change the color format from BGR to HSV
-	(cvt-color src img-hsv +bgr2hsv+)
-	;; Threshold the HSV image and create a binary image
-	(in-range-s img-hsv lower-hsv upper-hsv img-thresh)
-	;; Smooth the binary image using Gaussian kernel
-	(gaussian-blur img-thresh img-thresh (size 5 5) 0.0d0 0.0d0)
-	(imshow window-name-1 src)
-	(imshow window-name-2 img-thresh)
-	;; Clean up used images
-	(del-mat img-hsv) (del-mat img-thresh) 
-	(del-mat frame) (del-mat src))
-      (destroy-window window-name-1)
-      (destroy-window window-name-2))))
-
-
-
 
 CVT-COLOR
 
@@ -10684,7 +11068,7 @@ pattern is 50% green, 25% red and 25% blue, hence is also called RGBG,[1][2] GRG
 	    (format t "Cannot open the video camera")))
       (cap-set cap +cap-prop-frame-width+ width)
       (cap-set cap +cap-prop-frame-height+ height)
-      (format t "Frame Size : ~ax~a~%~%" 
+      (format t "~%Frame Size : ~ax~a~%~%" 
 	      (cap-get cap +cap-prop-frame-width+)
 	      (cap-get cap +cap-prop-frame-height+))
       (named-window window-name-1 +window-normal+)

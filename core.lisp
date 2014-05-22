@@ -1257,7 +1257,7 @@
   (src mat)
   (lowerb scalar)
   (upperb scalar)
-  (dst :pointer mat))
+  (dst mat))
 
 
 ;; MatExpr Mat::inv(int method=DECOMP_LU) const

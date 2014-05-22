@@ -1,4 +1,4 @@
-#include <opencv2/c/interop.hpp>
+#include "/home/w/quicklisp/dists/quicklisp/software/lisp-cv-master/include/interop.hpp"
 
 typedef string stdstring;
 

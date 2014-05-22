@@ -27,7 +27,7 @@
 
 
 
-;; C++ INTTEROP TYPES.
+;; C++ INTEROP TYPES.
 
 
 

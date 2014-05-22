@@ -6,6 +6,9 @@
 (in-package :lisp-cv)
 
 
+;;Utility
+
+
 
 ;; C Constants.
 
@@ -556,14 +559,22 @@
   (+not-draw-single-points+ 2)
   (+draw-rich-keypoints+ 4)
 
-
-
 ;;; objdetect
 
   (+cascade-do-canny-pruning+ 1)
   (+cascade-scale-image+ 2)
   (+cascade-find-biggest-object+ 4)
   (+cascade-do-rough-search+ 8)
+
+;;; photo
+
+  (+recurs-filter+ 1)
+  (+normconv-filter+ 2)
+  (+inpaint-ns+ 0)
+  (+inpaint-telea+ 1)
+  (+normal-clone+ 1)
+  (+mixed-clone+ 2)
+  (+monochrome-transfer+ 3)
 
 ;;; contrib
 
