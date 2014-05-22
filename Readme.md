@@ -318,7 +318,6 @@ I always add the plus signs to both ends, I always change the underscores to da-
 shes and I always remove the "CV_", no exceptions.
 
 
---------------------------------------------------------------------------------
 
 #FINALLY
 
