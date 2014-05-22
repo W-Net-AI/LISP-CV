@@ -119,6 +119,11 @@ to:
 
  ~/quicklisp/dists/quicklisp/software
 
+
+You might want to change the name of the LISP-CV-master folder to lisp-cv-master after extracting
+to avoid confusion. However the LISP-CV-master name shouldn't affect the compilation of Lisp-CV.
+
+
 If you built OpenCV with the extra modules correctly per this link: 
 
 https://github.com/arjuncomar/opencv_contrib. 
