@@ -319,7 +319,7 @@ and I always remove the "CV_", no exceptions.
 
 
 
-#END
+...Finally,
 
 Feel free to e-mail at me wnetai@gmail.com for any of the following reasons:
 
