@@ -13,9 +13,20 @@
    #:*frames-per-second*
    #:*millis-per-frame*
 
-;; Utilities 
 
-   #:full-pathname 
+;; utils - Utilities 
+
+   #:->
+   #:rename-package-nicknames
+   #:full-pathname
+   #:lisp-cv-src-dir
+   #:run-program
+   #:println
+   #:mklist
+   #:partition
+   #:cat
+   #:dup
+   #:do-while
 
 
 ;; Change default parameters

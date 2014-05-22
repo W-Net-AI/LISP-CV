@@ -155,5 +155,5 @@
 
 (defmacro run ()
 (asdf:oos 'lisp-executable:create-executables-op "lisp-executable-example")
-(su:run-program "~/quicklisp/dists/quicklisp/software/lisp-executable-20140113-git/example/example-program"))
+(run-program "~/quicklisp/dists/quicklisp/software/lisp-executable-20140113-git/example/example-program"))
 

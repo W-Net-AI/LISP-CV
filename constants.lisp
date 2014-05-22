@@ -6,10 +6,6 @@
 (in-package :lisp-cv)
 
 
-;;Utility
-
-
-
 ;; C Constants.
 
 (defanonenum

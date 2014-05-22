@@ -13,7 +13,7 @@
       (with-named-window (window-name +window-normal+)
 	(move-window window-name 759 175)
   	(loop
-	   (with-mat (frame (mat))
+	   (with-mat ((frame (mat)))
 	     (cap-read cap frame)
 	     (imshow window-name frame)
 	     (let ((c (wait-key 33)))

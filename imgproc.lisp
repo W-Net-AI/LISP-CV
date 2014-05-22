@@ -344,7 +344,7 @@
   (mask-size :int)
   (label-type :int))
 
-(defun %distance-transform (src dest *labels distance-type mask-size &optional (label-type +dist-lable-ccomp+))
+(defun %distance-transform (src dest *labels distance-type mask-size &optional (label-type +dist-label-ccomp+))
   (%%distance-transform src dest *labels distance-type mask-size label-type))
 
 (defun distance-transform5 (src dest distance-type mask-size &optional (dst-type +32f+))
