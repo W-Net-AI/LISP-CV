@@ -46,9 +46,11 @@ size.cpp
 ```
 
  If you run into a Lisp function that doesn't work suddenly after compiling the latest 
-.cpp files in lisp-cv-master/src, and it worked before, a change in the C wrappers might 
-be the reason. To circumvent that situation always install my full build (all of the 
-.lisp, .cpp and .hpp files) because I will always make sure it's in good working order. 
+.cpp files, and it worked before, a change in the C bindings might be the reason. Check 
+the above .cpp files to make sure the C bindings were'nt changed in anyway. Also, I make 
+alot of changes every day, so a non-working function could be the result of something I 
+missed. I am very good at discovering these errors so it shouldn't be long before I fix 
+said issue. You can hasten the fix by sending a bug report.
 
  I write a code example and documentation for each function I add to the library, so 
 it is very well documented. In the lisp-cv-master/examples/examples.lisp folder there 
