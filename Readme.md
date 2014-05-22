@@ -149,11 +149,11 @@ You should have these files present on your machine:
 ```
 You will need to add these files. They can be found in the Lisp-CV src and include directories:
 ```
-<where-you-placed->>/opencv_contrib/modules/c/include/opencv2/c/extra_functions.hpp
-<where-you-placed->>/opencv_contrib/modules/c/src/extra_functions.cpp
+<lisp-cv-src-dir>/include/extra_functions.hpp
+<lisp-cv-src-dir>/src/extra_functions.cpp
 
-<where-you-placed->>/opencv_contrib/modules/c/include/opencv2/c/interop.hpp
-<where-you-placed->>/opencv_contrib/modules/c/src/interop.cpp
+<lisp-cv-src-dir>/include/interop.hpp
+<lisp-cv-src-dir>/src/interop.cpp
 ```
 Build the above files with the below command:
 ```
