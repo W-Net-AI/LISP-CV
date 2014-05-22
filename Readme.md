@@ -302,8 +302,8 @@ and by comparing the tutorial at this link:
 
 http://opencv-srf.blogspot.com/2011/11/mouse-events.html
 
-to the SET-MOUSE-CALLBACK example. Doing that will give you an idea of how to convert C++ 
-OpenCv code you find online to Lisp.
+to the SET-MOUSE-CALLBACK example. Comparing the C++ code to the Lisp code will give 
+you an idea of how to convert C++ OpenCv code you find online to Lisp.
 
 
 All the constants are as so:
