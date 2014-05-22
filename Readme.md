@@ -52,13 +52,13 @@ alot of changes every day, so a non-working function could be the result of some
 missed. I am very good at discovering these errors so it shouldn't be long before I fix 
 said issue. You can hasten the fix by sending a bug report.
 
- I write a code example and documentation for each function I add to the library, so 
-it is very well documented. In the LISP-CV-MASTER/EXAMPLES/EXAMPLES.LISP file there 
-are over 12,000 lines of code examples and documentation. If you would like to contribute 
-a Lisp function I ask that you also write an example of how to use it. It doesn't have to 
-be a large example it only has to show what the function does and give an idea how it is 
-used in the most basic way. See LISP-CV-MASTER/EXAMPLES/EXAMPLES.LISP for an example 
-of the examples I already included.
+ I write a code example and documentation for each function I add to the library, so it 
+is very well documented. In the LISP-CV-MASTER/EXAMPLES/EXAMPLES.LISP file there are over 
+12,000 lines of code examples and documentation. If you would like to contribute a Lisp 
+function I ask that you also write an example of how to use it. It doesn't have to be a 
+large example it only has to show what the function does and give an idea how it is used 
+in the most basic way. See LISP-CV-MASTER/EXAMPLES/EXAMPLES.LISP for an example of the 
+examples I already included.
 
 To add contributions just Fork my repository at:
 
