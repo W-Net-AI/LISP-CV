@@ -306,17 +306,6 @@ to the SET-MOUSE-CALLBACK example. Comparing the C++ code to the Lisp code will 
 you an idea of how to convert C++ OpenCv code you find online to Lisp.
 
 
-All the constants are defined as so:
-
-If a constant in OpenCV's C++ interface is WINDOW_AUTOSIZE
-
-The Lisp version is +window-autosize+
-
-If a constant in OpenCV's C++ interface is CV_8UC3, it's Lisp version is +8UC3+
-
-I always add the plus signs to both ends, I always change the underscores to dashes 
-and I always remove the "CV_", no exceptions.
-
 
 
 #FINALLY
