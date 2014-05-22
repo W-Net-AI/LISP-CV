@@ -48,7 +48,7 @@ size.cpp
  If you run into a Lisp function that doesn't work suddenly after compiling the latest 
 .cpp files, and it worked before, a change in the C bindings might be the reason. Check 
 the above .cpp files to make sure the C bindings were'nt changed in anyway. Also, I make 
-alot of changes every day, so a non-working function could be the result of something I 
+a lot of changes every day, so a non-working function could be the result of something I 
 missed. I am very good at discovering these errors so it shouldn't be long before I fix 
 said issue. You can hasten the fix by sending a bug report.
 
@@ -276,9 +276,13 @@ lisp-cv-master/examples/examples.lisp.
 If you want to know if a function has been wrapped and is available, do a search 
 for the C++ function name in the examples.lisp folder. All functions are documented 
 and all have the C++ function declarations above the Lisp one. Some function names 
-aren't well defined but you can do a search for the class names i.e To find the Lisp 
-equivelant of the Matrix Expressions "*" , "/", "+" or "-" operators just do a search 
-for MatExpr in the examples.lisp file. 
+aren't well defined but you can do a search for the C++ class name i.e To find the 
+Lisp equivelant of the Matrix Expressions "*" , "/", "+" or "-" operators just do a 
+search for MatExpr in the examples.lisp file. Learning how to search this file will 
+help answer a lot of questions about this Library and put incrediple amounts of code 
+snippets right at your fingertips. Every function provided in this library has an 
+example program associated with it and all of the names of the examples are formatted 
+as <function-name>-example.
 
 
 You can also learn how to use the library by comparing the OpenCV C++ tutorials 
@@ -287,6 +291,19 @@ at this link:
 http://opencv-srf.blogspot.com/2011/09/capturing-images-videos.html
 
 to the CAP-FILE and CAP-CAM examples in examples.lisp.
+
+By comparing the tutorials at this link:
+
+http://opencv-srf.blogspot.com/2011/11/track-bars.html
+
+to the CREATE-TRACKBAR example.
+
+and by comparing the tutorial at this link:
+
+http://opencv-srf.blogspot.com/2011/11/mouse-events.html
+
+to the SET-MOUSE-CALLBACK example. Doing that will give you an idea of how to convert C++ 
+OpenCv code you find online to Lisp.
 
 
 All the constants are as so:
