@@ -31,11 +31,8 @@ will be given credit for your addition unless you decline.
 
   If you would like to contribute a function to this project, you will need to 
 first find out if the C wrapper for it is available. Don't worry 550+ C bindings
-are available and they can be found in the below files in the: 
+are available and they can be found in the below files in the Lisp-CV source directory's SRC folder: 
 ```
-
-<lisp_cv_src_dir>/src folder:
-
 opencv_generated.cpp 
 excluded_functions.cpp
 extra_functions.cpp
@@ -125,7 +122,7 @@ If you built OpenCV with the extra modules correctly per this link:
 https://github.com/arjuncomar/opencv_contrib. 
 
 You should have these files present on your machine:
-
+```
 <where-you-placed->>/opencv/build/modules/c/src/opencv_generated.cpp
 <where-you-placed->>/opencv_contrib/modules/c/include/opencv2/c/mat.hpp
 <where-you-placed->>/opencv_contrib/modules/c/include/opencv2/c/point.hpp
@@ -142,78 +139,78 @@ You should have these files present on your machine:
 <where-you-placed->>/opencv_contrib/modules/c/src/scalar.cpp
 <where-you-placed->>/opencv_contrib/modules/c/src/size.cpp
 <where-you-placed->>/opencv_contrib/modules/c/src/excluded_functions.cpp
-
+```
 You will need to add these files. They can be found in the Lisp-CV src and include directories:
-
+```
 <where-you-placed->>/opencv_contrib/modules/c/include/opencv2/c/extra_functions.hpp
 <where-you-placed->>/opencv_contrib/modules/c/src/extra_functions.cpp
 
 <where-you-placed->>/opencv_contrib/modules/c/include/opencv2/c/interop.hpp
 <where-you-placed->>/opencv_contrib/modules/c/src/interop.cpp
-
+```
 Build the above files with the below command:
-
+```
 g++ -Wall -shared -fPIC -o <filename>.so <filename>.cpp
-
+```
 Then take each one of those .so files you created and place in /usr/local/lib.
 
 
 Now start Emacs and run:
 
-
+```
 (ql:quickload "cffi")
-
+```
 
 To install CFFI, which Lisp-CV depends on, plus it's dependencies.
 
 
 Then run:
 
-
+```
 (ql:quickload "asdf")
 
-
+```
 To install ASDF, a Lisp-CV dependency.
 
 
 Run:
 
-
+```
 gksu gedit ~/.sbclrc
 
-
+```
 If you don't have it already, add this to the top of your ~/.sbclrc or ~/.clisprc file.
-
+```
 (require :asdf)
 ;put all subdirectories of quicklisp\software into asdf:*central-registry*
  (dolist (dir (directory "/home/w/quicklisp/dists/quicklisp/software/*/"))
  (pushnew dir asdf:*central-registry* :test #'equal))
-
+```
 
 Open Emacs and run this at the REPL:
-
+```
 (asdf:operate 'asdf:load-op :lisp-cv)
 
 (asdf:operate 'asdf:load-op :gc)
-
+```
 
 Lisp-CV will load. Then run this at the REPL:
 
-
+```
 (in-package #:lisp-cv)
-
+```
 
 Your REPL will change to look like this:
 
-
+```
 CV>
-
+```
 Now you are all finished!
 
 
 Run this at the REPL to test:
 
-
+```
 (defun imread-example-2 (filename)
 
   "Open the image FILENAME with IMREAD 
@@ -234,25 +231,25 @@ Run this at the REPL to test:
 	     (when (= c 27)
 	       (return))))))))
 
-
+```
 and then this:
 
-
+```
 (imread-example-2  <path-to-image>)
-
+```
 
 If all went as planned you should see your picture in a window.
 
 
 Note: You can place:
 
-
+```
 (asdf:operate 'asdf:load-op :lisp-cv)
 
 (asdf:operate 'asdf:load-op :gc)
 
 (in-package #:lisp-cv)
-
+```
 In your Lisp implementations initialization file(e.g. .sbclrc or .clisprc) to start LISP-CV
 automatically.
 
@@ -261,9 +258,9 @@ automatically.
 #TUTORIAL
 
 You can learn to use this library by looking at the examples in:
-
+```
 lisp-cv-master/examples/examples.lisp.
-
+``
 If you want to know if a function has been wrapped and is available, do a search 
 for the C++ function name in the examples.lisp folder. All functions are documented 
 and all have the C++ function declarations above the Lisp one. Some function names 
