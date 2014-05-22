@@ -31,7 +31,7 @@ will be given credit for your addition unless you decline.
 
   If you would like to contribute a function to this project, you will need to 
 first find out if the C wrapper for it is available. Don't worry 550+ C bindings
-are available and they can be found in the below files in the <lisp-cv-src-dir>/src 
+are available and they can be found in the below files in the /<lisp-cv-src-dir/>/src 
 folder:
 
 opencv_generated.cpp 
