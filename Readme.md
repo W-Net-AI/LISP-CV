@@ -284,7 +284,7 @@ snippets right at your fingertips. Every function provided in this library has a
 example program associated with it and all of the names of the examples are formatted 
 as <function-name>-example.
 
-
+####FINALLY
 You can also learn how to use the library by comparing the OpenCV C++ tutorials 
 at this link:
 
@@ -301,7 +301,7 @@ to the CREATE-TRACKBAR example.
 and by comparing the tutorial at this link:
 
 http://opencv-srf.blogspot.com/2011/11/mouse-events.html
-####FINALLY
+
 to the SET-MOUSE-CALLBACK example. Comparing the C++ code to the Lisp code will give 
 you an idea of how to convert C++ OpenCv code you find online to Lisp.
 
