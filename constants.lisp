@@ -562,6 +562,12 @@
   (+cascade-find-biggest-object+ 4)
   (+cascade-do-rough-search+ 8)
 
+;;; ml 
+
+(+ann-mlp-identity+ 0)
+(+ann-mlp-sigmoid-sym+ 1)
+(+ann-mlp-gaussian+  2) 
+
 ;;; photo
 
   (+recurs-filter+ 1)
@@ -570,6 +576,7 @@
   (+inpaint-telea+ 1)
   (+normal-clone+ 1)
   (+mixed-clone+ 2)
+  (+feature-exchange+ 3)
   (+monochrome-transfer+ 3)
 
 ;;; contrib

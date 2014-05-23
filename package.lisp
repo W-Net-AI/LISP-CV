@@ -976,21 +976,38 @@
    #:cascade-classifier-load
    #:detect-multi-scale
 
+
+;;; photo - Inpainting
+
+   #:+inpaint-ns+
+   #:+inpaint-telea+
+
+   #:in-paint
+
+;;; photo - Decolorization
+
+   #:decolor
+
+;;; photo - Seamless Cloning
+
+   #:+normal-clone+
+   #:+mixed-clone+
+   #:+feature-exchange+
+
+   #:color-change
+   #:illumination-change
+   #:seamless-clone
+   #:texture-flattening
+
 ;;; photo - Non-Photorealistic Rendering
 
    #:+recurs-filter+
    #:+normconv-filter+
-   #:+inpaint-ns+
-   #:+inpaint-telea+
-   #:+normal-clone+
-   #:+mixed-clone+
    #:+monochrome-transfer+ 
 
    #:detail-enhance
    #:edge-preserving-filter
-   #:in-paint
    #:pencil-sketch
-   #:seamless-clone
    #:stylization
 
 ;;; nonfree - Feature Detection and Description

@@ -212,31 +212,46 @@ need to access the return value of ASSGN-VAL to complete the operation,
 
   (let* ((window-name-1 "IMAGE - ASSGN-VAL Example")
          (window-name-2 "MAT - ASSGN-VAL Example")
-	 (image (imread filename 1))
-         ;; Create a matrix to fill with a scalar 
-         ;; value defined below
-         (mat (mat-ones 640 480 +8uc3+))
-         (scalar (scalar 255 0 0))
-         (result 0))
-    (named-window window-name-1 +window-normal+)
-    (named-window window-name-2 +window-normal+)	
-    (move-window window-name-1 533 175)
-    (move-window window-name-2 984 175)
-    ;; Set all elements of MAT to the value defined 
-    ;; by SCALAR.
-    (assgn-val mat scalar)
-    ;; Print IMAGE type. It is important to know this
-    ;; Before subtracting a matrix from an Image. You 
-    ;; must set the matrix size and type to be the sa-
-    ;; me as the image
-    (format t "IMAGE type = ~a(+8UC3+)" (mat-type image))
-    ;; Subtract MAT from IMAGE
-    (setf result (sub image mat))
-    ;; Show results
-    (imshow window-name-1 image)
-    (imshow window-name-2 (>> result))
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-all-windows)))
+         (b (alloc :int 0))
+         (g (alloc :int 0))
+	 (r (alloc :int 0)))
+    ;; Load an image
+    (with-mat ((image (imread filename 1))
+	       ;; Create a matrix to fill with a 
+               ;; scalar value defined below
+	       (mat (mat (rows image) (cols image) +8uc3+)))
+      ;; Print IMAGE type. It is important to know this
+      ;; Before subtracting a matrix from an image. You 
+      ;; must set the matrix size and type to be the sa-
+      ;; me as the image
+      (format t "~%IMAGE type = ~a(+8UC3+)~%~%" (mat-type image))
+      (with-named-window (window-name-1 +window-normal+)
+	(with-named-window (window-name-2 +window-normal+)	
+	  (move-window window-name-1 533 175)
+	  (move-window window-name-2 984 175)
+          ;; Create trackbars to change the BGR 
+          ;; values we will later subtract from 
+          ;; IMAGE
+	  (create-trackbar  "B" window-name-2 b 255)
+	  (create-trackbar  "G" window-name-2 g 255)
+	  (create-trackbar  "R" window-name-2 r 255)
+	  (loop
+	     ;; Set all elements of MAT to SCALAR.
+	     (with-scalar ((scalar (scalar (? b :int) 
+					   (? g :int) 
+					   (? r :int))))
+	       (assgn-val mat scalar))
+	     ;; Subtract MAT from IMAGE
+	     (with-mat-expr ((result (sub image mat)))
+	       ;; Show results
+	       (imshow window-name-1 image)
+               ;; Coerce RESULT to a MAT 
+               ;; before showing in window
+	       (with-mat ((forced-result (>> result)))
+		 (imshow window-name-2 forced-result)
+		 (let ((c (wait-key 33)))
+		   (when (= c 27)
+		     (return)))))))))))
 
 
 AT
@@ -7228,7 +7243,7 @@ Finds edges in an image using the [Canny86] algorithm.
 C++: void Canny(InputArray image, OutputArray edges, double threshold1, double threshold2, int apertureSize=3, bool L2gradient=false)
 
 LISP-CV: (CANNY (IMAGE MAT) (EDGES MAT) (THRESHOLD1 :DOUBLE) (THRESHOLD2 :DOUBLE) ((APERTURE-SIZE :INT) 3) 
-         ((L2-GRADIENT :BOOLEAN) NIL)) => :VOID
+               ((L2-GRADIENT :BOOLEAN) NIL)) => :VOID
 
     Parameters:	
 
@@ -8613,6 +8628,87 @@ By default, (= FLAGS (LOGIOR +WINDOW-AUTOSIZE+  +WINDOW-KEEPRATIO+  +GUI-EXPANDE
 
 
 
+SET-MOUSE-CALLBACK
+
+
+Sets mouse handler for the specified window
+
+
+C++: void setMouseCallback(const string& winname, MouseCallback onMouse, void* userdata=0 )
+
+LISP-CV: (SET-MOUSE-CALLBACK (WINNAME *STRING) (ON-MOUSE MOUSE-CALLBACK) (USERDATA :VOID)) => :VOID
+
+
+    Parameters:	
+
+        WINNAME - Window name
+
+        ONMOUSE - Mouse callback. See example below for how to use the callback.
+
+        USERDATA - The optional parameter passed to the callback.
+
+
+
+(defcallback call-back-func :void ((event :int)(x :int)(y :int)
+                                   (flags :int)(userdata :pointer))
+  ;; This callback function is called by the SET-MOUSE CALLBACK function
+  ;; in the example below. The mouse handler created by SET-MOUSE CALLBACK
+  ;; captures movements made by the mouse along with 3 different keypresses.
+  ;; They are then processed in this function.
+
+  (format t "Recieved ~a~%~%" (mem-aref userdata :string))
+
+  (if (= event +event-mousemove+)
+      (format t "Mouse move over the window (~a, ~a)~%~%" x y))
+  (if (= event +event-lbuttondown+)
+      (format t "Left button of the mouse down (~a, ~a)~%~%" x y))
+  (if (= event +event-rbuttondown+)
+      (format t "Right button of the mouse down (~a, ~a)~%~%" x y))
+  (if (= event +event-mbuttondown+)
+      (format t "Middle button of the mouse down (~a, ~a)~%~%" x y))
+  (if (= event +event-lbuttonup+)
+      (format t "Left button of the mouse up (~a, ~a)~%~%" x y))
+  (if (= event +event-rbuttonup+)
+      (format t "Right button of the mouse up (~a, ~a)~%~%" x y))
+  (if (= event +event-mbuttonup+)
+      (format t "Middle button of the mouse up (~a, ~a)~%~%" x y))
+  (if (= event +event-lbuttondblclk+)
+      (format t "Left button double-click flag triggered (~a, ~a)~%~%" x y))
+  (if (= event +event-rbuttondblclk+)
+      (format t "Right button double-click flag triggered (~a, ~a)~%~%" x y))
+  (if (= event +event-mbuttondblclk+)
+      (format t "Middle button double-click flag triggered (~a, ~a)~%~%" x y))
+  (if (= flags (+ +event-flag-ctrlkey+ +event-flag-lbutton+))
+      (format t "Left mouse button is clicked while pressing CTRL key (~a, ~a)~%~%" x y))
+  (if (= flags (+ +event-flag-shiftkey+ +event-flag-rbutton+))
+      (format t "Right mouse button is clicked while pressing SHIFT key (~a, ~a)~%~%" x y))
+  (if (= flags (+ +event-flag-altkey+ +event-mousemove+))
+      (format t "Mouse is moved over the window while pressing ALT key  (~a, ~a)~%~%" x y )))
+
+
+(defun set-mouse-callback-example (filename)
+  ;; load image
+  (let ((src (imread filename 1))
+	(window-name "SET-MOUSE-CALLBACK Example")
+	;; Declare a userdata parameter 
+	(userdata (alloc :string "USERDATA output")))
+    (if (empty src) 
+	(return-from set-mouse-callback-example
+	  (format t "Image not loaded")))
+    (named-window window-name 1)
+    (move-window window-name 759 175)
+    ;; Set mouse handler for the window, which passes a constant 
+    ;; stream of mouse and mouse button positional data to the f-
+    ;; unction above.  Also passes the contents of USERDATA to t-
+    ;; he above function CALL-BACK-FUNC.
+    (set-mouse-callback window-name (callback call-back-func) userdata)
+    (imshow window-name src)
+    (loop while (not (= (wait-key 0) 27)))
+    (destroy-window window-name)
+    (del-mat src)
+    (free userdata)))
+
+
 
 SET-TRACKBAR-POS
 
@@ -9344,7 +9440,184 @@ Example:
 		 (return)))))))))
 
 
+PHOTO - DECOLORIZATION
+
+
+DECOLOR
+
+Transforms a color image to a grayscale image. It is a basic tool in digital printing, stylized 
+black-and-white photograph rendering, and in many single channel image processing applications.
+
+C++: void decolor(InputArray src, OutputArray grayscale, OutputArray color_boost)
+
+LISP-CV: (DECOLOR (SRC MAT) (GRAYSCALE MAT) (COLOR-BOOST MAT)) => :VOID
+
+    Parameters:	
+
+        SRC - Input 8-bit 3-channel image.
+
+        GRAYSCALE - Output 8-bit 1-channel image.
+
+        COLOR-BOOST - Output 8-bit 3-channel image.
+
+
+This function is to be applied on color images.
+
+
+(defun decolor-example (filename)
+
+  (let ((window-name-1 "SOURCE - DECOLOR Example")
+	(window-name-2 "GRAYSCALE - DECOLOR Example")
+	(window-name-3 "COLOR-BOOST - DECOLOR Example"))
+    (with-named-window (window-name-1 +window-normal+)
+      (with-named-window (window-name-2 +window-normal+)
+	(with-named-window (window-name-3 +window-normal+)
+	  (move-window window-name-1 310 175)
+	  (move-window window-name-2 760 175)
+	  (move-window window-name-3 1210 175)
+	  (with-mat ((source (imread filename 1))
+		     (grayscale (mat))
+		     (color-boost (mat)))
+	    (if (empty source)
+		(return-from decolor-example))
+	    (decolor source grayscale color-boost)
+	    (imshow window-name-1 source)
+	    (imshow window-name-2 grayscale)
+	    (imshow window-name-3 color-boost)
+	    (loop
+	       (let ((c (wait-key 33)))
+		 (when (= c 27)
+		   (return))))))))))
+
+
+
 PHOTO - SEAMLESS CLONING
+
+
+
+COLOR-CHANGE
+
+Given an original color image, two differently colored versions of this image can be mixed seamlessly.
+
+C++: void colorChange(InputArray src, InputArray mask, OutputArray dst, float red_mul=1.0f, float green_mul=1.0f, float blue_mul=1.0f)
+
+LISP-CV: (COLOR-CHANGE (SRC MAT) (MASK MAT) (DEST MAT) &OPTIONAL ((RED-MUL :FLOAT) 1.0F0) ((GREEN-MUL :FLOAT) 1.0F0) 
+                      ((BLUE-MUL :FLOAT) 1.0F0)) => :VOID
+
+
+    Parameters:	
+
+        SRC - Input 8-bit 3-channel image.
+
+        MASK - Input 8-bit 1 or 3-channel image.
+
+        DEST - Output image with the same size and type as SRC.
+
+        RED-MUL - R-channel multiply factor.
+
+        GREEN-MUL - G-channel multiply factor.
+
+        BLUE-MUL - B-channel multiply factor.
+
+
+Multiplication factor is between 0.5f0 to 2.5f0.
+
+
+(defparameter *cloning-dir*
+  (cat *lisp-cv-src-dir* "images/cloning"))
+
+(defun color-change-example ()
+
+  (let ((window-name-1 "SOURCE - COLOR-CHANGE Example")
+	(window-name-2 "MASK - COLOR-CHANGE Example")
+	(window-name-3 "RESULT - COLOR-CHANGE Example"))
+    (with-named-window (window-name-1 +window-normal+)
+      (with-named-window (window-name-2 +window-normal+)
+	(with-named-window (window-name-3 +window-normal+)
+	  (move-window window-name-1 310 175)
+	  (move-window window-name-2 760 175)
+	  (move-window window-name-3 1210 175)
+	  (with-mat ((source (imread (cat *cloning-dir* "/color-change/source.png") 1))
+		     (mask (imread (cat *cloning-dir* "/color-change/mask.png") 1))
+		     (result (clone source)))
+	    (if (empty source)
+		(return-from color-change-example 
+		  (format t "Could not load source image")))
+	    (if (empty mask)
+		(return-from color-change-example 
+		  (format t "Could not load mask image")))
+	    (color-change source mask result 1.5f0 0.5f0 0.5f0)
+	    (imwrite (cat *cloning-dir* "/mixed-cloning/cloned.png") result)
+	    (imshow window-name-1 source)
+	    (imshow window-name-2 mask)
+	    (imshow window-name-3 result)
+	    (loop
+	       (let ((c (wait-key 33)))
+		 (when (= c 27)
+		   (return))))))))))
+
+
+
+ILLUMINATION-CHANGE
+
+Applying an appropriate non-linear transformation to the gradient field inside the selection and 
+then integrating back with a Poisson solver, modifies locally the apparent illumination of an 
+image.
+
+C++: void illuminationChange(InputArray src, InputArray mask, OutputArray dst, float alpha=0.2f, float beta=0.4f)
+
+LISP-CV: (ILLUMINATION-CHANGE (SRC MAT) (MASK MAT) (DEST MAT) &OPTIONAL ((ALPHA :FLOAT) 0.2F0) ((BETA :FLOAT) 0.4F0)) => :VOID
+
+    Parameters:	
+
+        SRC - Input 8-bit 3-channel image.
+
+        MASK - Input 8-bit 1 or 3-channel image.
+
+        DEST - Output image with the same size and type as SRC.
+
+        ALPHA - Value ranges between 0-2.
+
+        BETA - Value ranges between 0-2.
+
+
+This is useful to highlight under-exposed foreground objects or to reduce specular reflections.
+
+
+
+(defparameter *cloning-dir*
+  (cat *lisp-cv-src-dir* "images/cloning"))
+
+(defun illumination-change-example ()
+
+  (let ((window-name-1 "SOURCE - ILLUMINATION-CHANGE Example")
+	(window-name-2 "MASK - ILLUMINATION-CHANGE Example")
+	(window-name-3 "RESULT - ILLUMINATION-CHANGE Example"))
+    (with-named-window (window-name-1 +window-normal+)
+      (with-named-window (window-name-2 +window-normal+)
+	(with-named-window (window-name-3 +window-normal+)
+	  (move-window window-name-1 310 175)
+	  (move-window window-name-2 760 175)
+	  (move-window window-name-3 1210 175)
+	  (with-mat ((source (imread (cat *cloning-dir* "/illumination-change/source.png") 1))
+		     (mask (imread (cat *cloning-dir* "/illumination-change/mask.png") 1))
+		     (result (clone source)))
+	    (if (empty source)
+		(return-from illumination-change-example
+		  (format t "Could not load source image")))
+	    (if (empty mask)
+		(return-from illumination-change-example 
+		  (format t "Could not load mask image")))
+	    (illumination-change source mask result 0.2f0 0.4f0)
+	    (imwrite (cat *cloning-dir* "/illumination-change/cloned.png") result)
+	    (imshow window-name-1 source)
+	    (imshow window-name-2 mask)
+	    (imshow window-name-3 result)
+	    (loop
+	       (let ((c (wait-key 33)))
+		 (when (= c 27)
+		   (return))))))))))
+
 
 
 SEAMLESS-CLONE
@@ -9386,17 +9659,17 @@ LISP-CV:  (SEAMLESS-CLONING (SRC MAT) (DEST MAT) (MASK MAT) (P POINT) (BLEND MAT
             +FEATURE-EXCHANGE+ Feature exchange allows the user to replace easily certain
                 features of one object by alternative features.
 
-
+Example 1:
 
 (defparameter *cloning-dir*
-  (cat lisp-cv-src-dir "images/cloning"))
+  (cat *lisp-cv-src-dir* "images/cloning"))
 
-(defun seamless-cloning-example ()
+(defun seamless-cloning-example-1 ()
 
-  (let ((window-name-1 "SOURCE - SEAMLESS-CLONING Example")
-        (window-name-2 "DESTINATION -SEAMLESS-CLONING Example")
-	(window-name-3 "MASK -SEAMLESS-CLONING Example")
-	(window-name-4 "RESULT - SEAMLESS-CLONING Example"))
+  (let ((window-name-1 "SOURCE - SEAMLESS-CLONING Example 1")
+        (window-name-2 "DESTINATION - SEAMLESS-CLONING Example 1")
+	(window-name-3 "MASK - SEAMLESS-CLONING Example 1")
+	(window-name-4 "RESULT - SEAMLESS-CLONING Example 1"))
     (with-named-window (window-name-1 +window-normal+)
       (with-named-window (window-name-2 +window-normal+)
 	(with-named-window (window-name-3 +window-normal+)
@@ -9408,12 +9681,18 @@ LISP-CV:  (SEAMLESS-CLONING (SRC MAT) (DEST MAT) (MASK MAT) (P POINT) (BLEND MAT
 	    (with-mat ((source (imread (cat *cloning-dir* "/normal-cloning/source.png") 1))
 		       (destination (imread (cat *cloning-dir* "/normal-cloning/destination.png") 1))
 		       (mask (imread (cat *cloning-dir* "/normal-cloning/mask.png") 1))
-		       (result (clone destination)))
-	      (if (or (empty source) (empty destination) (empty mask))
-		  (return-from seamless-cloning-example 
-		    (format t "All images were not loaded")))
+		       (result (clone source)))
+	      (if (empty source)
+		  (return-from seamless-cloning-example-1 
+		    (format t "Could not load source image")))
+	      (if (empty destination)
+		  (return-from seamless-cloning-example-1 
+		    (format t "Could not load destination image")))
+	      (if (empty mask)
+		  (return-from seamless-cloning-example-1 
+		    (format t "Could not load mask image")))
 	      (with-point ((p (point 400 100)))
-		(seamless-clone source destination mask p result 1)
+		(seamless-clone source destination mask p result +normal-clone+)
 		(imwrite (cat *cloning-dir* "/normal-cloning/cloned.png") result)
 		(imshow window-name-1 source)
 		(imshow window-name-2 destination)
@@ -9423,6 +9702,124 @@ LISP-CV:  (SEAMLESS-CLONING (SRC MAT) (DEST MAT) (MASK MAT) (P POINT) (BLEND MAT
 		   (let ((c (wait-key 33)))
 		     (when (= c 27)
 		       (return))))))))))))
+
+
+
+Example 2:
+
+
+(defparameter *cloning-dir*
+  (cat *lisp-cv-src-dir* "images/cloning"))
+
+(defun seamless-cloning-example-3 ()
+
+  (let ((window-name-1 "SOURCE - SEAMLESS-CLONING Example 3")
+	(window-name-2 "DESTINATION - SEAMLESS-CLONING Example 3")
+	(window-name-3 "MASK - SEAMLESS-CLONING Example 3")
+	(window-name-4 "RESULT - SEAMLESS-CLONING Example 3"))
+    (with-named-window (window-name-1 +window-normal+)
+      (with-named-window (window-name-2 +window-normal+)
+	(with-named-window (window-name-3 +window-normal+)
+	  (with-named-window (window-name-4 +window-normal+)
+	    (move-window window-name-1 485 98)
+	    (move-window window-name-2 894 98)
+	    (move-window window-name-3 485 444)
+	    (move-window window-name-4 894 444)
+	    (with-mat ((source (imread (cat *cloning-dir* "/monochrome-transfer/source.png") 1))
+		       (destination (imread (cat *cloning-dir* "/monochrome-transfer/destination.png") 1))
+		       (mask (imread (cat *cloning-dir* "/monochrome-transfer/mask.png") 1))
+		       (result (clone source)))
+	      (if (empty source)
+		  (return-from seamless-cloning-example-3 
+		    (format t "Could not load source image")))
+	      (if (empty destination)
+		  (return-from seamless-cloning-example-3 
+		    (format t "Could not load destination image")))
+	      (if (empty mask)
+		  (return-from seamless-cloning-example-3 
+		    (format t "Could not load mask image")))
+	      (with-point ((p (point (- (round (/ (width (size destination)) 2)) 10)
+				     (round (/ (height (size destination)) 2)))))
+		(seamless-clone source destination mask p result +feature-exchange+)
+		(imwrite (cat *cloning-dir* "/mixed-cloning/cloned.png") result)
+		(imshow window-name-1 source)
+		(imshow window-name-2 destination)
+		(imshow window-name-3 mask)
+		(imshow window-name-4 result)
+		(loop
+		   (let ((c (wait-key 33)))
+		     (when (= c 27)
+		       (return))))))))))))
+
+
+
+
+TEXTURE-FLATTENING
+
+By retaining only the gradients at edge locations, before integrating with the Poisson solver, one 
+washes out the texture of the selected region, giving its contents a flat aspect. Here Canny Edge 
+Detector is used.
+
+C++: void textureFlattening(InputArray src, InputArray mask, OutputArray dst, double low_threshold=30 , double high_threshold=45, 
+                            int kernel_size=3)
+
+LISP-CV: (TEXTURE-FLATTENING (SRC MAT) (MASK MAT) (DEST MAT) &OPTIONAL ((LOW-THRESHOLD :DOUBLE) 30D0) 
+                            ((HIGH-THRESHOLD :DOUBLE) 45D0) ((KERNAL-SIZE :INT) 3)) => :VOID
+
+    Parameters:	
+
+        SRC - Input 8-bit 3-channel image.
+
+        MASK - Input 8-bit 1 or 3-channel image.
+
+        DEST - Output image with the same size and type as SRC.
+
+        LOW-THRESHOLD - Range from 0 to 100.
+
+        HIGH-THRESHOLD - Value > 100.
+
+        KERNEL-SIZE - The size of the Sobel kernel to be used.
+
+
+NOTE:
+
+The algorithm assumes that the color of the source image is close to that of the destination. This 
+assumption means that when the colors don’t match, the source image color gets tinted toward the 
+color of the destination image.
+
+
+(defparameter *cloning-dir*
+  (cat *lisp-cv-src-dir* "images/cloning"))
+
+(defun texture-flattening-example ()
+
+  (let ((window-name-1 "SOURCE - TEXTURE-FLATTENING Example")
+	(window-name-2 "MASK - TEXTURE-FLATTENING Example")
+	(window-name-3 "RESULT - TEXTURE-FLATTENING Example"))
+    (with-named-window (window-name-1 +window-normal+)
+      (with-named-window (window-name-2 +window-normal+)
+	(with-named-window (window-name-3 +window-normal+)
+	  (move-window window-name-1 310 175)
+	  (move-window window-name-2 760 175)
+	  (move-window window-name-3 1210 175)
+	  (with-mat ((source (imread (cat *cloning-dir* "/texture-flattening/source.png") 1))
+		     (mask (imread (cat *cloning-dir* "/texture-flattening/mask.png") 1))
+		     (result (clone source)))
+	    (if (empty source)
+		(return-from texture-flattening-example
+		  (format t "Could not load source image")))
+	    (if (empty mask)
+		(return-from texture-flattening-example 
+		  (format t "Could not load mask image")))
+	    (texture-flattening source mask result 30d0 45d0 3)
+	    (imwrite (cat *cloning-dir* "/texture-flattening/cloned.png") result)
+	    (imshow window-name-1 source)
+	    (imshow window-name-2 mask)
+	    (imshow window-name-3 result)
+	    (loop
+	       (let ((c (wait-key 33)))
+		 (when (= c 27)
+		   (return))))))))))
 
 
 
@@ -9663,6 +10060,8 @@ code applies all 11 color map types to an image based on the position of a track
         (i (alloc :int 0)))
     (with-named-window (window-name +window-normal+)
       (move-window window-name 759 175)
+      ;Create trackbar
+      (create-trackbar "Color Map" window-name i 11)
       ;Load image as grayscale - Color is okay too
       (with-mat ((img0 (imread filename 0)))
 	(if (empty img0) 
@@ -9670,11 +10069,10 @@ code applies all 11 color map types to an image based on the position of a track
 	      (format t "Image not loaded")))
         (with-mat ((cm-img0 (mat)))
 	  (loop
-	    ;In a loop apply one of 11 color map 
-	    ;types based on trackbar position
+	     ;In a loop apply one of 11 color map 
+	     ;types based on trackbar position
 	     (apply-color-map img0 cm-img0 (? i :int))
 	     (imshow window-name cm-img0)
-	     (create-trackbar "Color Map" window-name i 11)
 	     (let ((c (wait-key 33)))
 	       (when (= c 27)
 		 (return)))))))))
@@ -11739,88 +12137,6 @@ Example:
 
 
 
-SET-MOUSE-CALLBACK
-
-
-Sets mouse handler for the specified window
-
-
-C++: void setMouseCallback(const string& winname, MouseCallback onMouse, void* userdata=0 )
-
-LISP-CV: (SET-MOUSE-CALLBACK (WINNAME *STRING) (ON-MOUSE MOUSE-CALLBACK) (USERDATA :VOID)) => :VOID
-
-
-    Parameters:	
-
-        WINNAME - Window name
-
-        ONMOUSE - Mouse callback. See example below for how to use the callback.
-
-        USERDATA - The optional parameter passed to the callback.
-
-
-
-(defcallback call-back-func :void ((event :int)(x :int)(y :int)
-                                   (flags :int)(userdata :pointer))
-  ;; This callback function is called by the SET-MOUSE CALLBACK function
-  ;; in the example below. The mouse handler created by SET-MOUSE CALLBACK
-  ;; captures movements made by the mouse along with 3 different keypresses.
-  ;; They are then processed in this function.
-
-  (format t "Recieved ~a~%~%" (mem-aref userdata :string))
-
-  (if (= event +event-mousemove+)
-      (format t "Mouse move over the window (~a, ~a)~%~%" x y))
-  (if (= event +event-lbuttondown+)
-      (format t "Left button of the mouse down (~a, ~a)~%~%" x y))
-  (if (= event +event-rbuttondown+)
-      (format t "Right button of the mouse down (~a, ~a)~%~%" x y))
-  (if (= event +event-mbuttondown+)
-      (format t "Middle button of the mouse down (~a, ~a)~%~%" x y))
-  (if (= event +event-lbuttonup+)
-      (format t "Left button of the mouse up (~a, ~a)~%~%" x y))
-  (if (= event +event-rbuttonup+)
-      (format t "Right button of the mouse up (~a, ~a)~%~%" x y))
-  (if (= event +event-mbuttonup+)
-      (format t "Middle button of the mouse up (~a, ~a)~%~%" x y))
-  (if (= event +event-lbuttondblclk+)
-      (format t "Left button double-click flag triggered (~a, ~a)~%~%" x y))
-  (if (= event +event-rbuttondblclk+)
-      (format t "Right button double-click flag triggered (~a, ~a)~%~%" x y))
-  (if (= event +event-mbuttondblclk+)
-      (format t "Middle button double-click flag triggered (~a, ~a)~%~%" x y))
-  (if (= flags (+ +event-flag-ctrlkey+ +event-flag-lbutton+))
-      (format t "Left mouse button is clicked while pressing CTRL key (~a, ~a)~%~%" x y))
-  (if (= flags (+ +event-flag-shiftkey+ +event-flag-rbutton+))
-      (format t "Right mouse button is clicked while pressing SHIFT key (~a, ~a)~%~%" x y))
-  (if (= flags (+ +event-flag-altkey+ +event-mousemove+))
-      (format t "Mouse is moved over the window while pressing ALT key  (~a, ~a)~%~%" x y )))
-
-
-(defun set-mouse-callback-example (filename)
-  ;; load image
-  (let ((src (imread filename 1))
-	(window-name "SET-MOUSE-CALLBACK Example")
-	;; Declare a userdata parameter 
-	(userdata (alloc :string "USERDATA output")))
-    (if (empty src) 
-	(return-from set-mouse-callback-example
-	  (format t "Image not loaded")))
-    (named-window window-name 1)
-    (move-window window-name 759 175)
-    ;; Set mouse handler for the window, which passes a constant 
-    ;; stream of mouse and mouse button positional data to the f-
-    ;; unction above.  Also passes the contents of USERDATA to t-
-    ;; he above function CALL-BACK-FUNC.
-    (set-mouse-callback window-name (callback call-back-func) userdata)
-    (imshow window-name src)
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name)
-    (del-mat src)
-    (free userdata)))
-
-
-
 DATA
 
 Pointer to MAT data.
@@ -11888,8 +12204,6 @@ ix or because there can be some padding space in the end of each row for a prope
 
 
 
-
-
 $
 
 Time how long a function takes to complete n iterations.
@@ -11921,8 +12235,6 @@ Evaluation took:
   33,008 bytes consed
   
 NIL
-
-
 
 
 

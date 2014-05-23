@@ -909,6 +909,32 @@
     cascade-classifier))
 
 
+;; ML
+
+;; ANN-MLP
+
+
+(define-foreign-type ann-mlp ()
+  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+                     :garbage-collect))
+  (:actual-type :pointer)
+  (:simple-parser ann-mlp))
+
+
+(defclass cv-ann-mlp ()
+  ((c-pointer :reader c-pointer :initarg :c-pointer)))
+
+
+(defmethod translate-to-foreign ((lisp-value cv-ann-mlp) (c-type ann-mlp))
+  (values  (c-pointer lisp-value) lisp-value))
+
+
+(defmethod translate-from-foreign (c-pointer (c-type ann-mlp))
+  (let ((ann-mlp  (make-instance 'cv-ann-mlp :c-pointer c-pointer)))
+    (when (garbage-collect c-type)
+      (tg:finalize ann-mlp (lambda () (del-std-string c-pointer))))
+    ann-mlp))
+
 
 ;; NONFREE
 

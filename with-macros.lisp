@@ -7,6 +7,15 @@
 (in-package :lisp-cv)
 
 
+(defmacro with-ann-mlp (bind &body body)
+  "Ensures DEL-ANN-MLP gets called 
+   when ANN-MLP goes out of scope."
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-ann-mlp %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
+
+
 (defmacro with-cascade-classifier (bind &body body)
   "Ensures DEL-CASC-CLASS gets called 
    when CASCADE-CLASSIFIER goes out of scope."

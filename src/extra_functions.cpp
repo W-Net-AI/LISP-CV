@@ -5,7 +5,7 @@ using namespace flann;
 using namespace cvflann;
 
 
-#include <opencv2/c/extra_functions.hpp>
+#include "/home/w/quicklisp/dists/quicklisp/software/lisp-cv-master/include/extra_functions.hpp"
 
 
 extern "C" {
@@ -127,15 +127,11 @@ void cv_delete(char* self) {
     delete self;
 }
 
-void cv_delete_BFMatcher(BFMatcher* self) {
+void cv_delete_CvANN_MLP(CvANN_MLP* self) {
     delete self;
 }
 
-void cv_delete_BRISK(BRISK* self) {
-    delete self;
-}
-
-void cv_delete_CscadeClassifier(CascadeClassifier* self) {
+void cv_delete_CascadeClassifier(CascadeClassifier* self) {
      delete self;
 }
 
@@ -199,15 +195,7 @@ void cv_delete_Size2f(Size2f* self) {
      delete self;
 }
 
-void cv_delete_SURF(SURF* self) {
-     delete self;
-}
-
 void cv_delete_TermCriteria(TermCriteria* self) {
-     delete self;
-}
-
-void cv_delete_vector_char(vector_char* self) {
      delete self;
 }
 

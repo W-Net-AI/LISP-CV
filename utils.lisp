@@ -47,7 +47,7 @@
     (make-pathname :directory (absolute-dir (pathname-directory dir)) :name (pathname-name dir) :type (pathname-type dir))))
 
 
-(define-symbol-macro lisp-cv-src-dir  (full-pathname (asdf::system-source-directory :lisp-cv))) 
+(define-symbol-macro *lisp-cv-src-dir*  (full-pathname (asdf::system-source-directory :lisp-cv))) 
 
 
 ;;; -----------------------------------------------------------------------------------------
