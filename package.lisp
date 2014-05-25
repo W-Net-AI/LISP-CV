@@ -5,6 +5,7 @@
   (:use #:cffi #:common-lisp #:swank #:trivial-garbage #:lisp-executable) 
   (:export 
 
+
 ;; Default parameters.
 
    #:*camera-index* 
@@ -33,14 +34,17 @@
 
    #:def-params
 
+
 ;; DEFPARAMETER macro
 
    #:d
+
 
 ;; Live code editing
 
    #:continuable
    #:update-swank
+
 
 ;; Macros
 
@@ -51,6 +55,11 @@
    #:free
    #:print-mat
    #:size-of
+
+
+;; C-Interop
+
+   #:c-string-to-string
 
 
 ;; Extra OpenCV constants
@@ -86,11 +95,14 @@
 ;; DELETE
 
    #:del
+   #:del-ann-mlp
+   #:del-ann-mlp-train-params
    #:del-casc-class
    #:del-dmatch
    #:del-kp
    #:del-mat
    #:del-mat-expr
+   #:del-normal-bayes-classifier
    #:del-point
    #:del-point-2d
    #:del-point-2f
@@ -99,7 +111,7 @@
    #:del-point-3i
    #:del-rect
    #:del-rng
-   #:del-rotated-rect
+   #:del-rot-rect
    #:del-scalar
    #:del-size
    #:del-size2f
@@ -128,6 +140,7 @@
    #:with-keypoint
    #:with-mat
    #:with-mat-expr
+   #:with-normal-bayes-classifier
    #:with-object
    #:with-point
    #:with-point-2d
@@ -159,6 +172,8 @@
 
 ;; DEFCTYPE's
 
+   #:ann-mlp
+   #:ann-mlp-train-params
    #:cascade-classifier
    #:dmatch
    #:feature-2d
@@ -166,6 +181,7 @@
    #:mat
    #:mat-expr
    #:mouse-callback
+   #:normal-bayes-classifier
    #:point
    #:point-2d
    #:point-2f
@@ -175,9 +191,6 @@
    #:rect
    #:rng
    #:rotated-rect
-   #:rotated-rect-bounding-rect
-   #:rotated-rect-center
-   #:rotated-rect-size
    #:scalar
    #:size
    #:size2f
@@ -218,9 +231,6 @@
 
 
 ;; core - Basic Structures
-
-
-;; Mat*
    
    #:+8uc1+
    #:+8uc2+
@@ -251,6 +261,10 @@
    #:+64fc2+ 
    #:+64fc3+ 
    #:+64fc4+
+   #:+termcrit-iter+
+   #:+termcrit-number+
+   #:+termcrit-eps+
+   
 
    #:<<
    #:>>
@@ -329,6 +343,10 @@
    #:reshape-rows
    #:roi
    #:rotated-rect
+   #:rotated-rect-bounding-rect
+   #:rotated-rect-center
+   #:rotated-rect-size
+   #:row
    #:row-range
    #:rows
    #:scalar
@@ -346,23 +364,6 @@
    #:rect-tl
    #:total
 
-
-   #:+ipl-depth-1u+
-   #:+ipl-depth-8u+
-   #:+ipl-depth-16u+
-   #:+ipl-depth-32f+
-   #:+ipl-depth-64f+
-   #:+ipl-depth-8s+
-   #:+ipl-depth-16s+
-   #:+ipl-depth-32s+
-   #:+ipl-data-order-pixel+
-   #:+ipl-data-order-plane+
-   #:+ipl-origin-tl+
-   #:+ipl-origin-bl+
-   #:+termcrit-iter+
-   #:+termcrit-number+
-   #:+termcrit-eps+
-   
 ;; core - Dynamic Structures
 
 ;; core - Operations on Arrays
@@ -964,6 +965,7 @@
 
    #:draw-matches
 
+
 ;;; objdetect - Cascade Classification
 
    #:+cascade-do-canny-pruning+
@@ -975,6 +977,28 @@
    #:cascade-classifier
    #:cascade-classifier-load
    #:detect-multi-scale
+
+;;; ml - Normal Bayes Classifier
+
+   #:normal-bayes-classifier
+   #:normal-bayes-classifier-predict
+
+;;; ml - Neural Networks
+
+   #:+ann-mlp-identity+
+   #:+ann-mlp-sigmoid-sym+
+   #:+ann-mlp-gaussian+  
+   #:+ann-mlp-train-params-backprop+ 
+   #:+ann-mlp-train-params-rprop+
+   #:+update-weights+ 
+   #:+no-input-scale+ 
+   #:+no-output-scale+
+
+   #:ann-mlp
+   #:ann-mlp-create
+   #:ann-mlp-predict
+   #:ann-mlp-train
+   #:ann-mlp-train-params
 
 
 ;;; photo - Inpainting

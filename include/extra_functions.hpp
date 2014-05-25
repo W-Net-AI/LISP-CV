@@ -7,6 +7,10 @@ using namespace flann;
 using namespace cvflann;
 
 extern "C" {
+CvANN_MLP_TrainParams* cv_create_CvANN_MLP_TrainParams();
+CvANN_MLP_TrainParams* cv_create_CvANN_MLP_TrainParams4(TermCriteria* term_crit, int train_method, double param1, double param2);
+CvSVMParams* cv_create_CvSVMParams(); 
+//CvSVMParams* cv_create_CvSVMParams10(int svm_type, int kernel_type, double degree, double gamma, double coef0, double Cvalue, double nu, double p, Mat* class_weights, TermCriteria* term_crit);
 void cv_displayOverlay(String* winname, String* text, int delayms);
 MatExpr* cv_abs(Mat* m);
 Rect* cv_RotatedRect_boundingRect(RotatedRect* self);
@@ -37,10 +41,12 @@ float cv_Size2f_area(Size2f* self);
 float cv_Size2f_width(Size2f* self);
 float cv_Size2f_height(Size2f* self);
 void cv_delete_CvANN_MLP(CvANN_MLP* self);
+void cv_delete_CvANN_MLP_TrainParams(CvANN_MLP_TrainParams* self);
 void cv_delete_CascadeClassifier(CascadeClassifier* self);
 void cv_delete_DMatch(DMatch* ptr);
 void cv_delete_Feature2D(Feature2D* self);
 void cv_delete_KeyPoint(KeyPoint* self);
+void cv_delete_CvNormalBayesClassifier(CvNormalBayesClassifier* self);
 void cv_delete_Point(Point* self);
 void cv_delete_Point2d(Point2d* self);
 void cv_delete_Point2f(Point2f* self);

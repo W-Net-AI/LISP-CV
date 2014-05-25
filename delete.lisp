@@ -11,14 +11,21 @@
 ;; void cv_delete(char* ptr)
 (defcfun ("cv_delete" del) :void
   "Calls delete"
-  (ptr :pointer))
+  (self :pointer))
 
 
 ;; void operator delete  ( void* ptr )
 ;; void cv_delete_CvANN_MLP(CvANN_MLP* ptr)
 (defcfun ("cv_delete_CvANN_MLP" del-ann-mlp) :void
   "Calls delete on ANN-MLP"
-  (ptr ann-mlp))
+  (self ann-mlp))
+
+
+;; void operator delete  ( void* ptr )
+;; void cv_delete_CvANN_MLP_TrainParams(CvANN_MLP_TrainParams* self)
+(defcfun ("cv_delete_CvANN_MLP_TrainParams" del-ann-mlp-train-params) :void
+  "Calls delete on ANN-MLP-TRAIN-PARAMS"
+  (self ann-mlp-train-params))
 
 
 ;; void operator delete  ( void* ptr )
@@ -57,10 +64,17 @@
 
 
 ;; void operator delete  ( void* ptr )
-;; void cv_delete_MatExpr(MatExpr* self)
+;; void cv_delete_(MatExpr* self)
 (defcfun ("cv_delete_MatExpr" del-mat-expr) :void
   "Calls delete on MAT-EXPR"
   (self mat-expr))
+
+
+;; void operator delete  ( void* ptr )
+;; void cv_delete_CvNormalBayesClassifier(CvNormalBayesClassifier* self)
+(defcfun ("cv_delete_CvNormalBayesClassifier" del-normal-bayes-classifier) :void
+  "Calls delete on NORMAL-BAYES-CLASSIFIER"
+  (self normal-bayes-classifier))
 
 
 ;; void operator delete  ( void* ptr )

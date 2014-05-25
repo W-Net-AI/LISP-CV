@@ -11,9 +11,13 @@
    #:alloc
 
 
+;; C-Interop
+
+   #:c-string-to-string
+
+
 ;; Vectors
 
-   #:%mean
    #:vec-char
    #:c-arr-to-vec-char
    #:arr-to-vec-char
@@ -101,6 +105,7 @@
    #:reshape-rows
    #:roi
    #:rotated-rect
+   #:row
    #:row-range
    #:scale
    #:scalar
@@ -176,6 +181,16 @@
 
    #:cascade-classifier
    #:cascade-classifier-load
+
+;;; ml - Normal Bayes Classifier
+
+   #:normal-bayes-classifier
+   #:normal-bayes-classifier-predict
+
+;;; ml - Neural Networks
+
+   #:ann-mlp
+   #:ann-mlp-train-params
 
 ;;; nonfree - Feature Detection and Description
 

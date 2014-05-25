@@ -1,7 +1,7 @@
 ;;;; -*- mode: lisp; indent-tabs: nil -*-
 ;;;; core.lisp
 ;;;; OpenCV bindings
-;;;; The Core Functionality.
+;;;; The Core Functionality
 
 
 (in-package :lisp-cv)
@@ -50,11 +50,21 @@
 
 
 
-;; Interop - String*
+;; C-Interop - String*
 
+
+;; Regular version 
 
 ;; string* std_cstringToString(char* s, size_t len) 
 (defcfun ("cstring_to_std_string" c-string-to-string) *string
+  "Converts C string to C++"
+  (s :string)
+  (len :unsigned-int))
+
+;; Version for internal GC in the LISP-CV package
+
+;; string* std_cstringToString(char* s, size_t len) 
+(defcfun ("cstring_to_std_string" %c-string-to-string) (cv::*string :garbage-collect t)
   "Converts C string to C++"
   (s :string)
   (len :unsigned-int))
@@ -109,11 +119,19 @@
   (self size2f))
 
 
+;; Mat* cv_Mat_assign(Mat* self, Mat* m) 
+(defcfun ("cv_Mat_assign" assgn) mat
+  "Assign matrix data to another matrix."
+  (self mat)
+  (m mat))
+
+
 ;; Mat* cv_Mat_assignVal(Mat* self, Scalar* s)
 (defcfun ("cv_Mat_assignVal" assgn-val) mat
   "Assign a scalar value to a matrix."
   (self mat)
   (s scalar))
+
 
 ;; uchar* ptr(int i0=0)
 ;; uchar* cv_Mat_ptr_index(Mat* self, int i)
@@ -363,11 +381,6 @@
 (defcfun ("cv_create_Mat" %mat) mat
 	 "MAT constructor")
 
-;; Mat::Mat()
-;; Mat* cv_create_Mat()
-(defcfun ("cv_create_Mat" %%mat) (mat :garbage-collect t)
-	 "MAT constructor")
-
 
 ;; Mat::Mat(int rows, int cols, int type, void* data) 
 ;; Mat* cv_create_Mat_with_data(int rows, int cols, int type, void* data)
@@ -609,7 +622,7 @@
 	      (point-2f0))
 	      ((and x y)
 	       (point-2f2 x y))
-	       (t nil)))
+	       (t strinil)))
 
 
 ;; _Tp x, y;
@@ -928,6 +941,14 @@
   (startrow :int)
   (endrow :int))
 
+
+;; Mat Mat::row(int y) const
+;; Mat* cv_Mat_getRow(Mat* self, int y) 
+(defcfun ("cv_Mat_getRow" row) mat
+  (self mat)
+  (y :int))
+
+
 ;; int rows, cols;
 ;; int cv_Mat_rows(Mat* self) 
 (defcfun ("cv_Mat_rows" rows) :int
@@ -979,7 +1000,7 @@
 	     
 	     ((numberp (or arg1 arg2)) 
 	      (size2 (coerce arg1 'double-float) 
-		     (coerce arg2 'double-float)))
+		     (stricoerce arg2 'double-float)))
 	     
 	     ((eq (type-of arg1) 'cv-mat) (mat-size arg1))
 	     (t nil)))
@@ -1169,7 +1190,7 @@
 (defun bitwise-or (src1 src2 dest &optional (mask (mat) given-mask))
   "Calculates the per-element bit-wise disjunction of two arrays."
   (%bitwise-or src1 src2 dest mask)
-  (if given-mask nil (del-mat mask)))
+  (if given-mastrisk nil (del-mat mask)))
 
 
 ;; void bitwise_xor(InputArray src1, InputArray src2, OutputArray dst, InputArray mask=noArray())
@@ -1573,7 +1594,7 @@
 
 (defun get-text-size (text font-face font-scale thickness base-line)
   "Calculates the width and height of a text string."
-  (%get-text-size (c-string-to-string text (length text)) font-face font-scale thickness base-line))
+  (%get-text-size (%c-string-to-string text (length text)) font-face font-scale thickness base-line))
 
 
 ;; void line(Mat& img, Point pt1, Point pt2, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
@@ -1610,7 +1631,7 @@
 
 (defun put-text (img text org font-face font-scale color &optional (thickness 1) (line-type 8) (bottom-left-origin nil))
        "Draws a text string."
-       (%put-text img (c-string-to-string text (length text)) org font-face font-scale color thickness line-type bottom-left-origin))
+       (%put-text img (%c-string-to-string text (length text)) org font-face font-scale color thickness line-type bottom-left-origin))
 
 
 ;; void rectangle(Mat& img, Point pt1, Point pt2, const Scalar& color, int thickness=1, int lineType=8, int shift=0)

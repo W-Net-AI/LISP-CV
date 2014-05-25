@@ -5,7 +5,7 @@
 
 (in-package :lisp-cv)
 
-;note
+
 ;;; Feature Detection and Description
 
 
@@ -84,7 +84,7 @@
 
 (defun descrip-matcher-create (self descriptor-matcher-type)
   "Creates a descriptor matcher of a given type with the default parameters (using default constructor)."
-   (%descrip-matcher-create self (c-string-to-string descriptor-matcher-type (length descriptor-matcher-type))))
+   (%descrip-matcher-create self (%c-string-to-string descriptor-matcher-type (length descriptor-matcher-type))))
 
 
 ;; void DescriptorMatcher::match(const Mat& queryDescriptors, const Mat& trainDescriptors, 

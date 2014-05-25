@@ -29,9 +29,9 @@ function addLoadEvent(func){var oldonload=window.onload;if(typeof window.onload!
 <meta property="og:type" content="article" />
 <meta property="og:title" content="ASSGN-VAL" />
 <meta property="og:url" content="http://wnetai.wordpress.com/assgn-val/" />
-<meta property="og:description" content="======================================================================= Assign a scalar value to a matrix. C++: MatExpr &quot;=&quot; operator LISP-CV: (ASSGN-VAL (SELF (:POINTER MAT)) (S (:POINTER SCALAR)))..." />
+<meta property="og:description" content="======================================================================= Assign a scalar value to a matrix. C++: MatExpr &quot;=&quot; operator LISP-CV: (ASSGN-VAL (SELF MAT) (S SCALAR)) =&gt; MAT Parameters:..." />
 <meta property="article:published_time" content="2014-04-05T07:53:22+00:00" />
-<meta property="article:modified_time" content="2014-05-22T20:01:39+00:00" />
+<meta property="article:modified_time" content="2014-05-25T00:36:23+00:00" />
 <meta property="article:author" content="http://wnetai.wordpress.com/author/joeish80829-2/" />
 <meta property="og:site_name" content="WNET A.I." />
 <meta property="og:image" content="http://1.gravatar.com/blavatar/dcebe59d8afca988dd05c567ee79faf5?s=200" />
@@ -98,7 +98,7 @@ function addLoadEvent(func){var oldonload=window.onload;if(typeof window.onload!
 	}
 </style>
 <meta name="application-name" content="WNET A.I." /><meta name="msapplication-window" content="width=device-width;height=device-height" /><meta name="msapplication-tooltip" content="Bringing the World Into the Future" /><meta name="msapplication-task" content="name=Edit page;action-uri=http://wnetai.wordpress.com/wp-admin/post.php?post=3766&amp;action=edit;icon-uri=http://s0.wp.com/i/icons/page.ico" /><meta name="msapplication-task" content="name=Write a post;action-uri=http://wnetai.wordpress.com/wp-admin/post-new.php;icon-uri=http://s2.wp.com/i/icons/post.ico" /><meta name="msapplication-task" content="name=Moderate comments;action-uri=http://wnetai.wordpress.com/wp-admin/edit-comments.php?comment_status=moderated;icon-uri=http://s0.wp.com/i/icons/comment.ico" /><meta name="msapplication-task" content="name=Upload new media;action-uri=http://wnetai.wordpress.com/wp-admin/media-new.php;icon-uri=http://s2.wp.com/i/icons/media.ico" /><meta name="msapplication-task" content="name=Blog stats;action-uri=http://wnetai.wordpress.com/wp-admin/index.php?page=stats;icon-uri=http://s1.wp.com/i/icons/stats.ico" /><meta name="title" content="ASSGN-VAL | WNET A.I. on WordPress.com" />
-<meta name="description" content="======================================================================= Assign a scalar value to a matrix. C++: MatExpr &quot;=&quot; operator LISP-CV: (ASSGN-VAL (SELF (:POINTER MAT)) (S (:POINTER SCALAR))) =&gt; (:POINTER MAT) Parameters: SELF - A matrix. S - A scalar. Use the function SCALAR-ALL, as the S parameter value, to set each matrix element to the same value for example: (SCALAR-ALL -1) will&hellip;" />
+<meta name="description" content="======================================================================= Assign a scalar value to a matrix. C++: MatExpr &quot;=&quot; operator LISP-CV: (ASSGN-VAL (SELF MAT) (S SCALAR)) =&gt; MAT Parameters: SELF - A matrix. S - A scalar. Use the function SCALAR-ALL, as the S parameter value, to set each matrix element to the same value for example: (SCALAR-ALL -1) will assign -1 to&hellip;" />
 	<style type="text/css">
 				#header h1 {
 			color: #6895ff;
@@ -122,7 +122,7 @@ function addLoadEvent(func){var oldonload=window.onload;if(typeof window.onload!
 		<p><span style="color:#999999;"><strong>=======================================================================</strong></span></p>
 <p><strong>Assign a scalar value to a matrix.</strong></p>
 <p><strong><span style="color:#3366ff;">C++: MatExpr &#8220;=&#8221; operator</span></strong></p>
-<p><strong><span style="color:#3366ff;">LISP-CV: (ASSGN-VAL (SELF (:POINTER MAT)) (S (:POINTER SCALAR))) =&gt; (:POINTER MAT)</span></strong></p>
+<p><strong><span style="color:#3366ff;">LISP-CV: (ASSGN-VAL (SELF  MAT) (S SCALAR)) =&gt; MAT</span></strong></p>
 <p><strong>Parameters:</strong></p>
 <p><strong><span style="color:#ff0000;"><span style="font-size:13px;">SELF</span></span> &#8211; A matrix.</strong></p>
 <p><strong><span style="color:#ff0000;"><span style="font-size:13px;">S</span></span> &#8211; A scalar.</strong></p>
@@ -180,7 +180,7 @@ need to access the return value of ASSGN-VAL to complete the operation.</strong>
 
 </span></strong></pre>
 <p><span style="color:#999999;"><strong><span style="color:#999999;"><strong>=======================================================================</strong></span></strong></span></p>
-			</div>
+<div id="jp-post-flair" class="sharedaddy sd-like-enabled sd-sharing-enabled"><div class="sharedaddy sd-sharing-enabled"><div class="robots-nocontent sd-block sd-social sd-social-icon-text sd-sharing"><h3 class="sd-title">Share this:</h3><div class="sd-content"><ul><li class="share-press-this"><a rel="nofollow" class="share-press-this sd-button share-icon" href="http://wnetai.wordpress.com/assgn-val/?share=press-this" title="Click to Press This!"><span>Press This</span></a></li><li class="share-twitter"><a rel="nofollow" class="share-twitter sd-button share-icon" href="http://wnetai.wordpress.com/assgn-val/?share=twitter" title="Click to share on Twitter" id="sharing-twitter-3766"><span>Twitter</span></a></li><li class="share-facebook"><a rel="nofollow" class="share-facebook sd-button share-icon" href="http://wnetai.wordpress.com/assgn-val/?share=facebook" title="Share on Facebook" id="sharing-facebook-3766"><span>Facebook</span></a></li><li class="share-end"></li></ul></div></div></div><div class='sharedaddy sd-block sd-like jetpack-likes-widget-wrapper jetpack-likes-widget-unloaded' id='like-post-wrapper-53900451-3766-53813b0d5ee02' data-src='//widgets.wp.com/likes/#blog_id=53900451&amp;post_id=3766&amp;origin=wnetai.wordpress.com&amp;obj_id=53900451-3766-53813b0d5ee02' data-name='like-post-frame-53900451-3766-53813b0d5ee02'><h3 class='sd-title'>Like this:</h3><div class='likes-widget-placeholder post-likes-widget-placeholder' style='height:55px'><span class='button'><span>Like</span></span> <span class="loading">Loading...</span></div><span class='sd-text-color'></span><a class='sd-link-color'></a></div></div>			</div>
 
 	<div class="meta">
 		<p>Posted April 5, 2014 by <span class="author vcard"><a class="url fn n" href="http://wnetai.wordpress.com/author/joeish80829-2/" title="View all posts by Joe W. BiMedina">Joe W. BiMedina</a></span><span class="edit"> &mdash; <a class="post-edit-link" href="http://wnetai.wordpress.com/wp-admin/post.php?post=3766&amp;action=edit">Edit</a></span></p>
@@ -204,7 +204,7 @@ need to access the return value of ASSGN-VAL to complete the operation.</strong>
 
 <div id="footer" class="group">
 	<div id="top"><a href="#content">Back to top</a></div>
-	<p><a href="http://wordpress.com/?ref=footer_website">Create a free website or blog at WordPress.com</a>. <a href="http://theme.wordpress.com/themes/andrea/" title="Learn more about this theme">The Andrea Theme</a>.</p>
+	<p><a href="http://wordpress.com/?ref=footer_blog">Blog at WordPress.com</a>. <a href="http://theme.wordpress.com/themes/andrea/" title="Learn more about this theme">The Andrea Theme</a>.</p>
 </div>
 
 	<script type="text/javascript">
@@ -299,7 +299,264 @@ var WPGroHo = {"my_hash":"66420f145f6404d2e6c7ea034449b17f"};
 
 		<div style="display:none">
 	</div>
-<div id="report-form-window" style="display:none;"></div><script type='text/javascript'>
+<div id="report-form-window" style="display:none;"></div>
+	<script type="text/javascript">
+		WPCOM_sharing_counts = {"http:\/\/wnetai.wordpress.com\/assgn-val\/":3766}	</script>
+		<script type="text/javascript">
+		jQuery(document).on( 'ready post-load', function(){
+			jQuery( 'a.share-twitter' ).on( 'click', function() {
+				window.open( jQuery(this).attr( 'href' ), 'wpcomtwitter', 'menubar=1,resizable=1,width=600,height=350' );
+				return false;
+			});
+		});
+		</script>
+				<script type="text/javascript">
+		jQuery(document).on( 'ready post-load', function(){
+			jQuery( 'a.share-facebook' ).on( 'click', function() {
+				window.open( jQuery(this).attr( 'href' ), 'wpcomfacebook', 'menubar=1,resizable=1,width=600,height=400' );
+				return false;
+			});
+		});
+		</script>
+				<iframe src='http://widgets.wp.com/likes/master.html?ver=20140227#ver=20140227&amp;mp6=1' scrolling='no' id='likes-master' name='likes-master' style='display:none;'></iframe>
+		<div id='likes-other-gravatars'><div class="likes-text"><span>%d</span> bloggers like this:</div><ul class="wpl-avatars sd-like-gravatars"></ul></div>
+		<script type="text/javascript">
+		//<![CDATA[
+			var jetpackLikesWidgetQueue = [];
+			var jetpackLikesWidgetBatch = [];
+			var jetpackLikesMasterReady = false;
+
+			function JetpackLikespostMessage( message, target ) {
+				if ( "string" === typeof message ){
+					try{
+						message = JSON.parse( message );
+					}
+					catch(e) {
+						return;
+					}
+				}
+
+				pm( {
+					target: target,
+					type: 'likesMessage',
+					data: message,
+					origin: '*'
+				} );
+			}
+
+			function JetpackLikesBatchHandler() {
+				var requests = [];
+				jQuery( 'div.jetpack-likes-widget-unloaded' ).each( function( i ) {
+					if ( jetpackLikesWidgetBatch.indexOf( this.id ) > -1 )
+						return;
+					jetpackLikesWidgetBatch.push( this.id );
+					var regex = /like-(post|comment)-wrapper-(\d+)-(\d+)-(\w+)/;
+					var match = regex.exec( this.id );
+					if ( ! match || match.length != 5 )
+						return;
+
+					var info = {
+						blog_id: match[2],
+						width:   this.width
+					};
+
+					if ( 'post' == match[1] ) {
+						info.post_id = match[3];
+					} else if ( 'comment' == match[1] ) {
+						info.comment_id = match[3];
+					}
+
+					info.obj_id = match[4];
+
+					requests.push( info );
+				});
+
+				if ( requests.length > 0 ) {
+					JetpackLikespostMessage( { event: 'initialBatch', requests: requests }, window.frames['likes-master'] );
+				}
+			}
+
+			function JetpackLikesMessageListener( event ) {
+				if ( "undefined" == typeof event.event )
+					return;
+
+				if ( 'masterReady' == event.event ) {
+					jQuery( document ).ready( function() {
+						jetpackLikesMasterReady = true;
+
+						var stylesData = {
+								event: 'injectStyles'
+						};
+
+						if ( jQuery( 'iframe.admin-bar-likes-widget' ).length > 0 ) {
+							JetpackLikespostMessage( { event: 'adminBarEnabled' }, window.frames[ 'likes-master' ] );
+
+							stylesData.adminBarStyles = {
+								background: jQuery( '#wpadminbar .quicklinks li#wp-admin-bar-wpl-like > a' ).css( 'background' ),
+								isRtl: ( 'rtl' == jQuery( '#wpadminbar' ).css( 'direction' ) )
+							};
+						}
+
+						if ( !window.addEventListener )
+							jQuery( '#wp-admin-bar-admin-bar-likes-widget' ).hide();
+
+						stylesData.textStyles = {
+							color: jQuery( '.sd-text-color').css( 'color' ),
+							fontFamily: jQuery( '.sd-text-color' ).css( 'font-family' ),
+							fontSize: jQuery( '.sd-text-color' ).css( 'font-size' ),
+							direction: jQuery( '.sd-text-color' ).css( 'direction' ),
+							fontWeight: jQuery( '.sd-text-color' ).css( 'font-weight' ),
+							fontStyle: jQuery( '.sd-text-color' ).css( 'font-style' ),
+							textDecoration: jQuery( '.sd-text-color' ).css('text-decoration')
+						};
+
+						stylesData.linkStyles = {
+							color: jQuery( '.sd-link-color' ).css('color'),
+							fontFamily: jQuery( '.sd-link-color' ).css('font-family'),
+							fontSize: jQuery( '.sd-link-color' ).css('font-size'),
+							textDecoration: jQuery( '.sd-link-color' ).css('text-decoration'),
+							fontWeight: jQuery( '.sd-link-color' ).css( 'font-weight' ),
+							fontStyle: jQuery( '.sd-link-color' ).css( 'font-style' )
+						};
+
+						JetpackLikespostMessage( stylesData, window.frames[ 'likes-master' ] );
+
+						JetpackLikesBatchHandler();
+
+						jQuery( document ).on( 'inview', 'div.jetpack-likes-widget-unloaded', function() {
+							jetpackLikesWidgetQueue.push( this.id );
+						});
+					});
+				}
+
+				if ( 'showLikeWidget' == event.event ) {
+					jQuery( '#' + event.id + ' .post-likes-widget-placeholder'  ).fadeOut( 'fast', function() {
+						jQuery( '#' + event.id + ' .post-likes-widget' ).fadeIn( 'fast', function() {
+							JetpackLikespostMessage( { event: 'likeWidgetDisplayed', blog_id: event.blog_id, post_id: event.post_id, obj_id: event.obj_id }, window.frames['likes-master'] );
+						});
+					});
+				}
+
+				if ( 'clickReblogFlair' == event.event ) {
+					wpcom_reblog.toggle_reblog_box_flair( event.obj_id );
+				}
+
+				if ( 'showOtherGravatars' == event.event ) {
+					var $container = jQuery( '#likes-other-gravatars' );
+					var $list = $container.find( 'ul' );
+
+					$container.hide();
+					$list.html( '' );
+
+					$container.find( '.likes-text span' ).text( event.total );
+
+					jQuery.each( event.likers, function( i, liker ) {
+						$list.append( '<li class="' + liker.css_class + '"><a href="' + liker.profile_URL + '" class="wpl-liker" rel="nofollow" target="_parent"><img src="' + liker.avatar_URL + '" alt="' + liker.name + '" width="30" height="30" style="padding-right: 3px;" /></a></li>');
+					} );
+
+					var offset = jQuery( "[name='" + event.parent + "']" ).offset();
+
+					$container.css( 'left', offset.left + event.position.left - 10 + 'px' );
+					$container.css( 'top', offset.top + event.position.top - 33 + 'px' );
+
+					var rowLength = Math.floor( event.width / 37 );
+					var height = ( Math.ceil( event.likers.length / rowLength ) * 37 ) + 13;
+					if ( height > 204 ) {
+						height = 204;
+					}
+
+					$container.css( 'height', height + 'px' );
+					$container.css( 'width', rowLength * 37 - 7 + 'px' );
+
+					$list.css( 'width', rowLength * 37 + 'px' );
+
+					$container.fadeIn( 'slow' );
+
+					var scrollbarWidth = $list[0].offsetWidth - $list[0].clientWidth;
+					if ( scrollbarWidth > 0 ) {
+						$container.width( $container.width() + scrollbarWidth );
+						$list.width( $list.width() + scrollbarWidth );
+					}
+				}
+			}
+
+			pm.bind( 'likesMessage', function(e) { JetpackLikesMessageListener(e); } );
+
+			jQuery( document ).click( function( e ) {
+				var $container = jQuery( '#likes-other-gravatars' );
+
+				if ( $container.has( e.target ).length === 0 ) {
+					$container.fadeOut( 'slow' );
+				}
+			});
+
+			function JetpackLikesWidgetQueueHandler() {
+				var wrapperID;
+				if ( ! jetpackLikesMasterReady ) {
+					setTimeout( JetpackLikesWidgetQueueHandler, 500 );
+					return;
+				}
+
+				if ( jetpackLikesWidgetQueue.length > 0 ) {
+					// We may have a widget that needs creating now
+					var found = false;
+					while( jetpackLikesWidgetQueue.length > 0 ) {
+						// Grab the first member of the queue that isn't already loading.
+						wrapperID = jetpackLikesWidgetQueue.splice( 0, 1 )[0];
+						if ( jQuery( '#' + wrapperID ).hasClass( 'jetpack-likes-widget-unloaded' ) ) {
+							found = true;
+							break;
+						}
+					}
+					if ( ! found ) {
+						setTimeout( JetpackLikesWidgetQueueHandler, 500 );
+						return;
+					}
+				} else if ( jQuery( 'div.jetpack-likes-widget-unloaded' ).length > 0 ) {
+					// Grab any unloaded widgets for a batch request
+					JetpackLikesBatchHandler();
+
+					// Get the next unloaded widget
+					wrapperID = jQuery( 'div.jetpack-likes-widget-unloaded' ).first()[0].id;
+					if ( ! wrapperID ) {
+						// Everything is currently loaded
+						setTimeout( JetpackLikesWidgetQueueHandler, 500 );
+						return;
+					}
+				}
+
+				if ( 'undefined' === typeof wrapperID ) {
+					setTimeout( JetpackLikesWidgetQueueHandler, 500 );
+					return;
+				}
+
+				var $wrapper = jQuery( '#' + wrapperID );
+				$wrapper.find( 'iframe' ).remove();
+
+				if ( $wrapper.hasClass( 'slim-likes-widget' ) ) {
+					$wrapper.find( '.post-likes-widget-placeholder' ).after( "<iframe class='post-likes-widget jetpack-likes-widget' name='" + $wrapper.data( 'name' ) + "' height='22px' width='68px' frameBorder='0' scrolling='no' src='" + $wrapper.data( 'src' ) + "'></iframe>" );
+				} else {
+					$wrapper.find( '.post-likes-widget-placeholder' ).after( "<iframe class='post-likes-widget jetpack-likes-widget' name='" + $wrapper.data( 'name' ) + "' height='55px' width='100%' frameBorder='0' src='" + $wrapper.data( 'src' ) + "'></iframe>" );
+				}
+
+				$wrapper.removeClass( 'jetpack-likes-widget-unloaded' ).addClass( 'jetpack-likes-widget-loading' );
+
+				$wrapper.find( 'iframe' ).load( function( e ) {
+					var $iframe = jQuery( e.target );
+					$wrapper.removeClass( 'jetpack-likes-widget-loading' ).addClass( 'jetpack-likes-widget-loaded' );
+
+					JetpackLikespostMessage( { event: 'loadLikeWidget', name: $iframe.attr( 'name' ), width: $iframe.width() }, window.frames[ 'likes-master' ] );
+
+					if ( $wrapper.hasClass( 'slim-likes-widget' ) ) {
+						$wrapper.find( 'iframe' ).Jetpack( 'resizeable' );
+					}
+				});
+				setTimeout( JetpackLikesWidgetQueueHandler, 250 );
+			}
+			JetpackLikesWidgetQueueHandler();
+		//]]>
+		</script>
+<script type='text/javascript'>
 /* <![CDATA[ */
 var thickboxL10n = {"next":"Next >","prev":"< Prev","image":"Image","of":"of","close":"Close","noiframes":"This feature requires inline frames. You have iframes disabled or your browser does not support them.","loadingAnimation":"http:\/\/wnetai.wordpress.com\/wp-includes\/js\/thickbox\/loadingAnimation.gif"};
 var thickboxL10n = {"next":"Next >","prev":"< Prev","image":"Image","of":"of","close":"Close","noiframes":"This feature requires inline frames. You have iframes disabled or your browser does not support them.","loadingAnimation":"http:\/\/wnetai.wordpress.com\/wp-includes\/js\/thickbox\/loadingAnimation.gif"};
@@ -312,7 +569,7 @@ var kissmetrics_api = {"api_key":"39e3e583aca28fab00c85ad9019b51d9f073fc6d","use
 var kissmetrics_queries = {"events":[],"properties":[{"Browser_Type":"desktop"}]};
 /* ]]> */
 </script>
-<script type='text/javascript' src='http://s0.wp.com/wp-content/mu-plugins/kissmetrics/kissmetrics.js?m=1391946165g&#038;ver=20130513'></script>
+<script type='text/javascript' src='http://s0.wp.com/wp-content/mu-plugins/kissmetrics/kissmetrics.js?m=1384543266g&#038;ver=20130513'></script>
 <script type='text/javascript'>
 /* <![CDATA[ */
 var wpNotesArgs = {"cacheBuster":"20140321","iframeUrl":"https:\/\/widgets.wp.com\/notes\/"};
@@ -323,7 +580,12 @@ var wpNotesArgs = {"cacheBuster":"20140321","iframeUrl":"https:\/\/widgets.wp.co
 var wpcom_tos_report_form = {"ajaxurl":"\/wp-admin\/admin-ajax.php","isLoggedoutUser":"","post_ID":"3766","current_url":"http:\/\/wnetai.wordpress.com\/assgn-val","report_this_content":"Report this content"};
 /* ]]> */
 </script>
-<script type='text/javascript' src='http://s2.wp.com/_static/??-eJyFjUsOAiEQRC8kQ8ToZBbGs/BpFZzuJjSM1xcTN7LQTSWV9yqln1lF8msLIDqJbhSgiOcCE0aakuz0YDjrH47pi3umClTfGJtU6+8wImwqr+0WSTRxhU92jMikNvPXt6EfKmfLb7myqAKZS1VXLjj2vrzgeX9Yjqd5XoxJLywaXi8='></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var recaptcha_options = {"lang":"en"};
+/* ]]> */
+</script>
+<script type='text/javascript' src='http://s0.wp.com/_static/??-eJyFjUEOwjAMBD9EGlEEVQ+It6SJaVNqO7KT8n2CBAd6KJe1rJnV2mcykfxSAqid1RYKIOpZoMFIzawHuzEG5x8D0w/3TBkovzEWzc5PsEVYTFrKGEktcYZPVozIZNb2r+9CHTSDk305sxqBxJLNnQW3/04zsVZncVGsTk4ijd9bSze8Hk/9+dJ1fdvOLygdcko='></script>
 <script type="text/javascript">
 // <![CDATA[
 (function() {
@@ -341,7 +603,13 @@ try{
 }catch(e){}
 })();
 // ]]>
-</script>	<script type="text/javascript">
+</script><script src="http://s.stats.wordpress.com/w.js?21" type="text/javascript"></script>
+<script type="text/javascript">
+st_go({'blog':'53900451','v':'wpcom','tz':'-7','user':'1','user_id':'51554914','post':'3766','subd':'wnetai'});
+ex_go({'crypt':'UE40eW5QN0p8M2Y/RE1zNDZ8S252Wis9XUQyb3YrcUVIU2R0VH5TdXIyfFgyfjVBN0lIeEpROGxdTnl0NVVYdjNTZURNdE02OUdKNkUyY0E5bXUzSWdEL3dpVEk0P09LYVRHX2NRcEFWcTJdYmxCQ184N0RwOVRSbUhWXXErQTYrOElmTVdTdHdsZzJxM1FieGZbc1pIQUNEMGlfR2dOU3ppcEQsWnNlWTgxP0FRLyY1MzA3Q2dmRDA9Yl1bTmZvLXhoS25OOGJsUzM5W0YyX2g0eGtsb1ZNcEcrcjJ2WiVPLTR5LCZ3JV8rQ0U3bUlHeHJJPWV2SzddZTRdQ044aUs3ZjV3TF9CVHAzbXx4SExsZyZRMGlfdVJJeCU2NzN+R2RnQjdQP0xRUWdlZjY9US5r'});
+	</script>
+<noscript><img src="http://stats.wordpress.com/b.gif?v=noscript" style="height:0px;width:0px;overflow:hidden" alt="" /></noscript>
+	<script type="text/javascript">
 		(function() {
 			var request, b = document.body, c = 'className', cs = 'customize-support', rcs = new RegExp('(^|\\s+)(no-)?'+cs+'(\\s+|$)');
 
@@ -373,13 +641,14 @@ try{
 		<li id="wp-admin-bar-new-attachment"><a class="ab-item"  href="http://wnetai.wordpress.com/wp-admin/post-new.php?post_type=attachment">Media</a>		</li>
 		<li id="wp-admin-bar-new-link"><a class="ab-item"  href="http://wnetai.wordpress.com/wp-admin/link-add.php">Link</a>		</li></ul></div>		</li>
 		<li id="wp-admin-bar-comments"><a class="ab-item"  href="http://wnetai.wordpress.com/wp-admin/edit-comments.php">Comments <span class="comment-moderation-count">1</span></a>		</li>
-		<li id="wp-admin-bar-customize" class="hide-if-no-customize"><a class="ab-item"  href="http://wnetai.wordpress.com/wp-admin/customize.php?url=http%3A%2F%2Fwnetai.wordpress.com%2Fassgn-val%2F%3Fpreview%3Dtrue%26preview_id%3D3766%26preview_nonce%3D240a2d702e">Customize</a>		</li>
+		<li id="wp-admin-bar-customize" class="hide-if-no-customize"><a class="ab-item"  href="http://wnetai.wordpress.com/wp-admin/customize.php?url=http%3A%2F%2Fwnetai.wordpress.com%2Fassgn-val%2F">Customize</a>		</li>
 		<li id="wp-admin-bar-widgets"><a class="ab-item"  href="http://wnetai.wordpress.com/wp-admin/widgets.php">Widgets</a>		</li></ul><ul id="wp-admin-bar-blog-secondary" class="ab-sub-secondary ab-submenu">
 		<li id="wp-admin-bar-shortlink"><a class="ab-item"  href="http://wp.me/P3E9Y7-YK">Shortlink http://wp.me/P3E9Y7-YK</a>Shortlink: <input id="adminbar-shortlink-input" value="http://wp.me/P3E9Y7-YK" readonly="readonly" />		</li>
 		<li id="wp-admin-bar-random-post" class="menu-item-random-post"><a class="ab-item"  href="http://wnetai.wordpress.com/?random">Random Post</a>		</li>
 		<li id="wp-admin-bar-theme-andrea"><a class="ab-item"  href="http://theme.wordpress.com/themes/andrea/">Theme: Andrea</a>		</li>
 		<li id="wp-admin-bar-wpcom_report_url"><a class="ab-item"  href="http://en.wordpress.com/complaints/">Report this content</a>		</li></ul></div>		</li>
-		<li id="wp-admin-bar-follow" class="subscribed"><a class="ab-item"  href="http://wordpress.com/read?b=53900451&#038;unsub=1&#038;_wpnonce=9220b375cb"><span id="admin-bar-unfollow-link">Following</span></a>		</li>
+		<li id="wp-admin-bar-follow" class="subscribed"><a class="ab-item"  href="http://wordpress.com/read?b=53900451&#038;unsub=1&#038;_wpnonce=e91666cd53"><span id="admin-bar-unfollow-link">Following</span></a>		</li>
+		<li id="wp-admin-bar-admin-bar-likes-widget"><div class="ab-item ab-empty-item" ></div><iframe class='admin-bar-likes-widget jetpack-likes-widget' scrolling='no' frameBorder='0' name='admin-bar-likes-widget' src='http://widgets.wp.com/likes/#blog_id=53900451&amp;post_id=3766&amp;origin=http://wnetai.wordpress.com'></iframe>		</li>
 		<li id="wp-admin-bar-stats"><a class="ab-item"  href="http://wordpress.com/my-stats/"><div><script type='text/javascript'>var src;if(typeof(window.devicePixelRatio)=='undefined'||window.devicePixelRatio<2){src='/wp-includes/charts/admin-bar-hours-scale.php';}else{src='/wp-includes/charts/admin-bar-hours-scale-2x.php';}document.write('<img style=\'vertical-align: baseline\' src=\''+src+'\' alt=\'Stats\' title=\'Showing site views per hour for the last 48 hours. Click for full Site Stats.\' />');</script></div></a>		</li></ul><ul id="wp-admin-bar-top-secondary" class="ab-top-secondary ab-top-menu">
 		<li id="wp-admin-bar-search" class="admin-bar-search"><div class="ab-item ab-empty-item" tabindex="-1"><form id='adminbarsearch' name='adminbarsearch' action='http://en.search.wordpress.com' method='get'>
 				<input class='adminbar-search-input' name='q' id='q' type='text' value='' maxlength='150' tabindex='10' />
@@ -401,7 +670,7 @@ try{
 						<span class="noticon noticon-notification"></span>
 						</span></div><div id="wpnt-notes-panel" style="display:none" lang="en" dir="ltr"><div class="wpnt-notes-panel-header"><span class="wpnt-notes-header"></span><span class="wpnt-notes-panel-link"></span></div></div>		</li>
 		<li id="wp-admin-bar-ab-new-post"><a class="ab-item"  href="http://wordpress.com/post/53900451/new/">New Post</a>		</li></ul>			</div>
-						<a class="screen-reader-shortcut" href="http://wnetai.wordpress.com/wp-login.php?action=logout&#038;_wpnonce=70f4ad2dbf">Log Out</a>
+						<a class="screen-reader-shortcut" href="http://wnetai.wordpress.com/wp-login.php?action=logout&#038;_wpnonce=4e6f155deb">Log Out</a>
 					</div>
 
 		

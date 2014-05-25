@@ -25,7 +25,7 @@
   (cond ((eq filename nil)
 	 (cascade-classifier0))
 	(filename
-	 (cascade-classifier1 (c-string-to-string filename (length filename))))
+	 (cascade-classifier1 (%c-string-to-string filename (length filename))))
 	(t nil)))
 
 
@@ -38,7 +38,7 @@
 
 (defun cascade-classifier-load (self filename)
   "Loads a classifier from a file."
-  (%cascade-classifier-load self (c-string-to-string filename (length filename))))
+  (%cascade-classifier-load self (%c-string-to-string filename (length filename))))
 
 
 ;; void CascadeClassifier::detectMultiScale(const Mat& image, vector<Rect>& objects, double scaleFactor=1.1, int minNeighbors=3, 

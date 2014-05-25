@@ -16,17 +16,15 @@ an example that uses TG finalizers):
 
 
 (defun with-macro-example (&optional 
-			     (camera-index *camera-index*) 
+			     (cam *camera-index*) 
 			     (width *default-width*)
 			     (height *default-height*))
 
-  (with-capture (cap (video-capture camera-index))
+  (with-captured-camera (cap cam :width width :height height)
+    (if (not (cap-is-open cap)) 
+	(return-from with-macro-example 
+	  (format t "Cannot open the video camera")))      
     (let ((window-name "WITH-MACRO Example"))
-      (if (not (cap-is-open cap)) 
-	  (return-from with-macro-example 
-	    (format t "Cannot open the video camera")))
-      (cap-set cap +cap-prop-frame-width+ width)
-      (cap-set cap +cap-prop-frame-height+ height)
       (format t "~%Frame Size : ~ax~a~%~%" 
 	      (cap-get cap +cap-prop-frame-width+)
 	      (cap-get cap +cap-prop-frame-height+))
@@ -330,30 +328,30 @@ The method returns the number of matrix channels.
    e function CVT-COLOR and the function CHANNELS."
 
   ;; Read image
-  (let* ((img (imread filename 1))
-	 (window-name-1 "Original image - CHANNELS Example")
-         (window-name-2 "Grayscale image - CHANNELS Example"))
+  (with-mat ((img (imread filename 1)))
     (if (eq 1 (channels img)) 
 	(return-from channels-example 
 	  (format t "Must load full color image")))
-    (named-window window-name-1 +window-normal+)
-    (named-window window-name-2 +window-normal+)	
-    (move-window window-name-1 514 175)
-    (move-window window-name-2 966 175)
-    ;;Print the original number of channels of IMG
-    (format t "The number of channels of IMG as is = ~a~%~%" 
-	    (channels img))
-    (imshow window-name-1 img)
-    ;;Convert IMG to a grayscale image
-    (cvt-color img img +bgr2gray+)
-    ;;Print the number of channels of a grayscale IMG
-    (format t "After converting to grayscale the number of channels = ~a~%~%" 
-	    (channels img)) 
-    (imshow window-name-2 img)
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-all-windows)))
-
-
+    (let ((window-name-1 "Original image - CHANNELS Example")
+	  (window-name-2 "Grayscale image - CHANNELS Example"))
+      (with-named-window (window-name-1 +window-normal+)
+	(with-named-window (window-name-2 +window-normal+)	
+	  (move-window window-name-1 514 175)
+	  (move-window window-name-2 966 175)
+	  ;;Print the original number of channels of IMG
+	  (format t "~%The original number of channels of IMG = ~a~%~%" 
+		  (channels img))
+	  (imshow window-name-1 img)
+	  ;;Convert IMG to a grayscale image
+	  (cvt-color img img +bgr2gray+)
+	  ;;Print the number of channels of a grayscale IMG
+	  (format t "Grayscale IMG number of channels = ~a~%~%" 
+		  (channels img)) 
+	  (imshow window-name-2 img)
+	  (loop
+	     (let ((c (wait-key 33)))
+	       (when (= c 27)
+		 (return)))))))))
 
 
 COL-RANGE
@@ -438,7 +436,6 @@ COPY-TO
 
 Copies the matrix to another one.
 
-
 C++: void Mat::copyTo(OutputArray m) const
 
 LISP-CV: (COPY-TO (SELF MAT) (M MAT)) => :VOID
@@ -511,7 +508,6 @@ newly allocated matrix is initialized with all zeros before copying the data.
       (format t "~%"))))
 
 
-
 CROSS
 
 Computes a cross-product of two 3-element vectors.
@@ -557,6 +553,78 @@ shape and type as operands.
 	  (format t "~a" (at cp 0 j :double))
 	  (princ #\Space))
 	(format t "~%~%")))))
+
+
+
+DATA
+
+Pointer to MAT data.
+
+C++: uchar* data
+
+LISP-CV: (DATA (SELF MAT) ) => :POINTER
+
+    Parameters:	
+
+        SELF  a pointer to matrix(MAT construct)
+
+
+Once a matrix is created, it will be automatically managed by using a reference-counting mechanism
+(unless the matrix header is built on top of user-allocated data, in which case you should handle t-
+he data by yourself). The matrix data will be deallocated when no one points to it; if you want to 
+release the data pointed by a matrix header before the matrix destructor is called, use the functio-
+n (RELEASE).
+
+The next important thing to learn about the matrix class is element access. Here is how the matrix 
+is stored. The elements are stored in row-major order (row by row). The (DATA) function points to 
+the first element of the first row, the (ROWS) function contains the number of matrix rows, (COLS) - 
+the number of matrix columns. There is yet another function, (STEP), that is used to actually compu-
+te the address of a matrix element. (COLS) is needed because the matrix can be part of another matr-
+ix or because there can be some padding space in the end of each row for a proper alignment.
+
+
+
+;;Must supply a filename parameter for the image you 
+;;will be using in this example and one for the file 
+;;the image's pixel value will be written it.
+(defun data-example (filename)
+  ;;read image
+  (with-mat ((img (imread filename 1))) 
+    ;;INPUT is a pointer to IMG data
+    (let ((window-name "DATA Example")
+	  ;;variables used to hold the BGR image pixel values
+	  (b 0)
+	  (g 0)
+	  (r 0)
+	  (input (data img)))
+      (if (empty img) 
+	  (return-from data-example 
+	    (format t "Image not loaded")))
+      (with-named-window (window-name +window-normal+)
+	(move-window window-name 759 175)
+	;;In a loop access IMG pixel data using the STEP* 
+	;;function and print to a file instead of the co-
+	;;nsole so your implimentation doesn't freeze.
+	(with-open-file (str (cat *lisp-cv-src-dir* 
+				  "/data/pixel-values.txt")
+			     :direction :output
+			     :if-exists :supersede
+			     :if-does-not-exist :create)
+	  (dotimes (i (rows img))
+	    (dotimes (j (cols img))
+	      (setf b (mem-aref input :uchar 
+				(+  (* (*step img) i) (* 3 j) )))
+	      (setf g (mem-aref input :uchar 
+				(+ (+  (* (*step img) i) (* 3 j) ) 1)))
+	      (setf r (mem-aref input :uchar 
+				(+ (+  (* (*step img) i) (* 3 j) ) 2)))
+	      (format str "(~a,~a,~a)~%" b g r))))
+	(imshow window-name img)
+	(loop
+	   (let ((c (wait-key 33)))
+	     (when (= c 27)
+	       (return))))))))
+
 
 
 DEPTH
@@ -1729,48 +1797,45 @@ and/or different number of channels. Any combination is possible if:
 
 
 
-RotatedRect
+ROW
+
+Creates a matrix header for the specified matrix row.
+
+C++: Mat Mat::row(int y) const
+
+LISP-CV: (ROW (Y :INT)) => MAT
+
+    Parameters:	
+
+        Y - A 0-based row index.
+
+The method makes a new header for the specified matrix row and returns it. This is an O(1) operation,
+regardless of the matrix size. The underlying data of the new matrix is shared with the original matrix. 
+Here is the example of one of the classical basic matrix processing operations, axpy, used by LU and many 
+other algorithms:
+
+inline void matrix_axpy(Mat& A, int i, int j, double alpha)
+{
+    A.row(i) += A.row(j)*alpha;
+}
+
+Note: In the current implementation, the following code does not work as expected:
+
+Mat A;
+...
+A.row(i) = A.row(j); // will not work
+
+This happens because A.row(i) forms a temporary header that is further assigned to another header. Remember that each of these operations is O(1), that is, no data is copied. Thus, the above assignment is not true if you may have expected the j-th row to be copied to the i-th row. To achieve that, you should either turn this simple assignment into an expression or use the Mat::copyTo() method:
+
+Mat A;
+...
+// works, but looks a bit obscure.
+A.row(i) = A.row(j) + 0;
+
+// this is a bit longer, but the recommended method.
+A.row(j).copyTo(A.row(i));
 
 
-
-This function creates rotated (i.e. not up-right) rectangles on a plane. Each rectangle is specified 
-by the center point (mass center), length of each side (represented by cv::Size2f structure) and the 
-rotation angle in degrees.
-
-C++: RotatedRect::RotatedRect(const Point2f& center, const Size2f& size, float angle)
-
-        Parameters:	
-
-            center - The rectangle mass center.
-
-            size - Width and height of the rectangle.
-
-            angle - The rotation angle in a clockwise direction. When the angle is 0, 90, 180, 270 etc., the rectangle becomes an up-right rectangle.
-
-            box - The rotated rectangle parameters as the obsolete CvBox2D structure.
-
-   
-The sample below demonstrates how to use RotatedRect:
-
-Mat image(200, 200, CV_8UC3, Scalar(0));
-RotatedRect rRect = RotatedRect(Point2f(100,100), Size2f(100,50), 30);
-
-Point2f vertices[4];
-rRect.points(vertices);
-for (int i = 0; i < 4; i++)
-    line(image, vertices[i], vertices[(i+1)%4], Scalar(0,255,0));
-
-Rect brect = rRect.boundingRect();
-rectangle(image, brect, Scalar(255,0,0));
-
-imshow("rectangles", image);
-waitKey(0);
-
-../../../_images/rotatedrect.png
-
-See also:
-
-(CAM-SHIFT) , (FIT-ELLIPSE) , (MIN-AREA-RECT)
 
 
 
@@ -3083,50 +3148,48 @@ scaling, taking an absolute value, conversion to an unsigned 8-bit type. In case
 the function processes each channel independently. 
 
 
-(defun convert-scale-abs-example (&optional (camera-index *camera-index*) 
+
+(defun convert-scale-abs-example (&optional (cam *camera-index*) 
 				    (width *default-width*)
 				    (height *default-height*))
 
-  (with-capture (cap (video-capture camera-index))    
-    (let ((window-name "CONVERT-SCALE-ABS Example")
-	  ;;Create matrix so we can scale it, caclculate its 
-	  ;;absolute value and convert it to 8-bit with fun-
-	  ;;ction CONVERT-SCALE-ABS
-	  (mat (mat-ones 6 4 +32f+)))
-      (cap-set cap +cap-prop-frame-width+ width)
-      (cap-set cap +cap-prop-frame-height+ height)
-      (named-window window-name +window-normal+)
-       (move-window window-name 759 175)
-      ;;Print original type of MAT
-      (format t "MAT type before conversion = ~a(or +32f+)~%~%" (mat-type mat))
-      ;;Print original MAT before conversion
-      (format t "Printing MAT before the conversion~%~%")
-      (dotimes (i (rows mat))
-	(dotimes (j (cols mat))
-	  (format t "~a" (at mat i j :float))
-	  (princ #\Space))
-	(princ #\Newline))
-      ;;Run CONVERT-SCALE-ABS
-      (convert-scale-abs mat mat 2d0 5d0)
-      ;;Print converted MAT type which is 8-bit
-      (format t "~%~MAT type after conversion = ~a(or +8u+)~%~%" (mat-type mat))
-      ;;Print converted MAT
-      (format t "~%~%Printing MAT after the conversion~%~%")
-      (dotimes (i (rows mat))
-	(dotimes (j (cols mat))
-	  (format t "~a" (at mat i j :float))
-	  (princ #\Space))
-	(princ #\Newline))
-      (do ((frame 0))
-	  ((plusp (wait-key *millis-per-frame*)) 
-	   (format t "Key is pressed by user"))
-	(setf frame (mat))
-	(cap-read cap frame)
-        ;;Run CONVERT-SCALE-ABS on each frame of 
-        ;;camera output just to see what happens
-	(convert-scale-abs frame frame 2d0 5d0)
-        (imshow window-name frame))
-      (destroy-window window-name))))
+  (with-captured-camera (cap cam :width width :height height)
+    (if (not (cap-is-open cap)) 
+	(return-from convert-scale-abs-example 
+	  (format t "Cannot open the video camera")))  
+    (let ((window-name "CONVERT-SCALE-ABS Example"))
+      (with-named-window (window-name +window-normal+)
+	(move-window window-name 759 175)
+	;;Create a matrix
+	(with-mat ((mat (mat-ones 6 4 +32f+)))
+	  ;;Print original type of MAT
+	  (format t "~%MAT type before conversion = ~a(or +32f+)~%~%" 
+		  (mat-type mat))
+	  ;;Print original MAT before conversion
+	  (format t "Printing MAT before the conversion~%~%")
+	  (print-mat mat :float)
+	  ;;CONVERT-SCALE-ABS, scales by 2 and 
+	  ;;adds 5, to every elemement of MAT,
+          ;;and converts the result to 8-bit
+	  (convert-scale-abs mat mat 2d0 5d0)
+	  ;;Print converted MAT type which is 8-bit
+	  (format t "~%MAT type after conversion = ~a(or +8u+)" 
+		  (mat-type mat))
+	  ;;Print converted MAT
+	  (format t "~%~%Printing MAT after the conversion~%~%")
+	  (print-mat mat :uchar)
+          (format t "~%~%")
+	  (loop
+	     (with-mat ((frame (mat)))
+	       (cap-read cap frame)
+	       ;;Run CONVERT-SCALE-ABS on the camera
+               ;;output, just to see what happens
+	       (convert-scale-abs frame frame 2d0 5d0)
+	       (imshow window-name frame))
+	     (let ((c (wait-key 33)))
+	       (when (= c 27)
+		 (return)))))))))
+
 
 
 DET
@@ -3436,6 +3499,7 @@ All the arrays must have the same type, except the destination, and the same siz
 			     (cam *camera-index*) 
 			     (width *default-width*)
 			     (height *default-height*))
+
   ;; Set camera feed to CAP and set camera feed width/height
   (with-captured-camera (cap cam :width width :height height)  
     (let ((window-name-1 "Original camera feed - IN-RANGE-S Example")
@@ -8345,6 +8409,111 @@ Parameters:
 HIGHGUI - USER INTERFACE
 
 
+
+CREATE-TRACKBAR
+
+Creates a trackbar and attaches it to the specified window.
+
+C++: int createTrackbar(const string& trackbarname, const string& winname, int* value, int count, TrackbarCallback onChange=0, 
+                        void* userdata=0)
+
+LISP-CV:  (CREATE-TRACKBAR (TRACKBARNAME *STRING) (WINNAME *STRING) (VALUE :POINTER) (COUNT :INT) &OPTIONAL 
+                          ((ON-CHANGE TRACKBAR-CALLBACK) (NULL-POINTER)) ((USERDATA :POINTER) (NULL-POINTER))) => :INT
+
+    
+    Parameters:	
+
+        TRACKBARNAME - Name of the created trackbar
+
+        WINNAME - Name of the window that will be used as a parent of the created trackbar.
+
+        VALUE - Optional pointer to an integer variable whose value reflects the position of the slider. 
+                Upon creation, the slider position is defined by this variable.
+
+        COUNT - Maximal position of the slider. The minimal position is always 0.
+
+        ON-CHANGE - Pointer to the function to be called every time the slider changes position. This 
+                    function should be prototyped as in the below example, where the first parameter 
+                    is the trackbar position and the second parameter is the user data (see the next 
+                    parameter). If the callback is the NULL pointer, no callbacks are called, but only 
+                    value is updated.
+
+        USERDATA - User data that is passed as is to the callback. It can be used to handle trackbar 
+                   events without using global variables.
+
+
+The function CREATE-TRACKBAR creates a trackbar (a slider or range control) with the specified name
+and range, assigns a variable value to be a position synchronized with the trackbar and specifies the 
+callback function onChange to be called on the trackbar position change. The created trackbar is displayed 
+in the specified window winname.
+
+Note: (Qt Backend Only) WINNAME can be empty (or NIL) if the trackbar should be attached to the control panel.
+
+
+Example:
+
+
+;; a callback function called by the CREATE-TRACKBAR
+;; ON-CHANGE parameter...a HELLO-WORLD function.
+
+(defcallback hello-world-brightness :void ((pos :int) (ptr :pointer))
+  (format t "Hello World!~%~%~a~a~%~%" (mem-aref ptr :string 0) pos))
+
+;; another HELLO-WORLD callback function
+(defcallback hello-world-contrast :void ((pos :int) (ptr :pointer))
+  (format t "Hello World!~%~%~a~a~%~%" (mem-aref ptr :string 0) pos))
+
+
+(defun create-trackbar-example (filename)
+  (let ((window-name "Adjust brightness and contrast by moving the sliders.")
+	(brightness 0)
+	(contrast 0))
+    (with-named-window (window-name +window-autosize+)
+      (move-window window-name 759 175)
+      ;; allocate two :int pointers that trackbar can adjust
+      (with-object ((slider-1-value (alloc :int '(50)))
+		    (slider-2-value (alloc :int '(50)))
+		    ;; data to be passed to HELLO-WORLD-BRIGHTNESS callback function
+		    (userdata-1 (alloc :string "Brightness =  "))
+		    ;; data to be passed to HELLO-WORLD-CONTRAST callback function
+		    (userdata-2 (alloc :string "Contrast = ")))
+	(loop
+	   ;; read in image supplied by filename parameter
+	   (with-mat ((src (imread filename 1)))
+	     (if (empty src) 
+		 (return-from create-trackbar-example
+		   (format t "Image not loaded")))
+	     ;; Clone the source image to dest
+	     (with-mat  ((dest (clone src)))
+	       ;; create Trackbar with name, 'Brightness'
+	       (create-trackbar "Brightness" window-name slider-1-value 100
+				;; pointer to a callback function to be called every 
+				;; time the trackbar slider changes position 
+				(callback hello-world-brightness) 
+				;; user data that is passed to 
+				;; the callback function           
+				userdata-1)
+	       ;; create trackbar with name, 'Contrast'
+	       (create-trackbar  "Contrast" window-name slider-2-value 100
+				 ;; again,a callback function pointer 
+				 (callback hello-world-contrast) 
+				 ;; user data
+				 userdata-2)
+	       ;; when the top trackbar is moved, adjust brightness variable
+	       (setf brightness (- (mem-ref slider-1-value :int) 50))
+	       ;; when the bottom Trackbar is moved, adjust contrast variable
+	       (setf contrast (/ (mem-ref slider-2-value :int) 50))
+	       ;; apply brightness and contrast settings to the destination image
+	       (convert-to src dest -1 (coerce contrast 'double-float)  
+			   (coerce brightness 'double-float))
+	       ;; show adjusted image in a window
+	       (imshow window-name dest)
+	       (let ((c (wait-key 33)))
+		 (when (= c 27)
+		   (return))))))))))
+
+
+
 DESTROY-WINDOW
 
 
@@ -9323,6 +9492,736 @@ This function is parallelized with the TBB library.
 
 
 
+ML - NORMAL BAYES CLASSIFIER
+
+
+
+NORMAL-BAYES-CLASSIFIER
+
+Default and training constructors.
+
+C++: CvNormalBayesClassifier::CvNormalBayesClassifier()
+
+C++: CvNormalBayesClassifier::CvNormalBayesClassifier(const Mat& trainData, const Mat& responses, const Mat& varIdx=Mat(), 
+                                                      const Mat& sampleIdx=Mat() )
+
+LISP-CV: (NORMAL-BAYES-CLASSIFIER &OPTIONAL (TRAIN-DATA MAT) (RESPONSES MAT) ((VAR-IDX MAT) (MAT) GIVEN-VAR-IDX) 
+                                ((SAMPLE-IDX MAT) (MAT) GIVEN-SAMPLE-IDX)) => NORMAL-BAYES-CLASSIFIER
+
+
+The constructors follow conventions of (STAT-MODEL). See (STAT-MODEL-TRAIN) for parameters descriptions.
+
+
+
+Example:
+
+
+;; This example implements a feed-forward Artificial Neural Network or 
+;; more particularly, Multi-Layer Perceptrons (MLP), the most commonly 
+;; used type of Neural Networks. MLP consists of the input layer, outp-
+;; ut layer, and one or more hidden layers. Each layer of MLP includes 
+;; one or more neurons directionally linked with the neurons from the 
+;; previous and the next layer. Download the PDF at this link for more 
+;; details.
+
+;; https://github.com/bytefish/opencv/blob/master/machinelearning/doc/machinelearning.pdf 
+
+;; Note: This example is similar to, but is a more advanced 
+;; and informative version of the ANN-MLP-EAXMPLE in this file.
+
+;; Declare global variables.
+
+(defparameter *plot-support-vectors* t)
+(defparameter *num-training-points* 200)
+(defparameter *num-test-points* 2000)
+(defparameter *size* 200)
+
+;; Move the trackbar on the middle window to decide 
+;; which equation in the (F) function to use.
+
+(defparameter *equation* (alloc :int 2))
+
+;; Move the trackbars on the middle window to decide 
+;; what to multiply X by in the (F) function equatio-
+;; ns. Each trackbar in this list corresponds to a s-
+;; etting of the *EQUATION* variable and affects the 
+;; equations in the (F) function.
+
+;; Note: When changing any of the five below values 
+;; with the trackbar, make sure not to move the trac-
+;; kbar to less than 1, or the program will freeze. 
+;; Leaving this possibility allows for more precise 
+;; adjustments.
+
+(defparameter *equation-0* (alloc :int 10))
+(defparameter *equation-1* (alloc :int 10))
+(defparameter *equation-2* (alloc :int 2))
+(defparameter *equation-3* (alloc :int 10))
+(defparameter *other* (alloc :int 10))
+
+;; You can change the number of Neurons per layer wi-
+;; the trackbars, though it is reccomended that you 
+;; read the notes below before you do so. See the co-
+;; mments in the (MLP) function under the LAYERS hea-
+;; ding for more information.
+
+;; The number of Neurons in some of the layers are n-
+;; ot adjustable, or, they are not easily adjustable. 
+;; I left the oppurtunity for you to try because the 
+;; C++ errors in *INFERIOR-LISP*(or your implementat-
+;; ions version) offer good information and are usef-
+;; ul debug tools.
+
+;; Note 1: *LAYER-0* needs to stay on 2. Take a note 
+;; of the C++ error in *INFERIOR-LISP* if you do dec-
+;; ide to change it.
+
+;; Note 2: If the value of *LAYER-1* goes below two 
+;; you will get an error in *INFERIOR-LISP*. I could 
+;; have added two to the value, when *LAYER-1* is cal-
+;; led, to subvert the error, but I didn't for the sa-
+;; ke of precision. Nou you will be able to see exac-
+;; tly how many Neurons you're creating with the tra-
+;; ckbar in Layer 1(and all layers).
+
+;; Note 3: *LAYER-2* operates the same as *LAYER-1*.
+;; See Note 2 for more details.
+
+;; Note 4: *LAYER-3* operates the same as *LAYER-0*, 
+;; but needs to stay on 1. See Note 1 for details.
+
+(defparameter *layer-0* (alloc :int 2)) 
+(defparameter *layer-1* (alloc :int 10))
+(defparameter *layer-2* (alloc :int 15))
+(defparameter *layer-3* (alloc :int 1))
+
+;; Calculates the accuracy of the Normal Bayes Classifier and the Neural Network. 
+;; The accuracy is affected by the equations and equation's parameters you choose 
+;; for the (F) function and also by the number of Neurons per layer you choose in 
+;; the (MLP) function.
+
+(defun evaluate (predicted actual &optional p a (*t 0) (f 0)) 
+  (if (eq (rows predicted) (rows actual))
+      (dotimes (i (rows actual))
+	(setf p (at predicted i 0 :float))
+	(setf a (at actual i 0 :float))
+	(if (or (and (>= p 0.0f0) (>= a 0.0f0)) (and (<= p 0.0f0) (<= a 0.0f0))) 
+	    (incf *t)
+	    (incf f))) nil)
+  (float (/ (* *t 1) (+ *t f))))
+
+;; Function to learn. The trackbars on the middle window change the values held in 
+;; the EQUATION-* variables. The (? *EQUATION-* :INT) statements dereference those 
+;; variables and supply their values to the equations in this function. The '?' is 
+;; a macro for CFFI's dereferencing function, MEM-AREF. Again, make sure not to mo-
+;; ve the trackbar to less than 1 when adjusting these variables.
+
+(defun f (x y equation) 
+  (case equation (0 (return-from f (if (> y (sin (* x (+ (? *equation-0* :int) 1)))) -1 1)))
+	(1 (return-from f (if (> y (cos (* x (+ (? *equation-1* :int) 1)))) -1 1)))
+	(2 (return-from f (if (> y (* x (+ (? *equation-2* :int) 1))) -1 1)))
+	(3 (return-from f (if (> y (tan (* x (? *equation-3* :int)))) -1 1)))
+	(otherwise (return-from f (if (> y (cos (* x (? *other* :int)))) -1 1)))))
+
+;; NORMAL BAYES CLASSIFIER
+(defun bayes (training-data training-classes test-data test-classes) 
+  (with-normal-bayes-classifier ((bayes (normal-bayes-classifier training-data training-classes)))
+    (with-mat ((predicted (mat (rows test-classes) 1 +32f+)))
+      (dotimes (i (rows test-data))
+	(with-mat ((sample (row test-data i)))
+	  (setf (at predicted i 0 :float) (normal-bayes-classifier-predict bayes sample))))
+      ;; Calculate the accuracy of the Normal Bayes Classifier
+      (let ((evaluate (evaluate predicted test-classes)))
+	(format t "~%Accuracy_{BAYES} = ~a~%" evaluate))
+      ;; Plot the predictions
+      (plot-binary test-data predicted "Predictions Bayes"))))
+
+;; NEURAL NETWORK
+
+(defun mlp (training-Data training-Classes test-Data test-Classes) 
+
+  ;; LAYERS
+
+  ;; The purpose of a neural network is to generalize, which is the ability 
+  ;; to approximate outputs for inputs not available in the training set. W-
+  ;; hile small networks may not be able to approximate a function, large n-
+  ;; etworks tend to overfit and not find any relationship in data. It has 
+  ;; been shown that, given enough data, a multi layer perceptron with one 
+  ;; hidden layer can approximate any continuous function to any degree of 
+  ;; accuracy. Here the number of neurons per layer is stored in the row-o-
+  ;; rdered MAT below, LAYERS.
+
+  (with-mat ((layers (mat 4 1 +32SC1+)))
+    (setf (at layers 0 0 :int) (? *layer-0* :int)) 
+    (setf (at layers 1 0 :int) (? *layer-1* :int))
+    (setf (at layers 2 0 :int) (? *layer-2* :int))
+    (setf (at layers 3 0 :int) (? *layer-3* :int))
+    (with-ann-mlp ((mlp (ann-mlp)))
+      (with-term-criteria ((criteria (term-criteria (logior +termcrit-iter+ +termcrit-eps+) 
+						    100 0.00001d0)))
+	(with-ann-mlp-train-params ((params (ann-mlp-train-params criteria 
+								  +ann-mlp-train-params-backprop+ 
+								  0.05d0 
+	 							  0.05d0)))
+	  (ann-mlp-create mlp layers)
+	  ;; Train the Neural Net.
+	  (with-mat ((predicted (mat (rows test-classes) 1 +32f+))
+                     (sample-weights (mat))
+                     (sample-idx (mat)))
+	    (ann-mlp-train mlp training-data training-classes sample-weights sample-idx params)
+	    (dotimes (i (rows test-data))
+	      (with-mat ((response (mat 1 1 +32fc1+)))
+		(with-mat ((sample (row test-data i)))
+		  (ann-mlp-predict mlp sample response))
+		(setf (at predicted i 0 :float) (at response 0 0 :float))))
+            ;; Print the values of all adjustable variables.
+            (format t "~%*EQUATION* = ~a~%" (? *equation* :int))
+            (format t "~%*EQUATION-0* = ~a~%" (? *equation-0* :int))
+            (format t "~%*EQUATION-1* = ~a~%" (? *equation-1* :int))
+            (format t "~%*EQUATION-2* = ~a~%" (? *equation-2* :int))
+            (format t "~%*EQUATION-3* = ~a~%" (? *equation-3* :int))
+            (format t "~%*OTHER* = ~a~%" (? *other* :int))
+            (format t "~%*LAYER-0* = ~a~%" (? *layer-0* :int))
+            (format t "~%*LAYER-1* = ~a~%" (? *layer-1* :int))
+            (format t "~%*LAYER-2* = ~a~%" (? *layer-2* :int))
+            (format t "~%*LAYER-3* = ~a~%" (? *layer-3* :int))
+            ;; Calculate the accuracy of the Neural Net
+            (let ((evaluate (evaluate predicted test-classes)))
+	      (format t "~%Accuracy_{MLP} = ~a~%" evaluate))
+            ;; Plot the predictions
+	    (plot-binary test-data predicted "Predictions Backpropagation")
+	    nil ))))))
+
+;; Plot Data and Class function
+(defun plot-binary(data classes name &optional x y) 
+  (with-mat ((plot (mat *size* *size* +8uc3+)))
+    (with-scalar ((scalar (scalar 255 255 255)))
+      (assgn-val plot scalar))
+    (dotimes (i (rows data))
+      (setf x (* (at data i 0 :float) *size*))
+      (setf y (* (at data i 1 :float) *size*))
+      (with-scalar ((color1 (rgb 255 0 0))
+		    (color2 (rgb 0 255 0)))
+	(if (> (at classes i 0 :float) 0f0)
+            ;; Plot the points with the CIRCLE function
+	    (with-point ((center (point (round x) (round y))))
+	      (circle plot center 1 color1 1))
+	    (with-point ((center (point (round x) (round y))))
+	      (circle plot center 1 color2 1)))))
+    (imshow name plot)))
+
+
+(defun normal-bayes-classifier-example ()
+
+  "In this example, in the 2 right-most windows, a Normal Bayes 
+   Classifier is compared side by side with a Neural Network."
+  ;; Window names available to all of the functions
+  (let ((window-name-1 "Training data")
+	(window-name-2 "Test data")
+	(window-name-3 "Predictions Backpropagation")
+        (window-name-4 "Predictions Bayes")
+        ;; Declare other variables
+        (training-classes 0)
+        (test-classes 0)
+        (x 0)
+        (y 0))
+    ;; Create windows
+    (with-named-window (window-name-1 +window-normal+)
+      (with-named-window (window-name-2 +window-autosize+)
+	(with-named-window (window-name-3 +window-normal+)
+	  (with-named-window (window-name-4 +window-normal+)
+	    ;; Move windows to specified locations
+	    (move-window window-name-1 85 175)
+	    (move-window window-name-2 549 175)
+	    (move-window window-name-3 971 175)
+	    (move-window window-name-4 1435 175)
+	    ;; Create trackbars used to adjust the values in the (F) 
+            ;; and (MLP) functions. The trackbar names are hints at 
+            ;; how not to adjust them e.g. This 'Eq 0: > 1' means do
+            ;; not let the trackbar go below 1 and this 'Layr 0: 2'
+            ;; means the trackbar must stay at 2. Not abiding by the
+            ;; guidelines will cause the program to freeze.
+	    (create-trackbar "Equation" window-name-2 *equation* 4)
+	    (create-trackbar "Eq 0: > 1" window-name-2 *equation-0* 150)
+	    (create-trackbar "Eq 1: > 1" window-name-2 *equation-1* 150)
+	    (create-trackbar "Eq 2: > 1" window-name-2 *equation-2* 10)
+	    (create-trackbar "Eq 3: > 1" window-name-2 *equation-3* 150)
+	    (create-trackbar "Other: > 1" window-name-2 *other* 150)
+	    (create-trackbar "Lyr 0: 2" window-name-2 *layer-0* 10)
+	    (create-trackbar "Lyr 1: > 2" window-name-2 *layer-1* 500)
+	    (create-trackbar "Lyr 2: > 2 " window-name-2 *layer-2* 500)
+	    (create-trackbar "Lyr 3: 1" window-name-2 *layer-3* 5)
+	    (with-mat ((training-data (mat *num-training-points* 2 +32fc1+))
+		       (test-data (mat *num-test-points* 2 +32fc1+)))
+
+	      (loop;; Fill training and test data matrices 
+		   ;; with random numbers from zero to one
+		 (with-scalar ((zero (scalar 0))
+			       (one (scalar 1)))
+		   (randu training-data zero one)
+		   (randu test-data zero one))
+
+		 ;; Label data with equation
+		 (with-mat ((labels1 (mat (rows training-data) 1 +32fc1+)))
+		   (dotimes (i (rows training-data))
+		     (setf x (at training-data i 0 :float))
+		     (setf y (at training-data i 1 :float))
+		     (setf (at labels1 i 0 :float) (coerce (f x y (? *equation* :int)) 'float)))
+
+		   (with-mat ((labels2 (mat (rows test-data) 1 +32fc1+)))
+		     (dotimes (i (rows test-data))
+		       (setf x (at test-data i 0 :float))
+		       (setf y (at test-data i 1 :float))
+		       (setf (at labels2 i 0 :float) (coerce (f x y (? *equation* :int)) 'float)))
+
+		     (setf training-classes labels1)
+		     (setf test-classes labels2)
+
+		     ;; Plot training data
+		     (plot-binary training-data training-classes window-name-1)
+		     ;; Plot test data
+		     (plot-binary test-data test-classes window-name-2)
+		     ;; Plot predictions
+		     (mlp training-data training-classes test-data test-classes)
+		     (bayes training-data training-classes test-data test-classes)))
+		 (let ((c (wait-key 33)))
+		   (when (= c 27)
+		     (return)))))))))))
+
+
+
+NORMAL-BAYES-CLASSIFIER-PREDICT
+
+Predicts the response for sample(s).
+
+C++: float CvNormalBayesClassifier::predict(const Mat& samples, Mat* results=0, Mat* results_prob=0 ) const
+
+LISP-CV: (NORMAL-BAYES-CLASSIFIER-PREDICT (SELF NORMAL-BAYES-CLASSIFIER) (SAMPLES MAT) ((RESULTS MAT) (NULL-POINTER)) 
+                                          ((RESULTS-PROB MAT) (NULL-POINTER))) => :FLOAT
+
+The method estimates the most probable classes for input vectors. Input vectors (one or more) are 
+stored as rows of the matrix samples. In case of multiple input vectors, there should be one output 
+vector RESULTS. The predicted class for a single input vector is returned by the method. The vector 
+RESULTS-PROB contains the output probabilities coresponding to each element of RESULTS.
+
+The function is parallelized with the TBB library.
+
+
+Example:
+
+See NORMAL-BAYES-CLASSIFIER-EXAMPLE in this file.
+
+
+
+ML - NEURAL NETWORKS
+
+
+ANN-MLP
+
+The constructors.
+
+C++: CvANN_MLP::CvANN_MLP()
+
+C++: CvANN_MLP::CvANN_MLP(const CvMat* layerSizes, int activateFunc=CvANN_MLP::SIGMOID_SYM, double fparam1=0, double fparam2=0 )
+
+LISP-CV: (ANN-MLP &OPTIONAL (LAYER-SIZES MAT) ((ACTIVATE-FUNC :INT) +ANN-MLP-SIGMOID-SYM+) ((FPARAM1 :DOUBLE) 0D0) 
+                            ((FPARAM2 :DOUBLE) 0D0)) => ANN-MLP
+
+The advanced constructor allows to create MLP with the specified topology. See (ANN-MLP-CREATE) for 
+details.
+
+
+Example:
+
+;; This example implements a feed-forward Artificial Neural Network or 
+;; more particularly, Multi-Layer Perceptrons (MLP), the most commonly 
+;; used type of Neural Networks. MLP consists of the input layer, outp-
+;; ut layer, and one or more hidden layers. Each layer of MLP includes 
+;; one or more neurons directionally linked with the neurons from the 
+;; previous and the next layer. 
+
+
+;; Declare global variables.
+
+(defparameter *plot-support-vectors* t)
+(defparameter *num-training-points* 200)
+(defparameter *num-test-points* 2000)
+(defparameter *size* 200)
+
+;; Move the trackbar on the middle window to decide 
+;; which equation in the (F) function to use.
+
+(defparameter *equation* (alloc :int 2))
+
+;; Move the trackbars on the middle window to decide 
+;; what to multiply X by in the (F) function equatio-
+;; ns. Each trackbar in this list corresponds to a s-
+;; etting of the *EQUATION* variable and affects the 
+;; equations in the (F) function.
+
+(defparameter *equation-0* (alloc :int 10))
+(defparameter *equation-1* (alloc :int 10))
+(defparameter *equation-2* (alloc :int 2))
+(defparameter *equation-3* (alloc :int 10))
+(defparameter *equation-other* (alloc :int 10))
+
+
+;; Calculates the accuracy of the Neural Network. the NN 
+;; accuracy is affected the equations and equation's par-
+;; ameters you choose for the (F) function.
+
+(defun evaluate (predicted actual &optional p a (*t 0) (f 0)) 
+  (if (eq (rows predicted) (rows actual))
+      (dotimes (i (rows actual))
+	(setf p (at predicted i 0 :float))
+	(setf a (at actual i 0 :float))
+	(if (or (and (>= p 0.0f0) (>= a 0.0f0)) (and (<= p 0.0f0) (<= a 0.0f0))) 
+	    (incf *t)
+	    (incf f))) nil)
+  (float (/ (* *t 1) (+ *t f))))
+
+
+;; Function to learn. The trackbars on the middle window change the values held in 
+;; the EQUATION-* variables. The (? *EQUATION-* :INT) statements dereference those 
+;; variables and supply their values to the equations in this function. The ? func-
+;; tion, is a macro for CFFI::MEM-AREF.
+
+(defun f (x y equation) 
+  (case equation (0 (return-from f (if (> y (sin (* x (? *equation-0* :int)))) -1 1)))
+	(1 (return-from f (if (> y (cos (* x (? *equation-1* :int)))) -1 1)))
+	(2 (return-from f (if (> y (* x (? *equation-2* :int))) -1 1)))
+	(3 (return-from f (if (> y (tan (* x (? *equation-3* :int)))) -1 1)))
+	(otherwise (return-from f (if (> y (cos (* x (? *equation-other* :int)))) -1 1)))))
+
+
+
+(defun mlp (training-Data training-Classes test-Data test-Classes) 
+
+  (with-mat ((layers (mat 4 1 +32SC1+)))
+    (setf (at layers 0 0 :int) 2)
+    (setf (at layers 1 0 :int) 10)
+    (setf (at layers 2 0 :int) 15)
+    (setf (at layers 3 0 :int) 1)
+    (with-ann-mlp ((mlp (ann-mlp)))
+      (with-term-criteria ((criteria (term-criteria (logior +termcrit-iter+ +termcrit-eps+) 
+						    100 0.00001d0)))
+	(with-ann-mlp-train-params ((params (ann-mlp-train-params criteria 
+								  +ann-mlp-train-params-backprop+ 
+								  0.05d0 
+								  0.05d0)))
+	  (ann-mlp-create mlp layers)
+	  ;; Train the NN.
+	  (with-mat ((predicted (mat (rows test-classes) 1 +32f+))
+                     (sample-weights (mat))
+                     (sample-idx (mat)))
+	    (ann-mlp-train mlp training-data training-classes sample-weights sample-idx params)
+	    (dotimes (i (rows test-data))
+	      (with-mat ((response (mat 1 1 +32fc1+)))
+		(with-mat ((sample (row test-data i)))
+		  (ann-mlp-predict mlp sample response))
+		(setf (at predicted i 0 :float) (at response 0 0 :float))))
+            (format t "~%*EQUATION* = ~a~%" (? *equation* :int))
+            (format t "~%*EQUATION-0* = ~a~%" (? *equation-0* :int))
+            (format t "~%*EQUATION-1* = ~a~%" (? *equation-1* :int))
+            (format t "~%*EQUATION-2* = ~a~%" (? *equation-2* :int))
+            (format t "~%*EQUATION-3* = ~a~%" (? *equation-3* :int))
+            (format t "~%*EQUATION-OTHER* = ~a~%" (? *equation-other* :int))
+            (let ((evaluate (evaluate predicted test-classes)))
+	      (format t "~%Accuracy_{MLP} = ~a~%" evaluate) 
+	      (plot-binary test-data predicted "Predictions Backpropagation - ANN-MLP Example"))
+	    nil ))))))
+
+
+;; Plot data and class
+(defun plot-binary(data classes name &optional x y) 
+  (with-mat ((plot (mat *size* *size* +8uc3+)))
+    (with-scalar ((scalar (scalar 255 255 255)))
+      (assgn-val plot scalar))
+    (dotimes (i (rows data))
+      (setf x (* (at data i 0 :float) *size*))
+      (setf y (* (at data i 1 :float) *size*))
+      (with-scalar ((color1 (rgb 255 0 0))
+		    (color2 (rgb 0 255 0)))
+	(if (> (at classes i 0 :float) 0f0)
+	    (with-point ((center (point (round x) (round y))))
+	      (circle plot center 1 color1 1))
+	    (with-point ((center (point (round x) (round y))))
+	      (circle plot center 1 color2 1)))))
+    (imshow name plot)))
+
+
+(defun ann-mlp-example ()
+
+  (let ((window-name-1 "Training data - ANN-MLP Example")
+	(window-name-2 "Test data - ANN-MLP Example")
+	(window-name-3 "Predictions Backpropagation - ANN-MLP Example")
+        ;; Declare other variables
+        (training-classes 0)
+        (test-classes 0)
+        (x 0)
+        (y 0))
+    ;; Create windows
+    (with-named-window (window-name-1 +window-normal+)
+      (with-named-window (window-name-2 +window-autosize+)
+	(with-named-window (window-name-3 +window-normal+)
+          ;; Move windows to specified locations
+	  (move-window window-name-1 310 175)
+	  (move-window window-name-2 760 175)
+	  (move-window window-name-3 1210 175)
+          ;; Create trackbars used to adjust 
+          ;; the (F) function equations
+	  (create-trackbar "Equation" window-name-2 *equation* 4)
+	  (create-trackbar "Equation 0" window-name-2 *equation-0* 150)
+	  (create-trackbar "Equation 1" window-name-2 *equation-1* 150)
+	  (create-trackbar "Equation 2" window-name-2 *equation-2* 10)
+	  (create-trackbar "Equation 3" window-name-2 *equation-3* 150)
+	  (create-trackbar "Eq. Other" window-name-2 *equation-other* 150)
+	  (with-mat ((training-data (mat *num-training-points* 2 +32fc1+))
+		     (test-data (mat *num-test-points* 2 +32fc1+)))
+
+	    (loop;; Fill training and test data matrices 
+	       ;; with random numbers from zero to one
+	       (with-scalar ((zero (scalar 0))
+			     (one (scalar 1)))
+		 (randu training-data zero one)
+		 (randu test-data zero one))
+
+               ;; Label data with equation
+	       (with-mat ((labels1 (mat (rows training-data) 1 +32fc1+)))
+		 (dotimes (i (rows training-data))
+		   (setf x (at training-data i 0 :float))
+		   (setf y (at training-data i 1 :float))
+		   (setf (at labels1 i 0 :float) (coerce (f x y (? *equation* :int)) 'float)))
+
+		 (with-mat ((labels2 (mat (rows test-data) 1 +32fc1+)))
+		   (dotimes (i (rows test-data))
+		     (setf x (at test-data i 0 :float))
+		     (setf y (at test-data i 1 :float))
+		     (setf (at labels2 i 0 :float) (coerce (f x y (? *equation* :int)) 'float)))
+
+		   (setf training-classes labels1)
+		   (setf test-classes labels2)
+
+                   ;; Plot training data
+		   (plot-binary training-data training-classes window-name-1)
+                   ;; Plot test data
+		   (plot-binary test-data test-classes window-name-2)
+                   ;; Plot predictions
+		   (mlp training-data training-classes test-data test-classes)))
+	       (let ((c (wait-key 33)))
+		 (when (= c 27)
+		   (return))))))))))
+
+
+
+ANN-MLP-CREATE
+
+Constructs MLP with the specified topology.
+
+C++: void CvANN_MLP::create(const Mat& layerSizes, int activateFunc=CvANN_MLP::SIGMOID_SYM, double fparam1=0, double fparam2=0 )
+
+LISP-CV: (ANN-MLP-CREATE (SELF ANN-MLP) (LAYER-SIZES MAT) &OPTIONAL ((ACTIVATE-FUNC :INT) +ANN-MLP-SIGMOID-SYM+) 
+                         ((FPARAM1 :DOUBLE) 0D0) ((FPARAM2 :DOUBLE) 0D0)) => :VOID
+
+
+    Parameters:	
+
+        LAYER-SIZES - Integer vector specifying the number of neurons in each layer including the 
+                      input and output layers.
+
+        ACTIVATE-FUNC - Parameter specifying the activation function for each neuron: one of;
+                        +ANN-MLP-IDENTITY+, +ANN-MLP-SIGMOID-SYM+, +ANN-MLP-GAUSSIAN+ 
+
+        FPARAM1 - Free parameter of the ALPHA activation function. See the formulas in the 
+                  introduction section.
+
+        FPARAM2 - Free parameter of the BETA activation function. See the formulas in the 
+                  introduction section.
+
+
+Note: Introduction section of the OpenCV Neural Network documentation is at the top of this link:
+
+http://docs.opencv.org/trunk/modules/ml/doc/neural_networks.html
+
+There you will find a more complete explanation of the activation functions as well as the formulae.
+
+
+The method creates an MLP network with the specified topology and assigns the same activation function 
+to all the neurons.
+
+
+Example:
+
+See ANN-MLP-EXAMPLE in this file.
+
+
+
+ANN-MLP-PREDICT
+
+Predicts responses for input samples.
+
+C++: float CvANN_MLP::predict(const Mat& inputs, Mat& outputs) const
+
+LISP-CV: (ANN-MLP-PREDICT (SELF ANN-MLP) (INPUTS MAT) (OUTPUTS MAT)) => :FLOAT
+
+
+    Parameters:	
+
+        SELF - An ANN-MLP construct
+
+        INPUT - Input samples.
+
+        OUTPUTS - Predicted responses for corresponding samples.
+
+
+The method returns a dummy value which should be ignored.
+
+If you are using the default +ANN-MLP-SIGMOID-SYM+ activation function with the default parameter 
+values (EQ FPARAM1 0) and (EQ FPARAM2 0) then the function used is (EQ Y (* 1.7159 (TANH (* 2/3 X)))),
+so the output will range from (-1.7159, 1.7159), instead of (0,1).
+
+
+Example:
+
+See ANN-MLP-EXAMPLE in this file.
+
+
+
+
+ANN-MLP-TRAIN
+
+Trains/updates MLP.
+
+C++: int CvANN_MLP::train(const Mat& inputs, const Mat& outputs, const Mat& sampleWeights, const Mat& sampleIdx=Mat(), CvANN_MLP_TrainParams params=CvANN_MLP_TrainParams(), int flags=0 )
+
+LISP-CV: (ANN-MLP-TRAIN (SELF ANN-MLP) (INPUTS MAT) (OUTPUTS MAT) (SAMPLE-WEIGHTS MAT) &OPTIONAL 
+                        ((SAMPLE-IDX MAT) (MAT) GIVEN-SAMPLE-IDX) ((PARAMS ANN-MLP-TRAIN-PARAMS) (ANN-MLP-TRAIN-PARAMS) GIVEN-PARAMS) 
+                        ((FLAGS :INT) 0)) => :INT
+
+    Parameters:	
+
+        INPUTS - Floating-point matrix of input vectors, one vector per row.
+
+        OUTPUTS - Floating-point matrix of the corresponding output vectors, one vector per row.
+
+        SAMPLE-WEIGHTS - (RPROP only) Optional floating-point vector of weights for each sample. 
+                         Some samples may be more important than others for training. You may want 
+                         to raise the weight of certain classes to find the right balance between 
+                         hit-rate and false-alarm rate, and so on.
+
+        SAMPLE-IDX - Optional integer vector indicating the samples (rows of inputs and outputs) that 
+                     are taken into account.
+
+        PARAMS - Training parameters. See the ANN-MLP-TRAIN-PARAMS description.
+
+        FLAGS -
+
+          Various parameters to control the training algorithm.
+          A combination of the following parameters is possible:
+
+            +UPDATE-WEIGHTS+ Algorithm updates the network weights, rather than computes them from scratch. 
+                             In the latter case the weights are initialized using the Nguyen-Widrow algorithm.
+
+            +NO-INPUT-SCALE+ Algorithm does not normalize the input vectors. If this flag is not set, 
+                             the training algorithm normalizes each input feature independently, shifting 
+                             its mean value to 0 and making the standard deviation equal to 1. If the network 
+                             is assumed to be updated frequently, the new training data could be much different 
+                             from original one. In this case, you should take care of proper normalization.
+
+            +NO-OUTPUT-SCALE+ Algorithm does not normalize the output vectors. If the flag is not set, 
+                              the training algorithm normalizes each output feature independently, by 
+                              transforming it to the certain range depending on the used activation function.
+
+
+This method applies the specified training algorithm to computing/adjusting the network weights. It 
+returns the number of done iterations.
+
+The RPROP training algorithm is parallelized with the TBB library.
+
+If you are using the default ANN-MLP-SIGMOID-SYM+ activation function then the output should be in 
+the range [-1,1], instead of [0,1], for optimal results.
+
+
+Example:
+
+See ANN-MLP-EXAMPLE in this file.
+
+
+
+ANN-MLP-TRAIN-PARAMS
+
+The constructors.
+
+C++: CvANN_MLP_TrainParams::CvANN_MLP_TrainParams()
+
+C++: CvANN_MLP_TrainParams::CvANN_MLP_TrainParams(CvTermCriteria term_crit, int train_method, double param1, double param2=0 )
+
+LISP-CV: (ANN-MLP-TRAIN-PARAMS (TERM-CRIT TERM-CRITERIA) (TRAIN-METHOD :INT) (PARAM1 :DOUBLE) ((PARAM2 :DOUBLE) 0.0D0)) 
+                                => ANN-MLP-TRAIN-PARAMS
+
+    Parameters:	
+
+        TERM-CRIT - Termination criteria of the training algorithm. You can specify the maximum number 
+                    of iterations (MAX-COUNT) and/or how much the error could change between the iterations 
+                    to make the algorithm continue (EPSILON).
+
+        TRAIN-METHOD -
+
+        Training method of the MLP. Possible values are:
+
+            +ANN-MLP-TRAIN-PARAMS-BACKPROP+ - The back-propagation algorithm.
+
+            +ANN-MLP-TRAIN-PARAMS-RPROP+ - The RPROP algorithm.
+
+        PARAM1 - Parameter of the training method. It is rp_dw0 for RPROP and bp_dw_scale for BACKPROP.
+
+        PARAM2 - Parameter of the training method. It is rp_dw_min for RPROP and bp_moment_scale for 
+                 BACKPROP.
+
+
+Note: In OpenCV, rp_dw0, bp_dw_scale, rp_dw_min and bp_moment_scale are names of CvANN_MLP_TrainParams
+struct members. The CvANN_MLP_TrainParams class is represented in Lisp as a pointer to the class named
+ANN-MLP-TRAIN-PARAMS so the specific struct members are not referenced e.g. you will need to remember: 
+
+
+If you are using the back-propagation algorithm:
+
+   PARAM1 supplies the bp_dw_scale member value.
+
+   PARAM2 supplies the bp_moment_scale member value.
+
+
+If you are using the RPROP algorithm:
+
+   PARAM1 supplies the rp_dw0 member value.
+
+   PARAM2 supplies the rp_dw_min member value.
+
+
+
+By default the RPROP algorithm is used. The following code from:
+
+<Open-Cv-Source-Directory>/modules/ml/src/ann_mlp.cpp 
+
+is how this function is called(in C++) when no values are supplied.
+
+
+CvANN_MLP_TrainParams::CvANN_MLP_TrainParams()
+{
+    term_crit = cvTermCriteria( CV_TERMCRIT_ITER + CV_TERMCRIT_EPS, 1000, 0.01 );
+    train_method = RPROP;
+    bp_dw_scale = bp_moment_scale = 0.1;
+    rp_dw0 = 0.1; rp_dw_plus = 1.2; rp_dw_minus = 0.5;
+    rp_dw_min = FLT_EPSILON; rp_dw_max = 50.;
+}
+
+
+Example:
+
+See ANN-MLP-EXAMPLE in this file.
+
+
+
 PHOTO - INPAINTING
 
 
@@ -9711,12 +10610,12 @@ Example 2:
 (defparameter *cloning-dir*
   (cat *lisp-cv-src-dir* "images/cloning"))
 
-(defun seamless-cloning-example-3 ()
+(defun seamless-cloning-example-2 ()
 
-  (let ((window-name-1 "SOURCE - SEAMLESS-CLONING Example 3")
-	(window-name-2 "DESTINATION - SEAMLESS-CLONING Example 3")
-	(window-name-3 "MASK - SEAMLESS-CLONING Example 3")
-	(window-name-4 "RESULT - SEAMLESS-CLONING Example 3"))
+  (let ((window-name-1 "SOURCE - SEAMLESS-CLONING Example 2")
+	(window-name-2 "DESTINATION - SEAMLESS-CLONING Example 2")
+	(window-name-3 "MASK - SEAMLESS-CLONING Example 2")
+	(window-name-4 "RESULT - SEAMLESS-CLONING Example 2"))
     (with-named-window (window-name-1 +window-normal+)
       (with-named-window (window-name-2 +window-normal+)
 	(with-named-window (window-name-3 +window-normal+)
@@ -9730,13 +10629,13 @@ Example 2:
 		       (mask (imread (cat *cloning-dir* "/monochrome-transfer/mask.png") 1))
 		       (result (clone source)))
 	      (if (empty source)
-		  (return-from seamless-cloning-example-3 
+		  (return-from seamless-cloning-example-2 
 		    (format t "Could not load source image")))
 	      (if (empty destination)
-		  (return-from seamless-cloning-example-3 
+		  (return-from seamless-cloning-example-2 
 		    (format t "Could not load destination image")))
 	      (if (empty mask)
-		  (return-from seamless-cloning-example-3 
+		  (return-from seamless-cloning-example-2 
 		    (format t "Could not load mask image")))
 	      (with-point ((p (point (- (round (/ (width (size destination)) 2)) 10)
 				     (round (/ (height (size destination)) 2)))))
@@ -12033,177 +12932,6 @@ LISP-CV: (SURF (HESSIAN-THRESHOLD :DOUBLE) &OPTIONAL ((N-OCTAVES :INT) 4)
 
 
 
-CREATE-TRACKBAR
-
-Creates a trackbar and attaches it to the specified window.
-
-C++: int createTrackbar(const string& trackbarname, const string& winname, int* value, int count, TrackbarCallback onChange=0, 
-     void* userdata=0)
-
-LISP-CV:  (CREATE-TRACKBAR (TRACKBARNAME *STRING) (WINNAME *STRING) (VALUE :POINTER) (COUNT :INT) &OPTIONAL 
-          ((ON-CHANGE TRACKBAR-CALLBACK) (NULL-POINTER)) ((USERDATA :POINTER) (NULL-POINTER))) => :INT
-
-    
-    Parameters:	
-
-        TRACKBARNAME - Name of the created trackb
-
-        WINNAME - Name of the window that will be used as a parent of the created trackbar.
-
-        VALUE - Optional pointer to an integer variable whose value reflects the position of the sl-
-                ider. Upon creation, the slider position is defined by this variable.
-
-        COUNT - Maximal position of the slider. The minimal position is always 0.
-
-        ON-CHANGE - Pointer to the function to be called every time the slider changes position. Th-
-                    is function should be prototyped as void Foo(int,void*); , where the first para-
-                    meter is the trackbar position and the second parameter is the user data (see t-
-                    he next parameter). If the callback is the NULL pointer, no callbacks are calle-
-                    d, but only value is updated.
-
-        userdata - User data that is passed as is to the callback. It can be used to handle trackba-
-                   r events without using global variables.
-
-
-The function CREATE-TRACKBAR creates a trackbar (a slider or range control) with the specified name
-and range, assigns a variable value to be a position synchronized with the trackbar and specifies t-
-he callback function onChange to be called on the trackbar position change. The created trackbar is 
-displayed in the specified window winname.
-
-Note: [Qt Backend Only] winname can be empty (or NULL) if the trackbar should be attached to the control panel.
-
-
-Example:
-
-
-;; a callback function called by the CREATE-TRACKBAR
-;; ON-CHANGE parameter...a HELLO-WORLD function.
-
-(defcallback hello-world-brightness :void ((pos :int) (ptr :pointer))
-  (format t "Hello World!~%~%~a~a~%~%" (mem-aref ptr :string 0) pos))
-
-;; another HELLO-WORLD callback function
-(defcallback hello-world-contrast :void ((pos :int) (ptr :pointer))
-  (format t "Hello World!~%~%~a~a~%~%" (mem-aref ptr :string 0) pos))
-
-
-(defun create-trackbar-example (filename)
-  (let ((window-name "Adjust brightness and contrast by moving the sliders.")
-	(brightness 0)
-	(contrast 0))
-    (with-named-window (window-name +window-autosize+)
-      (move-window window-name 759 175)
-      ;; allocate two :int pointers that trackbar can adjust
-      (with-object ((slider-1-value (alloc :int '(50)))
-		    (slider-2-value (alloc :int '(50)))
-		    ;; data to be passed to HELLO-WORLD-BRIGHTNESS callback function
-		    (userdata-1 (alloc :string "Brightness =  "))
-		    ;; data to be passed to HELLO-WORLD-CONTRAST callback function
-		    (userdata-2 (alloc :string "Contrast = ")))
-	(loop
-	   ;; read in image supplied by filename parameter
-	   (with-mat ((src (imread filename 1)))
-	     (if (empty src) 
-		 (return-from create-trackbar-example
-		   (format t "Image not loaded")))
-	     ;; Clone the source image to dest
-	     (with-mat  ((dest (clone src)))
-	       ;; create Trackbar with name, 'Brightness'
-	       (create-trackbar "Brightness" window-name slider-1-value 100
-				;; pointer to a callback function to be called every 
-				;; time the trackbar slider changes position 
-				(callback hello-world-brightness) 
-				;; user data that is passed to 
-				;; the callback function           
-				userdata-1)
-	       ;; create trackbar with name, 'Contrast'
-	       (create-trackbar  "Contrast" window-name slider-2-value 100
-				 ;; again,a callback function pointer 
-				 (callback hello-world-contrast) 
-				 ;; user data
-				 userdata-2)
-	       ;; when the top trackbar is moved, adjust brightness variable
-	       (setf brightness (- (mem-ref slider-1-value :int) 50))
-	       ;; when the bottom Trackbar is moved, adjust contrast variable
-	       (setf contrast (/ (mem-ref slider-2-value :int) 50))
-	       ;; apply brightness and contrast settings to the destination image
-	       (convert-to src dest -1 (coerce contrast 'double-float)  
-			   (coerce brightness 'double-float))
-	       ;; show adjusted image in a window
-	       (imshow window-name dest)
-	       (let ((c (wait-key 33)))
-		 (when (= c 27)
-		   (return))))))))))
-
-
-
-DATA
-
-Pointer to MAT data.
-
-C++: uchar* data
-
-LISP-CV: (DATA (SELF MAT) ) => :POINTER
-
-    Parameters:	
-
-        SELF  a pointer to matrix(MAT construct)
-
-
-Once a matrix is created, it will be automatically managed by using a reference-counting mechanism
-(unless the matrix header is built on top of user-allocated data, in which case you should handle t-
-he data by yourself). The matrix data will be deallocated when no one points to it; if you want to 
-release the data pointed by a matrix header before the matrix destructor is called, use the functio-
-n (RELEASE).
-
-The next important thing to learn about the matrix class is element access. Here is how the matrix 
-is stored. The elements are stored in row-major order (row by row). The (DATA) function points to 
-the first element of the first row, the (ROWS) function contains the number of matrix rows, (COLS) - 
-the number of matrix columns. There is yet another function, (STEP), that is used to actually compu-
-te the address of a matrix element. (COLS) is needed because the matrix can be part of another matr-
-ix or because there can be some padding space in the end of each row for a proper alignment.
-
-
-;;Must supply a filename parameter for the image you 
-;;will be using in this example and one for the file 
-;;the image's pixel value will be written it.
-(defun data-example (filename-1 filename-2)
-  ;;read image
-  (let* ((img (imread filename-1 1)) 
-         ;;INPUT is a pointer to IMG data
-	 (input (data img))
-         ;;variables used to hold the BGR image pixel values
-	 (b 0)
-	 (g 0)
-	 (r 0)
-	 (window-name "DATA Example"))
-    (if (empty img) 
-	(return-from data-example 
-	  (format t "Image not loaded")))
-    (named-window window-name +window-normal+)
-    (move-window window-name 759 175)
-    ;;In a loop access IMG pixel data using the STEP* 
-    ;;function and print to a file instead of the co-
-    ;;nsole so your implimentation doesn't freeze.
-    (with-open-file (str filename-2
-			 :direction :output
-			 :if-exists :supersede
-			 :if-does-not-exist :create)
-      (dotimes (i (rows img))
-	(dotimes (j (cols img))
-	  (setf b (mem-aref input :uchar 
-			    (+  (* (step* img) i) (* 3 j) )))
-	  (setf g (mem-aref input :uchar 
-			    (+ (+  (* (step* img) i) (* 3 j) ) 1)))
-	  (setf r (mem-aref input :uchar 
-			    (+ (+  (* (step* img) i) (* 3 j) ) 2)))
-	  (format str "(~a,~a,~a)~%" b g r))))
-    (imshow window-name img)
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name)))
-
-
-
 $
 
 Time how long a function takes to complete n iterations.
@@ -12808,62 +13536,93 @@ LISP-CV> (POINT-Y A)
 0
 
 
+
 EXTRA FUNCTIONS:
+
 
 
 DEL-*
 
+
 Deletes allocated memory
 
-LISP-CV: (DEL-FEATURE-2D (PTR FEATURE-2D)) => :VOID
 
-LISP-CV: (DEL-KP (PTR KEY-POINT)) => :VOID
+LISP-CV: (DEL (SELF :POINTER)) => :VOID
 
-LISP-CV: (DEL-MAT (PTR MAT)) => :VOID
+LISP-CV: (DEL-ANN-MLP (SELF ANN-MLP)) => :VOID
 
-LISP-CV: (DEL-MAT-EXPR (PTR MAT-EXPR)) => :VOID
+LISP-CV: (DEL-ANN-MLP-TRAIN-PARAMS (SELF ANN-MLP-TRAIN-PARAMS)) => :VOID
 
-LISP-CV: (DEL-POINT (PTR POINT)) => :VOID
+LISP-CV: (DEL-CASC-CLASS (SELF CASCADE-CLASSIFIER)) => :VOID
 
-LISP-CV: (DEL-POINT-2D (PTR POINT-2D)) => :VOID
+LISP-CV: (DEL-DMATCH (SELF DMATCH)) => :VOID
 
-LISP-CV: (DEL-POINT-2F (PTR POINT-2F)) => :VOID
+LISP-CV: (DEL-FEATURE-2D (SELF FEATURE-2D)) => :VOID
 
-LISP-CV: (DEL-POINT-3D (PTR POINT-3D)) => :VOID
+LISP-CV: (DEL-KP (SELF KEY-POINT)) => :VOID
 
-LISP-CV: (DEL-POINT-3F (PTR POINT-3F)) => :VOID
+LISP-CV: (DEL-MAT (SELF MAT)) => :VOID
 
-LISP-CV: (DEL-POINT-3I (PTR POINT-3I)) => :VOID
+LISP-CV: (DEL-MAT-EXPR (SELF MAT-EXPR)) => :VOID
 
-LISP-CV: (DEL-RECT (PTR RECT)) => :VOID
+LISP-CV: (DEL-POINT (SELF POINT)) => :VOID
 
-LISP-CV: (DEL-SIZE (PTR SIZE)) => :VOID
+LISP-CV: (DEL-POINT-2D (SELF POINT-2D)) => :VOID
 
-LISP-CV: (DEL-VEC-CHAR (PTR VECTOR-CHAR)) => :VOID
+LISP-CV: (DEL-POINT-2F (SELF POINT-2F)) => :VOID
 
-LISP-CV: (DEL-VEC-DBL (PTR VECTOR-DOUBLE)) => :VOID
+LISP-CV: (DEL-POINT-3D (SELF POINT-3D)) => :VOID
 
-LISP-CV: (DEL-VEC-DM (PTR VECTOR-DMATCH)) => :VOID
+LISP-CV: (DEL-POINT-3F (SELF POINT-3F)) => :VOID
 
-LISP-CV: (DEL-VEC-FLT (PTR VECTOR-FLOAT)) => :VOID
+LISP-CV: (DEL-POINT-3I (SELF POINT-3I)) => :VOID
 
-LISP-CV: (DEL-VEC-INT (PTR VECTOR-INT)) => :VOID
+LISP-CV: (DEL-RECT (SELF RECT)) => :VOID
 
-LISP-CV: (DEL-VEC-KP (PTR VECTOR-KEY-POINT)) => :VOID
+LISP-CV: (DEL-RNG (SELF RNG)) => :VOID
 
-LISP-CV: (DEL-VEC-MAT (PTR VECTOR-MAT)) => :VOID
+LISP-CV: (DEL-ROT-RECT (SELF ROT-RECT)) => :VOID
 
-LISP-CV: (DEL-VEC-POINT (PTR VECTOR-POINT)) => :VOID
+LISP-CV: (DEL-SCALAR (SELF SCALAR)) => :VOID
 
-LISP-CV: (DEL-VEC-POINT-2F (PTR VECTOR-POINT-2F)) => :VOID
+LISP-CV: (DEL-SIZE (SELF SIZE)) => :VOID
 
-LISP-CV: (DEL-VEC-RECT (PTR VECTOR-RECT)) => :VOID
+LISP-CV: (DEL-SIZE2F (SELF SIZE2F)) => :VOID
 
-LISP-CV: (DEL-VEC-UCHAR (PTR VECTOR-UCHAR)) => :VOID
+LISP-CV: (DEL-STD-STRING (SELF *STRING)) => :VOID
+
+LISP-CV: (DEL-TERM-CRIT (SELF TERM-CRITERIA)) => :VOID
+
+LISP-CV: (DEL-VEC-CHAR (SELF VECTOR-CHAR)) => :VOID
+
+LISP-CV: (DEL-VEC-DBL (SELF VECTOR-DOUBLE)) => :VOID
+
+LISP-CV: (DEL-VEC-DM (SELF VECTOR-DMATCH)) => :VOID
+
+LISP-CV: (DEL-VEC-FLT (SELF VECTOR-FLOAT)) => :VOID
+
+LISP-CV: (DEL-VEC-INT (SELF VECTOR-INT)) => :VOID
+
+LISP-CV: (DEL-VEC-KP (SELF VECTOR-KEY-POINT)) => :VOID
+
+LISP-CV: (DEL-VEC-MAT (SELF VECTOR-MAT)) => :VOID
+
+LISP-CV: (DEL-VEC-POINT (SELF VECTOR-POINT)) => :VOID
+
+LISP-CV: (DEL-VEC-POINT-2F (SELF VECTOR-POINT-2F)) => :VOID
+
+LISP-CV: (DEL-VEC-RECT (SELF VECTOR-RECT)) => :VOID
+
+LISP-CV: (DEL-VEC-UCHAR (SELF VECTOR-UCHAR)) => :VOID
+
+LISP-CV: (DEL-VID-CAP (SELF VIDEO-CAPTURE)) => :VOID
+
+LISP-CV: (DEL-VID-WRITER (SELF VIDEO-WRITER)) => :VOID
+
 
   Parameters:	
 
-        PTR - A pointer to a <type> construct
+        SELF - A pointer to a <type> construct
 
 
 Some of the OpenCV C bindings for its C++ interface that this library binds to, allocate memory for
@@ -12880,47 +13639,75 @@ WITH-* macro.
 
 The function DEL deletes anything(may not be safe on all implementations)
 
-The function DEL-FEATURE-2D deletes a FEATURE-2D
+The function DEL-ANN-MLP deletes a ANN-MLP object.
 
-The function DEL-MAT deletes a MAT
+The function DEL-ANN-MLP-TRAIN-PARAMS deletes a ANN-MLP-TRAIN-PARAMS object.
 
-The function DEL-MAT-EXPR deletes a MAT-EXPR
+The function DEL-CASC-CLASS deletes a CASCADE-CLASSIFIER object.
 
-The function DEL-POINT deletes a POINT
+The function DEL-DMATCH deletes a DMATCH object.
 
-The function DEL-POINT-2D deletes a POINT-2D
+The function DEL-FEATURE-2D deletes a FEATURE-2D object.
 
-The function DEL-POINT-2F deletes a POINT-2F
+The function DEL-KP deletes a KEY-POINT object.
 
-The function DEL-POINT-3D deletes a POINT-3D
+The function DEL-MAT deletes a MAT object.
 
-The function DEL-POINT-3F deletes a POINT-3F
+The function DEL-MAT-EXPR deletes a MAT-EXPR object.
 
-The function DEL-POINT-3I deletes a POINT-3I
+The function DEL-POINT deletes a POINT object.
 
-The function DEL-RECT deletes a RECT
+The function DEL-POINT-2D deletes a POINT-2D object.
 
-The function DEL-VEC-CHAR deletes a VECTOR-CHAR
+The function DEL-POINT-2F deletes a POINT-2F object.
 
-The function DEL-VEC-DBL deletes a VECTOR-DOUBLE
+The function DEL-POINT-3D deletes a POINT-3D object.
 
-The function DEL-VEC-DM deletes a VECTOR-DMATCH
+The function DEL-POINT-3F deletes a POINT-3F object.
 
-The function DEL-VEC-FLT deletes a VECTOR-FLOAT
+The function DEL-POINT-3I deletes a POINT-3I object.
 
-The function DEL-VEC-INT deletes a VECTOR-INT
+The function DEL-RECT deletes a RECT object.
 
-The function DEL-VEC-KP deletes a VECTOR-KEY-POINT
+The function DEL-ROT-RECT deletes a ROTATED-RECT object.
 
-The function DEL-VEC-MAT deletes a VECTOR-MAT
+The function DEL-RNG deletes a RNG object.
 
-The function DEL-VEC-POINT deletes a VECTOR-POINT
+The function DEL-SCALAR deletes a SCALAR object.
 
-The function DEL-VEC-POINT-2F deletes a VECTOR-POINT-2F
+The function DEL-SIZE deletes a SIZE object.
 
-The function DEL-VEC-RECT deletes a VECTOR-RECT
+The function DEL-SIZE2F deletes a SIZE2F object.
 
-The function DEL-VEC-UCHAR deletes a VECTOR-UCHAR
+The function DEL-STD-STRING deletes a *STRING object.
+
+The function DEL-TERM-CRIT deletes a TERM-CRITERIA object.
+
+The function DEL-VEC-CHAR deletes a VECTOR-CHAR object.
+
+The function DEL-VEC-DBL deletes a VECTOR-DOUBLE object.
+
+The function DEL-VEC-DM deletes a VECTOR-DMATCH object.
+
+The function DEL-VEC-FLT deletes a VECTOR-FLOAT object.
+
+The function DEL-VEC-INT deletes a VECTOR-INT object.
+
+The function DEL-VEC-KP deletes a VECTOR-KEY-POINT object.
+
+The function DEL-VEC-MAT deletes a VECTOR-MAT object.
+
+The function DEL-VEC-POINT deletes a VECTOR-POINT object.
+
+The function DEL-VEC-POINT-2F deletes a VECTOR-POINT-2F object.
+
+The function DEL-VEC-RECT deletes a VECTOR-RECT object.
+
+The function DEL-VEC-UCHAR deletes a VECTOR-UCHAR object.
+
+The function DEL-VID-CAP deletes a VIDEO-CAPTURE object.
+
+The function DEL-VID-WRITER deletes a VIDEO-WRITER object.
 
 
 Example:

@@ -16,6 +16,15 @@
        (values))))
 
 
+(defmacro with-ann-mlp-train-params (bind &body body)
+  "Ensures DEL-ANN-MLP-TRAIN-PARAMS gets called 
+   when ANN-MLP-TRAIN-PARAMS goes out of scope."
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-ann-mlp-train-params %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
+
+
 (defmacro with-cascade-classifier (bind &body body)
   "Ensures DEL-CASC-CLASS gets called 
    when CASCADE-CLASSIFIER goes out of scope."
@@ -67,6 +76,15 @@
   `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
      (unwind-protect (progn ,@body)
        (mapcar #!(del-mat-expr %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
+
+
+(defmacro with-normal-bayes-classifier (bind &body body)
+  "Ensures DEL-NORMAL-BAYES-CLASSIFIER gets called 
+   when NORMAL-BAYES-CLASSIFIER goes out of scope."
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-normal-bayes-classifier %1) ,(cons 'list (mapcar #!(car %1) bind)))
        (values))))
 
 
@@ -186,13 +204,12 @@
        (mapcar #!(del-size2f %1) ,(cons 'list (mapcar #!(car %1) bind)))
        (values))))
 
-
-(defmacro with-surf (bind &body body)
-  "Ensures DEL-SURF gets called 
-   when SURF goes out of scope."
+(defmacro with-string (bind &body body)
+  "Ensures DEL-STD-STRING gets called 
+   when *STRING goes out of scope."
   `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
      (unwind-protect (progn ,@body)
-       (mapcar #!(del-surf %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (mapcar #!(del-std-string %1) ,(cons 'list (mapcar #!(car %1) bind)))
        (values))))
 
 

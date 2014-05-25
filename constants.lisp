@@ -31,6 +31,7 @@
   (+dbl-max+ 1.7976931348623157d308)
   (+flt-max+ 3.40282347e38) 
 
+
 ;;; core
 
   (+max-dim+ 32)
@@ -196,6 +197,10 @@
   (+stsnullptr+  -27)  
   (+stsveclengtherr+ -28) 
   (+stsfilterstructcontenterr+ -29) 
+  (+termcrit-iter+ 1)
+  (+termcrit-number 1)
+  (+termcrit-eps+ 2)
+
 
 ;;; highgui
 
@@ -564,9 +569,15 @@
 
 ;;; ml 
 
-(+ann-mlp-identity+ 0)
-(+ann-mlp-sigmoid-sym+ 1)
-(+ann-mlp-gaussian+  2) 
+  (+ann-mlp-identity+ 0)
+  (+ann-mlp-sigmoid-sym+ 1)
+  (+ann-mlp-gaussian+  2) 
+  (+ann-mlp-train-params-backprop+  0) 
+  (+ann-mlp-train-params-rprop+  1)
+  (+update-weights+ 1) 
+  (+no-input-scale+ 2) 
+  (+no-output-scale+ 4)
+
 
 ;;; photo
 

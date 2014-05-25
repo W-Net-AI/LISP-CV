@@ -16,11 +16,6 @@
 ;; MOUSE-CALLBACK
 (defctype mouse-callback :pointer)
 
-;; SVM
-(defctype svm :pointer)
-
-;; SVM-PARAMS
-(defctype svm-params :pointer)
 
 ;; TRACKBAR-CALLBACK
 (defctype trackbar-callback :pointer)
@@ -338,6 +333,7 @@
 
 ;; CORE
 
+
 ;; DMATCH
 
 (define-foreign-type dmatch ()
@@ -360,6 +356,7 @@
     (when (garbage-collect c-type)
       (tg:finalize dmatch (lambda () (del-dmatch c-pointer))))
     dmatch))
+
 
 
 ;; KEY-POINT
@@ -856,31 +853,6 @@
     feature-2d))
 
 
-;; SURF
-
-
-(define-foreign-type surf ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
-                     :garbage-collect))
-  (:actual-type :pointer)
-  (:simple-parser surf))
-
-
-(defclass cv-surf ()
-  ((c-pointer :reader c-pointer :initarg :c-pointer)))
-
-
-(defmethod translate-to-foreign ((lisp-value cv-surf) (c-type surf))
-  (values  (c-pointer lisp-value) lisp-value))
-
-
-(defmethod translate-from-foreign (c-pointer (c-type surf))
-  (let ((surf (make-instance 'cv-surf :c-pointer c-pointer)))
-    (when (garbage-collect c-type)
-      (tg:finalize surf (lambda () (del-surf c-pointer))))
-    surf))
-
-
 ;; OBJDETECT
 
 
@@ -934,6 +906,55 @@
     (when (garbage-collect c-type)
       (tg:finalize ann-mlp (lambda () (del-std-string c-pointer))))
     ann-mlp))
+
+
+;; ANN-MLP-TRAIN-PARAMS
+
+(define-foreign-type ann-mlp-train-params ()
+  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+                     :garbage-collect))
+  (:actual-type :pointer)
+  (:simple-parser ann-mlp-train-params))
+
+
+(defclass cv-ann-mlp-train-params ()
+  ((c-pointer :reader c-pointer :initarg :c-pointer)))
+
+
+(defmethod translate-to-foreign ((lisp-value cv-ann-mlp-train-params) (c-type ann-mlp-train-params))
+  (values  (c-pointer lisp-value) lisp-value))
+
+
+(defmethod translate-from-foreign (c-pointer (c-type ann-mlp-train-params))
+  (let ((ann-mlp-train-params  (make-instance 'cv-ann-mlp-train-params :c-pointer c-pointer)))
+    (when (garbage-collect c-type)
+      (tg:finalize ann-mlp-train-params (lambda () (del-ann-mlp-train-params c-pointer))))
+    ann-mlp-train-params))
+
+
+;; NORMAL-BAYES-CLASSIFIER
+
+(define-foreign-type normal-bayes-classifier ()
+  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+                     :garbage-collect))
+  (:actual-type :pointer)
+  (:simple-parser normal-bayes-classifier))
+
+
+(defclass cv-normal-bayes-classifier ()
+  ((c-pointer :reader c-pointer :initarg :c-pointer)))
+
+
+(defmethod translate-to-foreign ((lisp-value cv-normal-bayes-classifier) (c-type normal-bayes-classifier))
+  (values  (c-pointer lisp-value) lisp-value))
+
+
+(defmethod translate-from-foreign (c-pointer (c-type normal-bayes-classifier))
+  (let ((normal-bayes-classifier  (make-instance 'cv-normal-bayes-classifier :c-pointer c-pointer)))
+    (when (garbage-collect c-type)
+      (tg:finalize normal-bayes-classifier (lambda () (del-normal-bayes-classifier c-pointer))))
+    normal-bayes-classifier))
+
 
 
 ;; NONFREE

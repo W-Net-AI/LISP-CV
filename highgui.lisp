@@ -27,7 +27,7 @@
 
 (defun create-trackbar (trackbarname winname value count &optional (on-change (null-pointer)) (userdata (null-pointer)))
        "Creates a trackbar and attaches it to the specified window."
-       (%create-trackbar (c-string-to-string trackbarname (length trackbarname)) (c-string-to-string winname (length winname)) 
+       (%create-trackbar (%c-string-to-string trackbarname (length trackbarname)) (%c-string-to-string winname (length winname)) 
 			 value count on-change userdata))
 
 
@@ -45,7 +45,7 @@
 
 (defun destroy-window (winname)
        "Destroys a window."
-       (%destroy-window (c-string-to-string winname (length winname))))
+       (%destroy-window (%c-string-to-string winname (length winname))))
        
        
 ;; int getTrackbarPos(const String& trackbarname, const String& winname)
@@ -56,7 +56,7 @@
 
 (defun get-trackbar-pos (trackbarname winname)
   "Returns the trackbar position."
-  (%get-trackbar-pos (c-string-to-string trackbarname (length trackbarname)) (c-string-to-string winname (length winname))))
+  (%get-trackbar-pos (%c-string-to-string trackbarname (length trackbarname)) (%c-string-to-string winname (length winname))))
 
 
 ;; void imshow(const string& winname, InputArray mat)
@@ -68,7 +68,7 @@
 
 (defun imshow (winname mat)
        "Displays an image in the specified window."
-       (%imshow (c-string-to-string winname (length winname)) mat))
+       (%imshow (%c-string-to-string winname (length winname)) mat))
 
 
 ;; void moveWindow(const string& winname, int x, int y)
@@ -81,7 +81,7 @@
 
 (defun move-window (winname x y)
        "Moves window to the specified position"
-       (%move-window (c-string-to-string winname (length winname)) x y))
+       (%move-window (%c-string-to-string winname (length winname)) x y))
 
 
 ;; void namedWindow(const string& winname, int flags=WINDOW_AUTOSIZE)
@@ -92,7 +92,7 @@
 
 (defun named-window (winname &optional (flags +window-autosize+))
        "Creates a window."
-       (%named-window (c-string-to-string winname (length winname)) flags))
+       (%named-window (%c-string-to-string winname (length winname)) flags))
 
 (defmacro with-named-window ((winname &optional (flags +window-autosize+)) &body body)
 	  `(unwind-protect (progn (named-window ,winname ,flags)
@@ -111,7 +111,7 @@
 
 (defun set-mouse-callback (winname on-mouse &optional (userdata (null-pointer)))
        "Sets mouse handler for the specified window."
-       (%set-mouse-callback (c-string-to-string winname (length winname)) on-mouse userdata))
+       (%set-mouse-callback (%c-string-to-string winname (length winname)) on-mouse userdata))
        
        
 ;; void setTrackbarPos(const String& trackbarname, const String& winname, int pos)
@@ -123,7 +123,7 @@
 
 (defun set-trackbar-pos (trackbarname winname pos)
   "Sets the trackbar position."
-  (%set-trackbar-pos (c-string-to-string trackbarname (length trackbarname)) (c-string-to-string winname (length winname))  pos))
+  (%set-trackbar-pos (%c-string-to-string trackbarname (length trackbarname)) (%c-string-to-string winname (length winname))  pos))
 
 
 ;; int waitKey(int delay=0)
@@ -165,7 +165,7 @@
 	      ((numberp src)
 	       (video-capture-dev src))
 	       ((stringp src) 
-		(video-capture-fn (c-string-to-string src (length src))))
+		(video-capture-fn (%c-string-to-string src (length src))))
 		(t nil)))
 
 
@@ -216,7 +216,7 @@
   (flags :int))
 
 (defun imread (filename &optional (flags 1))
-       (%imread (c-string-to-string filename (length filename)) flags))
+       (%imread (%c-string-to-string filename (length filename)) flags))
 
 
 ;; bool imwrite(const string& filename, InputArray img, const vector<int>& params=vector<int>() )
@@ -252,7 +252,7 @@
        (cond ((eq filename nil)
 	      (video-writer0))
 	      (filename
-	       (video-writer5 (c-string-to-string filename (length filename)) fourcc fps frame-size is-color))
+	       (video-writer5 (%c-string-to-string filename (length filename)) fourcc fps frame-size is-color))
 	       (t nil)))
 
 
@@ -318,7 +318,7 @@
 
 (defun display-overlay (winname text &optional (delayms 0))
   "Displays a text on a window image as an overlay for a specified duration."
-  (%display-overlay (c-string-to-string winname (length winname)) (c-string-to-string text (length text)) delayms))
+  (%display-overlay (%c-string-to-string winname (length winname)) (%c-string-to-string text (length text)) delayms))
 
 
 
@@ -329,7 +329,7 @@
 
 (defun get-window-property (winname prop-id)
        "Provides parameters of a window."
-       (%get-window-property (c-string-to-string winname (length winname)) prop-id))
+       (%get-window-property (%c-string-to-string winname (length winname)) prop-id))
 
 
 ;; void setWindowProperty(const string& winname, int prop_id, double prop_value)
@@ -341,5 +341,5 @@
 
 (defun set-window-property (winname prop-id prop-value)
        "Changes parameters of a window dynamically."
-       (%set-window-property  (c-string-to-string winname (length winname)) prop-id (coerce prop-value 'double-float)))
+       (%set-window-property  (%c-string-to-string winname (length winname)) prop-id (coerce prop-value 'double-float)))
 

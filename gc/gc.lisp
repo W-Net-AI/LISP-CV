@@ -665,6 +665,13 @@
 	    (t nil)))
 
 
+;; Mat Mat::row(int y) const
+;; Mat* cv_Mat_getRow(Mat* self, int y) 
+(defcfun ("cv_Mat_getRow" row) (cv::mat :garbage-collect t)
+  (self cv::mat)
+  (y :int))
+
+
 ;; Mat Mat::rowRange(int startrow, int endrow) const
 ;; Mat* cv_Mat_getRowRange(Mat* self, int startrow, int endrow)
 (defcfun ("cv_Mat_getRowRange" row-range) (cv::mat :garbage-collect t)
@@ -965,7 +972,10 @@
 	       (t nil)))
 
 
-;;; FEATURES2D - Qt New Functions
+;;; HIGHGUI - Qt New Functions
+
+
+;;; FEATURES2D
 
 
 ;;; FEATURES2D - Feature Detection and Description
@@ -1004,6 +1014,9 @@
 ;;; FEATURES2D - Common Interfaces of Descriptor Matchers
 
 
+;;; OBJDETECT
+
+
 ;;; OBJDETECT - Cascade Classification
 
 
@@ -1024,6 +1037,73 @@
 	      (filename
 	       (cascade-classifier1 (c-string-to-string filename (length filename))))
 	       (t nil)))
+
+
+;;; ML
+
+
+;;; ML - Normal Bayes Classifier
+
+
+;; CvNormalBayesClassifier::CvNormalBayesClassifier()
+;; CvNormalBayesClassifier* cv_create_CvNormalBayesClassifier()
+(defcfun ("cv_create_CvNormalBayesClassifier" %normal-bayes-classifier) (cv::normal-bayes-classifier :garbage-collect t))
+
+;; CvNormalBayesClassifier::CvNormalBayesClassifier(const Mat& trainData, const Mat& responses, const Mat& varIdx=Mat(), 
+;;                                                  const Mat& sampleIdx=Mat() )
+;; CvNormalBayesClassifier* cv_create_CvNormalBayesClassifier4(Mat* trainData, Mat* responses, Mat* varIdx, Mat* sampleIdx) 
+(defcfun ("cv_create_CvNormalBayesClassifier4" normal-bayes-classifier4) (cv::normal-bayes-classifier :garbage-collect t)
+  (train-data cv::mat)
+  (responses cv::mat)
+  (var-idx cv::mat)
+  (sample-idx cv::mat))
+
+(defun normal-bayes-classifier (&optional train-data responses  (var-idx (cv::mat) given-var-idx) (sample-idx (cv::mat) given-sample-idx))
+  (let ((return (if train-data
+		    (normal-bayes-classifier4 train-data responses  var-idx sample-idx)
+		    (%normal-bayes-classifier))))
+    (if given-var-idx nil (cv::del-mat var-idx))
+    (if given-sample-idx nil (cv::del-mat sample-idx)) 
+    return))
+
+
+;;; ML - Neural Networks
+
+
+;; CvANN_MLP::CvANN_MLP()
+;; CvANN_MLP* cv_create_CvANN_MLP()
+(defcfun ("cv_create_CvANN_MLP" %ann-mlp) (cv::ann-mlp :garbage-collect t))
+
+;; CvANN_MLP::CvANN_MLP(const CvMat* layerSizes, int activateFunc=CvANN_MLP::SIGMOID_SYM, double fparam1=0, double fparam2=0 )
+;; CvANN_MLP* cv_create_CvANN_MLP4(Mat* layerSizes, int activateFunc, double fparam1, double fparam2) 
+(defcfun ("cv_create_CvANN_MLP4" ann-mlp4) (cv::ann-mlp :garbage-collect t)
+  (layer-sizes cv::mat)
+  (activate-func :int)
+  (fparam1 :double)
+  (fparam2 :double))
+
+(defun ann-mlp (&optional layer-sizes (activate-func cv::+ann-mlp-sigmoid-sym+) (fparam1 0d0) (fparam2 0d0))
+  (if layer-sizes
+      (ann-mlp4 layer-sizes activate-func fparam1 fparam2)
+      (%ann-mlp)))
+
+
+;; CvANN_MLP_TrainParams::CvANN_MLP_TrainParams()
+;; CvANN_MLP_TrainParams* cv_create_CvANN_MLP_TrainParams()
+(defcfun ("cv_create_CvANN_MLP_TrainParams" %ann-mlp-train-params) (cv::ann-mlp-train-params :garbage-collect t))
+
+;; CvANN_MLP_TrainParams::CvANN_MLP_TrainParams(CvTermCriteria term_crit, int train_method, double param1, double param2=0 )
+;; CvANN_MLP_TrainParams* cv_create_CvANN_MLP_TrainParams4(TermCriteria* term_crit, int train_method, double param1, double param2)
+(defcfun ("cv_create_CvANN_MLP_TrainParams" ann-mlp-train-params4) (cv::ann-mlp-train-params :garbage-collect t)
+  (term-crit cv::term-criteria)
+  (train-method :int)
+  (param1 :double)
+  (param2 :double))
+
+(defun ann-mlp-train-params (&optional term-crit train-method param1 (param2 0))
+       (if term-crit
+	   (ann-mlp-train-params4 term-crit train-method param1 param2)
+	   (%ann-mlp-train-params)))
 
 
 

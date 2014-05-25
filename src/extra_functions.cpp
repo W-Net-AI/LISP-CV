@@ -10,6 +10,22 @@ using namespace cvflann;
 
 extern "C" {
 
+CvANN_MLP_TrainParams* cv_create_CvANN_MLP_TrainParams() {
+    return new CvANN_MLP_TrainParams();
+}
+
+CvANN_MLP_TrainParams* cv_create_CvANN_MLP_TrainParams4(TermCriteria* term_crit, int train_method, double param1, double param2) {
+    return new CvANN_MLP_TrainParams(*term_crit, train_method, param1, param2);
+}
+
+CvSVMParams* cv_create_CvSVMParams() {
+    return new CvSVMParams();
+}
+
+//CvSVMParams* cv_create_CvSVMParams10(int svm_type, int kernel_type, double degree, double gamma, double coef0, double Cvalue, double nu, //double p, Mat* class_weights, TermCriteria* term_crit) {
+//    return new CvSVMParams(svm_type, kernel_type, degree, gamma, coef0, Cvalue, nu, p, *class_weights, *term_crit);
+//}
+
 void cv_displayOverlay(String* winname, String* text, int delayms) {
 	cv::displayOverlay(*winname, *text, delayms);
 }
@@ -131,6 +147,10 @@ void cv_delete_CvANN_MLP(CvANN_MLP* self) {
     delete self;
 }
 
+void cv_delete_CvANN_MLP_TrainParams(CvANN_MLP_TrainParams* self) {
+    delete self;
+}
+
 void cv_delete_CascadeClassifier(CascadeClassifier* self) {
      delete self;
 }
@@ -144,6 +164,10 @@ void cv_delete_Feature2D(Feature2D* self) {
 }
 
 void cv_delete_KeyPoint(KeyPoint* self) {
+     delete self;
+}
+
+void cv_delete_CvNormalBayesClassifier(CvNormalBayesClassifier* self) {
      delete self;
 }
 
