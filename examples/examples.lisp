@@ -584,27 +584,27 @@ ix or because there can be some padding space in the end of each row for a prope
 
 
 
-;;Must supply a filename parameter for the image you 
-;;will be using in this example and one for the file 
-;;the image's pixel value will be written it.
 (defun data-example (filename)
-  ;;read image
-  (with-mat ((img (imread filename 1))) 
-    ;;INPUT is a pointer to IMG data
-    (let ((window-name "DATA Example")
-	  ;;variables used to hold the BGR image pixel values
-	  (b 0)
-	  (g 0)
-	  (r 0)
-	  (input (data img)))
+
+  (let ((window-name "DATA Example")
+	;;Variables used to hold the 
+	;;BGR image pixel values
+	(b 0)
+	(g 0)
+	(r 0)
+        ;;INPUT is a pointer 
+        ;;to the IMG data
+	(input (data img))) 
+    ;;Read image
+    (with-mat ((img (imread filename 1))) 
       (if (empty img) 
 	  (return-from data-example 
 	    (format t "Image not loaded")))
       (with-named-window (window-name +window-normal+)
 	(move-window window-name 759 175)
 	;;In a loop access IMG pixel data using the STEP* 
-	;;function and print to a file instead of the co-
-	;;nsole so your implimentation doesn't freeze.
+	;;function and print to a file, instead of the co-
+	;;nsole, so your implementation doesn't freeze.
 	(with-open-file (str (cat *lisp-cv-src-dir* 
 				  "/data/pixel-values.txt")
 			     :direction :output
