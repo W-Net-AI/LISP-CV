@@ -1067,6 +1067,67 @@
     return))
 
 
+;;; ML - K-Nearest Neighbors
+
+
+
+;; CvKNearest::CvKNearest()
+;; CvKNearest* cv_create_CvKNearest() 
+(defcfun ("cv_create_CvKNearest" %k-nearest) (cv::k-nearest :garbage-collect t))
+
+;; CvKNearest::CvKNearest(const CvMat* trainData, const CvMat* responses, const CvMat* sampleIdx=0, bool isRegression=false, 
+;;                        int max_k=32 )
+;; CvKNearest* cv_create_CvKNearest5(Mat* trainData, Mat* responses, Mat* sampleIdx, bool isRegression, int max_k) 
+(defcfun ("cv_create_CvKNearest5" k-nearest5) (cv::k-nearest :garbage-collect t)
+  (train-data cv::mat)
+  (responses cv::mat)
+  (sample-idx cv::mat)
+  (is-regression :boolean)
+  (max-k :int))
+
+(defun k-nearest (&optional train-data responses (sample-idx (null-pointer)) (is-regression nil) (max-k 32))
+  (if train-data
+      (k-nearest5 train-data responses sample-idx is-regression max-k)
+      (%k-nearest)))
+
+
+;;; ML - Decision Trees
+
+
+;; CvDTree:CvDTree()
+;; CvDTree* cv_create_CvDTree() 
+(defcfun ("cv_create_CvDTree" d-tree) (cv::d-tree :garbage-collect t))
+
+
+;; CvDTreeParams::CvDTreeParams()
+;; CvDTreeParams* cv_create_CvDTreeParams()
+(defcfun ("cv_create_CvDTreeParams" %d-tree-params) (cv::d-tree-params :garbage-collect t))
+
+;; CvDTreeParams::CvDTreeParams(int max_depth, int min_sample_count, float regression_accuracy, bool use_surrogates, 
+;;                              int max_categories, int cv_folds, bool use_1se_rule, bool truncate_pruned_tree, const float* priors)
+;; CvDTreeParams* cv_create_CvDTreeParams9(int max_depth, int min_sample_count, float regression_accuracy, bool use_surrogates, 
+;;                                         int max_categories, int cv_folds, bool use_1se_rule, bool truncate_pruned_tree, 
+;;                                         const float* priors)
+(defcfun ("cv_create_CvDTreeParams9" d-tree-params9) (cv::d-tree-params :garbage-collect t)
+  (max-depth :int)
+  (min-sample-count :int)
+  (regression-accuracy :float)
+  (use-surrogates :boolean)
+  (max-categories :int)
+  (folds :int)
+  (use-1se-rule :boolean)
+  (truncate-pruned-tree :boolean)
+  (priors :pointer))
+
+(defun d-tree-params (&optional max-depth min-sample-count regression-accuracy use-surrogates max-categories folds use-1se-rule
+			truncate-pruned-tree priors)
+  (if max-depth
+      (d-tree-params9 max-depth min-sample-count regression-accuracy use-surrogates max-categories folds use-1se-rule
+                      truncate-pruned-tree priors)
+      (%d-tree-params)))
+
+
+
 ;;; ML - Neural Networks
 
 

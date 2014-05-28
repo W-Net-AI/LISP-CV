@@ -43,10 +43,31 @@
 
 
 ;; void operator delete  ( void* ptr )
+;; void cv_delete_CvDTree(CvDTree* self)
+(defcfun ("cv_delete_CvDTree" del-d-tree) :void
+  "Calls delete on D-TREE"
+  (self d-tree))
+
+
+;; void operator delete  ( void* ptr )
+;; void cv_delete_CvDTreeParams(CvDTreeParam* self)
+(defcfun ("cv_delete_CvDTreeParams" del-d-tree-params) :void
+  "Calls delete on D-TREE-PARAMS"
+  (self d-tree-params))
+
+
+;; void operator delete  ( void* ptr )
 ;; void cv_delete_Feature2D(Feature2D* self)
 (defcfun ("cv_delete_Feature2D" del-feature-2d) :void
   "Calls delete on FEATURE-2D"
   (self feature-2d))
+
+
+;; void operator delete  ( void* ptr )
+;; void cv_delete_CvKNearest(CvKNearest* self)
+(defcfun ("cv_delete_CvKNearest" del-k-nearest) :void
+  "Calls delete on K-NEAREST"
+  (self k-nearest))
 
 
 ;; void operator delete  ( void* ptr )

@@ -30,6 +30,7 @@
   (+dbl-min+ -1.7976931348623157d308)
   (+dbl-max+ 1.7976931348623157d308)
   (+flt-max+ 3.40282347e38) 
+  (+rand-max+ 2147483647)
 
 
 ;;; core
@@ -577,6 +578,11 @@
   (+update-weights+ 1) 
   (+no-input-scale+ 2) 
   (+no-output-scale+ 4)
+  (+var-numerical+ 0)
+  (+var-ordered+ 0)
+  (+var-categorical+ 1)
+  (+col-sample+ 0)
+  (+row-sample+ 1)
 
 
 ;;; photo

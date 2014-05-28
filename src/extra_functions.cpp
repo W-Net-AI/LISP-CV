@@ -10,20 +10,12 @@ using namespace cvflann;
 
 extern "C" {
 
-CvANN_MLP_TrainParams* cv_create_CvANN_MLP_TrainParams() {
-    return new CvANN_MLP_TrainParams();
-}
-
-CvANN_MLP_TrainParams* cv_create_CvANN_MLP_TrainParams4(TermCriteria* term_crit, int train_method, double param1, double param2) {
-    return new CvANN_MLP_TrainParams(*term_crit, train_method, param1, param2);
-}
-
 CvSVMParams* cv_create_CvSVMParams() {
     return new CvSVMParams();
 }
 
-//CvSVMParams* cv_create_CvSVMParams10(int svm_type, int kernel_type, double degree, double gamma, double coef0, double Cvalue, double nu, //double p, Mat* class_weights, TermCriteria* term_crit) {
-//    return new CvSVMParams(svm_type, kernel_type, degree, gamma, coef0, Cvalue, nu, p, *class_weights, *term_crit);
+//CvSVMParams* cv_create_CvSVMParams10(int svm_type, int kernel_type, double degree, double gamma, double coef0, double Cvalue, double nu, //double p, CvMat* class_weights, TermCriteria term_crit) {
+//   return new CvSVMParams(svm_type, kernel_type, degree, gamma, coef0, Cvalue, nu, p, Mat(class_weights), term_crit);
 //}
 
 void cv_displayOverlay(String* winname, String* text, int delayms) {
@@ -159,11 +151,23 @@ void cv_delete_DMatch(DMatch* self) {
     delete self;
 }
 
+void cv_delete_CvDTree(CvDTree* self) {
+    delete self;
+}
+
+void cv_delete_CvDTreeParams(CvDTreeParams* self) {
+    delete self;
+}
+
 void cv_delete_Feature2D(Feature2D* self) {
     delete self;
 }
 
 void cv_delete_KeyPoint(KeyPoint* self) {
+     delete self;
+}
+
+void cv_delete_CvKNearest(CvKNearest* self) {
      delete self;
 }
 

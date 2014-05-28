@@ -771,6 +771,32 @@
   (self point-3i))
 
 
+(defun print-mat (mat type &key to-file)
+
+  (cond (to-file
+         (let ((*print-case* :downcase))
+           (with-open-file (str (cat *lisp-cv-src-dir* 
+                                     "/data/" 
+                                     (write-to-string to-file))
+				:direction :output
+				:if-exists :supersede
+				:if-does-not-exist :create)
+	     (dotimes (i (rows mat))
+	       (dotimes (j (cols mat))
+		 (format str "~a" (at mat i j type))
+		 (format str " "))
+	       (format str "~%")))))
+        
+        ((eq to-file nil)
+         (dotimes (i (rows mat))
+           (dotimes (j (cols mat))
+             (format t "~a" (at mat i j type))
+             (princ #\Space))
+           (princ #\Newline)))
+        
+        (t nil)))
+
+
 ;; MatExpr* promote(Mat* m) 
 (defcfun ("promote" promote) mat-expr
   "Converts a MAT to a MAT-EXPR."
@@ -1000,7 +1026,7 @@
 	     
 	     ((numberp (or arg1 arg2)) 
 	      (size2 (coerce arg1 'double-float) 
-		     (stricoerce arg2 'double-float)))
+		     (coerce arg2 'double-float)))
 	     
 	     ((eq (type-of arg1) 'cv-mat) (mat-size arg1))
 	     (t nil)))
@@ -1503,8 +1529,8 @@
        (cond ((or (eq (type-of (and a b)) 'FIXNUM)
 		  (integerp (and a b)))
 	      (uniform-i rng a b))
-	      ((eq (type-of (and a b)) 'SINGLE-FLOAT) (uniform-f rng a b))
-	      ((eq (type-of (and a b)) 'DOUBLE-FLOAT) (uniform-d rng a b))
+	      ((eq (type-of (and a b)) 'single-float) (uniform-f rng a b))
+	      ((eq (type-of (and a b)) 'double-float) (uniform-d rng a b))
 	      (t nil)))
 
 
@@ -1586,7 +1612,7 @@
 ;; Size getTextSize(const string& text, int fontFace, double fontScale, int thickness, int* baseLine)
 ;; Size* cv_getTextSize(String* text, int fontFace, double fontScale, int thickness, int* baseLine)
 (defcfun ("cv_getTextSize" %get-text-size) (:pointer size)
-  (text (:pointer *string))
+  (text *string)
   (font-face :int)
   (font-scale :double)
   (thickness :int) 

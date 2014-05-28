@@ -20,7 +20,8 @@
    #:->
    #:rename-package-nicknames
    #:full-pathname
-   #:lisp-cv-src-dir
+   #:*lisp-cv-data-dir*
+   #:*lisp-cv-src-dir*
    #:run-program
    #:println
    #:mklist
@@ -99,6 +100,9 @@
    #:del-ann-mlp-train-params
    #:del-casc-class
    #:del-dmatch
+   #:del-d-tree
+   #:del-d-tree-params
+   #:del-k-nearest
    #:del-kp
    #:del-mat
    #:del-mat-expr
@@ -129,15 +133,18 @@
    #:del-vec-rect
    #:del-vec-uchar
    #:del-vid-cap
-   #:del-vid-writer
+   #:del-vid-writer35
 
 
 ;; WITH-MACROS
 
    #:with-cascade-classifier
    #:with-dmatch
+   #:with-d-tree
+   #:with-d-tree-params
    #:with-feature-2d
    #:with-keypoint
+   #:with-k-nearest
    #:with-mat
    #:with-mat-expr
    #:with-normal-bayes-classifier
@@ -176,8 +183,12 @@
    #:ann-mlp-train-params
    #:cascade-classifier
    #:dmatch
+   #:d-tree
+   #:d-tree-node
+   #:d-tree-params
    #:feature-2d
    #:key-point
+   #:k-nearest
    #:mat
    #:mat-expr
    #:mouse-callback
@@ -362,7 +373,7 @@
    #:*step
    #:sub
    #:rect-tl
-   #:total
+   #:total142
 
 ;; core - Dynamic Structures
 
@@ -978,10 +989,31 @@
    #:cascade-classifier-load
    #:detect-multi-scale
 
+
+;;; ml
+
+   #:+var-numerical+
+   #:+var-ordered+
+   #:+var-categorical+
+   #:+col-sample+
+   #:+row-sample+
+
 ;;; ml - Normal Bayes Classifier
 
    #:normal-bayes-classifier
    #:normal-bayes-classifier-predict
+
+;;; ml - K-Nearest Neighbors
+
+   #:k-nearest
+   #:k-nearest-find-nearest
+
+;;; ml - Decision Trees
+
+   #:d-tree
+   #:d-tree-params
+   #:d-tree-predict
+   #:d-tree-train
 
 ;;; ml - Neural Networks
 

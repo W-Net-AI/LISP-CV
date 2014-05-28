@@ -187,6 +187,16 @@
    #:normal-bayes-classifier
    #:normal-bayes-classifier-predict
 
+;;; ml - K-Nearest Neighbors
+
+   #:k-nearest
+   #:k-nearest-find-nearest
+
+;;; ml - Decision Trees
+
+   #:d-tree
+   #:d-tree-params
+
 ;;; ml - Neural Networks
 
    #:ann-mlp

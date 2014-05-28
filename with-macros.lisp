@@ -43,6 +43,24 @@
        (values))))
 
 
+(defmacro with-d-tree (bind &body body)
+  "Ensures DEL-D-TREE gets called 
+   when D-TREE goes out of scope."
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-d-tree %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
+
+
+(defmacro with-d-tree-params (bind &body body)
+  "Ensures DEL-D-TREE-PARAMS gets called 
+   when D-TREE-PARAMS goes out of scope."
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-d-tree-params %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
+
+
 (defmacro with-feature-2d (bind &body body)
   "Ensures DEL-FEATURE-2D gets called 
    when FEATURE-2D goes out of scope."
@@ -58,6 +76,15 @@
   `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
      (unwind-protect (progn ,@body)
        (mapcar #!(del-kp %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
+
+
+(defmacro with-k-nearest (bind &body body)
+  "Ensures DEL-K-NEAREST gets called 
+   when K-NEAREST goes out of scope."
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-k-nearest %1) ,(cons 'list (mapcar #!(car %1) bind)))
        (values))))
 
 

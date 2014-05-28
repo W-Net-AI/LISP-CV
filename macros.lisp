@@ -130,15 +130,6 @@
 	     (t nil)))
 
 
-;; Macro for printing a matrix 
-
-(defmacro print-mat (mat type)
-  `(dotimes (i (rows ,mat))
-    (dotimes (j (cols ,mat))
-      (format t "~a" (at ,mat i j ,type))
-      (princ #\Space))
-    (princ #\Newline)))
-
 
 ;; RUN
 

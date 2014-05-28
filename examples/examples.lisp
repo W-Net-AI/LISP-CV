@@ -183,11 +183,80 @@ See also
 
 
 
+ASSGN
+
+Assign a matrices data to another matrix.
+
+C++: Mat& Mat::operator=(const Mat& m)
+
+LISP-CV: (ASSGN (SELF MAT) (M MAT)) => MAT
+
+    Parameters:	
+
+        SELF - A matrix
+
+        M - The assigned, right-hand-side matrix. Matrix assignment is O(1) operation, that is, no 
+            data is copied. Instead, the data is shared and the reference counter, if any, is incremented. 
+            Before assigning new data, the old data is dereferenced via Mat::release in the underlying C++ 
+            interface.
+
+
+Example: 
+
+
+CV> (DEFPARAMETER A (MAT-ZEROS 7 7 +64f+))
+
+A
+
+CV> (PRINT-MAT A :DOUBLE)
+0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 
+0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 
+0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 
+0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 
+0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 
+0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 
+0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 
+NIL
+
+CV> (DEFPARAMETER B (MAT))
+
+B
+
+CV> (PRINT-MAT B :DOUBLE)
+
+NIL
+
+CV> (DEFPARAMETER C (ASSGN B A))
+
+C
+
+CV> (PRINT-MAT C :DOUBLE)
+0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 
+0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 
+0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 
+0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 
+0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 
+0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 
+0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 
+NIL
+
+CV> (PRINT-MAT B :DOUBLE)
+0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 
+0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 
+0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 
+0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 
+0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 
+0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 
+0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 
+NIL
+
+
+
 ASSGN-VAL
 
 Assign a scalar value to a matrix.
 
-C++: MatExpr = operator
+C++: Mat& Mat::operator=(const Scalar& s)
 
 LISP-CV: (ASSGN-VAL (SELF MAT) (S SCALAR)) => MAT
 
@@ -195,7 +264,7 @@ LISP-CV: (ASSGN-VAL (SELF MAT) (S SCALAR)) => MAT
 
         SELF - A matrix
 
-        S - A scalar.
+        S - Scalar assigned to each matrix element. The matrix size or type is not changed.
 
 
 Use the function SCALAR-ALL, as the S parameter value, to set each matrix element to the same value
@@ -1588,6 +1657,49 @@ T3I-Y and POINT-3I-Z are used to extract the x,y,Z coordinates of the point.
 
 
 
+PRINT-MAT
+
+Prints 2D matrices
+
+LISP-CV: print-mat (mat type &key to-file)
+
+    Parameters:	
+
+        MAT - A matrix.
+
+        TYPE - The type of the matrix.
+
+        TO-FILE - A &key argument used to specify the name of the file, in the <LISP-CV-SRC-DIR>/DATA 
+                  folder, that you would like to write the data to.
+
+
+If the file does not exist it will be created. If the file does exist the contents will be overwritten.
+
+Example:
+
+CV> (DEFPARAMETER A (MAT-ONES 3 3 +8U+)) ;Create a 3x3 matrix filled with ones
+
+A
+
+CV> (PRINT-MAT A :UCHAR) ;Print the matrix to the console
+
+1 1 1 
+1 1 1 
+1 1 1 
+NIL
+
+CV> (PRINT-MAT A :UCHAR :TO-FILE 'DATA.TXT) ;Print the matrix to <LISP-CV-SRC-DIR>/DATA/DATA.TXT
+
+NIL
+
+This is now the sole contents of <LISP-CV-SRC-DIR>/DATA/DATA.TXT
+
+1 1 1 
+1 1 1 
+1 1 1 
+
+
+
 PROMOTE 
 
 Coverts a MAT to MAT-EXPR
@@ -1595,6 +1707,11 @@ Coverts a MAT to MAT-EXPR
 LISP-CV: (PROMOTE (SELF MAT)) => MAT-EXPR
 
 LISP-CV: (<< (SELF MAT)) => MAT-EXPR
+
+
+    Parameters
+
+       Self - A matrix.
 
 The function PROMOTE converts a functions return from MAT to MAT-EXPR. This is useful if you would 
 like to do math computation on a matrix with a MAT type using a fast Matrix Expressions(MAT-EXPR) 
@@ -1797,7 +1914,7 @@ and/or different number of channels. Any combination is possible if:
 
 
 
-ROW
+ROW todo
 
 Creates a matrix header for the specified matrix row.
 
@@ -3217,60 +3334,55 @@ See also:
 (TRACE), (INVERT), (SOLVE), (EIGEN), Matrix Expressions(MAT-EXPR)
 
 
-(defun det-example ()
-	;Create matrix data.
-  (let* ((data-1 (alloc :float '(1f0 2f0 3f0 4f0 5f0 6f0 5f0 7f0 9f0)))
-	 (data-2 (alloc :float '(4f0 5f0 6f0 6f0 5f0 4f0 4f0 6f0 5f0)))
-	;Create matrix with zero determinant.
-         (zero-det-mat (mat 3 3 +32f+ data-1))
-	;Create matrix with non-zero determinant.
-         (mat (mat 3 3 +32f+ data-2))      
-	 (zero-det-mat-inv 0)
-         (mat-inv 0))
-	;Print MAT.
-    (format t "MAT =~%~%")
-    (dotimes (i (rows mat))
-      (dotimes (j (cols mat))
-	(princ (at mat i j :float))
-	(princ #\Space))
-      (princ #\Newline))
-    (format t "~%~%")
-	;Print ZERO-DET-MAT.
-    (format t "ZERO-DET-MAT =~%~%")
-    (dotimes (i (rows zero-det-mat))
-      (dotimes (j (cols zero-det-mat))
-	(princ (at zero-det-mat i j :float))
-	(princ #\Space))
-      (princ #\Newline))
-    (format t "~%~%")
-	;Check if the determinant of ZERO-DET-MAT is 0. 
-	;It is not, so an inverse cannot be determined.
-    (format t "The determinant of ZER0-DET-MAT = ~a~%~%" (det zero-det-mat))
-	;Check if the determinant of MAT is 0. It 
-	;is, so an inverse can be determined.
-    (format t "The determinant of MAT = ~a~%~%" (det mat))
-	;Find inverse of ZERO-DET-MAT and 
-        ;print it. It will be all zeros.
-    (setf zero-det-mat-inv (>> (inv zero-det-mat +decomp-lu+)))
-    (format t "The inverse of ZERO-DET-MAT =~%~%")
-    (dotimes (i (rows zero-det-mat-inv))
-      (dotimes (j (cols zero-det-mat-inv))
-	(princ (at zero-det-mat-inv i j :float))
-	(princ #\Space))
-      (princ #\Newline))
-    (format t "~%~%")
-	;Find inverse of MAT and print it.
-    (setf mat-inv (>> (inv mat +decomp-lu+)))
-    (format t "The inverse of MAT =~%~%")
-    (dotimes (i (rows mat-inv))
-      (dotimes (j (cols mat-inv))
-	(princ (at mat-inv i j :float))
-	(princ #\Space))
-      (princ #\Newline))
-      (princ #\Newline)
-      (free data-1)
-      (free data-2)))
+;Note: If a function has a GC: prefix, that 
+;means it is automatically Garbage Collected
 
+(defun det-example ()
+  ;Create matrix data.
+  (with-object ((data-1 (alloc :float '(1f0 2f0 3f0 4f0 5f0 6f0 5f0 7f0 9f0)))
+		(data-2 (alloc :float '(4f0 5f0 6f0 6f0 5f0 4f0 4f0 6f0 5f0))))
+         ;Create matrix with zero determinant.
+    (let ((zero-det-mat (gc:mat 3 3 +32f+ data-1))
+	  ;Create matrix with non-zero determinant.
+	  (mat (gc:mat 3 3 +32f+ data-2))      
+	  (zero-det-mat-inv 0)
+	  (mat-inv 0)
+          (identity-mat 0))
+      ;Print MAT.
+      (format t "~%MAT =~%~%")
+      (print-mat mat :float)
+      ;Print ZERO-DET-MAT.
+      (format t "~%ZERO-DET-MAT =~%~%")
+      (print-mat zero-det-mat :float)
+      (format t "~%")
+      ;Check if the determinant of MAT is 0. It
+      ;isn't, so an inverse can be determined.
+      (format t "The determinant of MAT = ~a~%~%" 
+	      (det mat))
+      ;Check if the determinant of ZERO-DET-MAT is 0. 
+      ;It is not, so an inverse cannot be determined.
+      (format t "The determinant of ZER0-DET-MAT = ~a~%~%" 
+	      (det zero-det-mat))
+      ;Find inverse of MAT and print it.
+      (setf mat-inv (gc:>> (gc:inv mat +decomp-lu+)))
+      (format t "The inverse of MAT =~%~%")
+      (print-mat mat-inv :float)
+      ;Find inverse of ZERO-DET-MAT and 
+      ;print it. It will be all zeros.
+      (setf zero-det-mat-inv  
+	    (gc:>> (gc:inv zero-det-mat +decomp-lu+)))
+      (format t "~%The inverse of ZERO-DET-MAT =~%~%")
+      (print-mat zero-det-mat-inv :float)
+      ;Multiply MAT-INV by MAT to verify it is 
+      ;the true inverse. If it is, the output 
+      ;will be an identity matrix. The return 
+      ;value of MUL is converted from MAT-EXPR,
+      ;back to MAT, with the (>>) function.
+      (setf identity-mat (gc:>> (gc:mul mat-inv mat)))
+      ;Print the identity matrix
+      (format t "~%The product of MAT-INV and MAT =~%~%")
+      (print-mat identity-mat :float)
+      (format t "~%"))))
 
 
 
@@ -3406,69 +3518,72 @@ See also:
 (TRANSPOSE) , (REPEAT) , (COMPLETE-SYMM)
 
 
-(defun flip-example (&optional (camera-index *camera-index*))
-  ;;Capture camera feed
-  (with-capture (cap (video-capture camera-index))
-    ;;Make array of window names
-    (let* ((window-name-arr 
-	    (make-array 6 :initial-contents 
+(defun flip-example (&optional (cam *camera-index*))
 
-			(list
-                         "Matrix flipped on both axes - FLIP Example"
-			 "Matrix flipped on x-axis - FLIP Example"
-			 "Matrix flipped on y-axis - FLIP Example"
-                         "Camera output flipped on both axes - FLIP Example"
-			 "Camera output flipped on x-axis - FLIP Example"
-			 "Camera output flipped on y-axis - FLIP Example")))
-	   ;;Allocate matrix data
-	   (data (alloc :uchar '(1 2 3 4 5 6 7 8 9)))
-	   ;;Create a data matrix, MAT
-	   (mat (mat 3 3 +8u+ data))    (loop while (not (= (wait-key 0) 27)))
-           ;;Create array of MAT clones
-           (mat-clone-arr (make-array 3 :initial-contents 
-				      (list 
-				       (clone mat) (clone mat) (clone mat)))))
-      ;;Create array of windows
-      (dotimes (i 6)
-	(named-window (aref window-name-arr i) +window-normal+))
-      ;;Move windows to specified locations
-      (move-window (aref window-name-arr 0) 288 150)
-      (move-window (aref window-name-arr 1) 738 150)
-      (move-window (aref window-name-arr 2) 1188 150)
-      (move-window (aref window-name-arr 3) 288 518)
-      (move-window (aref window-name-arr 4) 738 518)
-      (move-window (aref window-name-arr 5) 1188 515)
-      ;;Flip the first, second and third MAT clones we created 
-      ;;around the x, y and both axes, respectively
-      (dotimes (i 3)
-	(flip (aref mat-clone-arr i) (aref mat-clone-arr i) (- i 1)))
-      ;;Show the first, second and third 
-      ;;MAT clones in the top windows
-      (dotimes (i 3)
-	(imshow (aref window-name-arr i) (aref mat-clone-arr i)))
-      ;;Initialize variable FRAME to hold camera feed
-      (do ((frame 0)
-	   ;;Initialize array of FRAME clones
-	   (frame-clone-arr (make-array 3 :initial-contents '(0 0 0))))
-	  ((plusp (wait-key *millis-per-frame*)) 
-	   (format t "Key is pressed by user"))
-        ;;Assign camera feed to FRAME
-	(setf frame (mat))
-	(cap-read cap frame)
-        ;;Make 3 frame clones
+  "Note: In this example I use all 3 types of memory management, 
+   manual memory management, with-* macros and TG finalizers."
+
+  ;;Capture camera feed 
+  (with-captured-camera (cap cam :width 640 :height 480)
+    ;;Allocate matrix data
+    (with-object ((data (alloc :uchar '(1 2 3 4 5 6 7 8 9))))
+      ;;Create a data matrix, MAT  
+      (let* ((mat (gc:mat 3 3 +8u+ data))    
+	     ;;Create array of MAT clones
+	     (mat-clone-arr (make-array 3 :initial-contents 
+					(list 
+					 (gc:clone mat) (gc:clone mat) (gc:clone mat))))
+	     ;;Initialize array of FRAME clones
+	     (frame-clone-arr (make-array 3 :initial-contents '(0 0 0)))
+	     ;;Make array of window names
+	     (window-name-arr 
+	      (make-array 6 :initial-contents 
+			  (list
+			   "Matrix flipped on both axes - FLIP Example"
+			   "Matrix flipped on x-axis - FLIP Example"
+			   "Matrix flipped on y-axis - FLIP Example"
+			   "Camera output flipped on both axes - FLIP Example"
+			   "Camera output flipped on x-axis - FLIP Example"
+			   "Camera output flipped on y-axis - FLIP Example"))))
+	;;Create array of windows
+	(dotimes (i 6)
+	  (named-window (aref window-name-arr i) +window-normal+))
+	;;Move windows to specified locations
+	(move-window (aref window-name-arr 0) 288 150)
+	(move-window (aref window-name-arr 1) 738 150)
+	(move-window (aref window-name-arr 2) 1188 150)
+	(move-window (aref window-name-arr 3) 288 518)
+	(move-window (aref window-name-arr 4) 738 518)
+	(move-window (aref window-name-arr 5) 1188 518)
+	;;Flip the first, second and third MAT clones we created 
+	;;around the x, y and both axes, respectively
 	(dotimes (i 3)
-	  (setf (aref frame-clone-arr i) (clone frame)))
-        ;;Flip the first, second and third FRAME clones we 
-        ;;created around the x, y and both axes respectively
+	  (flip (aref mat-clone-arr i) (aref mat-clone-arr i) (- i 1)))
+	;;Show the first, second and third 
+	;;MAT clones in the top windows
 	(dotimes (i 3)
-	  (flip (aref frame-clone-arr i) (aref frame-clone-arr i) (- i 1)))
-        ;;Show all FRAME clones in windows
-	(dotimes (i 3)
-	  (imshow (aref window-name-arr (+ i 3)) (aref frame-clone-arr i)))
-	;;Clean up used memory
-	(dotimes (i 3)
-	  (del-mat (aref frame-clone-arr i))))
-      (destroy-all-windows))))
+	  (imshow (aref window-name-arr i) (aref mat-clone-arr i)))
+	(loop
+           ;;Assign camera feed to FRAME
+	   (with-mat ((frame (mat)))
+	     (cap-read cap frame)
+	     ;;Make 3 frame clones
+	     (dotimes (i 3)
+	       (setf (aref frame-clone-arr i) (gc:clone frame)))
+	     ;;Flip the first, second and third FRAME clones we 
+	     ;;created around the x, y and both axes respectively
+	     (dotimes (i 3)
+	       (flip (aref frame-clone-arr i) (aref frame-clone-arr i) (- i 1)))
+	     ;;Show all FRAME clones in windows
+	     (dotimes (i 3)
+	       (imshow (aref window-name-arr (+ i 3)) (aref frame-clone-arr i)))
+	     ;;Clean up used memory
+	     (dotimes (i 3)
+	       (del-mat (aref frame-clone-arr i))))
+	   (let ((c (wait-key 33)))
+	     (when (= c 27)
+	       (destroy-all-windows)
+	       (return))))))))
 
 
 
@@ -4517,7 +4632,8 @@ There is a nuance illustrated by the following example:
 
 
 
-DRAWING FUNCTIONS:
+CORE - DRAWING FUNCTIONS:
+
 
 
 GET-TEXT-SIZE
@@ -4542,8 +4658,7 @@ LISP-CV:  (GET-TEXT-SIZE (TEXT *STRING) (FONT-FACE :INT) (FONT-SCALE :DOUBLE) (T
 
         THICKNESS - Thickness of lines used to render the text. See (PUT-TEXT) for details.
 
-        BASE-LINE - Output parame
-ter - y-coordinate of the baseline relative to the bottom-most text 
+        BASE-LINE - Output parameter - y-coordinate of the baseline relative to the bottom-most text 
                     point.
 
 
@@ -4551,51 +4666,56 @@ The function GET-TEXT-SIZE calculates and returns the size of a box that contain
 That is, the following code renders some text, the tight box surrounding it, and the baseline:
 
 
-(defun get-text-example ()
+(defun get-text-size-example ()
+        ;; Declare variables
   (let* ((window-name "GET-TEXT Example")
 	 (text "Funny text inside the box")
 	 (font-face +font-hershey-script-simplex+)
-	 (font-scale 2d0)
-	 (thickness 3)
-	 (img (mat 600 800 +8uc3+ (scalar-all 0)))
-	 (base-line (alloc :int 0))
-	 (text-size 0)
-	 (text-org 0))
-    ;; create a window
-    (named-window window-name +window-normal+)
-    ;; set window to fullscreen with stretched aspect ratio
-    (set-window-property window-name +wnd-prop-fullscreen+ 
-			 +window-fullscreen+)
-    (if (equal 1.0d0 (get-window-property window-name +wnd-prop-fullscreen+)) 
-	(set-window-property window-name +wnd-prop-aspectratio+ 
-			     +window-freeratio+))
-    ;; '?' is a macro for CFFI:MEM-AREF, basically 'base-line += thickness'
-    (setf (? base-line :int) thickness)
-    ;; calculates the width and height of TEXT.
-    (setf text-size (get-text-size text font-face font-scale thickness base-line))
-    ;; center the text
-    (setf text-org (point (round (/ (- (cols img) (width text-size)) 2)) 
-			  (round (/ (- (rows img) (height text-size)) 2))))
-    ;; draw the box
-    (rectangle img (point (point-x text-org) (round 
-					      (+ (point-y text-org) 
-						 (? base-line :int))))
-	       (point (round 
-		       (+ (point-x text-org) (width text-size))) 
-		      (round 
-		       (- (point-y text-org) (height text-size))))
-	       (scalar 0 0 255))
-    ;; ... and the baseline first
-    (line img (point (point-x text-org) (round (+ (point-y text-org) thickness)))
-	  (point (+ (point-x text-org) (round (width text-size))) 
-		 (+ (point-y text-org) thickness))
-	  (scalar 0 0 255))
-    ;; then put the text itself
-    (put-text img text text-org font-face font-scale (scalar-all 255) thickness 8)
-    
-    (imshow window-name img)
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name)))
+	 (font-scale 2.0d0)
+	 (thickness 3))
+             ;; Create background
+    (with-mat ((img (mat 600 800 +8uc3+ (scalar-all 0))))
+      (with-object ((base-line (alloc :int 0)))
+	(with-named-window (window-name +window-normal+)
+
+	  ;; Set window to fullscreen
+	  (set-window-property window-name +wnd-prop-fullscreen+ 
+			       +window-fullscreen+)
+	  (set-window-property window-name +wnd-prop-aspectratio+ 
+			       +window-freeratio+)
+  
+	  (setf (mem-aref base-line :int) thickness)
+	  ;; Calculates the width and height of TEXT.
+	  (with-size ((text-size (get-text-size text font-face font-scale thickness base-line)))
+	    ;; Center the text
+	    (with-point((text-org (point (round (/ (- (cols img) (width text-size)) 2)) 
+					 (round (/ (- (rows img) (height text-size)) 2))))
+                        ;; Set rectangle coordinates
+			(pt1 (point (point-x text-org) (round (+ (point-y text-org) 
+								 (mem-aref base-line :int)))))
+
+			(pt2 (point (round (+ (point-x text-org) (width text-size))) 
+				    (round (- (point-y text-org) (height text-size))))))
+
+	      (with-scalar ((color (scalar 0 0 255)))
+                ;; Draw the box 
+		(rectangle img pt1 pt2 color)
+		(with-point ((pt1 (point (point-x text-org) (round (+ (point-y text-org) 
+								      thickness))))
+			     (pt2 (point (+ (point-x text-org) (round (width text-size))) 
+					 (+ (point-y text-org) thickness))))
+                  ;; Draw the baseline 
+		  (line img pt1 pt2 color)
+
+		  ;; Add the text
+		  (with-scalar ((color (scalar-all 255)))
+		    (put-text img text text-org font-face font-scale color thickness 8))
+                  ;; Show the result
+		  (imshow window-name img)
+		  (loop
+		     (let ((c (wait-key 33)))
+		       (when (= c 27)
+			 (return)))))))))))))
 
 
 
@@ -4748,7 +4868,7 @@ Example 2:
 	   (with-point ((box-loc (point (uniform rng 0 640) (uniform rng 0 480))))
 	     (with-size ((box-size (size (coerce (uniform rng 0 420) 'double-float) 
 					 (coerce (uniform rng 0 420) 'double-float))))
-	       (setf box-angle (coerce (uniform rng 0 360) 'float))
+	       (setf box-angle (coerce (uniform rng 0 360) 'single-float))
 	       ;; Create BOX
 	       (with-rotated-rect ((box (rotated-rect box-loc box-size box-angle)))
 		 ;; Create a black background, MAT
@@ -6767,7 +6887,7 @@ Example:
 (defparameter ind 0)
 
 ;Load the image
-(defparameter src (imread "/home/user/my-pic.jpg" 1))
+(defparameter src (imread "/d1" 1))
 
 ;Create DST, MAP-X and MAP-Y with the same size as SRC
 (defparameter dst (gc:mat (rows src) (cols src) (mat-type src)))
@@ -6803,23 +6923,23 @@ Example:
 	    ((= 1 ind)
 
 	     (progn (setf (at map-x j i :float) 
-			  (coerce i 'float))
+			  (coerce i 'single-float))
 		    (setf (at map-y j i :float) 
-			  (-  (coerce (rows src) 'float)  j))))
+			  (-  (coerce (rows src) 'single-float)  j))))
 
 	    ((= 2 ind)
 
 	     (progn (setf (at map-x j i :float) 
-			  (- (coerce (cols src) 'float) i))
+			  (- (coerce (cols src) 'single-float) i))
 		    (setf (at map-y j i :float) 
-			  (coerce j 'float))))
+			  (coerce j 'single-float))))
 
 	    ((= 3 ind) 
 
 	     (progn (setf (at map-x j i :float) 
-			  (- (coerce (cols src) 'float) i))
+			  (- (coerce (cols src) 'single-float) i))
 		    (setf (at map-y j i :float) 
-			  (- (coerce (rows src) 'float) j)))))))
+			  (- (coerce (rows src) 'single-float) j)))))))
   (incf ind))
 
 
@@ -8227,6 +8347,43 @@ have alpha set to 0, fully opaque pixels should have alpha set to 255/65535.
 		 (return)))))))))
 
 
+;;Extract frames 
+
+
+(defun image-extractor (&optional 
+			  (cam *camera-index*) 
+			  (width *default-width*)
+			  (height *default-height*))
+
+   "Extracts frames from the camera feed and saves as 
+    .jpg files in the Lisp-CV Data Directory. This is 
+    useful if you want to create large training sets 
+    easily."
+
+  (with-captured-camera (cap cam :width width :height height)
+    (if (not (cap-is-open cap)) 
+	(return-from image-extractor 
+	  (format t "Cannot open the video camera")))      
+    (let ((window-name "WITH-MACRO Example")
+          (filename 0))
+      (format t "~%Frame Size : ~ax~a~%~%" 
+	      (cap-get cap +cap-prop-frame-width+)
+	      (cap-get cap +cap-prop-frame-height+))
+      (with-named-window (window-name +window-normal+)
+	(move-window window-name 759 175)
+	(loop
+	   (with-mat ((frame (mat)))
+	     (cap-read cap frame)
+	     (setf filename (cat *lisp-cv-data-dir* "img-" 
+				 (write-to-string *file-number*) ".jpg"))
+	     (incf *file-number*)
+	     (imwrite filename frame)
+	     (imshow window-name frame)
+	     (let ((c (wait-key 33)))
+	       (when (= c 27)
+		 (return)))))))))
+
+
 
 VIDEO-CAPTURE
 
@@ -9516,18 +9673,12 @@ The constructors follow conventions of (STAT-MODEL). See (STAT-MODEL-TRAIN) for 
 Example:
 
 
-;; This example implements a feed-forward Artificial Neural Network or 
-;; more particularly, Multi-Layer Perceptrons (MLP), the most commonly 
-;; used type of Neural Networks. MLP consists of the input layer, outp-
-;; ut layer, and one or more hidden layers. Each layer of MLP includes 
-;; one or more neurons directionally linked with the neurons from the 
-;; previous and the next layer. Download the PDF at this link for more 
-;; details.
-
-;; https://github.com/bytefish/opencv/blob/master/machinelearning/doc/machinelearning.pdf 
-
 ;; Note: This example is similar to, but is a more advanced 
 ;; and informative version of the ANN-MLP-EAXMPLE in this file.
+
+;; Download the PDF at this link for more details.
+
+;; https://github.com/bytefish/opencv/blob/master/machinelearning/doc/machinelearning.pdf 
 
 ;; Declare global variables.
 
@@ -9608,7 +9759,7 @@ Example:
 	(if (or (and (>= p 0.0f0) (>= a 0.0f0)) (and (<= p 0.0f0) (<= a 0.0f0))) 
 	    (incf *t)
 	    (incf f))) nil)
-  (float (/ (* *t 1) (+ *t f))))
+  (/ (* *t 1.0) (+ *t f)))
 
 ;; Function to learn. The trackbars on the middle window change the values held in 
 ;; the EQUATION-* variables. The (? *EQUATION-* :INT) statements dereference those 
@@ -9617,9 +9768,9 @@ Example:
 ;; ve the trackbar to less than 1 when adjusting these variables.
 
 (defun f (x y equation) 
-  (case equation (0 (return-from f (if (> y (sin (* x (+ (? *equation-0* :int) 1)))) -1 1)))
-	(1 (return-from f (if (> y (cos (* x (+ (? *equation-1* :int) 1)))) -1 1)))
-	(2 (return-from f (if (> y (* x (+ (? *equation-2* :int) 1))) -1 1)))
+  (case equation (0 (return-from f (if (> y (sin (* x (? *equation-0* :int)))) -1 1)))
+	(1 (return-from f (if (> y (cos (* x (? *equation-1* :int)))) -1 1)))
+	(2 (return-from f (if (> y (* x (? *equation-2* :int))) -1 1)))
 	(3 (return-from f (if (> y (tan (* x (? *equation-3* :int)))) -1 1)))
 	(otherwise (return-from f (if (> y (cos (* x (? *other* :int)))) -1 1)))))
 
@@ -9711,6 +9862,7 @@ Example:
     (imshow name plot)))
 
 
+
 (defun normal-bayes-classifier-example ()
 
   "In this example, in the 2 right-most windows, a Normal Bayes 
@@ -9737,8 +9889,8 @@ Example:
 	    (move-window window-name-4 1435 175)
 	    ;; Create trackbars used to adjust the values in the (F) 
             ;; and (MLP) functions. The trackbar names are hints at 
-            ;; how not to adjust them e.g. This 'Eq 0: > 1' means do
-            ;; not let the trackbar go below 1 and this 'Layr 0: 2'
+            ;; how not to adjust them e.g. This, 'Eq 0: > 1', means 
+            ;; do not let the trackbar go below 1. This, 'Layr 0: 2',
             ;; means the trackbar must stay at 2. Not abiding by the
             ;; guidelines will cause the program to freeze.
 	    (create-trackbar "Equation" window-name-2 *equation* 4)
@@ -9755,7 +9907,7 @@ Example:
 		       (test-data (mat *num-test-points* 2 +32fc1+)))
 
 	      (loop;; Fill training and test data matrices 
-		   ;; with random numbers from zero to one
+		 ;; with random numbers from zero to one
 		 (with-scalar ((zero (scalar 0))
 			       (one (scalar 1)))
 		   (randu training-data zero one)
@@ -9766,13 +9918,15 @@ Example:
 		   (dotimes (i (rows training-data))
 		     (setf x (at training-data i 0 :float))
 		     (setf y (at training-data i 1 :float))
-		     (setf (at labels1 i 0 :float) (coerce (f x y (? *equation* :int)) 'float)))
+		     (setf (at labels1 i 0 :float) (coerce (f x y (? *equation* :int)) 
+							   'single-float)))
 
 		   (with-mat ((labels2 (mat (rows test-data) 1 +32fc1+)))
 		     (dotimes (i (rows test-data))
 		       (setf x (at test-data i 0 :float))
 		       (setf y (at test-data i 1 :float))
-		       (setf (at labels2 i 0 :float) (coerce (f x y (? *equation* :int)) 'float)))
+		       (setf (at labels2 i 0 :float) (coerce (f x y (? *equation* :int)) 
+							     'single-float)))
 
 		     (setf training-classes labels1)
 		     (setf test-classes labels2)
@@ -9782,8 +9936,8 @@ Example:
 		     ;; Plot test data
 		     (plot-binary test-data test-classes window-name-2)
 		     ;; Plot predictions
-		     (mlp training-data training-classes test-data test-classes)
-		     (bayes training-data training-classes test-data test-classes)))
+		     (bayes training-data training-classes test-data test-classes)
+		     (mlp training-data training-classes test-data test-classes)))
 		 (let ((c (wait-key 33)))
 		   (when (= c 27)
 		     (return)))))))))))
@@ -9810,6 +9964,873 @@ The function is parallelized with the TBB library.
 Example:
 
 See NORMAL-BAYES-CLASSIFIER-EXAMPLE in this file.
+
+
+
+ML - K-NEAREST NEIGHBORS
+
+
+
+K-NEAREST
+
+
+Default and training constructors.
+
+C++: CvKNearest::CvKNearest()
+
+C++: CvKNearest::CvKNearest(const Mat& trainData, const Mat& responses, const Mat& sampleIdx=Mat(), bool isRegression=false, 
+                            int max_k=32 )
+
+LISP-CV: (K-NEAREST (&OPTIONAL (TRAIN-DATA MAT) (RESPONSES MAT) ((SAMPLE-IDX MAT) (NULL-POINTER)) ((IS-REGRESSION :BOOLEAN) NIL) 
+                    ((MAX-K :INT) 32))) => K-NEAREST
+
+
+See (K-NEAREST-TRAIN) for additional parameters descriptions.
+
+
+Example:
+
+
+;; This example compares a Multi Layer Perceptron, a
+;; Normal Bayes Classifier, and a K-Nearest Neighbors 
+;; model.
+
+;; Download the PDF at this link for more 
+;; details.
+
+;; https://github.com/bytefish/opencv/blob/master/machinelearning/doc/machinelearning.pdf 
+
+;; Declare global variables.
+
+(defparameter *plot-support-vectors* t)
+(defparameter *num-training-points* 200)
+(defparameter *num-test-points* 2000)
+(defparameter *size* 200)
+
+;; Move the trackbar on the middle window to decide 
+;; which equation in the (F) function to use.
+
+(defparameter *equation* (alloc :int 2))
+
+;; Move the trackbars on the middle window to decide 
+;; what to multiply X by in the (F) function equatio-
+;; ns. Each trackbar in this list corresponds to a s-
+;; etting of the *EQUATION* variable and affects the 
+;; equations in the (F) function.
+
+;; Note: When changing any of the five below values 
+;; with the trackbar, make sure not to move the trac-
+;; kbar to less than 1, or the program will freeze. 
+;; Leaving this possibility allows for more precise 
+;; adjustments.
+
+(defparameter *equation-0* (alloc :int 10))
+(defparameter *equation-1* (alloc :int 10))
+(defparameter *equation-2* (alloc :int 2))
+(defparameter *equation-3* (alloc :int 10))
+(defparameter *other* (alloc :int 10))
+
+;; You can change the number of Neurons per layer wi-
+;; the trackbars, though it is reccomended that you 
+;; read the notes below before you do so. See the co-
+;; mments in the (MLP) function under the LAYERS hea-
+;; ding for more information.
+
+;; The number of Neurons in some of the layers are n-
+;; ot adjustable, or, they are not easily adjustable. 
+;; I left the oppurtunity for you to try because the 
+;; C++ errors in *INFERIOR-LISP*(or your implementat-
+;; ions version) offer good information and are usef-
+;; ul debug tools.
+
+;; Note 1: *LAYER-0* needs to stay on 2. Take a note 
+;; of the C++ error in *INFERIOR-LISP* if you do dec-
+;; ide to change it.
+
+;; Note 2: If the value of *LAYER-1* goes below two 
+;; you will get an error in *INFERIOR-LISP*. I could 
+;; have added two to the value, when *LAYER-1* is cal-
+;; led, to subvert the error, but I didn't for the sa-
+;; ke of precision. Nou you will be able to see exac-
+;; tly how many Neurons you're creating with the tra-
+;; ckbar in Layer 1(and all layers).
+
+;; Note 3: *LAYER-2* operates the same as *LAYER-1*.
+;; See Note 2 for more details.
+
+;; Note 4: *LAYER-3* operates the same as *LAYER-0*, 
+;; but needs to stay on 1. See Note 1 for details.
+
+(defparameter *layer-0* (alloc :int 2)) 
+(defparameter *layer-1* (alloc :int 10))
+(defparameter *layer-2* (alloc :int 15))
+(defparameter *layer-3* (alloc :int 1))
+
+;; Calculates the accuracy of the K-Nearest Neighbors model, the Normal Bayes 
+;; Classifier and the Neural Network. The accuracy is affected by the equatio-
+;; ns and equation's parameters you choose for the (F) function,  it is also 
+;; affected by the number of Neurons per layer chosen in the (MLP) function.
+
+(defun evaluate (predicted actual &optional p a (*t 0) (f 0)) 
+  (if (eq (rows predicted) (rows actual))
+      (dotimes (i (rows actual))
+	(setf p (at predicted i 0 :float))
+	(setf a (at actual i 0 :float))
+	(if (or (and (>= p 0.0f0) (>= a 0.0f0)) (and (<= p 0.0f0) (<= a 0.0f0))) 
+	    (incf *t)
+	    (incf f))) nil)
+  (float (/ (* *t 1) (+ *t f))))
+
+;; Function to learn. The trackbars on the middle window change the values held in 
+;; the EQUATION-* variables. The (? *EQUATION-* :INT) statements dereference those 
+;; variables and supply their values to the equations in this function. The '?' is 
+;; a macro for CFFI's dereferencing function, MEM-AREF. Again, make sure not to mo-
+;; ve the trackbar to less than 1 when adjusting these variables.
+
+(defun f (x y equation) 
+  (case equation (0 (return-from f (if (> y (sin (* x (? *equation-0* :int)))) -1 1)))
+	(1 (return-from f (if (> y (cos (* x (? *equation-1* :int)))) -1 1)))
+	(2 (return-from f (if (> y (* x (? *equation-2* :int))) -1 1)))
+	(3 (return-from f (if (> y (tan (* x (? *equation-3* :int)))) -1 1)))
+	(otherwise (return-from f (if (> y (cos (* x (? *other* :int)))) -1 1)))))
+
+
+;; K-NEAREST NEIGHBORS
+(defun knn (training-data training-classes test-data test-classes k) 
+  (with-mat ((mat (mat)))
+    (with-k-nearest ((knn (k-nearest training-data training-classes mat nil k)))
+      (with-mat ((predicted (mat (rows test-classes) 1 +32f+)))
+	(dotimes (i (rows test-data))
+	  (with-mat ((sample (row test-data i)))
+	    (setf (at predicted i 0 :float) (k-nearest-find-nearest knn sample k))))
+	;; Calculate the accuracy of the K-Nearest Neighbors
+	(let ((evaluate (evaluate predicted test-classes)))
+	  (format t "~%Accuracy_{KNN} = ~a~%" evaluate))
+	;; Plot the predictions
+	(plot-binary test-data predicted "Predictions KNN")))))
+
+
+;; NORMAL BAYES CLASSIFIER
+(defun bayes (training-data training-classes test-data test-classes) 
+  (with-normal-bayes-classifier ((bayes (normal-bayes-classifier training-data training-classes)))
+    (with-mat ((predicted (mat (rows test-classes) 1 +32f+)))
+      (dotimes (i (rows test-data))
+	(with-mat ((sample (row test-data i)))
+	  (setf (at predicted i 0 :float) (normal-bayes-classifier-predict bayes sample))))
+      ;; Calculate the accuracy of the Normal Bayes Classifier
+      (let ((evaluate (evaluate predicted test-classes)))
+	(format t "~%Accuracy_{BAYES} = ~a~%" evaluate))
+      ;; Plot the predictions
+      (plot-binary test-data predicted "Predictions Bayes"))))
+
+
+;; NEURAL NETWORK
+
+(defun mlp (training-Data training-Classes test-Data test-Classes) 
+
+  ;; LAYERS
+
+  ;; The purpose of a neural network is to generalize, which is the ability 
+  ;; to approximate outputs for inputs not available in the training set. W-
+  ;; hile small networks may not be able to approximate a function, large n-
+  ;; etworks tend to overfit and not find any relationship in data. It has 
+  ;; been shown that, given enough data, a multi layer perceptron with one 
+  ;; hidden layer can approximate any continuous function to any degree of 
+  ;; accuracy. Here the number of neurons per layer is stored in the row-o-
+  ;; rdered MAT below, LAYERS.
+
+  (with-mat ((layers (mat 4 1 +32SC1+)))
+    (setf (at layers 0 0 :int) (? *layer-0* :int)) 
+    (setf (at layers 1 0 :int) (? *layer-1* :int))
+    (setf (at layers 2 0 :int) (? *layer-2* :int))
+    (setf (at layers 3 0 :int) (? *layer-3* :int))
+    (with-ann-mlp ((mlp (ann-mlp)))
+      (with-term-criteria ((criteria (term-criteria (logior +termcrit-iter+ +termcrit-eps+) 
+						    100 0.00001d0)))
+	(with-ann-mlp-train-params ((params (ann-mlp-train-params criteria 
+								  +ann-mlp-train-params-backprop+ 
+								  0.05d0 
+	 							  0.05d0)))
+	  (ann-mlp-create mlp layers)
+	  ;; Train the Neural Net.
+	  (with-mat ((predicted (mat (rows test-classes) 1 +32f+))
+                     (sample-weights (mat))
+                     (sample-idx (mat)))
+	    (ann-mlp-train mlp training-data training-classes sample-weights sample-idx params)
+	    (dotimes (i (rows test-data))
+	      (with-mat ((response (mat 1 1 +32fc1+)))
+		(with-mat ((sample (row test-data i)))
+		  (ann-mlp-predict mlp sample response))
+		(setf (at predicted i 0 :float) (at response 0 0 :float))))
+            ;; Print the values of all adjustable variables.
+            (format t "~%*EQUATION* = ~a~%" (? *equation* :int))
+            (format t "~%*EQUATION-0* = ~a~%" (? *equation-0* :int))
+            (format t "~%*EQUATION-1* = ~a~%" (? *equation-1* :int))
+            (format t "~%*EQUATION-2* = ~a~%" (? *equation-2* :int))
+            (format t "~%*EQUATION-3* = ~a~%" (? *equation-3* :int))
+            (format t "~%*OTHER* = ~a~%" (? *other* :int))
+            (format t "~%*LAYER-0* = ~a~%" (? *layer-0* :int))
+            (format t "~%*LAYER-1* = ~a~%" (? *layer-1* :int))
+            (format t "~%*LAYER-2* = ~a~%" (? *layer-2* :int))
+            (format t "~%*LAYER-3* = ~a~%" (? *layer-3* :int))
+            ;; Calculate the accuracy of the Neural Net
+            (let ((evaluate (evaluate predicted test-classes)))
+	      (format t "~%Accuracy_{MLP} = ~a~%" evaluate))
+            ;; Plot the predictions
+	    (plot-binary test-data predicted "Predictions Backpropagation")
+	    nil ))))))
+
+;; Plot Data and Class function
+(defun plot-binary(data classes name &optional x y) 
+  (with-mat ((plot (mat *size* *size* +8uc3+)))
+    (with-scalar ((scalar (scalar 255 255 255)))
+      (assgn-val plot scalar))
+    (dotimes (i (rows data))
+      (setf x (* (at data i 0 :float) *size*))
+      (setf y (* (at data i 1 :float) *size*))
+      (with-scalar ((color1 (rgb 255 0 0))
+		    (color2 (rgb 0 255 0)))
+	(if (> (at classes i 0 :float) 0f0)
+            ;; Plot the points with the CIRCLE function
+	    (with-point ((center (point (round x) (round y))))
+	      (circle plot center 1 color1 1))
+	    (with-point ((center (point (round x) (round y))))
+	      (circle plot center 1 color2 1)))))
+    (imshow name plot)))
+
+
+(defun k-nearest-example ()
+
+  "In this example, in the top 3 windows, a K-Nearest Neighbors model 
+   is compared with a Normal Bayes Classifier and a Neural Network."
+
+  ;; Window names available to all of the functions
+  (let ((window-name-1 "Training data")
+	(window-name-2 "Test data")
+	(window-name-3 "Predictions Backpropagation")
+        (window-name-4 "Predictions Bayes")
+        (window-name-5 "Predictions KNN")
+        ;; Declare other variables
+        (training-classes 0)
+        (test-classes 0)
+        (x 0)
+        (y 0))
+    ;; Create windows
+    (with-named-window (window-name-1 +window-normal+)
+      (with-named-window (window-name-2 +window-autosize+)
+	(with-named-window (window-name-3 +window-normal+)
+	  (with-named-window (window-name-4 +window-normal+)
+	    (with-named-window (window-name-5 +window-normal+)
+	      ;; Move windows to specified locations
+	      (move-window window-name-3 310 96)
+	      (move-window window-name-4 760 96)
+	      (move-window window-name-5 1210 96)
+	      (move-window window-name-1 533 500)
+	      (move-window window-name-2 984 500)
+	      ;; Create trackbars used to adjust the values in the (F) 
+	      ;; and (MLP) functions. The trackbar names are hints at 
+	      ;; how not to adjust them e.g. This, 'Eq 0: > 1', means 
+              ;; do not let the trackbar go below 1. This, 'Layr 0: 2',
+              ;; means the trackbar must stay at 2. Not following the
+	      ;; guidelines will cause the program to freeze.
+	      (create-trackbar "Equation" window-name-2 *equation* 4)
+	      (create-trackbar "Eq 0: > 1" window-name-2 *equation-0* 150)
+	      (create-trackbar "Eq 1: > 1" window-name-2 *equation-1* 150)
+	      (create-trackbar "Eq 2: > 1" window-name-2 *equation-2* 10)
+	      (create-trackbar "Eq 3: > 1" window-name-2 *equation-3* 150)
+	      (create-trackbar "Other: > 1" window-name-2 *other* 150)
+	      (create-trackbar "Lyr 0: 2" window-name-2 *layer-0* 10)
+	      (create-trackbar "Lyr 1: > 2" window-name-2 *layer-1* 500)
+	      (create-trackbar "Lyr 2: > 2 " window-name-2 *layer-2* 500)
+	      (create-trackbar "Lyr 3: 1" window-name-2 *layer-3* 5)
+	      (with-mat ((training-data (mat *num-training-points* 2 +32fc1+))
+			 (test-data (mat *num-test-points* 2 +32fc1+)))
+
+		(loop;; Fill training and test data matrices 
+		     ;; with random numbers from zero to one
+		   (with-scalar ((zero (scalar 0))
+				 (one (scalar 1)))
+		     (randu training-data zero one)
+		     (randu test-data zero one))
+
+		   ;; Label data with equation
+		   (with-mat ((labels1 (mat (rows training-data) 1 +32fc1+)))
+		     (dotimes (i (rows training-data))
+		       (setf x (at training-data i 0 :float))
+		       (setf y (at training-data i 1 :float))
+		       (setf (at labels1 i 0 :float) (coerce (f x y (? *equation* :int)) 'single-float)))
+
+		     (with-mat ((labels2 (mat (rows test-data) 1 +32fc1+)))
+		       (dotimes (i (rows test-data))
+			 (setf x (at test-data i 0 :float))
+			 (setf y (at test-data i 1 :float))
+			 (setf (at labels2 i 0 :float) (coerce (f x y (? *equation* :int)) 'single-float)))
+
+		       (setf training-classes labels1)
+		       (setf test-classes labels2)
+
+		       ;; Plot training data
+		       (plot-binary training-data training-classes window-name-1)
+		       ;; Plot test data
+		       (plot-binary test-data test-classes window-name-2)
+		       ;; Plot predictions
+		       (knn training-data training-classes test-data test-classes 3)
+		       (bayes training-data training-classes test-data test-classes)
+		       (mlp training-data training-classes test-data test-classes)))
+		   (let ((c (wait-key 33)))
+		     (when (= c 27)
+		       (return))))))))))))
+
+
+
+
+K-NEAREST-FIND-NEAREST
+
+Finds the neighbors and predicts responses for input vectors.
+
+C++: float CvKNearest::find_nearest(const Mat& samples, int k, Mat& results, Mat& neighborResponses, Mat& dists) const
+
+LISP-CV: (K-NEAREST-FIND-NEAREST (SELF MAT) (SAMPLES MAT) &OPTIONAL ((RESULTS MAT) (NULL-POINTER)) 
+                                ((NEIGHBOR-RESPONSES MAT) (NULL-POINTER)) (DISTS (NULL-POINTER))) => :FLOAT
+
+    Parameters:	
+
+        SAMPLES - Input samples stored by rows. It is a single-precision floating-point matrix of 
+                  (* Mumber-of-samples number-of-features) size.
+
+        K - Number of used nearest neighbors. It must satisfy constraint: (<= K (K-NEAREST-GET-MAX-K)).
+
+        RESULTS - Vector with results of prediction (regression or classification) for each input 
+                  sample. It is a single-precision floating-point vector with NUMBER-OF-SAMPLES 
+                  elements.
+
+        NEIGHBORS - Optional output pointers to the neighbor vectors themselves. It is an array of 
+                    (* K (ROWS SAMPLES)) pointers.
+
+        NEIGHBOR_RESPONSES - Optional output values for corresponding neighbors. It is a single-precision 
+                             floating-point matrix of (* NUMBER-OF-SAMPLES K) size.
+
+        DIST - Optional output distances from the input vectors to the corresponding neighbors. It is 
+               a single-precision floating-point matrix of (* NUMBER-OF-SAMPLES K)  size.
+
+For each input vector (a row of the matrix samples), the method finds the k nearest neighbors. In 
+case of regression, the predicted result is a mean value of the particular vector’s neighbor responses. 
+In case of classification, the class is determined by voting.
+
+For each input vector, the neighbors are sorted by their distances to the vector.
+
+In case of C++ interface(Lisp-CV binds to the C++ interface) you can use output pointers to empty 
+matrices and the function will allocate memory itself.
+
+If only a single input vector is passed, all output matrices are optional and the predicted value is 
+returned by the function.
+
+The function is parallelized with the TBB library.
+
+
+Example:
+
+See the K-NEAREST-EXAMPLE in this library
+
+
+
+ML - DECISION TREES
+
+
+D-TREE
+
+A constructor.
+
+
+C++: CvDTree::CvDTree()
+
+LISP-CV: (D-TREE) => D-TREE
+
+
+This function implements a decision tree as described in the beginning of this link:
+
+http://docs.opencv.org/trunk/modules/ml/doc/decision_trees.html?highlight=dtreep#cvdtree
+
+
+Example:
+
+
+;; This example compares Decision Trees, a Multi Layer Perceptron,
+;; Normal Bayes Classifier, and a K-Nearest Neighbors 
+;; model.
+
+;; Download the PDF at this link for more details.
+
+;; https://github.com/bytefish/opencv/blob/master/machinelearning/doc/machinelearning.pdf 
+
+;; Declare global variables.
+
+(defparameter *plot-support-vectors* t)
+(defparameter *num-training-points* 200)
+(defparameter *num-test-points* 2000)
+(defparameter *size* 200)
+
+;; Move the trackbar on the middle window to decide 
+;; which equation in the (F) function to use.
+
+(defparameter *equation* (alloc :int 2))
+
+;; Move the trackbars on the middle window to decide 
+;; what to multiply X by in the (F) function equatio-
+;; ns. Each trackbar in this list corresponds to a s-
+;; etting of the *EQUATION* variable and affects the 
+;; equations in the (F) function.
+
+;; Note: When changing any of the five below values 
+;; with the trackbar, make sure not to move the trac-
+;; kbar to less than 1, or the program will freeze. 
+;; Leaving this possibility allows for more precise 
+;; adjustments.
+
+(defparameter *equation-0* (alloc :int 10))
+(defparameter *equation-1* (alloc :int 10))
+(defparameter *equation-2* (alloc :int 2))
+(defparameter *equation-3* (alloc :int 10))
+(defparameter *other* (alloc :int 10))
+
+;; You can change the number of Neurons per layer wi-
+;; the trackbars, though it is reccomended that you 
+;; read the notes below before you do so. See the co-
+;; mments in the (MLP) function under the LAYERS hea-
+;; ding for more information.
+
+;; The number of Neurons in some of the layers are n-
+;; ot adjustable, or, they are not easily adjustable. 
+;; I left the oppurtunity for you to try because the 
+;; C++ errors in *INFERIOR-LISP*(or your implementat-
+;; ions version) offer good information and are usef-
+;; ul debug tools.
+
+;; Note 1: *LAYER-0* needs to stay on 2. Take a note 
+;; of the C++ error in *INFERIOR-LISP* if you do dec-
+;; ide to change it.
+
+;; Note 2: If the value of *LAYER-1* goes below two 
+;; you will get an error in *INFERIOR-LISP*. I could 
+;; have added two to the value, when *LAYER-1* is cal-
+;; led, to subvert the error, but I didn't for the sa-
+;; ke of precision. Nou you will be able to see exac-
+;; tly how many Neurons you're creating with the tra-
+;; ckbar in Layer 1(and all layers).
+
+;; Note 3: *LAYER-2* operates the same as *LAYER-1*.
+;; See Note 2 for more details.
+
+;; Note 4: *LAYER-3* operates the same as *LAYER-0*, 
+;; but needs to stay on 1. See Note 1 for details.
+
+(defparameter *layer-0* (alloc :int 2)) 
+(defparameter *layer-1* (alloc :int 10))
+(defparameter *layer-2* (alloc :int 15))
+(defparameter *layer-3* (alloc :int 1))
+
+;; Calculates the accuracy of the Decision Trees, the K-Nearest Neighbors model, 
+;; the Normal Bayes Classifier and the Neural Network. The accuracy is affected 
+;; by the equations and equation's parameters you choose for the (F) function, 
+;; and it's also affected by the number of Neurons per layer chosen in the (MLP) 
+;; function.
+
+(defun evaluate (predicted actual &optional p a (*t 0) (f 0)) 
+  (if (eq (rows predicted) (rows actual))
+      (dotimes (i (rows actual))
+	(setf p (at predicted i 0 :float))
+	(setf a (at actual i 0 :float))
+	(if (or (and (>= p 0.0f0) (>= a 0.0f0)) (and (<= p 0.0f0) (<= a 0.0f0))) 
+	    (incf *t)
+	    (incf f))) nil)
+  (float (/ (* *t 1) (+ *t f))))
+
+;; Function to learn. The trackbars on the middle window change the values held in 
+;; the EQUATION-* variables. The (? *EQUATION-* :INT) statements dereference those 
+;; variables and supply their values to the equations in this function. The '?' is 
+;; a macro for CFFI's dereferencing function, MEM-AREF. Again, make sure not to mo-
+;; ve the trackbar to less than 1 when adjusting these variables.
+
+(defun f (x y equation) 
+  (case equation (0 (return-from f (if (> y (sin (* x (? *equation-0* :int)))) -1 1)))
+	(1 (return-from f (if (> y (cos (* x (? *equation-1* :int)))) -1 1)))
+	(2 (return-from f (if (> y (* x (? *equation-2* :int))) -1 1)))
+	(3 (return-from f (if (> y (tan (* x (? *equation-3* :int)))) -1 1)))
+	(otherwise (return-from f (if (> y (cos (* x (? *other* :int)))) -1 1)))))
+
+
+;; DECISION TREE
+
+(defun decision-tree (training-data training-classes test-data test-classes &optional prediction)
+  (with-d-tree ((d-tree (d-tree)))
+
+    (with-mat ((var-type (mat 3 1 +8u+))
+	       (predicted (mat (rows test-classes) 1 +32f+))
+               (mat (mat)))
+      ;; Define attributes as numerical
+      (setf (at var-type 0 0 :uint) +var-numerical+)
+      ;; Define output node as numerical
+      (setf (at var-type 0 1 :uint) +var-numerical+)
+      (setf (at var-type 0 2 :uint) +var-numerical+)
+      (d-tree-train d-tree training-data +row-sample+ training-classes mat mat var-type)
+      (dotimes (i (rows test-data))
+	(with-mat ((sample (row test-data i)))
+	  (setf prediction (d-tree-predict d-tree sample))
+	  (with-foreign-slots ((value) prediction (:struct d-tree-node))
+	    (setf (at predicted i 0 :float) (coerce value 'single-float)))))
+      ;; Calculate the accuracy of the Decision Trees
+      (let ((evaluate (evaluate predicted test-classes)))
+	(format t "~%Accuracy_{TREE} = ~a~%" evaluate))
+      ;; Plot the predictions
+      (plot-binary test-data predicted "Predictions Tree"))))
+
+
+;; K-NEAREST NEIGHBORS
+(defun knn (training-data training-classes test-data test-classes k) 
+  (with-mat ((mat (mat)))
+    (with-k-nearest ((knn (k-nearest training-data training-classes mat nil k)))
+      (with-mat ((predicted (mat (rows test-classes) 1 +32f+)))
+	(dotimes (i (rows test-data))
+	  (with-mat ((sample (row test-data i)))
+	    (setf (at predicted i 0 :float) (k-nearest-find-nearest knn sample k))))
+	;; Calculate the accuracy of the K-Nearest Neighbors
+	(let ((evaluate (evaluate predicted test-classes)))
+	  (format t "~%Accuracy_{KNN} = ~a~%" evaluate))
+	;; Plot the predictions
+	(plot-binary test-data predicted "Predictions KNN")))))
+
+
+;; NORMAL BAYES CLASSIFIER
+(defun bayes (training-data training-classes test-data test-classes) 
+  (with-normal-bayes-classifier ((bayes (normal-bayes-classifier training-data training-classes)))
+    (with-mat ((predicted (mat (rows test-classes) 1 +32f+)))
+      (dotimes (i (rows test-data))
+	(with-mat ((sample (row test-data i)))
+	  (setf (at predicted i 0 :float) (normal-bayes-classifier-predict bayes sample))))
+      ;; Calculate the accuracy of the Normal Bayes Classifier
+      (let ((evaluate (evaluate predicted test-classes)))
+	(format t "~%Accuracy_{BAYES} = ~a~%" evaluate))
+      ;; Plot the predictions
+      (plot-binary test-data predicted "Predictions Bayes"))))
+
+
+;; NEURAL NETWORK
+
+(defun mlp (training-Data training-Classes test-Data test-Classes) 
+
+  ;; LAYERS
+
+  ;; The purpose of a neural network is to generalize, which is the ability 
+  ;; to approximate outputs for inputs not available in the training set. W-
+  ;; hile small networks may not be able to approximate a function, large n-
+  ;; etworks tend to overfit and not find any relationship in data. It has 
+  ;; been shown that, given enough data, a multi layer perceptron with one 
+  ;; hidden layer can approximate any continuous function to any degree of 
+  ;; accuracy. Here the number of neurons per layer is stored in the row-o-
+  ;; rdered MAT below, LAYERS.
+
+  (with-mat ((layers (mat 4 1 +32SC1+)))
+    (setf (at layers 0 0 :int) (? *layer-0* :int)) 
+    (setf (at layers 1 0 :int) (? *layer-1* :int))
+    (setf (at layers 2 0 :int) (? *layer-2* :int))
+    (setf (at layers 3 0 :int) (? *layer-3* :int))
+    (with-ann-mlp ((mlp (ann-mlp)))
+      (with-term-criteria ((criteria (term-criteria (logior +termcrit-iter+ +termcrit-eps+) 
+						    100 0.00001d0)))
+	(with-ann-mlp-train-params ((params (ann-mlp-train-params criteria 
+								  +ann-mlp-train-params-backprop+ 
+								  0.05d0 
+								  0.05d0)))
+	  (ann-mlp-create mlp layers)
+	  ;; Train the Neural Net.
+	  (with-mat ((predicted (mat (rows test-classes) 1 +32f+))
+		     (sample-weights (mat))
+		     (sample-idx (mat)))
+	    (ann-mlp-train mlp training-data training-classes sample-weights sample-idx params)
+	    (dotimes (i (rows test-data))
+	      (with-mat ((response (mat 1 1 +32fc1+)))
+		(with-mat ((sample (row test-data i)))
+		  (ann-mlp-predict mlp sample response))
+		(setf (at predicted i 0 :float) (at response 0 0 :float))))
+	    ;; Print the values of all adjustable variables.
+	    (format t "~%*EQUATION* = ~a~%" (? *equation* :int))
+	    (format t "~%*EQUATION-0* = ~a~%" (? *equation-0* :int))
+	    (format t "~%*EQUATION-1* = ~a~%" (? *equation-1* :int))
+	    (format t "~%*EQUATION-2* = ~a~%" (? *equation-2* :int))
+	    (format t "~%*EQUATION-3* = ~a~%" (? *equation-3* :int))
+	    (format t "~%*OTHER* = ~a~%" (? *other* :int))
+	    (format t "~%*LAYER-0* = ~a~%" (? *layer-0* :int))
+	    (format t "~%*LAYER-1* = ~a~%" (? *layer-1* :int))
+	    (format t "~%*LAYER-2* = ~a~%" (? *layer-2* :int))
+	    (format t "~%*LAYER-3* = ~a~%" (? *layer-3* :int))
+	    ;; Calculate the accuracy of the Neural Net
+	    (let ((evaluate (evaluate predicted test-classes)))
+	      (format t "~%Accuracy_{MLP} = ~a~%" evaluate))
+	    ;; Plot the predictions
+	    (plot-binary test-data predicted "Predictions Backpropagation")
+	    nil ))))))
+
+;; Plot Data and Class function
+(defun plot-binary(data classes name &optional x y) 
+  (with-mat ((plot (mat *size* *size* +8uc3+)))
+    (with-scalar ((scalar (scalar 255 255 255)))
+      (assgn-val plot scalar))
+    (dotimes (i (rows data))
+      (setf x (* (at data i 0 :float) *size*))
+      (setf y (* (at data i 1 :float) *size*))
+      (with-scalar ((color1 (rgb 255 0 0))
+		    (color2 (rgb 0 255 0)))
+	(if (> (at classes i 0 :float) 0f0)
+	    ;; Plot the points with the CIRCLE function
+	    (with-point ((center (point (round x) (round y))))
+	      (circle plot center 1 color1 1))
+	    (with-point ((center (point (round x) (round y))))
+	      (circle plot center 1 color2 1)))))
+    (imshow name plot)))
+
+
+(defun d-tree-example ()
+
+  "In this example, Decision trees are compared with a K-Nearest 
+   Neighbors model, a Normal Bayes Classifier and a Neural Network."
+
+  ;; Window names available to all of the functions
+  (let ((window-name-1 "Training data")
+	(window-name-2 "Test data")
+	(window-name-3 "Predictions Backpropagation")
+	(window-name-4 "Predictions Bayes")
+	(window-name-5 "Predictions KNN")
+	(window-name-6 "Predictions Tree")
+	;; Declare other variables
+	(training-classes 0)
+	(test-classes 0)
+	(x 0)
+	(y 0))
+    ;; Create windows
+    (with-named-window (window-name-1 +window-normal+)
+      (with-named-window (window-name-2 +window-autosize+)
+	(with-named-window (window-name-3 +window-normal+)
+	  (with-named-window (window-name-4 +window-normal+)
+	    (with-named-window (window-name-5 +window-normal+)
+	      (with-named-window (window-name-6 +window-normal+)
+		;; Move windows to specified locations
+		(move-window window-name-1 288 150)
+		(move-window window-name-2 756 0)
+		(move-window window-name-3 1188 150)
+		(move-window window-name-4 288 518)
+		(move-window window-name-5 738 639)
+		(move-window window-name-6 1188 518)
+		;; Create trackbars used to adjust the values in the (F) 
+		;; and (MLP) functions. The trackbar names are hints at 
+		;; how not to adjust them e.g. This, 'Eq 0: > 1', means 
+		;; do not let the trackbar go below 1. This, 'Layr 0: 2',
+		;; means the trackbar must stay at 2. Not following the
+		;; guidelines will cause the program to freeze.
+		(create-trackbar "Equation" window-name-2 *equation* 4)
+		(create-trackbar "Eq 0: > 1" window-name-2 *equation-0* 150)
+		(create-trackbar "Eq 1: > 1" window-name-2 *equation-1* 150)
+		(create-trackbar "Eq 2: > 1" window-name-2 *equation-2* 10)
+		(create-trackbar "Eq 3: > 1" window-name-2 *equation-3* 150)
+		(create-trackbar "Other: > 1" window-name-2 *other* 150)
+		(create-trackbar "Lyr 0: 2" window-name-2 *layer-0* 10)
+		(create-trackbar "Lyr 1: > 2" window-name-2 *layer-1* 500)
+		(create-trackbar "Lyr 2: > 2 " window-name-2 *layer-2* 500)
+		(create-trackbar "Lyr 3: 1" window-name-2 *layer-3* 5)
+		(with-mat ((training-data (mat *num-training-points* 2 +32fc1+))
+			   (test-data (mat *num-test-points* 2 +32fc1+)))
+
+		  (loop;; Fill training and test data matrices 
+		     ;; with random numbers from zero to one
+		     (with-scalar ((zero (scalar 0))
+				   (one (scalar 1)))
+		       (randu training-data zero one)
+		       (randu test-data zero one))
+
+		     ;; Label data with equation
+		     (with-mat ((labels1 (mat (rows training-data) 1 +32fc1+)))
+		       (dotimes (i (rows training-data))
+			 (setf x (at training-data i 0 :float))
+			 (setf y (at training-data i 1 :float))
+			 (setf (at labels1 i 0 :float) (coerce (f x y (? *equation* :int)) 
+							       'single-float)))
+
+		       (with-mat ((labels2 (mat (rows test-data) 1 +32fc1+)))
+			 (dotimes (i (rows test-data))
+			   (setf x (at test-data i 0 :float))
+			   (setf y (at test-data i 1 :float))
+			   (setf (at labels2 i 0 :float) (coerce (f x y (? *equation* :int)) 
+								 'single-float)))
+			 (setf training-classes labels1)
+			 (setf test-classes labels2)
+
+			 ;; Plot training data
+			 (plot-binary training-data training-classes window-name-1)
+			 ;; Plot test data
+			 (plot-binary test-data test-classes window-name-2)
+			 ;; Plot predictions
+			 (mlp training-data training-classes test-data test-classes)
+			 (bayes training-data training-classes test-data test-classes)
+			 (knn training-data training-classes test-data test-classes 3)
+			 (decision-tree training-data training-classes test-data test-classes)))
+		     (let ((c (wait-key 33)))
+		       (when (= c 27)
+			 (return)))))))))))))
+
+
+
+
+
+D-TREE-PARAMS
+
+The constructors.
+
+C++: CvDTreeParams::CvDTreeParams()
+
+C++: CvDTreeParams::CvDTreeParams(int max_depth, int min_sample_count, float regression_accuracy, bool use_surrogates, 
+                                  int max_categories, int cv_folds, bool use_1se_rule, bool truncate_pruned_tree, const float* priors)
+
+LISP-CV: (D-TREE-PARAMS (&OPTIONAL (MAX-DEPTH :INT) (MIN-SAMPLE-COUNT :INT) (REGRESSION-ACCURACY :FLOAT) (USE-SURROGATES :BOOLEAN) 
+                        (MAX-CATEGORIES :INT) (FOLDS :INT) (USE-1SE-RULE :BOOLEAN) (TRUNCATE-PRUNED-TREE:BOOLEAN) (PRIORS :POINTER))   
+
+
+    Parameters:	
+
+        MAX-DEPTH - The maximum possible depth of the tree. That is the training algorithms attempts 
+                    to split a node while its depth is less than MAX-DEPTH. The actual depth may be 
+                    smaller if the other termination criteria are met (see the outline of the training 
+                    procedure at the top of this link:
+   
+                    http://docs.opencv.org/trunk/modules/ml/doc/decision_trees.html?highlight=dtreep#decision-trees 
+
+                    ),and/or if the tree is pruned.
+
+        MIN-SAMPLE-COUNT - If the number of samples in a node is less than this parameter then the 
+                           node will not be split.
+
+        REGRESSION-ACCURACY - Termination criteria for regression trees. If all absolute differences 
+                              between an estimated value in a node and values of train samples in this 
+                              node are less than this parameter then the node will not be split.
+
+        USE-SURROGATES - If true then surrogate splits will be built. These splits allow to work with 
+                         missing data and compute variable importance correctly.
+
+        MAX-CATEGORIES - Cluster possible values of a categorical variable into (<= K MAX-CATEGORIES) 
+                         clusters to find a suboptimal split. If a discrete variable, on which the training 
+                         procedure tries to make a split, takes more than MAX-CATEGORIES values, the precise 
+                         best subset estimation may take a very long time because the algorithm is exponential. 
+                         Instead, many decision trees engines (including The OpenCV ML module) try to find sub-
+                         optimal split in this case by clustering all the samples into MAX-CATEGORIES clusters 
+                         that is. some categories are merged together. The clustering is applied only in (> N 2)-
+                         class classification problems for categorical variables with (> N MAX-CATEGORIES) possible 
+                         values. In case of regression and 2-class classification the optimal split can be found 
+                         efficiently without employing clustering, thus the parameter is not used in these cases.
+
+        FOLDS - If (> FOLDS 1) then prune a tree with K-fold cross-validation where K is equal to FOLDS.
+
+        USE-1SE-RULE - If true then a pruning will be harsher. This will make a tree more compact and 
+                       more resistant to the training data noise but a bit less accurate.
+
+        TRUNCATE-PRUNED-TREE - If true then pruned branches are physically removed from the tree. 
+                               Otherwise they are retained and it is possible to get results from 
+                               the original unpruned (or pruned less aggressively) tree by decreasing 
+                               CvDTree::pruned_tree_idx parameter <- todo.
+
+        PRIORS - The array of a priori class probabilities, sorted by the class label value. The 
+                 parameter can be used to tune the decision tree preferences toward a certain class. 
+                 For example, if you want to detect some rare anomaly occurrence, the training base 
+                 will likely contain much more normal cases than anomalies, so a very good classification 
+                 performance will be achieved just by considering every case as normal. To avoid this, the 
+                 priors can be specified, where the anomaly probability is artificially increased (up to 0.5 
+                 or even greater), so the weight of the misclassified anomalies becomes much bigger, and the 
+                 tree is adjusted properly. You can also think about this parameter as weights of prediction 
+                 categories which determine relative weights that you give to misclassification. That is, if 
+                 the weight of the first category is 1 and the weight of the second category is 10, then each 
+                 mistake in predicting the second category is equivalent to making 10 mistakes in predicting 
+                 the first category.
+
+
+The default constructor initializes all the parameters with the default values tuned for the standalone 
+classification tree:
+
+Note: Below are the default settings used in the underlying C++ code when D-TREE-PARAMS is called 
+without entering any parameters:
+
+CvDTreeParams() : max_categories(10), max_depth(INT_MAX), min_sample_count(10),
+    cv_folds(10), use_surrogates(true), use_1se_rule(true),
+    truncate_pruned_tree(true), regression_accuracy(0.01f), priors(0)
+{}
+
+
+Example:
+
+See D-TREE-EXAMPLE in this file.
+
+
+
+D-TREE-PREDICT
+
+Returns the leaf node of a decision tree corresponding to the input vector.
+
+C++: CvDTreeNode* CvDTree::predict(const Mat& sample, const Mat& missingDataMask=Mat(), bool preprocessedInput=false ) const
+
+LISP-CV: (D-TREE-PREDICT (SELF D-TREE) (SAMPLE MAT) &OPTIONAL ((MISSING-DATA-MASK MAT) (MAT) GIVEN-MISSING-DATA-MASK) 
+                         ((PREPROCESSED-INPUT :BOOLEAN) NIL)) => (:POINTER (:STRUCT D-TREE-NODE))
+
+
+    Parameters:	
+
+        SELF - A D-TREE object.
+
+        SAMPLE - Sample for prediction.
+
+        MISSING-DATA-MASK - Optional input missing measurement mask.
+
+        PREPROCESSED-INPUT - This parameter is normally set to false, implying a regular input. If it 
+                             is true, the method assumes that all the values of the discrete input variables 
+                             have been already normalized to 0 to (- (NUM-OF-CATEGORIES I) 1) ranges since the 
+                             decision tree uses such normalized representation internally. It is useful for faster 
+                             prediction with tree ensembles. For ordered input variables, the flag is not used.
+
+The method traverses the decision tree and returns the reached leaf node as output. The prediction 
+result, either the class label or the estimated function value, may be retrieved as the value field 
+of the D-TREE-NODE structure, for example: 
+
+(let ((prediction (d-tree-predict d-tree sample mask)))
+  (with-foreign-slots ((value) prediction (:struct d-tree-node))
+		      value))
+
+
+
+Example:
+
+See D-TREE-EXAMPLE in this file.
+
+
+
+D-TREE-TRAIN
+
+Trains a decision tree.
+
+C++: bool CvDTree::train(const Mat& trainData, int tflag, const Mat& responses, const Mat& varIdx=Mat(), const Mat& sampleIdx=Mat(), const Mat& varType=Mat(), const Mat& missingDataMask=Mat(), CvDTreeParams params=CvDTreeParams() )
+
+LISP-CV:  (d-tree-train (self d-tree) (train-data mat) (tflag :int) (responses mat) &optional 
+                       ((var-idx mat) (mat) given-var-idx) ((sample-idx mat) (mat) given-sample-idx) 
+                       ((var-type mat) (mat) given-var-type) ((missing-data-mask mat) (mat) given-missing-data-mask) 
+                       ((params d-tree-params) (d-tree-params) given-params)) => :boolean
+
+    This function follows the generic (STAT-MODEL-TRAIN) conventions. It is the most complete form. 
+    Both data layouts (EQ TFLAG +ROW-SAMPLE+) and (EQ TFLAG +COL-SAMPLE+) are supported, as well as 
+    sample and variable subsets, missing measurements, arbitrary combinations of input and output 
+    variable types, and so on. The last parameter contains all of the necessary training parameters 
+    (see the D-TREE-PARAMS description).
+
+The function is parallelized with the TBB library.
+
+
+Example:
+
+See D-TREE-EXAMPLE in this file.
+
 
 
 
@@ -9991,13 +11012,15 @@ Example:
 		 (dotimes (i (rows training-data))
 		   (setf x (at training-data i 0 :float))
 		   (setf y (at training-data i 1 :float))
-		   (setf (at labels1 i 0 :float) (coerce (f x y (? *equation* :int)) 'float)))
+		   (setf (at labels1 i 0 :float) (coerce (f x y (? *equation* :int)) 
+							 'single-float)))
 
 		 (with-mat ((labels2 (mat (rows test-data) 1 +32fc1+)))
 		   (dotimes (i (rows test-data))
 		     (setf x (at test-data i 0 :float))
 		     (setf y (at test-data i 1 :float))
-		     (setf (at labels2 i 0 :float) (coerce (f x y (? *equation* :int)) 'float)))
+		     (setf (at labels2 i 0 :float) (coerce (f x y (? *equation* :int))
+							   'single-float)))
 
 		   (setf training-classes labels1)
 		   (setf test-classes labels2)
@@ -10901,6 +11924,86 @@ LISP-CV: (STYLIZATION (SRC MAT) (DEST MAT) &OPTIONAL ((SIGMA-S :FLOAT) 60F0) ((S
 
 
 
+
+NON-FREE - FEATURE DETECTION AND DESCRIPTION
+
+
+
+SURF
+
+The SURF extractor constructors.
+
+C++: SURF::SURF()
+
+LISP-CV: (SURF) => FEATURE-2D
+
+C++: SURF::SURF(double hessianThreshold, int nOctaves=4, int nOctaveLayers=2, bool extended=true, bool upright=false )
+
+LISP-CV: (SURF (HESSIAN-THRESHOLD :DOUBLE) &OPTIONAL ((N-OCTAVES :INT) 4) 
+                 ((EXTENDED :BOOLEAN) T) ((UPRIGHT :BOOLEAN) NIL)) => FEATURE-2D
+
+    Parameters:	
+
+        HESSIAN-THRESHOLD - Threshold for hessian keypoint detector used in SURF.
+
+        N-OCTAVES - Number of pyramid octaves the keypoint detector will use.
+
+        N-OCTAVE-LAYERS - Number of octave layers within each octave.
+
+        EXTENDED - Extended descriptor flag (t - use extended 128-element descriptors; nil - u-
+                   se 64-element descriptors).
+
+        UPRIGHT - Up-right or rotated features flag (t - do not compute orientation of features; 
+                  nil - compute orientation).
+
+
+
+(defun surf-example (filename-1 filename-2) 
+
+  "Try using the box.png and the box_in_scene.png from
+   the LISP-CV-MASTER/IMAGES directory to get a better 
+   understanding of this example the first time you ru-
+   n it."
+
+  ;; Read in image in grayscale -> The object you want to track
+  (let* ((img-1 (gc:imread filename-1 +load-image-grayscale+))
+	 ;; The image the object is a part of
+	 (img-2 (gc:imread filename-2 +load-image-grayscale+))
+         (min-hessian 400d0) 
+         (detector (gc:surf min-hessian))
+	 (keypoints-1 (gc:vec-key-point))
+	 (keypoints-2 (gc:vec-key-point))
+         (extractor (gc:surf))
+	 (descriptors-1 (gc:mat))
+	 (descriptors-2 (gc:mat))
+	 (matcher (gc:bf-matcher +norm-l2+))
+	 (matches (gc:vec-dmatch))
+	 (img-matches (gc:mat))
+	 (window-name "Image Matches - SURF Example"))
+    (if (empty (or img-1 img-2)) 
+	(return-from surf-example 
+	  (format t "Both images were not loaded")))
+    (with-named-window (window-name +window-normal+)
+      (move-window window-name 759 175)
+      ;;-- Step 1: Detect the keypoints using SURF Detector
+      (feat-detector-detect detector img-1 keypoints-1)
+      (feat-detector-detect detector img-2 keypoints-2)
+      ;;-- Step 2: Calculate descriptors (feature vectors)
+      (feat-2d-compute extractor img-1 keypoints-1 descriptors-1)
+      (feat-2d-compute extractor img-2 keypoints-2 descriptors-2)
+      ;-- Step 3: Matching descriptor vectors with a brute force matcher
+      (descrip-matcher-match matcher descriptors-1 descriptors-2 matches)
+      ;;-- Draw matches
+      (draw-matches img-1 keypoints-1 img-2 keypoints-2 matches img-matches)
+      ;;-- Show detected matches
+      (imshow window-name img-matches)
+      (loop
+	 (let ((c (wait-key 33)))
+	   (when (= c 27)
+	     (return)))))))
+
+
+
 CONTRIB - COLORMAPS IN OPENCV
 
 
@@ -11448,9 +12551,11 @@ MAT-EXPR-T
 
 Transposes a matrix.
 
+
 C++: MatExpr Mat::t() const
 
 LISP-CV: (MAT-EXPR-T (SELF MAT)) => MAT-EXPR
+
 
 The method performs matrix transposition by means of matrix expressions. It does not perform the ac-
 tual transposition but returns a temporary matrix transposition object that can be further used as 
@@ -11461,7 +12566,22 @@ a part of more complex matrix expressions or can be assigned to a matrix.
         SELF - Input matrix
 
 
-; todo - finish example
+CV> (DEFPARAMETER A (MAT 3 3 +8U+ :UCHAR '(1 2 3 4 5 6 7 8 9)))
+
+A
+
+CV> (PRINT-MAT A :UCHAR)
+1 2 3 
+4 5 6 
+7 8 9 
+NIL
+
+CV> (PRINT-MAT (>> (MAT-EXPR-T A)) :UCHAR) ;coerce the return value, back to MAT 
+1 4 7                                      ;with the (>>) function before printing
+2 5 8 
+3 6 9 
+NIL
+
 
 
 FORCE
@@ -11472,14 +12592,16 @@ LISP-CV: (FORCE (SELF MAT-EXPR)) => MAT
 
 LISP-CV: (>> (SELF MAT-EXPR)) => MAT
 
+
+  Parameters:	
+
+        SELF - A Matrix Expression.
+
+
 The function FORCE converts a functions output from MAT-EXPR to MAT.  This is useful if you have just 
 done mathematical computation with a Matrix Expressions(MAT-EXPR) function and would like to use the 
 result in a function that only accepts a MAT as input i.e. IMSHOW. The function >> is an identical 
 shorthand version of the FORCE function supplied for ease of use. 
-
-  Parameters:	
-
-        SELF - A Matrix Expressions pointer.
 
 
 (defun force-example ()
@@ -12857,115 +13979,6 @@ Also a combined format is supported: feature detector adapter name:
 
 
 
-SURF
-
-The SURF extractor constructors.
-
-C++: SURF::SURF()
-
-LISP-CV: (SURF) => FEATURE-2D
-
-C++: SURF::SURF(double hessianThreshold, int nOctaves=4, int nOctaveLayers=2, bool extended=true, bool upright=false )
-
-LISP-CV: (SURF (HESSIAN-THRESHOLD :DOUBLE) &OPTIONAL ((N-OCTAVES :INT) 4) 
-                 ((EXTENDED :BOOLEAN) T) ((UPRIGHT :BOOLEAN) NIL)) => FEATURE-2D
-
-    Parameters:	
-
-        HESSIAN-THRESHOLD - Threshold for hessian keypoint detector used in SURF.
-
-        N-OCTAVES - Number of pyramid octaves the keypoint detector will use.
-
-        N-OCTAVE-LAYERS - Number of octave layers within each octave.
-
-        EXTENDED - Extended descriptor flag (t - use extended 128-element descriptors; nil - u-
-                   se 64-element descriptors).
-
-        UPRIGHT - Up-right or rotated features flag (t - do not compute orientation of features; 
-                  nil - compute orientation).
-
-
-
-(defun surf-example (filename-1 filename-2) 
-
-  "Try using the box.png and the box_in_scene.png from
-   the LISP-CV-MASTER/IMAGES directory to get a better 
-   understanding of this example the first time you ru-
-   n it."
-
-  ;; Read in image in grayscale -> The object you want to track
-  (let* ((img-1 (gc:imread filename-1 +load-image-grayscale+))
-	 ;; The image the object is a part of
-	 (img-2 (gc:imread filename-2 +load-image-grayscale+))
-         (min-hessian 400d0) 
-         (detector (gc:surf min-hessian))
-	 (keypoints-1 (gc:vec-key-point))
-	 (keypoints-2 (gc:vec-key-point))
-         (extractor (gc:surf))
-	 (descriptors-1 (gc:mat))
-	 (descriptors-2 (gc:mat))
-	 (matcher (gc:bf-matcher +norm-l2+))
-	 (matches (gc:vec-dmatch))
-	 (img-matches (gc:mat))
-	 (window-name "Image Matches - SURF Example"))
-    (if (empty (or img-1 img-2)) 
-	(return-from surf-example 
-	  (format t "Both images were not loaded")))
-    (with-named-window (window-name +window-normal+)
-      (move-window window-name 759 175)
-      ;;-- Step 1: Detect the keypoints using SURF Detector
-      (feat-detector-detect detector img-1 keypoints-1)
-      (feat-detector-detect detector img-2 keypoints-2)
-      ;;-- Step 2: Calculate descriptors (feature vectors)
-      (feat-2d-compute extractor img-1 keypoints-1 descriptors-1)
-      (feat-2d-compute extractor img-2 keypoints-2 descriptors-2)
-      ;-- Step 3: Matching descriptor vectors with a brute force matcher
-      (descrip-matcher-match matcher descriptors-1 descriptors-2 matches)
-      ;;-- Draw matches
-      (draw-matches img-1 keypoints-1 img-2 keypoints-2 matches img-matches)
-      ;;-- Show detected matches
-      (imshow window-name img-matches)
-      (loop
-	 (let ((c (wait-key 33)))
-	   (when (= c 27)
-	     (return)))))))
-
-
-
-$
-
-Time how long a function takes to complete n iterations.
-
-
-LISP-CV: ($ FORM &optional (COUNT-FORM 1000000) ) => RESULT
-
-    Parameters:	
-
-        FORM - From the Common Lisp HyperSpec:
-               1. any object meant to be evaluated. 2. a symbol, a compound form, or a self-evaluat-
-               ing object. 3. (for an operator, as in ``<<operator>> form'') a compound form having 
-               that operator as its first element. ``A quote form is a constant form.''
-
-        COUNT-FORM - The number of iterations of FORM you would like to calculate.
-
-This is useful, if you have just written a function and would like to time the seconds it takes to 
-complete n iterations, because all you have to do is go back one in the REPL history and add a $ and 
-
-Example:
-
-LISP-CV> ($  (sleep 1) 5)
-
-Evaluation took:
-  5.0000 seconds of real time
-  0.004951 seconds of total run time (0.003775 user, 0.001176 system)
-  0.10% CPU
-  12,501,013,695 processor cycles
-  33,008 bytes consed
-  
-NIL
-
-
-
 VECTOR
 
 Bindings for the C++ VECTOR class.
@@ -13277,90 +14290,52 @@ CV> (VEC-DMATCH A 0 3 :FLOAT)  <--- If a VECTOR-DMATCH contains a 3 element DMAT
 
 
 
-LISP-CV - MACROS
+
+LISP-CV - MACROS AND EXTRA FUNCTIONS:
 
 
-Macro for CFFI::FOREIGN-ALLOC
 
-CFFI: - foreign-alloc type &key initial-element initial-contents (count 1) null-terminated-p ⇒ pointer
+$ (Macro for CL::TIME macro)
 
-LISP-CV: (ALLOC TYPE VALUE) => :POINTER
 
+Time how long a function takes to complete n iterations.
+
+
+LISP-CV: ($ FORM &optional (COUNT-FORM 1000000) ) => RESULT
 
     Parameters:	
 
-        TYPE - A CFFI type
+        FORM - From the Common Lisp HyperSpec:
+               1. any object meant to be evaluated. 2. a symbol, a compound form, or a self-evaluat-
+               ing object. 3. (for an operator, as in ``<<operator>> form'') a compound form having 
+               that operator as its first element. ``A quote form is a constant form.''
 
-        VALUE - A number or a sequence - Stand-in for the INITIAL-ELEMENT 
-                and INITIAL-CONTENTS parameter of FOREIGN-ALLOC
+        COUNT-FORM - The number of iterations of FORM you would like to calculate.
 
+
+This is useful, if you have just written a function and would like to time the seconds it takes to 
+complete n iterations, because all you have to do is go back one in the REPL history and add a $ and 
 
 
 Example:
 
-LISP-CV> (DEFPARAMETER A (ALLOC :DOUBLE 8.0D0))
 
-A
+LISP-CV> ($  (sleep 1) 5)
 
-LISP-CV> (MEM-AREF A :DOUBLE)
-
-8.0d0
-
-LISP-CV> (DEFPARAMETER B (ALLOC :INT '(1 2 3)))
-
-B
-
-LISP-CV> (MEM-AREF B :INT)
-
-1
-
-LISP-CV> (MEM-AREF B :INT 1)
-
-2
-
-LISP-CV> (MEM-AREF B :INT 2)
-
-3
-
-
-
-FREE
-
-Macro for CFFI::FOREIGN-FREE
-
-CFFI: - foreign-free ptr ⇒ undefined
-
-LISP-CV: (FREE PTR) => undefined
-
-
-    Parameters:	
-
-        PTR - A foreign pointer.
-
-
-Example:
-
-LISP-CV> (DEFPARAMETER A (ALLOC :INT 55))
-
-A
-
-LISP-CV> (MEM-REF A :INT)
-
-55
-
-LISP-CV> (FREE A)
-
+Evaluation took:
+  5.0000 seconds of real time
+  0.004951 seconds of total run time (0.003775 user, 0.001176 system)
+  0.10% CPU
+  12,501,013,695 processor cycles
+  33,008 bytes consed
+  
 NIL
 
-LISP-CV> (MEM-REF A :INT)
-
-0
 
 
 
-?
+? (Macro for CFFI::MEM-AREF)
 
-Macro for CFFI::MEM-AREF
 
 CFFI: mem-aref ptr type &optional (index 0)
 
@@ -13406,11 +14381,60 @@ LCV> (? A :STRING)
 "12545"
 
 
+
+
+ALLOC (Macro for CFFI::FOREIGN-ALLOC)
+
+
+CFFI: - foreign-alloc type &key initial-element initial-contents (count 1) null-terminated-p ⇒ pointer
+
+LISP-CV: (ALLOC TYPE VALUE) => :POINTER
+
+
+    Parameters:	
+
+        TYPE - A CFFI type
+
+        VALUE - A number or a sequence - Stand-in for the INITIAL-ELEMENT 
+                and INITIAL-CONTENTS parameter of FOREIGN-ALLOC
+
+
+Example:
+
+
+LISP-CV> (DEFPARAMETER A (ALLOC :DOUBLE 8.0D0))
+
+A
+
+LISP-CV> (MEM-AREF A :DOUBLE)
+
+8.0d0
+
+LISP-CV> (DEFPARAMETER B (ALLOC :INT '(1 2 3)))
+
+B
+
+LISP-CV> (MEM-AREF B :INT)
+
+1
+
+LISP-CV> (MEM-AREF B :INT 1)
+
+2
+
+LISP-CV> (MEM-AREF B :INT 2)
+
+3
+
+
+
 CONTINUABLE
+
 
 Catches any error and gives the option to ignore it and continue.
 
 LISP-CV: (CONTINUABLE &BODY BODY)
+
 
     Parameters: 
           
@@ -13426,122 +14450,9 @@ Macro included for reference:
      (continue () :report "Continue"  )))
 
 
-UPDATE-SWANK
-
-Grabs SWANK connections and tells it to handle requests. Call this every loop in the main loop of your 
-program.
-
-LISP-CV: (UPDATE-SWANK)
-
-     Parameters: None
 
 
-Function included for reference:
-
-
-(defun update-swank ()
-  "Grabs SWANK connections and tells it to handle requests. 
-   Call this every loop in the main loop of your program"
-  (continuable
-    (let ((connection (or swank::*emacs-connection*
-			  (swank::default-connection))))
-      (when connection
-	(swank::handle-requests connection t)))))
-
-
-Example:
-
-
-(defvar n (/ 1 1))
-
-(defun live-code-editing-example (filename)
-
-  "You can update this program as it runs! Just run 
-   M-x SLIME-COMPILE-AND-LOAD-FILE then at the REPL 
-   run (LIVE-CODE-EDITING-EXAMPLE FILENAME). Switch 
-   to the REPL, even though its not active, you can 
-   use (SETF N (/ 1 <NEW VALUE>)) to update N which 
-   will change the strobe effect. After you running 
-   SETF once you will get the REPL back"
-
-  (let ((image (imread filename 1))
-	(x 0)
-	(window-name "test"))
-    (named-window window-name +window-normal+)
-    (move-window window-name 759 175)
-    (do* ((value (scalar 0 0 0)))
-	 ((plusp (wait-key *millis-per-frame*)) 
-	  (format t "Key is pressed by user"))
-      (incf x 1)
-      (if (= x 2) (progn (assgn-val image value)  (decf x 2)))
-      (update-swank)
-      (continuable (imshow window-name image))
-      (del-mat image)
-      (setf image (imread filename 1))
-      (sleep n))
-    (destroy-window window-name)))
-
-
-
-EXTRA FUNCTIONS:
-
-
-DEL
-
-Deletes allocated memory
-
-C++: void operator delete  ( void* ptr )
-
-LISP-CV: (DEL (SELF :POINTER)) :VOID
-
-
-  Parameters:	
-
-        SELF - A pointer to allocated memory
-
-
-Some of the OpenCV C bindings for its C++ interface that this library binds to, allocate memory for 
-their return value, with a new operator. A call to the C++ delete operator must be made for every call 
-to new to avoid a memory leak. The DEL function is a wrapper for the C++ delete operator. See the specific 
-functions example to see if it is necessary to call DEL or use the macro WITH-ALLOC to free its memory when 
-the function goes out of scope.
-
-
-Example:
-
-
-LISP-CV> (DEFPARAMETER A (POINT 1 2)) ;A POINT is created
-
-A
-
-LISP-CV> (POINT-X A) ;The x coordinate of A is retrieved
-
-1
-
-LISP-CV> (POINT-Y A) ;The y coordinate of A is retrieved
-
-2
-
-LISP-CV> (DEL A) ; A is deleted with DEL
-
-; No value
-
-
-LISP-CV> (POINT-X A) ; The memory has been deallocated
-
-0
-
-LISP-CV> (POINT-Y A)
-
-0
-
-
-
-EXTRA FUNCTIONS:
-
-
-
-DEL-*
+DEL andd DEL-*
 
 
 Deletes allocated memory
@@ -13737,4 +14648,100 @@ LISP-CV> (POINT-X A) ; The memory has been deallocated
 LISP-CV> (POINT-Y A)
 
 0
+
+
+
+FREE (Macro for CFFI::FOREIGN-FREE)
+
+
+CFFI: - foreign-free ptr ⇒ undefined
+
+LISP-CV: (FREE PTR) => undefined
+
+
+    Parameters:	
+
+        PTR - A foreign pointer.
+
+
+Example:
+
+LISP-CV> (DEFPARAMETER A (ALLOC :INT 55))
+
+A
+
+LISP-CV> (MEM-REF A :INT)
+
+55
+
+LISP-CV> (FREE A)
+
+NIL
+
+LISP-CV> (MEM-REF A :INT)
+
+0
+
+
+
+UPDATE-SWANK
+
+
+Grabs SWANK connections and tells it to handle requests. Call this every loop in the main loop of your 
+program.
+
+
+LISP-CV: (UPDATE-SWANK)
+
+     Parameters: None
+
+
+Function included for reference:
+
+
+(defun update-swank ()
+  "Grabs SWANK connections and tells it to handle requests. 
+   Call this every loop in the main loop of your program"
+  (continuable
+    (let ((connection (or swank::*emacs-connection*
+			  (swank::default-connection))))
+      (when connection
+	(swank::handle-requests connection t)))))
+
+
+Example:
+
+
+(defvar n (/ 1 1))
+
+(defun live-code-editing-example (filename)
+
+  "You can update this program as it runs! Just run 
+   M-x SLIME-COMPILE-AND-LOAD-FILE then at the REPL 
+   run (LIVE-CODE-EDITING-EXAMPLE FILENAME). Switch 
+   to the REPL, even though its not active, you can 
+   use (SETF N (/ 1 <NEW VALUE>)) to update N which 
+   will change the strobe effect. After you running 
+   SETF once you will get the REPL back"
+
+  (let ((image (imread filename 1))
+	(x 0)
+	(window-name "test"))
+    (named-window window-name +window-normal+)
+    (move-window window-name 759 175)
+    (do* ((value (scalar 0 0 0)))
+	 ((plusp (wait-key *millis-per-frame*)) 
+	  (format t "Key is pressed by user"))
+      (incf x 1)
+      (if (= x 2) (progn (assgn-val image value)  (decf x 2)))
+      (update-swank)
+      (continuable (imshow window-name image))
+      (del-mat image)
+      (setf image (imread filename 1))
+      (sleep n))
+    (destroy-window window-name)))
+
+
+
+
 

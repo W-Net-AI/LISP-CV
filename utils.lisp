@@ -46,9 +46,13 @@
 		   (append default-dir (cdr dir))))))
     (make-pathname :directory (absolute-dir (pathname-directory dir)) :name (pathname-name dir) :type (pathname-type dir))))
 
-
+;'Lisp-CV Source Directory
 (define-symbol-macro *lisp-cv-src-dir*  (full-pathname (asdf::system-source-directory :lisp-cv))) 
 
+;;Lisp-CV Data Directory
+(define-symbol-macro *lisp-cv-data-dir*  (cat *lisp-cv-src-dir* "/data/")) 
+
+(defparameter *file-number* 0)
 
 ;;; -----------------------------------------------------------------------------------------
 ;;; external-process

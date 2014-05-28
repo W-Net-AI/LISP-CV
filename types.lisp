@@ -932,6 +932,79 @@
     ann-mlp-train-params))
 
 
+;; D-TREE
+
+(define-foreign-type d-tree ()
+  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+                     :garbage-collect))
+  (:actual-type :pointer)
+  (:simple-parser d-tree))
+
+
+(defclass cv-d-tree ()
+  ((c-pointer :reader c-pointer :initarg :c-pointer)))
+
+
+(defmethod translate-to-foreign ((lisp-value cv-d-tree) (c-type d-tree))
+  (values  (c-pointer lisp-value) lisp-value))
+
+
+(defmethod translate-from-foreign (c-pointer (c-type d-tree))
+  (let ((d-tree  (make-instance 'cv-d-tree :c-pointer c-pointer)))
+    (when (garbage-collect c-type)
+      (tg:finalize d-tree (lambda () (del-d-tree c-pointer))))
+    d-tree))
+
+
+;; D-TREE-PARAMS
+
+(define-foreign-type d-tree-params ()
+  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+                     :garbage-collect))
+  (:actual-type :pointer)
+  (:simple-parser d-tree-params))
+
+
+(defclass cv-d-tree-params ()
+  ((c-pointer :reader c-pointer :initarg :c-pointer)))
+
+
+(defmethod translate-to-foreign ((lisp-value cv-d-tree-params) (c-type d-tree-params))
+  (values  (c-pointer lisp-value) lisp-value))
+
+
+(defmethod translate-from-foreign (c-pointer (c-type d-tree-params))
+  (let ((d-tree-params  (make-instance 'cv-d-tree-params :c-pointer c-pointer)))
+    (when (garbage-collect c-type)
+      (tg:finalize d-tree-params (lambda () (del-d-tree-params c-pointer))))
+    d-tree-params))
+
+
+
+;; K-NEAREST
+
+(define-foreign-type k-nearest ()
+  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+                     :garbage-collect))
+  (:actual-type :pointer)
+  (:simple-parser k-nearest))
+
+
+(defclass cv-k-nearest ()
+  ((c-pointer :reader c-pointer :initarg :c-pointer)))
+
+
+(defmethod translate-to-foreign ((lisp-value cv-k-nearest) (c-type k-nearest))
+  (values  (c-pointer lisp-value) lisp-value))
+
+
+(defmethod translate-from-foreign (c-pointer (c-type k-nearest))
+  (let ((k-nearest  (make-instance 'cv-k-nearest :c-pointer c-pointer)))
+    (when (garbage-collect c-type)
+      (tg:finalize k-nearest (lambda () (del-k-nearest c-pointer))))
+    k-nearest))
+
+
 ;; NORMAL-BAYES-CLASSIFIER
 
 (define-foreign-type normal-bayes-classifier ()
