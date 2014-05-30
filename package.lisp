@@ -443,6 +443,7 @@
    #:bitwise-not
    #:bitwise-or
    #:bitwise-xor
+   #:calc-covar-matrix
    #:convert-scale-abs
    #:determinant
    #:divide
@@ -451,6 +452,7 @@
    #:inv
    #:invert
    #:magnitude
+   #:mahalanobis
    #:mean
    #:min-max-loc
    #:multiply
