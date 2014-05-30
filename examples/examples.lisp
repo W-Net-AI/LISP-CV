@@ -9648,24 +9648,28 @@ LISP-CV: (FEATURE-DETECTOR-DETECT (self FEATURE-2D) (image MAT) (keypoints key-p
 
 
 (defun feat-detector-detect-example (&optional 
-		       (cam *camera-index*) 
-		       (width *default-width*)
-		       (height *default-height*))
+				       (cam *camera-index*) 
+				       (width *default-width*)
+				       (height *default-height*))
 
   (with-captured-camera (cap cam :width width :height height)
-    ;;Initialize the template location and dimension variables 
-    ;;and other variables for the trackbars to adjust
+    ;;Initialize the template location, dimension and 
+    ;;min-hessian variables for the trackbars to adjust
     (with-object ((template-x (alloc :int '(0)))
 		  (template-y (alloc :int '(0)))
 		  (template-width (alloc :int (list (round (/ width 2)))))
 		  (template-height (alloc :int (list (round (/ height 2)))))
 		  (min-hessian (alloc :int 400)))
+      ;;Vectors for holding all keypoints
       (let* ((keypoints-1 (gc:vec-key-point))
 	     (keypoints-2 (gc:vec-key-point))
+             ;;Matrices for holding the descriptors
 	     (descriptors-1 (gc:mat))
 	     (descriptors-2 (gc:mat))
 	     (matcher (gc:bf-matcher +norm-l2+))
+             ;;Vector for holding the matches
 	     (matches (gc:vec-dmatch))
+             ;;Output matrix
 	     (img-matches (gc:mat))
 	     (window-name "Image Matches - FEAT-DETECTOR-DETECT Example"))
         ;;Create fullscreen window
@@ -9674,15 +9678,15 @@ LISP-CV: (FEATURE-DETECTOR-DETECT (self FEATURE-2D) (image MAT) (keypoints key-p
 	  (set-window-property window-name +wnd-prop-fullscreen+ 
 			       +window-fullscreen+)
 	  ;;Trackbars that control the template location/dimensions
-	  (create-trackbar "RECT-X" window-name template-x 250)
-	  (create-trackbar "RECT-Y" window-name template-y 250)
-	  (create-trackbar "RECT-WIDTH" window-name template-width width)
-	  (create-trackbar "RECT-HEIGHT" window-name template-height height) 
-          (create-trackbar "RECT-WIDTH" window-name template-width width)
+	  (create-trackbar "TEMPLATE-X" window-name template-x 250)
+	  (create-trackbar "TEMPLATE-Y" window-name template-y 250)
+	  (create-trackbar "TEMPLATE-WIDTH" window-name template-width width)
+	  (create-trackbar "TEMPLATE-HEIGHT" window-name template-height height) 
+          (create-trackbar "TEMPLATE-WIDTH" window-name template-width width)
           ;;Trackbar to set the hessian keypoint detector threshold
 	  (create-trackbar "MIN-HESSIAN" window-name min-hessian 1000) 
 	  (loop ;;Were using the camera feed as the image here and a
-	     ;;region of interest of the feed as the template
+	        ;;region of interest of the feed as the template
 	     (with-mat ((frame (mat)))
 	       (cap-read cap frame)
 	       ;;Instantiate logic for the location/dimensions 
@@ -9709,9 +9713,8 @@ LISP-CV: (FEATURE-DETECTOR-DETECT (self FEATURE-2D) (image MAT) (keypoints key-p
                  ;;region of interest will be the template image.
 		 (with-mat ((template (roi frame roi)))
 		   (cvt-color template template +bgr2gray+)
-		   (with-feature-2d ((detector (surf (coerce 
-						      (? min-hessian :int) 
-						      'double-float)))
+		   (with-feature-2d ((detector (surf (coerce (? min-hessian :int) 
+							     'double-float)))
                                      (extractor (gc:surf)))
 		     ;;-- Step 1: Detect keypoints in the image 
                      ;;-- and template using FEAT-DETECTOR-DETECT
@@ -9730,8 +9733,6 @@ LISP-CV: (FEATURE-DETECTOR-DETECT (self FEATURE-2D) (image MAT) (keypoints key-p
 	       (let ((c (wait-key 33)))
 		 (when (= c 27)
 		   (return))))))))))
-
-
 
 
 
