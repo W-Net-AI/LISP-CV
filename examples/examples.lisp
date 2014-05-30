@@ -9528,7 +9528,7 @@ FEATURES2D - COMMON INTERFACES OF FEATURE DETECTORS
 
 
 
-FEAT-DETECT-CREATE
+FEAT-DETECTOR-CREATE
 
 Creates a feature detector by its name.
 
@@ -9579,7 +9579,7 @@ Also a combined format is supported: feature detector adapter name:
   (let* ((thresh 60)
 	 (octaves 4)
 	 (pattern-scale 2.0f0)
-	 (window-name "All Matches - FEAT-DETECT-CREATE Example"))
+	 (window-name "All Matches - FEAT-DETECTOR-CREATE Example"))
     ;; read some images in grayscale -> The object you want to track
     (with-mat ((gray-a (imread filename-1 +load-image-grayscale+))
 	       ;; The image the object is a part of
