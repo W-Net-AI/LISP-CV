@@ -9626,6 +9626,114 @@ Also a combined format is supported: feature detector adapter name:
 
 
 
+FEAT-DETECTOR-DETECT
+
+Detects keypoints in an image.
+
+C++: void FeatureDetector::detect(InputArray image, vector<KeyPoint>& keypoints, InputArray mask=noArray() ) const
+
+LISP-CV: (FEATURE-DETECTOR-DETECT (self FEATURE-2D) (image MAT) (keypoints key-point) &optional ((mask mat) (mat) given-mask)) => :void
+
+    Parameters:	
+
+        SELF - A FEATURE-2D object e.g. SURF, BRISK etc.
+
+        IMAGE - An image.
+
+        KEYPOINTS - The detected keypoints.
+
+        MASK - Mask specifying where to look for keypoints (optional). It must be a 8-bit integer 
+               matrix with non-zero values in the region of interest.
+
+
+
+(defun feat-detector-detect-example (&optional 
+		       (cam *camera-index*) 
+		       (width *default-width*)
+		       (height *default-height*))
+
+  (with-captured-camera (cap cam :width width :height height)
+    ;;Initialize the template location and dimension variables 
+    ;;and other variables for the trackbars to adjust
+    (with-object ((template-x (alloc :int '(0)))
+		  (template-y (alloc :int '(0)))
+		  (template-width (alloc :int (list (round (/ width 2)))))
+		  (template-height (alloc :int (list (round (/ height 2)))))
+		  (min-hessian (alloc :int 400)))
+      (let* ((keypoints-1 (gc:vec-key-point))
+	     (keypoints-2 (gc:vec-key-point))
+	     (descriptors-1 (gc:mat))
+	     (descriptors-2 (gc:mat))
+	     (matcher (gc:bf-matcher +norm-l2+))
+	     (matches (gc:vec-dmatch))
+	     (img-matches (gc:mat))
+	     (window-name "Image Matches - FEAT-DETECTOR-DETECT Example"))
+        ;;Create fullscreen window
+	(with-named-window (window-name +window-normal+)
+	  ;;Set window to fullscreen
+	  (set-window-property window-name +wnd-prop-fullscreen+ 
+			       +window-fullscreen+)
+	  ;;Trackbars that control the template location/dimensions
+	  (create-trackbar "RECT-X" window-name template-x 250)
+	  (create-trackbar "RECT-Y" window-name template-y 250)
+	  (create-trackbar "RECT-WIDTH" window-name template-width width)
+	  (create-trackbar "RECT-HEIGHT" window-name template-height height) 
+          (create-trackbar "RECT-WIDTH" window-name template-width width)
+          ;;Trackbar to set the hessian keypoint detector threshold
+	  (create-trackbar "MIN-HESSIAN" window-name min-hessian 1000) 
+	  (loop ;;Were using the camera feed as the image here and a
+	     ;;region of interest of the feed as the template
+	     (with-mat ((frame (mat)))
+	       (cap-read cap frame)
+	       ;;Instantiate logic for the location/dimensions 
+	       ;;of the template based on the trackbar input
+	       (if (equal (? template-x :int) 0) 
+		   (setf (? template-x :int) 0))
+	       (if (> (? template-x :int) 
+		      (- width (? template-width :int))) 
+		   (setf (? template-x :int) 
+			 (- width (? template-width :int))))
+	       (if (equal (? template-y :int) 0) 
+		   (setf (? template-y :int) 1))
+	       (if (> (? template-y :int) 
+		      (- height (? template-height :int))) 
+		   (setf (? template-y :int) 
+			 (- height (? template-height :int))))
+	       (if (< (? template-width :int) 1) 
+		   (setf (? template-width :int) 1))
+	       (if (< (? template-height :int) 1) 
+		   (setf (? template-height :int) 1))
+	       (with-rect ((roi (rect (? template-x :int) (? template-y :int)
+				      (? template-width :int) (? template-height :int))))
+		 ;;Set region of interest of FRAME to ROI. This 
+                 ;;region of interest will be the template image.
+		 (with-mat ((template (roi frame roi)))
+		   (cvt-color template template +bgr2gray+)
+		   (with-feature-2d ((detector (surf (coerce 
+						      (? min-hessian :int) 
+						      'double-float)))
+                                     (extractor (gc:surf)))
+		     ;;-- Step 1: Detect keypoints in the image 
+                     ;;-- and template using FEAT-DETECTOR-DETECT
+		     (feat-detector-detect detector template keypoints-1)
+		     (feat-detector-detect detector frame keypoints-2)
+		     ;;-- Step 2: Calculate descriptors(feature vectors) 
+                     ;;-- using the keypoints detected in the last step
+		     (feat-2d-compute extractor template keypoints-1 descriptors-1)
+		     (feat-2d-compute extractor frame keypoints-2 descriptors-2)
+		     ;;-- Step 3: Match descriptor vectors with a brute force matcher
+		     (descrip-matcher-match matcher descriptors-1 descriptors-2 matches)
+		     ;;-- Draw matches
+		     (draw-matches template keypoints-1 frame keypoints-2 matches img-matches)
+		     ;;-- Show detected matches
+		     (imshow window-name img-matches))))
+	       (let ((c (wait-key 33)))
+		 (when (= c 27)
+		   (return))))))))))
+
+
+
+
 
 FEATURES2D - COMMON INTERFACES OF DESCRIPTOR MATCHERS
 
