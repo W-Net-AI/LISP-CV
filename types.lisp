@@ -1,5 +1,5 @@
 ;;;; -*- mode: lisp; indent-tabs: nil -*-
-;;;; core.lisp
+;;;; types.lisp
 ;;;; OpenCV bindings
 ;;;; Type declarations and Trivial Garbage finalizers for memory 
 ;;;; management, Finalizers are still in process. If a function 
@@ -587,6 +587,31 @@
     point-3i))
 
 
+;; RANGE
+
+
+(define-foreign-type range ()
+  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+                     :garbage-collect))
+  (:actual-type :pointer)
+  (:simple-parser range))
+
+
+(defclass cv-range ()
+  ((c-pointer :reader c-pointer :initarg :c-pointer)))
+
+
+(defmethod translate-to-foreign ((lisp-value cv-range) (c-type range))
+  (values  (c-pointer lisp-value) lisp-value))
+
+
+(defmethod translate-from-foreign (c-pointer (c-type range))
+  (let ((range (make-instance 'cv-range :c-pointer c-pointer)))
+    (when (garbage-collect c-type)
+      (tg:finalize range (lambda () (del-range c-pointer))))
+    range))
+
+
 ;; RECT
 
 
@@ -879,6 +904,31 @@
     (when (garbage-collect c-type)
       (tg:finalize cascade-classifier (lambda () (del-casc-class c-pointer))))
     cascade-classifier))
+
+
+;; HOG-DESCRIPTOR
+
+
+(define-foreign-type hog-descriptor ()
+  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+                     :garbage-collect))
+  (:actual-type :pointer)
+  (:simple-parser hog-descriptor))
+
+
+(defclass cv-hog-descriptor ()
+  ((c-pointer :reader c-pointer :initarg :c-pointer)))
+
+
+(defmethod translate-to-foreign ((lisp-value cv-hog-descriptor) (c-type hog-descriptor))
+  (values  (c-pointer lisp-value) lisp-value))
+
+
+(defmethod translate-from-foreign (c-pointer (c-type hog-descriptor))
+  (let ((hog-descriptor (make-instance 'cv-hog-descriptor :c-pointer c-pointer)))
+    (when (garbage-collect c-type)
+      (tg:finalize hog-descriptor (lambda () (del-hog-descriptor c-pointer))))
+    hog-descriptor))
 
 
 ;; ML

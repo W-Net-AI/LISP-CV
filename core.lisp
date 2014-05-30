@@ -327,7 +327,7 @@
 
 ;; bool Mat::empty() const
 ;; int cv_Mat_empty(Mat* self) 
-(defcfun ("cv_Mat_empty" empty) :boolean
+(defcfun ("cv_Mat_empty" mat-empty) :boolean
   "Returns true if the array has no elements."
   (self mat))
 
@@ -432,9 +432,25 @@
   (type :int))
 
 
+;; Mat::Mat(const Mat& m, const Range& rowRange, const Range& colRange=Range::all() )
+;; Mat* cv_Mat_get_Range(Mat* self, Range* rowRange, Range* colRange)
+(defcfun ("cv_Mat_with_Range" %mat-range) mat
+  "MAT constructor with Range parameters."
+  (self mat)
+  (row-range range)
+  (col-range range))
+
+
+(defun mat-range (self row-range &optional (col-range (range-all) given-col-range))
+  (let ((return (%mat-range self row-range col-range)))
+    (if given-col-range nil (del-range col-range))
+    return))
+
+
 ;; Size Mat::size() const
 ;; Size* cv_Mat_size(Mat* self)
 (defcfun ("cv_Mat_size" mat-size) size
+  "Returns a matrix size."
   (self mat))
 
 
@@ -442,13 +458,6 @@
 ;; int cv_Mat_type(Mat* self)
 (defcfun ("cv_Mat_type" mat-type) :int
   (self mat))
-
-
-;; MatExpr * operator
-;; MatExpr* cv_Mat_scale(MatExpr* m, double alpha)
-(defcfun ("cv_Mat_scale" scale) mat-expr
-  (m mat-expr)
-  (alpha :double))
 
 
 ;; Mat::Mat(int rows, int cols, int type)
@@ -482,28 +491,35 @@
 
 ;;; MAT
 
+
 (defun mat (&rest args)
-       
-       "MAT constructor"  
-       
-       (cond ((eq (first args) nil) (%mat))
-	     
-	     ((and (eq (fourth args) nil) (first args)) 
-	      (%mat-typed (first args) (second args) (third args)))
-	       
-	       ((eq (type-of (fourth args)) 'cv-scalar)
-		(%mat-value (first args) (second args) (third args) (fourth args)))
-		
-		((listp (fourth args))
-		 (%%mat-value (first args) (second args) (third args) (fourth args)))
-		   
-		   ((pointerp (fourth args))
-		    (%mat-data (first args) (second args) (third args) (fourth args)))
-		    
-		    ((listp (fifth args))
-		     (%%mat-data (first args) (second args) (third args) (fourth args) (fifth args)))
-		       
-		       (t nil)))
+  
+  "MAT constructor"  
+  
+  (cond ((eq (first args) nil) (%mat))
+
+	((typep (second args) 'cv-range)
+	 (apply #'mat-range args))
+	
+	((and (eq (fourth args) nil) (first args)) 
+	 (apply #'%mat-typed args))
+	
+	((typep (fourth args) 'cv-scalar)
+	 (apply #'%mat-value args))
+	
+	((listp (fourth args))
+	 (apply #'%%mat-value args))
+	
+	((pointerp (fourth args))
+	 (apply #'%mat-data args))
+	
+	((listp (fifth args))
+	 (apply #'%%mat-data args))
+
+	
+	(t nil)))
+
+
 
 ;;; MAT
 
@@ -814,6 +830,59 @@
        (%ptr self i0))
 
 
+;; Range::Range(int _start, int _end)
+;; Range* cv_create_Range(int _start, int _end) 
+(defcfun ("cv_create_Range" range) range
+  "Range constructor"
+  (start :int)
+  (end :int))
+
+
+;; static Range::Range all()
+;; Range* cv_create_RangeAll()
+(defcfun ("cv_create_RangeAll" range-all) range
+  "Range constructor - Returns a special variable 
+   that means “the whole sequence” or “the whole 
+   range”")
+
+
+;; bool Range::empty() const;
+;; bool cv_Range_empty(Range* self)
+(cffi:defcfun ("cv_Range_empty" range-empty) :boolean
+  "Returns true if the matrix row or column span, 
+   the RANGE object points to, has no elements"
+  (self range))
+
+(defun empty (arg)
+       (cond ((typep arg 'cv-mat)
+	      (mat-empty arg))
+	      ((typep arg 'cv-range)
+	       (range-empty arg))
+	       (t nil)))
+
+
+;; int Range::end
+;; int cv_Range_getend(Range* self)
+(cffi:defcfun ("cv_Range_getend" range-end) :int
+  "Retrieves the exclusive right boundary of the range."
+  (self range))
+
+
+;; int Range::size() const;
+;; int cv_Range_size(Range* self)
+(cffi:defcfun ("cv_Range_size" range-size) :int
+  "Returns the size of a matrix row or column 
+   span that has been stored as a RANGE object."
+  (self range))
+
+
+;; int Range::start
+;; int cv_Range_getstart(Range* self) 
+(cffi:defcfun ("cv_Range_getstart" range-start) :int
+  "Retrieves the inclusive left boundary of the range."
+  (self range))
+
+
 ;; Rect_()
 ;; Rect* cv_create_Rect() 
 (defcfun ("cv_create_Rect" rect0) rect 
@@ -983,7 +1052,7 @@
 
 ;; Scalar_<_Tp>::Scalar_(_Tp v0, _Tp v1, _Tp v2, _Tp v3)
 ;; Scalar* cv_create_Scalar(double val0, (double val1, double val2, double val3)
-(defcfun ("cv_create_Scalar" %scalar) scalar 
+(defcfun ("cv_create_Scalar" %scalar) scalar
 	 (val0 :double)
 	 (val1 :double)
 	 (val2 :double)
@@ -1002,8 +1071,16 @@
 
 
 (defun scalar-all (val0123)
-       "SCALAR conctctor - initializes all of the scalar values 0...3 with val0123"
+       "SCALAR conctctor - Initializes all of 
+        the scalar values 0...3 with val0123"
        (%scalar-all (coerce val0123 'double-float)))
+
+
+;; MatExpr * operator
+;; MatExpr* cv_Mat_scale(MatExpr* m, double alpha)
+(defcfun ("cv_Mat_scale" scale) mat-expr
+  (m mat-expr)
+  (alpha :double))
 
 
 ;; Size_()
@@ -1021,15 +1098,16 @@
 
 
 (defun size (&optional arg1 arg2)
-       (cond ((eq (or arg1 arg2) nil)
-	      (size0))
-	     
-	     ((numberp (or arg1 arg2)) 
-	      (size2 (coerce arg1 'double-float) 
-		     (coerce arg2 'double-float)))
-	     
-	     ((eq (type-of arg1) 'cv-mat) (mat-size arg1))
-	     (t nil)))
+  (cond ((null arg1)
+	 (size0))
+	
+	((numberp arg1) 
+	 (size2 (coerce arg1 'double-float) 
+		(coerce arg2 'double-float)))
+	
+	((typep arg1 'cv-mat) (mat-size arg1))
+	((typep arg1 'cv-range) (range-size arg1))
+	(t nil)))
 
 
 ;; Size* cv_Size_assignTo(Size* self, Size* other) 
@@ -1234,6 +1312,20 @@
   (if given-mask nil (del-mat mask)))
 
 
+;; void calcCovarMatrix(InputArray samples, OutputArray covar, InputOutputArray mean, int flags, int ctype=CV_64F)
+;; void cv_calcCovarMatrix(Mat* samples, Mat* covar, Mat* mean, int flags, int ctype)
+(cffi:defcfun ("cv_calcCovarMatrix" %calc-covar-matrix) :void
+  (samples mat)
+  (covar mat)
+  (mean mat)
+  (flags :int)
+  (ctype :int))
+
+(defun calc-covar-matrix (samples covar mean flags &optional (ctype +64f+))
+       "Calculates the covariance matrix of a set of vectors."
+       (%calc-covar-matrix samples covar mean flags ctype))
+
+
 ;; void convertScaleAbs(InputArray src, OutputArray dst, double alpha=1, double beta=0)
 ;; void cv_convertScaleAbs(Mat* src, Mat* dst, double alpha, double beta)
 (defcfun ("cv_convertScaleAbs" %convert-scale-abs) :void
@@ -1333,6 +1425,23 @@
   "Calculates the natural logarithm of every array element."
   (src mat)
   (dest mat))
+
+
+;; void magnitude(InputArray x, InputArray y, OutputArray magnitude)
+;; void cv_magnitude(Mat* x, Mat* y, Mat* magnitude)
+(cffi:defcfun ("cv_magnitude" %magnititude) :void
+  "Calculates the magnitude of 2D vectors."
+  (x mat)
+  (y mat)
+  (magnitude mat))
+
+
+;; double Mahalanobis(InputArray v1, InputArray v2, InputArray icovar)
+;; double cv_Mahalanobis(Mat* v1, Mat* v2, Mat* icovar)
+(cffi:defcfun ("cv_Mahalanobis" mahalanobis) :double
+  (v1 mat)
+  (v2 mat)
+  (icovar mat))
 
 
 ;; Scalar mean(InputArray src, InputArray mask=noArray())
@@ -1532,6 +1641,9 @@
 	      ((eq (type-of (and a b)) 'single-float) (uniform-f rng a b))
 	      ((eq (type-of (and a b)) 'double-float) (uniform-d rng a b))
 	      (t nil)))
+
+
+;;; Operations on Arrays
 
 
 ;;; Drawing Functions

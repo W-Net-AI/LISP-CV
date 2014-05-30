@@ -70,6 +70,15 @@
        (values))))
 
 
+(defmacro with-hog-descriptor (bind &body body)
+  "Ensures DEL-HOG-DESCRIPTOR gets called 
+   when HOG-DESCRIPTOR goes out of scope."
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-hog-descriptor %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
+
+
 (defmacro with-keypoint (bind &body body)
   "Ensures DEL-KP gets called 
    when KEYPOINT goes out of scope."
@@ -175,6 +184,15 @@
   `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
      (unwind-protect (progn ,@body)
        (mapcar #!(del-point-3i %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
+
+
+(defmacro with-range (bind &body body)
+  "Ensures DEL-RANGE gets called 
+   when RANGE goes out of scope."
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-range %1) ,(cons 'list (mapcar #!(car %1) bind)))
        (values))))
 
 

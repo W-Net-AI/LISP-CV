@@ -203,6 +203,22 @@
 	 (type :int))
 
 
+;; Mat::Mat(const Mat& m, const Range& rowRange, const Range& colRange=Range::all() )
+;; Mat* cv_Mat_get_Range(Mat* self, Range* rowRange, Range* colRange)
+(defcfun ("cv_Mat_with_Range" %mat-range) (cv::mat :garbage-collect t)
+  "MAT constructor with Range parameters."
+  (self cv::mat)
+  (row-range cv::range)
+  (col-range cv::range))
+
+
+(defun mat-range (self row-range &optional (col-range (range-all) given-col-range))
+  (let ((return (%mat-range self row-range col-range)))
+    (if given-col-range nil (cv::del-range col-range))
+    return))
+
+
+
 ;; Size Mat::size() const
 ;; Size* cv_Mat_size(Mat* self)
 (defcfun ("cv_Mat_size" mat-size) (cv::size :garbage-collect t)
@@ -246,28 +262,33 @@
 
 ;;; MAT
 
+
 (defun mat (&rest args)
-       
-       "MAT constructor"  
-       
-       (cond ((eq (first args) nil) (%mat))
-	     
-	     ((and (eq (fourth args) nil) (first args)) 
-	      (%mat-typed (first args) (second args) (third args)))
-	      
-	      ((eq (type-of (fourth args)) 'cv::cv-scalar)
-	       (%mat-value (first args) (second args) (third args) (fourth args)))
-	       
-	       ((listp (fourth args))
-		(%%mat-value (first args) (second args) (third args) (fourth args)))
-		
-		((pointerp (fourth args))
-		 (%mat-data (first args) (second args) (third args) (fourth args)))
-		 
-		 ((listp (fifth args))
-		  (%%mat-data (first args) (second args) (third args) (fourth args) (fifth args)))
-		  
-		  (t nil)))
+  
+  "MAT constructor"  
+  
+  (cond ((eq (first args) nil) (%mat))
+
+	((typep (second args) 'cv::cv-range)
+	 (apply #'mat-range args))
+	
+	((and (eq (fourth args) nil) (first args)) 
+	 (apply #'%mat-typed args))
+	
+	((typep (fourth args) 'cv::cv-scalar)
+	 (apply #'%mat-value args))
+	
+	((listp (fourth args))
+	 (apply #'%%mat-value args))
+	
+	((pointerp (fourth args))
+	 (apply #'%mat-data args))
+	
+	((listp (fifth args))
+	 (apply #'%%mat-data args))
+
+	(t nil)))
+
 
 ;;; MAT
 
@@ -542,6 +563,22 @@
 (defun ptr (self &optional (i0 0))
        "Returns pointer to i0-th submatrix along the dimension #0"
        (%ptr self i0))
+
+
+;; Range::Range(int _start, int _end)
+;; Range* cv_create_Range(int _start, int _end) 
+(defcfun ("cv_create_Range" range) (cv::range :garbage-collect t)
+  "Range constructor"
+  (start :int)
+  (end :int))
+
+
+;; static Range::Range all()
+;; Range* cv_create_RangeAll()
+(defcfun ("cv_create_RangeAll" range-all) (cv::range :garbage-collect t)
+  "Range constructor - Returns a special variable 
+   that means “the whole sequence” or “the whole 
+   range”")
 
 
 ;; Rect_()

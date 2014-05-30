@@ -96,6 +96,8 @@
    #:point-3i-y
    #:point-3i-z
    #:promote
+   #:range
+   #:range-all
    #:rect
    #:rect-br
    #:rect-clone

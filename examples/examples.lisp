@@ -4,6 +4,7 @@
 ;;;; for a specified OpenCV C++ function search this file for the OpenCV C++ function name to find its 
 ;;;; Lisp name, documentation and an example program.
 
+
 There are 3 major types of memory management, manual, with-* macros and Trivial Garbage finalizers
 Most examples so far use manual memory management, which is unsafe, but long-lived and fast. I'll 
 be adding some examples from now on, using the new with-* macro syntax as well as examples that use 
@@ -201,7 +202,7 @@ LISP-CV: (ASSGN (SELF MAT) (M MAT)) => MAT
             interface.
 
 
-Example: 
+ASSGN-EXAMPLE: 
 
 
 CV> (DEFPARAMETER A (MAT-ZEROS 7 7 +64f+))
@@ -526,7 +527,7 @@ LISP-CV: (COPY-TO (SELF MAT) (M MAT) (MASK MAT)) => :VOID
 
 The method copies the matrix data to another matrix. Before copying the data, the method invokes:
 
-(CREATE (MAT-SIZE THIS) (MAT-TYPE THIS))
+m.create(this->size(), this->type()); (On the C++ side)
 
 So that the destination matrix is reallocated if needed. While (COPY-TO M M) works flawlessly, the 
 function does not handle the case of a partial overlap between the source and destination matrices. 
@@ -728,28 +729,28 @@ types contains the following values:
 Example:
 
 
-LISP-CV> (DEFPARAMETER A (MAT 3 3 +8SC1+)) ;Initialize 1 channel matrix of 8-bit signed integer type
+CV> (DEFPARAMETER A (MAT 3 3 +8SC1+)) ;Initialize 1 channel matrix of 8-bit signed integer type
 
 A
 
-LISP-CV> (MAT-TYPE A) 
+CV> (MAT-TYPE A) 
 
 1   ;The type of the matrix is 1(+8SC1+) - 1 channel matrix with 8-bit signed integer elements
 
-LISP-CV> (DEPTH A)
+CV> (DEPTH A)
 
 1   ;The type of the matrix elements are 1(+8S+) - 8-bit signed integer
 
 
-LISP-CV> (DEFPARAMETER A (MAT 3 3 +8SC3+)) ;Initialize 3 channel matrix of 8-bit signed integer type
+CV> (DEFPARAMETER A (MAT 3 3 +8SC3+)) ;Initialize 3 channel matrix of 8-bit signed integer type
 
 A
 
-LISP-CV> (MAT-TYPE A)  
+CV> (MAT-TYPE A)  
 
 17   ;The type of the matrix is 17(+8SC1+) - 3 channel matrix with 8-bit signed integer elements
 
-LISP-CV> (DEPTH A)
+CV> (DEPTH A)
 
 1   ;The type of the matrix elements are 1(+8S+) - 8-bit signed integer
 
@@ -793,6 +794,47 @@ index, and distance between descriptors.
 Example:
 
 TODO(Write an example showing how to create DMatch manually, add to vector and send to DRAW-MATCHES)
+
+
+
+MAT-DOT
+
+Computes a dot-product of two vectors.
+
+C++: double Mat::dot(InputArray m) const
+
+LISP-CV: (DOT (SELF MAT) (M MAT)) => :DOUBLE
+
+
+    Parameters:	
+
+        SELF - A matrix
+
+        M - another dot-product operand.
+
+
+The method computes a dot-product of two matrices. If the matrices are not single-column or single-row 
+vectors, the top-to-bottom left-to-right scan ordering is used to treat them as 1D vectors. The vectors 
+must have the same size and type. If the matrices have more than one channel, the dot products from all 
+the channels are summed together.
+
+
+(defun mat-dot-example () 
+  ;; Create data
+  (with-object ((data (alloc :uchar '(1 2 3 4 5 6 7 8))))
+    ;; Create matrices A and B
+    (with-mat ((a (mat 2 4 +8u+ data))
+	       (b (mat 2 4 +8u+ data)))
+
+      ;; In this case the dot product is simply:
+
+      ;; (+ (* 1 1) (* 2 2) (* 3 3) (* 4 4) (* 5 5) (* 6 6) (* 7 7) (* 8 8))
+
+      ;; The 2-row, 4-column matrices are treated as 1D vectors like this: 
+      
+      ;; 1,2,3,4,5,6,7,8.
+
+      (format t "~%The dot product of A and B = ~a~%~%" (mat-dot a b)))))
 
 
 
@@ -850,29 +892,60 @@ See STEP1 example.
 
 EMPTY
 
-Returns true if the array has no elements.
+Returns true if a MAT or RANGE object is empty.
 
 C++: bool Mat::empty() const
 
 LISP-CV: (EMPTY (SELF MAT)) => :BOOLEAN
 
+C++: bool Range::empty() const
 
-(defun empty-example (filename)
-  ;; load image 
-  (let* ((image (imread filename 1))
-	 (window-name "EMPTY Example"))
-    ;; if image is not loaded correctly 
-    ;; the return of EMPTY is true and 
-    ;; the function is exited
-    (if (empty image) 
-	(return-from empty-example 
-	  (format t "Image not loaded")))
-    (named-window window-name +window-normal+)
-    (move-window window-name 759 175)
-    (imshow window-name image)
-    (loop while (not (= (wait-key 0) 27)))
-    (del-mat image)
-    (destroy-window window-name)))
+LISP-CV: (EMPTY (SELF RANGE)) => :BOOLEAN
+
+
+    Parameters:
+
+        SELF - A MAT or a RANGE object.
+
+
+Example for matrices(The GC: prefix signals a finalizer is being used):
+
+
+CV> (DEFPARAMETER A (GC:IMREAD "/HOME/USER/THIS-IS-A-REAL-IMAGE.JPG" 1))
+
+A
+
+CV> (EMPTY A)
+
+NIL
+
+CV> (DEFPARAMETER A (GC:IMREAD "/HOME/USER/THIS-IS-NOT-A-REAL-IMAGE.JPG" 1))
+
+A
+
+CV> (EMPTY A)
+
+T
+
+
+Example for RANGE objects(The GC: prefix signals a finalizer is being used):
+
+
+CV> (DEFPARAMETER B (GC:RANGE 1 10))
+
+B
+
+CV> (EMPTY B)
+
+NIL
+
+CV> (DEFPARAMETER C (GC:RANGE-ALL))
+
+C
+
+CV> (EMPTY C)
+
+T
 
 
 
@@ -908,103 +981,55 @@ Matrix Expressions or can be assigned to a matrix. You may need to coerce the re
 back to type MAT with the function (FORCE), (or the shorthand version (>>)) to use in other functions.
 
 
-(defun inv-example (filename)
+(defun inv-example ()
 
   "Matrix division, which is undefined in vector mathematics, 
    is simulated here by finding the inverse of a matrix, DIV-
-   ISOR and then multiplying another matrix, MAT by it. We a-
-   lso find the inverse of an image, IMAGE and show in a win-
-   dow just to see what it looks like."
+   ISOR, and then multiplying another matrix, MAT, by it. I
+   use some finalizers for GC here(denoted by the gc: prefix 
+   to the function name), so the code doesn't get too long."
 
-	 ;Read in image
-  (let* ((image (imread filename 1))
-	 ;Create matrix data
-	 (data-1 (alloc :float '(1f0 2f0 3f0 3f0 2f0 1f0 2f0 1f0 3f0)))
-	 (data-2 (alloc :float '(4f0 5f0 6f0 6f0 5f0 4f0 4f0 6f0 5f0)))
-	 ;Create numerator matrix
-         (numerator (mat 3 3 +32f+ data-1))
-	 ;Create divisor matrix
-         (divisor (mat 3 3 +32f+ data-2)) 
-	 ;Find determinant of DIVISOR       
-	 (determinant (det divisor)) 
-	 (divisor-inv 0)
-         (identity-mat 0)
-	 (quotient 0)
-         (image-inv 0)
-	 (n (coerce (/ 1 255) 'double-float))
-	 (window-name-1 "Original IMAGE - INV Example")
-         (window-name-2 "Inverse of IMAGE - INV Example"))
-    (if (empty image) 
-	(return-from inv-example 
-	  (format t "Image not loaded")))
-    (named-window window-name-1 +window-normal+)
-    (named-window window-name-2 +window-normal+)
-    (move-window window-name-1 533 175)
-    (move-window window-name-2 984 175)
-    ;Print NUMERATOR
-    (format t "NUMERATOR =~%~%")
-    (dotimes (i (rows numerator))
-      (dotimes (j (cols numerator))
-	(princ (at numerator i j :float))
-	(princ #\Space))
-      (princ #\Newline))
-    (format t "~%~%")
-    ;Print DIVISOR
-    (format t "DIVISOR =~%~%")
-    (dotimes (i (rows divisor))
-      (dotimes (j (cols divisor))
-	(princ (at divisor i j :float))
-	(princ #\Space))
-      (princ #\Newline))
-    (format t "~%~%")
-   ;Check if the determinant of divisor is 0. If not, 
-   ;an inverse cannot be determined, so exit program
-    (if (= 0.0d0 determinant) 
-	(return-from inv-example 
-	  (progn (format t "The determinant of DIVISOR is 0.0d0.~%")
-		 (format t "Cannot find its inverse.~%")))
-	(format t "The determinant of DIVISOR = ~a~%~%" determinant))
-   ;Find inverse of DIVISOR and print it
-    (setf divisor-inv (>> (inv divisor +decomp-lu+)))
-    (format t "The inverse of DIVISOR =~%~%")
-    (dotimes (i (rows divisor-inv))
-      (dotimes (j (cols divisor-inv))
-	(princ (at divisor-inv i j :float))
-	(princ #\Space))
-      (princ #\Newline))
-    (format t "~%~%")
-   ;Multiply DIVISOR by the inverse of divisor
-   ;Output is a float identity matrix
-    (setf identity-mat (>> (mul divisor divisor-inv)))
-   ;Print the identity matrix
-    (format t "Product of DIVISOR and its inverse =~%~%")
-    (dotimes (i (rows identity-mat))
-      (dotimes (j (cols identity-mat))
-	(princ (at identity-mat i j :float))
-	(princ #\Space))
-      (princ #\Newline))
-    (format t "~%~%")
-    (setf quotient (>> (mul numerator (>> (inv divisor +decomp-lu+)))))
-    (format t "Simulated quotient of NUMERATOR and DIVISOR =~%~%")
-    (dotimes (i (rows quotient))
-      (dotimes (j (cols quotient))
-	(princ (at quotient i j :float))
-	(princ #\Space))
-      (princ #\Newline))
-    ;Show original image
-    (imshow window-name-1 image)
-    ;Convert image to 1 channel
-    (cvt-color image image +bgr2gray+)
-    ;Convert image to float
-    (convert-to image image +32f+ n)
-    ;Find inverse of IMAGE
-    (setf image-inv (>> (inv image +decomp-svd+)))
-    ;Show inverse of IMAGE in window
-    (imshow window-name-2 image-inv)
-    (loop while (not (= (wait-key 0) 27)))
-    (free data-1)
-    (free data-2)
-    (destroy-all-windows)))
+
+	       ;Create matrix data
+  (with-object ((data-1 (alloc :float '(1f0 2f0 3f0 3f0 2f0 1f0 2f0 1f0 3f0)))
+		(data-2 (alloc :float '(4f0 5f0 6f0 6f0 5f0 4f0 4f0 6f0 5f0))))
+	       ;Create numerator matrix
+    (with-mat ((numerator (mat 3 3 +32f+ data-1))
+	       ;Create divisor matrix
+	       (divisor (mat 3 3 +32f+ data-2)))
+	   ;Find determinant of divisor     
+      (let ((determinant (det divisor))
+	    (divisor-inv 0)
+	    (identity-mat 0)
+	    (quotient 0))
+	;Print NUMERATOR
+	(format t "~%NUMERATOR:~%~%")
+	(print-mat numerator :float)
+	;Print DIVISOR
+	(format t "~%DIVISOR:~%~%")
+	(print-mat divisor :float)
+	;Check if the determinant of divisor is 0. If not, 
+	;an inverse cannot be determined, so exit program
+	(if (= 0.0d0 determinant) 
+	    (return-from inv-example 
+	      (progn (format t "The determinant of DIVISOR is 0.0d0.~%")
+		     (format t "Cannot find its inverse.~%")))
+	    (format t "~%The determinant of DIVISOR: ~a~%~%" determinant))
+	;Find inverse of DIVISOR and print it
+	(setf divisor-inv (gc:>> (gc:inv divisor +decomp-lu+)))
+	(format t "The inverse of DIVISOR:~%~%")
+	(print-mat divisor-inv :float)
+	;Multiply DIVISOR by the inverse of divisor
+        ;Output is a float identity matrix
+	(setf identity-mat (gc:>> (gc:mul divisor divisor-inv)))
+        ;Print the identity matrix
+	(format t "~%Product of DIVISOR and its inverse:~%~%")
+	(print-mat identity-mat :float)
+	(setf quotient (gc:>> (gc:mul numerator 
+				      (gc:>> (gc:inv divisor +decomp-lu+)))))
+	(format t "~%Simulated quotient of NUMERATOR and DIVISOR:~%~%")
+	(print-mat quotient :float)
+        (format t "~%")))))
 
 
 
@@ -1014,7 +1039,7 @@ Reports whether the matrix is continuous or not.
 
 C++: bool Mat::isContinuous() const
 
-LISP-CV: (IS-CONTINUOUS) => :BOOLEAN
+LISP-CV: (IS-CONTINUOUS (SELF MAT)) => :BOOLEAN
 
 The method returns true if the matrix elements are stored continuously without gaps at the end of 
 each row. Otherwise, it returns false. Obviously, 1x1 or 1xN matrices are always continuous. Matrices 
@@ -1024,51 +1049,58 @@ no longer have this property.
 
 
 (defun is-continuous-example (filename)
-  (let* (;;Allocate matrix data
-	 (data (alloc :uchar '(1 2 3 4 5 6 7 8 9)))
-	 ;;Create initialized matrix
-	 (mat (mat 3 3 +8u+ data))
-         ;;Extract a 2x2 roi of MAT
-	 (mat-roi (roi mat (rect 0 0 2 2)))
-	 ;;Read in image
-	 (img (imread filename 1))
-         ;;Extraxt a 100x100 centered roi of IMG
-	 (roi-size 100)
-	 (x (- (/ (cols img) 2) (/ roi-size 2)))
-	 (y (- (/ (rows img) 2) (/ roi-size 2)))
-	 (img-roi (roi img (rect x y roi-size roi-size)))
-	 (window-name-1 "3x3 Matrix - RESHAPE Example")
-	 (window-name-2 "2x2 roi of MAT - RESHAPE Example")
-	 (window-name-3 "Original image - RESHAPE Example")
-	 (window-name-4 "Centered 100x100 roi of IMG - RESHAPE Example"))      
-    (named-window window-name-1 +window-normal+)
-    (named-window window-name-2 +window-normal+)
-    (named-window window-name-3 +window-normal+)
-    (named-window window-name-4 +window-normal+)
-    (move-window window-name-1 485 98)
-    (move-window window-name-2 894 98)
-    (move-window window-name-3 485 444)
-    (move-window window-name-4 894 444)
-    ;;Show original 3x3 matrix
-    (imshow window-name-1 mat)
-    ;;Show 2x2 roi of MAT
-    (imshow window-name-2 mat-roi)
-    ;;Show original image
-    (imshow window-name-3 img)
-    ;;Show a centered 100x100 roi of image
-    (imshow window-name-4 img-roi)
-    ;;This shows that submats(roi) are intrinsically non-continuous
-    (format t "Are MAT matrix elements stored continuously: ~a~%~%" 
-	    (is-continuous mat))
-    (format t "Are MAT-ROI matrix elements stored continuously: ~a~%~%" 
-	    (is-continuous mat-roi))
-    (format t "Are IMG matrix elements stored continuously: ~a~%~%" 
-	    (is-continuous img))
-    (format t "Are IMG-ROI matrix elements stored continuously: ~a~%~%" 
-	    (is-continuous img-roi))
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-all-windows)))
 
+  ;;Allocate matrix data
+  (with-object ((data (alloc :uchar '(1 2 3 4 5 6 7 8 
+				      9 10 11 12 13 14 15 16))))
+    ;;Create initialized matrix
+    (with-mat ((mat (mat 4 4 +8u+ data))
+	       ;;Extract a 2x2 roi of MAT. 
+               ;;Note: I use a finalizer 
+               ;;for RECT
+	       (mat-roi (roi mat (gc:rect 1 1 2 2)))
+	       ;;Read in image
+	       (img (imread filename 1)))
+      (let* ((window-name-1 "3x3 Matrix - IS-CONTINUOUS Example")
+	     (window-name-2 "2x2 roi of MAT - IS-CONTINUOUS Example")
+	     (window-name-3 "Original image - IS-CONTINUOUS Example")
+	     (window-name-4 "Centered 100x100 roi of IMG - IS-CONTINUOUS Example")
+	     (roi-size 100)
+	     (x (- (/ (cols img) 2) (/ roi-size 2)))
+	     (y (- (/ (rows img) 2) (/ roi-size 2)))) 
+        ;;Extract a 100x100 centered roi of IMG
+	(with-rect ((roi (rect x y roi-size roi-size)))
+	  (with-mat ((img-roi (roi img roi)))     
+	    (with-named-window (window-name-1 +window-normal+)
+	      (with-named-window (window-name-2 +window-normal+)
+		(with-named-window (window-name-3 +window-normal+)
+		  (with-named-window (window-name-4 +window-normal+)
+		    (move-window window-name-1 485 98)
+		    (move-window window-name-2 894 98)
+		    (move-window window-name-3 485 444)
+		    (move-window window-name-4 894 444)
+		    ;;Show original 3x3 matrix
+		    (imshow window-name-1 mat)
+		    ;;Show 2x2 roi of MAT
+		    (imshow window-name-2 mat-roi)
+		    ;;Show original image
+		    (imshow window-name-3 img)
+		    ;;Show a centered 100x100 roi of image
+		    (imshow window-name-4 img-roi)
+		    (format t "~%~%")
+		    ;;This shows that submats(roi) are intrinsically non-continuous
+		    (format t "Are MAT matrix elements stored continuously: ~a~%~%" 
+			    (is-continuous mat))
+		    (format t "Are MAT-ROI matrix elements stored continuously: ~a~%~%" 
+			    (is-continuous mat-roi))
+		    (format t "Are IMG matrix elements stored continuously: ~a~%~%" 
+			    (is-continuous img))
+		    (format t "Are IMG-ROI matrix elements stored continuously: ~a~%~%" 
+			    (is-continuous img-roi))
+		    (loop
+		       (let ((c (wait-key 33)))
+			 (when (= c 27)
+			   (return))))))))))))))
 
 
 
@@ -1220,6 +1252,10 @@ C++: Mat::Mat(int rows, int cols, int type, void* data, size_t step=AUTO_STEP)
 
 LISP-CV: (MAT (ROWS :INT) (COLS :INT) (TYPE :INT) (DATA :POINTER)) => MAT
 
+C++: Mat::Mat(const Mat& m, const Range& rowRange, const Range& colRange=Range::all() )
+
+LISP-CV: (MAT (SELF MAT) (ROW-RANGE RANGE) (COL-RANGE RANGE)) => MAT
+
 
     Parameters:	
 
@@ -1264,8 +1300,8 @@ solution for mind blowing processing speed(I know, sounds like a commercial...bu
    memory managed have a finalized version.
 
    Note: Automatic memory management is the slowest, 
-         WITH-* macros are the quickest, and manual 
-         MM is part way between the two."
+         WITH-* macros are second, and manual  MM is 
+         the quickest for the MAT functions."
 
   (with-object ((data (alloc :double '(1d0 2d0 3d0 4d0 5d0 
 				       6d0 7d0 8d0 9d0))))
@@ -1276,11 +1312,11 @@ solution for mind blowing processing speed(I know, sounds like a commercial...bu
 	   (mat-value2 (gc:mat 3 3 +32f+ '(255)))
 	   (mat-data1 (gc:mat 3 3 +64f+ data))
 	   (mat-data2 (gc:mat 3 3 +64f+ :double 
-			       '(1d0 2d0 3d0 4d0 5d0 
-				 6d0 7d0 8d0 9d0))))
-      ;Print matrices, gcc:: must be added to the front 
-      ;of the PRINT-MAT function if you are printing a 
-      ;finalizer 
+			      '(1d0 2d0 3d0 4d0 5d0 
+				6d0 7d0 8d0 9d0)))
+	   (mat-data2-row-1 (gc:mat mat-data2 (range 0 1) (range-all)))
+           (manual 0))
+      ;Print matrices
       (format t "~%~%MAT = ~%~%")
       (print-mat mat :uchar)
       (format t "~%~%MAT-TYPED = ~%~%")
@@ -1293,12 +1329,20 @@ solution for mind blowing processing speed(I know, sounds like a commercial...bu
       (print-mat mat-data1 :double)
       (format t "~%~%MAT-DATA2 = ~%~%")
       (print-mat mat-data2 :double)
+      (format t "~%~%MAT-DATA2-ROW-1 = ~%~%")
+      (print-mat mat-data2-row-1 :double)
       (format t "~%~%")
       ;Time how long it takes to create 2,592,000
       ;finalized matrices using the CL:TIME macro 
-      ;`$`. I use the 't:' prefix here to enable 
-      ;finalization.
-     ($ (t:mat) 2592000))))
+      ;$. I use the 't:' prefix here to enable 
+      ;finalization. 
+    ($ (t:mat) 2592000)
+      ;Time how long it takes to create 2,592,000
+      ;matrices GC'ed by a with-* macro.
+    ($ (with-mat ((with (mat)))) 2592000)
+      ;Time how long it takes to create 2,592,000
+      ;matrices manuallly GC'ed.
+    ($ (progn (setf manual (mat)) (del-mat manual)) 2592000))))
 
 
 MUL
@@ -1770,7 +1814,6 @@ LISP-CV: (PTR (SELF MAT) &OPTIONAL ((I0 :INT) 0)) => :POINTER
 
 This function returns a pointer to the specified matrix row.
 
-when
 
 ;;Must supply a filename parameter for the image you 
 ;;will be using in this example and one for the file 
@@ -1847,7 +1890,65 @@ when
 
 Usage: 
 
-   (PTR-EXAMPLE "/HOME/W/IMG.JPG" "~/DATA.TXT")
+   (PTR-EXAMPLE "/HOME/USERS/IMG.JPG" "~/DATA.TXT")
+
+
+
+RANGE
+
+Range constructor.
+
+
+C++: Range::Range(int _start, int _end)
+
+LISP-CV: (RANGE (START :INT) (END :INT)) => RANGE
+
+C++: Range* cv_create_RangeAll()
+
+LISP-CV:  (RANGE-ALL) => RANGE
+
+C++: int Range::start
+
+LISP-CV: (RANGE-START (SELF RANGE)) => :INT
+
+C++: int Range::end
+
+LISP-CV: (RANGE-END (SELF RANGE)) => :INT
+
+
+    Parameters:	
+
+        START - Inclusive left boundary of the range.
+
+        END - Exclusive right boundary of the range.
+       
+
+These functions are used to specify a row or a column span in a matrix (MAT) and for many other 
+purposes. (RANGE A B) is basically the same as a:b in Matlab or a..b in Python. As in Python, 
+START is an inclusive left boundary of the range and END is an exclusive right boundary of the 
+range. Such a half-opened interval is usually denoted as [START,END).
+
+The function (RANGE-ALL) returns a special variable that means “the whole sequence” or “the whole 
+range”, just like ” : ” in Matlab or ” ... ” in Python. All the functions in LISP-CV that take RANGE, 
+support this special (RANGE-ALL)  value. But, of course, in case of your own custom processing, you 
+will probably have to check and handle it explicitly:
+
+
+(defun my-example (... r ....)
+
+    (if (eq r (range-all)) 
+
+        ;; Process all the data
+   
+        ;; (else)Process [ (range-start r), (range-end r) )
+)
+
+
+Note:
+
+To retrieve the size of the matrix row or column span held in a RANGE object or to determine whether 
+or not a RANGE object is empty, use the functions SIZE and EMPTY. Documentation and examples for SIZE
+and EMPTY are in this file.
 
 
 
@@ -1990,9 +2091,10 @@ ons.
 
 
 
+
 SIZE
 
-SIZE constructor
+This function is a SIZE constructor and retrieves other size values(See below).
 
 C++: Size_(_Tp _width, _Tp _height);
      typedef Size_<int> Size2i;
@@ -2012,6 +2114,14 @@ C: Size* self, other;
 
 LISP-CV: (SIZE-ASSGN-TO (SELF SIZE) (OTHER SIZE)) => SIZE
 
+C++: Size Mat::size() const
+
+LISP-CV: (SIZE (SELF MAT)) => SIZE
+
+C++: int Range::size() const;
+
+LISP-CV: (SIZE (SELF RANGE)) => :INT
+
 
     Parameters:	
 
@@ -2022,40 +2132,46 @@ LISP-CV: (SIZE-ASSGN-TO (SELF SIZE) (OTHER SIZE)) => SIZE
         HEIGHT - The height of SIZE.
 
 
-The function SIZE creates and also retrieves size values and stores the values in SIZE construct.
+The function SIZE creates and also retrieves MAT and RANGE size values..
 
 The function WIDTH Finds the width of a SIZE construct.
 
 The function HEIGHT Finds the height of a SIZE construct.
 
 
-The function SIZE contains the functionality of both the OpenCV class Size_ and the OpenCV MAT class 
-method size. It can return a pointer to an uninitialized SIZE construct, an initialized SIZE object 
-holding (WIDTH, HEIGHT) values and also determines the SIZE value of any MAT object passed to it, When 
-returning a MAT size the columns are listed first and  the rows are listed second(COLS, ROWS). For a tiny
-bit faster matrix size accessor choose the MAT-SIZE Dfunction.
+The function SIZE contains the functionality of both the OpenCV class Size_, the OpenCV MAT class 
+member size and the OpenCV Range class member size. It can return a pointer to an uninitialized SIZE 
+construct, an initialized SIZE object holding (WIDTH, HEIGHT) values, determine the SIZE value of any 
+MAT object passed to it, or determine the size of any RANGE object passes to it. When returning a MAT 
+size the columns are listed first and the rows are listed second(COLS, ROWS). When the matrix is more
+than 2-dimensional, the returned size is (-1 -1). 
 
 
 (defun size-example ()
   
-  "In the code below the (COLS, ROWS) values of MAT are 
-   accessed and stored in a SIZE construct. Their value-
-   s are accessed with the WIDTH and HEIGHT functions. 
-   Then an uninitialized and an initialized SIZE constr-
-   uct are created. Their values are also printed."
+  "In the code below, the (COLS, ROWS) values of MAT 
+   are accessed and stored in a SIZE construct. The 
+   values are accessed with the WIDTH and HEIGHT fun-
+   ctions and printed. A RANGE object, RANGE, is cre-
+   ated and its value is printed. Then an uninitiali-
+   zed and an initialized SIZE construct are created. 
+   Their values are also printed."
   
-  (let* ((mat (mat 5 5 +8u+ (scalar 100 100 100)))
-	 (mat-size (size mat))
-	 (size-un-init (size))
-	 (size (size 640d0 480d0)))
-    ;;The '?' is a macro for CFFI:MEM-AREF
-    (format t "~MAT (COLS,ROWS) = (~a ~a)~%~%" 
-	    (width mat-size)
-	    (height mat-size))
-    (format t "Return of an uninitialized SIZE construct: ~a
+  (with-mat ((mat (mat 5 5 +8u+ (scalar 100 100 100))))
+    (with-range ((range (range 1 10)))
+      (with-size ((mat-size (size mat))
+		  (size-un-init (size))
+		  (size (size 640d0 480d0)))
+	;;The '?' is a macro for CFFI:MEM-AREF
+	(format t "~%MAT (COLS,ROWS) = (~a ~a)~%~%" 
+		(width mat-size)
+		(height mat-size))
+	(format t "The size of RANGE = ~a" 
+		(size range))
+	(format t "~%~%Return of SIZE-UN-INIT: ~a
                ~%" size-un-init) 
-    (format t "Width of SIZE = ~a~%" (width size))
-    (format t "Height of SIZE = ~a~%~%" (height size))))
+	(format t "Width of SIZE = ~a~%~%" (width size))
+	(format t "Height of SIZE = ~a~%~%" (height size))))))
 
 
 
@@ -2080,35 +2196,35 @@ LISP-CV: (SIZE-ASSGN-TO (SELF SIZE) (OTHER SIZE)) => SIZE
 Example:
 
 
-LISP-CV> (DEFPARAMETER A (SIZE 640 480))
+CV> (DEFPARAMETER A (SIZE 640 480))
 
 A
 
-LISP-CV> A
+CV> A
 
 #<CV-SIZE {10042FE323}>
 
-LISP-CV> (DEFPARAMETER B (SIZE))
+CV> (DEFPARAMETER B (SIZE))
 
 B
 
-LISP-CV> B
+CV> B
 
 #<CV-SIZE {100431E313}>
 
-LISP-CV> (DEFPARAMETER C (SIZE-ASSGN-TO B A))
+CV> (DEFPARAMETER C (SIZE-ASSGN-TO B A))
 
 C
 
-LISP-CV> C
+CV> C
 
 #<CV-SIZE {1004345E93}>
 
-LISP-CV> (WIDTH C)
+CV> (WIDTH C)
 
 640.0d0
 
-LISP-CV> (HEIGHT C)
+CV> (HEIGHT C)
 
 480.0d0
 
@@ -2133,19 +2249,19 @@ LISP-CV: (SIZE-FROM-POINT (P POINT)) => SIZE
 Example:
 
 
-LISP-CV> (DEFPARAMETER A (POINT 1 2))
+CV> (DEFPARAMETER A (POINT 1 2))
 
 A
 
-LISP-CV> (DEFPARAMETER B (SIZE-FROM-POINT A))
+CV> (DEFPARAMETER B (SIZE-FROM-POINT A))
 
 B
 
-LISP-CV> (WIDTH B)
+CV> (WIDTH B)
 
 1.0d0
 
-LISP-CV> (HEIGHT B)
+CV> (HEIGHT B)
 
 2.0d0
 
@@ -2219,67 +2335,67 @@ arbitrary matrix element.
 Example:
 
 
-LISP-CV> (DEFPARAMETER M (MAT 7 2 +8UC1+))
+CV> (DEFPARAMETER M (MAT 7 2 +8UC1+))
 
 M
 
-LISP-CV> (ELEM-SIZE M) 
+CV> (ELEM-SIZE M) 
 
 1
 
-LISP-CV> (ELEM-SIZE1 M) 
+CV> (ELEM-SIZE1 M) 
 
 1
 
-LISP-CV> (STEP1 M)
+CV> (STEP1 M)
 
 7
 
-LISP-CV> (DEFPARAMETER M (MAT 7 2 +8UC1+))
+CV> (DEFPARAMETER M (MAT 7 2 +8UC1+))
 
 M
 
-LISP-CV> (ELEM-SIZE M) 
+CV> (ELEM-SIZE M) 
 
 1
 
-LISP-CV> (ELEM-SIZE1 M) 
+CV> (ELEM-SIZE1 M) 
 
 1
 
-LISP-CV> (STEP1 M)
+CV> (STEP1 M)
 
 7
 
-LISP-CV> (DEFPARAMETER M (MAT 7 2 +32FC1+))
+CV> (DEFPARAMETER M (MAT 7 2 +32FC1+))
 
 M
 
-LISP-CV> (ELEM-SIZE M) 
+CV> (ELEM-SIZE M) 
 
 4
 
-LISP-CV> (ELEM-SIZE1 M) 
+CV> (ELEM-SIZE1 M) 
 
 4
 
-LISP-CV> (STEP1 M)
+CV> (STEP1 M)
 
 7
 
-LISP-CV> (DEFPARAMETER M (MAT 7 2 +32FC3+))
+CV> (DEFPARAMETER M (MAT 7 2 +32FC3+))
 
 M
 
-LISP-CV> (ELEM-SIZE M) 
+CV> (ELEM-SIZE M) 
 
 12
 
-LISP-CV> (ELEM-SIZE1 M) 
+CV> (ELEM-SIZE1 M) 
 
 4
 
-LISP-CV> (STEP1 M)
+CV> (STEP1 M)
 
 21
 
@@ -2594,7 +2710,7 @@ Note: This function is named *MAX instead of MAX because, MAX is the name of a C
 
 See also:
 
-(*MIN), (COMPARE), (INRANGE), (MIN-MAX-LOC), Matrix Expressions(MAT-EXPR)
+(*MIN), (COMPARE), (IN-RANGE), (MIN-MAX-LOC), Matrix Expressions(MAT-EXPR)
 
 
 (defun *max-example (&optional (cam 0)
@@ -2706,7 +2822,7 @@ Note: This function is named *MIN instead of MIN because, MIN is the name of a C
 
 See also:
 
-(*MAX), (COMPARE), (INRANGE), (MIN-MAX-LOC), Matrix Expressions(MAT-EXPR)
+(*MAX), (COMPARE), (IN-RANGE), (MIN-MAX-LOC), Matrix Expressions(MAT-EXPR)
 
 
 
@@ -3660,30 +3776,27 @@ See also:
 
 
 (defun invert-example (&optional 
-			 (camera-index *camera-index*)) 
+			 (cam *camera-index*) 
+			 (width *default-width*)
+			 (height *default-height*)) 
 
-  (with-capture (cap (video-capture camera-index))
-    ;;Allocate matrix data and create a square matrix
-    (let* ((data (alloc :float '(4f0 -7f0 2f0 -3f0)))
-	   (mat (mat 2 2 +32f+ data))
-           ;;Create a destination matrix 
-           ;;the same size/type as MAT
-	   (dest-1 (mat 2 2 +32f+))
-	   (invert-return 0)
-	   (identity-mat 0)
-           ;;Create an array of window names
-	   (window-name-arr 
-	    (make-array 6 :initial-contents 
-			(list
-                         "Original MAT - INVERT Example"
-			 "Inverted MAT - INVERT Example"
-                         "IDENTITY-MAT - INVERT Example"
-                         "Camera output - 1 channel float - INVERT Example"
-			 "Camera output inverted - INVERT Example"
-			 "Identity MAT - INVERT Example"))))
-      (if (not (cap-is-open cap)) 
-	  (return-from invert-example 
-	    (format t "Cannot open the video camera")))
+  (with-captured-camera (cap cam :width width :height height)
+    (if (not (cap-is-open cap)) 
+	(return-from invert-example 
+	  (format t "Cannot open the video camera")))
+    (let ((invert-return 0)
+	  (identity-mat 0)
+	  ;;Create an array of window names
+	  (window-name-arr 
+	   (make-array 6 :initial-contents 
+		       (list
+			"Original MAT - INVERT Example"
+			"Inverted MAT - INVERT Example"
+			"IDENTITY-MAT - INVERT Example"
+			"Camera output - 1 channel float - INVERT Example"
+			"Camera output inverted - INVERT Example"
+			"Identity MAT - INVERT Example")))
+	  (n (coerce (/ 1 255) 'double-float)))
       ;;Create array of windows
       (dotimes (i 6)
 	(named-window (aref window-name-arr i) +window-normal+))
@@ -3694,70 +3807,192 @@ See also:
       (move-window (aref window-name-arr 3) 288 518)
       (move-window (aref window-name-arr 4) 738 518)
       (move-window (aref window-name-arr 5) 1188 515)
-      ;;Find inverse of MAT
-      (setf invert-return (invert mat dest-1 +decomp-lu+))
-      ;;Print the return of INVERT(if non-zero the operation was successful)
-      (format t "Return from Invert Function = ~a~%" invert-return)
-      ;;Print the inverse of MAT
-      (dotimes (i (cols dest-1))
-	(dotimes (j (rows dest-1))
-	  (princ (at dest-1 i j :float))
-	  (princ #\Space))
-	(princ #\Newline))
-      (format t "~%~%")
-      ;;Multiply MAT by its inverse. If the inversion was 
-      ;;a success the output will be an identity matrix
-      (setf identity-mat (>> (mul mat dest-1))) 
-      ;;Operation was a success!, print the identity matrix
-      (dotimes (i (cols identity-mat))
-	(dotimes (j (rows identity-mat))
-	  (princ (at identity-mat i j :float))
-	  (princ #\Space))
-	(princ #\Newline))
-      (format t "~%~%")
-      ;;Show MAT, its inverse and the identity 
-      ;;matrix in the top windows
-      (imshow (aref window-name-arr 0) mat)
-      (imshow (aref window-name-arr 1) dest-1)
-      (imshow (aref window-name-ar
-r 2) identity-mat)
-      (do* ((frame 0)
-	    (dest-2 0)
-            (roi 0)
-            (result 0)
-            (n (coerce (/ 1 255) 'double-float)))
-	   ((plusp (wait-key *millis-per-frame*)) 
-	    (format t "Key is pressed by user"))
-	;;Read in camera feed, call it FRAME
-	(setf frame (mat))
-	(cap-read cap frame)
-        ;;Make a clone of the camera feed, DEST-2
-	(setf dest-2 (clone frame))
-        ;;Crop FRAME to make it a square matrix, set to ROI
-        (setf roi (roi frame (rect 0 0 (rows frame) (rows frame))))
-        ;;Convert ROI to 1 channel image
-	(cvt-color roi roi +bgr2gray+)
-        ;;Convert ROI to a float(+32F+) matrix
-        (convert-to roi roi +32f+ n)
-        ;;Show the float matrix in bottom-left window
-       	(imshow (aref window-name-arr 3) roi)
-        ;;Find the inverse of ROI and show it in 
-        ;;bottom-center window, just for fun
-        (invert roi dest-2 +decomp-lu+)
-	(imshow (aref window-name-arr 4) dest-2)
-        ;;Find if inverse was a success by multiplying the 
-        ;;original ROI by the output of the INVERT function. 
-        ;;Then show the resulting identity matrix in the 
-        ;;bottom-right window
-	(setf result (mul roi dest-2))
-	(setf identity-mat (>> result))
- 	(imshow (aref window-name-arr 5) identity-mat)
-        ;;Clean up used memory
-	(del-mat roi)
-        (del-mat dest-2)
-	(del-mat identity-mat)
-        (del-mat-expr result))
-      (destroy-all-windows))))
+      ;;Allocate matrix data and create a square matrix
+      (with-object ((data (alloc :float '(4f0 -7f0 2f0 -3f0))))
+	(with-mat ((mat (mat 2 2 +32f+ data))
+		   ;;Create a destination matrix 
+		   ;;the same size/type as MAT
+		   (dest (mat 2 2 +32f+)))
+	  ;;Find inverse of MAT
+	  (setf invert-return (invert mat dest +decomp-lu+))
+	  ;;Print the return of INVERT(if non-zero the operation was successful)
+	  (format t "~%Return from Invert Function = ~a~%~%" invert-return)
+	  ;;Print the inverse of MAT
+	  (print-mat dest :float)
+	  (format t "~%")
+	  ;;Multiply MAT by its inverse. If the inversion was 
+	  ;;a success the output will be an identity matrix
+	  (setf identity-mat (gc:>> (gc:mul mat dest))) 
+	  ;;Operation was a success!, print the identity matrix
+	  (print-mat identity-mat :float)
+	  (format t "~%~%")
+	  ;;Show MAT, its inverse and the identity 
+	  ;;matrix in the top windows
+	  (imshow (aref window-name-arr 0) mat)
+	  (imshow (aref window-name-arr 1) dest)
+	  (imshow (aref window-name-arr 2) identity-mat)
+	  (loop ;;Read in camera feed
+	     (with-mat ((frame (mat)))
+	       (cap-read cap frame)
+	       ;;Make a clone of the camera feed, DEST
+	       (with-mat ((dest (clone frame))
+			  ;;Crop FRAME to make it a square matrix, set to ROI
+			  (roi (roi frame (gc:rect 0 0 (rows frame) (rows frame)))))
+		 ;;Convert ROI to 1 channel image
+		 (cvt-color roi roi +bgr2gray+)
+		 ;;Convert ROI to a float(+32F+) matrix
+		 (convert-to roi roi +32f+ n)
+		 ;;Show the float matrix in bottom-left window
+		 (imshow (aref window-name-arr 3) roi)
+		 ;;Find the inverse of ROI and show it in 
+		 ;;bottom-center window, just for fun. 
+                 ;;Note: Running invert on a matrix this 
+                 ;;big makes the example run slowly.
+		 (invert roi dest +decomp-lu+)
+		 (imshow (aref window-name-arr 4) dest)
+		 ;;Find out if inverse was a success by multiplying 
+                 ;;the original ROI by the INVERT function's output. 
+		 ;;Then show the resulting identity matrix in the b-
+                 ;;ottom-right window. 
+                 ;;Note: Running MUL on a matrix this big makes the 
+                 ;;example slow too.
+		 (with-mat ((identity-mat (>> (mul roi dest))))
+		 (imshow (aref window-name-arr 5) identity-mat))))
+	     (let ((c (wait-key 33)))
+	       (when (= c 27)
+		 (destroy-all-windows)
+		 (return)))))))))
+
+
+
+MAGNITUDE
+
+Calculates the magnitude of 2D vectors.
+
+C++: void magnitude(InputArray x, InputArray y, OutputArray magnitude)
+
+LIP-CV: (MAGNITUDE (X MAT) (Y MAT) (MAGNITUDE MAT)) => :VOID
+
+
+    Parameters:	
+
+        X - Floating-point array of x-coordinates of the vectors.
+
+        Y - Floating-point array of y-coordinates of the vectors; it must have the same size as X.
+
+        MAGNITUDE - Output array of the same size and type as X.
+
+
+The function magnitude calculates the magnitude of 2D vectors formed from the corresponding elements of x and y arrays:
+
+
+See OpenCV documentation here:
+
+http://docs.opencv.org/trunk/modules/core/doc/operations_on_arrays.html?highlight=magnitude#magnitude
+
+for the formula.
+
+
+See also:
+
+(CART-TO-POLAR), (POLAR-TO-CART), (PHASE), (SQRT)
+
+
+(defun magnitude-example ()
+
+  (with-mat ((x (mat 1 1 +32f+ '(3)))
+	     (y (mat 1 1 +32f+ '(-5)))
+	     (magnitude (mat 1 1 +32f+)))
+
+    (magnitude x y magnitude)
+
+    (format t "~%The magnitude of X and Y = ")
+    (print-mat magnitude :float)
+    (format t "~%")))
+
+
+
+MAHALANOBIS
+
+Calculates the Mahalanobis distance between two vectors.
+
+
+C++: double Mahalanobis(InputArray v1, InputArray v2, InputArray icovar)
+
+LISP-CV: (MAHALANOBIS (V1 MAT) (V2 MAT) (ICOVAR MAT)) => :DOUBLE
+
+
+    Parameters:	
+
+        VEC1 - First 1D input vector.
+
+        VEC2 - Second 1D input vector.
+
+        ICOVAR - Inverse covariance matrix.
+
+
+The function MAHALANOBIS calculates and returns the weighted distance between two vectors:
+
+
+See OpenCV Documentation at this link:
+
+http://docs.opencv.org/trunk/modules/core/doc/operations_on_arrays.html?highlight=mahalanobi#mahalanobis
+
+for the formula.
+
+
+The covariance matrix may be calculated using the (CALC-COVAR-MATRIX) function and then inverted using 
+the (INVERT) function (preferably using the +DECOMP-SVD+ method, as the most accurate).
+
+
+(defun mahalanobis-example ()
+
+  "Here we calculate Covariance Matrix, Inverse 
+   Covariance Matrix and Mahalanobis Distance."
+
+  (let ((rows 5)
+	(cols 3)
+	(x (make-array '(5 3) :initial-contents
+		       '((20f0 55f0 119f0)
+			 (123f0 333f0 11f0)
+			 (113f0 321f0 11f0)
+			 (103f0 313f0 191f0)
+			 (123f0 3433f0 1100f0)))))
+
+    (with-mat ((points (mat rows cols +32f+ '(0)))
+	       (mean (mat))
+	       (covar (mat))
+	       (invcovar (mat))
+	       (p1 (mat-range points (gc:range 0 1) (gc:range-all)))
+	       (p2 (mat-range points (gc:range 1 2) (gc:range-all)))
+               (mat (mat 3 3 +32f+)))
+
+      (dotimes (i rows)
+	(dotimes (j cols)
+	  (setf (at points i j :float) (aref x i j))))
+      (format t "~%Input matrix: ~%~%")
+      (print-mat points :float)
+      (format t "~%")
+      ;For covariance:
+      (calc-covar-matrix points covar mean 
+			 (+ +covar-normal+ +covar-rows+) -1)
+      (assgn-val mat (gc:scalar (- (rows points) 1)))
+      (format t "Covar matrix: ~%~%")
+      (setf covar (gc:>> (gc:div covar mat)))
+      (print-mat covar :float)
+      ;For inverse matrix:
+      (invert covar invcovar +decomp-svd+)
+      (format t "~%Inverse covar matrix: ~%~%")
+      (print-mat invcovar :float)
+      (format t "~%Mahalanobis distance between: ~%~%")
+      (format t "P1: ")
+      (print-mat p1 :float)
+      (format t "~%and~%")
+      (format t "~%P2: ")
+      (print-mat p2 :float)
+      (format t "~%is: ")
+      ;For Mahalanobis Distance:
+      (format t "~a~%~%"(mahalanobis p1 p2 invcovar)))))
 
 
 
@@ -4340,19 +4575,19 @@ random number sequence, consisting of all zeros.
 Example:
 
 
-LISP-CV> (DEFPARAMETER RNG (RNG #XFFFFFFFF))
+CV> (DEFPARAMETER RNG (RNG #XFFFFFFFF))
 
 RNG
 
-LISP-CV> (UNIFORM RNG 0 10)
+CV> (UNIFORM RNG 0 10)
 
 6
 
-LISP-CV> (UNIFORM RNG 0D0 10D0)
+CV> (UNIFORM RNG 0D0 10D0)
 
 6.992592005760082d0
 
-LISP-CV> (UNIFORM RNG 0F0 10F0)
+CV> (UNIFORM RNG 0F0 10F0)
 
 3.1438508
 
@@ -6991,35 +7226,34 @@ See also:
 (WARP-AFFINE), (WARP-PERSPECTIVE), (REMAP)
 
 
-(defun resize-example (&optional (camera-index *camera-index*) 
+(defun resize-example (&optional (cam *camera-index*) 
 			 (width 640)
 			 (height 480))
 
   "Uses RESIZE to enlarge the camera output and then shows
    both the resized FRAME(RESIZED) and the original FRAME 
-   a window"
+   a window."
 
-  (with-capture (cap (video-capture camera-index))
+  (with-captured-camera (cap cam :width width :height height)    
     (let* ((window-name-1 "Original FRAME - RESIZE Example")
-	   (window-name-2 "RESIZED - RESIZE Example")
-	   (resized (mat (round (* height 1.5)) (round (* width 1.35)) +8uc3+)))
-      (cap-set cap +cap-prop-frame-width+ width)
-      (cap-set cap +cap-prop-frame-height+ height)
-      (named-window window-name-1 +window-autosize+)
-      (named-window window-name-2 +window-autosize+)
-      (move-window window-name-1 0 0)
-      (move-window window-name-2 650 175)
-      (do* ((frame 0))
-	   ((plusp (wait-key *millis-per-frame*)) 
-	    (format t "Key is pressed by user"))
-	(setf frame (mat))
-	(cap-read cap frame)
-        (resize frame resized (size 1280 960) 0.0d0 
-		0.0d0 +inter-lanczos4+)
-	(imshow window-name-1 frame)
-        (imshow window-name-2 resized))
-      (destroy-all-windows))))
-
+	   (window-name-2 "RESIZED - RESIZE Example"))
+      (with-named-window (window-name-1 +window-autosize+)
+	(with-named-window (window-name-2 +window-autosize+)
+	  (move-window window-name-1 0 0)
+	  (move-window window-name-2 700 175)
+	  (with-mat ((resized (mat (round (* height 2)) 
+				   (round (* width 2)) 
+				   +8uc3+)))
+	    (loop
+	       (with-mat ((frame (mat)))
+		 (cap-read cap frame)
+		 (resize frame resized (size 1280 960) 0.0d0 
+			 0.0d0 +inter-lanczos4+)
+		 (imshow window-name-1 frame)
+		 (imshow window-name-2 resized))
+	       (let ((c (wait-key 33)))
+		 (when (= c 27)
+		   (return))))))))))
 
 
 
@@ -8296,12 +8530,14 @@ have alpha set to 0, fully opaque pixels should have alpha set to 255/65535.
 	  ;;by the OUT-FILE parameter 
 	  (imwrite out-file image 
 		   (vec-int 
-		    (list +imwrite-jpeg-quality+ 
-			  99)))
+		    (list +imwrite-jpeg-quality+ 99)))
 	  (loop 
     	     (let ((c (wait-key 33)))
 	       (when (= c 27)
 		 (return)))))))))
+
+
+Usage: (IMWRITE-EXAMPLE "/MY-PIC.JPG" "/HOME/USERS/OUT-FILE.JPG")
 
 
 ;;Extract frames 
@@ -8321,7 +8557,7 @@ have alpha set to 0, fully opaque pixels should have alpha set to 255/65535.
     (if (not (cap-is-open cap)) 
 	(return-from image-extractor 
 	  (format t "Cannot open the video camera")))      
-    (let ((window-name "WITH-MACRO Example")
+    (let ((window-name "IMAGE-EXTRACTOR Example")
           (filename 0))
       (format t "~%Frame Size : ~ax~a~%~%" 
 	      (cap-get cap +cap-prop-frame-width+)
@@ -9287,7 +9523,112 @@ The function SET-WINDOW-PROPERTY enables changing properties of a window.
 
 
 
+
+FEATURES2D - COMMON INTERFACES OF FEATURE DETECTORS
+
+
+
+FEAT-DETECT-CREATE
+
+Creates a feature detector by its name.
+
+C++: Ptr<FeatureDetector> FeatureDetector::create(const string& detectorType)
+
+LISP-CV: (FEAT-DETECTOR-CREATE (SELF FEATURE-2D) (DETECTOR-TYPE :STRING)) => FEATURE-2D 
+
+
+    Parameters:	
+
+        SELF - A pointer to a BRISK construct
+
+        DETECTOR-TYPE - Feature detector type:
+
+
+The following detector types are supported:
+
+
+    "FAST" - FAST-FEATURE-DETECTOR
+    "STAR" - STAR-FEATURE-DETECTOR
+    "SIFT" - SIFT (nonfree module)
+    "SURF" - SURF (nonfree module)
+    "ORB" - ORB
+    "BRISK" - BRISK
+    "MSER" - MSER
+    "GFTT" - GOOD-FEATURES-TO-TRACK-DETECTOR
+    "HARRIS" - GOOD-FEATURES-TO-TRACK-DETECTOR with Harris detector enabled
+    "Dense" - DENSE-FEATURE-DETECTOR
+    "SimpleBlob" - SIMPLE-BLOB-DETECTOR
+
+
+Also a combined format is supported: feature detector adapter name:
+
+           ("GRID" - GRID-ADAPTED-FEATURE-DETECTOR, "PYRAMID" - PYRAMID-ADAPTED-FEATURE-DETECTOR) + 
+
+                                     feature detector name: (see above), for example: "GRIDFAST", "PYRAMIDSTAR".
+
+
+
+(defun feat-detector-create-example (filename-1 filename-2) 
+
+  "Try using the box.png and the box_in_scene.png from
+   the LISP-CV-MASTER/IMAGES directory to get a better 
+   understanding of this example the first time you ru-
+   n it."
+
+  ;; set brisk parameters
+  (let* ((thresh 60)
+	 (octaves 4)
+	 (pattern-scale 2.0f0)
+	 (window-name "All Matches - FEAT-DETECT-CREATE Example"))
+    ;; read some images in grayscale -> The object you want to track
+    (with-mat ((gray-a (imread filename-1 +load-image-grayscale+))
+	       ;; The image the object is a part of
+	       (gray-b (imread filename-2 +load-image-grayscale+)) 
+	       (descriptors-a (mat))
+	       (descriptors-b (mat))
+	       (all-matches (mat)))
+      (if (empty (or gray-a gray-b)) 
+	  (return-from feat-detector-create-example 
+	    (format t "Both images were not loaded")))
+      (with-vector-key-point ((keypoints-a (vec-key-point))
+			      (keypoints-b (vec-key-point)))
+	;; declare a variable BRISKD of the type FEATURE-2D
+	(with-feature-2d ((briskd (brisk thresh octaves pattern-scale))
+			  ;; declare matcher
+			  (matcher (bf-matcher)))
+	  (with-vector-dmatch ((matches (vec-dmatch)))
+	    ;; create a feature detector
+	    (feat-detector-create briskd "STAR")
+	    ;; detect keypoints in the image GRAY-A
+	    (feat-detector-detect briskd gray-a keypoints-a)
+	    ;; Compute the descriptors for a set of keypoints detected in GRAY-A
+	    (feat-2d-compute briskd gray-a keypoints-a descriptors-a)
+	    ;; detect keypoints in the image GRAY-B
+	    (feat-detector-detect briskd gray-b keypoints-b)
+	    ;; Compute the descriptors for a set of keypoints detected in GRAY-B
+	    (feat-2d-compute briskd gray-b keypoints-b descriptors-b)
+	    ;; find the best match for each descriptor
+	    (descrip-matcher-match matcher descriptors-a descriptors-b matches)
+	    (with-named-window (window-name +window-normal+)
+	      (move-window window-name 759 175)
+	      (with-scalar ((scalar (scalar-all -1)))
+		;; draw the found matches
+		(with-vector-char ((matches-mask (vec-char)))
+		  (draw-matches gray-a keypoints-a gray-b keypoints-b matches all-matches 
+				scalar scalar matches-mask
+				+not-draw-single-points+)
+		  ;; show the matches in a window 
+		  (imshow window-name all-matches)
+		  (loop 
+		     (let ((c (wait-key 33)))
+		       (when (= c 27)
+			 (return)))))))))))))
+
+
+
+
 FEATURES2D - COMMON INTERFACES OF DESCRIPTOR MATCHERS
+
 
 
 
@@ -9358,18 +9699,18 @@ Example:
 
 ;Create an uninitialized CASCADE-CLASSIFIER object
 
-LISP-CV> (DEFPARAMETER FACE-CASCADE (CASCADE-CLASSIFIER))
+CV> (DEFPARAMETER FACE-CASCADE (CASCADE-CLASSIFIER))
 
 FACE-CASCADE
 
 
 ;Create a CASCADE-CLASSIFIER object initialized with an XML classifier 
 
-LISP-CV> (DEFPARAMETER FACE-CASCADE-NAME "<opencv_source_directory>/data/haarcascades/haarcascade_frontalface_alt.xml")
+CV> (DEFPARAMETER FACE-CASCADE-NAME "<opencv_source_directory>/data/haarcascades/haarcascade_frontalface_alt.xml")
 
 FACE-CASCADE-NAME
 
-LISP-CV> (DEFPARAMETER FACE-CASCADE (CASCADE-CLASSIFIER FACE-CASCADE-NAME))
+CV> (DEFPARAMETER FACE-CASCADE (CASCADE-CLASSIFIER FACE-CASCADE-NAME))
 
 FACE-CASCADE
 
@@ -9397,15 +9738,15 @@ LISP-CV: (CASCADE-CLASSIFIER-LOAD (SELF CASCADE-CLASSIFIER) (FILENAME *STRING)) 
 Example:
 
 
-LISP-CV> (DEFPARAMETER FACE-CASCADE-NAME "<opencv_source_directory>/data/haarcascades/haarcascade_frontalface_alt.xml")
+CV> (DEFPARAMETER FACE-CASCADE-NAME "<opencv_source_directory>/data/haarcascades/haarcascade_frontalface_alt.xml")
 
 FACE-CASCADE-NAME
 
-LISP-CV> (DEFPARAMETER FACE-CASCADE (CASCADE-CLASSIFIER)) ;Create CASCADE-CLASSIFIER object 
+CV> (DEFPARAMETER FACE-CASCADE (CASCADE-CLASSIFIER)) ;Create CASCADE-CLASSIFIER object 
 
 FACE-CASCADE
 
-LISP-CV> (CASCADE-CLASSIFIER-LOAD FACE-CASCADE FACE-CASCADE-NAME)  ;Load the Classifier
+CV> (CASCADE-CLASSIFIER-LOAD FACE-CASCADE FACE-CASCADE-NAME)  ;Load the Classifier
 
 T ;<--- Operation successful
 
@@ -12144,34 +12485,6 @@ with all elements having the same value.
 
 
 
-MAT-SIZE
-
-Returns pointer to a matrix size.
-
-C++: Size Mat::size() const
-
-LISP-CV: (MAT-SIZE (SELF MAT)) => SIZE
-
-The function MAT-SIZE returns SIZE, a matrix size pointer in which the columns are listed first an-
-d the rows second. When the matrix is more than 2-dimensional, the returned size is (-1 -1).
-
-
-Note: This example uses TG finalizers for memory management.
-
-(defun mat-size-example ()
-       
-  "In the code below the (COLS, ROWS) values of MAT are
-   accessed and stored in a SIZE object. Their values a-
-   re accessed with the WIDTH and HEIGHT functions."
-       
-       (let* ((mat (gc:mat 5 5 +8u+ (gc:scalar 100 100 100)))
-	      (mat-size (gc:size mat)))
-	 (format t "~%MAT (COLS,ROWS) = (~a ~a)~%~%" 
-		 ;;The '?' is a macro for CFFI:MEM-AREF
-		 (width mat-size)
-		 (height mat-size))))
-
-
 MAT-TYPE
 
 Returns the type of a matrix element.
@@ -13710,7 +14023,7 @@ http://docs.opencv.org/modules/features2d/doc/feature_detection_and_description.
    start this program with a good amount of available RAM.
 
    Don't let this example make you nervous it's basically 12 
-   FEAT-DETECTOR-CREATE-EXAMPLES, stacked, in one. Here I am 
+   FEAT-DETECTOR-CREATE-EXAMPLE's stacked, in one. Here I am 
    basically just showing, in a quick easy to see fashion, h-
    ow the THRESH, OUTPUT and PATTERN-SCALE parameters of the 
    function BRISK affect it's output. Each of the 12 windows 
@@ -13835,104 +14148,6 @@ http://docs.opencv.org/modules/features2d/doc/feature_detection_and_description.
     (dotimes (i 12)
       (destroy-window (aref window-name-arr i)))))
 
-
-
-
-FEAT-DETECT-CREATE
-
-Creates a feature detector by its name.
-
-C++: Ptr<FeatureDetector> FeatureDetector::create(const string& detectorType)
-
-LISP-CV: (FEAT-DETECTOR-CREATE (SELF FEATURE-2D) (DETECTOR-TYPE :STRING)) => FEATURE-2D 
-
-
-    Parameters:	
-
-        SELF - A pointer to a BRISK construct
-
-        DETECTOR-TYPE - Feature detector type:
-
-
-The following detector types are supported:
-
-
-    "FAST" - FAST-FEATURE-DETECTOR
-    "STAR" - STAR-FEATURE-DETECTOR
-    "SIFT" - SIFT (nonfree module)
-    "SURF" - SURF (nonfree module)
-    "ORB" - ORB
-    "BRISK" - BRISK
-    "MSER" - MSER
-    "GFTT" - GOOD-FEATURES-TO-TRACK-DETECTOR
-    "HARRIS" - GOOD-FEATURES-TO-TRACK-DETECTOR with Harris detector enabled
-    "Dense" - DENSE-FEATURE-DETECTOR
-    "SimpleBlob" - SIMPLE-BLOB-DETECTOR
-
-
-Also a combined format is supported: feature detector adapter name:
-
-           ("GRID" - GRID-ADAPTED-FEATURE-DETECTOR, "PYRAMID" - PYRAMID-ADAPTED-FEATURE-DETECTOR) + 
-
-                                     feature detector name: (see above), for example: "GRIDFAST", "PYRAMIDSTAR".
-
-
-
-(defun feat-detect-create-example (filename-1 filename-2) 
-
-  "Try using the box.png and the box_in_scene.png from
-   the LISP-CV-MASTER/IMAGES directory to get a better 
-   understanding of this example the first time you ru-
-   n it."
-
-  ;; set brisk parameters
-  (let* ((thresh 60)
-	 (octaves 4)
-	 (pattern-scale 2.0f0)
-	 (window-name "All Matches - FEAT-DETECT-CREATE Example"))
-    ;; read some images in grayscale -> The object you want to track
-    (with-mat ((gray-a (imread filename-1 +load-image-grayscale+))
-	       ;; The image the object is a part of
-	       (gray-b (imread filename-2 +load-image-grayscale+)) 
-	       (descriptors-a (mat))
-	       (descriptors-b (mat))
-	       (all-matches (mat)))
-      (if (empty (or gray-a gray-b)) 
-	  (return-from feat-detect-create-example 
-	    (format t "Both images were not loaded")))
-      (with-vector-key-point ((keypoints-a (vec-key-point))
-			      (keypoints-b (vec-key-point)))
-	;; declare a variable BRISKD of the type FEATURE-2D
-	(with-feature-2d ((briskd (brisk thresh octaves pattern-scale))
-			  ;; declare matcher
-			  (matcher (bf-matcher)))
-	  (with-vector-dmatch ((matches (vec-dmatch)))
-	    ;; create a feature detector
-	    (feat-detector-create briskd "STAR")
-	    ;; detect keypoints in the image GRAY-A
-	    (feat-detector-detect briskd gray-a keypoints-a)
-	    ;; Compute the descriptors for a set of keypoints detected in GRAY-A
-	    (feat-2d-compute briskd gray-a keypoints-a descriptors-a)
-	    ;; detect keypoints in the image GRAY-B
-	    (feat-detector-detect briskd gray-b keypoints-b)
-	    ;; Compute the descriptors for a set of keypoints detected in GRAY-B
-	    (feat-2d-compute briskd gray-b keypoints-b descriptors-b)
-	    ;; find the best match for each descriptor
-	    (descrip-matcher-match matcher descriptors-a descriptors-b matches)
-	    (with-named-window (window-name +window-normal+)
-	      (move-window window-name 759 175)
-	      (with-scalar ((scalar (scalar-all -1)))
-		;; draw the found matches
-		(with-vector-char ((matches-mask (vec-char)))
-		  (draw-matches gray-a keypoints-a gray-b keypoints-b matches all-matches 
-				scalar scalar matches-mask
-				+not-draw-single-points+)
-		  ;; show the matches in a window 
-		  (imshow window-name all-matches)
-		  (loop 
-		     (let ((c (wait-key 33)))
-		       (when (= c 27)
-			 (return)))))))))))))
 
 
 
@@ -14073,7 +14288,7 @@ If you would like to created an unititialized pointer to a vector<float> to pass
 evaluate:
 
 
-LISP-CV> (VEC-FLOAT)
+CV> (VEC-FLOAT)
 
 
 #<STD-VECTOR-FLOAT {100352FEA3}> <--- Output is an object pointing to an uninitialized vector<float>.
@@ -14085,13 +14300,13 @@ the below:
 
 
 
-LISP-CV> (VEC-FLOAT '(1f0 2f0 3f0)) 
+CV> (VEC-FLOAT '(1f0 2f0 3f0)) 
 
 
-LISP-CV> (VEC-FLOAT (LIST 1f0 2f0 3f0)) 
+CV> (VEC-FLOAT (LIST 1f0 2f0 3f0)) 
 
 
-LISP-CV> (VEC-FLOAT (VECTOR 1f0 2f0 3f0))  
+CV> (VEC-FLOAT (VECTOR 1f0 2f0 3f0))  
 
 
 #<STD-VECTOR-FLOAT {100352FEA3}> <--- Output is a CLOS object pointing to an initialized vector<float>.
@@ -14119,15 +14334,15 @@ CV> (DEFPARAMETER A (VEC-FLOAT '(1F0 2F0 3F0)))
 
 A
 
-LISP-CV> (VEC-FLOAT A)  <--- Access the 0th element of A.
+CV> (VEC-FLOAT A)  <--- Access the 0th element of A.
 
 1.0
 
-LISP-CV> (VEC-FLOAT A 1)   <---Access the 1st element of A.
+CV> (VEC-FLOAT A 1)   <---Access the 1st element of A.
 
 2.0
 
-LISP-CV> (VEC-FLOAT A 2)  <---Access the 2nd element of A.
+CV> (VEC-FLOAT A 2)  <---Access the 2nd element of A.
 
 3.0
 
@@ -14176,19 +14391,19 @@ CV> (VEC-POINT A 1)  <--- Access the 1st POINT in vector A
 
 
 
-LISP-CV> (VEC-POINT A 0 0) <--- Access the 0th element of the 0th POINT in vector A.
+CV> (VEC-POINT A 0 0) <--- Access the 0th element of the 0th POINT in vector A.
 
 1
 
-LISP-CV> (VECT-POINT A 0 1) <--- Access the 1st element of the 0th POINT in vector A.
+CV> (VECT-POINT A 0 1) <--- Access the 1st element of the 0th POINT in vector A.
 
 2
 
-LISP-CV> (VEC-POINT A 1 0) <--- Access the 0th element of the 1st POINT in vector A.
+CV> (VEC-POINT A 1 0) <--- Access the 0th element of the 1st POINT in vector A.
 
 3
 
-LISP-CV> (VEC-POINT A 1 1) <--- Access the 1st element of the 1st POINT in vector A.
+CV> (VEC-POINT A 1 1) <--- Access the 1st element of the 1st POINT in vector A.
 
 4
 
@@ -14277,7 +14492,7 @@ complete n iterations, because all you have to do is go back one in the REPL his
 Example:
 
 
-LISP-CV> ($  (sleep 1) 5)
+CV> ($  (sleep 1) 5)
 
 Evaluation took:
   5.0000 seconds of real time
@@ -14359,27 +14574,27 @@ LISP-CV: (ALLOC TYPE VALUE) => :POINTER
 Example:
 
 
-LISP-CV> (DEFPARAMETER A (ALLOC :DOUBLE 8.0D0))
+CV> (DEFPARAMETER A (ALLOC :DOUBLE 8.0D0))
 
 A
 
-LISP-CV> (MEM-AREF A :DOUBLE)
+CV> (MEM-AREF A :DOUBLE)
 
 8.0d0
 
-LISP-CV> (DEFPARAMETER B (ALLOC :INT '(1 2 3)))
+CV> (DEFPARAMETER B (ALLOC :INT '(1 2 3)))
 
 B
 
-LISP-CV> (MEM-AREF B :INT)
+CV> (MEM-AREF B :INT)
 
 1
 
-LISP-CV> (MEM-AREF B :INT 1)
+CV> (MEM-AREF B :INT 1)
 
 2
 
-LISP-CV> (MEM-AREF B :INT 2)
+CV> (MEM-AREF B :INT 2)
 
 3
 
@@ -14581,28 +14796,28 @@ The function DEL-VID-WRITER deletes a VIDEO-WRITER object.
 Example:
 
 
-LISP-CV> (DEFPARAMETER A (POINT 1 2)) ;A POINT is created
+CV> (DEFPARAMETER A (POINT 1 2)) ;A POINT is created
 
 A
 
-LISP-CV> (POINT-X A) ;The x coordinate of A is retrieved
+CV> (POINT-X A) ;The x coordinate of A is retrieved
 
 1
 
-LISP-CV> (POINT-Y A) ;The y coordinate of A is retrieved
+CV> (POINT-Y A) ;The y coordinate of A is retrieved
 
 2
 
-LISP-CV> (DEL-POINT A) ; A is deleted with DEL-POINT
+CV> (DEL-POINT A) ; A is deleted with DEL-POINT
 
 ; No value
 
 
-LISP-CV> (POINT-X A) ; The memory has been deallocated
+CV> (POINT-X A) ; The memory has been deallocated
 
 0
 
-LISP-CV> (POINT-Y A)
+CV> (POINT-Y A)
 
 0
 
@@ -14623,19 +14838,19 @@ LISP-CV: (FREE PTR) => undefined
 
 Example:
 
-LISP-CV> (DEFPARAMETER A (ALLOC :INT 55))
+CV> (DEFPARAMETER A (ALLOC :INT 55))
 
 A
 
-LISP-CV> (MEM-REF A :INT)
+CV> (MEM-REF A :INT)
 
 55
 
-LISP-CV> (FREE A)
+CV> (FREE A)
 
 NIL
 
-LISP-CV> (MEM-REF A :INT)
+CV> (MEM-REF A :INT)
 
 0
 

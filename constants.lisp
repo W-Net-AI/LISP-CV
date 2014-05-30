@@ -201,6 +201,12 @@
   (+termcrit-iter+ 1)
   (+termcrit-number 1)
   (+termcrit-eps+ 2)
+  (+covar-scrambled+ 0)
+  (+covar-normal+ 1)
+  (+covar-use-avg+ 2)
+  (+covar-scale+ 4)
+  (+covar-rows+ 8)
+  (+covar-cols+ 16)
 
 
 ;;; highgui
@@ -213,6 +219,7 @@
   (+window-opengl+ 4096)
   (+gui-expanded+ 0)
   (+gui-normal+ 16)
+  (+cap-any+ 0)
   (+cap-prop-pos-msec+ 0)      
   (+cap-prop-pos-frames+ 1)    
   (+cap-prop-pos-avi-ratio+ 2) 
@@ -567,6 +574,9 @@
   (+cascade-scale-image+ 2)
   (+cascade-find-biggest-object+ 4)
   (+cascade-do-rough-search+ 8)
+  (+hog-descriptor-l-2-hys+ 0)
+  (+hog-descriptor-default-nlevels+ 64)
+
 
 ;;; ml 
 

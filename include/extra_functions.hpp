@@ -7,7 +7,15 @@ using namespace flann;
 using namespace cvflann;
 
 extern "C" {
-
+Mat* cv_Mat_with_Range(Mat* self, Range* rowRange, Range* colRange);
+Range* cv_create_Range(int _start, int _end);
+Range* cv_create_RangeAll();
+bool cv_Range_empty(Range* self);
+int cv_Range_size(Range* self);
+int cv_Range_getstart(Range* self);
+int cv_Range_getend(Range* self);
+void cv_HOGDescriptor_detectMultiScale9_2(HOGDescriptor* self, Mat* img, vector_Rect* foundLocations, double hitThreshold, Size* winStride, Size* padding, double scale, double finalThreshold, bool useMeanshiftGrouping);
+void cv_HOGDescriptor_setSVMDetector2(HOGDescriptor* self, vector_float* _svmdetector);
 CvSVMParams* cv_create_CvSVMParams(); 
 //CvSVMParams* cv_create_CvSVMParams10(int svm_type, int kernel_type, double degree, double gamma, double coef0, double Cvalue, double nu, double p, CvMat class_weights, TermCriteria term_crit);
 void cv_displayOverlay(String* winname, String* text, int delayms);
@@ -46,6 +54,7 @@ void cv_delete_DMatch(DMatch* ptr);
 void cv_delete_CvDTree(CvDTree* self);
 void cv_delete_CvDTreeParams(CvDTreeParams* self);
 void cv_delete_Feature2D(Feature2D* self);
+void cv_delete_HOGDescriptor(HOGDescriptor* self);
 void cv_delete_KeyPoint(KeyPoint* self);
 void cv_delete_CvKNearest(CvKNearest* self);
 void cv_delete_CvNormalBayesClassifier(CvNormalBayesClassifier* self);
@@ -55,6 +64,7 @@ void cv_delete_Point2f(Point2f* self);
 void cv_delete_Point3d(Point3d* self);
 void cv_delete_Point3f(Point3f* self);
 void cv_delete_Point3i(Point3i* self);
+void cv_delete_Range(Range* self);
 void cv_delete_Rect(Rect* self);
 void cv_delete_RNG(RNG* self);
 void cv_delete_RotatedRect(RotatedRect* self);

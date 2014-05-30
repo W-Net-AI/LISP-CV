@@ -47,7 +47,7 @@
 ;; void cv_CascadeClassifier_detectMultiScale(CascadeClassifier* self, Mat* image, vector_Rect* objects, double scaleFactor, 
 ;; int minNeighbors, int flags, Size* minSize, Size* maxSize)
 
-(defcfun ("cv_CascadeClassifier_detectMultiScale" %detect-multi-scale) :void
+(defcfun ("cv_CascadeClassifier_detectMultiScale" %%detect-multi-scale) :void
   (self cascade-classifier)
   (image mat)
   (objects vector-rect)
@@ -57,9 +57,9 @@
   (min-size size)
   (max-size size))
 
-(defun %%detect-multi-scale (self image objects &optional (scale-factor 1.1d0) (min-neighbors 3) (flags 0) (min-size (size) given-min-size) (max-size (size) given-max-size))
+(defun %detect-multi-scale (self image objects &optional (scale-factor 1.1d0) (min-neighbors 3) (flags 0) (min-size (size) given-min-size) (max-size (size) given-max-size))
   "Detects objects of different sizes in the input image. The detected objects are returned as a list of rectangles."
-  (%detect-multi-scale self image objects scale-factor min-neighbors flags min-size max-size)
+  (%%detect-multi-scale self image objects scale-factor min-neighbors flags min-size max-size)
   (if given-min-size nil (del-size min-size)) (if given-max-size nil (del-size max-size)))
 
 
@@ -69,7 +69,7 @@
 ;; void cv_CascadeClassifier_detectMultiScale8(CascadeClassifier* self, Mat* image, vector_Rect* objects, 
 ;; vector_int* numDetections, double scaleFactor, int minNeighbors, int flags, Size* minSize, Size* maxSize)
 
-(defcfun ("cv_CascadeClassifier_detectMultiScale8" %detect-multi-scale8) :void
+(defcfun ("cv_CascadeClassifier_detectMultiScale8" %%detect-multi-scale8) :void
   (self cascade-classifier)
   (image mat)
   (objects vector-rect)
@@ -81,9 +81,9 @@
   (max-size size))
 
 
-(defun detect-multi-scale8 (self image objects num-detections &optional (scale-factor 1.1d0) (min-neighbors 3) (flags 0) (min-size (size) given-min-size) (max-size (size) given-max-size))
+(defun %detect-multi-scale8 (self image objects num-detections &optional (scale-factor 1.1d0) (min-neighbors 3) (flags 0) (min-size (size) given-min-size) (max-size (size) given-max-size))
   "Detects objects of different sizes in the input image. The detected objects are returned as a list of rectangles."
-  (%detect-multi-scale8 self image objects num-detections scale-factor min-neighbors flags min-size max-size) 
+  (%%detect-multi-scale8 self image objects num-detections scale-factor min-neighbors flags min-size max-size) 
   (if given-min-size nil (del-size min-size)) (if given-max-size nil (del-size max-size)))
 
  
@@ -95,7 +95,7 @@
 ;; vector_int* rejectLevels, vector_double* levelWeights, double scaleFactor, int minNeighbors, int flags, 
 ;; Size* minSize, Size* maxSize, bool outputRejectLevels) 
 
-(defcfun ("cv_CascadeClassifier_detectMultiScale" %detect-multi-scale10) :void
+(defcfun ("cv_CascadeClassifier_detectMultiScale" %%detect-multi-scale10) :void
   (self cascade-classifier)
   (image mat)
   (objects vector-rect)
@@ -109,19 +109,12 @@
   (output-reject-levels :boolean))
 
 
-(defun detect-multi-scale10 (self image objects reject-levels level-weights &optional (scale-factor 1.1d0) (min-neighbors 3) (flags 0) min-size max-size (output-reject-levels nil))
+(defun %detect-multi-scale10 (self image objects reject-levels level-weights &optional (scale-factor 1.1d0) (min-neighbors 3) (flags 0) (min-size (size) given-min-size) (max-size (size) given-max-size) (output-reject-levels nil))
   "Detects objects of different sizes in the input image. The detected objects are returned as a list of rectangles."
-  (with-size ((s1 (size)))
-	     (with-size ((s2 (size)))
-			
-			(cond (max-size
-			       (%detect-multi-scale10 self image objects reject-levels level-weights scale-factor min-neighbors flags s1 s2 
-                                          output-reject-levels))
-			       
-			       ((not max-size)
-				(if (not min-size)
-				  (%detect-multi-scale10 self image objects reject-levels level-weights scale-factor min-neighbors flags s1 s2 output-reject-levels)
-				  (%detect-multi-scale10 self image objects reject-levels level-weights scale-factor min-neighbors flags min-size s2 output-reject-levels)))))))
+			       (%%detect-multi-scale10 self image objects reject-levels level-weights scale-factor min-neighbors flags min-size 
+                                           max-size output-reject-levels)
+                                  (if given-min-size nil (del-size min-size))
+                                  (if given-max-size nil (del-size max-size)))
 
 
 (defun detect-multi-scale (&rest args)
@@ -133,7 +126,7 @@
 	  (apply #'%detect-multi-scale8 args))
 
 	 ((typep (third args) 'std-vector-rect)
-	  (apply #'%%detect-multi-scale args))
+	  (apply #'%detect-multi-scale args))
 
 	 (t nil)))
 

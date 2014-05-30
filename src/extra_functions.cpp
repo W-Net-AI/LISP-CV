@@ -10,6 +10,44 @@ using namespace cvflann;
 
 extern "C" {
 
+
+Mat* cv_Mat_with_Range(Mat* self, Range* rowRange, Range* colRange) {
+    return new Mat(*self, *rowRange, *colRange);
+}
+
+Range* cv_create_Range(int _start, int _end) {
+    return new Range(_start, _end);
+}
+
+Range* cv_create_RangeAll() {
+    return new Range(Range::all());
+}
+
+bool cv_Range_empty(Range* self) {
+    return self->empty();
+}
+
+int cv_Range_size(Range* self) {
+    return self->size();
+}
+
+int cv_Range_getstart(Range* self) {
+    return self->start;
+}
+
+int cv_Range_getend(Range* self) {
+    return self->end;
+}
+
+void cv_HOGDescriptor_detectMultiScale9_2(HOGDescriptor* self, Mat* img, vector_Rect* foundLocations, double hitThreshold, Size* winStride, Size* padding, double scale, double finalThreshold, bool useMeanshiftGrouping) {
+	self->detectMultiScale(*img, *foundLocations,  hitThreshold, *winStride, *padding, scale, finalThreshold, useMeanshiftGrouping);
+}
+
+
+void cv_HOGDescriptor_setSVMDetector2(HOGDescriptor* self, vector_float* _svmdetector) {
+	self->setSVMDetector(*_svmdetector);
+}
+
 CvSVMParams* cv_create_CvSVMParams() {
     return new CvSVMParams();
 }
@@ -163,6 +201,10 @@ void cv_delete_Feature2D(Feature2D* self) {
     delete self;
 }
 
+void cv_delete_HOGDescriptor(HOGDescriptor* self) {
+    delete self;
+}
+
 void cv_delete_KeyPoint(KeyPoint* self) {
      delete self;
 }
@@ -196,6 +238,10 @@ void cv_delete_Point3f(Point3f* self) {
 }
 
 void cv_delete_Point3i(Point3i* self) {
+     delete self;
+}
+
+void cv_delete_Range(Range* self) {
      delete self;
 }
 

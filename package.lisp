@@ -102,6 +102,8 @@
    #:del-dmatch
    #:del-d-tree
    #:del-d-tree-params
+   #:del-feature-2d
+   #:del-hog-descriptor
    #:del-k-nearest
    #:del-kp
    #:del-mat
@@ -113,6 +115,7 @@
    #:del-point-3d
    #:del-point-3f
    #:del-point-3i
+   #:del-range
    #:del-rect
    #:del-rng
    #:del-rot-rect
@@ -143,6 +146,7 @@
    #:with-d-tree
    #:with-d-tree-params
    #:with-feature-2d
+   #:with-hog-descriptor
    #:with-keypoint
    #:with-k-nearest
    #:with-mat
@@ -156,6 +160,7 @@
    #:with-point-3f
    #:with-point-3i
    #:with-rect
+   #:with-range
    #:with-rng
    #:with-rotated-rect
    #:with-scalar
@@ -187,6 +192,7 @@
    #:d-tree-node
    #:d-tree-params
    #:feature-2d
+   #:hog-descriptor
    #:key-point
    #:k-nearest
    #:mat
@@ -199,6 +205,7 @@
    #:point-3d
    #:point-3f
    #:point-3i
+   #:range
    #:rect
    #:rng
    #:rotated-rect
@@ -316,7 +323,6 @@
    #:mat-expr-t
    #:mat-eye
    #:mat-ones
-   #:mat-size
    #:mat-type
    #:mat-zeros
    #:mul
@@ -343,6 +349,10 @@
    #:point-3i-z
    #:promote
    #:ptr
+   #:range
+   #:range-end
+   #:range-all
+   #:range-start
    #:rect
    #:rect-clone
    #:rect-height
@@ -415,6 +425,12 @@
    #:+relative-c+
    #:+relative-l1+
    #:+relative-l2+
+   #:+covar-scrambled+
+   #:+covar-normal+ 
+   #:+covar-use-avg+ 
+   #:+covar-scale+ 
+   #:+covar-rows+ 
+   #:+covar-cols+ 
 
    #:*abs
    #:*exp
@@ -434,6 +450,7 @@
    #:in-range-s
    #:inv
    #:invert
+   #:magnitude
    #:mean
    #:min-max-loc
    #:multiply
@@ -877,6 +894,7 @@
 
 ;; highgui - Reading and Writing Images and Video
 
+   #:+cap-any+
    #:+cap-prop-pos-msec+
    #:+cap-prop-pos-frames+
    #:+cap-prop-pos-avi-ratio+
@@ -976,6 +994,11 @@
 
    #:draw-matches
 
+
+;;; objdetect
+
+   #:+hog-descriptor-l-2-hys+
+   #:+hog-descriptor-default-nlevels+
 
 ;;; objdetect - Cascade Classification
 

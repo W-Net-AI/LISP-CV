@@ -64,6 +64,13 @@
 
 
 ;; void operator delete  ( void* ptr )
+;; void cv_delete_HOGDescriptor(HOGDescriptor* self)
+(defcfun ("cv_delete_HOGDescriptor" del-hog-descriptor) :void
+  "Calls delete on HOG-DESCRIPTOR"
+  (self hog-descriptor))
+
+
+;; void operator delete  ( void* ptr )
 ;; void cv_delete_CvKNearest(CvKNearest* self)
 (defcfun ("cv_delete_CvKNearest" del-k-nearest) :void
   "Calls delete on K-NEAREST"
@@ -145,6 +152,13 @@
 (defcfun ("cv_delete_Rect" del-rect) :void
   "Calls delete on RECT"
   (self rect))
+
+
+;; void operator delete  ( void* ptr )
+;; void cv_delete_Range(Rect* self)
+(defcfun ("cv_delete_Range" del-range) :void
+  "Calls delete on RANGE"
+  (self range))
 
 
 ;; void operator delete  ( void* ptr )
