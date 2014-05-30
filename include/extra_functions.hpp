@@ -7,6 +7,10 @@ using namespace flann;
 using namespace cvflann;
 
 extern "C" {
+CvANN_MLP_TrainParams* cv_create_CvANN_MLP_TrainParams();
+CvANN_MLP_TrainParams* cv_create_CvANN_MLP_TrainParams4(TermCriteria* term_crit, int train_method, double param1, double param2);
+CvDTreeParams* cv_create_CvDTreeParams();
+CvDTreeParams* cv_create_CvDTreeParams9(int max_depth, int min_sample_count, float regression_accuracy, bool use_surrogates, int max_categories, int cv_folds, bool use_1se_rule, bool truncate_pruned_tree, const float* priors);
 Mat* cv_Mat_with_Range(Mat* self, Range* rowRange, Range* colRange);
 Range* cv_create_Range(int _start, int _end);
 Range* cv_create_RangeAll();

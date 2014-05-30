@@ -10,6 +10,21 @@ using namespace cvflann;
 
 extern "C" {
 
+CvANN_MLP_TrainParams* cv_create_CvANN_MLP_TrainParams() {
+    return new CvANN_MLP_TrainParams();
+}
+
+CvANN_MLP_TrainParams* cv_create_CvANN_MLP_TrainParams4(TermCriteria* term_crit, int train_method, double param1, double param2) {
+    return new CvANN_MLP_TrainParams(*term_crit, train_method, param1, param2);
+}
+
+CvDTreeParams* cv_create_CvDTreeParams() {
+    return new CvDTreeParams();
+}
+
+CvDTreeParams* cv_create_CvDTreeParams9(int max_depth, int min_sample_count, float regression_accuracy, bool use_surrogates, int max_categories, int cv_folds, bool use_1se_rule, bool truncate_pruned_tree, const float* priors) {
+    return new CvDTreeParams(max_depth, min_sample_count, regression_accuracy, use_surrogates, max_categories, cv_folds, use_1se_rule, truncate_pruned_tree, priors);
+}
 
 Mat* cv_Mat_with_Range(Mat* self, Range* rowRange, Range* colRange) {
     return new Mat(*self, *rowRange, *colRange);
