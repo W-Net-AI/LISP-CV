@@ -535,7 +535,7 @@ When the operation mask is specified, and the (CREATE) call shown above realloca
 newly allocated matrix is initialized with all zeros before copying the data.
 
 
-(defun copy-to-example ()
+(defun copy-to-example-1 ()
   ;; initialize data for matrices
   (with-object ((data (alloc :int '(10 20 30 40))))
     ;; initialize MAT-1 with DATA.
@@ -576,6 +576,52 @@ newly allocated matrix is initialized with all zeros before copying the data.
       (format t "M-2 =~%~%")
       (print-mat m-2 :int)
       (format t "~%"))))
+
+
+
+(defun copy-to-example-2 (&optional (cam 0) 
+			    (width *default-width*)
+			    (height *default-height*))
+
+  "In this COPY-TO example, we use the output of CANNY, 
+   a binary image, as the MASK parameter of COPY-TO."
+
+  (let ((window-name "COPY-TO Example 2"))
+    (with-named-window (window-name +window-normal+)
+      (set-window-property window-name +wnd-prop-fullscreen+ 
+			   +window-fullscreen+)
+      (set-window-property window-name +wnd-prop-aspectratio+ 
+			   +window-freeratio+)
+      (with-captured-camera (cap cam :width width :height height)
+	(with-object ((threshold1 (alloc :int 0))
+		      (threshold2 (alloc :int 0)))
+	  (loop        ;;Create matrices to 
+	               ;;hold all the data
+	     (with-mat ((frame (mat))
+			(src (mat height width +8u+))
+			(dst (mat height width +8u+))
+                        ;;Create matrix filled with zeros(all black)
+			(black-mat (mat-zeros (rows frame) (cols frame) 0)))
+               ;;Set the camera 
+               ;;feed to FRAME
+	       (cap-read cap frame)
+               ;;Convert FRAME to grayscale
+	       (cvt-color frame src +bgr2gray+)
+	       ;;Adjusting the trackbars changes the THRESHOLD1 
+               ;;and THRESHOLD2 parameters of the function CANNY
+	       (create-trackbar "THRESHOLD1" window-name threshold1 500)
+	       (create-trackbar "THRESHOLD2" window-name threshold2 500)
+               ;;Set CANNY output to DST
+	       (canny src dst (coerce (? threshold1 :int) 'double-float) 
+		      (coerce (? threshold2 :int) 'double-float))
+               ;;Copy FRAME to BLACK-MAT, masked		
+	       (copy-to frame black-mat dst)
+               ;;Show BLACK-MAT then delete all matrices
+	       (imshow window-name black-mat))
+	     (let ((c (wait-key 33)))
+	       (when (= c 27)
+		 (return)))))))))
+
 
 
 CROSS
@@ -1157,7 +1203,7 @@ Locates the matrix header within a parent matrix.
 
 C++: void Mat::locateROI(Size& wholeSize, Point& ofs) const
 
-LISP-CV: (LOCATE-ROI (SELF MAT) (S SIZE) (P POINT)) => :VOID
+LISP-CV: (LOCATE-ROI (SELF MAT) (WHOLE-SIZE SIZE) (OFS POINT)) => :VOID
 
 
     Parameters:	
@@ -1168,6 +1214,7 @@ LISP-CV: (LOCATE-ROI (SELF MAT) (S SIZE) (P POINT)) => :VOID
 
         OFS - Output parameter that contains an offset of *this inside the whole matrix.
 
+
 After you have extracted a submatrix from a matrix MAT using (ROWS MAT), (COLS MAT), (ROW-RANGE MAT) 
 ,(COL-RANGE MAT), and others, the resultant submatrix points just to the part of the original parent 
 matrix. However, each submatrix contains information (represented by the OpenCv Mat class DATASTART 
@@ -1176,60 +1223,56 @@ submatrix within the original matrix. The function LOCATE-ROI does exactly that.
 
 
 (defun locate-roi-example (&optional 
-			     (camera-index *camera-index*) 
+			     (cam *camera-index*) 
 			     (width *default-width*)
 			     (height *default-height*))
-  ;Set camera feed to CAP
-  (with-capture (cap (video-capture camera-index))
+  ;Set camera feed to CAP and set its width and height
+  (with-captured-camera (cap cam :width width :height height)
     (let ((window-name-1 "Original FRAME - LOCATE-ROI Example")
 	  (window-name-2 "Submatrix - LOCATE-ROI Example"))
       (if (not (cap-is-open cap)) 
 	  (return-from locate-roi-example 
 	    (format t "Cannot open the video camera")))
-      ;Set width and height of CAP
-      (cap-set cap +cap-prop-frame-width+ width)
-      (cap-set cap +cap-prop-frame-height+ height)
       (format t "~%Frame Size : ~ax~a~%~%" 
 	      (cap-get cap +cap-prop-frame-width+)
 	      (cap-get cap +cap-prop-frame-height+))
       ;;Create windows and move to specified positions
-      (named-window window-name-1 +window-normal+)
-      (named-window window-name-2 +window-normal+)
-      (move-window window-name-1 514 175)
-      (move-window window-name-2 966 175)
-      (do* ((frame 0)
-            ;Create rectangle RECT
-            (rect (rect (round (/ width 4)) 
-			(round (/ height 4))  
-			(round (/ width 2)) 
-			(round (/ height 2))))
+      (with-named-window (window-name-1 +window-normal+)
+	(with-named-window (window-name-2 +window-normal+)
+	  (move-window window-name-1 514 175)
+	  (move-window window-name-2 966 175)
+	  ;Create rectangle RECT
+	  (with-rect ((rect (rect (round (/ width 4)) 
+				  (round (/ height 4))  
+				  (round (/ width 2)) 
+				  (round (/ height 2)))))
             ;;Create variables to hold the size and location 
             ;;information derived by LOCATE-ROI
-            (roi-size (size 0 0))
-             (roi-loc (point 0 0)))
-	   ((plusp (wait-key *millis-per-frame*)) 
-	    (format t "Key is pressed by user"))
-        ;Set camera feed to FRAME
-	(setf frame (mat))
-	(cap-read cap frame)
-        ;Show original FRAME in window
-	(imshow window-name-1 frame)
-        ;Extract submatrix(roi) from FRAME
-        (setf frame (roi frame rect))
-        ;Locate the position of the submatrix 
-        ;inside FRAME we just extracted as well 
-        ;as the size of its parent matrix which 
-        ;is, in this case FRAME 
-	(locate-roi frame roi-size roi-loc)
-        ;Print location of submatrix
-        (format t "Location of FRAME region of interest (~a, ~a)
-        ~%~%" (point-x roi-loc) (point-y roi-loc))
-        ;Print size of parent matrix
-        (format t "Size of FRAME (~a, ~a)
-        ~%~%" (width roi-size) (height roi-size))
-        ;;Show submatrix in window
-	(imshow window-name-2 frame))
-      (destroy-all-windows))))
+            (with-size ((roi-size (size 0 0)))
+	      (with-point ((roi-loc (point 0 0)))
+		(loop
+		   (with-mat ((frame (mat)))
+		     (cap-read cap frame)
+		     ;Show original FRAME in window
+		     (imshow window-name-1 frame)
+		     ;Extract submatrix(roi) from FRAME
+		     (with-mat ((frame (roi frame rect)))
+		       ;Locate the position of the submatrix 
+		       ;inside FRAME we just extracted as well 
+		       ;as the size of its parent matrix which 
+		       ;is, in this case FRAME 
+		       (locate-roi frame roi-size roi-loc)
+		       ;Print location of submatrix
+		       (format t "Location of FRAME region of interest (~a, ~a)~%~%" 
+			       (point-x roi-loc) (point-y roi-loc))
+		       ;Print size of parent matrix
+		       (format t "Size of FRAME (~a, ~a)~%~%" 
+			       (width roi-size) (height roi-size))
+		       ;;Show submatrix in window
+		       (imshow window-name-2 frame))
+		     (let ((c (wait-key 33)))
+		       (when (= c 27)
+			 (return)))))))))))))
 
 
 MAT
@@ -4468,6 +4511,135 @@ See MATCH-TEMPLATE-EXAMPLE for example usage of NORMALIZE.
 
 
 
+PHASE
+
+Calculates the rotation angle of 2D vectors.
+
+C++: void phase(InputArray x, InputArray y, OutputArray angle, bool angleInDegrees=false)
+
+LISP-CV: (PHASE (X MAT) (Y MAT) (ANGLE MAT) &OPTIONAL (ANGLE-IN-DEGREES :BOOLEAN)) => :VOID
+
+    Parameters:	
+
+        X - Input floating-point array of x-coordinates of 2D vectors.
+
+        Y - Input array of y-coordinates of 2D vectors; it must have the same size and the same type as X.
+
+        ANGLE - Output array of vector angles; it has the same size and same type as X.
+
+        ANGLE-IN-DEGREES - When true, the function calculates the angle in degrees, otherwise, they are measured in radians.
+
+The function phase calculates the rotation angle of each 2D vector that is formed from the corresponding elements of X and Y:
+
+
+See OpenCV documentation at this link for further description and a formula:
+
+http://docs.opencv.org/trunk/modules/core/doc/operations_on_arrays.html?highlight=phase#phase
+
+
+
+
+(defun random-color (rng &optional (icolor 0))
+  (setf icolor rng)
+  (return-from random-color (scalar (uniform rng 0 255) 
+				    (uniform rng 0 255) (uniform rng 0 255))))
+
+(defun phase-example ()
+  ;;Declare variables
+  (let ((window-name "Move Trackbars to change the start/end angles of the ellipse - PHASE Example")
+        (x1 0)
+        (y1 0)
+        (y2 0)
+        (x2 0)
+        (count 720)
+        (start-angle 0)
+        (end-angle 0)
+        (font-face +FONT-HERSHEY-PLAIN+ )
+	(scale 1.25d0)
+        (line-type 4)
+        (thickness 1)
+        (text1 0)
+        (text2 0)
+        (text3 0)
+        (text4 0)
+        (text5 0)
+        (text6 0))
+    ;;Allocate varables for the x,y coordinates 
+    ;;that the trackbar can adjust
+    (with-object ((x-val-1 (alloc :int 0))
+		  (y-val-1 (alloc :int 0))
+		  (x-val-2 (alloc :int 0))
+		  (y-val-2 (alloc :int 0)))
+      ;;Create a window
+      (with-named-window (window-name +window-autosize+)
+	(move-window window-name 639 175)
+        ;;Create trackbars for adjusting 
+        ;;the x,y values given to PHASE
+	(create-trackbar  "X value 1" window-name x-val-1  count)
+	(create-trackbar  "Y value 1" window-name y-val-1 count)
+        (create-trackbar  "X value 2" window-name x-val-2  count)
+	(create-trackbar  "Y value 2" window-name y-val-2 count)
+	;;Initialize random number generator
+	(with-rng ((rng (rng #xFFFFFFFF)))
+	  (loop
+	     ;; Set ELLIPSE CENTER and AXES parameters
+	     (with-point ((center (point 320 311)))
+	       (with-size ((axes (size 125d0 125d0)))
+                            ;;Set the X1,Y1,X2,Y2 to the values output by the trackbars  
+			    (setf x1 (- (coerce (? x-val-1 :int) 'single-float) 360))
+			    (setf y1 (- (coerce (? y-val-1 :int) 'single-float) 360))
+			    (setf x2 (- (coerce (? x-val-2 :int) 'single-float) 360))
+			    (setf y2 (- (coerce (? y-val-2 :int) 'single-float) 360))
+		 ;;Create a black background, MAT
+		 (with-mat ((mat (mat-zeros 480 640 +8uc3+))
+			    ;;Create two vectors, using the function 
+                            ;;MAT, to hold the x,y coordinates PHASE 
+                            ;;uses to determine the rotation angles
+			    (x (mat 1 2 +32f+ :float (list x1 x2)))
+			    (y (mat 1 2 +32f+ :float (list y1 y2)))
+                            ;;Output matrix used to hold 
+                            ;;the two rotation angles
+			    (angle (mat 1 2 +32f+)))
+                      ;;Set PUT-TEXT COLOR parameters
+             	     (with-scalar ((red (scalar 0 0 255)))
+             ;;Set PUT-TEXT TEXT parameters
+	     (setf text1 (cat "x value 1: " (write-to-string x1)))
+	     (setf text2 (cat "y value 1: " (write-to-string y1)))
+	     (setf text3 (cat "x value 2: " (write-to-string x2)))
+	     (setf text4 (cat "y value 2: " (write-to-string y2)))
+	     (setf text5 (cat "start-angle: " (write-to-string start-angle)))
+	     (setf text6 (cat "end-angle: " (write-to-string end-angle)))
+               ;;Output the values of X1, Y1, X2, Y2, START-ANGLE and END-ANGLE 
+	       (put-text mat text1 (gc:point 0 18) font-face  scale red thickness line-type)
+	       (put-text mat text2 (gc:point 0 43) font-face scale red thickness line-type)
+	       (put-text mat text3 (gc:point 0 68) font-face scale red thickness line-type)
+	       (put-text mat text4 (gc:point 0 93) font-face scale red thickness line-type)
+	       (put-text mat text5 (gc:point 0 118) font-face scale red thickness line-type)
+	       (put-text mat text6 (gc:point 0 143) font-face scale red thickness line-type))
+                   ;;Doing the following actions, multiple times
+                   ;;in a loop, makes the ELLIPSE look better
+		   (dotimes (n 10)
+                     ;;Compute the rotation angles 
+                     ;;of X1,Y1,X2,Y2 with PHASE
+		     (*phase x y angle t)
+		     ;;Set START-ANGLE and END-ANGLE of the ellipse to 
+                     ;;the 0,0 and 0,1 elements of the matrix ANGLE
+		     (setf start-angle (coerce (at angle 0 0 :float) 'double-float))
+		     (setf end-angle (coerce (at angle 0 1 :float) 'double-float))
+                     ;;Draw the ellipse
+		     (ellipse mat center axes 360d0 start-angle end-angle
+			      (random-color rng) (uniform rng -1 9) +aa+)
+		     (sleep .015)
+		     ;;Show and then delete MAT 
+                     ;;as it goes out of focus
+		     (imshow window-name mat)))
+		 (let ((c (wait-key 33)))
+		   (when (= c 27)
+		     (return)))))))))))
+
+
+
+
 POW
 
 Raises every array element to a power.
@@ -4954,6 +5126,8 @@ LISP-CV: (ELLIPSE (IMG MAT) (CENTER POINT) (AXES SIZE) (ANGLE :DOUBLE) (START-AN
 
 C++: void ellipse(Mat& img, const RotatedRect& box, const Scalar& color, int thickness=1, int lineType=8)
 
+LISP-CV: (ELLIPSE (IMG MAT) (BOX ROTATED-RECT) (COLOR SCALAR) &OPTIONAL ((THICKNESS :INT) 1) ((LINE-TYPE :INT) 8)) => :VOID
+
 
     Parameters:	
 
@@ -4965,7 +5139,7 @@ C++: void ellipse(Mat& img, const RotatedRect& box, const Scalar& color, int thi
 
         AMGLE - Ellipse rotation angle in degrees.
 
-        START-AMGLE - Starting angle of the elliptic arc in degrees.
+        START-ANGLE - Starting angle of the elliptic arc in degrees.
 
         END-ANGLE - Ending angle of the elliptic arc in degrees.
 
@@ -4974,7 +5148,7 @@ C++: void ellipse(Mat& img, const RotatedRect& box, const Scalar& color, int thi
 
         COLOR - Ellipse color.
 
-        THICKNESS - Thickness of the ellipse arc outline, if positive. Otherwise, this -s th-
+        THICKNESS - Thickness of the ellipse arc outline, if positive. Otherwise, this indicates th-
                     at a filled ellipse sector is to be drawn.
 
         LINE-TYPE - Type of the ellipse boundary. See the (LINE) description.
@@ -5014,7 +5188,7 @@ Example 1:
       ;;Initialize random number generator
       (with-rng ((rng (rng #xFFFFFFFF)))
 	(loop
-	   ;; Set BOX location and size to random values
+	   ;; Set ELLIPSE CENTER and AXES parameters to random values
 	   (with-point ((center (point (uniform rng 0 640) (uniform rng 0 480))))
 	     (with-size ((axes (size (coerce (uniform rng 0 420) 'double-float) 
 				     (coerce (uniform rng 0 420) 'double-float))))
@@ -9520,6 +9694,167 @@ The function SET-WINDOW-PROPERTY enables changing properties of a window.
     (loop while (not (= (wait-key 0) 27)))
     (del-mat image)
     (destroy-window window-name)))
+
+
+
+
+FEATURES2D - FEATURE DETECTION AND DESCRIPTION
+
+
+
+BRISK
+
+The BRISK constructor
+
+C++: BRISK::BRISK(int thresh=30, int octaves=3, float patternScale=1.0f)
+
+LISP-CV: (BRISK &OPTIONAL ((THRESH :INT) 30) ((OCTAVES :INT) 3) ((PATTERN-SCALE :FLOAT) 1.0F0) => FEATURE-2D
+
+    Parameters:	
+
+        THRESH - FAST/AGAST detection threshold score.
+
+        OCTAVES - detection octaves. Use 0 to do single scale.
+
+        PATTERN-SCALE - apply this scale to the pattern used for sampling the neighbourhood of a keypoint.
+
+BRISK is a object implementing the BRISK keypoint detector and descriptor extractor, described in [LCS11]:
+
+http://docs.opencv.org/modules/features2d/doc/feature_detection_and_description.html?highlight=brisk#lcs11
+
+
+
+(defun brisk-example (filename-1 filename-2)
+
+  "Warning: Creating 12 BRISK objects uses a lot of RAM. It
+   will get deleted though, within 30 seconds. It's best to 
+   start this program with a good amount of available RAM.
+
+   Don't let this example make you nervous it's basically 12 
+   FEAT-DETECTOR-CREATE-EXAMPLE's stacked, in one. Here I am 
+   basically just showing, in a quick easy to see fashion, h-
+   ow the THRESH, OUTPUT and PATTERN-SCALE parameters of the 
+   function BRISK affect it's output. Each of the 12 windows 
+   has the function call used to set those parameters printe-
+   d on the titlebar, so you don't have to look through the 
+   code to get the effect of this example. For example, if y-
+   ou see this on the windows titlebar: (BRISK 0 0 0.0f0), t-
+   hen you know the BRISK parameter set for that window is: 
+
+       THRESH = 0, OCTAVES  = 0, PATTERN-SCALE = 0.0f0.
+
+   Note: Try using the box.png and the box_in_scene.png from
+   the LISP-CV-MASTER/IMAGES directory to get a better under-
+   standing of this example the first time you run it. And, 
+   just be aware, this example takes a few seconds to start."
+
+  ;; read two images in grayscale, first the object you want to track,
+  (let* ((gray-a (gc:imread filename-1 +load-image-grayscale+))
+	 ;; second the image the object is a part of
+	 (gray-b (gc:imread filename-2 +load-image-grayscale+))
+         ;; make arrays to hold the keypoints and descriptors
+         (keypoints-a-arr (make-array '(12))) 
+         (keypoints-b-arr (make-array '(12)))
+	 (descriptors-a-arr (make-array '(12)))
+	 (descriptors-b-arr (make-array '(12)))  
+	 (matcher-arr (make-array '(12))) 
+	 (matches-arr (make-array '(12)))
+	 (all-matches-arr (make-array '(12)))
+	 ;; declare an array of BRISK objects
+	 (brisk-arr 
+	  (make-array 12 :initial-contents 
+		      (list
+		       (brisk 0 0 0.0f0)
+		       (brisk 60 0 0.0f0)
+		       (brisk 120 0 0.0f0)
+		       (brisk 180 0 0.0f0)
+		       (brisk 0 4 1.0f0)
+		       (brisk 60 4 1.0f0)
+		       (brisk 120 4 1.0f0)
+		       (brisk 180 4 1.0f0)
+		       (brisk 0 8 2.0f0)
+		       (brisk 60 8 2.0f0)
+		       (brisk 120 8 2.0f0)
+		       (brisk 180 8 2.0f0))))
+         ;; declare an array of 12 window names which will be used 
+         ;; by MOVE-WINDOW, NAMED WINDOW, IMSHOW and  DESTROY-WINDOW
+	 (window-name-arr 
+	  (make-array 12 :initial-contents 
+
+		      (list
+		       "(BRISK 0 0 0.0f0) - BRISK Example"
+		       "(BRISK 60 0 0.0f0) - BRISK Example"
+		       "(BRISK 120 0 0.0f0) - BRISK Example"
+		       "(BRISK 180 0 0.0f0) - BRISK Example"
+		       "(BRISK 0 4 1.0f0) - BRISK Example"
+		       "(BRISK 60 4 1.0f0) - BRISK Example"
+		       "(BRISK 120 4 1.0f0) - BRISK Example"
+		       "(BRISK 180 4 1.0f0) - BRISK Example"
+		       "(BRISK 0 8 2.0f0) - BRISK Example"
+		       "(BRISK 60 8 2.0f0) - BRISK Example"
+		       "(BRISK 120 8 2.0f0) - BRISK Example"
+		       "(BRISK 180 8 2.0f0) - BRISK Example"))))
+    ;; if images not loaded, break
+    (if (empty (or gray-a gray-b)) 
+	(return-from brisk-example 
+	  (format t "Both images were not loaded")))
+    ;; create 12 windows to show the output images in
+    (dotimes (i 12)
+      (named-window (aref window-name-arr i) +window-normal+))
+    ;; move the windows to specific coordinates
+    (move-window (aref window-name-arr 0) 88 0)
+    (move-window (aref window-name-arr 1) 538 0)
+    (move-window (aref window-name-arr 2) 988 0)
+    (move-window (aref window-name-arr 3) 1438 0)
+    (move-window (aref window-name-arr 4) 88 368)
+    (move-window (aref window-name-arr 5) 538 368)
+    (move-window (aref window-name-arr 6) 988 368)-
+    (move-window (aref window-name-arr 7) 1438 368)
+    (move-window (aref window-name-arr 8) 88 708)
+    (move-window (aref window-name-arr 9) 538 708)
+    (move-window (aref window-name-arr 10) 988 708)
+    (move-window (aref window-name-arr 11) 1438 708)
+    ;; declare 2 arrays of 12 keypoints each
+    (dotimes (i 12)
+      (setf (aref keypoints-a-arr i) (gc:vec-key-point))
+      (setf (aref keypoints-b-arr i) (gc:vec-key-point))
+      ;; declare an array of 12 query descriptors 
+      (setf (aref descriptors-a-arr i) (gc:mat))
+      ;; declare an array of 12 train descriptors 
+      (setf (aref descriptors-b-arr i) (gc:mat))
+      ;; declare an array of 12 matchers
+      (setf (aref matcher-arr i) (gc:bf-matcher))
+      ;; declare an array of 12 MAT constructs to hold the 
+      ;; matches from the first image to the second one
+      (setf (aref matches-arr i) (gc:vec-dmatch))
+      ;; declare an array of 12 MAT constructs to hold the final output images
+      (setf (aref all-matches-arr i) (gc:mat))
+      ;; find matches, between the two images, 12 times,
+      ;; each using a different set of BRISK parameters
+      (feat-detector-create (aref brisk-arr i) "BRISK")
+      ;; detect keypoints in the image GRAY-A
+      (feat-detector-detect (aref brisk-arr i) gray-a (aref keypoints-a-arr i))
+      ;; Compute the descriptors for a set of keypoints detected in GRAY-A
+      (feat-2d-compute (aref brisk-arr i) gray-a (aref keypoints-a-arr i) (aref descriptors-a-arr i))
+      ;; detect keypoints in the image GRAY-B
+      (feat-detector-detect (aref brisk-arr i) gray-b (aref keypoints-b-arr i))
+      ;; compute the descriptors for a set of keypoints detected in GRAY-B
+      (feat-2d-compute (aref brisk-arr i) gray-b (aref keypoints-b-arr i) (aref descriptors-b-arr i))
+      ;; find the best match for each descriptor
+      (descrip-matcher-match (aref matcher-arr i) (aref descriptors-a-arr i) 
+			     (aref descriptors-b-arr i) (aref matches-arr i))
+      ;; draw the found matches
+      (draw-matches gray-a (aref keypoints-a-arr i) gray-b (aref keypoints-b-arr i) 
+		    (aref matches-arr i) (aref all-matches-arr i) 
+		    (gc:scalar-all -1) (gc:scalar-all -1) (gc:vec-char) 
+		    +draw-rich-keypoints+)
+      ;; show the 12 different matches in 12 windows
+      (imshow (aref window-name-arr i) (aref all-matches-arr i))
+      (del-feature-2d (aref brisk-arr i)))
+    ;; after 'esc' key is pressed destroy all 12 windows
+    (loop while (not (= (wait-key 0) 27)))
+    (dotimes (i 12)
+      (destroy-window (aref window-name-arr i)))))
 
 
 
@@ -14100,162 +14435,6 @@ two keypoints (circles). The FLAGS parameters are defined as follows:
     (destroy-window window-name-2)
     (destroy-window window-name-3)
     (destroy-window window-name-4)))
-
-
-
-BRISK
-
-The BRISK constructor
-
-C++: BRISK::BRISK(int thresh=30, int octaves=3, float patternScale=1.0f)
-
-LISP-CV: (BRISK &OPTIONAL ((THRESH :INT) 30) ((OCTAVES :INT) 3) ((PATTERN-SCALE :FLOAT) 1.0F0) => FEATURE-2D
-
-    Parameters:	
-
-        THRESH - FAST/AGAST detection threshold score.
-
-        OCTAVES - detection octaves. Use 0 to do single scale.
-
-        PATTERN-SCALE - apply this scale to the pattern used for sampling the neighbourhood of a keypoint.
-
-BRISK is a object implementing the BRISK keypoint detector and descriptor extractor, described in [LCS11]:
-
-http://docs.opencv.org/modules/features2d/doc/feature_detection_and_description.html?highlight=brisk#lcs11
-
-
-
-(defun brisk-example (filename-1 filename-2)
-
-  "Warning: Creating 12 BRISK objects uses a lot of RAM. It
-   will get deleted though, within 30 seconds. It's best to 
-   start this program with a good amount of available RAM.
-
-   Don't let this example make you nervous it's basically 12 
-   FEAT-DETECTOR-CREATE-EXAMPLE's stacked, in one. Here I am 
-   basically just showing, in a quick easy to see fashion, h-
-   ow the THRESH, OUTPUT and PATTERN-SCALE parameters of the 
-   function BRISK affect it's output. Each of the 12 windows 
-   has the function call used to set those parameters printe-
-   d on the titlebar, so you don't have to look through the 
-   code to get the effect of this example. For example, if y-
-   ou see this on the windows titlebar: (BRISK 0 0 0.0f0), t-
-   hen you know the BRISK parameter set for that window is: 
-
-       THRESH = 0, OCTAVES  = 0, PATTERN-SCALE = 0.0f0.
-
-   Note: Try using the box.png and the box_in_scene.png from
-   the LISP-CV-MASTER/IMAGES directory to get a better under-
-   standing of this example the first time you run it. And, 
-   just be aware, this example takes a few seconds to start."
-
-  ;; read two images in grayscale, first the object you want to track,
-  (let* ((gray-a (gc:imread filename-1 +load-image-grayscale+))
-	 ;; second the image the object is a part of
-	 (gray-b (gc:imread filename-2 +load-image-grayscale+))
-         ;; make arrays to hold the keypoints and descriptors
-         (keypoints-a-arr (make-array '(12))) 
-         (keypoints-b-arr (make-array '(12)))
-	 (descriptors-a-arr (make-array '(12)))
-	 (descriptors-b-arr (make-array '(12)))  
-	 (matcher-arr (make-array '(12))) 
-	 (matches-arr (make-array '(12)))
-	 (all-matches-arr (make-array '(12)))
-	 ;; declare an array of BRISK objects
-	 (brisk-arr 
-	  (make-array 12 :initial-contents 
-		      (list
-		       (brisk 0 0 0.0f0)
-		       (brisk 60 0 0.0f0)
-		       (brisk 120 0 0.0f0)
-		       (brisk 180 0 0.0f0)
-		       (brisk 0 4 1.0f0)
-		       (brisk 60 4 1.0f0)
-		       (brisk 120 4 1.0f0)
-		       (brisk 180 4 1.0f0)
-		       (brisk 0 8 2.0f0)
-		       (brisk 60 8 2.0f0)
-		       (brisk 120 8 2.0f0)
-		       (brisk 180 8 2.0f0))))
-         ;; declare an array of 12 window names which will be used 
-         ;; by MOVE-WINDOW, NAMED WINDOW, IMSHOW and  DESTROY-WINDOW
-	 (window-name-arr 
-	  (make-array 12 :initial-contents 
-
-		      (list
-		       "(BRISK 0 0 0.0f0) - BRISK Example"
-		       "(BRISK 60 0 0.0f0) - BRISK Example"
-		       "(BRISK 120 0 0.0f0) - BRISK Example"
-		       "(BRISK 180 0 0.0f0) - BRISK Example"
-		       "(BRISK 0 4 1.0f0) - BRISK Example"
-		       "(BRISK 60 4 1.0f0) - BRISK Example"
-		       "(BRISK 120 4 1.0f0) - BRISK Example"
-		       "(BRISK 180 4 1.0f0) - BRISK Example"
-		       "(BRISK 0 8 2.0f0) - BRISK Example"
-		       "(BRISK 60 8 2.0f0) - BRISK Example"
-		       "(BRISK 120 8 2.0f0) - BRISK Example"
-		       "(BRISK 180 8 2.0f0) - BRISK Example"))))
-    ;; if images not loaded, break
-    (if (empty (or gray-a gray-b)) 
-	(return-from brisk-example 
-	  (format t "Both images were not loaded")))
-    ;; create 12 windows to show the output images in
-    (dotimes (i 12)
-      (named-window (aref window-name-arr i) +window-normal+))
-    ;; move the windows to specific coordinates
-    (move-window (aref window-name-arr 0) 88 0)
-    (move-window (aref window-name-arr 1) 538 0)
-    (move-window (aref window-name-arr 2) 988 0)
-    (move-window (aref window-name-arr 3) 1438 0)
-    (move-window (aref window-name-arr 4) 88 368)
-    (move-window (aref window-name-arr 5) 538 368)
-    (move-window (aref window-name-arr 6) 988 368)-
-    (move-window (aref window-name-arr 7) 1438 368)
-    (move-window (aref window-name-arr 8) 88 708)
-    (move-window (aref window-name-arr 9) 538 708)
-    (move-window (aref window-name-arr 10) 988 708)
-    (move-window (aref window-name-arr 11) 1438 708)
-    ;; declare 2 arrays of 12 keypoints each
-    (dotimes (i 12)
-      (setf (aref keypoints-a-arr i) (gc:vec-key-point))
-      (setf (aref keypoints-b-arr i) (gc:vec-key-point))
-      ;; declare an array of 12 query descriptors 
-      (setf (aref descriptors-a-arr i) (gc:mat))
-      ;; declare an array of 12 train descriptors 
-      (setf (aref descriptors-b-arr i) (gc:mat))
-      ;; declare an array of 12 matchers
-      (setf (aref matcher-arr i) (gc:bf-matcher))
-      ;; declare an array of 12 MAT constructs to hold the 
-      ;; matches from the first image to the second one
-      (setf (aref matches-arr i) (gc:vec-dmatch))
-      ;; declare an array of 12 MAT constructs to hold the final output images
-      (setf (aref all-matches-arr i) (gc:mat))
-      ;; find matches, between the two images, 12 times,
-      ;; each using a different set of BRISK parameters
-      (feat-detector-create (aref brisk-arr i) "BRISK")
-      ;; detect keypoints in the image GRAY-A
-      (feat-detector-detect (aref brisk-arr i) gray-a (aref keypoints-a-arr i))
-      ;; Compute the descriptors for a set of keypoints detected in GRAY-A
-      (feat-2d-compute (aref brisk-arr i) gray-a (aref keypoints-a-arr i) (aref descriptors-a-arr i))
-      ;; detect keypoints in the image GRAY-B
-      (feat-detector-detect (aref brisk-arr i) gray-b (aref keypoints-b-arr i))
-      ;; compute the descriptors for a set of keypoints detected in GRAY-B
-      (feat-2d-compute (aref brisk-arr i) gray-b (aref keypoints-b-arr i) (aref descriptors-b-arr i))
-      ;; find the best match for each descriptor
-      (descrip-matcher-match (aref matcher-arr i) (aref descriptors-a-arr i) 
-			     (aref descriptors-b-arr i) (aref matches-arr i))
-      ;; draw the found matches
-      (draw-matches gray-a (aref keypoints-a-arr i) gray-b (aref keypoints-b-arr i) 
-		    (aref matches-arr i) (aref all-matches-arr i) 
-		    (gc:scalar-all -1) (gc:scalar-all -1) (gc:vec-char) 
-		    +draw-rich-keypoints+)
-      ;; show the 12 different matches in 12 windows
-      (imshow (aref window-name-arr i) (aref all-matches-arr i))
-      (del-feature-2d (aref brisk-arr i)))
-    ;; after 'esc' key is pressed destroy all 12 windows
-    (loop while (not (= (wait-key 0) 27)))
-    (dotimes (i 12)
-      (destroy-window (aref window-name-arr i)))))
 
 
 

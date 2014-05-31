@@ -458,6 +458,7 @@
    #:multiply
    #:norm
    #:normalize
+   #:phase
    #:pow
    #:randu
    #:rng

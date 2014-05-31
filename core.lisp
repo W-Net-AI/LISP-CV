@@ -1392,7 +1392,7 @@
 ;; void inRange(InputArray src, InputArray lowerb, InputArray upperb, OutputArray dst)
 ;; void cv_inRangeS(Mat* src, Scalar* lowerb, Scalar* upperb, Mat* dst)
 (defcfun ("cv_inRangeS" in-range-s) :void
-  "Checks if array elements lie between the elements of two other arrays."
+  "Checks if array elements lie between the elements of two scalar values."
   (src mat)
   (lowerb scalar)
   (upperb scalar)
@@ -1537,6 +1537,18 @@
   "Normalizes the norm or value range of an array."
   (%normalize src dest alpha beta norm-type  dtype  mask)
   (if given-mask nil (del-mat mask)))
+
+
+;; void phase(InputArray x, InputArray y, OutputArray angle, bool angleInDegrees=false)
+;; void cv_phase(Mat* x, Mat* y, Mat* angle, bool angleInDegrees) 
+(defcfun ("cv_phase" %phase) :void
+  (x mat)
+  (y mat)
+  (angle mat)
+  (angle-in-degrees :boolean))
+
+(defun *phase (x y angle &optional (angle-in-degrees nil))
+  (%phase x y angle angle-in-degrees))
 
 
 ;; void pow(InputArray src, double power, OutputArray dst)
