@@ -7,6 +7,10 @@ using namespace flann;
 using namespace cvflann;
 
 extern "C" {
+typedef vector<Vec4i> vector_Vec4i;
+void cv_LineSegmentDetector_detect2(LineSegmentDetector* self, Mat* _image, vector_Vec4i* _lines, Mat* width, Mat* prec, Mat* nfa);
+void cv_LineSegmentDetector_drawSegments2(LineSegmentDetector* self, Mat* _image, vector_Vec4i* lines);
+Vec4i* cv_create_Vec4i();
 CvANN_MLP_TrainParams* cv_create_CvANN_MLP_TrainParams();
 CvANN_MLP_TrainParams* cv_create_CvANN_MLP_TrainParams4(TermCriteria* term_crit, int train_method, double param1, double param2);
 CvDTreeParams* cv_create_CvDTreeParams();
@@ -76,6 +80,7 @@ void cv_delete_Scalar(Scalar* self);
 void cv_delete_Size(Size* self);
 void cv_delete_Size2f(Size2f* self);
 void cv_delete_TermCriteria(TermCriteria* self);
+void cv_delete_Vec4i(Vec4i* self);
 void cv_delete_VideoCapture(VideoCapture* self);
 void cv_delete_VideoWriter(VideoWriter* self);
 

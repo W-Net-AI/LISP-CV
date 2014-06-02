@@ -211,6 +211,13 @@
 
 
 ;; void operator delete  ( void* ptr )
+;; void cv_delete_Vec4i(Vec4i* self)
+(defcfun ("cv_delete_Vec4i" del-vec-4i) :void
+  "Calls delete on VEC-4I"
+  (self vec-4i))
+
+
+;; void operator delete  ( void* ptr )
 ;; void delete_std_vector##tn( vector_##t * v)
 (defcfun ("delete_std_vectorc" del-vec-char) :void
   "Calls delete on VECTOR-CHAR"
@@ -285,6 +292,13 @@
 (defcfun ("delete_std_vectoru" del-vec-uchar) :void
   "Calls delete on VECTOR-UCHAR"
   (self vector-uchar))
+
+
+;; void operator delete  ( void* ptr )
+;; void delete_std_vector##tn( vector_##t * v)
+(defcfun ("delete_std_vectorv4i" del-vec-vec-4i) :void
+  "Calls delete on VECTOR-VEC-4I"
+  (self vector-vec-4i))
 
 
 ;; void operator delete  ( void* ptr )

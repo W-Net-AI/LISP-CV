@@ -49,6 +49,9 @@
 ;'Lisp-CV Source Directory
 (define-symbol-macro *lisp-cv-src-dir*  (full-pathname (asdf::system-source-directory :lisp-cv))) 
 
+;;Lisp-CV Images Directory
+(define-symbol-macro *lisp-cv-images-dir*  (cat *lisp-cv-src-dir* "/images/")) 
+
 ;;Lisp-CV Data Directory
 (define-symbol-macro *lisp-cv-data-dir*  (cat *lisp-cv-src-dir* "/data/")) 
 

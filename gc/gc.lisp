@@ -833,6 +833,13 @@
 	       (t nil)))
 
 
+;; typedef Vec<int, 4> Vec4i;
+;; Vec4i* cv_create_Vec4i()
+(defcfun ("cv_create_Vec4i" vec-4i) (cv::vec-4i :garbage-collect t)
+	 "Vec4i constructor")
+
+
+
 ;;; Basic Structures
 
 
@@ -890,6 +897,8 @@
 (defcfun ("cv_sum" sum) (cv::scalar :garbage-collect t) 
 	 "Calculates the sum of array elements."
 	 (src cv::mat))
+
+
 
 
 ;;; CORE - Drawing Functions
@@ -1255,13 +1264,15 @@
 
 
 (defmacro vec-char (&rest args)
-  (if (third args)
+  (if (fourth args)
       (error "odd number of args to VEC-CHAR")
       nil)
   (let ((x (gensym))
-        (y (gensym)))
+        (y (gensym))
+        (z (gensym)))
     `(let ((,x (first (list ,@args)))
-	   (,y (second (list ,@args))))
+	   (,y (second (list ,@args)))
+           (,z (third (list ,@args))))
        (cond ((eq ,x nil)
 	      (%vec-char))
 	     ((or (vectorp ,x) (listp ,x))
@@ -1271,13 +1282,14 @@
 	     ((and (eq :to-lisp-list ,x))
 	      (cv::vec-char-to-lisp-list ,y))
 	     ((and (eq :to-lisp-vec ,x))
-	      (cv::vec-char-to-lisp-vec ,y))
+	      (cv::vec-char-to-lisp-vec ,y ,z))
 	     ((typep ,x 'cv::std-vector-char)
 	      (if (eq ,y nil)
 		  (mem-aref (cv::vec-char-to-c-arr ,x) :char) 
 		  (mem-aref (cv::vec-char-to-c-arr ,x) :char ,y)))
 	     (t (error "incorrect input. 
                    ~%See VEC-CHAR documentation in <LISP-CV-SOURCE-DIR>/EXAMPLES.LISP~%"))))))
+
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
@@ -1673,51 +1685,80 @@
   ~%See VEC-RECT documentation in <LISP-CV-SOURCE-DIR>/EXAMPLES.LISP~%"))))))
 
 
-
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * create_std_vector##tn()
-(defcfun ("create_std_vectoru" %vec-uchar) (cv::vector-uchar :garbage-collect t))
+(defcfun ("create_std_vectorv4i" %vec-vec-4i) (cv::vector-vec-4i :garbage-collect t))
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
-(defcfun ("carray_to_std_vectoru" c-arr-to-vec-uchar) (cv::vector-uchar :garbage-collect t)
+(defcfun ("carray_to_std_vectorv4i" c-arr-to-vec-vec4i) (cv::vector-vec-4i :garbage-collect t)
   (a :pointer)
   (len :unsigned-int))
 
 
 (let ((previous nil))
-  (defun arr-to-vec-uchar (a)
+  (defun arr-to-vec-vec-4i (a)
     (unless (equal a (car previous))
-      (setf previous (cons a (foreign-alloc :uchar :initial-contents 
-					    (coerce a 'list)))))
-    (c-arr-to-vec-uchar (cdr previous) (length a))))
+      (setf previous (cons a (foreign-alloc :pointer :initial-contents
+					    (mapcar #!(cv::c-pointer %1) (coerce a 'list))))))
+    (c-arr-to-vec-vec-4i (cdr previous) (length a))))
 
 
-(defmacro vec-uchar (&rest args)
-  (if (third args)
-      (error "odd number of args to VEC-UCHAR")
+
+(defmacro vec-rect (&rest args)
+  (if (fourth args)
+      (error "odd number of args to VECTOR-RECT")
       nil)
   (let ((x (gensym))
-        (y (gensym)))
+        (y (gensym))
+        (z (gensym)))
     `(let ((,x (first (list ,@args)))
-	   (,y (second (list ,@args))))
+	   (,y (second (list ,@args)))
+           (,z (third (list ,@args))))
        (cond ((eq ,x nil)
-	      (%vec-uchar))
+	      (%vec-rect))
 	     ((or (vectorp ,x) (listp ,x))
-	      (arr-to-vec-uchar ,x))
+	      (arr-to-vec-rect ,x))
 	     ((eq :length ,x)
-	      (cv::vec-uchar-length ,y))
+	      (cv::vec-rect-length ,y))
 	     ((and (eq :to-lisp-list ,x))
-	      (cv::vec-uchar-to-lisp-list ,y))
+	      (cv::vec-rect-to-lisp-list ,y))
 	     ((and (eq :to-lisp-vec ,x))
-	      (cv::vec-uchar-to-lisp-vec ,y))
-	     ((typep ,x 'cv::std-vector-uchar)
-	      (if (eq ,y nil)
-		  (mem-aref (cv::vec-uchar-to-c-arr ,x) :uchar) 
-		  (mem-aref (cv::vec-uchar-to-c-arr ,x) :uchar ,y)))
+	      (cv::vec-rect-to-lisp-vec ,y))
+	     ((and (typep ,x 'cv::std-vector-rect) ,y)
+	      (if (eq ,z nil)
+		  (mem-aref (cv::vec-rect-to-c-arr ,x) 'cv::rect ,y)
+		  (mem-aref (cv::c-pointer (mem-aref (cv::vec-rect-to-c-arr ,x) 'cv::rect ,y)) :int ,z)))
 	     (t (error "incorrect input. 
-                   ~%See VEC-UCHAR documentation in <LISP-CV-SOURCE-DIR>/EXAMPLES.LISP~%"))))))
+  ~%See VEC-RECT documentation in <LISP-CV-SOURCE-DIR>/EXAMPLES.LISP~%"))))))
 
+
+(defmacro vec-vec-4i (&rest args)
+  (if (fourth args)
+      (error "odd number of args to VEC-VEC-4I")
+      nil)
+  (let ((x (gensym))
+        (y (gensym))
+        (z (gensym)))
+    `(let ((,x (first (list ,@args)))
+	   (,y (second (list ,@args)))
+           (,z (third (list ,@args))))
+       (cond ((eq ,x nil)
+	      (%vec-vec-4i))
+	     ((or (vectorp ,x) (listp ,x))
+	      (arr-to-vec-vec-4i ,x))
+	     ((eq :length ,x)
+	      (cv::vec-vec-4i-length ,y))
+	     ((and (eq :to-lisp-list ,x))
+	      (cv::vec-vec-4i-to-lisp-list ,y))
+	     ((and (eq :to-lisp-vec ,x))
+	      (cv::vec-vec-4i-to-lisp-vec ,y))
+	     ((and (typep ,x 'cv::std-vector-vec-4i) ,y)
+	      (if (eq ,z nil)
+		  (mem-aref (cv::vec-vec-4i-to-c-arr ,x) 'cv::vec-4i ,y)
+		  (mem-aref (cv::c-pointer (mem-aref (cv::vec-vec-4i-to-c-arr ,x) 'cv::vec-4i ,y)) :int ,z)))
+	     (t (error "incorrect input. 
+  ~%See VEC-VEC-4I documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%"))))))
 
 

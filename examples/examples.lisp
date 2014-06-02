@@ -40,9 +40,9 @@ an example that uses TG finalizers):
 		 (return)))))))))
 
 
-
+=========================================================================================================================================
 CORE - BASIC STRUCTURES:
-
+=========================================================================================================================================
 
 
 ADD
@@ -2479,9 +2479,9 @@ Example:
 TODO(Reference example of function that uses TERM-CRITERIA)
 
 
-
-CORE - OPERATIONS ON ARRAYS:
-
+=========================================================================================================================================
+CORE - OPERATIONS ON ARRAYS
+=========================================================================================================================================
 
 *ABS
 
@@ -2564,81 +2564,32 @@ See also:
 (*LOG) , (CART-TO-POLAR) , (POLAR-TO-CART) , (PHASE) , (POW) , (*SQRT) , (MAGNITUDE)
 
 
-(defun *exp-example (filename)
 
-        ;Create double float matrix data
-  (let* ((data (alloc :double '(1d0 2d0 3d0 4d0 5d0 
-                               6d0 7d0 8d0 9d0)))
-         ;Create double float matrix
-	 (mat (mat 3 3 +64f+ data))
-	 (window-name-1 "Original Image - *EXP Example")
-	 (window-name-2 "Image after CONVERT-TO - *EXP Example")
-	 (window-name-3 "Image after LOG - *EXP Example")
-	 (window-name-4 "Image after EXP and LOG - *EXP Example")
-         (image (imread filename 1))
-         (dest (mat 3 3 +64f+)))
-      (named-window window-name-1 +window-normal+)
-      (named-window window-name-2 +window-normal+)
-      (named-window window-name-3 +window-normal+)
-      (named-window window-name-4 +window-normal+)
-      (move-window window-name-1 485 98)
-      (move-window window-name-2 894 98)
-      (move-window window-name-3 485 444)
-      (move-window window-name-4 894 444)
-    (format t "~MAT: ~%~%")
-    ;Print MAT
-    (dotimes (i (rows mat))
-      (dotimes (j (cols mat))
-	(format t "~a" (at mat i j :double))
-	(princ #\Space))
-      (princ #\Newline))
-    ;Calculate exponent of each element of 
-    ;MAT, using MAT as destination matrix
-    (format t "~%Calculate exponents: ~%~%")
-    (*exp mat mat)
-    (format t "MAT after *EXP: ~%~%")
-    ;Print MAT
-    (dotimes (i (rows mat))
-      (dotimes (j (cols mat))
-	(format t "~a" (at mat i j :double))
-	(princ #\Space))
-      (princ #\Newline))
-    ;Calculating natural logarithm of the 
-    ;exponent of each matrix element of M-
-    ;AT, virtually reverts MAT to it's or-
-    ;iginal state
-    (format t "~%Calculate natural logarithm: ~%~%")
-    (*log mat mat)
-    (format t "MAT after *LOG: ~%~%")
-    ;Print MAT
-    (dotimes (i (rows mat))
-      (dotimes (j (cols mat))
-	(format t "~a" (at mat i j :double))
-	(princ #\Space))
-      (princ #\Newline))
-    (free data)
-    (format t "~%")
-    ;Show original IMAGE in window
-    (imshow window-name-1 image)
-    ;Convert IMAGE to 1 channel
-    (cvt-color image image +bgr2gray+)
-    ;Convert IMAGE to double float
-    ;and show image in window
-    (convert-to image image +64f+)
-    (imshow window-name-2 image)
-    ;Find natural logarithm of 
-    ;IMAGE and show in window
-    (*log image dest)
-    (imshow window-name-3 dest)
-    ;Finding natural logarithm of each exponent 
-    ;of each element of IMAGE, reverts IMAGE ba-
-    ;ck to its original state after CONVERT-TO
-    (*exp image image)
-    (*log image image)
-    ;Show result in window
-    (imshow window-name-4 image)
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-all-windows)))
+(defun *exp-example ()
+  ;Create double float matrix data
+  (with-object ((data (alloc :double '(1d0 2d0 3d0 4d0 5d0 
+				       6d0 7d0 8d0 9d0))))
+    ;Create double float matrix
+    (with-mat ((mat (mat 3 3 +64f+ data)))
+      (format t "~%MAT: ~%~%")
+      ;Print MAT
+      (print-mat mat :double)
+      ;Calculate exponent of each element of 
+      ;MAT, using MAT as destination matrix
+      (format t "~%Calculate exponent of each element of MAT: ~%~%")
+      (*exp mat mat)
+      (format t "MAT: ~%~%")
+      ;Print MAT
+      (print-mat mat :double)
+      ;Calculating natural logarithm of each 
+      ;matrix element of MAT, virtually reve-
+      ;rts MAT to it's original state
+      (format t "~%Calculate natural logarithm or each element of MAT: ~%~%")
+      (*log mat mat)
+      (format t "MAT: ~%~%")
+      ;Print MAT
+      (print-mat mat :double)
+      (format t "~%"))))
 
 
 
@@ -2691,7 +2642,7 @@ See also:
     (named-window window-name-2 +window-normal+)
     (move-window window-name-1 533 175)
     (move-window window-name-2 984 175)
-    (format t "~MAT = ~%~%")
+    (format t "MAT = ~%~%")
     ;Print MAT
     (dotimes (i (rows mat))
       (dotimes (j (cols mat))
@@ -3355,6 +3306,81 @@ arrays, each channel is processed independently.
     (del-mat image-2)
     (del-mat dest)
     (destroy-all-windows)))
+
+
+
+COMPLETE-SYMM
+
+Copies the lower or the upper half of a square matrix to another half.
+
+C++: void completeSymm(InputOutputArray mtx, bool lowerToUpper=false)
+
+LISP-CV: (COMPLETE-SYMM (MTX MAT) &OPTIONAL (LOWER-TO-UPPER NIL)) => :VOID
+
+
+    Parameters:	
+
+        MTX - Input-Output floating-point square matrix.
+
+        LOWER-TO-UPPER - Operation flag; if true, the lower half is copied to the upper half. Otherwise, 
+                         the upper half is copied to the lower half.
+
+
+
+The function COMPLETE-SYMM copies the lower half of a square matrix to its another half. The matrix 
+diagonal remains unchanged:
+
+
+See OpenCV documentation at this link for a formula:
+
+http://docs.opencv.org/trunk/modules/core/doc/operations_on_arrays.html?highlight=symm#completesymm
+
+
+See also:
+
+(FLIP), (TRANSPOSE)
+
+
+(defun complete-symm-example ()
+
+  ;Create double float matrix data for MAT1
+
+  ;Note: If I used the same data array for 
+  ;MAT1 and MAT2, this example, as is other
+  ;wise, wouldn't work. The data array is a-
+  ;lso written to by COMPLETE-SYMM.
+
+  (with-object ((data1 (alloc :float '(1f0 2f0 3f0 4f0 5f0 
+				       6f0 7f0 8f0 9f0))))
+    ;Create double float matrix MAT1
+    (with-mat ((mat1 (mat 3 3 +32f+ data1)))
+      (format t "~%Original MAT1: ~%~%")
+      ;Print original MAT1
+      (print-mat mat1 :float)
+      (format t "~%")
+      ;Copy the lower half to the upper
+      ;See documentation link in:
+      ;<LISP-CV-SRC-DIR>EXAMPLES/EXAMPLES.LISP 
+      ;for precise equation
+      (%complete-symm mat1 t)
+      (format t "MAT1 after copying lower half to upper: ~%~%")
+      ;Print MAT1 after COMPLETE-SYMM
+      (print-mat mat1 :float))
+  ;Create double float matrix data
+  (with-object ((data2 (alloc :float '(1f0 2f0 3f0 4f0 5f0 
+				       6f0 7f0 8f0 9f0))))
+      ;Create double float matrix data for MAT2
+    (with-mat ((mat2 (mat 3 3 +32f+ data2)))
+      (format t "~%Original MAT2: ~%~%")
+      ;Print original MAT2
+      (print-mat mat2 :float)
+      (format t "~%")
+      ;Copy the upper half to the lower
+      (%complete-symm mat2 nil)
+      (format t "MAT2 after copying upper half to lower: ~%~%")
+      ;Print MAT2 after COMPLETE-SYMM
+      (print-mat mat2 :float)
+      (format t "~%")))))
 
 
 
@@ -4055,7 +4081,14 @@ LISP-CV: (MEAN (SRC MAT) &OPTIONAL ((MASK (:POINTER (MAT)) (MAT)))) => SCALAR
         MASK - Optional operation mask.
 
 The function mean calculates the mean value M of array elements, independently for each channel, and 
-returns it. When all the mask elements are 0’s, the function returns (SCALAR-ALL 0) .
+returns it:
+
+See OpenCv documentation at this link for the formula:
+
+http://docs.opencv.org/trunk/modules/core/doc/operations_on_arrays.html?highlight=mean#mean
+
+When all the mask elements are 0’s, the function returns (SCALAR-ALL 0).
+
 
 See also:
 
@@ -4261,8 +4294,7 @@ Calculates the per-element scaled product of two arrays.
 
 C++: void multiply(InputArray src1, InputArray src2, OutputArray dst, double scale=1, int dtype=-1 )
 
-LISP-CV: (MULTIPLY (SRC1 MAT) (SRC2 MAT) (DEST MAT) &OPTIONAL ((SCALE :DOUBLE) 1) 
-         ((DTYPE :INT) -1)) => :VOID
+LISP-CV: (MULTIPLY (SRC1 MAT) (SRC2 MAT) (DEST MAT) &OPTIONAL ((SCALE :DOUBLE) 1) ((DTYPE :INT) -1)) => :VOID
 
 
     Parameters:	
@@ -4296,54 +4328,37 @@ See also:
 
 (defun multiply-example ()
   ;;Allocate int, double float and unsigned char matrix data
-  (let* ((int-data (alloc :int '(1 2 3 4 5 6 7 8 9)))
-	 (double-data (alloc :double '(1d0 2d0 3d0 4d0 5d0 6d0 7d0 8d0 9d0)))
-	 (uchar-data (alloc :uchar '(1 2 3 4 5 6 7 8 9)))
-	 ;;Create 2 identical src matrices and 
-	 ;;1 dest matrix for each data type
-	 (int-mat-1 (mat 3 3 +32s+ int-data))
-         (int-mat-2 (mat 3 3 +32s+ int-data))
-         (dest1 (mat))
-	 (double-mat-1 (mat 3 3 +64f+ double-data))
-         (double-mat-2 (mat 3 3 +64f+ double-data))
-         (dest2 (mat))
-	 (uchar-mat-1 (mat 3 3 +8u+ uchar-data))
-         (uchar-mat-2 (mat 3 3 +8u+ uchar-data))
-         (dest3 (mat)))
-    ;;Multiply int matrix by identical matrix using 
-    ;;a default dtype(destination type) parameter
-    (multiply int-mat-1 int-mat-2 dest1 1d0 -1)
-    ;;Multiply double float matrix by identical matrix using 
-    ;;a dtype parameter of 6(+64F+) or double float type
-    (multiply double-mat-1 double-mat-2 dest2 1d0 6)
-    ;;Multiply uchar matrix by identical matrix using 
-    ;;a default dtype parameter and a scalar, 2d0
-    (multiply uchar-mat-1 uchar-mat-2 dest3 2d0 -1)
-    ;;Print results
-    (format t "~%")
-    (dotimes (i (rows dest1))
-      (dotimes (j (cols dest1))    (loop while (not (= (wait-key 0) 27)))
-	(format t "~a" (at dest1 i j :int))
-	(princ #\Space))
-      (princ #\Newline))
-    (format t "~%~%")
-    (dotimes (i (rows dest2))
-      (dotimes (j (cols dest2))
-	(format t "~a" (at dest2 i j :double))
-	(princ #\Space))
-      (princ #\Newline))
-    (format t "~%~%")
-    (dotimes (i (rows dest3))
-      (dotimes (j (cols dest3))
-	(format t "~a" (at dest3 i j :uchar))
-	(princ #\Space))
-      (princ #\Newline))
-    (format t "~%")
-    ;;Clean up used memory
-    (free int-data)
-    (free double-data)
-    (free uchar-data)))
-
+  (with-object ((int-data (alloc :int '(1 2 3 4 5 6 7 8 9)))
+		(double-data (alloc :double '(1d0 2d0 3d0 4d0 5d0 6d0 7d0 8d0 9d0)))
+		(uchar-data (alloc :uchar '(1 2 3 4 5 6 7 8 9))))
+    ;;Create two identical source matrices and 
+    ;;one destination matrix for each data type
+    (with-mat ((int-mat-1 (mat 3 3 +32s+ int-data))
+	       (int-mat-2 (mat 3 3 +32s+ int-data))
+	       (dest1 (mat))
+	       (double-mat-1 (mat 3 3 +64f+ double-data))
+	       (double-mat-2 (mat 3 3 +64f+ double-data))
+	       (dest2 (mat))
+	       (uchar-mat-1 (mat 3 3 +8u+ uchar-data))
+	       (uchar-mat-2 (mat 3 3 +8u+ uchar-data))
+	       (dest3 (mat)))
+      ;;Multiply int matrix by identical matrix using 
+      ;;a default DTYPE(destination type) parameter
+      (multiply int-mat-1 int-mat-2 dest1 1d0 -1)
+      ;;Multiply double float matrix by identical matrix using 
+      ;;a DTYPE parameter of 6(+64F+) or double float type
+      (multiply double-mat-1 double-mat-2 dest2 1d0 6)
+      ;;Multiply uchar matrix by identical matrix using 
+      ;;a default DTYPE parameter and scalar 2
+      (multiply uchar-mat-1 uchar-mat-2 dest3 2d0 -1)
+      ;;Print results
+      (format t "~%DEST1 =~%~%")
+      (print-mat dest1 :double)
+      (format t "~%~%DEST2 =~%~%")
+      (print-mat dest2 :double)
+      (format t "~%~%DEST3 =~%~%")
+      (print-mat dest3 :double)
+      (format t "~%"))))
 
 
 
@@ -4995,9 +5010,9 @@ There is a nuance illustrated by the following example:
 (defparameter d (uniform rng 0 .999999))
 
 
-
-CORE - DRAWING FUNCTIONS:
-
+=========================================================================================================================================
+CORE - DRAWING FUNCTIONS
+=========================================================================================================================================
 
 
 GET-TEXT-SIZE
@@ -5811,9 +5826,9 @@ See also:
     (free data)))
 
 
-
-IMGPROC - IMAGE FILTERING:
-
+=========================================================================================================================================
+IMGPROC - IMAGE FILTERING
+=========================================================================================================================================
 
 
 
@@ -7195,9 +7210,9 @@ Example 2:
 	    (return))))))))
 
 
-
-IMGPROC - GEOMETRIC IMAGE TRANSFORMATIONS:
-
+=========================================================================================================================================
+IMGPROC - GEOMETRIC IMAGE TRANSFORMATIONS
+=========================================================================================================================================
 
 
 REMAP
@@ -7431,7 +7446,9 @@ See also:
 
 
 
+=========================================================================================================================================
 IMGPROC - MISCELLANEOUS IMAGE TRANSFORMATIONS:
+=========================================================================================================================================
 
 
 
@@ -7708,9 +7725,9 @@ See also:
 			 (return)))))))))))))
 
 
-
-IMGPROC - HISTOGRAMS:
-
+=========================================================================================================================================
+IMGPROC - HISTOGRAMS
+=========================================================================================================================================
 
 
 EQUALIZE-HIST
@@ -7782,7 +7799,9 @@ http://docs.opencv.org/modules/imgproc/doc/histograms.html?highlight=equalizeh#e
 
 
 
-IMGPROC - FEATURE DETECTION:
+=========================================================================================================================================
+IMGPROC - FEATURE DETECTION
+=========================================================================================================================================
 
 
 CANNY
@@ -7863,7 +7882,11 @@ See: http://en.wikipedia.org/wiki/Canny_edge_detector
 		 (return)))))))))
 
 
-IMGPROC - OBJECT DETECTION:
+
+=========================================================================================================================================
+IMGPROC - OBJECT DETECTION
+=========================================================================================================================================
+
 
 
 MATCH-TEMPLATE:
@@ -8209,7 +8232,9 @@ Example 2:
 
 
 
-HIGHGUI - READING AND WRITING IMAGES AND VIDEO:
+=========================================================================================================================================
+HIGHGUI - READING AND WRITING IMAGES AND VIDEO
+=========================================================================================================================================
 
 
 
@@ -8930,7 +8955,9 @@ Parameters:
 
 
 
+=========================================================================================================================================
 HIGHGUI - USER INTERFACE
+=========================================================================================================================================
 
 
 
@@ -9514,7 +9541,9 @@ f there are several HighGUI windows, any of them can be active.
 
 
 
+=========================================================================================================================================
 HIGHGUI - QT NEW FUNCTIONS
+=========================================================================================================================================
 
 
 
@@ -9702,6 +9731,14 @@ FEATURES2D - FEATURE DETECTION AND DESCRIPTION
 
 
 
+
+
+
+
+
+
+
+
 BRISK
 
 The BRISK constructor
@@ -9730,8 +9767,8 @@ http://docs.opencv.org/modules/features2d/doc/feature_detection_and_description.
    will get deleted though, within 30 seconds. It's best to 
    start this program with a good amount of available RAM.
 
-   Don't let this example make you nervous it's basically 12 
-   FEAT-DETECTOR-CREATE-EXAMPLE's stacked, in one. Here I am 
+   Don't let this example make you nervous, it is basically 
+   12 FEATURE-DETECTOR-CREATE-EXAMPLE's stacked, in one. I'm
    basically just showing, in a quick easy to see fashion, h-
    ow the THRESH, OUTPUT and PATTERN-SCALE parameters of the 
    function BRISK affect it's output. Each of the 12 windows 
@@ -9831,13 +9868,13 @@ http://docs.opencv.org/modules/features2d/doc/feature_detection_and_description.
       (setf (aref all-matches-arr i) (gc:mat))
       ;; find matches, between the two images, 12 times,
       ;; each using a different set of BRISK parameters
-      (feat-detector-create (aref brisk-arr i) "BRISK")
+      (feature-detector-create (aref brisk-arr i) "BRISK")
       ;; detect keypoints in the image GRAY-A
-      (feat-detector-detect (aref brisk-arr i) gray-a (aref keypoints-a-arr i))
+      (feature-detector-detect (aref brisk-arr i) gray-a (aref keypoints-a-arr i))
       ;; Compute the descriptors for a set of keypoints detected in GRAY-A
       (feat-2d-compute (aref brisk-arr i) gray-a (aref keypoints-a-arr i) (aref descriptors-a-arr i))
       ;; detect keypoints in the image GRAY-B
-      (feat-detector-detect (aref brisk-arr i) gray-b (aref keypoints-b-arr i))
+      (feature-detector-detect (aref brisk-arr i) gray-b (aref keypoints-b-arr i))
       ;; compute the descriptors for a set of keypoints detected in GRAY-B
       (feat-2d-compute (aref brisk-arr i) gray-b (aref keypoints-b-arr i) (aref descriptors-b-arr i))
       ;; find the best match for each descriptor
@@ -9863,13 +9900,13 @@ FEATURES2D - COMMON INTERFACES OF FEATURE DETECTORS
 
 
 
-FEAT-DETECTOR-CREATE
+FEATURE-DETECTOR-CREATE
 
 Creates a feature detector by its name.
 
 C++: Ptr<FeatureDetector> FeatureDetector::create(const string& detectorType)
 
-LISP-CV: (FEAT-DETECTOR-CREATE (SELF FEATURE-2D) (DETECTOR-TYPE :STRING)) => FEATURE-2D 
+LISP-CV: (FEATURE-DETECTOR-CREATE (SELF FEATURE-2D) (DETECTOR-TYPE :STRING)) => FEATURE-2D 
 
 
     Parameters:	
@@ -9903,7 +9940,7 @@ Also a combined format is supported: feature detector adapter name:
 
 
 
-(defun feat-detector-create-example (filename-1 filename-2) 
+(defun feature-detector-create-example (filename-1 filename-2) 
 
   "Try using the box.png and the box_in_scene.png from
    the LISP-CV-MASTER/IMAGES directory to get a better 
@@ -9914,7 +9951,7 @@ Also a combined format is supported: feature detector adapter name:
   (let* ((thresh 60)
 	 (octaves 4)
 	 (pattern-scale 2.0f0)
-	 (window-name "All Matches - FEAT-DETECTOR-CREATE Example"))
+	 (window-name "All Matches - FEATURE-DETECTOR-CREATE Example"))
     ;; read some images in grayscale -> The object you want to track
     (with-mat ((gray-a (imread filename-1 +load-image-grayscale+))
 	       ;; The image the object is a part of
@@ -9923,7 +9960,7 @@ Also a combined format is supported: feature detector adapter name:
 	       (descriptors-b (mat))
 	       (all-matches (mat)))
       (if (empty (or gray-a gray-b)) 
-	  (return-from feat-detector-create-example 
+	  (return-from feature-detector-create-example 
 	    (format t "Both images were not loaded")))
       (with-vector-key-point ((keypoints-a (vec-key-point))
 			      (keypoints-b (vec-key-point)))
@@ -9933,13 +9970,13 @@ Also a combined format is supported: feature detector adapter name:
 			  (matcher (bf-matcher)))
 	  (with-vector-dmatch ((matches (vec-dmatch)))
 	    ;; create a feature detector
-	    (feat-detector-create briskd "STAR")
+	    (feature-detector-create briskd "STAR")
 	    ;; detect keypoints in the image GRAY-A
-	    (feat-detector-detect briskd gray-a keypoints-a)
+	    (feature-detector-detect briskd gray-a keypoints-a)
 	    ;; Compute the descriptors for a set of keypoints detected in GRAY-A
 	    (feat-2d-compute briskd gray-a keypoints-a descriptors-a)
 	    ;; detect keypoints in the image GRAY-B
-	    (feat-detector-detect briskd gray-b keypoints-b)
+	    (feature-detector-detect briskd gray-b keypoints-b)
 	    ;; Compute the descriptors for a set of keypoints detected in GRAY-B
 	    (feat-2d-compute briskd gray-b keypoints-b descriptors-b)
 	    ;; find the best match for each descriptor
@@ -9961,13 +9998,13 @@ Also a combined format is supported: feature detector adapter name:
 
 
 
-FEAT-DETECTOR-DETECT
+FEATURE-DETECTOR-DETECT
 
 Detects keypoints in an image.
 
 C++: void FeatureDetector::detect(InputArray image, vector<KeyPoint>& keypoints, InputArray mask=noArray() ) const
 
-LISP-CV: (FEATURE-DETECTOR-DETECT (self FEATURE-2D) (image MAT) (keypoints key-point) &optional ((mask mat) (mat) given-mask)) => :void
+LISP-CV: (FEATURE-DETECTOR-DETECT (SELF FEATURE-2D) (IMAGE MAT) (KEYPOINTS KEY-POINT) &OPTIONAL ((MASK MAT) (MAT) GIVEN-MASK)) => :VOID
 
     Parameters:	
 
@@ -9982,7 +10019,7 @@ LISP-CV: (FEATURE-DETECTOR-DETECT (self FEATURE-2D) (image MAT) (keypoints key-p
 
 
 
-(defun feat-detector-detect-example (&optional 
+(defun feature-detector-detect-example (&optional 
 				       (cam *camera-index*) 
 				       (width *default-width*)
 				       (height *default-height*))
@@ -10006,7 +10043,7 @@ LISP-CV: (FEATURE-DETECTOR-DETECT (self FEATURE-2D) (image MAT) (keypoints key-p
 	     (matches (gc:vec-dmatch))
              ;;Output matrix
 	     (img-matches (gc:mat))
-	     (window-name "Image Matches - FEAT-DETECTOR-DETECT Example"))
+	     (window-name "Image Matches - FEATURE-DETECTOR-DETECT Example"))
         ;;Create fullscreen window
 	(with-named-window (window-name +window-normal+)
 	  ;;Set window to fullscreen
@@ -10019,7 +10056,7 @@ LISP-CV: (FEATURE-DETECTOR-DETECT (self FEATURE-2D) (image MAT) (keypoints key-p
 	  (create-trackbar "TEMPLATE-HEIGHT" window-name template-height height) 
           (create-trackbar "TEMPLATE-WIDTH" window-name template-width width)
           ;;Trackbar to set the hessian keypoint detector threshold
-	  (create-trackbar "MIN-HESSIAN" window-name min-hessian 1000) 
+	  (create-trackbar "MIN-HESSIAN" window-name min-hessian 100000) 
 	  (loop ;;Were using the camera feed as the image here and a
 	        ;;region of interest of the feed as the template
 	     (with-mat ((frame (mat)))
@@ -10052,9 +10089,9 @@ LISP-CV: (FEATURE-DETECTOR-DETECT (self FEATURE-2D) (image MAT) (keypoints key-p
 							     'double-float)))
                                      (extractor (gc:surf)))
 		     ;;-- Step 1: Detect keypoints in the image 
-                     ;;-- and template using FEAT-DETECTOR-DETECT
-		     (feat-detector-detect detector template keypoints-1)
-		     (feat-detector-detect detector frame keypoints-2)
+                     ;;-- and template using FEATURE-DETECTOR-DETECT
+		     (feature-detector-detect detector template keypoints-1)
+		     (feature-detector-detect detector frame keypoints-2)
 		     ;;-- Step 2: Calculate descriptors(feature vectors) 
                      ;;-- using the keypoints detected in the last step
 		     (feat-2d-compute extractor template keypoints-1 descriptors-1)
@@ -10068,6 +10105,165 @@ LISP-CV: (FEATURE-DETECTOR-DETECT (self FEATURE-2D) (image MAT) (keypoints key-p
 	       (let ((c (wait-key 33)))
 		 (when (= c 27)
 		   (return))))))))))
+
+
+=========================================================================================================================================
+FEATURES2D - DRAWING FUNCTION OF KEYPOINTS AND MATCHES
+=========================================================================================================================================
+
+
+
+DRAW-MATCHES
+
+Draws the found matches of keypoints from two images.
+
+C++: void drawMatches(const Mat& img1, const vector<KeyPoint>& keypoints1, const Mat& img2, const vector<KeyPoint>& keypoints2, 
+                      const vector<DMatch>& matches1to2, Mat& outImg, const Scalar& matchColor=Scalar::all(-1), 
+                      const Scalar& singlePointColor=Scalar::all(-1), const vector<char>& matchesMask=vector<char>(), 
+                      int flags=DrawMatchesFlags::DEFAULT )
+
+LISP-CV: (DRAW-MATCHES (IMG1 MAT) (KEYPOINTS1 KEYPOINT) (IMG2 MAT) (KEYPOINTS2 KEYPOINT) (MATCHES1TO2 VECTOR-DMATCH) 
+                       (OUT-IMG MAT) (MATCH-COLOR SCALAR) (SINGLE-POINT-COLOR SCALAR) &OPTIONAL ((MATCHES-MASK VECTOR-CHAR) 
+                       (VEC-CHAR)) ((FLAGS :INT) +DEFAULT+)) => :VOID
+
+
+    Parameters:	
+
+        IMG1 - First source image.
+
+        KEYPOINTS1 - Keypoints from the first source image.
+
+        IMG2 - Second source image.
+
+        KEYPOINTS2 - Keypoints from the second source image.
+
+        MATCHES1TO2 - Matches from the first image to the second one, which means that (KEYPOINTS1 I)
+                      has a corresponding point in (KEYPOINTS2 (MATCHES I)).
+
+        OUT-IMG - Output image. Its content depends on the flags value defining what is drawn in the 
+                  output image. See possible flags bit values below.
+
+        MATCH-COLOR - Color of matches (lines and connected keypoints). If (EQ MATCH-COLOR (SCALAR-ALL -1)) 
+                      the color is generated randomly.
+
+        SINGLE-POINT-COLOR - Color of single keypoints (circles), which means that keypoints do not 
+                             have the matches. If (EQ SINGLE-POINT-COLOR (SCALAR-ALL -1)) , the color 
+                             is generated randomly.
+
+        MATCHES-MASK - Mask determining which matches are drawn. If the mask is empty, all matches are drawn.
+
+        FLAGS - Flags setting drawing features. Possible flags bit values are defined below.
+
+This function draws matches of keypoints from two images in the output image. Match is a line connecting 
+two keypoints (circles). The FLAGS parameters are defined as follows:
+
+        +DEFAULT+ = 0 - Output image matrix will be created (MAT-CREATE), i.e. existing memory of 
+                        output image may be reused. Two source images, matches, and single keypoints 
+                        will be drawn. For each keypoint, only the center point will be drawn (without 
+                        a circle around the keypoint with the keypoint size and orientation).
+
+        +DRAW-OVER-OUTIMG+ = 1 - Output image matrix will not be created (using MAT-CREATE). Matches 
+                                 will be drawn on existing content of output image.
+
+        +NOT-DRAW-SINGLE-POINTS = 2 - Single keypoints will not be drawn.
+
+        +DRAW-RICH-KEYPOINTS+ = 4 - For each keypoint, the circle around keypoint with keypoint siz-
+                                    e and orientation wilL be drawn.
+
+
+
+(defun draw-matches-example (filename-1 filename-2) 
+
+  "I use this example to show examples of the parameters of DRAW-MATCHES.
+   See the documentation in EXAMPLES.LISP for more details on these para-
+   meters. Each window is labeled, first, with the color used to define g-
+   ood matches between images, the MATCH-COLOR parameter. Secondly the co-
+   lor used to mark empty keypoints or non-matches, the SINGLE-POINT-COLOR 
+   parameter. Finally, each window is labeled with the name of the flag u-
+   sed to set  drawing features for that particular window, for example:
+ 
+      * RED * WHITE * +NOT-DRAW-SINGLE-POINTS+ *
+    
+    Try using the box.png and box_in_scene.png images located inside the
+    LISP-CV-MASTER/IMAGES directory to get a clearer understanding of th-
+    is example the first time you run it."
+
+  (let ((window-name-1 "RANDOM * RANDOM * +DEFAULT+")
+	(window-name-2 "BLACK * WHITE * +DRAW-RICH-KEYPOINTS+")
+	(window-name-3 "RED * WHITE * +NOT-DRAW-SINGLE-POINTS+")
+	(window-name-4 "WHITE * RANDOM * +DRAW-RICH-KEYPOINTS+")
+	;; Set brisk parameters
+	(thresh 60)
+	(octaves 4)
+	(pattern-scale 2.0f0))
+    (with-named-window (window-name-1 +window-normal+)
+      (with-named-window (window-name-2 +window-normal+)
+	(with-named-window (window-name-3 +window-normal+)
+	  (with-named-window (window-name-4 +window-normal+)
+	    (move-window window-name-1 485 98)
+	    (move-window window-name-2 894 98)
+	    (move-window window-name-3 485 444)
+	    (move-window window-name-4 894 444)
+	    ;; declare feature detector
+	    (with-feature-2d ((briskd (brisk thresh octaves pattern-scale))
+			      ;; declare matcher
+			      (matcher (bf-matcher)))
+	      ;; the object you want to track 
+	      (with-mat ((object (imread filename-1 +load-image-grayscale+))
+			 ;; the image the object is a part of
+			 (image (imread filename-2 +load-image-grayscale+))
+			 ;; matrices used to hold the descriptors
+			 (descriptors-a (mat))
+			 (descriptors-b (mat))) 
+		;; vectors used to hold the keypoints
+		(with-vector-key-point ((keypoints-a (vec-key-point))
+					(keypoints-b (vec-key-point)))
+		  (with-vector-dmatch ((matches (vec-dmatch)))
+
+		    (if (empty (or object image)) 
+			(return-from draw-matches-example 
+			  (format t "Both images were not loaded")))
+
+		    ;; create a feature detector
+		    (feature-detector-create briskd "SimpleBlob")
+		    ;; detect keypoints in OBJECT
+		    (feature-detector-detect briskd object keypoints-a)
+		    ;; Compute the descriptors for a set of keypoints detected in object
+		    (feat-2d-compute briskd object keypoints-a descriptors-a)
+		    ;; detect keypoints in IMAGE
+		    (feature-detector-detect briskd image keypoints-b)
+		    ;; Compute the descriptors for a set of keypoints detected in IMAGE
+		    (feat-2d-compute briskd image keypoints-b descriptors-b)
+		    ;; find the best match for each descriptor
+		    (descrip-matcher-match matcher descriptors-a descriptors-b matches)
+		    ;; draw the found matches and show in a window 
+                    ;; four times, each with different parameters
+		    ;; output matrix
+		    (with-mat ((all-matches (mat)))
+		      (draw-matches object keypoints-a image keypoints-b matches all-matches 
+				    (gc:scalar-all -1) (gc:scalar-all -1) (gc:vec-char) 
+				    +default+)
+		      (imshow window-name-1 all-matches))
+		    (with-mat ((all-matches (mat)))
+		      (draw-matches object keypoints-a image keypoints-b matches all-matches 
+				    (gc:scalar 0 0 0) (gc:scalar 255 255 255) (gc:vec-char) 
+				    +draw-rich-keypoints+)
+		      (imshow window-name-2 all-matches))
+		    (with-mat ((all-matches (mat)))
+		      (draw-matches object keypoints-a image keypoints-b matches all-matches 
+				    (gc:scalar 0 0 255) (gc:scalar 255 255 2555) (gc:vec-char) 
+				    +not-draw-single-points+)
+		      (imshow window-name-3 all-matches))
+		    (with-mat ((all-matches (mat)))
+		      (draw-matches object keypoints-a image keypoints-b matches all-matches 
+				    (gc:scalar-all 255) (gc:scalar-all -1) (gc:vec-char) 
+				    +draw-rich-keypoints+)
+		      (imshow window-name-4 all-matches))
+		    (loop
+		       (let ((c (wait-key 33)))
+			 (when (= c 27)
+			   (return))))))))))))))
+
 
 
 
@@ -10112,7 +10308,9 @@ See BRISK-EXAMPLE
 
 
 
-OBJDETECT - CASCADE CLASSIFICATION:
+=========================================================================================================================================
+OBJDETECT - CASCADE CLASSIFICATION
+=========================================================================================================================================
 
 
 
@@ -10391,7 +10589,9 @@ This function is parallelized with the TBB library.
 
 
 
+=========================================================================================================================================
 ML - NORMAL BAYES CLASSIFIER
+=========================================================================================================================================
 
 
 
@@ -10709,7 +10909,9 @@ See NORMAL-BAYES-CLASSIFIER-EXAMPLE in this file.
 
 
 
+=========================================================================================================================================
 ML - K-NEAREST NEIGHBORS
+=========================================================================================================================================
 
 
 
@@ -11076,12 +11278,15 @@ See the K-NEAREST-EXAMPLE in this library
 
 
 
+=========================================================================================================================================
 ML - DECISION TREES
+=========================================================================================================================================
+
 
 
 D-TREE
 
-A constructor.
+A D-TREE object constructor.
 
 
 C++: CvDTree::CvDTree()
@@ -11575,8 +11780,10 @@ See D-TREE-EXAMPLE in this file.
 
 
 
-
+=========================================================================================================================================
 ML - NEURAL NETWORKS
+=========================================================================================================================================
+
 
 
 ANN-MLP
@@ -11987,7 +12194,10 @@ See ANN-MLP-EXAMPLE in this file.
 
 
 
+=========================================================================================================================================
 PHOTO - INPAINTING
+=========================================================================================================================================
+
 
 
 IN-PAINT
@@ -12104,7 +12314,11 @@ Example:
 		 (return)))))))))
 
 
+
+=========================================================================================================================================
 PHOTO - DECOLORIZATION
+=========================================================================================================================================
+
 
 
 DECOLOR
@@ -12155,7 +12369,9 @@ This function is to be applied on color images.
 
 
 
+=========================================================================================================================================
 PHOTO - SEAMLESS CLONING
+=========================================================================================================================================
 
 
 
@@ -12487,7 +12703,9 @@ color of the destination image.
 
 
 
+=========================================================================================================================================
 PHOTO - NON-PHOTOREALISTIC RENDERING
+=========================================================================================================================================
 
 
 
@@ -12728,8 +12946,8 @@ LISP-CV: (SURF (HESSIAN-THRESHOLD :DOUBLE) &OPTIONAL ((N-OCTAVES :INT) 4)
     (with-named-window (window-name +window-normal+)
       (move-window window-name 759 175)
       ;;-- Step 1: Detect the keypoints using SURF Detector
-      (feat-detector-detect detector img-1 keypoints-1)
-      (feat-detector-detect detector img-2 keypoints-2)
+      (feature-detector-detect detector img-1 keypoints-1)
+      (feature-detector-detect detector img-2 keypoints-2)
       ;;-- Step 2: Calculate descriptors (feature vectors)
       (feat-2d-compute extractor img-1 keypoints-1 descriptors-1)
       (feat-2d-compute extractor img-2 keypoints-2 descriptors-2)
@@ -12746,7 +12964,9 @@ LISP-CV: (SURF (HESSIAN-THRESHOLD :DOUBLE) &OPTIONAL ((N-OCTAVES :INT) 4)
 
 
 
+=========================================================================================================================================
 CONTRIB - COLORMAPS IN OPENCV
+=========================================================================================================================================
 
 
 
@@ -14280,478 +14500,9 @@ before passing to SCALE.
 
 
 
-DRAW-MATCHES
-
-Draws the found matches of keypoints from two images.
-
-C++: void drawMatches(const Mat& img1, const vector<KeyPoint>& keypoints1, const Mat& img2, const vector<KeyPoint>& keypoints2, const vector<DMatch>& matches1to2, Mat& outImg, const Scalar& matchColor=Scalar::all(-1), const Scalar& singlePointColor=Scalar::all(-1), const vector<char>& matchesMask=vector<char>(), int flags=DrawMatchesFlags::DEFAULT )
-
-LISP-CV: (DRAW-MATCHES (IMG1 MAT) (KEYPOINTS1 KEYPOINT) (IMG2 MAT) (KEYPOINTS2 KEYPOINT) (MATCHES1TO2 VECTOR-DMATCH) (OUTIMG MAT) (MATCH-COLOR SCALAR) (SINGLE-POINT-COLOR SCALAR) &OPTIONAL ((MATCHES-MASK VECTOR-CHAR) (VEC-CHAR)) ((FLAGS :INT) +DEFAULT+))
--
-C++: void drawMatches(const Mat& img1, const vector<KeyPoint>& keypoints1, const Mat& img2, const vector<KeyPoint>& keypoints2, const vector<vector<DMatch>>& matches1to2, Mat& outImg, const Scalar& matchColor=Scalar::all(-1), const Scalar& singlePointColor=Scalar::all(-1), const vector<vector<char>>& matchesMask=vector<vector<char> >(), int flags=DrawMatchesFlags::DEFAULT )
-
-    Parameters:	
-
-        IMG1 - First source image.
-
-        KEYPOINTS1 - Keypoints from the first source image.
-
-        IMG2 - Second source image.
-
-        KEYPOINTS2 - Keypoints from the second source image.
-
-        MATCHES1TO2 - Matches from the first image to the second one, which means that (KEYPOINTS1 I)
-                      has a corresponding point in (KEYPOINTS2 (MATCHES I)).
-
-        OUT-IMG - Output image. Its content depends on the flags value defining what is drawn in the 
-                  output image. See possible flags bit values below.
-
-        MATCH-COLOR - Color of matches (lines and connected keypoints). If (EQ MATCH-COLOR (SCALAR-ALL -1)) 
-                      the color is generated randomly.
-
-        SINGLE-POINT-COLOR - Color of single keypoints (circles), which means that keypoints do not 
-                             have the matches. If (EQ SINGLE-POINT-COLOR (SCALAR-ALL -1)) , the color 
-                             is generated randomly.
-
-        MATCHES-MASK - Mask determining which matches are drawn. If the mask is empty, all matches are drawn.
-
-        FLAGS - Flags setting drawing features. Possible flags bit values are defined below.
-
-This function draws matches of keypoints from two images in the output image. Match is a line connecting 
-two keypoints (circles). The FLAGS parameters are defined as follows:
-
-        +DEFAULT+ = 0 - Output image matrix will be created (MAT-CREATE), i.e. existing memory of 
-                        output image may be reused. Two source images, matches, and single keypoints 
-                        will be drawn. For each keypoint, only the center point will be drawn (without 
-                        a circle around the keypoint with the keypoint size and orientation).
-
-        +DRAW-OVER-OUTIMG+ = 1 - Output image matrix will not be created (using MAT-CREATE). Matches 
-                                 will be drawn on existing content of output image.
-
-        +NOT-DRAW-SINGLE-POINTS = 2 - Single keypoints will not be drawn.
-
-        +DRAW-RICH-KEYPOINTS+ = 4 - For each keypoint, the circle around keypoint with keypoint siz-
-                                    e and orientation wilL be drawn.
-
-
-
-(defun draw-matches-example (filename-1 filename-2) 
-
-  "I use this example to show examples of the parameters of DRAW-MATCHES.
-   See the documentation in EXAMPLES.LISP for more details on these para-
-   meters. Each window is labeled, first, with the color used to define g-
-   ood matches between images, the MATCH-COLOR parameter. Secondly the co-
-   lor used to mark empty keypoints or non-matches, the SINGLE-POINT-COLOR 
-   parameter. Finally, each window is labeled with the name of the flag u-
-   sed to set  drawing features for that particular window, for example:
- 
-      RED * WHITE * +NOT-DRAW-SINGLE-POINTS+
-    
-    Try using the box.png and box_in_scene.png images located inside the
-    LISP-CV-MASTER/IMAGES directory to get a clearer understanding of th-
-    is example the first time you run it."
-
-  ;; the object you want to track 
-  (let* ((object (imread filename-1 +load-image-grayscale+))
-	 ;; the image the object is a part of
-	 (image (imread filename-2 +load-image-grayscale+)) 
-	 (keypoints-a (vec-key-point))
-	 (keypoints-b (vec-key-point))
-	 (descriptors-a (mat))
-	 (descriptors-b (mat))
-         ;; Set brisk parameters
-	 (thresh 60)
-	 (octaves 4)
-	 (pattern-scale 2.0f0)
-         ;; declare feature detector
-	 (briskd (brisk thresh octaves pattern-scale))
-         ;; declare matcher
-	 (matcher (bf-matcher))
-	 (matches (vec-dmatch))
-	 (all-matches (mat))
-	 (window-name-1 "RANDOM * RANDOM * +DEFAULT+")
-	 (window-name-2 "BLACK * WHITE * +DRAW-RICH-KEYPOINTS+")
-	 (window-name-3 "RED * WHITE * +NOT-DRAW-SINGLE-POINTS+")
-	 (window-name-4 "WHITE * RANDOM * +DRAW-RICH-KEYPOINTS+"))
-    (if (empty (or object image)) 
-	(return-from draw-matches-example 
-	  (format t "Both images were not loaded")))
-    (named-window window-name-1 +window-normal+)
-    (named-window window-name-2 +window-normal+)
-    (named-window window-name-3 +window-normal+)
-    (named-window window-name-4 +window-normal+)
-    (move-window window-name-1 485 98)
-    (move-window window-name-2 894 98)
-    (move-window window-name-3 485 444)
-    (move-window window-name-4 894 444)
-    ;; create a feature detector
-    (feat-detector-create briskd "SimpleBlob")
-    ;; detect keypoints in OBJECT
-    (feat-detector-detect briskd object keypoints-a)
-    ;; Compute the descriptors for a set of keypoints detected in object
-    (feat-2d-compute briskd object keypoints-a descriptors-a)
-    ;; detect keypoints in IMAGE
-    (feat-detector-detect briskd image keypoints-b)
-    ;; Compute the descriptors for a set of keypoints detected in IMAGE
-    (feat-2d-compute briskd image keypoints-b descriptors-b)
-    ;; find the best match for each descriptor
-    (descrip-matcher-match matcher descriptors-a descriptors-b matches)
-    ;; draw the found matches
-    (draw-matches object keypoints-a image keypoints-b matches all-matches 
-		  (scalar-all -1) (scalar-all -1) (vec-char) 
-		  +default+)
-    ;; show the matches in a window 
-    (imshow window-name-1 all-matches)
-    ;; draw the found matches
-    (draw-matches object keypoints-a image keypoints-b matches all-matches 
-		  (scalar 0 0 0) (scalar 255 255 255) (vec-char) 
-		  +draw-rich-keypoints+)
-    ;; show the matches in a window 
-    (imshow window-name-2 all-matches)
-    ;; draw the found matches
-    (draw-matches object keypoints-a image keypoints-b matches all-matches 
-		  (scalar 0 0 255) (scalar 255 255 2555) (vec-char) 
-		  +not-draw-single-points+)
-    ;; show the matches in a window 
-    (imshow window-name-3 all-matches)
-    ;; draw the found matches
-    (draw-matches object keypoints-a image keypoints-b matches all-matches 
-		  (scalar-all 255) (scalar-all -1) (vec-char) 
-		  +draw-rich-keypoints+)
-    ;; show the matches in a window 
-    (imshow window-name-4 all-matches)
-    (del-mat object)
-    (del-mat image)
-    (del-vec-kp keypoints-a)
-    (del-vec-kp keypoints-b)
-    (del-mat descriptors-a)
-    (del-mat descriptors-b)
-    (del-feature-2d briskd)
-    (del-feature-2d matcher)
-    (del-vec-dm matches)
-    (del-mat all-matches)
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name-1)
-    (destroy-window window-name-2)
-    (destroy-window window-name-3)
-    (destroy-window window-name-4)))
-
-
-
-
-VECTOR
-
-Bindings for the C++ VECTOR class.
-
-C++: template < class T, class Alloc = allocator<T> > class vector; // generic template
-
-LISP-CV: See description.
-
-
-    Parameters:	
-
-       See description.
-
-
-The bindings for the C++ vector class, so far, are:
-
-
-LISP-CV:         
-             
------------------------        
-VEC-CHAR -> vector<char>
-
-VEC-DMATCH -> vector<DMatch>      
-
-VEC-DOUBLE -> vector<double> 
-
-VEC-FLOAT -> vector<float>
-
-VEC-INT -> vector<int>
-
-VEC-KEY-POINT -> vector<KeyPoint>
-
-VEC-POINT -> vector<Point>
-
-VEC-POINT-2F -> vector<Point2f>
-
-VEC-RECT -> vector<Rect>
-
-VEC-UCHAR -> vector<uchar>
--------------------------
-
-
-
-Description:
-
-
-
-Vectors with numbers as elements, VEC-CHAR, VEC-DOUBLE, VEC-FLOAT and VEC-INT VEC-UCHAR operate as 
-follows:(I use VEC-FLOAT as an example of the 5 aforementioned vector types). 
-
-The idea behind the vector macros in Lisp-CV is you use them primarily to pass data to and from the 
-underlying OpenCV code only. The reason being, due to the nature of wrapping the C++ vector class in 
-Lisp, some of the C++ speed is lost. Since Lisp vectors are extremely fast, the best workaround is to 
-use Lisp's own vector and list processing functions to fill in the gaps. The functions are designed so 
-first you would create, for instance, a Lisp vector or a list of floats e.g.
-
-
-CV> (DEFPARAMETER A '(1F0 2F0 3F0))
-
-A
-
-CV> A
-
-(1.0 2.0 3.0)
-
-
-CV> (DEFPARAMETER A (LIST 1F0 2F0 3F0))
-
-A
-
-CV> A
-
-(1.0 2.0 3.0)
-
-
-CV> (DEFPARAMETER A (VECTOR 1F0 2F0 3F0))
-
-A
-
-CV> A
-
-#(1.0 2.0 3.0)
-
-
-Next, and this is where it gets fun, you can use any of the myriad of functions in Lisp designed 
-to operate on lists and vectors and then pass the results to the underlying OpenCV code by way of 
-the Lisp-CV vector functions. Since Lisp's main strength is list processing, hence it's name, this 
-is a great feature and adds a lot of power to OpenCV and a lot of speed to the Lisp-CV bindings. 
-
-Now, once you have created your vector as above and performed whatever operations you needed to on 
-it, you can convert that vector to a C++ vector as so:
-
-
-CV> (DEFPARAMETER B (VEC-FLOAT A))
-
-B
-
-CV> B
-
-
-#<STD-VECTOR-FLOAT {1006BA6983}> <--- A CLOS object, STD-VECTOR-FLOAT type, pointing to a vector<float>
-
-
-That's all there is to it. Now it can be passed to any Lisp-CV binding for OpenCV or C++ that will 
-accept it.
-
-
-Now, if an OpenCV or C++ binding in this library outputs a STD-VECTOR-FLOAT(vector<float>) type object
-(again, using vector<float> as an example of all number based C++ vector types). You can convert that 
-back to a Lisp list or a Lisp vector like so:(variable B being a #<STD-VECTOR-FLOAT {1006BA6983}>:)
-
-CV> (VEC-FLOAT :TO-LISP-LIST B)
-
-(1.0 2.0 3.0)
-
-
-CV> (VEC-FLOAT :TO-LISP-VEC B)
-
-#(1.0 2.0 3.0)
-
-
-and then complete any necessary operations on the data.
-
-
-The ability to retrieve the length of a C++ vector is built into the Lisp-CV vector functions, it is 
-quite fast as well. You just evaluate as follows(using variable B from above):
-
-
-CV> (VEC-FLOAT :LENGTH B)
-
-3  <--- Vector B length
-
-
-If you would like to created an unititialized pointer to a vector<float> to pass to a function, you 
-evaluate:
-
-
-CV> (VEC-FLOAT)
-
-
-#<STD-VECTOR-FLOAT {100352FEA3}> <--- Output is an object pointing to an uninitialized vector<float>.
-
-
-
-If you would like to created an initialized C++ vector to pass to a function, you evaluate either of 
-the below:
-
-
-
-CV> (VEC-FLOAT '(1f0 2f0 3f0)) 
-
-
-CV> (VEC-FLOAT (LIST 1f0 2f0 3f0)) 
-
-
-CV> (VEC-FLOAT (VECTOR 1f0 2f0 3f0))  
-
-
-#<STD-VECTOR-FLOAT {100352FEA3}> <--- Output is a CLOS object pointing to an initialized vector<float>.
-
-
-
-Again these functions are a little bit slow for extremely large operations. However, if you assign 
-the vector to a variable first like this:
-
-
-CV> (DEFPARAMETER A (VECTOR 1F0 2F0 3F0 4F0 5F0))
-
-A
-
-
-CV> (VEC-FLOAT A)  <--- this only takes about 0.699 seconds for a million iterations
-
-
-
-The functionality to retrieve data from an initialized vector is built into the vector functions. So 
-to retrieve data from a vector you evaluate as follows(vector elements are zero-based):
-
-
-CV> (DEFPARAMETER A (VEC-FLOAT '(1F0 2F0 3F0)))
-
-A
-
-CV> (VEC-FLOAT A)  <--- Access the 0th element of A.
-
-1.0
-
-CV> (VEC-FLOAT A 1)   <---Access the 1st element of A.
-
-2.0
-
-CV> (VEC-FLOAT A 2)  <---Access the 2nd element of A.
-
-3.0
-
-
-
-Vectors with objects as their elements, VEC-DMATCH, VEC-KEY-POINT, VEC-POINT, VEC-POINT-2F 
-and VEC-RECT operate as follows:(I use VEC-POINT as an example of the four vectors.)
-
-
-If you would like to created an uninitialized vector, you evaluate:
-
-
-CV> (VEC-POINT)
-
-#<STD-VECTOR-POINT {1007B187B3}> <--- Output is a object pointing to an uninitialized POINT vector.
-
-
-If you would like to created an initialized vector, you evaluate:
-
-
-CV> (VEC-POINT (LIST (POINT 1 2) (POINT 3 4)))
-
-#<STD-VECTOR-POINT {1002DBE013}> <--- Output is a object pointing to an initialized POINT vector.
-
-
-Again, you'll get the most efficiency if you, first, assign the list or vector to a variable.
-
-
-The functionality to retrieve data from an initialized vector of objects is built into the vector 
-function. You just evaluate as follows(vector elements are zero-based):
-
-
-CV> (DEFPARAMETER A (VEC-POINT (LIST (POINT 1 2) (POINT 3 4)))) <--- Create an initialized vector A.
-
-A 
-
-
-CV> (VEC-POINT A 0)  <--- Access the 0th POINT in vector A
-
-#<CV-POINT {1003D4FA73}> 
-
-
-CV> (VEC-POINT A 1)  <--- Access the 1st POINT in vector A
-
-#<CV-POINT {10042AB633}> 
-
-
-
-CV> (VEC-POINT A 0 0) <--- Access the 0th element of the 0th POINT in vector A.
-
-1
-
-CV> (VECT-POINT A 0 1) <--- Access the 1st element of the 0th POINT in vector A.
-
-2
-
-CV> (VEC-POINT A 1 0) <--- Access the 0th element of the 1st POINT in vector A.
-
-3
-
-CV> (VEC-POINT A 1 1) <--- Access the 1st element of the 1st POINT in vector A.
-
-4
-
-
-And, also, as above, you can convert the POINT vector back to a Lisp list or vector as follows:
-
-
-CV> (VEC-POINT :TO-LISP-LIST A)
-
-
-(#<CV-POINT {1006C49DA3}> #<CV-POINT {1006C49E03}>)  <--- Lisp list
-
-
-CV> (VEC-POINT :TO-LISP-VEC A)
-
-
-#(#<CV-POINT {1006C49DA3}> #<CV-POINT {1006C49E03}>)  <--- Lisp vector
-
-
-And also retrieve the length of the vector:
-
-
-(VEC-POINT :LENGTH A)
-
-2  <--- Vector a length,
-
-
-
-Note: For VEC-DMATCH. When accessing the numerical content of of the objects in a VECTOR-DMATCH, 
-you must supply the type of the element you are attempting to access as the last parameter e.g.
-
-
-CV> (DEFPARAMETER A (VEC-DMATCH (VECTOR (DMATCH 1 2 3F0) (DMATCH 1 2 3F0))))
-
-A
-
-CV> (VEC-DMATCH A 0 0 :INT)
-
-1
-
-CV> (VEC-DMATCH A 0 1 :INT)
-
-2
-
-CV> (VEC-DMATCH A 0 2 :FLOAT)  
-    
-#<SINGLE-FLOAT quiet NaN>                                
-
-CV> (VEC-DMATCH A 0 2 :INT)
-
--1
-
-CV> (VEC-DMATCH A 0 3 :FLOAT)  <--- If a VECTOR-DMATCH contains a 3 element DMATCH, the value you entered 
-                                    as the 3rd parameter will be accessible at the 4th index. 
-3.0
-
-
-
-
+=========================================================================================================================================
 LISP-CV - MACROS AND EXTRA FUNCTIONS:
+=========================================================================================================================================
 
 
 
@@ -14926,15 +14677,25 @@ LISP-CV: (DEL-ANN-MLP-TRAIN-PARAMS (SELF ANN-MLP-TRAIN-PARAMS)) => :VOID
 
 LISP-CV: (DEL-CASC-CLASS (SELF CASCADE-CLASSIFIER)) => :VOID
 
+LISP-CV: (DEL-D-TREE (SELF D-TREE)) => :VOID
+
+LISP-CV: (DEL-D-TREE-PARAMS (SELF D-TREE-PARAMS)) => :VOID
+
 LISP-CV: (DEL-DMATCH (SELF DMATCH)) => :VOID
 
 LISP-CV: (DEL-FEATURE-2D (SELF FEATURE-2D)) => :VOID
+
+LISP-CV: (DEL-HOG-DESCRIPTOR (SELF HOG-DESCRIPTOR)) => :VOID
+
+LISP-CV: (DEL-K-NEAREST (SELF K-NEAREST)) => :VOID
 
 LISP-CV: (DEL-KP (SELF KEY-POINT)) => :VOID
 
 LISP-CV: (DEL-MAT (SELF MAT)) => :VOID
 
 LISP-CV: (DEL-MAT-EXPR (SELF MAT-EXPR)) => :VOID
+
+LISP-CV: (DEL-NORMAL-BAYES-CLASSIFIER (SELF NORMAL-BAYES-CLASSIFIER)) => :VOID
 
 LISP-CV: (DEL-POINT (SELF POINT)) => :VOID
 
@@ -14947,6 +14708,8 @@ LISP-CV: (DEL-POINT-3D (SELF POINT-3D)) => :VOID
 LISP-CV: (DEL-POINT-3F (SELF POINT-3F)) => :VOID
 
 LISP-CV: (DEL-POINT-3I (SELF POINT-3I)) => :VOID
+
+LISP-CV: (DEL-RANGE (SELF RANGE)) => :VOID
 
 LISP-CV: (DEL-RECT (SELF RECT)) => :VOID
 
@@ -14963,6 +14726,8 @@ LISP-CV: (DEL-SIZE2F (SELF SIZE2F)) => :VOID
 LISP-CV: (DEL-STD-STRING (SELF *STRING)) => :VOID
 
 LISP-CV: (DEL-TERM-CRIT (SELF TERM-CRITERIA)) => :VOID
+
+LISP-CV: (DEL-VEC-4I (SELF VEC-4I)) => :VOID
 
 LISP-CV: (DEL-VEC-CHAR (SELF VECTOR-CHAR)) => :VOID
 
@@ -14985,6 +14750,8 @@ LISP-CV: (DEL-VEC-POINT-2F (SELF VECTOR-POINT-2F)) => :VOID
 LISP-CV: (DEL-VEC-RECT (SELF VECTOR-RECT)) => :VOID
 
 LISP-CV: (DEL-VEC-UCHAR (SELF VECTOR-UCHAR)) => :VOID
+
+LISP-CV: (DEL-VEC-VEC-4I (SELF VECTOR-VEC-4I)) => :VOID
 
 LISP-CV: (DEL-VID-CAP (SELF VIDEO-CAPTURE)) => :VOID
 
@@ -15016,15 +14783,25 @@ The function DEL-ANN-MLP-TRAIN-PARAMS deletes a ANN-MLP-TRAIN-PARAMS object.
 
 The function DEL-CASC-CLASS deletes a CASCADE-CLASSIFIER object.
 
+The function DEL-D-TREE deletes a D-TREE object.
+
+The function DEL-D-TREE-PARAMS deletes a D-TREE-PARAMS object.
+
 The function DEL-DMATCH deletes a DMATCH object.
 
 The function DEL-FEATURE-2D deletes a FEATURE-2D object.
+
+The function DEL-HOG-DESCRIPTOR deletes a HOG-DESCRIPTOR object.
+
+The function DEL-K-NEAREST deletes a K-NEAREST object.
 
 The function DEL-KP deletes a KEY-POINT object.
 
 The function DEL-MAT deletes a MAT object.
 
 The function DEL-MAT-EXPR deletes a MAT-EXPR object.
+
+The function DEL-NORMAL-BAYES-CLASSIFIER deletes a NORMAL-BAYES-CLASSIFIER object.
 
 The function DEL-POINT deletes a POINT object.
 
@@ -15037,6 +14814,8 @@ The function DEL-POINT-3D deletes a POINT-3D object.
 The function DEL-POINT-3F deletes a POINT-3F object.
 
 The function DEL-POINT-3I deletes a POINT-3I object.
+
+The function DEL-RANGE deletes a RANGE object.
 
 The function DEL-RECT deletes a RECT object.
 
@@ -15053,6 +14832,8 @@ The function DEL-SIZE2F deletes a SIZE2F object.
 The function DEL-STD-STRING deletes a *STRING object.
 
 The function DEL-TERM-CRIT deletes a TERM-CRITERIA object.
+
+The function DEL-VEC-4I deletes a VEC-4I object.
 
 The function DEL-VEC-CHAR deletes a VECTOR-CHAR object.
 
@@ -15075,6 +14856,8 @@ The function DEL-VEC-POINT-2F deletes a VECTOR-POINT-2F object.
 The function DEL-VEC-RECT deletes a VECTOR-RECT object.
 
 The function DEL-VEC-UCHAR deletes a VECTOR-UCHAR object.
+
+The function DEL-VEC-VEC-4I deletes a VECTOR-VEC-4I object.
 
 The function DEL-VID-CAP deletes a VIDEO-CAPTURE object.
 
@@ -15203,5 +14986,316 @@ Example:
 
 
 
+=========================================================================================================================================
 
+VECTOR
+
+Bindings for the C++ VECTOR class.
+
+C++: template < class T, class Alloc = allocator<T> > class vector; // generic template
+
+LISP-CV: See description.
+
+
+    Parameters:	
+
+       See description.
+
+
+The bindings for the C++ vector class, so far, are:
+
+
+LISP-CV  <===>  C++              
+===========================     
+VEC-CHAR <===> vector<char>
+===============================      
+VEC-DMATCH <===> vector<DMatch>      
+===============================      
+VEC-DOUBLE <===> vector<double> 
+=============================      
+VEC-FLOAT <===> vector<float>
+=============================    
+VEC-INT <===>  vector<int>
+====================================      
+VEC-KEY-POINT <===> vector<KeyPoint>
+====================================     
+VEC-POINT <===> vector<Point>
+==================================      
+VEC-POINT-2F <===> vector<Point2f>
+=================================  
+VEC-RECT <===> vector<Rect>
+=============================     
+VEC-UCHAR <===> vector<uchar>
+==============================    
+VEC-VEC-4I <===> vector<Vec4i>
+==============================
+
+
+
+Description:
+
+
+
+Vectors with numbers as elements, VEC-CHAR, VEC-DOUBLE, VEC-FLOAT, VEC-INT and VEC-UCHAR operate as 
+follows:(I use VEC-FLOAT as an example of the 5 aforementioned vector types). 
+
+The idea behind the vector macros in Lisp-CV is you use them primarily to pass data to and from the 
+underlying OpenCV code only. The reason being, due to the nature of wrapping the C++ vector class in 
+Lisp, some of the C++ speed is lost. Since Lisp vectors are extremely fast, the best workaround is to 
+use Lisp's own vector and list processing functions to fill in the gaps. The functions are designed so 
+first you would create, for instance, a Lisp vector or a list of floats e.g.
+
+
+CV> (DEFPARAMETER A '(1F0 2F0 3F0))
+
+A
+
+CV> A
+
+(1.0 2.0 3.0)
+
+
+CV> (DEFPARAMETER A (LIST 1F0 2F0 3F0))
+
+A
+
+CV> A
+
+(1.0 2.0 3.0)
+
+
+CV> (DEFPARAMETER A (VECTOR 1F0 2F0 3F0))
+
+A
+
+CV> A
+
+#(1.0 2.0 3.0)
+
+
+Next, and this is where it gets fun, you can use any of the myriad of functions in Lisp designed 
+to operate on lists and vectors and then pass the results to the underlying OpenCV code by way of 
+the Lisp-CV vector functions. Since Lisp's main strength is list processing, hence it's name, this 
+is a great feature and adds a lot of power to OpenCV and a lot of speed to the Lisp-CV bindings. 
+
+Now, once you have created your vector as above and performed whatever operations you needed to on 
+it, you can convert that vector to a C++ vector as so:
+
+
+CV> (DEFPARAMETER B (VEC-FLOAT A))
+
+B
+
+CV> B
+
+
+#<STD-VECTOR-FLOAT {1006BA6983}> <--- A CLOS object, STD-VECTOR-FLOAT type, pointing to a vector<float>
+
+
+That's all there is to it. Now it can be passed to any Lisp-CV binding for OpenCV or C++ that will 
+accept it.
+
+
+Now, if an OpenCV or C++ binding in this library outputs a STD-VECTOR-FLOAT(vector<float>) type object
+(again, using vector<float> as an example of all number based C++ vector types). You can convert that 
+back to a Lisp list or a Lisp vector like so:(variable B being a #<STD-VECTOR-FLOAT {1006BA6983}>:)
+
+CV> (VEC-FLOAT :TO-LISP-LIST B)
+
+(1.0 2.0 3.0)
+
+
+CV> (VEC-FLOAT :TO-LISP-VEC B)
+
+#(1.0 2.0 3.0)
+
+
+and then complete any necessary operations on the data.
+
+
+The ability to retrieve the length of a C++ vector is built into the Lisp-CV vector functions, it is 
+quite fast as well. You just evaluate as follows(using variable B from above):
+
+
+CV> (VEC-FLOAT :LENGTH B)
+
+3  <--- Vector B length
+
+
+If you would like to created an unititialized pointer to a vector<float> to pass to a function, you 
+evaluate:
+
+
+CV> (VEC-FLOAT)
+
+
+#<STD-VECTOR-FLOAT {100352FEA3}> <--- Output is an object pointing to an uninitialized vector<float>.
+
+
+
+If you would like to created an initialized C++ vector to pass to a function, you evaluate either of 
+the below:
+
+
+
+CV> (VEC-FLOAT '(1f0 2f0 3f0)) 
+
+
+CV> (VEC-FLOAT (LIST 1f0 2f0 3f0)) 
+
+
+CV> (VEC-FLOAT (VECTOR 1f0 2f0 3f0))  
+
+
+#<STD-VECTOR-FLOAT {100352FEA3}> <--- Output is a CLOS object pointing to an initialized vector<float>.
+
+
+
+Again these functions are a little bit slow for extremely large operations. However, if you assign 
+the vector to a variable first like this:
+
+
+CV> (DEFPARAMETER A (VECTOR 1F0 2F0 3F0 4F0 5F0))
+
+A
+
+
+CV> (VEC-FLOAT A)  <--- this only takes about 0.699 seconds for a million iterations
+
+
+
+The functionality to retrieve data from an initialized vector is built into the vector functions. So 
+to retrieve data from a vector you evaluate as follows(vector elements are zero-based):
+
+
+CV> (DEFPARAMETER A (VEC-FLOAT '(1F0 2F0 3F0)))
+
+A
+
+CV> (VEC-FLOAT A)  <--- Access the 0th element of A.
+
+1.0
+
+CV> (VEC-FLOAT A 1)   <---Access the 1st element of A.
+
+2.0
+
+CV> (VEC-FLOAT A 2)  <---Access the 2nd element of A.
+
+3.0
+
+
+
+Vectors with objects as their elements, VEC-DMATCH, VEC-KEY-POINT, VEC-POINT, VEC-POINT-2F,
+VEC-RECT and VEC-VEC-4I operate as follows:(I use VEC-POINT as an example of the six vectors.)
+
+
+If you would like to created an uninitialized vector, you evaluate:
+
+
+CV> (VEC-POINT)
+
+#<STD-VECTOR-POINT {1007B187B3}> <--- Output is a object pointing to an uninitialized POINT vector.
+
+
+If you would like to created an initialized vector, you evaluate:
+
+
+CV> (VEC-POINT (LIST (POINT 1 2) (POINT 3 4)))
+
+#<STD-VECTOR-POINT {1002DBE013}> <--- Output is a object pointing to an initialized POINT vector.
+
+
+Again, you'll get the most efficiency if you, first, assign the list or vector to a variable.
+
+
+The functionality to retrieve data from an initialized vector of objects is built into the vector 
+function. You just evaluate as follows(vector elements are zero-based):
+
+
+CV> (DEFPARAMETER A (VEC-POINT (LIST (POINT 1 2) (POINT 3 4)))) <--- Create an initialized vector A.
+
+A 
+
+
+CV> (VEC-POINT A 0)  <--- Access the 0th POINT in vector A
+
+#<CV-POINT {1003D4FA73}> 
+
+
+CV> (VEC-POINT A 1)  <--- Access the 1st POINT in vector A
+
+#<CV-POINT {10042AB633}> 
+
+
+
+CV> (VEC-POINT A 0 0) <--- Access the 0th element of the 0th POINT in vector A.
+
+1
+
+CV> (VECT-POINT A 0 1) <--- Access the 1st element of the 0th POINT in vector A.
+
+2
+
+CV> (VEC-POINT A 1 0) <--- Access the 0th element of the 1st POINT in vector A.
+
+3
+
+CV> (VEC-POINT A 1 1) <--- Access the 1st element of the 1st POINT in vector A.
+
+4
+
+
+And, also, as above, you can convert the POINT vector back to a Lisp list or vector as follows:
+
+
+CV> (VEC-POINT :TO-LISP-LIST A)
+
+
+(#<CV-POINT {1006C49DA3}> #<CV-POINT {1006C49E03}>)  <--- Lisp list
+
+
+CV> (VEC-POINT :TO-LISP-VEC A)
+
+
+#(#<CV-POINT {1006C49DA3}> #<CV-POINT {1006C49E03}>)  <--- Lisp vector
+
+
+And also retrieve the length of the vector:
+
+
+(VEC-POINT :LENGTH A)
+
+2  <--- Vector a length,
+
+
+
+Note: For VEC-DMATCH. When accessing the numerical content of of the objects in a VECTOR-DMATCH, 
+you must supply the type of the element you are attempting to access as the last parameter e.g.
+
+
+CV> (DEFPARAMETER A (VEC-DMATCH (VECTOR (DMATCH 1 2 3F0) (DMATCH 1 2 3F0))))
+
+A
+
+CV> (VEC-DMATCH A 0 0 :INT)
+
+1
+
+CV> (VEC-DMATCH A 0 1 :INT)
+
+2
+
+CV> (VEC-DMATCH A 0 2 :FLOAT)  
+    
+#<SINGLE-FLOAT quiet NaN>                                
+
+CV> (VEC-DMATCH A 0 2 :INT)
+
+-1
+
+CV> (VEC-DMATCH A 0 3 :FLOAT)  <--- If a VECTOR-DMATCH contains a 3 element DMATCH, the value you entered 
+                                    as the 3rd parameter will be accessible at the 4th index. 
+3.0
+=========================================================================================================================================
 

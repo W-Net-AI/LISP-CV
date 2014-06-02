@@ -13,9 +13,11 @@
 ;; NON GARBAGE COLLECTED TYPES
 
 
+;; LINE-SEGMENT-DETECTOR
+(defctype line-segment-detector :pointer)
+
 ;; MOUSE-CALLBACK
 (defctype mouse-callback :pointer)
-
 
 ;; TRACKBAR-CALLBACK
 (defctype trackbar-callback :pointer)
@@ -205,6 +207,31 @@
     vector-key-point))
 
 
+;; VECTOR-MAT
+
+
+(define-foreign-type vector-mat ()
+  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+                     :garbage-collect))
+  (:actual-type :pointer)
+  (:simple-parser vector-mat))
+
+
+(defclass std-vector-mat ()
+  ((c-pointer :reader c-pointer :initarg :c-pointer)))
+
+
+(defmethod translate-to-foreign ((lisp-value std-vector-mat) (c-type vector-mat))
+  (values  (c-pointer lisp-value) lisp-value))
+
+
+(defmethod translate-from-foreign (c-pointer (c-type vector-mat))
+  (let ((vector-mat  (make-instance 'std-vector-mat :c-pointer c-pointer)))
+    (when (garbage-collect c-type)
+      (tg:finalize vector-mat (lambda () (del-vec-mat c-pointer))))
+    vector-mat))
+
+
 ;; VECTOR-POINT
 
 
@@ -256,31 +283,6 @@
 
 
 
-;; VECTOR-MAT
-
-
-(define-foreign-type vector-mat ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
-                     :garbage-collect))
-  (:actual-type :pointer)
-  (:simple-parser vector-mat))
-
-
-(defclass std-vector-mat ()
-  ((c-pointer :reader c-pointer :initarg :c-pointer)))
-
-
-(defmethod translate-to-foreign ((lisp-value std-vector-mat) (c-type vector-mat))
-  (values  (c-pointer lisp-value) lisp-value))
-
-
-(defmethod translate-from-foreign (c-pointer (c-type vector-mat))
-  (let ((vector-mat  (make-instance 'std-vector-mat :c-pointer c-pointer)))
-    (when (garbage-collect c-type)
-      (tg:finalize vector-mat (lambda () (del-vec-mat c-pointer))))
-    vector-mat))
-
-
 ;; VECTOR-RECT
 
 
@@ -306,6 +308,7 @@
     vector-rect))
 
 
+
 ;; VECTOR-UCHAR
 
 
@@ -329,6 +332,32 @@
     (when (garbage-collect c-type)
       (tg:finalize vector-uchar (lambda () (del-vec-uchar c-pointer))))
     vector-uchar))
+
+
+
+;; VECTOR-VEC-4I
+
+
+(define-foreign-type vector-vec-4i ()
+  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+                     :garbage-collect))
+  (:actual-type :pointer)
+  (:simple-parser vector-vec-4i))
+
+
+(defclass std-vector-vec-4i ()
+  ((c-pointer :reader c-pointer :initarg :c-pointer)))
+
+
+(defmethod translate-to-foreign ((lisp-value std-vector-vec-4i) (c-type vector-vec-4i))
+  (values  (c-pointer lisp-value) lisp-value))
+
+
+(defmethod translate-from-foreign (c-pointer (c-type vector-vec-4i))
+  (let ((vector-vec-4i  (make-instance 'std-vector-vec-4i :c-pointer c-pointer)))
+    (when (garbage-collect c-type)
+      (tg:finalize vector-vec-4i (lambda () (del-vec-vec-4i c-pointer))))
+    vector-vec-4i))
 
 
 ;; CORE
@@ -788,6 +817,33 @@
     (when (garbage-collect c-type)
       (tg:finalize term-criteria (lambda () (del-term-crit c-pointer))))
     term-criteria))
+
+
+
+;; VEC-4I
+
+
+(define-foreign-type vec-4i ()
+  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+                     :garbage-collect))
+  (:actual-type :pointer)
+  (:simple-parser vec-4i))
+
+
+(defclass cv-vec-4i ()
+  ((c-pointer :reader c-pointer :initarg :c-pointer)))
+
+
+(defmethod translate-to-foreign ((lisp-value cv-vec-4i) (c-type vec-4i))
+  (values  (c-pointer lisp-value) lisp-value))
+
+
+(defmethod translate-from-foreign (c-pointer (c-type vec-4i))
+  (let ((vec-4i (make-instance 'cv-vec-4i :c-pointer c-pointer)))
+    (when (garbage-collect c-type)
+      (tg:finalize vec-4i (lambda () (del-vec-4i c-pointer))))
+    vec-4i))
+
 
 
 ;; IMGPROC

@@ -21,34 +21,87 @@
    #:vec-char
    #:c-arr-to-vec-char
    #:arr-to-vec-char
+   #:vec-char-to-c-arr
+   #:vec-char-length
+   #:vec-char-to-lisp-list
+   #:vec-char-to-lisp-vec
    #:vec-dmatch
    #:c-arr-to-vec-dmatch
    #:arr-to-vec-dmatch
+   #:vec-dmatch-to-c-arr
+   #:vec-dmatch-length
+   #:vec-dmatch-to-lisp-list
+   #:vec-dmatch-to-lisp-vec
    #:vec-double
    #:c-arr-to-vec-double
    #:arr-to-vec-double
+   #:vec-double-to-c-arr
+   #:vec-double-length
+   #:vec-double-to-lisp-list
+   #:vec-double-to-lisp-vec
    #:vec-float
    #:c-arr-to-vec-float
    #:arr-to-vec-float
+   #:vec-float-to-c-arr
+   #:vec-float-length
+   #:vec-float-to-lisp-list
+   #:vec-float-to-lisp-vec
    #:vec-int
    #:c-arr-to-vec-int
    #:arr-to-vec-int
+   #:vec-int-to-c-arr
+   #:vec-int-length
+   #:vec-int-to-lisp-list
+   #:vec-int-to-lisp-vec
    #:vec-key-point
    #:c-arr-to-vec-key-point
    #:arr-to-vec-key-point
+   #:vec-key-point-to-c-arr
+   #:vec-key-point-length
+   #:vec-key-point-to-lisp-list
+   #:vec-key-point-to-lisp-vec
+   #:vec-mat
+   #:c-arr-to-vec-mat
+   #:arr-to-vec-mat
+   #:vec-mat-to-c-arr
+   #:vec-mat-length
+   #:vec-mat-to-lisp-list
+   #:vec-mat-to-lisp-vec
    #:vec-point
    #:c-arr-to-vec-point
    #:arr-to-vec-point
+   #:vec-point-to-c-arr
+   #:vec-point-length
+   #:vec-point-to-lisp-list
+   #:vec-point-to-lisp-vec
    #:vec-point-2f
    #:c-arr-to-vec-point-2f
    #:arr-to-vec-point-2f
+   #:vec-point-2f-to-c-arr
+   #:vec-point-2f-length
+   #:vec-point-2f-to-lisp-list
+   #:vec-point-2f-to-lisp-vec
    #:vec-rect
    #:c-arr-to-vec-rect
    #:arr-to-vec-rect
+   #:vec-rect-to-c-arr
+   #:vec-rect-length
+   #:vec-rect-to-lisp-list
+   #:vec-rect-to-lisp-vec
    #:vec-uchar
    #:c-arr-to-vec-uchar
    #:arr-to-vec-uchar
-
+   #:vec-uchar-to-c-arr
+   #:vec-uchar-length
+   #:vec-uchar-to-lisp-list
+   #:vec-uchar-to-lisp-vec
+   #:vec-vec-4i
+   #:c-arr-to-vec-vec-4i
+   #:arr-to-vec-vec-4i
+   #:vec-vec-4i-to-c-arr
+   #:vec-vec-4i-length
+   #:vec-vec-4i-to-lisp-list
+   #:vec-vec-4i-to-lisp-vec
 
 
 
@@ -117,6 +170,7 @@
    #:size-from-point
    #:size2f
    #:sub
+   #:vec-4i
 
 ;; core - Dynamic Structures
 

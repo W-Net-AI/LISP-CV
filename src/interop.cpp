@@ -31,5 +31,6 @@ ADD_VECTOR_IMPL(Mat, m);
 ADD_VECTOR_IMPL(Point, p);
 ADD_VECTOR_IMPL(Point2f, p2f);
 ADD_VECTOR_IMPL(Rect, r);
+ADD_VECTOR_IMPL(Vec4i, v4i);
 
 }

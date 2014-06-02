@@ -27,26 +27,26 @@
 
 ;; Ptr<FeatureDetector> FeatureDetector::create(const string& detectorType)
 ;; FeatureDetector* cv_FeatureDetector_create2(FeatureDetector* self, String* detectorType) 
-(defcfun ("cv_FeatureDetector_create2" %feat-detector-create) feature-2d 
+(defcfun ("cv_FeatureDetector_create2" %feature-detector-create) feature-2d 
   (self feature-2d)
   (detector-type :string))
 
-(defun feat-detector-create (self detector-type)
+(defun feature-detector-create (self detector-type)
   "Creates a feature detector by its name."
-   (%feat-detector-create self detector-type))
+   (%feature-detector-create self detector-type))
 
 
 ;; void FeatureDetector::detect(const Mat& image, vector<KeyPoint>& keypoints, const Mat& mask=Mat() ) const
 ;; void cv_FeatureDetector_detect3(FeatureDetector* self, Mat* image, vector_KeyPoint* keypoints, Mat* mask)
-(defcfun ("cv_FeatureDetector_detect3" %feat-detector-detect) :void
+(defcfun ("cv_FeatureDetector_detect3" %feature-detector-detect) :void
   (self feature-2d)
   (image mat)
   (key-points vector-key-point)
   (mask mat))
 
-(defun feat-detector-detect (self image keypoints &optional (mask (mat) given-mask))
+(defun feature-detector-detect (self image keypoints &optional (mask (mat) given-mask))
   "Detects keypoints in an image."
-  (%feat-detector-detect self image keypoints mask)
+  (%feature-detector-detect self image keypoints mask)
   (if given-mask nil (del-mat mask)))
 
 
@@ -120,20 +120,20 @@
   (img2 mat)
   (keypoints2 vector-key-point)
   (matches1to2 vector-dmatch)
-  (outimg mat)
+  (out-img mat)
   (match-color scalar)
   (single-point-color scalar)
   (matches-mask vector-char)
   (flags :int))
 
 
-(defun draw-matches (img1 keypoints1 img2 keypoints2 matches1to2 outimg &optional 
+(defun draw-matches (img1 keypoints1 img2 keypoints2 matches1to2 out-img &optional 
 									  (match-color (scalar-all -1) given-match-color) 
 									  (single-point-color (scalar-all -1) given-single-point-color) 
 									  (matches-mask (vec-char) given-matches-mask) 
 									  (flags +default+))
   "Draws the found matches of keypoints from two images."
-  (%draw-matches img1 keypoints1 img2 keypoints2 matches1to2 outimg match-color single-point-color matches-mask flags)
+  (%draw-matches img1 keypoints1 img2 keypoints2 matches1to2 out-img match-color single-point-color matches-mask flags)
   (if given-match-color nil (del-scalar match-color)) 
   (if given-single-point-color nil (del-scalar single-point-color)) 
   (if given-matches-mask nil (del-vec-char matches-mask)))

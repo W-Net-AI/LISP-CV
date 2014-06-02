@@ -12,6 +12,12 @@
   `(defparameter ,var ,val))
 
 
+;; FORMAT macro (to make debugging easier)
+(defmacro f (&optional (val "test"))
+  `(if ,val
+       (format t "~%~a~%~%" ,val) nil))
+
+
 ;;SIZEOF macro
 
 ;;All non CFFI type sizes are the same for now.

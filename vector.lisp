@@ -91,7 +91,7 @@
 		  (mem-aref (vec-char-to-c-arr ,x) :char) 
 		  (mem-aref (vec-char-to-c-arr ,x) :char ,y)))
 	     (t (error "incorrect input. 
-                   ~%See VEC-CHAR documentation in <LISP-CV-SOURCE-DIR>/EXAMPLES.LISP~%"))))))
+                   ~%See VEC-CHAR documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%"))))))
 
 
 
@@ -154,7 +154,7 @@
 
 (defmacro vec-dmatch (&rest args)
   (if (fifth args)
-      (error "odd number of args to VECTOR-DMATCH")
+      (error "odd number of args to VEC-DMATCH")
       nil)
   (let ((x (gensym))
         (y (gensym))
@@ -181,7 +181,7 @@
 		      (mem-aref (c-pointer (mem-aref (vec-dmatch-to-c-arr ,x) 'dmatch ,y)) :int ,z)
 		      (mem-aref (c-pointer (mem-aref (vec-dmatch-to-c-arr ,x) 'dmatch ,y)) ,type ,z)))) 
 	     (t (error "incorrect input. 
-  ~%See VEC-DMATCH documentation in <LISP-CV-SOURCE-DIR>/EXAMPLES.LISP~%"))))))
+  ~%See VEC-DMATCH documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%"))))))
 
 
 
@@ -265,7 +265,7 @@
 		  (mem-aref (vec-double-to-c-arr ,x) :double) 
 		  (mem-aref (vec-double-to-c-arr ,x) :double ,y)))
 	     (t (error "incorrect input. 
-                   ~%See VEC-DOUBLE documentation in <LISP-CV-SOURCE-DIR>/EXAMPLES.LISP~%"))))))
+                   ~%See VEC-DOUBLE documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%"))))))
 
 
 
@@ -349,7 +349,7 @@
 		  (mem-aref (vec-float-to-c-arr ,x) :float) 
 		  (mem-aref (vec-float-to-c-arr ,x) :float ,y)))
 	     (t (error "incorrect input. 
-                   ~%See VEC-FLOAT documentation in <LISP-CV-SOURCE-DIR>/EXAMPLES.LISP~%"))))))
+                   ~%See VEC-FLOAT documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%"))))))
 
 
 
@@ -433,7 +433,7 @@
 		  (mem-aref (vec-int-to-c-arr ,x) :int) 
 		  (mem-aref (vec-int-to-c-arr ,x) :int ,y)))
 	     (t (error "incorrect input. 
-                   ~%See VEC-INT documentation in <LISP-CV-SOURCE-DIR>/EXAMPLES.LISP~%"))))))
+                   ~%See VEC-INT documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%"))))))
 
 
 
@@ -496,7 +496,7 @@
 
 (defmacro vec-key-point (&rest args)
   (if (fourth args)
-      (error "odd number of args to VECTOR-KEY-POINT")
+      (error "odd number of args to VEC-KEY-POINT")
       nil)
   (let ((x (gensym))
         (y (gensym))
@@ -523,7 +523,93 @@
 		      (mem-aref (c-pointer 
 				 (mem-aref (vec-key-point-to-c-arr ,x) 'key-point ,y)) :int ,z))))
 	     (t (error "incorrect input. 
-  ~%See VEC-KEY-POINT documentation in <LISP-CV-SOURCE-DIR>/EXAMPLES.LISP~%"))))))
+  ~%See VEC-KEY-POINT documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%"))))))
+
+
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_##t * create_std_vector##tn()
+(defcfun ("create_std_vectorm" %vec-mat) vector-mat)
+
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
+(defcfun ("carray_to_std_vectorm" c-arr-to-vec-mat) vector-mat
+  (a :pointer)
+  (len :unsigned-int))
+
+
+(let ((previous nil))
+  (defun arr-to-vec-mat (a)
+    (unless (equal a (car previous))
+      (setf previous (cons a (foreign-alloc :pointer :initial-contents
+					    (mapcar #!(c-pointer %1) (coerce a 'list))))))
+    (c-arr-to-vec-mat (cdr previous) (length a))))
+
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; t * std_vector##tn##_to_carray( vector_##t * v ) 
+(defcfun ("std_vectorm_to_carray" vec-mat-to-c-arr) :pointer 
+  (v vector-mat))
+
+
+;; size_t std_vector##tn##_length( vector_##t * v)
+(defcfun ("std_vectorm_length" vec-mat-length) :unsigned-int
+  (self vector-mat))
+
+
+(defmacro vec-mat-to-lisp-list (vec)
+  (let ((x (gensym))
+        (y (gensym))
+        (z (gensym)))
+    `(let* ((,x ,vec)
+	    (,y (vec-mat-length ,x))
+            (,z (list)))
+       (dotimes (i ,y)
+	 (push (mem-aref (vec-mat-to-c-arr ,x) 'mat i) ,z))
+       (reverse ,z))))
+
+
+(defmacro vec-mat-to-lisp-vec (vec)
+  (let ((x (gensym))
+        (y (gensym))
+        (z (gensym)))
+    `(let* ((,x ,vec)
+	    (,y (vec-mat-length ,x))
+            (,z (make-array ,y :element-type t :fill-pointer 0
+			    :initial-element   
+			    nil)))
+       (dotimes (i ,y)
+	 (vector-push (mem-aref (vec-mat-to-c-arr ,x) 'mat i) ,z))
+       ,z)))
+
+
+(defmacro vec-mat (&rest args)
+  (if (fourth args)
+      (error "odd number of args to VEC-MAT")
+      nil)
+  (let ((x (gensym))
+        (y (gensym))
+        (z (gensym)))
+    `(let ((,x (first (list ,@args)))
+	   (,y (second (list ,@args)))
+           (,z (third (list ,@args))))
+       (cond ((eq ,x nil)
+	      (%vec-mas))
+	     ((or (vectorp ,x) (listp ,x))
+	      (arr-to-vec-mat ,x))
+	     ((eq :length ,x)
+	      (vec-mat-length ,y))
+	     ((and (eq :to-lisp-list ,x))
+	      (vec-mat-to-lisp-list ,y))
+	     ((and (eq :to-lisp-vec ,x))
+	      (vec-mat-to-lisp-vec ,y))
+	     ((and (typep ,x 'std-vector-mat) ,y)
+	      (if (eq ,z nil)
+		  (mem-aref (vec-mat-to-c-arr ,x) 'point ,y)
+		  (mem-aref (c-pointer (mem-aref (vec-mat-to-c-arr ,x) 'mat ,y)) :int ,z)))
+	     (t (error "incorrect input. 
+  ~%See VEC-MAT documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%"))))))
 
 
 
@@ -586,7 +672,7 @@
 
 (defmacro vec-point (&rest args)
   (if (fourth args)
-      (error "odd number of args to VECTOR-POINT")
+      (error "odd number of args to VEC-POINT")
       nil)
   (let ((x (gensym))
         (y (gensym))
@@ -609,7 +695,7 @@
 		  (mem-aref (vec-point-to-c-arr ,x) 'point ,y)
 		  (mem-aref (c-pointer (mem-aref (vec-point-to-c-arr ,x) 'point ,y)) :int ,z)))
 	     (t (error "incorrect input. 
-  ~%See VEC-POINT documentation in <LISP-CV-SOURCE-DIR>/EXAMPLES.LISP~%"))))))
+  ~%See VEC-POINT documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%"))))))
 
 
 
@@ -672,7 +758,7 @@
 
 (defmacro vec-point-2f (&rest args)
   (if (fourth args)
-      (error "odd number of args to VECTOR-POINT-2F")
+      (error "odd number of args to VEC-POINT-2F")
       nil)
   (let ((x (gensym))
         (y (gensym))
@@ -695,7 +781,7 @@
 		  (mem-aref (vec-point-2f-to-c-arr ,x) 'point-2f ,y)
 		  (mem-aref (c-pointer (mem-aref (vec-point-2f-to-c-arr ,x) 'point-2f ,y)) :float ,z)))
 	     (t (error "incorrect input. 
-  ~%See VEC-POINT-2F documentation in <LISP-CV-SOURCE-DIR>/EXAMPLES.LISP~%"))))))
+  ~%See VEC-POINT-2F documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%"))))))
 
 
 
@@ -762,7 +848,7 @@
 
 (defmacro vec-rect (&rest args)
   (if (fourth args)
-      (error "odd number of args to VECTOR-RECT")
+      (error "odd number of args to VEC-RECT")
       nil)
   (let ((x (gensym))
         (y (gensym))
@@ -785,7 +871,7 @@
 		  (mem-aref (vec-rect-to-c-arr ,x) 'rect ,y)
 		  (mem-aref (c-pointer (mem-aref (vec-rect-to-c-arr ,x) 'rect ,y)) :int ,z)))
 	     (t (error "incorrect input. 
-  ~%See VEC-RECT documentation in <LISP-CV-SOURCE-DIR>/EXAMPLES.LISP~%"))))))
+  ~%See VEC-RECT documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%"))))))
 
 
 
@@ -869,7 +955,91 @@
 		  (mem-aref (vec-uchar-to-c-arr ,x) :uchar) 
 		  (mem-aref (vec-uchar-to-c-arr ,x) :uchar ,y)))
 	     (t (error "incorrect input. 
-                   ~%See VEC-UCHAR documentation in <LISP-CV-SOURCE-DIR>/EXAMPLES.LISP~%"))))))
+                   ~%See VEC-UCHAR documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%"))))))
 
 
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_##t * create_std_vector##tn()
+(defcfun ("create_std_vectorv4i" %vec-vec-4i) vector-vec-4i)
+
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
+(defcfun ("carray_to_std_vectorv4i" c-arr-to-vec-vec-4i) vector-vec-4i
+  (a :pointer)
+  (len :unsigned-int))
+
+
+(let ((previous nil))
+  (defun arr-to-vec-vec-4i (a)
+    (unless (equal a (car previous))
+      (setf previous (cons a (foreign-alloc :pointer :initial-contents
+					    (mapcar #!(c-pointer %1) (coerce a 'list))))))
+    (c-arr-to-vec-vec-4i (cdr previous) (length a))))
+
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; t * std_vector##tn##_to_carray( vector_##t * v ) 
+(defcfun ("std_vectorv4i_to_carray" vec-vec-4i-to-c-arr) :pointer 
+  (v vector-vec-4i))
+
+
+;; size_t std_vector##tn##_length( vector_##t * v)
+(defcfun ("std_vectorv4i_length" vec-vec-4i-length) :unsigned-int
+  (self vector-vec-4i))
+
+
+(defmacro vec-vec-4i-to-lisp-list (vec)
+  (let ((x (gensym))
+        (y (gensym))
+        (z (gensym)))
+    `(let* ((,x ,vec)
+	    (,y (vec-vec-4i-length ,x))
+            (,z (list)))
+       (dotimes (i ,y)
+	 (push (mem-aref (vec-vec-4i-to-c-arr ,x) 'vec-4i i) ,z))
+       (reverse ,z))))
+
+
+(defmacro vec-vec-4i-to-lisp-vec (vec)
+  (let ((x (gensym))
+        (y (gensym))
+        (z (gensym)))
+    `(let* ((,x ,vec)
+	    (,y (vec-vec-4i-length ,x))
+            (,z (make-array ,y :element-type t :fill-pointer 0
+			    :initial-element   
+			    nil)))
+       (dotimes (i ,y)
+	 (vector-push (mem-aref (vec-vec-4i-to-c-arr ,x) 'vec-4i i) ,z))
+       ,z)))
+
+
+(defmacro vec-vec-4i (&rest args)
+  (if (fourth args)
+      (error "odd number of args to VEC-VEC-4I")
+      nil)
+  (let ((x (gensym))
+        (y (gensym))
+        (z (gensym)))
+    `(let ((,x (first (list ,@args)))
+	   (,y (second (list ,@args)))
+           (,z (third (list ,@args))))
+       (cond ((eq ,x nil)
+	      (%vec-vec-4i))
+	     ((or (vectorp ,x) (listp ,x))
+	      (arr-to-vec-vec-4i ,x))
+	     ((eq :length ,x)
+	      (vec-vec-4i-length ,y))
+	     ((and (eq :to-lisp-list ,x))
+	      (vec-vec-4i-to-lisp-list ,y))
+	     ((and (eq :to-lisp-vec ,x))
+	      (vec-vec-4i-to-lisp-vec ,y))
+	     ((and (typep ,x 'std-vector-vec-4i) ,y)
+	      (if (eq ,z nil)
+		  (mem-aref (vec-vec-4i-to-c-arr ,x) 'vec-4i ,y)
+		  (mem-aref (c-pointer (mem-aref (vec-vec-4i-to-c-arr ,x) 'vec-4i ,y)) :int ,z)))
+	     (t (error "incorrect input. 
+  ~%See VEC-VEC-4I documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%"))))))
 

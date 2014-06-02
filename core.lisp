@@ -1187,6 +1187,9 @@
   (self mat))
 
 
+
+
+
 ;; _Tp width, height
 ;; double cv_Size_width(Size* self) 
 (defcfun ("cv_Size_width" width) :double
@@ -1324,6 +1327,16 @@
 (defun calc-covar-matrix (samples covar mean flags &optional (ctype +64f+))
        "Calculates the covariance matrix of a set of vectors."
        (%calc-covar-matrix samples covar mean flags ctype))
+
+
+;; void completeSymm(InputOutputArray mtx, bool lowerToUpper=false)
+;; void cv_completeSymm(Mat* mtx, bool lowerToUpper)
+(defcfun ("cv_completeSymm" %complete-symm) :void
+  (mtx mat)
+  (lower-to-upper :boolean))
+
+(defun complete-symm (mtx &optional (lower-to-upper nil))
+  (%complete-symm mtx lower-to-upper))
 
 
 ;; void convertScaleAbs(InputArray src, OutputArray dst, double alpha=1, double beta=0)

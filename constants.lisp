@@ -255,11 +255,11 @@
   (+event-flag-ctrlkey+ 8) 
   (+event-flag-shiftkey+ 16)
   (+event-flag-altkey+ 32) 
-  (imread_unchanged -1)
-  (imread_grayscale 0)
-  (imread_color 1)
-  (imread_anydepth 2)
-  (imread_anycolor  4)
+  (+imread-unchanged+ -1)
+  (+imread-grayscale+ 0)
+  (+imread-color+ 1)
+  (+imread-anydepth+ 2)
+  (+imread-anycolor+  4)
   (+imwrite-jpeg-quality+ 1)
   (+imwrite-png-compression+ 16)
   (+imwrite-png-strategy+ 17)
@@ -291,7 +291,7 @@
   (+calib-cb-filter-quads+ 4)
   (+calib-cb-fast-check+ 8)
 
-;;; improc:
+;;; imgproc:
 
   (+ipl-border-constant+ 0)
   (+ipl-border-replicate+ 1)
@@ -560,6 +560,10 @@
   (+tm-ccorr-normed+ 3)
   (+tm-ccoeff+ 4)
   (+tm-ccoeff-normed+ 5)
+  (+lsd-refine-none+ 0)
+  (+lsd-refine-std+ 1)
+  (+lsd-refine-adv+ 2)
+
 
 ;;; features2d
 

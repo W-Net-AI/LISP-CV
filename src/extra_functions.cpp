@@ -10,6 +10,19 @@ using namespace cvflann;
 
 extern "C" {
 
+void cv_LineSegmentDetector_detect2(LineSegmentDetector* self, Mat* _image, vector_Vec4i* _lines, Mat* width, Mat* prec, Mat* nfa) {
+	self->detect(*_image, *_lines, *width, *prec, *nfa);
+}
+
+void cv_LineSegmentDetector_drawSegments2(LineSegmentDetector* self, Mat* _image, vector_Vec4i* lines) {
+	self->drawSegments(*_image, *lines);
+}
+
+
+Vec4i* cv_create_Vec4i() {
+    return new Vec4i();
+}
+
 CvANN_MLP_TrainParams* cv_create_CvANN_MLP_TrainParams() {
     return new CvANN_MLP_TrainParams();
 }
@@ -285,6 +298,10 @@ void cv_delete_Size2f(Size2f* self) {
 }
 
 void cv_delete_TermCriteria(TermCriteria* self) {
+     delete self;
+}
+
+void cv_delete_Vec4i(Vec4i* self) {
      delete self;
 }
 
