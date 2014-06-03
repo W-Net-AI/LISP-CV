@@ -2,7 +2,10 @@
 ;;;; examples.lisp
 ;;;; Documentation and Examples(In process) -> For now, if you want to know if a Lisp binding exists 
 ;;;; for a specified OpenCV C++ function search this file for the OpenCV C++ function name to find its 
-;;;; Lisp name, documentation and an example program.
+;;;; Lisp name, documentation and an example program. All examples written inside a DEFUN are named by 
+;;;; the Lisp function name followed by "-EXAMPLE", e.g. MAT-EXAMPLE for the function MAT, to make finding 
+;;;; them easier in this file. If an example is not written inside a DEFUN, e.g. if the MAT example were not 
+;;;; written inside a DEFUN, the title MAT-EXAMPLE, would still be above it.(implementing this is still in process)
 
 
 There are 3 major types of memory management, manual, with-* macros and Trivial Garbage finalizers
@@ -682,7 +685,7 @@ LISP-CV: (DATA (SELF MAT) ) => :POINTER
 
     Parameters:	
 
-        SELF  a pointer to matrix(MAT construct)
+        SELF  a pointer to matrix(MAT object)
 
 
 Once a matrix is created, it will be automatically managed by using a reference-counting mechanism
@@ -851,18 +854,21 @@ C++: double Mat::dot(InputArray m) const
 
 LISP-CV: (DOT (SELF MAT) (M MAT)) => :DOUBLE
 
+LISP-CV: (MAT-DOT (SELF MAT) (M MAT)) => :DOUBLE
+
 
     Parameters:	
 
         SELF - A matrix
 
-        M - another dot-product operand.
+        M - Another dot-product operand.
 
 
 The method computes a dot-product of two matrices. If the matrices are not single-column or single-row 
 vectors, the top-to-bottom left-to-right scan ordering is used to treat them as 1D vectors. The vectors 
 must have the same size and type. If the matrices have more than one channel, the dot products from all 
-the channels are summed together.
+the channels are summed together. You use the DEFMETHOD DOT to call this function. Note that it is only 
+slightly slower(See example below). 
 
 
 (defun mat-dot-example () 
@@ -880,7 +886,17 @@ the channels are summed together.
       
       ;; 1,2,3,4,5,6,7,8.
 
-      (format t "~%The dot product of A and B = ~a~%~%" (mat-dot a b)))))
+      (format t "~%The dot product of A and B using MAT-DOT = ~a~%~%" (mat-dot a b))
+
+      ;; You use the DEFMETHOD DOT, instead, as below.
+      (format t "~%Using the DEFMETHOD, DOT = ~a~%~%" (dot a b))
+      ;; Note: it is only slightly slower
+
+      ;; Note: $ is a macro for the CFFI TIME macro 
+      (format t "~%A million runs of MAT-DOT:~% ")
+      ($ (mat-dot a b))
+      (format t "~%A million runs of DOT: ~%~%")
+      ($ (dot a b)))))
 
 
 
@@ -1457,7 +1473,7 @@ LISP-CV: (POINT-Y (SELF POINT)) => :INT
 
     Parameters:	
 
-        SELF - A POINT construct.
+        SELF - A POINT object.
 
         X - X-coordinate of the point.
 
@@ -1471,18 +1487,19 @@ POINT-Y are used to extract the x,y coordinates of a point.
 (defun point-example (x y)
 
   "In this example we create an unitialized 
-   POINT with the function POINT. Then crea-
-   tes a point with the function POINT. Fin-
-   ally, lists the x,y coordinates with the 
-   POINT functions POINT-X and POINT-Y."
+   and an initialized point with the functi-
+   on POINT. The x,y coordinates of the poi-
+   nt are retrieved, with functions POINT-X 
+   and POINT-Y, and printed."
 
-  (let* ((initialized-point (point))
-	 (point (point x y)))
+  (with-point ((initialized-point (point))
+	       (point (point x y)))
     (format t "~%Pointer to initialized point: ~a~%~%" 
 	    initialized-point)
     (format t "POINT (x, y) = (~a, ~a)~%~%" 
 	    (point-x point)
 	    (point-y point))))
+
 
 
 POINT-2D
@@ -1506,7 +1523,7 @@ LISP-CV: (POINT-2D-Y (SELF POINT-2D)) => :DOUBLE
 
     Parameters:	
 
-        SELF - A POINT-2D construct.
+        SELF - A POINT-2D object.
 
         X - x-coordinate of the point.
 
@@ -1556,7 +1573,7 @@ LISP-CV: (POINT-2F-Y (SELF POINT-2F)) => :INT
 
     Parameters:	
 
-        SELF - A POINT-2F construct.
+        SELF - A POINT-2F object.
 
         X - x-coordinate of the point.
 
@@ -1587,7 +1604,7 @@ NT2F-Y are used to extract the x,y coordinates the point.
 
 POINT-3D
 
-when
+
 POINT-3D constructor.
 
 
@@ -1606,7 +1623,7 @@ LISP-CV: (POINT-3D-Y (SELF POINT-3D)) => :DOUBLE
 
     Parameters:	
 
-        SELF - A POINT-3D construct.
+        SELF - A POINT-3D object.
 
         X - x-coordinate of the point.
 
@@ -1659,7 +1676,7 @@ LISP-CV: (POINT-3F-Y (SELF POINT)) => :FLOAT
 
     Parameters:	
 
-        SELF - A POINT-3F construct.
+        SELF - A POINT-3F object.
 
         X - x-coordinate of the point.
 
@@ -1712,7 +1729,7 @@ LISP-CV: (POINT-3I-Y (SELF POINT-3I)) => :INT
 
     Parameters:	
 
-        SELF - A POINT-3I construct.
+        SELF - A POINT-3I object.
 
         X - x-coordinate of the point.
 
@@ -1839,6 +1856,9 @@ Example:
     (destroy-window window-name)))
 
 
+(<<-example)
+
+
 
 PTR
 
@@ -1858,82 +1878,81 @@ LISP-CV: (PTR (SELF MAT) &OPTIONAL ((I0 :INT) 0)) => :POINTER
 This function returns a pointer to the specified matrix row.
 
 
-;;Must supply a filename parameter for the image you 
-;;will be using in this example and one for the file 
-;;the image's pixel value will be written it.
-(defun ptr-example (filename-1 filename-2)
-  ;;Read in image
-  (let* ((img (imread filename-1 1))
-	 (window-name-1 "Original image - PTR Example")
-	 (window-name-2 "All white image - PTR Example")
-         ;;Variables used to hold the 
-         ;;BGR image pixel values.
-	 (b 0)
-         (g 0)
-         (r 0)
-	 (p 0))
-    (if (empty img) 
-	(return-from ptr-example 
-	  (format t "Image not loaded")))
-    (named-window window-name-1 +window-normal+)
-    (named-window window-name-2 +window-normal+)
-    (move-window window-name-1 514 175)
-    (move-window window-name-2 966 175)
-    ;;Access the first BGR pixel value 
-    ;;with the function PTR and print it.
-    ;;Note: the '?' is a CFFI:MEM-AREF
-    ;;macro.
-    (setf b (? (ptr img 0) :uchar))
-    (setf g (? (ptr img 0) :uchar 1))
-    (setf r (? (ptr img 0) :uchar 2))
-    (format t "First BGR pixel value = (~a,~a,~a)
-~%~% " b g r)
-    ;;Access the second BGR pixel value 
-    ;;with the function PTR and print it.
-    (setf b (? (ptr img 0) :uchar 3))
-    (setf g (? (ptr img 0) :uchar 4))
-    (setf r (? (ptr img 0) :uchar 5))
-    (format t "Second BGR pixel value = (~a,~a,~a)
+
+;;The file the image's pixel value will be written 
+;;in this example, will be saved to:
+
+;;<LISP-CV-SOURCE-DIR>/DATA.
+
+(defun ptr-example (filename)
+
+  (let ((window-name-1 "Original image - PTR Example")
+	(window-name-2 "All white image - PTR Example")
+	;;Variables used to hold the 
+	;;BGR image pixel values.
+	(b 0)
+	(g 0)
+	(r 0)
+	(p 0))
+    ;;Read in image
+    (with-mat ((img (imread filename 1)))
+      (if (empty img) 
+	  (return-from ptr-example 
+	    (format t "Image not loaded")))
+      (with-named-window (window-name-1 +window-normal+)
+	(with-named-window (window-name-2 +window-normal+)
+	  (move-window window-name-1 514 175)
+	  (move-window window-name-2 966 175)
+	  ;;Access the first BGR pixel value 
+	  ;;with the function PTR and print it.
+	  ;;Note: the '?' is a CFFI:MEM-AREF
+	  ;;macro.
+	  (setf b (? (ptr img 0) :uchar))
+	  (setf g (? (ptr img 0) :uchar 1))
+	  (setf r (? (ptr img 0) :uchar 2))
+	  (format t "~%First BGR pixel value = (~a,~a,~a)
+~%~%" b g r)
+	  ;;Access the second BGR pixel value 
+	  ;;with the function PTR and print it.
+	  (setf b (? (ptr img 0) :uchar 3))
+	  (setf g (? (ptr img 0) :uchar 4))
+	  (setf r (? (ptr img 0) :uchar 5))
+	  (format t "Second BGR pixel value = (~a,~a,~a)
  ~%~%" b g r)
-    ;;Access the third BGR pixel value 
-    ;;with the function PTR and print it.
-    (setf b (? (ptr img 0) :uchar 6))
-    (setf g (? (ptr img 0) :uchar 7))
-    (setf r (? (ptr img 0) :uchar 8))
-    (format t "Third BGR pixel value = (~a,~a,~a)
- ~%~%" b g r)
-    ;;Access all BGR pixel values with the function PTR 
-    ;;and print them to a file so you can verify the fi-
-    ;;rst 3 BGR values in the file will match the 3 pri-
-    ;;nted here.
-    (with-open-file (str filename-2
-			 :direction :output
-			 :if-exists :supersede
-			 :if-does-not-exist :create)
-      (dotimes (row (rows img))  
-	(dotimes (col (* (cols img) 3))
-	  (setf p (? (ptr img row) :uchar col))
-	  (format str "~a~%" p))))
-    ;;Show original image in a window.
-    (imshow window-name-1 img)
-    ;;Here we set every pixel of IMG to white, the same
-    ;;way we saved every pixel to a file so you can ver-
-    ;;if every pixel was included.
-    (dotimes (row (rows img))  
-      (dotimes (col (* (cols img) 3))
-	(setf (? (ptr img row) :uchar col) 255)
-	(setf p (? (ptr img row) :uchar col))))
-    ;;Show the all white image in a window.
-    (imshow window-name-2 img)
-    (loop while (not (= (wait-key 0) 27)))
-    (del-mat img)
-    (destroy-all-windows)))
-
-
-
-Usage: 
-
-   (PTR-EXAMPLE "/HOME/USERS/IMG.JPG" "~/DATA.TXT")
+	  ;;Access the third BGR pixel value 
+	  ;;with the function PTR and print it.
+	  (setf b (? (ptr img 0) :uchar 6))
+	  (setf g (? (ptr img 0) :uchar 7))
+	  (setf r (? (ptr img 0) :uchar 8))
+	  (format t "Third BGR pixel value = (~a,~a,~a)
+ ~%" b g r)
+	  ;;Access all BGR pixel values with the function PTR 
+	  ;;and print them to a file so you can verify the fi-
+	  ;;rst 3 BGR values in the file will match the 3 pri-
+	  ;;nted here.
+	  (with-open-file (str (cat *lisp-cv-data-dir* "pixel-values.txt")
+			       :direction :output
+			       :if-exists :supersede
+			       :if-does-not-exist :create)
+	    (dotimes (row (rows img))  
+	      (dotimes (col (* (cols img) 3))
+		(setf p (? (ptr img row) :uchar col))
+		(format str "~a~%" p))))
+	  ;;Show original image in a window.
+	  (imshow window-name-1 img)
+	  ;;Here we set every pixel of IMG to white, the same
+	  ;;way we saved every pixel to a file so you can ver-
+	  ;;if every pixel was included.
+	  (dotimes (row (rows img))  
+	    (dotimes (col (* (cols img) 3))
+	      (setf (? (ptr img row) :uchar col) 255)
+	      (setf p (? (ptr img row) :uchar col))))
+	  ;;Show the all white image in a window.
+	  (imshow window-name-2 img)
+	  (loop
+    	     (let ((c (wait-key 33)))
+	       (when (= c 27)
+		 (return)))))))))
 
 
 
@@ -2118,7 +2137,7 @@ LISP-CV: (ROWS (SELF MAT)) => :INT
 
     Parameters:	
 
-        SELF - A MAT construct.
+        SELF - A MAT object.
 
 
 The function ROWS finds the number of rows in a matrix or -1 when the array has more than 2 dimensi-
@@ -2132,6 +2151,54 @@ ons.
   (let* ((mat (mat 3 4 +64f+ (scalar 100)) ))
           (format t "The number of rows in MAT = ~a" (rows mat))))
 
+
+
+
+SCALE
+
+Finds the product a matrix and a scalar..
+
+C++: MatExpr * operator
+
+LISP-CV: (SCALE (SELF MAT-EXPR) (ALPHA :DOUBLE)) => MAT-EXPR
+
+
+    Parameters:	
+
+        SELF - A single float or double float matrix.
+
+        ALPHA - A scalar of type double-float. 
+
+
+This is the primary function used in this library for multiplication by and division by scalar. See 
+SCALE-EXAMPLE for an example of division by scalar. You may need to coerce the return value of SCALE, 
+a scaled matrix, back to type MAT with the function (FORCE), (or the shorthand version (>>)) to use in 
+other functions. Also matrices of MAT type must be coerced to MAT-EXPR, with the function PROMOTE(<<), 
+before passing to SCALE.
+
+
+(defun scale-example ()
+
+  "In this example a +32F+(single-float) matrix 
+   is created and filled with data. Then, using 
+   SCALE, each element of the matrix is divided 
+   by the scalar 10. Finally, the matrix is pri-
+   nted.
+
+   Note: The t: prefix before the functions >> 
+   and << signify that automatic GC is enabled."
+
+  (with-object ((data (alloc :float '(1.0f0 2.0f0 3.0f0 4.0f0 5.0f0 
+				      6.0f0 7.0f0 8.0f0 9.0f0))))
+    (with-mat ((mat (mat 3 3 +32f+ data)))
+      (with-mat-expr ((scaled-mat (scale (t:<< mat) (/ 1d0 10d0))))
+	(format t "~%")
+	(dotimes (i 3)
+	  (dotimes (j 3)
+	    (format t "~a" (at (t:>> scaled-mat) i j :float))
+	    (princ #\Space))
+	  (princ #\Newline))
+	(format t "~%")))))
 
 
 
@@ -2168,7 +2235,7 @@ LISP-CV: (SIZE (SELF RANGE)) => :INT
 
     Parameters:	
 
-        SELF - A SIZE construct.
+        SELF - A SIZE object.
 
         WIDTH - The width of SIZE.
         
@@ -2177,14 +2244,14 @@ LISP-CV: (SIZE (SELF RANGE)) => :INT
 
 The function SIZE creates and also retrieves MAT and RANGE size values..
 
-The function WIDTH Finds the width of a SIZE construct.
+The function WIDTH Finds the width of a SIZE object.
 
-The function HEIGHT Finds the height of a SIZE construct.
+The function HEIGHT Finds the height of a SIZE object.
 
 
 The function SIZE contains the functionality of both the OpenCV class Size_, the OpenCV MAT class 
 member size and the OpenCV Range class member size. It can return a pointer to an uninitialized SIZE 
-construct, an initialized SIZE object holding (WIDTH, HEIGHT) values, determine the SIZE value of any 
+object, an initialized SIZE object holding (WIDTH, HEIGHT) values, determine the SIZE value of any 
 MAT object passed to it, or determine the size of any RANGE object passes to it. When returning a MAT 
 size the columns are listed first and the rows are listed second(COLS, ROWS). When the matrix is more
 than 2-dimensional, the returned size is (-1 -1). 
@@ -2193,12 +2260,12 @@ than 2-dimensional, the returned size is (-1 -1).
 (defun size-example ()
   
   "In the code below, the (COLS, ROWS) values of MAT 
-   are accessed and stored in a SIZE construct. The 
-   values are accessed with the WIDTH and HEIGHT fun-
-   ctions and printed. A RANGE object, RANGE, is cre-
-   ated and its value is printed. Then an uninitiali-
-   zed and an initialized SIZE construct are created. 
-   Their values are also printed."
+   are accessed and stored in a SIZE object. The val-
+   ues are accessed with the WIDTH and HEIGHT functi-
+   ons and printed. A RANGE object, RANGE, is create-
+   d and its value is printed. Then an uninitialized 
+   and an initialized SIZE object are created. Their 
+   values are also printed."
   
   (with-mat ((mat (mat 5 5 +8u+ (scalar 100 100 100))))
     (with-range ((range (range 1 10)))
@@ -3309,9 +3376,75 @@ arrays, each channel is processed independently.
 
 
 
+
+CALC-COVAR-MATRIX
+
+
+Calculates the covariance matrix of a set of vectors.
+
+
+C++: void calcCovarMatrix(InputArray samples, OutputArray covar, InputOutputArray mean, int flags, int ctype=CV_64F)
+
+LISP-CV: (CALC-COVAR-MATRIX (SAMPLES MAT) (COVAR MAT) (MEAN MAT) (FLAGS :INT) ((CTYPE :INT) +64F+)) => :VOID
+
+
+    Parameters:	
+
+        SAMPLES - Samples stored either as separate matrices or as rows/columns of a single matrix.
+
+        COVAR - Output covariance matrix of the type CTYPE and square size.
+
+        MEAN - Input or output (depending on the flags) array as the average value of the input vectors.
+
+        FLAGS -
+
+          Operation flags as a combination of the following values
+
+
+                      +COVAR-SCRAMBLED+ 
+
+                      +COVAR-NORMAL+ 
+
+                      +COVAR-USE-AVG+
+
+                      +COVAR-SCALE+ 
+
+                      +COVAR-ROWS+ 
+
+                      +COVAR-COLS+ 
+
+
+See OpenCV documentation at this link for a description of the flags and formulae: 
+
+http://docs.opencv.org/trunk/modules/core/doc/operations_on_arrays.html?highlight=calccovar#calccovarmatrix
+
+Note: At the above link, the first variant of this function is not currently supported in this library.
+
+
+        CTYPE - Type of the matrix; it equals ‘+64F+’ by default.
+
+        
+The functions CALC-COVAR-MATRIX calculate the covariance matrix and, optionally, the mean vector of 
+the set of input vectors.
+
+
+See also:
+
+PCA, (MUL-TRANSPOSED), (MAHALANOBIS)
+
+
+CALC-COVAR-MATRIX-EXAMPLE:
+
+See MAHALANOBIS-EXAMPLE in this file.
+
+
+
+
 COMPLETE-SYMM
 
+
 Copies the lower or the upper half of a square matrix to another half.
+
 
 C++: void completeSymm(InputOutputArray mtx, bool lowerToUpper=false)
 
@@ -4288,6 +4421,123 @@ See also
 
 
 
+
+
+MUL-TRANSPOSED
+
+
+Calculates the product of a matrix and its transposition.
+
+
+C++: void mulTransposed(InputArray src, OutputArray dst, bool aTa, InputArray delta=noArray(), double scale=1, int dtype=-1 )
+
+LISP-CV: (MUL-TRANSPOSED (SRC MAT) (DEST MAT) (A-T-A :BOOLEAN) &OPTIONAL ((DELTA MAT) (MAT)) ((SCALE :DOUBLE) 1D0) 
+                        ((DTYPE :INT) -1)) => :VOID
+
+
+    Parameters:	
+
+        SRC - Input single-channel matrix. Note that unlike (GEMM), the function can multiply not 
+              only floating-point matrices.
+
+        DEST - Output square matrix.
+
+        A-T-A - Flag specifying the multiplication ordering. See the description below.
+
+        DELTA - Optional delta matrix subtracted from SRC before the multiplication. When the matrix 
+                is empty (EQ DELTA (MAT)), it is assumed to be zero, that is, nothing is subtracted. 
+                If it has the same size as SRC , it is simply subtracted. Otherwise, it is “repeated” 
+                (see (REPEAT) ) to cover the full SRC and then subtracted. Type of the delta matrix, 
+                when it is not empty, must be the same as the type of created output matrix. See the 
+                DTYPE parameter description below.
+
+        SCALE - Optional scale factor for the matrix product.
+
+        DTYPE - Optional type of the output matrix. When it is negative, the output matrix will have 
+                the same type as SRC . Otherwise, it will be type=CV_MAT_DEPTH(dtype) (<--internal C++ 
+                function. See <OpenCV-source-directory>/modules/core/include/opencv2/core/cvdef.h) that 
+                should be either +32F+ or +64F+.
+
+
+The function MUL-TRANSPOSED calculates the product of SRC and its transposition.
+
+
+See OpenCV documentation at this link:
+
+http://docs.opencv.org/trunk/modules/core/doc/operations_on_arrays.html?highlight=multransposed#multransposed
+
+for further description and formulae.
+
+Note: The output of MUL-TRANSPOSED into the matrix supplied by the DEST param is so strong that DEST cannot be overwritten by calling 
+See also:
+
+(CALC-COVAR-MATRIX), (GEMM), (REPEAT), (REDUCE)
+
+
+
+MUL-TRANSPOSE-EXAMPLE:
+
+
+To show this functions works as stated, first multiply A by its transpose, using the MUL function:
+(The GC: prefix to these functions signal automatic Garbage Collection is activated.)
+
+
+Define A, a single float matrix:
+
+CV> (DEFPARAMETER A (GC:MAT 3 3 +32f+ :FLOAT '(1f0 2f0 3f0 4f0 5f0 6f0 7f0 8f0 9f0)))
+
+A
+
+
+Define B as the transpose of A:
+
+CV> (DEFPARAMETER B (GC:>> (GC:MAT-EXPR-T A))) <--- The MAT-EXPR type output of MAT-EXPR-T is converted 
+                                                    back to MAT with the (>>) function, so it can be used 
+B                                                   as input to MUL. 
+
+
+Finally, multiply A and B and print the output. Again, output must be converted to MAT type before 
+sending to PRINT-MAT.
+
+CV> (PRINT-MAT (GC:>> (GC:MUL A B)) :FLOAT)
+
+14.0 32.0 50.0 
+32.0 77.0 122.0 
+50.0 122.0 194.0 
+
+NIL
+
+
+Now, do the same operation with MUL-TRANSPOSE:
+
+
+First define A, a single float matrix:
+
+CV> (DEFPARAMETER A (GC:MAT 3 3 +32f+ :FLOAT '(1f0 2f0 3f0 4f0 5f0 6f0 7f0 8f0 9f0)))
+
+A
+
+
+Multipy A by its transpose. A is the destination matrix:
+
+CV> (MUL-TRANSPOSED A A NIL) 
+
+; No value
+
+
+Print A:
+
+CV> (PRINT-MAT A :FLOAT)
+
+14.0 32.0 50.0 
+32.0 77.0 122.0 
+50.0 122.0 194.0 
+
+NIL
+
+
+
+
 MULTIPLY
 
 Calculates the per-element scaled product of two arrays.
@@ -4734,6 +4984,93 @@ See also:
       (princ #\Newline))
     (princ #\Space)
     (free data)))
+
+
+
+
+
+REPEAT
+
+
+Fills the output array with repeated copies of the input array.
+
+
+C++: void repeat(InputArray src, int ny, int nx, OutputArray dst)
+
+LISP-CV: (REPEAT (SRC MAT) (NY :INT) (NX :INT) (DEST MAT)) => :VOID 
+
+
+    Parameters:	
+
+        SRC - Input array to replicate.
+
+        DST - Output array of the same type as SRC.
+
+        NY - Flag to specify how many times the SRC is repeated along the vertical axis.
+
+        NX - Flag to specify how many times the SRC is repeated along the horizontal axis.
+
+
+The function (REPEAT) duplicates the input array one or more times along each of the two axes:
+
+
+See OpenCV documentation at this link for the formula: 
+
+http://docs.opencv.org/trunk/modules/core/doc/operations_on_arrays.html?highlight=repeat#repeat
+
+
+See also:
+
+(REDUCE), Matrix Expressions(MAT-EXPR)
+
+
+REPEAT-EXAMPLE:
+
+
+Create a 2x2 matrix. (The GC: prefix indicates automatic Garbage Collection is activated.)
+
+CV> (DEFPARAMETER A (GC:MAT 2 2 +32s+ :INT '(1 2 3 4))) 
+
+A
+
+Print the original matrix A
+
+CV> (PRINT-MAT A :INT)
+
+1 2 
+3 4 
+
+NIL
+
+Create a 10x10 matrix to hold the repeated copies of marix A data.
+
+CV> (DEFPARAMETER B (GC:MAT 10 10 +32s+ :INT))
+
+B
+
+Evaluate the REPEAT function to fill matrix B with repeated copies of A.
+
+CV> (REPEAT A 5 5 B)
+
+; No value
+
+Print B.
+
+CV> (PRINT-MAT b :INT)
+
+1 2 1 2 1 2 1 2 1 2 
+3 4 3 4 3 4 3 4 3 4 
+1 2 1 2 1 2 1 2 1 2 
+3 4 3 4 3 4 3 4 3 4 
+1 2 1 2 1 2 1 2 1 2 
+3 4 3 4 3 4 3 4 3 4 
+1 2 1 2 1 2 1 2 1 2 
+3 4 3 4 3 4 3 4 3 4 
+1 2 1 2 1 2 1 2 1 2 
+3 4 3 4 3 4 3 4 3 4 
+
+NIL
+
 
 
 RNG
@@ -7504,6 +7841,216 @@ See also:
 
 
 
+CVT-COLOR
+
+Converts an image from one color space to another.
+
+C++: void cvtColor(InputArray src, OutputArray dst, int code, int dstCn=0 )
+
+LISP-CV: (CVT-COLOR (SRC MAT) (DEST MAT) (CODE :INT) ((DEST-CN :INT) 0))
+
+
+    Parameters:	
+
+        SRC - input image: 8-bit unsigned, 16-bit unsigned ( +16UC...+ ), or single-precision float-
+              ing-point.
+
+        DST - output image of the same size and depth as src.
+
+        CODE - color space conversion code (see the description below).
+
+        DEST-CN - number of channels in the destination image; if the parameter is 0, the number of
+                  the channels is derived automatically from src and code .
+
+
+The function converts an input image from one color space to another. In case of a transformation t-
+o-from RGB color space, the order of the channels should be specified explicitly (RGB or BGR). Note
+that the default color format in OpenCV is often referred to as RGB but it is actually BGR (the byt-
+es are reversed). So the first byte in a standard (24-bit) color image will be an 8-bit Blue compon-
+ent, the second byte will be Green, and the third byte will be Red. The fourth, fifth, and sixth by-
+tes would then be the second pixel (Blue, then Green, then Red), and so on.
+
+
+The conventional ranges for R, G, and B channel values are:
+
+    0 to 255 for +8U+ images
+
+    0 to 65535 for +16U+ images
+
+    0 to 1 for +32F+ images
+
+In case of linear transformations, the range does not matter. But in case of a non-linear transform-
+ation, an input RGB image should be normalized to the proper value range to get the correct results, 
+for example, for RGB -> L*u*v* transformation. For example, if you have a 32-bit floating-point ima-
+ge directly converted from an 8-bit image without any scaling, then it will have the 0..255 value r-
+ange instead of 0..1 assumed by the function. So, before calling CVT-COLOR , you need first to scal-
+e the image down:
+
+(LET ((img (/ 1 255)))todo
+  (CVT-COLOR IMG IMG +BGR2LUV))
+
+If you use CVT-COLOR with 8-bit images, the conversion will have some information lost. For many ap-
+plications, this will not be noticeable but it is recommended to use 32-bit images in applications 
+that need the full range of colors or that convert an image before an operation and then convert back.
+
+The function can do the following transformations:
+
+
+        ***RGB <-> GRAY (+BGR2GRAY+, +RGB2GRAY+, +GRAY2BGR+, +GRAY2RGB+)*** 
+
+Transformations within RGB space like adding/removing the alpha channel, reversing the channel orde-
+r, conversion to/from 16-bit RGB color (R5:G6:B5 or R5:G5:B5), as well as conversion to/from graysc-
+ale. The conversion from a RGB image to gray is done with:
+
+
+(CVT-COLOR SRC BWSRC +RGB2GRAY+)
+
+More advanced channel reordering can also be done with (MIX-CHANNELS).
+
+
+For more info on the CVT-COLOR types below. See OpenCV's cvtColor Documentation at: 
+
+
+http://docs.opencv.org/modules/imgproc/doc/miscellaneous_transformations.html?highlight=cvtcolor#cv.CvtColor
+
+
+Thank you to Wikipedia for the information on Color Spaces provided below:
+
+
+        ***RGB <-> CIE XYZ.REC 709 WITH D65 WHITE POINT (+BGR2XYZ+, +RGB2XYZ+, +XYZ2BGR+, +XYZ2RGB+)***
+
+
+   Meaning of X, Y, and Z:
+
+ A comparison between a typical normalised M cone's spectral sensitivity and the CIE 1931 luminosity
+function for a standard observer in photopic vision
+
+ When judging the relative luminance (brightness) of different colours in well-lit situations, human-
+s tend to perceive light within the green parts of the spectrum as brighter than red or blue light 
+of equal power. The luminosity function that describes the perceived brightnesses of different wave-
+lengths is thus roughly analogous to the spectral sensitivity of M cones.
+
+ The CIE model capitalises on this fact by defining Y as luminance. Z is quasi-equal to blue stimul-
+ation, or the S cone response, and X is a mix (a linear combination) of cone response curves chosen 
+to be nonnegative. The XYZ tristimulus values are thus analogous to, but not equal to, the LMS cone 
+responses of the human eye. Defining Y as luminance has the useful result that for any given Y valu-
+e, the XZ plane will contain all possible chromaticities at that luminance.
+
+
+        ***RGB <-> YCRCB JPEG (OR YCC) (+BGR2YCRCB+, +RGB2YCRCB+, +YCRCB2BGR+, +YCRCB2RGB+)***
+
+
+ YCbCr, Y′CbCr, or Y Pb/Cb Pr/Cr, also written as YCBCR or Y′CBCR, is a family of color spaces used 
+as a part of the color image pipeline in video and digital photography systems. Y′ is the luma comp-
+onent and CB and CR are the blue-difference and red-difference chroma components. Y′ (with prime) i-
+s distinguished from Y, which is luminance, meaning that light intensity is nonlinearly encoded bas-
+ed on gamma corrected RGB primaries.
+
+ Y′CbCr is not an absolute color space; rather, it is a way of encoding RGB information. The actual 
+color displayed depends on the actual RGB primaries used to display the signal. Therefore a value e-
+xpressed as Y′CbCr is predictable only if standard RGB primary chromaticities are used.
+
+
+        ***RGB <-> HSV (+BGR2HSV+, +RGB2HSV+, +HSV2BGR+, +HSV2RGB+)***
+
+        ***RGB <-> HLS (+BGR2HLS+, +RGB2HLS+, +HLS2BGR+, +HLS2RGB+)***
+
+
+ HSL and HSV are the two most common cylindrical-coordinate representations of points in an RGB colo-
+r model. The two representations rearrange the geometry of RGB in an attempt to be more intuitive a-
+nd perceptually relevant than the cartesian (cube) representation. Developed in the 1970s for compu-
+ter graphics applications, HSL and HSV are used today in color pickers, in image editing software, 
+and less commonly in image analysis and computer vision.
+
+
+        ***RGB <-> CIE L*A*B* (+BGR2LAB+, +RGB2LAB+, +LAB2BGR+, +LAB2RGB+)***
+
+
+ A Lab color space is a color-opponent space with dimension L for lightness and a and b for the colo-
+r-opponent dimensions, based on nonlinearly compressed CIE XYZ color space coordinates.
+
+ The dimensions of the Hunter 1948 L, a, b color space are L, a, and b.[1][2] However, Lab is now mo-
+re often used as an informal abbreviation for the CIE 1976 (L*, a*, b*) color space (or CIELAB). Th-
+e difference between Hunter and CIE color coordinates is that the CIE coordinates are based on a cu-
+be root transformation of the color data, while the Hunter coordinates are based on a square root t-
+ransformation.
+
+
+        ***RGB <-> CIE L*U*V* (+BGR2LUV+, +RGB2LUV+, +LUV2BGR+, +LUV2RGB+)***
+
+
+ In colorimetry, the CIE 1976 (L*, Readu*, v*) color space, commonly known by its abbreviation CIELUV, 
+is a color space adopted by the International Commission on Illumination (CIE) in 1976, as a simple-
+to-compute transformation of the 1931 CIE XYZ color space, but which attempted perceptual uniformit-
+y. It is extensively used for applications such as computer graphics which deal with colored lights-
+. Although additive mixtures of different colored lights will fall on a line in CIELUV's uniform ch-
+romaticity diagram (dubbed the CIE 1976 UCS), such additive mixtures will not, contrary to popular 
+belief, fall along a line in the CIELUV color space unless the mixtures are constant in lightness.
+
+
+        ***BAYER <-> RGB (+BAYERBG2BGR+, +BAYERGB2BGR+, +BAYERRG2BGR+, +BAYERGR2BGR+
+                         +BAYERBG2RGB+, +BAYERGB2RGB+, +BAYERRG2RGB+, +BAYERGR2RGB+)***
+
+
+ A Bayer filter mosaic is a color filter array (CFA) for arranging RGB color filters on a square gr-
+id of photosensors. Its particular arrangement of color filters is used in most single-chip digital 
+image sensors used in digital cameras, camcorders, and scanners to create a color image. The filter 
+pattern is 50% green, 25% red and 25% blue, hence is also called RGBG,[1][2] GRGB,[3] or RGGB.[4]
+
+
+
+(defun cvt-color-example (&optional (camera *camera-index*) 
+			    (width 640)
+			    (height 480))
+
+  "In this example, the function CVT-COLOR converts 
+   the camera output to 4 different color spaces an-
+   d shows the results in four windows. See the CVT-
+   COLOR documentation:
+
+   LISP-CV-MASTER/EXAMPLES/EXAMPLES.LISP 
+
+   for more information on these color spaces."
+
+  (with-captured-camera (cap camera :width width :height height)
+    (let ((window-name-1 "+BGR2HSV+ - CVT-COLOR Example")
+	  (window-name-2 "+BGR2XYZ+ - CVT-COLOR Example")
+	  (window-name-3 "+BGR2GRAY+ - CVT-COLOR Example")
+	  (window-name-4 "+BGR2HLS+ - CVT-COLOR Example"))
+      (if (not (cap-is-open cap)) 
+	  (return-from cvt-color-example 
+	    (format t "Cannot open the video camera")))
+      (format t "~%Frame Size : ~ax~a~%~%" 
+	      (cap-get cap +cap-prop-frame-width+)
+	      (cap-get cap +cap-prop-frame-height+))
+      (with-named-window (window-name-1 +window-normal+)
+	(with-named-window (window-name-2 +window-normal+)
+	  (with-named-window (window-name-3 +window-normal+)
+	    (with-named-window (window-name-4 +window-normal+)
+	      (move-window window-name-1 485 98)
+	      (move-window window-name-2 894 98)
+	      (move-window window-name-3 485 444)
+	      (move-window window-name-4 894 444)
+	      (loop
+		 (with-mat ((frame (mat)))
+		   (cap-read cap frame)
+		   (with-mat ((src1 (clone frame))
+			      (src2 (clone frame))
+			      (src3 (clone frame)))
+		     (cvt-color frame frame +BGR2HSV+)
+		     (cvt-color src1 src1 +BGR2XYZ+)
+		     (cvt-color src2 src2 +BGR2GRAY+)
+		     (cvt-color src3 src3 +BGR2HLS+)
+		     (imshow window-name-1 frame)
+		     (imshow window-name-2 src1)
+		     (imshow window-name-3 src2)
+		     (imshow window-name-4  src3))
+		   (let ((c (wait-key 33)))
+		     (when (= c 27)
+		       (return))))))))))))
+
+
+
 DISTANCE-TRANSFORM
 
 Calculates the distance to the closest zero pixel for each pixel of the source image.
@@ -9861,10 +10408,10 @@ http://docs.opencv.org/modules/features2d/doc/feature_detection_and_description.
       (setf (aref descriptors-b-arr i) (gc:mat))
       ;; declare an array of 12 matchers
       (setf (aref matcher-arr i) (gc:bf-matcher))
-      ;; declare an array of 12 MAT constructs to hold the 
+      ;; declare an array of 12 MAT objects to hold the 
       ;; matches from the first image to the second one
       (setf (aref matches-arr i) (gc:vec-dmatch))
-      ;; declare an array of 12 MAT constructs to hold the final output images
+      ;; declare an array of 12 MAT objects to hold the final output images
       (setf (aref all-matches-arr i) (gc:mat))
       ;; find matches, between the two images, 12 times,
       ;; each using a different set of BRISK parameters
@@ -9911,7 +10458,7 @@ LISP-CV: (FEATURE-DETECTOR-CREATE (SELF FEATURE-2D) (DETECTOR-TYPE :STRING)) => 
 
     Parameters:	
 
-        SELF - A pointer to a BRISK construct
+        SELF - A pointer to a BRISK object
 
         DETECTOR-TYPE - Feature detector type:
 
@@ -12039,7 +12586,7 @@ LISP-CV: (ANN-MLP-PREDICT (SELF ANN-MLP) (INPUTS MAT) (OUTPUTS MAT)) => :FLOAT
 
     Parameters:	
 
-        SELF - An ANN-MLP construct
+        SELF - An ANN-MLP object
 
         INPUT - Input samples.
 
@@ -13500,6 +14047,8 @@ a part of more complex matrix expressions or can be assigned to a matrix.
         SELF - Input matrix
 
 
+MAT-EXPR-T-EXAMPLE:
+
 CV> (DEFPARAMETER A (MAT 3 3 +8U+ :UCHAR '(1 2 3 4 5 6 7 8 9)))
 
 A
@@ -13558,6 +14107,8 @@ shorthand version of the FORCE function supplied for ease of use.
     (loop while (not (= (wait-key 0) 27)))
     (destroy-window window-name)))
 
+
+(>>-example)
 
 
          
@@ -14138,6 +14689,7 @@ The function RECT-BR retrieves the bottom-right corner of the rectangle.
 		(point-y clone-br-corner))))))
 
 
+
 DOT
 
 Dot product computed in double-precision arithmetics.
@@ -14146,357 +14698,57 @@ C++:  _Tp dot(const Point_& pt) const;
 
 LISP-CV: (DOT (SELF POINT) (OTHER POINT)) => :INT
 
-LISP-CV: (DOT2F (SELF POINT-2F) (OTHER POINT-2F)) => :FLOAT
+LISP-CV: (DOT (SELF POINT-2D) (OTHER POINT-2D)) => :DOUBLE
 
-LISP-CV: (DOT2D (SELF POINT-2D) (OTHER POINT-2D)) => :DOUBLE
+LISP-CV: (DOT (SELF POINT-2F) (OTHER POINT-2F)) => :FLOAT
 
 C++"  _Tp dot(const Point3_& pt) const;
 
-LISP-CV: (DOT3I (SELF POINT-3I) (OTHER POINT-3I)) => :INT
+LISP-CV: (DOT (SELF POINT-3D) (OTHER POINT-3D)) => :DOUBLE
 
-LISP-CV: (DOT3F (SELF (:POINTER POINT-3F)) (OTHER POINT-3F)) => :FLOAT
+LISP-CV: (DOT (SELF POINT-3F) (OTHER POINT-3F)) => :FLOAT
 
-LISP-CV: (DOT3D (SELF POINT) (OTHER POINT)) => :INT
+LISP-CV: (DOT (SELF POINT-3I) (OTHER POINT-3I)) => :INT
 
 
     Parameters:	
 
-        SELF - A POINT construct.
+        SELF - A POINT object.
          
-        OTHER - A POINT construct.
+        OTHER - A POINT object.
+
 
 
 (defun dot-example ()
 
   "This example uses the function DOT to 
-   find the dot product of points P1 and 
-   P2."
-
-  (let* ((p1 (point 1 2))
-	 (p2 (point 3 4)))
-    (format t "The dot product of P1 and P2 = ~a~%~%"  
-	    (dot p1 p2) )))
-
-
-(defun dot2f-example ()
-
-  "This example uses the function DOT to 
-   find the dot product of 2 point-2f con-
-   structs P1 and P2."
-
-  (let* ((p1 (point-2f 1.0f0 2.0f0))
-	 (p2 (point-2f 3.0f0 4.0f0)))
-    (format t "The dot product of P1 and P2 = ~a~%~%"  
-	    (dot2f p1 p2) )))
-
-
-(defun dot2d-example ()
-
-  "This example uses the function DOT to 
-   find the dot product of 2 point-2d con-
-   structs P1 and P2."
-
-  (let* ((p1 (point-2d 1.0d0 2.0d0))
-	 (p2 (point-2d 3.0d0 4.0d0)))
-    (format t "The dot product of P1 and P2 = ~a~%~%"  
-	    (dot2d p1 p2) )))
-
-
-(defun dot3i-example ()
-
-  "This example uses the function DOT to 
-   find the dot product of 2 point-3i con-
-   structs P1 and P2."
-
-  (let* ((p1 (point-3i 1 2 3))
-	 (p2 (point-3i 4 5 6)))
-    (format t "The dot product of P1 and P2 = ~a~%~%"  
-	    (dot3i p1 p2) )))
-
-
-(defun dot3f-example ()
-
-  "This example uses the function DOT to 
-   find the dot product of 2 point-3f con-
-   structs P1 and P2."
-
-  (let* ((p1 (point-3f 7.0f0 8.0f0 9.0f0))
-	 (p2 (point-3f 10.0f0 11.0f0 12.0f0)))
-    (format t "The dot product of P1 and P2 = ~a~%~%"  
-	    (dot3f p1 p2) )))
-
-(defun dot3d-example ()
-
-  "This example uses the function DOT to 
-   find the dot product of 2 point-3d con-
-   structs P1 and P2."
-
-  (let* ((p1 (point-3d 13.0d0 14.0d0 15.0d0))
-	 (p2 (point-3d 16.0d0 17.0d0 18.0d0)))
-    (format t "The dot product of P1 and P2 = ~a~%~%"  
-	    (dot3d p1 p2))))
-
-
-
-CVT-COLOR
-
-Converts an image from one color space to another.
-
-C++: void cvtColor(InputArray src, OutputArray dst, int code, int dstCn=0 )
-
-LISP-CV: (CVT-COLOR (SRC MAT) (DEST MAT) (CODE :INT) ((DEST-CN :INT) 0))
-
-
-    Parameters:	
-
-        SRC - input image: 8-bit unsigned, 16-bit unsigned ( +16UC...+ ), or single-precision float-
-              ing-point.
-
-        DST - output image of the same size and depth as src.
-
-        CODE - color space conversion code (see the description below).
-
-        DEST-CN - number of channels in the destination image; if the parameter is 0, the number of
-                  the channels is derived automatically from src and code .
-
-
-The function converts an input image from one color space to another. In case of a transformation t-
-o-from RGB color space, the order of the channels should be specified explicitly (RGB or BGR). Note
-that the default color format in OpenCV is often referred to as RGB but it is actually BGR (the byt-
-es are reversed). So the first byte in a standard (24-bit) color image will be an 8-bit Blue compon-
-ent, the second byte will be Green, and the third byte will be Red. The fourth, fifth, and sixth by-
-tes would then be the second pixel (Blue, then Green, then Red), and so on.
-
-
-The conventional ranges for R, G, and B channel values are:
-
-    0 to 255 for +8U+ images
-
-    0 to 65535 for +16U+ images
-
-    0 to 1 for +32F+ images
-
-In case of linear transformations, the range does not matter. But in case of a non-linear transform-
-ation, an input RGB image should be normalized to the proper value range to get the correct results, 
-for example, for RGB -> L*u*v* transformation. For example, if you have a 32-bit floating-point ima-
-ge directly converted from an 8-bit image without any scaling, then it will have the 0..255 value r-
-ange instead of 0..1 assumed by the function. So, before calling CVT-COLOR , you need first to scal-
-e the image down:
-
-(LET ((img (/ 1 255)))todo
-  (CVT-COLOR IMG IMG +BGR2LUV))
-
-If you use CVT-COLOR with 8-bit images, the conversion will have some information lost. For many ap-
-plications, this will not be noticeable but it is recommended to use 32-bit images in applications 
-that need the full range of colors or that convert an image before an operation and then convert back.
-
-The function can do the following transformations:
-
-
-        ***RGB <-> GRAY (+BGR2GRAY+, +RGB2GRAY+, +GRAY2BGR+, +GRAY2RGB+)*** 
-
-Transformations within RGB space like adding/removing the alpha channel, reversing the channel orde-
-r, conversion to/from 16-bit RGB color (R5:G6:B5 or R5:G5:B5), as well as conversion to/from graysc-
-ale. The conversion from a RGB image to gray is done with:
-
-
-(CVT-COLOR SRC BWSRC +RGB2GRAY+)
-
-More advanced channel reordering can also be done with (MIX-CHANNELS).
-
-
-For more info on the CVT-COLOR types below. See OpenCV's cvtColor Documentation at: 
-
-
-http://docs.opencv.org/modules/imgproc/doc/miscellaneous_transformations.html?highlight=cvtcolor#cv.CvtColor
-
-
-Thank you to Wikipedia for the information on Color Spaces provided below:
-
-
-        ***RGB <-> CIE XYZ.REC 709 WITH D65 WHITE POINT (+BGR2XYZ+, +RGB2XYZ+, +XYZ2BGR+, +XYZ2RGB+)***
-
-
-   Meaning of X, Y, and Z:
-
- A comparison between a typical normalised M cone's spectral sensitivity and the CIE 1931 luminosity
-function for a standard observer in photopic vision
-
- When judging the relative luminance (brightness) of different colours in well-lit situations, human-
-s tend to perceive light within the green parts of the spectrum as brighter than red or blue light 
-of equal power. The luminosity function that describes the perceived brightnesses of different wave-
-lengths is thus roughly analogous to the spectral sensitivity of M cones.
-
- The CIE model capitalises on this fact by defining Y as luminance. Z is quasi-equal to blue stimul-
-ation, or the S cone response, and X is a mix (a linear combination) of cone response curves chosen 
-to be nonnegative. The XYZ tristimulus values are thus analogous to, but not equal to, the LMS cone 
-responses of the human eye. Defining Y as luminance has the useful result that for any given Y valu-
-e, the XZ plane will contain all possible chromaticities at that luminance.
-
-
-        ***RGB <-> YCRCB JPEG (OR YCC) (+BGR2YCRCB+, +RGB2YCRCB+, +YCRCB2BGR+, +YCRCB2RGB+)***
-
-
- YCbCr, Y′CbCr, or Y Pb/Cb Pr/Cr, also written as YCBCR or Y′CBCR, is a family of color spaces used 
-as a part of the color image pipeline in video and digital photography systems. Y′ is the luma comp-
-onent and CB and CR are the blue-difference and red-difference chroma components. Y′ (with prime) i-
-s distinguished from Y, which is luminance, meaning that light intensity is nonlinearly encoded bas-
-ed on gamma corrected RGB primaries.
-
- Y′CbCr is not an absolute color space; rather, it is a way of encoding RGB information. The actual 
-color displayed depends on the actual RGB primaries used to display the signal. Therefore a value e-
-xpressed as Y′CbCr is predictable only if standard RGB primary chromaticities are used.
-
-
-        ***RGB <-> HSV (+BGR2HSV+, +RGB2HSV+, +HSV2BGR+, +HSV2RGB+)***
-
-        ***RGB <-> HLS (+BGR2HLS+, +RGB2HLS+, +HLS2BGR+, +HLS2RGB+)***
-
-
- HSL and HSV are the two most common cylindrical-coordinate representations of points in an RGB colo-
-r model. The two representations rearrange the geometry of RGB in an attempt to be more intuitive a-
-nd perceptually relevant than the cartesian (cube) representation. Developed in the 1970s for compu-
-ter graphics applications, HSL and HSV are used today in color pickers, in image editing software, 
-and less commonly in image analysis and computer vision.
-
-
-        ***RGB <-> CIE L*A*B* (+BGR2LAB+, +RGB2LAB+, +LAB2BGR+, +LAB2RGB+)***
-
-
- A Lab color space is a color-opponent space with dimension L for lightness and a and b for the colo-
-r-opponent dimensions, based on nonlinearly compressed CIE XYZ color space coordinates.
-
- The dimensions of the Hunter 1948 L, a, b color space are L, a, and b.[1][2] However, Lab is now mo-
-re often used as an informal abbreviation for the CIE 1976 (L*, a*, b*) color space (or CIELAB). Th-
-e difference between Hunter and CIE color coordinates is that the CIE coordinates are based on a cu-
-be root transformation of the color data, while the Hunter coordinates are based on a square root t-
-ransformation.
-
-
-        ***RGB <-> CIE L*U*V* (+BGR2LUV+, +RGB2LUV+, +LUV2BGR+, +LUV2RGB+)***
-
-
- In colorimetry, the CIE 1976 (L*, Readu*, v*) color space, commonly known by its abbreviation CIELUV, 
-is a color space adopted by the International Commission on Illumination (CIE) in 1976, as a simple-
-to-compute transformation of the 1931 CIE XYZ color space, but which attempted perceptual uniformit-
-y. It is extensively used for applications such as computer graphics which deal with colored lights-
-. Although additive mixtures of different colored lights will fall on a line in CIELUV's uniform ch-
-romaticity diagram (dubbed the CIE 1976 UCS), such additive mixtures will not, contrary to popular 
-belief, fall along a line in the CIELUV color space unless the mixtures are constant in lightness.
-
-
-        ***BAYER <-> RGB (+BAYERBG2BGR+, +BAYERGB2BGR+, +BAYERRG2BGR+, +BAYERGR2BGR+
-                         +BAYERBG2RGB+, +BAYERGB2RGB+, +BAYERRG2RGB+, +BAYERGR2RGB+)***
-
-
- A Bayer filter mosaic is a color filter array (CFA) for arranging RGB color filters on a square gr-
-id of photosensors. Its particular arrangement of color filters is used in most single-chip digital 
-image sensors used in digital cameras, camcorders, and scanners to create a color image. The filter 
-pattern is 50% green, 25% red and 25% blue, hence is also called RGBG,[1][2] GRGB,[3] or RGGB.[4]
-
-
-(defun cvt-color-example (&optional (camera-index *camera-index*) 
-			    (width 640)
-			    (height 480))
-
-  "In this example, the function CVT-COLOR converts 
-   the camera output to 4 different color spaces an-
-   d shows the results in four windows. See the CVT-
-   COLOR documentation:
-
-   LISP-CV-MASTER/EXAMPLES/EXAMPLES.LISP 
-
-   for more information on these color spaces."
-
-  (with-capture (cap (video-capture camera-index))
-    (let ((window-name-1 "+BGR2HSV+ - CVT-COLOR Example")
-	  (window-name-2 "+BGR2XYZ+ - CVT-COLOR Example")
-	  (window-name-3 "+BGR2GRAY+ - CVT-COLOR Example")
-	  (window-name-4 "+BGR2HLS+ - CVT-COLOR Example")
-	  (src1 0)
-	  (src2 0)
-	  (src3 0))
-      (if (not (cap-is-open cap)) 
-	  (return-from cvt-color-example 
-	    (format t "Cannot open the video camera")))
-      (cap-set cap +cap-prop-frame-width+ width)
-      (cap-set cap +cap-prop-frame-height+ height)
-      (format t "~%Frame Size : ~ax~a~%~%" 
-	      (cap-get cap +cap-prop-frame-width+)
-	      (cap-get cap +cap-prop-frame-height+))
-      (named-window window-name-1 +window-normal+)
-      (named-window window-name-2 +window-normal+)
-      (named-window window-name-3 +window-normal+)
-      (named-window window-name-4 +window-normal+)
-      (move-window window-name-1 485 98)
-      (move-window window-name-2 894 98)
-      (move-window window-name-3 485 444)
-      (move-window window-name-4 894 444)
-      (do* ((frame 0))
-	   ((plusp (wait-key *millis-per-frame*)) 
-	    (format t "Key is pressed by user"))
-	(setf frame (mat))
-	(cap-read cap frame)
-	(setf src1 (clone frame))
-	(setf src2 (clone frame))
-	(setf src3 (clone frame))
-	(cvt-color frame frame +BGR2HSV+)
-	(cvt-color src1 src1 +BGR2XYZ+)
-	(cvt-color src2 src2 +BGR2GRAY+)
-	(cvt-color src3 src3 +BGR2HLS+)
-	(imshow window-name-1 frame)
-	(imshow window-name-2 src1)
-	(imshow window-name-3 src2)
-	(imshow window-name-4  src3)
-	(del-mat frame) (del-mat src1) 
-	(del-mat src2) (del-mat src3))
-      (destroy-window window-name-1)
-      (destroy-window window-name-2)
-      (destroy-window window-name-3)
-      (destroy-window window-name-4))))
-
-
-SCALE
-
-Finds the product a matrix and a scalar..
-
-C++: MatExpr * operator
-
-LISP-CV: (SCALE (SELF MAT-EXPR) (ALPHA :DOUBLE)) => MAT-EXPR
-
-
-    Parameters:	
-
-        SELF - A single float or double float matrix.
-
-        ALPHA - A scalar of type double-float. 
-
-
-This is the primary function used in this library for multiplication by and division by scalar. See 
-SCALE-EXAMPLE for an example of division by scalar. You may need to coerce the rerturn value of SCALE, 
-a scaled matrix, back to type MAT with the function (FORCE), (or the shorthand version (>>)) to use in 
-other functions. Also matrices of MAT type must be coerced to MAT-EXPR, with the function PROMOTE(<<), 
-before passing to SCALE.
-
-
-(defun scale-example ()
-
-  "In this example a +32F+(float) matrix is 
-   created and filled with data. Then, usin-
-   g SCALE, each element of the matrix 
-   is divided by the scalar 10. Finally the 
-   matrix is printed."
-
-  (let* ((data (alloc :float '(1.0f0 2.0f0 3.0f0 4.0f0 5.0f0 
-                               6.0f0 7.0f0 8.0f0 9.0f0)))
-	 (mat (mat 3 3 +32f+ data))
-	 (scaled-mat (scale (<< mat) (/ 1d0 10d0))))
-    (dotimes (i 3)
-      (dotimes (j 3)
-	(format t "~a" (at (>> scaled-mat) i j :float))
-	(princ #\Space))
-      (princ #\Newline))
-    (free data)))
+   find The dot product of all the POINT
+   type objects in this library."
+
+  (with-point ((point-1 (point 1 2))
+	       (point-2 (point 3 4)))
+    (format t "~%The dot product of POINT-1 and POINT-2 = ~a~%~%"  
+	    (dot point-1 point-2)))
+  (with-point-2d ((point-2d-1 (point-2d 1.0d0 2.0d0))
+		  (point-2d-2 (point-2d 3.0d0 4.0d0)))
+    (format t "~%The dot product of POINT-2D-1 and POINT-2D-2 = ~a~%~%"  
+	    (dot point-2d-1 point-2d-2)))
+  (with-point-2f ((point-2f-1 (point-2f 1.0f0 2.0f0))
+		  (point-2f-2 (point-2f 3.0f0 4.0f0)))
+    (format t "~%The dot product of POINT-2F-1 and POINT-2F-2 = ~a~%~%"  
+	    (dot-2f point-2f-1 point-2f-2)))
+  (with-point-3d ((point-3d-1 (point-3d 13.0d0 14.0d0 15.0d0))
+		  (point-3d-2 (point-3d 16.0d0 17.0d0 18.0d0)))
+    (format t "~%The dot product of POINT-3D-1 and POINT-3D-2 = ~a~%~%"  
+	    (dot-3d point-3d-1 point-3d-2)))
+  (with-point-3f ((point-3f-1 (point-3f 7.0f0 8.0f0 9.0f0))
+		  (point-3f-2 (point-3f 10.0f0 11.0f0 12.0f0)))
+    (format t "~%The dot product of POINT-3F-1 and POINT-3F-2 = ~a~%~%"  
+	    (dot point-3f-1 point-3f-2)))
+  (with-point-3i ((point-3i-1 (point-3i 1 2 3))
+		  (point-3i-2 (point-3i 4 5 6)))
+    (format t "~%The dot product of POINT-3I-1 and POINT-3I-2 = ~a~%~%"  
+	    (dot point-3i-1 point-3i-2))))
 
 
 
@@ -14760,7 +15012,7 @@ LISP-CV: (DEL-VID-WRITER (SELF VIDEO-WRITER)) => :VOID
 
   Parameters:	
 
-        SELF - A pointer to a <type> construct
+        SELF - A pointer to a <type> object
 
 
 Some of the OpenCV C bindings for its C++ interface that this library binds to, allocate memory for

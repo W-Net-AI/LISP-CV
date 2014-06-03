@@ -70,6 +70,13 @@
   (len :unsigned-int))
 
 
+;;; DEFGENERIC (*defgeneric functions are placed here so the whole file can use them*)
+
+
+(defgeneric dot (self other)
+  (:documentation "Used for all bindings with a dot member"))
+
+
 ;;; Basic Structures
 
 
@@ -272,57 +279,70 @@
 
 
 ;; _Tp dot(const Point_& pt) const
-;; int cv_Point_dot(Point* self, Point* other) 
-(defcfun ("cv_Point2i_dot" dot) :int 
+;; tn cv_Point2##t##_dot( Point2##t * self, Point2##t * other)
+(defcfun ("cv_Point2i_dot" dot-2i) :int 
 	 "Finds the dot product of a point."
 	 (self point)
 	 (other point))
 
 
 ;; _Tp dot(const Point_& pt) const
-;; double cv_Point2d_dot(Point2d* self, Point2d* other) 
-(defcfun ("cv_Point2d_dot" dot2d) :double
+;; tn cv_Point2##t##_dot( Point2##t * self, Point2##t * other)
+(defcfun ("cv_Point2d_dot" dot-2d) :double
   "Finds the dot product of a point-2d."
   (self point-2d)
   (other point-2d))
 
 
 ;; _Tp dot(const Point_& pt) const
-;; float cv_Point2f_dot(Point2f* self, Point2f* other)
-(defcfun ("cv_Point2f_dot" dot2f) :float
+;; tn cv_Point2##t##_dot( Point2##t * self, Point2##t * other)
+(defcfun ("cv_Point2f_dot" dot-2f) :float
   "Finds the dot product of a point-2f."
   (self point-2f)
   (other point-2f))
 
 
 ;; _Tp dot(const Point3_& pt) const
-;; double cv_Point3d_dot(Point3d* self, Point3d* other)
-(defcfun ("cv_Point3d_dot" dot3d) :double 
+;; tn cv_Point3##t##_dot( Point3##t * self, Point3##t * other)
+(defcfun ("cv_Point3d_dot" dot-3d) :double 
 	 "Finds the dot product of a point-3d."
 	 (self point-3d)
 	 (other point-3d))
 
 
-;; bool Mat::isContinuous() const
-;; bool cv_Mat_isContinuous(Mat* self) 
-(defcfun ("cv_Mat_isContinuous" is-continuous) :boolean
-  (self mat))
-
-
 ;; _Tp dot(const Point3_& pt) const
-;; float cv_Point3f_dot(Point3f* self, Point3f* other)
-(defcfun ("cv_Point3f_dot" dot3f) :float 
+;; tn cv_Point3##t##_dot( Point3##t * self, Point3##t * other)
+(defcfun ("cv_Point3f_dot" dot-3f) :float 
 	 "Finds the dot product of a point-3f."
 	 (self point-3f)
 	 (other point-3f))
 
 
 ;; _Tp dot(const Point3_& pt) const
-;; int cv_Point3i_dot(Point3i* self, Point3i* other)
-(defcfun ("cv_Point3i_dot" dot3i) :int 
+;; tn cv_Point3##t##_dot( Point3##t * self, Point3##t * other)
+(defcfun ("cv_Point3i_dot" dot-3i) :int 
 	 "Finds the dot product of a point-3i."
 	 (self point-3i)
 	 (other point-3i))
+
+
+(defmethod dot ((self cv-point-2d) (other cv-point-2d))
+  (dot-2d self other))
+
+(defmethod dot ((self cv-point-2f) (other cv-point-2f))
+  (dot-2f self other))
+
+(defmethod dot ((self cv-point) (other cv-point))
+  (dot-2i self other))
+
+(defmethod dot ((self cv-point-3d) (other cv-point-3d))
+  (dot-3d self other))
+
+(defmethod dot ((self cv-point-3f) (other cv-point-3f))
+  (dot-3f self other))
+
+(defmethod dot ((self cv-point-3i) (other cv-point-3i))
+  (dot-3i self other))
 
 
 ;; bool Mat::empty() const
@@ -397,6 +417,16 @@
 		    (setf previous (cons (second args) (foreign-alloc (first args) 
 								      :initial-contents (second args)))))
 								      (%mat-data rows cols type (cdr previous))))
+
+
+;; double Mat::dot(InputArray m) const
+;; double cv_Mat_dot(Mat* self, Mat* m)
+(defcfun ("cv_Mat_dot" mat-dot) :double
+  (self mat)
+  (m mat))
+
+(defmethod dot ((self cv-mat) (other cv-mat))
+  (mat-dot self other))
 
 
 ;; Mat::t
@@ -1297,7 +1327,7 @@
 (defun bitwise-or (src1 src2 dest &optional (mask (mat) given-mask))
   "Calculates the per-element bit-wise disjunction of two arrays."
   (%bitwise-or src1 src2 dest mask)
-  (if given-mastrisk nil (del-mat mask)))
+  (if given-mat nil (del-mat mask)))
 
 
 ;; void bitwise_xor(InputArray src1, InputArray src2, OutputArray dst, InputArray mask=noArray())
@@ -1432,6 +1462,12 @@
        (%invert src dest flags))
 
 
+;; bool Mat::isContinuous() const
+;; bool cv_Mat_isContinuous(Mat* self) 
+(defcfun ("cv_Mat_isContinuous" is-continuous) :boolean
+  (self mat))
+
+
 ;; void log(InputArray src, OutputArray dst)
 ;; void cv_log(Mat* src, Mat* dst)
 (defcfun ("cv_log" *log) :int
@@ -1484,6 +1520,21 @@
   "Finds the global minimum and maximum in an array."
   (%min-max-loc src min-val max-val min-loc max-loc mask)
   (if given-mask nil (del-mat mask)))
+
+
+;; void mulTransposed(InputArray src, OutputArray dst, bool aTa, InputArray delta=noArray(), double scale=1, int dtype=-1 )
+;; void cv_mulTransposed(Mat* src, Mat* dst, bool aTa, Mat* delta, double scale, int dtype)
+(defcfun ("cv_mulTransposed" %mul-transposed) :void
+  (src mat)
+  (dest mat)
+  (a-t-a :boolean)
+  (delta mat)
+  (scale :double)
+  (dtype :int))
+
+(defun mul-transposed (src dest a-t-a &optional (delta (mat) given-delta) (scale 1d0) (dtype -1)) 
+       (%mul-transposed src dest a-t-a delta scale dtype)
+       (if given-delta nil (del-mat delta)))
 
 
 ;; void multiply(InputArray src1, InputArray src2, OutputArray dst, double scale=1, int dtype=-1 )
@@ -1579,6 +1630,15 @@
   (dest mat)
   (low scalar)
   (high scalar))
+
+
+;; void repeat(InputArray src, int ny, int nx, OutputArray dst)
+;; void cv_repeat(Mat* src, int ny, int nx, Mat* dst)
+(defcfun ("cv_repeat" repeat) :void
+  (src mat)
+  (ny :int)
+  (nx :int)
+  (dest mat))
 
 
 ;; RNG::RNG()

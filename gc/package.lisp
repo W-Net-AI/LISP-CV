@@ -122,6 +122,7 @@
    #:inv
    #:keypoint
    #:mat
+   #:mat-dot
    #:mat-expr-t
    #:mat-eye
    #:mat-ones

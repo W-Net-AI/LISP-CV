@@ -383,11 +383,12 @@
    #:div
    #:dmatch
    #:dot
-   #:dot2d
-   #:dot2f
-   #:dot3d
-   #:dot3f
-   #:dot3i
+   #:dot-2d
+   #:dot-2f
+   #:dot-2i
+   #:dot-3d
+   #:dot-3f
+   #:dot-3i
    #:elem-size
    #:elem-size1
    #:empty
@@ -536,12 +537,14 @@
    #:mahalanobis
    #:mean
    #:min-max-loc
+   #:mul-transposed
    #:multiply
    #:norm
    #:normalize
    #:phase
    #:pow
    #:randu
+   #:repeat
    #:rng
    #:scale-add
    #:subtract

@@ -106,6 +106,10 @@
 		   (t (partition-helper (subseq lst x) (cons (subseq lst 0 x) acc) x))))) 
     (reverse (partition-helper lst '() x))))
 
+
+(defgeneric cat (sequence &rest sequences)
+  (:documentation "Makes the Common Lisp function CONCATENATE, easier to type and easier to use"))
+
 (defmethod cat ((sequence string) &rest sequences)
   (apply #'concatenate 'string sequence sequences))
 
@@ -115,6 +119,10 @@
 
 (defun dup (object &optional (n 2))
   (duplicate object n))
+
+
+(defgeneric duplicate (self n)
+  (:documentation ""))
 
 (defmethod duplicate (self (n integer))
   (if (not (listp self)) (make-list n :initial-element self)
