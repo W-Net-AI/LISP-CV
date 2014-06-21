@@ -183,12 +183,12 @@ To install ASDF, a Lisp-CV dependency.
 Run:
 
 ```
-gksu gedit ~/.sbclrc
+gedit ~/.sbclrc
 
 ```
 or
 ```
-gksu gedit ~/.clisprc
+gedit ~/.clisprc
 ```
 
 If you don't have it already, add this to the top of your ~/.sbclrc or ~/.clisprc file.

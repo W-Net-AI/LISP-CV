@@ -12,21 +12,29 @@
 
 ;; CvNormalBayesClassifier::CvNormalBayesClassifier()
 ;; CvNormalBayesClassifier* cv_create_CvNormalBayesClassifier()
-(defcfun ("cv_create_CvNormalBayesClassifier" %normal-bayes-classifier) normal-bayes-classifier)
+(defcfun ("cv_create_CvNormalBayesClassifier" normal-bayes-classifier-0) normal-bayes-classifier)
 
 ;; CvNormalBayesClassifier::CvNormalBayesClassifier(const Mat& trainData, const Mat& responses, const Mat& varIdx=Mat(), 
 ;;                                                  const Mat& sampleIdx=Mat() )
 ;; CvNormalBayesClassifier* cv_create_CvNormalBayesClassifier4(Mat* trainData, Mat* responses, Mat* varIdx, Mat* sampleIdx) 
-(defcfun ("cv_create_CvNormalBayesClassifier4" normal-bayes-classifier4) normal-bayes-classifier
+(defcfun ("cv_create_CvNormalBayesClassifier4" normal-bayes-classifier-4) normal-bayes-classifier
   (train-data mat)
   (responses mat)
   (var-idx mat)
   (sample-idx mat))
 
-(defun normal-bayes-classifier (&optional train-data responses  (var-idx (mat) given-var-idx) (sample-idx (mat) given-sample-idx))
+(defun normal-bayes-classifier (&optional train-data responses  (var-idx (%mat) given-var-idx) (sample-idx (%mat) given-sample-idx))
   (let ((return (if train-data
-		    (normal-bayes-classifier4 train-data responses  var-idx sample-idx)
-		    (%normal-bayes-classifier))))
+		    (normal-bayes-classifier-4 train-data responses  var-idx sample-idx)
+		    (normal-bayes-classifier-0))))
+    (if given-var-idx nil (del-mat var-idx))
+    (if given-sample-idx nil (del-mat sample-idx)) 
+    return))
+
+(defun make-normal-bayes-classifier (&optional train-data responses  (var-idx (%mat) given-var-idx) (sample-idx (%mat) given-sample-idx))
+  (let ((return (if train-data
+		    (normal-bayes-classifier-4 train-data responses  var-idx sample-idx)
+		    (normal-bayes-classifier-0))))
     (if given-var-idx nil (del-mat var-idx))
     (if given-sample-idx nil (del-mat sample-idx)) 
     return))
@@ -50,12 +58,12 @@
 
 ;; CvKNearest::CvKNearest()
 ;; CvKNearest* cv_create_CvKNearest() 
-(defcfun ("cv_create_CvKNearest" %k-nearest) k-nearest)
+(defcfun ("cv_create_CvKNearest" k-nearest-0) k-nearest)
 
 ;; CvKNearest::CvKNearest(const CvMat* trainData, const CvMat* responses, const CvMat* sampleIdx=0, bool isRegression=false, 
 ;;                        int max_k=32 )
 ;; CvKNearest* cv_create_CvKNearest5(Mat* trainData, Mat* responses, Mat* sampleIdx, bool isRegression, int max_k) 
-(defcfun ("cv_create_CvKNearest5" k-nearest5) k-nearest
+(defcfun ("cv_create_CvKNearest5" k-nearest-5) k-nearest
   (train-data mat)
   (responses mat)
   (sample-idx mat)
@@ -64,8 +72,13 @@
 
 (defun k-nearest (&optional train-data responses (sample-idx (null-pointer)) (is-regression nil) (max-k 32))
   (if train-data
-      (k-nearest5 train-data responses sample-idx is-regression max-k)
-      (%k-nearest)))
+      (k-nearest-5 train-data responses sample-idx is-regression max-k)
+      (k-nearest-0)))
+
+(defun make-k-nearest (&optional train-data responses (sample-idx (null-pointer)) (is-regression nil) (max-k 32))
+  (if train-data
+      (k-nearest-5 train-data responses sample-idx is-regression max-k)
+      (k-nearest-0)))
 
 
 ;; float CvKNearest::find_nearest(const Mat& samples, int k, Mat& results, Mat& neighborResponses, Mat& dists) const
@@ -90,17 +103,21 @@
 ;; CvDTree* cv_create_CvDTree() 
 (defcfun ("cv_create_CvDTree" d-tree) d-tree)
 
+;; CvDTree:CvDTree()
+;; CvDTree* cv_create_CvDTree() 
+(defcfun ("cv_create_CvDTree" make-d-tree) d-tree)
+
 
 ;; CvDTreeParams::CvDTreeParams()
 ;; CvDTreeParams* cv_create_CvDTreeParams()
-(defcfun ("cv_create_CvDTreeParams" %d-tree-params) d-tree-params)
+(defcfun ("cv_create_CvDTreeParams" d-tree-params-0) d-tree-params)
 
 ;; CvDTreeParams::CvDTreeParams(int max_depth, int min_sample_count, float regression_accuracy, bool use_surrogates, 
 ;;                              int max_categories, int cv_folds, bool use_1se_rule, bool truncate_pruned_tree, const float* priors)
 ;; CvDTreeParams* cv_create_CvDTreeParams9(int max_depth, int min_sample_count, float regression_accuracy, bool use_surrogates, 
 ;;                                         int max_categories, int cv_folds, bool use_1se_rule, bool truncate_pruned_tree, 
 ;;                                         const float* priors)
-(defcfun ("cv_create_CvDTreeParams9" d-tree-params9) d-tree-params
+(defcfun ("cv_create_CvDTreeParams9" d-tree-params-9) d-tree-params
   (max-depth :int)
   (min-sample-count :int)
   (regression-accuracy :float)
@@ -114,9 +131,16 @@
 (defun d-tree-params (&optional max-depth min-sample-count regression-accuracy use-surrogates max-categories folds use-1se-rule
 			truncate-pruned-tree priors)
   (if max-depth
-      (d-tree-params9 max-depth min-sample-count regression-accuracy use-surrogates max-categories folds use-1se-rule
+      (d-tree-params-9 max-depth min-sample-count regression-accuracy use-surrogates max-categories folds use-1se-rule
                       truncate-pruned-tree priors)
-      (%d-tree-params)))
+      (d-tree-params-0)))
+
+(defun make-d-tree-params (&optional max-depth min-sample-count regression-accuracy use-surrogates max-categories folds use-1se-rule
+			truncate-pruned-tree priors)
+  (if max-depth
+      (d-tree-params-9 max-depth min-sample-count regression-accuracy use-surrogates max-categories folds use-1se-rule
+                      truncate-pruned-tree priors)
+      (d-tree-params-0)))
 
 
 ;; CvDTreeNode* CvDTree::predict(const Mat& sample, const Mat& missingDataMask=Mat(), bool preprocessedInput=false ) const
@@ -127,7 +151,7 @@
   (missing-data-mask mat)
   (preprocessed-input :boolean))
 
-(defun d-tree-predict (self sample &optional (missing-data-mask (mat) given-missing-data-mask) (preprocessed-input nil))
+(defun d-tree-predict (self sample &optional (missing-data-mask (%mat) given-missing-data-mask) (preprocessed-input nil))
   (let ((return 
 	  (%d-tree-predict self sample missing-data-mask preprocessed-input)))
     (if given-missing-data-mask nil (del-mat missing-data-mask))
@@ -149,8 +173,8 @@
   (missing-data-mask mat)
   (params d-tree-params))
 
-(defun d-tree-train (self train-data tflag responses &optional (var-idx (mat) given-var-idx) (sample-idx (mat) given-sample-idx) 
-						       (var-type (mat) given-var-type) (missing-data-mask (mat) given-missing-data-mask) 
+(defun d-tree-train (self train-data tflag responses &optional (var-idx (%mat) given-var-idx) (sample-idx (%mat) given-sample-idx) 
+						       (var-type (%mat) given-var-type) (missing-data-mask (%mat) given-missing-data-mask) 
 						       (params (d-tree-params) given-params))
   (let ((return 
 	  (%d-tree-train self train-data tflag responses var-idx sample-idx var-type missing-data-mask params)))
@@ -167,11 +191,11 @@
 
 ;; CvANN_MLP::CvANN_MLP()
 ;; CvANN_MLP* cv_create_CvANN_MLP()
-(defcfun ("cv_create_CvANN_MLP" %ann-mlp) ann-mlp)
+(defcfun ("cv_create_CvANN_MLP" ann-mlp-0) ann-mlp)
 
 ;; CvANN_MLP::CvANN_MLP(const CvMat* layerSizes, int activateFunc=CvANN_MLP::SIGMOID_SYM, double fparam1=0, double fparam2=0 )
 ;; CvANN_MLP* cv_create_CvANN_MLP4(Mat* layerSizes, int activateFunc, double fparam1, double fparam2) 
-(defcfun ("cv_create_CvANN_MLP4" ann-mlp4) ann-mlp
+(defcfun ("cv_create_CvANN_MLP4" ann-mlp-4) ann-mlp
   (layer-sizes mat)
   (activate-func :int)
   (fparam1 :double)
@@ -179,9 +203,13 @@
 
 (defun ann-mlp (&optional layer-sizes (activate-func +ann-mlp-sigmoid-sym+) (fparam1 0d0) (fparam2 0d0))
   (if layer-sizes
-      (ann-mlp4 layer-sizes activate-func fparam1 fparam2)
-      (%ann-mlp)))
+      (ann-mlp-4 layer-sizes activate-func fparam1 fparam2)
+      (ann-mlp-0)))
 
+(defun make-ann-mlp (&optional layer-sizes (activate-func +ann-mlp-sigmoid-sym+) (fparam1 0d0) (fparam2 0d0))
+  (if layer-sizes
+      (ann-mlp-4 layer-sizes activate-func fparam1 fparam2)
+      (ann-mlp-0)))
 
 ;; void CvANN_MLP::create(const Mat& layerSizes, int activateFunc=CvANN_MLP::SIGMOID_SYM, double fparam1=0, double fparam2=0 )
 ;; void cv_CvANN_MLP_create(CvANN_MLP* self, Mat* layerSizes, int activateFunc, double fparam1, double fparam2)
@@ -218,7 +246,7 @@
   (params ann-mlp-train-params)
   (flags :int))
 
-(defun ann-mlp-train (self inputs outputs sample-weights &optional (sample-idx (mat) given-sample-idx) 
+(defun ann-mlp-train (self inputs outputs sample-weights &optional (sample-idx (%mat) given-sample-idx) 
 							   (params (ann-mlp-train-params) given-params) (flags 0))
   "Trains/updates MLP."
   (let ((return (%ann-mlp-train self inputs outputs sample-weights sample-idx params flags)))
@@ -229,11 +257,11 @@
 
 ;; CvANN_MLP_TrainParams::CvANN_MLP_TrainParams()
 ;; CvANN_MLP_TrainParams* cv_create_CvANN_MLP_TrainParams()
-(defcfun ("cv_create_CvANN_MLP_TrainParams" %ann-mlp-train-params) ann-mlp-train-params)
+(defcfun ("cv_create_CvANN_MLP_TrainParams" ann-mlp-train-params-0) ann-mlp-train-params)
 
 ;; CvANN_MLP_TrainParams::CvANN_MLP_TrainParams(CvTermCriteria term_crit, int train_method, double param1, double param2=0 )
 ;; CvANN_MLP_TrainParams* cv_create_CvANN_MLP_TrainParams4(TermCriteria* term_crit, int train_method, double param1, double param2)
-(defcfun ("cv_create_CvANN_MLP_TrainParams" ann-mlp-train-params4) ann-mlp-train-params
+(defcfun ("cv_create_CvANN_MLP_TrainParams" ann-mlp-train-params-4) ann-mlp-train-params
   (term-crit term-criteria)
   (train-method :int)
   (param1 :double)
@@ -241,5 +269,10 @@
 
 (defun ann-mlp-train-params (&optional term-crit train-method param1 (param2 0))
        (if term-crit
-	   (ann-mlp-train-params4 term-crit train-method param1 param2)
-	   (%ann-mlp-train-params)))
+	   (ann-mlp-train-params-4 term-crit train-method param1 param2)
+	   (ann-mlp-train-params-0)))
+
+(defun make-ann-mlp-train-params (&optional term-crit train-method param1 (param2 0))
+       (if term-crit
+	   (ann-mlp-train-params-4 term-crit train-method param1 param2)
+	   (ann-mlp-train-params-0)))

@@ -14,6 +14,10 @@
 ;; Scalar* cv_create_morphologyDefaultBorderValue()
 (defcfun ("cv_create_morphologyDefaultBorderValue" morphology-default-border-value) scalar)
 
+;; static inline Scalar morphologyDefaultBorderValue() { return Scalar::all(DBL_MAX); }
+;; Scalar* cv_create_morphologyDefaultBorderValue()
+(defcfun ("cv_create_morphologyDefaultBorderValue" make-morphology-default-border-value) scalar)
+
 
 
 ;;; Image Filtering
@@ -201,7 +205,7 @@
 	 (dstsize size)
 	 (border-type :int))
 
-(defun pyr-down (src dest &optional (dstsize (size) given-dstsize) (border-type +border-default+))
+(defun pyr-down (src dest &optional (dstsize (size-0) given-dstsize) (border-type +border-default+))
   "Blurs an image and downsamples it."
   (%pyr-down src dest dstsize border-type)
   (if given-dstsize nil (del-size dstsize)))
@@ -215,7 +219,7 @@
   (dstsize size)
   (border-type :int))
 
-(defun pyr-up (src dest &optional (dstsize (size) given-dstsize) (border-type +border-default+))
+(defun pyr-up (src dest &optional (dstsize (size-0) given-dstsize) (border-type +border-default+))
   "Upsamples an image and then blurs it."
   (%pyr-up src dest dstsize border-type)
   (if given-dstsize nil (del-size dstsize)))

@@ -121,11 +121,32 @@
    #:del-rot-rect
    #:del-scalar
    #:del-size
-   #:del-size2f
+   #:del-size-2f
    #:del-std-string
    #:del-term-crit
+   #:del-vec-2b
+   #:del-vec-3b
+   #:del-vec-4b
+   #:del-vec-2d
+   #:del-vec-3d
+   #:del-vec-4d
+   #:del-vec-6d
+   #:del-vec-2f
+   #:del-vec-3f
+   #:del-vec-4f 
+   #:del-vec-6f
+   #:del-vec-2i
+   #:del-vec-3i
    #:del-vec-4i
-   #:del-vec-char
+   #:del-vec-6i
+   #:del-vec-8i
+   #:del-vec-2s
+   #:del-vec-3s
+   #:del-vec-4s
+   #:del-vec-2w
+   #:del-vec-3w
+   #:del-vec-4w
+   #:del-vector-char
    #:del-vec-dbl
    #:del-vec-dm
    #:del-vec-flt
@@ -136,7 +157,28 @@
    #:del-vec-point-2f
    #:del-vec-rect
    #:del-vec-uchar
+   #:del-vec-vec-2b
+   #:del-vec-vec-3b
+   #:del-vec-vec-4b
+   #:del-vec-vec-2d
+   #:del-vec-vec-3d
+   #:del-vec-vec-4d
+   #:del-vec-vec-6d
+   #:del-vec-vec-2f
+   #:del-vec-vec-3f
+   #:del-vec-vec-4f 
+   #:del-vec-vec-6f
+   #:del-vec-vec-2i
+   #:del-vec-vec-3i
    #:del-vec-vec-4i
+   #:del-vec-vec-6i
+   #:del-vec-vec-8i
+   #:del-vec-vec-2s
+   #:del-vec-vec-3s
+   #:del-vec-vec-4s
+   #:del-vec-vec-2w
+   #:del-vec-vec-3w
+   #:del-vec-vec-4w
    #:del-vid-cap
    #:del-vid-writer35
 
@@ -167,21 +209,63 @@
    #:with-rotated-rect
    #:with-scalar
    #:with-size
-   #:with-size2f
+   #:with-size-2f
    #:with-term-criteria
+   #:with-vec-2b
+   #:with-vec-3b
+   #:with-vec-4b
+   #:with-vec-2d
+   #:with-vec-3d
+   #:with-vec-4d
+   #:with-vec-6d
+   #:with-vec-2f
+   #:with-vec-3f
+   #:with-vec-4f
+   #:with-vec-6f
+   #:with-vec-2i
+   #:with-vec-3i
    #:with-vec-4i
-   #:with-vec-char
-   #:with-vec-dbl
-   #:with-vec-dmatch
-   #:with-vec-flt
-   #:with-vec-int
-   #:with-vec-key-point
-   #:with-vec-mat
-   #:with-vec-point
-   #:with-vec-point-2f
-   #:with-vec-rect
-   #:with-vec-uchar
-   #:with-vec-vec-4i
+   #:with-vec-6i
+   #:with-vec-8i
+   #:with-vec-2s
+   #:with-vec-3s
+   #:with-vec-4s
+   #:with-vec-2w
+   #:with-vec-3w
+   #:with-vec-4w
+   #:with-vector-char
+   #:with-vector-double
+   #:with-vector-dmatch
+   #:with-vector-float
+   #:with-vector-int
+   #:with-vector-key-point
+   #:with-vector-mat
+   #:with-vector-point
+   #:with-vector-point-2f
+   #:with-vector-rect
+   #:with-vector-uchar
+   #:with-vector-vec-2b
+   #:with-vector-vec-3b
+   #:with-vector-vec-4b
+   #:with-vector-vec-2d
+   #:with-vector-vec-3d
+   #:with-vector-vec-4d
+   #:with-vector-vec-6d
+   #:with-vector-vec-2f
+   #:with-vector-vec-3f
+   #:with-vector-vec-4f 
+   #:with-vector-vec-6f
+   #:with-vector-vec-2i
+   #:with-vector-vec-3i
+   #:with-vector-vec-4i
+   #:with-vector-vec-6i
+   #:with-vector-vec-8i
+   #:with-vector-vec-2s
+   #:with-vector-vec-3s
+   #:with-vector-vec-4s
+   #:with-vector-vec-2w
+   #:with-vector-vec-3w
+   #:with-vector-vec-4w
    #:with-video-capture
    #:with-video-writer
 
@@ -199,6 +283,7 @@
    #:hog-descriptor
    #:key-point
    #:k-nearest
+   #:make-mat
    #:mat
    #:mat-expr
    #:mouse-callback
@@ -215,13 +300,34 @@
    #:rotated-rect
    #:scalar
    #:size
-   #:size2f
+   #:size-2f
    #:*string
    #:svm
    #:svm-params
    #:term-criteria
    #:trackbar-callback
+   #:vec-2b
+   #:vec-3b
+   #:vec-4b
+   #:vec-2d
+   #:vec-3d
+   #:vec-4d
+   #:vec-6d
+   #:vec-2f
+   #:vec-3f
+   #:vec-4f 
+   #:vec-6f
+   #:vec-2i
+   #:vec-3i
    #:vec-4i
+   #:vec-6i
+   #:vec-8i
+   #:vec-2s
+   #:vec-3s
+   #:vec-4s
+   #:vec-2w
+   #:vec-3w
+   #:vec-4w
    #:vector-char
    #:vector-dmatch
    #:vector-double
@@ -233,98 +339,295 @@
    #:vector-point-2f
    #:vector-rect
    #:vector-uchar
+   #:vector-vec-2d
+   #:vector-vec-3d
+   #:vector-vec-4d
+   #:vector-vec-6d
+   #:vector-vec-2f
+   #:vector-vec-3f
+   #:vector-vec-4f 
+   #:vector-vec-6f
+   #:vector-vec-2i
+   #:vector-vec-3i
    #:vector-vec-4i
+   #:vector-vec-6i
+   #:vector-vec-8i
+   #:vector-vec-2s
+   #:vector-vec-3s
+   #:vector-vec-4s
+   #:vector-vec-2w
+   #:vector-vec-3w
+   #:vector-vec-4w
    #:video-capture
    #:video-writer
 
 
 ;; Vectors
 
-
-   #:vec-char
+   #:vector-char
+   #:make-vector-char
    #:c-arr-to-vec-char
    #:arr-to-vec-char
    #:vec-char-to-c-arr
    #:vec-char-length
    #:vec-char-to-lisp-list
    #:vec-char-to-lisp-vec
-   #:vec-dmatch
+   #:make-vector-dmatch
+   #:vector-dmatch
    #:c-arr-to-vec-dmatch
    #:arr-to-vec-dmatch
    #:vec-dmatch-to-c-arr
    #:vec-dmatch-length
    #:vec-dmatch-to-lisp-list
    #:vec-dmatch-to-lisp-vec
-   #:vec-double
+   #:make-vector-double
+   #:vector-double
    #:c-arr-to-vec-double
    #:arr-to-vec-double
    #:vec-double-to-c-arr
    #:vec-double-length
    #:vec-double-to-lisp-list
    #:vec-double-to-lisp-vec
-   #:vec-float
+   #:make-vector-float
+   #:vector-float
    #:c-arr-to-vec-float
    #:arr-to-vec-float
    #:vec-float-to-c-arr
    #:vec-float-length
    #:vec-float-to-lisp-list
    #:vec-float-to-lisp-vec
-   #:vec-int
+   #:make-vector-int
+   #:vector-int
    #:c-arr-to-vec-int
    #:arr-to-vec-int
    #:vec-int-to-c-arr
    #:vec-int-length
    #:vec-int-to-lisp-list
    #:vec-int-to-lisp-vec
-   #:vec-key-point
+   #:make-vector-key-point
+   #:vector-key-point
    #:c-arr-to-vec-key-point
    #:arr-to-vec-key-point
    #:vec-key-point-to-c-arr
    #:vec-key-point-length
    #:vec-key-point-to-lisp-list
    #:vec-key-point-to-lisp-vec
-   #:vec-mat
+   #:make-vector-mat
+   #:vector-mat
    #:c-arr-to-vec-mat
    #:arr-to-vec-mat
    #:vec-mat-to-c-arr
    #:vec-mat-length
    #:vec-mat-to-lisp-list
    #:vec-mat-to-lisp-vec
-   #:vec-point
+   #:make-vector-point
+   #:vector-point
    #:c-arr-to-vec-point
    #:arr-to-vec-point
    #:vec-point-to-c-arr
    #:vec-point-length
    #:vec-point-to-lisp-list
    #:vec-point-to-lisp-vec
-   #:vec-point-2f
+   #:make-vector-point-2f
+   #:vector-point-2f
    #:c-arr-to-vec-point-2f
    #:arr-to-vec-point-2f
    #:vec-point-2f-to-c-arr
    #:vec-point-2f-length
    #:vec-point-2f-to-lisp-list
    #:vec-point-2f-to-lisp-vec
-   #:vec-rect
+   #:make-vector-rect
+   #:vector-rect
    #:c-arr-to-vec-rect
    #:arr-to-vec-rect
    #:vec-rect-to-c-arr
    #:vec-rect-length
    #:vec-rect-to-lisp-list
    #:vec-rect-to-lisp-vec
-   #:vec-uchar
+   #:make-vector-uchar
+   #:vector-uchar
    #:c-arr-to-vec-uchar
    #:arr-to-vec-uchar
    #:vec-uchar-to-c-arr
    #:vec-uchar-length
    #:vec-uchar-to-lisp-list
    #:vec-uchar-to-lisp-vec
-   #:vec-vec-4i
+   #:make-vector-vec-2b
+   #:vector-vec-2b
+   #:c-arr-to-vec-vec-2b
+   #:arr-to-vec-vec-2b
+   #:vec-vec-2b-to-c-arr
+   #:vec-vec-2b-length
+   #:vec-vec-2b-to-lisp-list
+   #:vec-vec-2b-to-lisp-vec
+   #:make-vector-vec-3b
+   #:vector-vec-3b
+   #:c-arr-to-vec-vec-3b
+   #:arr-to-vec-vec-3b
+   #:vec-vec-3b-to-c-arr
+   #:vec-vec-3b-length
+   #:vec-vec-3b-to-lisp-list
+   #:vec-vec-3b-to-lisp-vec
+   #:make-vector-vec-4b
+   #:vector-vec-4b
+   #:c-arr-to-vec-vec-4b
+   #:arr-to-vec-vec-4b
+   #:vec-vec-4b-to-c-arr
+   #:vec-vec-4b-length
+   #:vec-vec-4b-to-lisp-list
+   #:vec-vec-4b-to-lisp-vec
+   #:make-vector-vec-2d
+   #:vector-vec-2d
+   #:c-arr-to-vec-vec-2d
+   #:arr-to-vec-vec-2d
+   #:vec-vec-2d-to-c-arr
+   #:vec-vec-2d-length
+   #:vec-vec-2d-to-lisp-list
+   #:vec-vec-2d-to-lisp-vec
+   #:make-vector-vec-3d
+   #:vector-vec-3d
+   #:c-arr-to-vec-vec-3d
+   #:arr-to-vec-vec-3d
+   #:vec-vec-3d-to-c-arr
+   #:vec-vec-3d-length
+   #:vec-vec-3d-to-lisp-list
+   #:vec-vec-3d-to-lisp-vec
+   #:make-vector-vec-4d
+   #:vector-vec-4d
+   #:c-arr-to-vec-vec-4d
+   #:arr-to-vec-vec-4d
+   #:vec-vec-4d-to-c-arr
+   #:vec-vec-4d-length
+   #:vec-vec-4d-to-lisp-list
+   #:vec-vec-4d-to-lisp-vec
+   #:make-vector-vec-6d
+   #:vector-vec-6d
+   #:c-arr-to-vec-vec-6d
+   #:arr-to-vec-vec-6d
+   #:vec-vec-6d-to-c-arr
+   #:vec-vec-6d-length
+   #:vec-vec-6d-to-lisp-list
+   #:vec-vec-6d-to-lisp-vec
+   #:make-vector-vec-2f
+   #:vector-vec-2f
+   #:c-arr-to-vec-vec-2f
+   #:arr-to-vec-vec-2f
+   #:vec-vec-2f-to-c-arr
+   #:vec-vec-2f-length
+   #:vec-vec-2f-to-lisp-list
+   #:vec-vec-2f-to-lisp-vec
+   #:make-vector-vec-3f
+   #:vector-vec-3f
+   #:c-arr-to-vec-vec-3f
+   #:arr-to-vec-vec-3f
+   #:vec-vec-3f-to-c-arr
+   #:vec-vec-3f-length
+   #:vec-vec-3f-to-lisp-list
+   #:vec-vec-3f-to-lisp-vec
+   #:make-vector-vec-4f
+   #:vector-vec-4f
+   #:c-arr-to-vec-vec-4f
+   #:arr-to-vec-vec-4f
+   #:vec-vec-4f-to-c-arr
+   #:vec-vec-4f-length
+   #:vec-vec-4f-to-lisp-list
+   #:vec-vec-4f-to-lisp-vec
+   #:make-vector-vec-6f
+   #:vector-vec-6f
+   #:c-arr-to-vec-vec-6f
+   #:arr-to-vec-vec-6f
+   #:vec-vec-6f-to-c-arr
+   #:vec-vec-6f-length
+   #:vec-vec-6f-to-lisp-list
+   #:vec-vec-6f-to-lisp-vec
+   #:make-vector-vec-2i
+   #:vector-vec-2i
+   #:c-arr-to-vec-vec-2i
+   #:arr-to-vec-vec-2i
+   #:vec-vec-2i-to-c-arr
+   #:vec-vec-2i-length
+   #:vec-vec-2i-to-lisp-list
+   #:vec-vec-2i-to-lisp-vec
+   #:make-vector-vec-3i
+   #:vector-vec-3i
+   #:c-arr-to-vec-vec-3i
+   #:arr-to-vec-vec-3i
+   #:vec-vec-3i-to-c-arr
+   #:vec-vec-3i-length
+   #:vec-vec-3i-to-lisp-list
+   #:vec-vec-3i-to-lisp-vec
+   #:make-vector-vec-4i
+   #:vector-vec-4i
    #:c-arr-to-vec-vec-4i
    #:arr-to-vec-vec-4i
    #:vec-vec-4i-to-c-arr
    #:vec-vec-4i-length
    #:vec-vec-4i-to-lisp-list
    #:vec-vec-4i-to-lisp-vec
+   #:make-vector-vec-6i
+   #:vector-vec-6i
+   #:c-arr-to-vec-vec-6i
+   #:arr-to-vec-vec-6i
+   #:vec-vec-6i-to-c-arr
+   #:vec-vec-6i-length
+   #:vec-vec-6i-to-lisp-list
+   #:vec-vec-6i-to-lisp-vec
+   #:make-vector-vec-8i
+   #:vector-vec-8i
+   #:c-arr-to-vec-vec-8i
+   #:arr-to-vec-vec-8i
+   #:vec-vec-8i-to-c-arr
+   #:vec-vec-8i-length
+   #:vec-vec-8i-to-lisp-list
+   #:vec-vec-8i-to-lisp-vec
+   #:make-vector-vec-2s
+   #:vector-vec-2s
+   #:c-arr-to-vec-vec-2s
+   #:arr-to-vec-vec-2s
+   #:vec-vec-2s-to-c-arr
+   #:vec-vec-2s-length
+   #:vec-vec-2s-to-lisp-list
+   #:vec-vec-2s-to-lisp-vec
+   #:make-vector-vec-3s
+   #:vector-vec-3s
+   #:c-arr-to-vec-vec-3s
+   #:arr-to-vec-vec-3s
+   #:vec-vec-3s-to-c-arr
+   #:vec-vec-3s-length
+   #:vec-vec-3s-to-lisp-list
+   #:vec-vec-3s-to-lisp-vec
+   #:make-vector-vec-4s
+   #:vector-vec-4s
+   #:c-arr-to-vec-vec-4s
+   #:arr-to-vec-vec-4s
+   #:vec-vec-4s-to-c-arr
+   #:vec-vec-4s-length
+   #:vec-vec-4s-to-lisp-list
+   #:vec-vec-4s-to-lisp-vec
+   #:make-vector-vec-2w
+   #:vector-vec-2w
+   #:c-arr-to-vec-vec-2w
+   #:arr-to-vec-vec-2w
+   #:vec-vec-2w-to-c-arr
+   #:vec-vec-2w-length
+   #:vec-vec-2w-to-lisp-list
+   #:vec-vec-2w-to-lisp-vec
+   #:make-vector-vec-3w
+   #:vector-vec-3w
+   #:c-arr-to-vec-vec-3w
+   #:arr-to-vec-vec-3w
+   #:vec-vec-3w-to-c-arr
+   #:vec-vec-3w-length
+   #:vec-vec-3w-to-lisp-list
+   #:vec-vec-3w-to-lisp-vec
+   #:make-vector-vec-4w
+   #:vector-vec-4w
+   #:c-arr-to-vec-vec-4w
+   #:arr-to-vec-vec-4w
+   #:vec-vec-4w-to-c-arr
+   #:vec-vec-4w-length
+   #:vec-vec-4w-to-lisp-list
+   #:vec-vec-4w-to-lisp-vec
 
 
 ;; core - Basic Structures
@@ -368,7 +671,7 @@
    #:add
    #:adjust-roi
    #:area
-   #:area2f
+   #:area-2f
    #:rect-br
    #:channels
    #:clone
@@ -395,15 +698,65 @@
    #:force
    #:height
    #:inv
-   #:height2f
+   #:height-2f
    #:is-continuous
-   #:keypoint
+   #:key-point
    #:locate-roi
+   #:make-dmatch
+   #:make-key-point
+   #:make-mat
+   #:make-mat-data
+   #:make-mat-range
+   #:make-mat-typed
+   #:make-mat-value
+   #:make-mat-zeros
+   #:make-point
+   #:make-point-2d
+   #:make-point-2f
+   #:make-point-3d
+   #:make-point-3f
+   #:make-point-3i
+   #:make-range
+   #:make-range-all
+   #:make-rect
+   #:make-rotated-rect
+   #:make-scalar
+   #:make-scalar-all
+   #:make-size
+   #:make-size-2f
+   #:make-term-criteria
+   #:make-vec-2b
+   #:make-vec-3b
+   #:make-vec-4b
+   #:make-vec-2d
+   #:make-vec-3d
+   #:make-vec-4d
+   #:make-vec-6d
+   #:make-vec-2f
+   #:make-vec-3f
+   #:make-vec-4f
+   #:make-vec-6f
+   #:make-vec-2i
+   #:make-vec-3i
+   #:make-vec-4i
+   #:make-vec-6i
+   #:make-vec-8i
+   #:make-vec-2s
+   #:make-vec-3s
+   #:make-vec-4s
+   #:make-vec-2w
+   #:make-vec-3w
+   #:make-vec-4w
    #:mat
+   #:mat-data
    #:mat-expr-t
    #:mat-eye
    #:mat-ones
+   #:mat-range
+   #:mat-size
    #:mat-type
+   #:mat-typed
+   #:mat-value
    #:mat-zeros
    #:mul
    #:point
@@ -434,7 +787,6 @@
    #:range-all
    #:range-start
    #:rect
-   #:rect-clone
    #:rect-height
    #:rect-size
    #:rect-width
@@ -453,18 +805,39 @@
    #:scalar
    #:scalar-all
    #:scale
-   #:size
    #:size-assgn-to
    #:size-from-point
-   #:size2f
+   #:size-2f
    #:step1
    #:width
-   #:width2f
+   #:width-2f
    #:*step
    #:sub
    #:rect-tl
+   #:term-criteria
    #:total
+   #:vec-2b
+   #:vec-3b
+   #:vec-4b
+   #:vec-2d
+   #:vec-3d
+   #:vec-4d
+   #:vec-6d
+   #:vec-2f
+   #:vec-3f
+   #:vec-4f
+   #:vec-6f
+   #:vec-2i
+   #:vec-3i
    #:vec-4i
+   #:vec-6i
+   #:vec-8i
+   #:vec-2s
+   #:vec-3s
+   #:vec-4s
+   #:vec-2w
+   #:vec-3w
+   #:vec-4w
 
 ;; core - Dynamic Structures
 
@@ -525,6 +898,7 @@
    #:bitwise-or
    #:bitwise-xor
    #:calc-covar-matrix
+   #:check-range
    #:complete-symm
    #:convert-scale-abs
    #:determinant
@@ -535,6 +909,7 @@
    #:invert
    #:magnitude
    #:mahalanobis
+   #:make-rng
    #:mean
    #:min-max-loc
    #:mul-transposed
@@ -563,12 +938,16 @@
    #:+font-hershey-script-complex+
    #:+font-italic+ 
 
-
+   #:bgr
    #:circle
+   #:clip-line
    #:ellipse
    #:get-text
    #:line
+   #:make-bgr
+   #:make-rgb
    #:put-text
+   #:rgb
 
 ;; core - Utility and System Functions and Macros
 
@@ -671,7 +1050,6 @@
    #:+median+
    #:+bilateral+
    #:+scharr+
-   #:morphology-default-border-value
 
    #:bilateral-filter
    #:blur
@@ -681,13 +1059,14 @@
    #:filter-2d
    #:gaussian-blur
    #:laplacian
+   #:make-morphology-default-border-value
    #:median-blur
+   #:morphology-default-border-value
    #:morphology-ex
    #:pyr-down
    #:pyr-up
    #:scharr
    #:sobel
-
 
 
 ;; imgproc - Geometric Image Transformations
@@ -1025,6 +1404,8 @@
 
    #:imread
    #:imwrite
+   #:make-video-capture
+   #:make-video-writer
    #:video-capture
    #:video-writer
    #:video-writer-is-open
@@ -1059,6 +1440,7 @@
 ;; features2d - Feature Detection and Description
 
    #:brisk
+   #:make-brisk
 
 ;; features2d - Common Interfaces of Feature Detectors
 
@@ -1075,6 +1457,7 @@
    #:bf-matcher
    #:descrip-matcher-create 
    #:descrip-matcher-match
+   #:make-bf-matcher
 
 ;;; features2d - Drawing Function of Keypoints and Matches
 
@@ -1102,6 +1485,7 @@
    #:cascade-classifier
    #:cascade-classifier-load
    #:detect-multi-scale
+   #:make-cascade-classifier
 
 
 ;;; ml
@@ -1114,6 +1498,7 @@
 
 ;;; ml - Normal Bayes Classifier
 
+   #:make-normal-bayes-classifier
    #:normal-bayes-classifier
    #:normal-bayes-classifier-predict
 
@@ -1121,6 +1506,7 @@
 
    #:k-nearest
    #:k-nearest-find-nearest
+   #:make-k-nearest
 
 ;;; ml - Decision Trees
 
@@ -1128,6 +1514,8 @@
    #:d-tree-params
    #:d-tree-predict
    #:d-tree-train
+   #:make-d-tree
+   #:make-d-tree-params
 
 ;;; ml - Neural Networks
 
@@ -1145,6 +1533,8 @@
    #:ann-mlp-predict
    #:ann-mlp-train
    #:ann-mlp-train-params
+   #:make-ann-mlp
+   #:make-ann-mlp-train-params
 
 
 ;;; photo - Inpainting
@@ -1182,6 +1572,7 @@
 
 ;;; nonfree - Feature Detection and Description
 
+   #:make-surf
    #:surf
 
 ;;; contrib - ColorMaps in OpenCV

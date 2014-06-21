@@ -12,20 +12,27 @@
 
 ;; CascadeClassifier::CascadeClassifier()
 ;; CascadeClassifier* cv_create_CascadeClassifier() 
-(defcfun ("cv_create_CascadeClassifier" cascade-classifier0) cascade-classifier
+(defcfun ("cv_create_CascadeClassifier" cascade-classifier-0) cascade-classifier
   "CASCADE-CLASSIFIER construct.")
 
 ;; CascadeClassifier::CascadeClassifier(const string& filename)
 ;; CascadeClassifier* cv_create_CascadeClassifier1(String* filename)
-(defcfun ("cv_create_CascadeClassifier1" cascade-classifier1) (cascade-classifier :garbage-collect t)
+(defcfun ("cv_create_CascadeClassifier1" cascade-classifier-1) cascade-classifier
   "Loads a classifier from a file."
   (filename *string))
 
 (defun cascade-classifier (&optional filename)
   (cond ((eq filename nil)
-	 (cascade-classifier0))
+	 (cascade-classifier-0))
 	(filename
-	 (cascade-classifier1 (%c-string-to-string filename (length filename))))
+	 (cascade-classifier-1 (%c-string-to-string filename (length filename))))
+	(t nil)))
+
+(defun make-cascade-classifier (&optional filename)
+  (cond ((eq filename nil)
+	 (cascade-classifier-0))
+	(filename
+	 (cascade-classifier-1 (%c-string-to-string filename (length filename))))
 	(t nil)))
 
 
@@ -57,7 +64,7 @@
   (min-size size)
   (max-size size))
 
-(defun %detect-multi-scale (self image objects &optional (scale-factor 1.1d0) (min-neighbors 3) (flags 0) (min-size (size) given-min-size) (max-size (size) given-max-size))
+(defun %detect-multi-scale (self image objects &optional (scale-factor 1.1d0) (min-neighbors 3) (flags 0) (min-size (size-0) given-min-size) (max-size (size-0) given-max-size))
   "Detects objects of different sizes in the input image. The detected objects are returned as a list of rectangles."
   (%%detect-multi-scale self image objects scale-factor min-neighbors flags min-size max-size)
   (if given-min-size nil (del-size min-size)) (if given-max-size nil (del-size max-size)))
@@ -81,7 +88,7 @@
   (max-size size))
 
 
-(defun %detect-multi-scale8 (self image objects num-detections &optional (scale-factor 1.1d0) (min-neighbors 3) (flags 0) (min-size (size) given-min-size) (max-size (size) given-max-size))
+(defun %detect-multi-scale8 (self image objects num-detections &optional (scale-factor 1.1d0) (min-neighbors 3) (flags 0) (min-size (size-0) given-min-size) (max-size (size-0) given-max-size))
   "Detects objects of different sizes in the input image. The detected objects are returned as a list of rectangles."
   (%%detect-multi-scale8 self image objects num-detections scale-factor min-neighbors flags min-size max-size) 
   (if given-min-size nil (del-size min-size)) (if given-max-size nil (del-size max-size)))
@@ -109,7 +116,7 @@
   (output-reject-levels :boolean))
 
 
-(defun %detect-multi-scale10 (self image objects reject-levels level-weights &optional (scale-factor 1.1d0) (min-neighbors 3) (flags 0) (min-size (size) given-min-size) (max-size (size) given-max-size) (output-reject-levels nil))
+(defun %detect-multi-scale10 (self image objects reject-levels level-weights &optional (scale-factor 1.1d0) (min-neighbors 3) (flags 0) (min-size (size-0) given-min-size) (max-size (size-0) given-max-size) (output-reject-levels nil))
   "Detects objects of different sizes in the input image. The detected objects are returned as a list of rectangles."
 			       (%%detect-multi-scale10 self image objects reject-levels level-weights scale-factor min-neighbors flags min-size 
                                            max-size output-reject-levels)

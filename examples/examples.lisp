@@ -1,11 +1,12 @@
 ;;;; -*- mode: lisp; indent-tabs: nil -*-
 ;;;; examples.lisp
-;;;; Documentation and Examples(In process) -> For now, if you want to know if a Lisp binding exists 
-;;;; for a specified OpenCV C++ function search this file for the OpenCV C++ function name to find its 
-;;;; Lisp name, documentation and an example program. All examples written inside a DEFUN are named by 
-;;;; the Lisp function name followed by "-EXAMPLE", e.g. MAT-EXAMPLE for the function MAT, to make finding 
-;;;; them easier in this file. If an example is not written inside a DEFUN, e.g. if the MAT example were not 
-;;;; written inside a DEFUN, the title MAT-EXAMPLE, would still be above it.(implementing this is still in process)
+;;;; Documentation and Examples(In process). For now, if you want to know if a Lisp binding exists 
+;;;; for a specified OpenCV C++ function search this file for the OpenCV C++ function name to find 
+;;;; its Lisp name, documentation and an example program. All examples written inside a DEFUN are 
+;;;; named by the Lisp function name followed by "-EXAMPLE", e.g. MAT-EXAMPLE for the function MAT, 
+;;;; to make finding them easier in this file. If an example is not written inside a DEFUN, e.g. if 
+;;;; the MAT example was not written inside a DEFUN, the title MAT-EXAMPLE, would still be typed above 
+;;;; it to make locating the example in this file easier. Note: Implementing this is still in process.
 
 
 There are 3 major types of memory management, manual, with-* macros and Trivial Garbage finalizers
@@ -43,9 +44,9 @@ an example that uses TG finalizers):
 		 (return)))))))))
 
 
-=========================================================================================================================================
+========================================================================================================================================
 CORE - BASIC STRUCTURES:
-=========================================================================================================================================
+========================================================================================================================================
 
 
 ADD
@@ -807,21 +808,35 @@ CV> (DEPTH A)
 
 DMATCH
 
-
 DMATCH constructor.
 
+Note: Both DMATCH and MAKE-DMATCH are provided in this library. The first, to match OpenCV's naming 
+conventions, the second, to adhere to Common Lisp naming conventions. Except for the name, they are 
+the same function. I use the DMATCH function in the examples in this file because it will make them 
+easier to compare with OpenCV examples you find online, thus making this library easier to learn.
 
 C++: DMatch() : queryIdx(-1), trainIdx(-1), imgIdx(-1),
+                distance(std::numeric_limits<float>::max()) {}
 
 LISP-CV: (DMATCH) => DMATCH
 
-C++: DMatch( int _queryIdx, int _trainIdx, float _distance ) 
+LISP-CV: (MAKE-DMATCH) => DMATCH
+
+C++: DMatch( int _queryIdx, int _trainIdx, float _distance ) :
+             queryIdx(_queryIdx), trainIdx(_trainIdx), imgIdx(-1),
+             distance(_distance) {}
 
 LISP-CV: (DMATCH (QUERY-IDX :INT) (TRAIN-IDX :INT) (DISTANCE :FLOAT)) => DMATCH
 
-C++: DMatch( int _queryIdx, int _trainIdx, int _imgIdx, float _distance )
+LISP-CV: (MAKE-DMATCH (QUERY-IDX :INT) (TRAIN-IDX :INT) (DISTANCE :FLOAT)) => DMATCH
+
+C++: DMatch( int _queryIdx, int _trainIdx, int _imgIdx, float _distance ) :
+             queryIdx(_queryIdx), trainIdx(_trainIdx), imgIdx(_imgIdx),
+             distance(_distance) {}
 
 LISP-CV: (DMATCH (QUERY-IDX :INT) (TRAIN-IDX :INT) (IMG-IDX :INT) (DISTANCE :FLOAT)) => DMATCH
+
+LISP-CV: (MAKE-DMATCH (QUERY-IDX :INT) (TRAIN-IDX :INT) (IMG-IDX :INT) (DISTANCE :FLOAT)) => DMATCH
 
 
     Parameters:	
@@ -835,43 +850,116 @@ LISP-CV: (DMATCH (QUERY-IDX :INT) (TRAIN-IDX :INT) (IMG-IDX :INT) (DISTANCE :FLO
         DISTANCE - Distance between descriptors. The lower, the better it is.
 
 
-
 Used for matching keypoint descriptors: query descriptor index, train descriptor index, train image 
-index, and distance between descriptors.
+index, and distance between descriptors. If you are using the 3 element version of the function and 
+using the function CFFI:MEM-AREF(or the LISP-CV macro for it "?") to access a specific element of the 
+DMATCH object it returns, the value you entered as the 3rd parameter will be accessible at the 4th 
+index(This is just a workaround until I come up with a better solution).
 
 
 Example:
 
-TODO(Write an example showing how to create DMatch manually, add to vector and send to DRAW-MATCHES)
+TODO (Write an example showing how to create DMatch manually, add to vector and send to DRAW-MATCHES)
 
 
 
-MAT-DOT
+DOT
 
-Computes a dot-product of two vectors.
+Note: This is a overloaded method that computes the dot product of elements in both MAT and POINT-* 
+objects. THe documentation is revealed pertaining to both.
+
+
+MAT
 
 C++: double Mat::dot(InputArray m) const
 
-LISP-CV: (DOT (SELF MAT) (M MAT)) => :DOUBLE
+LISP-CV: (DOT (SELF MAT) (OTHER MAT)) => :DOUBLE
 
-LISP-CV: (MAT-DOT (SELF MAT) (M MAT)) => :DOUBLE
+
+POINT-2*
+
+C++:  _Tp dot(const Point_& pt) const;
+
+LISP-CV: (DOT (SELF POINT) (OTHER POINT)) => :INT
+
+LISP-CV: (DOT (SELF POINT-2D) (OTHER POINT-2D)) => :DOUBLE
+
+LISP-CV: (DOT (SELF POINT-2F) (OTHER POINT-2F)) => :FLOAT
+
+
+POINT-3*
+
+C++"  _Tp dot(const Point3_& pt) const;
+
+LISP-CV: (DOT (SELF POINT-3D) (OTHER POINT-3D)) => :DOUBLE
+
+LISP-CV: (DOT (SELF POINT-3F) (OTHER POINT-3F)) => :FLOAT
+
+LISP-CV: (DOT (SELF POINT-3I) (OTHER POINT-3I)) => :INT
 
 
     Parameters:	
 
-        SELF - A matrix
+        SELF - A POINT-* or a MAT object.
 
-        M - Another dot-product operand.
+        OTHER - Another dot-product operand(MAT or POINT-* object).
 
+
+Descriptions:
+
+
+POINT-*
+
+Operates as to the normal rules of mathematics.
+
+MAT
 
 The method computes a dot-product of two matrices. If the matrices are not single-column or single-row 
 vectors, the top-to-bottom left-to-right scan ordering is used to treat them as 1D vectors. The vectors 
 must have the same size and type. If the matrices have more than one channel, the dot products from all 
-the channels are summed together. You use the DEFMETHOD DOT to call this function. Note that it is only 
-slightly slower(See example below). 
+the channels are summed together.
 
 
-(defun mat-dot-example () 
+Examples: 
+
+
+POINT-*
+
+(defun dot-example-1 ()
+
+  "This example uses the function DOT to 
+   find The dot product of all the POINT
+   type objects in this library."
+
+  (with-point ((point-1 (point 1 2))
+	       (point-2 (point 3 4)))
+    (format t "~%The dot product of POINT-1 and POINT-2 = ~a~%~%"  
+	    (dot point-1 point-2)))
+  (with-point-2d ((point-2d-1 (point-2d 1.0d0 2.0d0))
+		  (point-2d-2 (point-2d 3.0d0 4.0d0)))
+    (format t "~%The dot product of POINT-2D-1 and POINT-2D-2 = ~a~%~%"  
+	    (dot point-2d-1 point-2d-2)))
+  (with-point-2f ((point-2f-1 (point-2f 1.0f0 2.0f0))
+		  (point-2f-2 (point-2f 3.0f0 4.0f0)))
+    (format t "~%The dot product of POINT-2F-1 and POINT-2F-2 = ~a~%~%"  
+	    (dot-2f point-2f-1 point-2f-2)))
+  (with-point-3d ((point-3d-1 (point-3d 13.0d0 14.0d0 15.0d0))
+		  (point-3d-2 (point-3d 16.0d0 17.0d0 18.0d0)))
+    (format t "~%The dot product of POINT-3D-1 and POINT-3D-2 = ~a~%~%"  
+	    (dot-3d point-3d-1 point-3d-2)))
+  (with-point-3f ((point-3f-1 (point-3f 7.0f0 8.0f0 9.0f0))
+		  (point-3f-2 (point-3f 10.0f0 11.0f0 12.0f0)))
+    (format t "~%The dot product of POINT-3F-1 and POINT-3F-2 = ~a~%~%"  
+	    (dot point-3f-1 point-3f-2)))
+  (with-point-3i ((point-3i-1 (point-3i 1 2 3))
+		  (point-3i-2 (point-3i 4 5 6)))
+    (format t "~%The dot product of POINT-3I-1 and POINT-3I-2 = ~a~%~%"  
+	    (dot point-3i-1 point-3i-2))))
+
+
+MAT
+
+(defun dot-example-2 () 
   ;; Create data
   (with-object ((data (alloc :uchar '(1 2 3 4 5 6 7 8))))
     ;; Create matrices A and B
@@ -882,21 +970,11 @@ slightly slower(See example below).
 
       ;; (+ (* 1 1) (* 2 2) (* 3 3) (* 4 4) (* 5 5) (* 6 6) (* 7 7) (* 8 8))
 
-      ;; The 2-row, 4-column matrices are treated as 1D vectors like this: 
-      
-      ;; 1,2,3,4,5,6,7,8.
+      ;; The 2-row, 4-column matrix is treated as 1D vectors like this: 
 
-      (format t "~%The dot product of A and B using MAT-DOT = ~a~%~%" (mat-dot a b))
+      ;; 1,2,3,4,5,6,7,8
 
-      ;; You use the DEFMETHOD DOT, instead, as below.
-      (format t "~%Using the DEFMETHOD, DOT = ~a~%~%" (dot a b))
-      ;; Note: it is only slightly slower
-
-      ;; Note: $ is a macro for the CFFI TIME macro 
-      (format t "~%A million runs of MAT-DOT:~% ")
-      ($ (mat-dot a b))
-      (format t "~%A million runs of DOT: ~%~%")
-      ($ (dot a b)))))
+      (format t "~%The dot product of A and B = ~a~%~%" (dot a b)))))
 
 
 
@@ -1166,21 +1244,29 @@ no longer have this property.
 
 
 
-KEYPOINT
-
+KEY-POINT
 
 KEYPOINT constructor.
 
+Note: Both KEY-POINT and MAKE-KEY-POINT are provided in this library. The first, to match OpenCV's 
+naming conventions, the second, to adhere to Common Lisp naming conventions. Except for the name, 
+they are the same function. I use the KEY-POINT function in the examples in this file because it 
+will make them easier to compare with OpenCV examples you find online, thus making this library 
+easier to learn.
 
 C++: KeyPoint::KeyPoint()
 
 LISP-CV: (KEY-POINT) => KEY-POINT
+
+LISP-CV: (MAKE-KEY-POINT) => KEY-POINT
 
 C++: KeyPoint::KeyPoint(float x, float y, float _size, float _angle=-1, float _response=0, int _octave=0, int _class_id=-1)
 
 LISP-CV: (KEY-POINT (X :FLOAT) (Y :FLOAT) (SIZE :FLOAT) &OPTIONAL ((ANGLE :FLOAT) -1) ((RESPONSE :FLOAT) 0) ((OCTAVE :INT) 0) 
         ((CLASS-ID :INT) -1)) => KEY-POINT
 
+LISP-CV: (MAKE-KEY-POINT (X :FLOAT) (Y :FLOAT) (SIZE :FLOAT) &OPTIONAL ((ANGLE :FLOAT) -1) ((RESPONSE :FLOAT) 0) ((OCTAVE :INT) 0) 
+        ((CLASS-ID :INT) -1)) => KEY-POINT
 
 
     Parameters:	
@@ -1188,8 +1274,6 @@ LISP-CV: (KEY-POINT (X :FLOAT) (Y :FLOAT) (SIZE :FLOAT) &OPTIONAL ((ANGLE :FLOAT
         X - X-coordinate of the keypoint
 
         Y - Y-coordinate of the keypoint
-
-        PT - X & y coordinates of the keypoint
 
         SIZE - Keypoint diameter
 
@@ -1202,8 +1286,6 @@ LISP-CV: (KEY-POINT (X :FLOAT) (Y :FLOAT) (SIZE :FLOAT) &OPTIONAL ((ANGLE :FLOAT
         CLASS-ID - Object id
 
 
-
-
 Used for matching keypoint descriptors: query descriptor index, train descriptor index, train image 
 index, and distance between descriptors.
 
@@ -1211,6 +1293,7 @@ index, and distance between descriptors.
 Example:
 
 TODO(Write example using DRAW KEYPOINTS to draw random keypoints)
+
 
 
 LOCATE-ROI
@@ -1291,29 +1374,45 @@ submatrix within the original matrix. The function LOCATE-ROI does exactly that.
 			 (return)))))))))))))
 
 
+
 MAT
 
 Creates a matrix
+
+Note: Both MAKE-MAT and MAT are provided in this library. The first to adhere to Common Lisp 
+standards and the second to match OpenCV's. Except for the name, they are the same function.
+I use the MAT function in the examples in this file because it will make them easier to compare 
+with OpenCV examples you find online, thus making this library easier to learn.
 
 C++: Mat::Mat()
 
 LISP-CV: (MAT) => MAT
 
+LISP-CV: (MAKE-MAT) => MAT
+
 C++: Mat::Mat(int rows, int cols, int type)
 
 LISP-CV: (MAT (ROWS :INT) (COLS :INT) (TYPE :INT)) => MAT
+
+LISP-CV: (MAKE-MAT (ROWS :INT) (COLS :INT) (TYPE :INT)) => MAT
 
 C++: Mat::Mat(int rows, int cols, int type, const Scalar& s)
 
 LISP-CV: (MAT (ROWS :INT) (COLS :INT) (TYPE :INT) (S SCALAR)) => MAT
 
+LISP-CV: (MAKE-MAT (ROWS :INT) (COLS :INT) (TYPE :INT) (S SCALAR)) => MAT
+
 C++: Mat::Mat(int rows, int cols, int type, void* data, size_t step=AUTO_STEP)
 
 LISP-CV: (MAT (ROWS :INT) (COLS :INT) (TYPE :INT) (DATA :POINTER)) => MAT
 
+LISP-CV: (MAKE-MAT (ROWS :INT) (COLS :INT) (TYPE :INT) (DATA :POINTER)) => MAT
+
 C++: Mat::Mat(const Mat& m, const Range& rowRange, const Range& colRange=Range::all() )
 
 LISP-CV: (MAT (SELF MAT) (ROW-RANGE RANGE) (COL-RANGE RANGE)) => MAT
+
+LISP-CV: (MAKE-MAT (SELF MAT) (ROW-RANGE RANGE) (COL-RANGE RANGE)) => MAT
 
 
     Parameters:	
@@ -1332,12 +1431,13 @@ LISP-CV: (MAT (SELF MAT) (ROW-RANGE RANGE) (COL-RANGE RANGE)) => MAT
 Speed notes:
 
 The speed of the function will improve as I fine tune it's operation. I time how long 2,592,000 runs
-of (MAT :t) takes in the example below. 2,592,000 is the number of matrices that would be created, if 
-you created 1 matrix for every 30fps video frame in a 24 hour period. (MAT :t) is the finalized version 
+of (T:MAT) takes in the example below. 2,592,000 is the number of matrices that would be created, if 
+you created 1 matrix for every 30fps video frame in a 24 hour period. (T:MAT) is the finalized version 
 of (MAT) and finalizers are the slowest of the three forms of MM in this library. You can get a 33% speed 
 increase in this library by compiling your programs to an executable before you run them(See the RUN macro 
 in <lisp-cv-source-dir>/macros.lisp for details on that. Also, try looking into Paralella boards, a cheaper 
-solution for mind blowing processing speed(I know, sounds like a commercial...but trust me:)).
+solution for mind blowing processing speed(I know, sounds like a commercial...but trust me:)). A CUDA module
+will be coming to this library as well.
 
 
 
@@ -1348,18 +1448,18 @@ solution for mind blowing processing speed(I know, sounds like a commercial...bu
    the MAT functions here. Their memory is automatic-
    ally managed so you don't need WITH-* macros or m-
    anual memory management to clean up. They are slo-
-   wer though. The gc: prefix, signals automatic mem-
+   wer though. The GC: prefix, signals automatic mem-
    ory management is activated. I prove it is activa-
    ted by creating millions of MAT objects at the en-
    d of the example. You should notice your RAM fluc-
    tuate, but not rise to any dangerous level. You c-
-   an also use the shorter t: prefix(finalizer true) 
+   an also use the shorter T: prefix(finalizer true) 
    to enable automatic GC in functions that support 
    it. All functions in this library that need to be 
    memory managed have a finalized version.
 
    Note: Automatic memory management is the slowest, 
-         WITH-* macros are second, and manual  MM is 
+         WITH-* macros are second, and manual MM is 
          the quickest for the MAT functions."
 
   (with-object ((data (alloc :double '(1d0 2d0 3d0 4d0 5d0 
@@ -1367,41 +1467,45 @@ solution for mind blowing processing speed(I know, sounds like a commercial...bu
 	  ;Create matrices
     (let* ((mat (gc:mat))
 	   (mat-typed (gc:mat 4 4 +32s+))
-	   (mat-value1 (gc:mat 3 3 +32f+ (scalar 255)))
-	   (mat-value2 (gc:mat 3 3 +32f+ '(255)))
-	   (mat-data1 (gc:mat 3 3 +64f+ data))
-	   (mat-data2 (gc:mat 3 3 +64f+ :double 
+	   (mat-value-1 (gc:mat 3 3 +32f+ (scalar 255)))
+	   (mat-value-2 (gc:mat 3 3 +32f+ '(255)))
+	   (mat-data-1 (gc:mat 3 3 +64f+ data))
+	   (mat-data-2 (gc:mat 3 3 +64f+ :double 
 			      '(1d0 2d0 3d0 4d0 5d0 
 				6d0 7d0 8d0 9d0)))
-	   (mat-data2-row-1 (gc:mat mat-data2 (range 0 1) (range-all)))
+	   (mat-data-2-row-1 (gc:mat mat-data-2 (range 0 1) (range-all)))
            (manual 0))
       ;Print matrices
-      (format t "~%~%MAT = ~%~%")
+      (format t "~%~%MAT:~%~%")
       (print-mat mat :uchar)
-      (format t "~%~%MAT-TYPED = ~%~%")
+      (format t "~%~%MAT-TYPED:~%~%")
       (print-mat mat-typed :int)
-      (format t "~%~%MAT-VALUE1 = ~%~%")
-      (print-mat mat-value1 :float)
-      (format t "~%~%MAT-VALUE2 = ~%~%")
-      (print-mat mat-value2 :float)
-      (format t "~%~%MAT-DATA1 = ~%~%")
-      (print-mat mat-data1 :double)
-      (format t "~%~%MAT-DATA2 = ~%~%")
-      (print-mat mat-data2 :double)
-      (format t "~%~%MAT-DATA2-ROW-1 = ~%~%")
-      (print-mat mat-data2-row-1 :double)
+      (format t "~%~%MAT-VALUE-1:~%~%")
+      (print-mat mat-value-1 :float)
+      (format t "~%~%MAT-VALUE-2:~%~%")
+      (print-mat mat-value-2 :float)
+      (format t "~%~%MAT-DATA-1:~%~%")
+      (print-mat mat-data-1 :double)
+      (format t "~%~%MAT-DATA-2:~%~%")
+      (print-mat mat-data-2 :double)
+      (format t "~%~%MAT-DATA-2-ROW-1:~%~%")
+      (print-mat mat-data-2-row-1 :double)
       (format t "~%~%")
       ;Time how long it takes to create 2,592,000
-      ;finalized matrices using the CL:TIME macro 
-      ;$. I use the 't:' prefix here to enable 
+      ;finalized MAT objects using the CL:TIME ma-
+      ;cro $. I use the t: prefix here to enable 
       ;finalization. 
-    ($ (t:mat) 2592000)
+      (format t "Create 2,592,000 finalized MAT objects:~%~%")
+      ($ (t:mat) 2592000)
       ;Time how long it takes to create 2,592,000
       ;matrices GC'ed by a with-* macro.
-    ($ (with-mat ((with (mat)))) 2592000)
+      (format t "Create 2,592,000 MAT objects GC'ed by WITH-* macro:~%~%")
+      ($ (with-mat ((with (mat)))) 2592000)
       ;Time how long it takes to create 2,592,000
       ;matrices manuallly GC'ed.
-    ($ (progn (setf manual (mat)) (del-mat manual)) 2592000))))
+      (format t "Create 2,592,000 MAT objects GC'ed manually:~%~%")
+      ($ (progn (setf manual (mat)) (del-mat manual)) 2592000))))
+
 
 
 MUL
@@ -1450,17 +1554,24 @@ functions.
 
 POINT
 
-
 POINT constructor.
 
+Note: Both POINT and MAKE-POINT are provided in this library. The first, to match OpenCV's naming 
+conventions, the second, to adhere to Common Lisp naming conventions. Except for the name, they are 
+the same function. I use the POINT function in the examples in this file because it will make them 
+easier to compare with OpenCV examples you find online, thus making this library easier to learn.
 
 C++: Point_()
 
 LISP-CV: (POINT) => POINT
 
+LISP-CV: (MAKE-POINT) => POINT
+
 C++: Point_(_Tp _x, _Tp _y)
 
 LISP-CV:  (POINT (X :INT) (Y :INT)) => POINT
+
+LISP-CV:  (MAKE-POINT (X :INT) (Y :INT)) => POINT
 
 C++: _Tp x, y;
 
@@ -1477,7 +1588,7 @@ LISP-CV: (POINT-Y (SELF POINT)) => :INT
 
         X - X-coordinate of the point.
 
-        Y -	Y-coordinate of the point.
+        Y - Y-coordinate of the point.
 
 
 POINT creates a 2D point with integer coordinates (usually zero-based). The functions POINT-X and  
@@ -1504,13 +1615,22 @@ POINT-Y are used to extract the x,y coordinates of a point.
 
 POINT-2D
 
-
 POINT-2D constructor.
 
+Note: Both POINT-2D and MAKE-POINT-2D are provided in this library. The first, to match OpenCV's naming 
+conventions, the second, to adhere to Common Lisp naming conventions. Except for the name, they are 
+the same function. I use the POINT-2D function in the examples in this file because it will make them 
+easier to compare with OpenCV examples you find online, thus making this library easier to learn.
 
 C++: typedef Point_<double> Point2d
 
+LISP-CV: (POINT-2D) => POINT-2D
+
+LISP-CV: (MAKE-POINT-2D) => POINT-2D
+
 LISP-CV: (POINT-2D (X :INT) (Y :INT)) => POINT-2D
+
+LISP-CV: (MAKE-POINT-2D (X :INT) (Y :INT)) => POINT-2D
 
 C++: _Tp x, y
 
@@ -1525,13 +1645,13 @@ LISP-CV: (POINT-2D-Y (SELF POINT-2D)) => :DOUBLE
 
         SELF - A POINT-2D object.
 
-        X - x-coordinate of the point.
+        X - X-coordinate of the point.
 
-        Y -	y-coordinate of the point.
+        Y - Y-coordinate of the point.
 
 
 POINT-2D creates a 2D point with double-float coordinates (usually zero-based). Functions POINT-2D-X 
-and  POINT-2D-Y are used to extract the x,y coordinates of the point.
+and POINT-2D-Y are used to extract the x,y coordinates of the double float point.
 
 
 (defun point-2d-example (x y)
@@ -1554,13 +1674,22 @@ and  POINT-2D-Y are used to extract the x,y coordinates of the point.
 
 POINT-2F
 
-
 POINT-2F constructor.
 
+Note: Both POINT-2F and MAKE-POINT-2F are provided in this library. The first, to match OpenCV's naming 
+conventions, the second, to adhere to Common Lisp naming conventions. Except for the name, they are 
+the same function. I use the POINT-2F function in the examples in this file because it will make them 
+easier to compare with OpenCV examples you find online, thus making this library easier to learn.
 
 C++: typedef Point_<float> Point2f
 
-LISP-CV:  (POINT-2F (X :INT) (Y :INT)) => POINT-2F
+LISP-CV:  (POINT-2F) => POINT-2F
+
+LISP-CV:  (MAKE-POINT-2F) => POINT-2F
+
+LISP-CV:  (POINT-2F (X :FLOAT) (Y :FLOAT)) => POINT-2F
+
+LISP-CV:  (MAKE-POINT-2F (X :FLOAT) (Y :FLOAT)) => POINT-2F
 
 C++: _Tp x, y
 
@@ -1575,13 +1704,13 @@ LISP-CV: (POINT-2F-Y (SELF POINT-2F)) => :INT
 
         SELF - A POINT-2F object.
 
-        X - x-coordinate of the point.
+        X - X-coordinate of the point.
 
-        Y -	y-coordinate of the point.
+        Y - Y-coordinate of the point.
 
 
-POINT-2F creates a 2D point with float coordinates (usually zero-based). Functions POINT-2F-X and POI-
-NT2F-Y are used to extract the x,y coordinates the point.
+POINT-2F creates a 2D point with single float coordinates (usually zero-based). Functions POINT-2F-X 
+and POINT-2F-Y are used to extract the x,y coordinates the single float point.
 
 
 (defun point-2f-example (x y)
@@ -1604,13 +1733,22 @@ NT2F-Y are used to extract the x,y coordinates the point.
 
 POINT-3D
 
-
 POINT-3D constructor.
 
+Note: Both POINT-3D and MAKE-POINT-3D are provided in this library. The first, to match OpenCV's naming 
+conventions, the second, to adhere to Common Lisp naming conventions. Except for the name, they are 
+the same function. I use the POINT-3D function in the examples in this file because it will make them 
+easier to compare with OpenCV examples you find online, thus making this library easier to learn.
 
 C++: typedef Point3_<double> Point3d
 
-LISP-CV:  (POINT-3D (X :INT) (Y :INT) (Z :INT)) => POINT-3D
+LISP-CV:  (POINT-3D) => POINT-3D
+
+LISP-CV:  (MAKE-POINT-3D) => POINT-3D
+
+LISP-CV:  (POINT-3D (X :DOUBLE) (Y :DOUBLE) (Z :DOUBLE)) => POINT-3D
+
+LISP-CV:  (MAKE-POINT-3D (X :DOUBLE) (Y :DOUBLE) (Z :DOUBLE)) => POINT-3D
 
 C++: _Tp x, y, z
 
@@ -1620,20 +1758,24 @@ C++: _Tp x, y, z
 
 LISP-CV: (POINT-3D-Y (SELF POINT-3D)) => :DOUBLE
 
+C++: _Tp x, y, z
+
+LISP-CV: (POINT-3D-Z (SELF POINT-3D)) => :DOUBLE
+
 
     Parameters:	
 
         SELF - A POINT-3D object.
 
-        X - x-coordinate of the point.
+        X - X-coordinate of the point.
 
-        Y -	y-coordinate of the point.
+        Y - Y-coordinate of the point.
         
         Z - Z-coordinate of the point.
 
 
-POINT-3D creates a 3D point with double-float coordinates (usually zero-based). Functions POINT-3D-X, 
-POINT-3D-Y AND POINT-3D-Z are used to extract the x,y,Z coordinates the point.
+POINT-3D creates a 3D point with double float coordinates (usually zero-based). Functions POINT-3D-X, 
+POINT-3D-Y AND POINT-3D-Z are used to extract the x,y,Z coordinates the double float point.
 
 
 (defun point-3d-example (x y z)
@@ -1657,13 +1799,22 @@ POINT-3D-Y AND POINT-3D-Z are used to extract the x,y,Z coordinates the point.
 
 POINT-3F
 
-
 POINT-3F constructor.
 
+Note: Both POINT-3F and MAKE-POINT-3F are provided in this library. The first, to match OpenCV's naming 
+conventions, the second, to adhere to Common Lisp naming conventions. Except for the name, they are 
+the same function. I use the POINT-3F function in the examples in this file because it will make them 
+easier to compare with OpenCV examples you find online, thus making this library easier to learn.
 
 C++: typedef Point3_<float> Point3f
 
-LISP-CV:  (POINT-3F (X :INT) (Y :INT) (Z :INT)) => POINT-3F
+LISP-CV:  (POINT-3F) => POINT-3F
+
+LISP-CV:  (MAKE-POINT-3F) => POINT-3F
+
+LISP-CV:  (POINT-3F (X :FLOAT) (Y :FLOAT) (Z :FLOAT)) => POINT-3F
+
+LISP-CV:  (MAKE-POINT-3F (X :FLOAT) (Y :FLOAT) (Z :FLOAT)) => POINT-3F
 
 C++: _Tp x, y, z
 
@@ -1671,22 +1822,22 @@ LISP-CV: (POINT-3F-X (SELF POINT-3F)) => :FLOAT
 
 C++: _Tp x, y, z
 
-LISP-CV: (POINT-3F-Y (SELF POINT)) => :FLOAT
+LISP-CV: (POINT-3F-Y (SELF POINT-3F)) => :FLOAT
 
 
     Parameters:	
 
         SELF - A POINT-3F object.
 
-        X - x-coordinate of the point.
+        X - X-coordinate of the point.
 
-        Y -	y-coordinate of the point.
+        Y - Y-coordinate of the point.
         
         Z - Z-coordinate of the point.
 
 
-POINT-3F creates a 3D point with float coordinates (usually zero-based). Functions POINT-3F-X, POINT3-
-F-Y AND POINT-3F-Z are used to extract the x,y,Z coordinates the point.
+POINT-3F creates a 3D point with single float coordinates (usually zero-based). Functions POINT-3F-X, 
+POINT3-F-Y and POINT-3F-Z are used to extract the x,y,Z coordinates the single float point.
 
 
 (defun point-3f-example (x y z)
@@ -1710,13 +1861,22 @@ F-Y AND POINT-3F-Z are used to extract the x,y,Z coordinates the point.
 
 POINT-3I
 
-
 POINT-3I constructor.
 
+Note: Both POINT-3I and MAKE-POINT-3I are provided in this library. The first, to match OpenCV's naming 
+conventions, the second, to adhere to Common Lisp naming conventions. Except for the name, they are 
+the same function. I use the POINT-3I function in the examples in this file because it will make them 
+easier to compare with OpenCV examples you find online, thus making this library easier to learn.
 
 C++: typedef Point3_<int> Point3i;
 
+LISP-CV:  (POINT-3I) => POINT-3I
+
+LISP-CV:  (MAKE-POINT-3I) => POINT-3I
+
 LISP-CV:  (POINT-3I (X :INT) (Y :INT) (Z :INT)) => POINT-3I
+
+LISP-CV:  (MAKE-POINT-3I (X :INT) (Y :INT) (Z :INT)) => POINT-3I
 
 C++: _Tp x, y, z
 
@@ -1731,15 +1891,15 @@ LISP-CV: (POINT-3I-Y (SELF POINT-3I)) => :INT
 
         SELF - A POINT-3I object.
 
-        X - x-coordinate of the point.
+        X - X-coordinate of the point.
 
-        Y -	y-coordinate of the point.
+        Y - Y-coordinate of the point.
         
         Z - Z-coordinate of the point.
 
 
-POINT-3I creates a 3D point with integer coordinates (usually zero-based). Functions POINT-3I-X, POIN-
-T3I-Y and POINT-3I-Z are used to extract the x,y,Z coordinates of the point.
+POINT-3I creates a 3D point with integer coordinates (usually zero-based). Functions POINT-3I-X, 
+POINT-3I-Y and POINT-3I-Z are used to extract the x,y,Z coordinates of the type integer point.
 
 
 (defun point-3i-example (x y z)
@@ -1960,14 +2120,23 @@ RANGE
 
 Range constructor.
 
+Note: RANGE and RANGE-ALL and MAKE-RANGE and MAKE-RANGE-ALL are provided in this library. The first 
+two, to match OpenCV's naming conventions, the second two, to adhere to Common Lisp naming conventions. 
+Except for the name, they are the same function. I use the DMATCH function in the examples in this 
+file because it will make them easier to compare with OpenCV examples you find online, thus making 
+this library easier to learn.
 
 C++: Range::Range(int _start, int _end)
 
 LISP-CV: (RANGE (START :INT) (END :INT)) => RANGE
 
+LISP-CV: (MAKE-RANGE (START :INT) (END :INT)) => RANGE
+
 C++: Range* cv_create_RangeAll()
 
 LISP-CV:  (RANGE-ALL) => RANGE
+
+LISP-CV:  (MAKE-RANGE-ALL) => RANGE
 
 C++: int Range::start
 
@@ -1996,7 +2165,7 @@ support this special (RANGE-ALL)  value. But, of course, in case of your own cus
 will probably have to check and handle it explicitly:
 
 
-(defun my-example (... r ....)
+(defun range-example (... r ....)
 
     (if (eq r (range-all)) 
 
@@ -2073,6 +2242,70 @@ and/or different number of channels. Any combination is possible if:
     (imshow window-name-4 (reshape img 1))
     (loop while (not (= (wait-key 0) 27)))
     (destroy-all-windows)))
+
+
+
+
+ROTATED-RECT
+
+Functions representing rotated (i.e. not up-right) rectangles on a plane and the associated functions 
+used to retrieve their values.
+
+Note: Both ROTATED-RECT and MAKE-ROTATED-RECT are provided in this library. The first, to match OpenCV's 
+naming conventions, the second, to adhere to Common Lisp naming conventions. MAKE-ROTATED-RECT is the function 
+used to construct a ROTATED-RECT object and that is its only function. ROTATED-RECT has the same functionality 
+as MAKE-ROTATED-RECT but when the keyword :BOUNDING-RECT, :CENTER or :SIZE is supplied as the first parameter 
+and an already instantiated ROTATED-RECT object is supplied as the second parameter, the ROTATED-RECT function 
+will return the corresponding value of the supplied ROTATED-RECT object. I use the ROTATED-RECT function in the 
+examples in this file because it will make them easier to compare with OpenCV examples you find online, thus making 
+this library easier to learn.
+
+C++: RotatedRect::RotatedRect(const Point2f& center, const Size2f& size, float angle)
+
+LISP-CV: (ROTATED-RECT (CENTER POINT) (SIZE SIZE) (ANGLE :FLOAT)) => ROTATED-RECT
+
+LISP-CV: (MAKE-ROTATED-RECT (CENTER POINT) (SIZE SIZE) (ANGLE :FLOAT)) => ROTATED-RECT
+
+C++: Rect RotatedRect::boundingRect() const
+
+LISP-CV: (ROTATED-RECT :BOUNDING-RECT (SELF ROTATED-RECT)) => RECT
+
+C++: Point2f RotatedRect::center() 
+
+LISP-CV: (ROTATED-RECT :CENTER (SELF ROTATED-RECT)) => POINT
+
+C++: Size2f RotatedRect::size() 
+
+LISP-CV: (ROTATED-RECT :SIZE (SELF ROTATED-RECT)) => SIZE
+
+
+        Parameters:	
+
+            SELF - A ROTATED-RECT object.
+
+            CENTER - The rectangle mass center.
+
+            SIZE - Width and height of the rectangle.
+
+            ANGLE - The rotation angle in a clockwise direction. When the angle is 0, 90, 180, 270 
+                    etc., the rectangle becomes an up-right rectangle.
+
+
+(defun rotated-rect-example ()
+
+  ;;Set the ROTATED-RECT location
+  (let* ((box-loc (point 0 0))
+	 ;;Set the ROTATED-RECT size
+	 (box-size (size 100 100))
+	 ;;Set the ROTATED-RECT angle
+	 (box-angle 360f0)
+	 (box (rotated-rect box-loc box-size box-angle)))
+    (format t "~%The location of the ROTATED-RECT = (~a, ~a)~%" 
+	    (point-x (rotated-rect :center box)) (point-y (rotated-rect :center box)))
+    (format t "~%The (width, height) of the ROTATED-RECT = (~a, ~a)~%" 
+	    (width (rotated-rect :size box)) (height (rotated-rect :size box)))
+    (format t "~%The angle of the ROTATED-RECT = ~a~%~%" box-angle)))
+
 
 
 
@@ -2201,28 +2434,88 @@ before passing to SCALE.
 	(format t "~%")))))
 
 
-
+========================================================================================================================================
 SIZE
+========================================================================================================================================
 
-This function is a SIZE constructor and retrieves other size values(See below).
+The SIZE method is multifaceted in that it is a binding for the OpenCV class Size and able to create 
+a SIZE(Lisp-CV designation) object, plus, it is a tool used to retrieve the value of any size member 
+belonging to any class bound in this library. The SIZE method documentation is split into 2 parts one 
+for the SIZE constructor methods and one for the size member accessor methods. 
+
+========================================================================================================================================
+SIZE CONSTRUCTOR
+========================================================================================================================================
+
+Note: The MAKE-SIZE function is supplied because its name adheres to Common-Lisps naming conventions. 
+The MAKE-SIZE function, has the ability to create a uninitialized and an initialized SIZE object, whereas 
+the SIZE method too has this ability, except for the fact that when creating an uninitialized SIZE object 
+with it, NIL must be supplied as the only parameter(See example). Due to the fact that the SIZE method is 
+an overloaded method meant also to be a tool used to retrieve the size values held by the size member in 
+any OpenCV class bound in this library(e.g. Mat, Rect), the SIZE method is restricted in this way for now 
+due to limitations in Lisp method overloading. A workaround for this limitation is in the works and the 
+documentation will be updated as soon as it is implemented. Note that I will use the SIZE method in the 
+examples in this file because its name is similar to the OpenCV Size class and that will make the examples 
+easier to compare with OpenCV examples you find online. Also note that use the low-level function SIZE-0 
+to create a SIZE object to give to any function that requires one for the default parameter(its faster), 
+so you may see the function name SIZE-0 floating around in some or the function definitions in this file.
 
 C++: Size_(_Tp _width, _Tp _height);
      typedef Size_<int> Size2i;
      typedef Size2i Size;
 
+LISP-CV: (SIZE (ARG NULL)) => SIZE
+
+LISP-CV: (MAKE-SIZE) => SIZE
+
 LISP-CV: (SIZE (WIDTH :INT) (HEIGHT :INT)) => SIZE
+
+LISP-CV: (MAKE-SIZE (WIDTH :INT) (HEIGHT :INT)) => SIZE
 
 C++: _Tp width, height
 
 LISP-CV: (WIDTH (SELF SIZE)) => :INT
 
-C++: _Tp width, height
+LISP-CV: (HEIGHT (SELF SIZE)) => :INT
 
-C: Size* self, other;
 
-   *self = *other;
+    Parameters:	
 
-LISP-CV: (SIZE-ASSGN-TO (SELF SIZE) (OTHER SIZE)) => SIZE
+        SELF - A SIZE object.
+
+        WIDTH - The width of the SIZE object.
+        
+        HEIGHT - The height of the SIZE oject.
+
+
+The function SIZE and MAKE-SIZE create a SIZE object
+
+The function WIDTH Finds the width of a SIZE object.
+
+The function HEIGHT Finds the height of a SIZE object.
+
+
+(defun size-example-1 ()
+  
+  "An uninitialized and an initialized SIZE 
+   object are created and their values are 
+   printed."
+  
+  (with-size ((un-init-size (size nil))
+	      (size (size 640d0 480d0)))
+    (format t "~%Return of SIZE-UN-INIT: ~a
+               ~%" un-init-size) 
+    (format t "Width of SIZE = ~a~%~%" (width size))
+    (format t "Height of SIZE = ~a~%~%" (height size))))
+
+
+========================================================================================================================================
+SIZE ACCESSOR
+========================================================================================================================================
+
+The method SIZE can access the size member of any OpenCV class.
+
+Note: The method is in process, but all definitions supplied here will work as expected.
 
 C++: Size Mat::size() const
 
@@ -2232,61 +2525,100 @@ C++: int Range::size() const;
 
 LISP-CV: (SIZE (SELF RANGE)) => :INT
 
+C++: Rect_::Size_<_Tp> size() const;
+
+LISP-CV: (SIZE (SELF RECT)) => SIZE
+
 
     Parameters:	
 
-        SELF - A SIZE object.
-
-        WIDTH - The width of SIZE.
-        
-        HEIGHT - The height of SIZE.
+        SELF - A MAT, RANGE or RECT object.
 
 
-The function SIZE creates and also retrieves MAT and RANGE size values..
-
-The function WIDTH Finds the width of a SIZE object.
-
-The function HEIGHT Finds the height of a SIZE object.
+The function SIZE creates and also retrieves MAT, RANGE and RECT size values.
 
 
-The function SIZE contains the functionality of both the OpenCV class Size_, the OpenCV MAT class 
-member size and the OpenCV Range class member size. It can return a pointer to an uninitialized SIZE 
-object, an initialized SIZE object holding (WIDTH, HEIGHT) values, determine the SIZE value of any 
-MAT object passed to it, or determine the size of any RANGE object passes to it. When returning a MAT 
-size the columns are listed first and the rows are listed second(COLS, ROWS). When the matrix is more
-than 2-dimensional, the returned size is (-1 -1). 
+The function SIZE contains the functionality of the OpenCV MAT class member size, the OpenCV Range 
+class member size and the the OpenCV Rect class member size. It can determine the size value of any 
+MAT object passed to it, determine the size of any RANGE object passed to it and determine the size 
+of any RECT object passed to it. When returning a MAT size,  columns are listed first and rows are 
+listed second(COLS, ROWS). When the matrix is more than 2-dimensional, the returned size is (-1 -1). 
 
 
-(defun size-example ()
+(defun size-example-2 ()
   
   "In the code below, the (COLS, ROWS) values of MAT 
-   are accessed and stored in a SIZE object. The val-
-   ues are accessed with the WIDTH and HEIGHT functi-
-   ons and printed. A RANGE object, RANGE, is create-
-   d and its value is printed. Then an uninitialized 
-   and an initialized SIZE object are created. Their 
-   values are also printed."
+   and the (WIDTH, HEIGHT) values of RECT are access-
+   ed and stored in a SIZE object. The MAT and RECT 
+   size values are then accessed with the WIDTH and 
+   HEIGHT functions and printed. Finally, the RANGE 
+   object, RANGE, is created and its value printed."
   
   (with-mat ((mat (mat 5 5 +8u+ (scalar 100 100 100))))
-    (with-range ((range (range 1 10)))
-      (with-size ((mat-size (size mat))
-		  (size-un-init (size))
-		  (size (size 640d0 480d0)))
-	;;The '?' is a macro for CFFI:MEM-AREF
-	(format t "~%MAT (COLS,ROWS) = (~a ~a)~%~%" 
-		(width mat-size)
-		(height mat-size))
-	(format t "The size of RANGE = ~a" 
-		(size range))
-	(format t "~%~%Return of SIZE-UN-INIT: ~a
-               ~%" size-un-init) 
-	(format t "Width of SIZE = ~a~%~%" (width size))
-	(format t "Height of SIZE = ~a~%~%" (height size))))))
+    (with-rect ((rect (rect 0 0 640 480)))
+      (with-size ((mat-size (size mat)))
+	(with-size ((rect-size (size rect)))
+	  (with-range ((range (range 1 10)))
+	    ;;The '?' is a macro for CFFI:MEM-AREF
+	    (format t "~%MAT (COLS,ROWS) = (~a ~a)~%~%" 
+		    (width mat-size)
+		    (height mat-size))
+	    (format t "RECT (WIDTH, HEIGHT) = (~a ~a)~%~%" 
+		    (width rect-size)
+		    (height rect-size))
+	    (format t "The size of RANGE = ~a~%~%" 
+		    (size range))))))))
 
 
 
+
+========================================================================================================================================
+SIZE-2F(function in process)
+========================================================================================================================================
+
+Note: Both SIZE-2F and MAKE-SIZE-2F are provided in this library. The first, to match OpenCV's naming 
+conventions, the second, to adhere to Common Lisp naming conventions. Except for the name, they are 
+the same function. I use the SIZE-2F function in the examples in this file because it will make them 
+easier to compare with OpenCV examples you find online, thus making this library easier to learn.
+
+C++: typedef Size_<float> Size2f;
+
+LISP-CV: (SIZE-2F) => SIZE
+
+LISP-CV: (MAKE-SIZE-2F) => SIZE
+
+LISP-CV: (SIZE-2F (WIDTH :FLOAT) (HEIGHT :FLOAT)) => SIZE
+
+LISP-CV: (MAKE-SIZE-2F (WIDTH :FLOAT) (HEIGHT :FLOAT)) => SIZE
+
+C++: _Tp width, height
+
+LISP-CV: (WIDTH-2F (SELF SIZE-2F)) => :INT
+
+LISP-CV: (HEIGHT-2F (SELF SIZE-2F)) => :INT
+
+
+    Parameters:	
+
+        SELF - A SIZE-2F object.
+
+        WIDTH - The width of the SIZE-2F object.
+        
+        HEIGHT - The height of the SIZE-2F object.
+
+
+The function SIZE-2F and MAKE-SIZE-2F create a SIZE-2F object
+
+The function WIDTH-2F Finds the width of a SIZE-2F object.
+
+The function HEIGHT-2F Finds the height of a SIZE-2F object.
+
+
+
+
+========================================================================================================================================
 SIZE-ASSGN-TO
-
+========================================================================================================================================
 
 Create a SIZE object from another SIZE objects data.
 
@@ -2314,7 +2646,7 @@ CV> A
 
 #<CV-SIZE {10042FE323}>
 
-CV> (DEFPARAMETER B (SIZE))
+CV> (DEFPARAMETER B (SIZE NIL))
 
 B
 
@@ -2546,9 +2878,9 @@ Example:
 TODO(Reference example of function that uses TERM-CRITERIA)
 
 
-=========================================================================================================================================
+========================================================================================================================================
 CORE - OPERATIONS ON ARRAYS
-=========================================================================================================================================
+========================================================================================================================================
 
 *ABS
 
@@ -3439,6 +3771,68 @@ See MAHALANOBIS-EXAMPLE in this file.
 
 
 
+CHECK-RANGE
+
+Checks every element of an input array for invalid values.
+
+C++: bool checkRange(InputArray a, bool quiet=true, Point* pos=0, double minVal=-DBL_MAX, double maxVal=DBL_MAX )
+
+LISP-CV: (CHECK-RANGE (A MAT) &OPTIONAL ((QUIET :BOOLEAN) T) ((POS POINT) (NULL-POINTER)) ((MIN-VAL :DOUBLE) +-DBL-MAX+)
+                      ((MAX-VAL :DOUBLE)  +DBL-MAX+)) => :BOOLEAN
+
+    Parameters:	
+
+        A - Input array.
+
+        QUIET - A flag, indicating whether the functions quietly return NIL when the array elements 
+                are out of range or they throw an exception.
+
+        POS - Optional output parameter, where the position of the first outlier is stored.
+
+        MIN-VAL - inclusive lower boundary of valid values range.
+
+        MAX-VAL - exclusive upper boundary of valid values range.
+
+The function CHECK-RANGE checks that every array element is neither NaN nor infinite. When (< MINVAL +-DBL-MAX+) 
+and (< MAX-VAL +DBL-MAX+), the function also checks that each value is between MIN-VAL and MAX-VAL. In case of 
+multi-channel arrays, each channel is processed independently. If some values are out of range, position of the 
+first outlier is stored in POS (when: (NOT (EQ POS (NULL-POINTER))) ). Then, the functions either return NIL 
+(when: (EQ QUIET T) ) or throw an exception.
+
+
+CHECK-RANGE-EXAMPLE
+
+
+Create a matrix filled with integers between 1 and 10
+
+CV> (DEFPARAMETER A (MAT 3 3 +32S+ :INT '(1 2 3 4 5 6 7 8 9)))
+
+A
+
+Print matrix
+
+CV> (PRINT-MAT A :INT)
+
+1 2 3 
+4 5 6 
+7 8 9 
+
+NIL
+
+Since 1 and 9 are elements in the matrix, CHECK-RANGE returns NIL, or false, here, meaning that all 
+the matrix elements do not lie between 1 and 9.
+
+CV> (CHECK-RANGE A T (GC:POINT) 1D0 9D0)
+
+NIL
+
+Now, CHECK-RANGE returns true. All matrix elements are between 0.5 and 9.5
+
+CV> (CHECK-RANGE A T (GC:POINT) 0.5D0 9.5D0)
+
+T
+
+
 
 COMPLETE-SYMM
 
@@ -3663,34 +4057,13 @@ See also:
 
 DIVIDE
 
+
 Performs per-element division of two arrays or a scalar by an array.
 
 
 C++: void divide(InputArray src1, InputArray src2, OutputArray dst, double scale=1, int dtype=-1)
 
 LISP-CV: (DIVIDE (SRC1 MAT) (SRC2 MAT) (DEST MAT) &OPTIONAL ((SCALE :DOUBLE) 1) ((DTYPE :INT) -1)) => :VOID
-
-
-					;"/home/w/Pictures/100_0229.JPG"  <---money mike
-
-
-
-;Global variables
-
-
-
-;Number of file to be saved
-(defparameter filenumber 0)
-;Name of file to be saved 
-(defparameter filename 0) 
-(defparameter crop (mat))
-
-
-
-(defun detect-and-draw (img cascade nested-cascade scale)
-
-  (let ((num-buffers 2)
-        (size-factor 1.1d0)
 
 C++: void divide(double scale, InputArray src2, OutputArray dst, int dtype=-1)
 
@@ -4165,8 +4538,8 @@ the (INVERT) function (preferably using the +DECOMP-SVD+ method, as the most acc
 	       (mean (mat))
 	       (covar (mat))
 	       (invcovar (mat))
-	       (p1 (mat-range points (gc:range 0 1) (gc:range-all)))
-	       (p2 (mat-range points (gc:range 1 2) (gc:range-all)))
+	       (p1 (mat points (gc:range 0 1) (gc:range-all)))
+	       (p2 (mat points (gc:range 1 2) (gc:range-all)))
                (mat (mat 3 3 +32f+)))
 
       (dotimes (i rows)
@@ -4865,9 +5238,9 @@ http://docs.opencv.org/trunk/modules/core/doc/operations_on_arrays.html?highligh
                             ;;Output matrix used to hold 
                             ;;the two rotation angles
 			    (angle (mat 1 2 +32f+)))
-                      ;;Set PUT-TEXT COLOR parameters
+                      ;;Set COLOR parameter for PUT-TEXT
              	     (with-scalar ((red (scalar 0 0 255)))
-             ;;Set PUT-TEXT TEXT parameters
+             ;;Set TEXT parameter for PUT-TEXT
 	     (setf text1 (cat "x value 1: " (write-to-string x1)))
 	     (setf text2 (cat "y value 1: " (write-to-string y1)))
 	     (setf text3 (cat "x value 2: " (write-to-string x2)))
@@ -5077,13 +5450,22 @@ RNG
 
 The constructors
 
+Note: Both RNG and MAKE-RNG are provided in this library. The first, to match OpenCV's naming 
+conventions, the second, to adhere to Common Lisp naming conventions. Except for the name, they are 
+the same function. I use the RNG function in the examples in this file because it will make them 
+easier to compare with OpenCV examples you find online, thus making this library easier to learn.
+
 C++: RNG::RNG()
 
-LISP-CV: (RNG) => (:POINTER RNG)
+LISP-CV: (RNG) => RNG
+
+LISP-CV: (MAKE-RNG) => RNG
 
 C++: RNG::RNG(uint64 state)
 
-LISP-CV: (RNG (STATE :UINT64)) => (:POINTER RNG)
+LISP-CV: (RNG (STATE :UINT64)) => RNG
+
+LISP-CV: (MAKE-RNG (STATE :UINT64)) => RNG
 
     Parameters:	
 
@@ -5092,7 +5474,7 @@ LISP-CV: (RNG (STATE :UINT64)) => (:POINTER RNG)
 
 These are the RNG constructors. The first form sets the state to some pre-defined value, equal to 
 2**32-1 in the current implementation. The second form sets the state to the specified value. If 
-you passed STATE = 0 , the constructor uses the above default value instead to avoid the singular 
+you passed (EQ STATE 0) , the constructor uses the above default value instead to avoid the singular 
 random number sequence, consisting of all zeros.
 
 
@@ -5347,101 +5729,120 @@ There is a nuance illustrated by the following example:
 (defparameter d (uniform rng 0 .999999))
 
 
-=========================================================================================================================================
+========================================================================================================================================
 CORE - DRAWING FUNCTIONS
-=========================================================================================================================================
+========================================================================================================================================
 
 
-GET-TEXT-SIZE
 
 
-Calculates the width and height of a text string.
+CLIP-LINE
 
+Clips the line against the image rectangle.
 
-C++: Size getTextSize(const string& text, int fontFace, double fontScale, int thickness, int* baseLine)
+C++: bool clipLine(Rect imgRect, Point& pt1, Point& pt2)
 
-LISP-CV:  (GET-TEXT-SIZE (TEXT *STRING) (FONT-FACE :INT) (FONT-SCALE :DOUBLE) (THICKNESS :INT) (BASE-LINE :POINTER)) 
-           => SIZE
+LISP-CV: (CLIP-LINE (IMG-RECT RECT) (PT1 POINT) (PT2 POINT)) => :BOOLEAN
 
 
     Parameters:	
 
-        TEXT - Input text string.
+        IMG-RECT - Image rectangle.
 
-        FONT-FACE - Font to use. See (PUT-TEXT) for details.
+        PT1 - First line point.
 
-        FONT-SCALE - Font scale. See (PUT-TEXT) for details.
-
-        THICKNESS - Thickness of lines used to render the text. See (PUT-TEXT) for details.
-
-        BASE-LINE - Output parameter - y-coordinate of the baseline relative to the bottom-most text 
-                    point.
+        PT2 - Second line point.
 
 
-The function GET-TEXT-SIZE calculates and returns the size of a box that contains the specified text. 
-That is, the following code renders some text, the tight box surrounding it, and the baseline:
+The functions CLIP-LINE calculate a part of the line segment that is entirely within the specified 
+rectangle. They return NIL if the line segment is completely outside the rectangle. Otherwise, they 
+return T.
 
 
-(defun get-text-size-example ()
-        ;; Declare variables
-  (let* ((window-name "GET-TEXT Example")
-	 (text "Funny text inside the box")
-	 (font-face +font-hershey-script-simplex+)
-	 (font-scale 2.0d0)
-	 (thickness 3))
-             ;; Create background
-    (with-mat ((img (mat 600 800 +8uc3+ (scalar-all 0))))
-      (with-object ((base-line (alloc :int 0)))
-	(with-named-window (window-name +window-normal+)
+Example:
 
-	  ;; Set window to fullscreen
-	  (set-window-property window-name +wnd-prop-fullscreen+ 
-			       +window-fullscreen+)
-	  (set-window-property window-name +wnd-prop-aspectratio+ 
-			       +window-freeratio+)
-  
-	  (setf (mem-aref base-line :int) thickness)
-	  ;; Calculates the width and height of TEXT.
-	  (with-size ((text-size (get-text-size text font-face font-scale thickness base-line)))
-	    ;; Center the text
-	    (with-point((text-org (point (round (/ (- (cols img) (width text-size)) 2)) 
-					 (round (/ (- (rows img) (height text-size)) 2))))
-                        ;; Set rectangle coordinates
-			(pt1 (point (point-x text-org) (round (+ (point-y text-org) 
-								 (mem-aref base-line :int)))))
 
-			(pt2 (point (round (+ (point-x text-org) (width text-size))) 
-				    (round (- (point-y text-org) (height text-size))))))
+(defun random-color (rng)
+  (return-from random-color (gc:scalar (uniform rng 0 255) 
+				       (uniform rng 0 255) (uniform rng 0 255))))
 
-	      (with-scalar ((color (scalar 0 0 255)))
-                ;; Draw the box 
-		(rectangle img pt1 pt2 color)
-		(with-point ((pt1 (point (point-x text-org) (round (+ (point-y text-org) 
-								      thickness))))
-			     (pt2 (point (+ (point-x text-org) (round (width text-size))) 
-					 (+ (point-y text-org) thickness))))
-                  ;; Draw the baseline 
-		  (line img pt1 pt2 color)
-
-		  ;; Add the text
-		  (with-scalar ((color (scalar-all 255)))
-		    (put-text img text text-org font-face font-scale color thickness 8))
-                  ;; Show the result
-		  (imshow window-name img)
-		  (loop
-		     (let ((c (wait-key 33)))
-		       (when (= c 27)
-			 (return)))))))))))))
+(defun clip-line-example (&optional (width *default-width*)
+			    (height *default-height*))
+  ;;Declare variables
+  (let* ((window-name "Move Trackbars to Change the Position of the Line - CLIP-LINE Example")
+	 (n 2)
+	 (bool 0)
+	 (text 0)
+	 (font-face +font-hershey-duplex+ )
+	 (scale 0.85d0)
+	 (line-type 4)
+	 (thickness 10)
+	 (rect-x (round (/ width 4)))
+	 (rect-y (round (/ height 4)))
+	 (rect-width (round (/ width n)))
+	 (rect-height (round (/ height n))))
+    ;;Allocate memory to hold the line pt1 and pt2 values.
+    (with-object ((line-pt1-x (alloc :int '(640)))
+		  (line-pt1-y (alloc :int '(0)))
+		  (line-pt2-x (alloc :int '(0)))
+		  (line-pt2-y (alloc :int '(0))))    
+      ;;Create a window
+      (with-named-window (window-name +window-autosize+)
+	(move-window window-name 639 175)
+	;;Create trackbars to control the line position/length.
+	(create-trackbar "line-pt1-x" window-name line-pt1-x width)
+	(create-trackbar "line-pt1-y" window-name line-pt1-y 3000)
+	(create-trackbar "line-pt2-x" window-name line-pt2-x width)
+	(create-trackbar "line-pt2-y" window-name line-pt2-y height)
+	;;Initialize the random number generator. It is used to 
+        ;;create random colors for the rectangle, line and text.
+	(with-rng ((rng (rng #xFFFFFFFF)))
+	  (loop
+	     ;;Create a black background, MAT.
+	     (with-mat ((mat (mat-zeros 480 640 +8uc3+)))
+	       (with-point ((rect-pt1 (point rect-x rect-y))
+			    (rect-pt2 (point (+ rect-x rect-width) 
+					     (+ rect-y rect-height))))
+		 (with-point ((line-pt1 (point (mem-ref line-pt1-x :int) 
+					       (mem-ref line-pt1-y :int)))
+			      (line-pt2 (point (mem-ref line-pt2-x :int) 
+					       (mem-ref line-pt2-y :int))))
+		   (with-scalar ((color (scalar 0 255 0)))
+		     ;;Create a rectangle.
+		     (rectangle mat rect-pt1 rect-pt2 (random-color rng) +filled+ 4 0)
+		     ;;Create a line.
+		     (line mat line-pt1 line-pt2 (random-color rng) thickness line-type)
+		     ;;Evaluate CLIP-LINE and then set to BOOL. If the line is 
+		     ;;inside the bounds of the rectangle, return T, else, NIL.
+		     (with-rect ((rect (rect rect-x rect-y rect-width rect-height)))
+		       (setf bool (clip-line rect line-pt1 line-pt2))
+		       ;;Set TEXT parameter for PUT-TEXT.
+		       (setf text (cat "Is the Line inside the Rectangle? ===> " 
+				       (if bool "YES" "NO")))
+		       ;;Print text to window.
+		       (put-text mat text (gc:point 10 35) font-face  scale (random-color rng) 
+				 (round (/ thickness 5)) line-type))
+		     ;;Show and then delete MAT 
+		     ;;as it goes out of scope.
+		     (imshow window-name mat)))))
+	     (let ((c (wait-key 1)))
+	       (when (= c 27)
+		 (return)))))))))
 
 
 
 BGR
 
-
 A macro for SCALAR organized as BGR(BLUE, GREEN, RED) color values.
 
+Note: Both BGR and MAKE-BGR are provided in this library. The first, to match OpenCV's naming 
+conventions, the second, to adhere to Common Lisp naming conventions. Except for the name, they are 
+the same function. I use the BGR function in the examples in this file because it will make them 
+easier to compare with OpenCV examples you find online, thus making this library easier to learn.
 
 LISP-CV: (BGR B G R) => SCALAR
+ 
+LISP-CV: (MAKE-BGR B G R) => SCALAR
 
 
     Parameters:	
@@ -5453,16 +5854,15 @@ LISP-CV: (BGR B G R) => SCALAR
         R - The red color value
 
 
-BGR is the default color space in LisP-CV
+BGR is the default color space in OpenCV and Lisp-CV.
 
 
 Example:
 
-Here BGR supplies a blue color value. 
+Here BGR supplies a blue color value. The T: prefix signifies that automatic memory management is 
+enabled in the RGB macro, (EQ FINALIZER T).
 
-CIRCLE IMAGE POINT RADIUS (BRG 255 0 0) +FILLED+ +AA+ 0)
-
-
+CV> (CIRCLE IMAGE POINT RADIUS (T:BRG 255 0 0) +FILLED+ +AA+ 0)
 
 
 
@@ -5595,12 +5995,96 @@ Example 2:
 		     ;;Draw multiple ellipses with varied parameters
 		     (ellipse mat box (random-color rng) (uniform rng -1 9) 
 			      +aa+)
-		     (sleep .01)
+		     (sleep .015)
 		     ;; Show and then delete MAT
 		     (imshow window-name mat)))
 		 (let ((c (wait-key 33)))
 		   (when (= c 27)
 		     (return)))))))))))
+
+
+
+GET-TEXT-SIZE
+
+
+Calculates the width and height of a text string.
+
+
+C++: Size getTextSize(const string& text, int fontFace, double fontScale, int thickness, int* baseLine)
+
+LISP-CV:  (GET-TEXT-SIZE (TEXT *STRING) (FONT-FACE :INT) (FONT-SCALE :DOUBLE) (THICKNESS :INT) (BASE-LINE :POINTER)) 
+           => SIZE
+
+
+    Parameters:	
+
+        TEXT - Input text string.
+
+        FONT-FACE - Font to use. See (PUT-TEXT) for details.
+
+        FONT-SCALE - Font scale. See (PUT-TEXT) for details.
+
+        THICKNESS - Thickness of lines used to render the text. See (PUT-TEXT) for details.
+
+        BASE-LINE - Output parameter - y-coordinate of the baseline relative to the bottom-most text 
+                    point.
+
+
+The function GET-TEXT-SIZE calculates and returns the size of a box that contains the specified text. 
+That is, the following code renders some text, the tight box surrounding it, and the baseline:
+
+
+(defun get-text-size-example ()
+        ;; Declare variables
+  (let* ((window-name "GET-TEXT Example")
+	 (text "Funny text inside the box")
+	 (font-face +font-hershey-script-simplex+)
+	 (font-scale 2.0d0)
+	 (thickness 3))
+             ;; Create background
+    (with-mat ((img (mat 600 800 +8uc3+ (scalar-all 0))))
+      (with-object ((base-line (alloc :int 0)))
+	(with-named-window (window-name +window-normal+)
+
+	  ;; Set window to fullscreen
+	  (set-window-property window-name +wnd-prop-fullscreen+ 
+			       +window-fullscreen+)
+	  (set-window-property window-name +wnd-prop-aspectratio+ 
+			       +window-freeratio+)
+  
+	  (setf (mem-aref base-line :int) thickness)
+	  ;; Calculates the width and height of TEXT.
+	  (with-size ((text-size (get-text-size text font-face font-scale thickness base-line)))
+	    ;; Center the text
+	    (with-point((text-org (point (round (/ (- (cols img) (width text-size)) 2)) 
+					 (round (/ (- (rows img) (height text-size)) 2))))
+                        ;; Set rectangle coordinates
+			(pt1 (point (point-x text-org) (round (+ (point-y text-org) 
+								 (mem-aref base-line :int)))))
+
+			(pt2 (point (round (+ (point-x text-org) (width text-size))) 
+				    (round (- (point-y text-org) (height text-size))))))
+
+	      (with-scalar ((color (scalar 0 0 255)))
+                ;; Draw the box 
+		(rectangle img pt1 pt2 color)
+		(with-point ((pt1 (point (point-x text-org) (round (+ (point-y text-org) 
+								      thickness))))
+			     (pt2 (point (+ (point-x text-org) (round (width text-size))) 
+					 (+ (point-y text-org) thickness))))
+                  ;; Draw the baseline 
+		  (line img pt1 pt2 color)
+
+		  ;; Add the text
+		  (with-scalar ((color (scalar-all 255)))
+		    (put-text img text text-org font-face font-scale color thickness 8))
+                  ;; Show the result
+		  (imshow window-name img)
+		  (loop
+		     (let ((c (wait-key 33)))
+		       (when (= c 27)
+			 (return)))))))))))))
+
 
 
 LINE
@@ -5636,14 +6120,11 @@ LISP-CV: (LINE (IMG MAT) (PT1 POINT) (PT2 POINT) (COLOR SCALAR) &OPTIONAL ((THIC
 
 
 
-The function line draws the line segment between pt1 and pt2 points in the image. The line is clipp-
-ed by the image boundaries. For non-antialiased lines with integer coordinates, the 8-connected or 
-4-connected Bresenham algorithm is used. Thick lines are drawn with rounding endings. Antialiased l-
-ines are drawn using Gaussian filtering. To specify the color of the line, you may also use the mac-
-ros RGB - (RGB R G B) and BGR - (BGR B G R).
-
-
-Example:
+The function LINE draws the line segment between PT1 and PT2 points in the image. The line is clipped 
+by the image boundaries. For non-antialiased lines with integer coordinates, the 8-connected or the 
+4-connected Bresenham algorithm is used. Thick lines are drawn with rounding endings. Antialiased lines 
+are drawn using Gaussian filtering. To specify the line color, you may use the macros RGB -> (RGB R G B) 
+and BGR -> (BGR B G R).
 
 
 (defun line-example ()
@@ -5884,10 +6365,16 @@ RGB
 
 A macro for SCALAR organized as RGB(RED, GREEN, BLUE) color values.
 
+Note: Both RGB and MAKE-RGB are provided in this library. The first, to match OpenCV's naming 
+conventions, the second, to adhere to Common Lisp naming conventions. Except for the name, they are 
+the same function. I use the RGB function in the examples in this file because it will make them 
+easier to compare with OpenCV examples you find online, thus making this library easier to learn.
+
 LISP-CV: (RGB R G B) => SCALAR
 
-    Parameters:	
+LISP-CV: (MAKE-RGB R G B) => SCALAR
 
+    Parameters:	
 
         R - The red color value
 
@@ -5895,21 +6382,22 @@ LISP-CV: (RGB R G B) => SCALAR
 
         B - The blue color value
 
-
-A creative reversal of the default BGR color space in LisP-CV. Values are put into the RGB macro in
+A creative reversal of the default BGR color space in Lisp-CV. Values are put into the RGB macro in
 Red, Green, Blue, order, but are ultimately entered into the recieving function as BGR. This macro 
 is designed for ease of use.
 
 
 Usage:
 
-Here RGB supplies a red color value. 
+Here RGB supplies a red color value. The T: prefix signifies that automatic memory management is 
+enabled in the RGB macro, (EQ FINALIZER T).
 
-CIRCLE IMAGE POINT RADIUS (RGB 255 0 0) +FILLED+ +AA+ 0) 
+CV> (CIRCLE IMAGE POINT RADIUS (T:RGB 255 0 0) +FILLED+ +AA+ 0) 
 
 
-UTILITY AND SYSTEM FUNCTIONS AND MACROS:
-
+========================================================================================================================================
+CORE - UTILITY AND SYSTEM FUNCTIONS AND MACROS
+========================================================================================================================================
 
 
 CHECK-HARDWARE-SUPPORT
@@ -6163,9 +6651,9 @@ See also:
     (free data)))
 
 
-=========================================================================================================================================
+========================================================================================================================================
 IMGPROC - IMAGE FILTERING
-=========================================================================================================================================
+========================================================================================================================================
 
 
 
@@ -6514,9 +7002,9 @@ Example:
   ;; to perform the dilation operation
   (with-mat ((element (%get-structuring-element 
 		       dilation-type 
-		       (size (+ (* (? dilation-size :int) 2) 1)
+		       (gc:size (+ (* (? dilation-size :int) 2) 1)
 			     (+ (* (? dilation-size :int) 2) 1)) 
-		       (point (? dilation-size :int) (? dilation-size :int)))))
+		       (gc:point (? dilation-size :int) (? dilation-size :int)))))
     ;; Apply the dilation operation
     (dilate src dilation-dest element)
     (imshow window-name dilation-dest)))
@@ -6607,7 +7095,7 @@ Example:
 ;; Global variables
 (defparameter window-name "EROSION-DEST - ERODE Example")
 ;; Load an image
-(defparameter src (imread "/d1" 1))
+(defparameter src (imread "/my-pic.jpg" 1))
 (defparameter erosion-dest (mat))
 (defparameter erosion-elem (alloc :int 0))
 (defparameter erosion-size (alloc :int 0))
@@ -6627,9 +7115,9 @@ Example:
   ;; to perform the erosion operation
   (with-mat ((element (get-structuring-element 
 		       erosion-type 
-		       (size (+ (* (? erosion-size :int) 2) 1)
+		       (gc:size (+ (* (? erosion-size :int) 2) 1)
 			     (+ (* (? erosion-size :int) 2) 1)) 
-		       (point (? erosion-size :int) (? erosion-size :int)))))
+		       (gc:point (? erosion-size :int) (? erosion-size :int)))))
     ;; Apply the erosion operation
     (erode src erosion-dest element)
     (imshow window-name erosion-dest)))
@@ -6660,6 +7148,7 @@ Example:
 	   (del erosion-elem)
 	   (del erosion-size)
 	   (return))))))
+
 
 
 FILTER-2D
@@ -6860,10 +7349,10 @@ and use it as the structuring element.
 
   (setf element 
 	(gc:get-structuring-element (? morph-elem :int) 
-				 (size 
+				 (gc:size 
 				  (+ (* (? morph-size :int) 2) 1) 
 				  (+ (* (? morph-size :int) 2) 1)) 
-				 (point 
+				 (gc:point 
 				  (? morph-size :int) 
 				  (? morph-size :int))))
 
@@ -7135,7 +7624,7 @@ Blurs an image and downsamples it.
 
 C++: void pyrDown(InputArray src, OutputArray dst, const Size& dstsize=Size(), int borderType=BORDER_DEFAULT )
 
-LISP-CV: (PYR-DOWN (SRC MAT) (DEST MAT) &OPTIONAL ((DSTSIZE SIZE) (SIZE)) 
+LISP-CV: (PYR-DOWN (SRC MAT) (DEST MAT) &OPTIONAL ((DSTSIZE SIZE) (SIZE-0)) 
          ((BORDER-TYPE :INT) +BORDER-DEFAULT+)) => :VOID
 
     Parameters:	
@@ -7214,7 +7703,7 @@ Upsamples an image and then blurs it.
 
 C++: void pyrUp(InputArray src, OutputArray dst, const Size& dstsize=Size(), int borderType=BORDER_DEFAULT )
 
-LISP-CV: (PYR-UP (SRC MAT) (DEST MAT) &OPTIONAL ((DSTSIZE SIZE) (SIZE)) 
+LISP-CV: (PYR-UP (SRC MAT) (DEST MAT) &OPTIONAL ((DSTSIZE SIZE) (SIZE-0)) 
          ((BORDER-TYPE :INT) +BORDER-DEFAULT+)) => :VOID
 
     Parameters:	
@@ -7547,9 +8036,9 @@ Example 2:
 	    (return))))))))
 
 
-=========================================================================================================================================
+========================================================================================================================================
 IMGPROC - GEOMETRIC IMAGE TRANSFORMATIONS
-=========================================================================================================================================
+========================================================================================================================================
 
 
 REMAP
@@ -7739,7 +8228,7 @@ If you want to decimate the image by factor of 2 in each direction, you can call
 ;; Specify FX and FY and let the function compute the destination image size.
 
 
-(RESIZE SRC DEST (SIZE) 0.5d0 0.5d0 INTERPOLATION)
+(RESIZE SRC DEST (SIZE NIL) 0.5d0 0.5d0 INTERPOLATION)
 
 
 To shrink an image, it will generally look best with +INTER-AREA+ interpolation, whereas to enlarge 
@@ -7783,9 +8272,9 @@ See also:
 
 
 
-=========================================================================================================================================
+========================================================================================================================================
 IMGPROC - MISCELLANEOUS IMAGE TRANSFORMATIONS:
-=========================================================================================================================================
+========================================================================================================================================
 
 
 
@@ -8272,9 +8761,9 @@ See also:
 			 (return)))))))))))))
 
 
-=========================================================================================================================================
+========================================================================================================================================
 IMGPROC - HISTOGRAMS
-=========================================================================================================================================
+========================================================================================================================================
 
 
 EQUALIZE-HIST
@@ -8346,9 +8835,9 @@ http://docs.opencv.org/modules/imgproc/doc/histograms.html?highlight=equalizeh#e
 
 
 
-=========================================================================================================================================
+========================================================================================================================================
 IMGPROC - FEATURE DETECTION
-=========================================================================================================================================
+========================================================================================================================================
 
 
 CANNY
@@ -8430,9 +8919,9 @@ See: http://en.wikipedia.org/wiki/Canny_edge_detector
 
 
 
-=========================================================================================================================================
+========================================================================================================================================
 IMGPROC - OBJECT DETECTION
-=========================================================================================================================================
+========================================================================================================================================
 
 
 
@@ -8779,9 +9268,9 @@ Example 2:
 
 
 
-=========================================================================================================================================
+========================================================================================================================================
 HIGHGUI - READING AND WRITING IMAGES AND VIDEO
-=========================================================================================================================================
+========================================================================================================================================
 
 
 
@@ -9219,7 +9708,7 @@ Saves an image to a specified file.
 
 C++: bool imwrite(const string& filename, InputArray img, const vector<int>& params=vector<int>() )
 
-LISP-CV: (IMWRITE (FILENAME :STRING) (IMG MAT) ((PARAMS VECTOR-INT) (VEC-INT))) => :BOOLEAN
+LISP-CV: (IMWRITE (FILENAME :STRING) (IMG MAT) ((PARAMS VECTOR-INT) (VECTOR-INT))) => :BOOLEAN
 
     Parameters:	
 
@@ -9275,7 +9764,7 @@ have alpha set to 0, fully opaque pixels should have alpha set to 255/65535.
 	  ;;Write flipped image to filename specified 
 	  ;;by the OUT-FILE parameter 
 	  (imwrite out-file image 
-		   (vec-int 
+		   (vector-int 
 		    (list +imwrite-jpeg-quality+ 99)))
 	  (loop 
     	     (let ((c (wait-key 33)))
@@ -9326,19 +9815,31 @@ Usage: (IMWRITE-EXAMPLE "/MY-PIC.JPG" "/HOME/USERS/OUT-FILE.JPG")
 
 VIDEO-CAPTURE
 
-VideoCapture constructors.
+VIDEO-CAPTURE constructors.
+
+Note: Both VIDEO-CAPTURE and MAKE-VIDEO-CAPTURE are provided in this library. The first, to match 
+OpenCV's naming conventions, the second, to adhere to Common Lisp naming conventions. Except for 
+the name, they are the same function. I use the VIDEO-CAPTURE function in the examples in this file 
+because it will make them easier to compare with OpenCV examples you find online, thus making this 
+library easier to learn.
 
 C++: VideoCapture::VideoCapture()
 
 LISP-CV: (VIDEO-CAPTURE) => VIDEO-CAPTURE
 
+LISP-CV: (MAKE-VIDEO-CAPTURE) => VIDEO-CAPTURE
+
 C++: VideoCapture::VideoCapture(int device)
 
 LISP-CV: (VIDEO-CAPTURE &OPTIONAL (SRC :INT)) => VIDEO-CAPTURE
 
+LISP-CV: (MAKE-VIDEO-CAPTURE &OPTIONAL (SRC :INT)) => VIDEO-CAPTURE
+
 C++: VideoCapture::VideoCapture(const string& filename)
 
-LISP-CV: (VIDEO-CAPTURE &OPTIONAL (SRC :POINTER STRING*)) => VIDEO-CAPTURE
+LISP-CV: (VIDEO-CAPTURE &OPTIONAL (SRC *STRING)) => VIDEO-CAPTURE
+
+LISP-CV: (MAKE-VIDEO-CAPTURE &OPTIONAL (SRC *STRING)) => VIDEO-CAPTURE
 
 
   Parameters:	
@@ -9352,9 +9853,9 @@ LISP-CV: (VIDEO-CAPTURE &OPTIONAL (SRC :POINTER STRING*)) => VIDEO-CAPTURE
                           img_%02d.jpg, which will read samples like img_00.jpg, img_01.jpg, 
                           img_02.jpg, ...)
 
-             NIL: Creates an uninitialized VIDEO-CAPTURE
+  
+If no arguments are provided this function creates an uninitialized VIDEO-CAPTURE object.
         
-
 
 (defun video-capture-example (filename &optional 
 					 (camera-index *camera-index*))
@@ -9365,31 +9866,30 @@ LISP-CV: (VIDEO-CAPTURE &OPTIONAL (SRC :POINTER STRING*)) => VIDEO-CAPTURE
    the function VIDEO-CAPTURE is used to open a video file sup-
    plied by the parameter FILENAME."
   
-  (with-capture (video-capture (video-capture camera-index))
-    (with-capture (cap-file (video-capture filename))
-      (let ((window-name-1 "Camera - VIDEO-CAPTURE Example")
-	    (window-name-2 "Video file - VIDEO-CAPTURE Example"))
-	(if (not (cap-is-open video-capture)) 
-	    (return-from video-capture-example 
-	      (format t "Cannot open the video camera")))
-	(if (not (cap-is-open cap-file)) 
-	    (return-from video-capture-example 
-	      (format t "Cannot open the video file")))
-	(named-window window-name-1 +window-normal+)
-	(named-window window-name-2 +window-normal+)
-	(move-window window-name-1 533 175)
-	(move-window window-name-2 984 175)
-	(do* ((camera 0)
-	      (video-file 0))
-	     ((plusp (wait-key *millis-per-frame*)) 
-	      (format t "Key is pressed by user"))
-	  (setf camera (mat))
-	  (cap-read video-capture camera)
-	  (setf video-file (mat))
-	  (cap-read cap-file video-file)
-	  (imshow window-name-1 camera)
-	(destroy-all-windows)))))
-
+  (with-video-capture ((camera-capture (video-capture camera-index))
+		       (file-capture (video-capture filename)))
+    (let ((window-name-1 "Camera Feed - VIDEO-CAPTURE Example")
+	  (window-name-2 "Video file - VIDEO-CAPTURE Example"))
+      (if (not (cap-is-open camera-capture)) 
+	  (return-from video-capture-example 
+	    (format t "Cannot open the video camera")))
+      (if (not (cap-is-open file-capture)) 
+	  (return-from video-capture-example 
+	    (format t "Cannot open the video file")))
+      (with-named-window (window-name-1 +window-normal+)
+	(with-named-window (window-name-2 +window-normal+)
+	  (move-window window-name-1 533 175)
+	  (move-window window-name-2 984 175)
+	  (loop 
+	     (with-mat ((camera-frame (mat))
+			(video-frame (mat)))
+	       (cap-read camera-capture camera-frame)
+	       (imshow window-name-1 camera-frame)
+	       (cap-read file-capture video-frame)
+	       (imshow window-name-2 video-frame))
+	     (let ((c (wait-key 33)))
+	       (when (= c 27)
+		 (return)))))))))
 
 
 WITH-CAPTURE
@@ -9502,9 +10002,9 @@ Parameters:
 
 
 
-=========================================================================================================================================
+========================================================================================================================================
 HIGHGUI - USER INTERFACE
-=========================================================================================================================================
+========================================================================================================================================
 
 
 
@@ -10088,9 +10588,9 @@ f there are several HighGUI windows, any of them can be active.
 
 
 
-=========================================================================================================================================
+========================================================================================================================================
 HIGHGUI - QT NEW FUNCTIONS
-=========================================================================================================================================
+========================================================================================================================================
 
 
 
@@ -10273,26 +10773,32 @@ The function SET-WINDOW-PROPERTY enables changing properties of a window.
 
 
 
-
+========================================================================================================================================
 FEATURES2D - FEATURE DETECTION AND DESCRIPTION
+========================================================================================================================================
 
 
-
-
-
-
-
-
-
-
-
+========================================================================================================================================
 BRISK
+========================================================================================================================================
 
 The BRISK constructor
+
+Note: Both BRISK and MAKE-BRISK are provided in this library. The first, to match OpenCV's naming 
+conventions, the second, to adhere to Common Lisp naming conventions. Except for the name, they are 
+the same function. I use the BRISK function in the examples in this file because it will make them 
+easier to compare with OpenCV examples you find online, thus making this library easier to learn.
 
 C++: BRISK::BRISK(int thresh=30, int octaves=3, float patternScale=1.0f)
 
 LISP-CV: (BRISK &OPTIONAL ((THRESH :INT) 30) ((OCTAVES :INT) 3) ((PATTERN-SCALE :FLOAT) 1.0F0) => FEATURE-2D
+
+LISP-CV: (MAKE-BRISK &OPTIONAL ((THRESH :INT) 30) ((OCTAVES :INT) 3) ((PATTERN-SCALE :FLOAT) 1.0F0) => FEATURE-2D
+
+
+Note: In this library, to make all the FEATURES2D functions work together nicely, I had to make 
+      the three functions BF-MATCHER, BRISK and SURF the same type, FEATURE-2D. 
+
 
     Parameters:	
 
@@ -10392,7 +10898,7 @@ http://docs.opencv.org/modules/features2d/doc/feature_detection_and_description.
     (move-window (aref window-name-arr 3) 1438 0)
     (move-window (aref window-name-arr 4) 88 368)
     (move-window (aref window-name-arr 5) 538 368)
-    (move-window (aref window-name-arr 6) 988 368)-
+    (move-window (aref window-name-arr 6) 988 368)
     (move-window (aref window-name-arr 7) 1438 368)
     (move-window (aref window-name-arr 8) 88 708)
     (move-window (aref window-name-arr 9) 538 708)
@@ -10400,8 +10906,8 @@ http://docs.opencv.org/modules/features2d/doc/feature_detection_and_description.
     (move-window (aref window-name-arr 11) 1438 708)
     ;; declare 2 arrays of 12 keypoints each
     (dotimes (i 12)
-      (setf (aref keypoints-a-arr i) (gc:vec-key-point))
-      (setf (aref keypoints-b-arr i) (gc:vec-key-point))
+      (setf (aref keypoints-a-arr i) (gc:vector-key-point))
+      (setf (aref keypoints-b-arr i) (gc:vector-key-point))
       ;; declare an array of 12 query descriptors 
       (setf (aref descriptors-a-arr i) (gc:mat))
       ;; declare an array of 12 train descriptors 
@@ -10410,7 +10916,7 @@ http://docs.opencv.org/modules/features2d/doc/feature_detection_and_description.
       (setf (aref matcher-arr i) (gc:bf-matcher))
       ;; declare an array of 12 MAT objects to hold the 
       ;; matches from the first image to the second one
-      (setf (aref matches-arr i) (gc:vec-dmatch))
+      (setf (aref matches-arr i) (gc:vector-dmatch))
       ;; declare an array of 12 MAT objects to hold the final output images
       (setf (aref all-matches-arr i) (gc:mat))
       ;; find matches, between the two images, 12 times,
@@ -10430,7 +10936,7 @@ http://docs.opencv.org/modules/features2d/doc/feature_detection_and_description.
       ;; draw the found matches
       (draw-matches gray-a (aref keypoints-a-arr i) gray-b (aref keypoints-b-arr i) 
 		    (aref matches-arr i) (aref all-matches-arr i) 
-		    (gc:scalar-all -1) (gc:scalar-all -1) (gc:vec-char) 
+		    (gc:scalar-all -1) (gc:scalar-all -1) (gc:make-vector-char) 
 		    +draw-rich-keypoints+)
       ;; show the 12 different matches in 12 windows
       (imshow (aref window-name-arr i) (aref all-matches-arr i))
@@ -10442,9 +10948,9 @@ http://docs.opencv.org/modules/features2d/doc/feature_detection_and_description.
 
 
 
-
+========================================================================================================================================
 FEATURES2D - COMMON INTERFACES OF FEATURE DETECTORS
-
+========================================================================================================================================
 
 
 FEATURE-DETECTOR-CREATE
@@ -10509,13 +11015,13 @@ Also a combined format is supported: feature detector adapter name:
       (if (empty (or gray-a gray-b)) 
 	  (return-from feature-detector-create-example 
 	    (format t "Both images were not loaded")))
-      (with-vector-key-point ((keypoints-a (vec-key-point))
-			      (keypoints-b (vec-key-point)))
+      (with-vector-key-point ((keypoints-a (vector-key-point))
+			      (keypoints-b (vector-key-point)))
 	;; declare a variable BRISKD of the type FEATURE-2D
 	(with-feature-2d ((briskd (brisk thresh octaves pattern-scale))
 			  ;; declare matcher
 			  (matcher (bf-matcher)))
-	  (with-vector-dmatch ((matches (vec-dmatch)))
+	  (with-vector-dmatch ((matches (vector-dmatch)))
 	    ;; create a feature detector
 	    (feature-detector-create briskd "STAR")
 	    ;; detect keypoints in the image GRAY-A
@@ -10532,7 +11038,7 @@ Also a combined format is supported: feature detector adapter name:
 	      (move-window window-name 759 175)
 	      (with-scalar ((scalar (scalar-all -1)))
 		;; draw the found matches
-		(with-vector-char ((matches-mask (vec-char)))
+		(with-vector-char ((matches-mask (gc:make-vector-char)))
 		  (draw-matches gray-a keypoints-a gray-b keypoints-b matches all-matches 
 				scalar scalar matches-mask
 				+not-draw-single-points+)
@@ -10580,14 +11086,14 @@ LISP-CV: (FEATURE-DETECTOR-DETECT (SELF FEATURE-2D) (IMAGE MAT) (KEYPOINTS KEY-P
 		  (template-height (alloc :int (list (round (/ height 2)))))
 		  (min-hessian (alloc :int 400)))
       ;;Vectors for holding all keypoints
-      (let* ((keypoints-1 (gc:vec-key-point))
-	     (keypoints-2 (gc:vec-key-point))
+      (let* ((keypoints-1 (gc:vector-key-point))
+	     (keypoints-2 (gc:vector-key-point))
              ;;Matrices for holding the descriptors
 	     (descriptors-1 (gc:mat))
 	     (descriptors-2 (gc:mat))
 	     (matcher (gc:bf-matcher +norm-l2+))
              ;;Vector for holding the matches
-	     (matches (gc:vec-dmatch))
+	     (matches (gc:vector-dmatch))
              ;;Output matrix
 	     (img-matches (gc:mat))
 	     (window-name "Image Matches - FEATURE-DETECTOR-DETECT Example"))
@@ -10654,9 +11160,9 @@ LISP-CV: (FEATURE-DETECTOR-DETECT (SELF FEATURE-2D) (IMAGE MAT) (KEYPOINTS KEY-P
 		   (return))))))))))
 
 
-=========================================================================================================================================
+========================================================================================================================================
 FEATURES2D - DRAWING FUNCTION OF KEYPOINTS AND MATCHES
-=========================================================================================================================================
+========================================================================================================================================
 
 
 
@@ -10664,14 +11170,16 @@ DRAW-MATCHES
 
 Draws the found matches of keypoints from two images.
 
-C++: void drawMatches(const Mat& img1, const vector<KeyPoint>& keypoints1, const Mat& img2, const vector<KeyPoint>& keypoints2, 
-                      const vector<DMatch>& matches1to2, Mat& outImg, const Scalar& matchColor=Scalar::all(-1), 
-                      const Scalar& singlePointColor=Scalar::all(-1), const vector<char>& matchesMask=vector<char>(), 
+C++: void drawMatches(const Mat& img1, const vector<KeyPoint>& keypoints1, const Mat& img2, 
+                      const vector<KeyPoint>& keypoints2, const vector<DMatch>& matches1to2, 
+                      Mat& outImg, const Scalar& matchColor=Scalar::all(-1), 
+                      const Scalar& singlePointColor=Scalar::all(-1), 
+                      const vector<char>& matchesMask=vector<char>(), 
                       int flags=DrawMatchesFlags::DEFAULT )
 
 LISP-CV: (DRAW-MATCHES (IMG1 MAT) (KEYPOINTS1 KEYPOINT) (IMG2 MAT) (KEYPOINTS2 KEYPOINT) (MATCHES1TO2 VECTOR-DMATCH) 
                        (OUT-IMG MAT) (MATCH-COLOR SCALAR) (SINGLE-POINT-COLOR SCALAR) &OPTIONAL ((MATCHES-MASK VECTOR-CHAR) 
-                       (VEC-CHAR)) ((FLAGS :INT) +DEFAULT+)) => :VOID
+                       (MAKE-VECTOR-CHAR)) ((FLAGS :INT) +DEFAULT+)) => :VOID
 
 
     Parameters:	
@@ -10763,9 +11271,9 @@ two keypoints (circles). The FLAGS parameters are defined as follows:
 			 (descriptors-a (mat))
 			 (descriptors-b (mat))) 
 		;; vectors used to hold the keypoints
-		(with-vector-key-point ((keypoints-a (vec-key-point))
-					(keypoints-b (vec-key-point)))
-		  (with-vector-dmatch ((matches (vec-dmatch)))
+		(with-vector-key-point ((keypoints-a (vector-key-point))
+					(keypoints-b (vector-key-point)))
+		  (with-vector-dmatch ((matches (vector-dmatch)))
 
 		    (if (empty (or object image)) 
 			(return-from draw-matches-example 
@@ -10788,22 +11296,22 @@ two keypoints (circles). The FLAGS parameters are defined as follows:
 		    ;; output matrix
 		    (with-mat ((all-matches (mat)))
 		      (draw-matches object keypoints-a image keypoints-b matches all-matches 
-				    (gc:scalar-all -1) (gc:scalar-all -1) (gc:vec-char) 
+				    (gc:scalar-all -1) (gc:scalar-all -1) (gc:make-vector-char) 
 				    +default+)
 		      (imshow window-name-1 all-matches))
 		    (with-mat ((all-matches (mat)))
 		      (draw-matches object keypoints-a image keypoints-b matches all-matches 
-				    (gc:scalar 0 0 0) (gc:scalar 255 255 255) (gc:vec-char) 
+				    (gc:scalar 0 0 0) (gc:scalar 255 255 255) (gc:make-vector-char) 
 				    +draw-rich-keypoints+)
 		      (imshow window-name-2 all-matches))
 		    (with-mat ((all-matches (mat)))
 		      (draw-matches object keypoints-a image keypoints-b matches all-matches 
-				    (gc:scalar 0 0 255) (gc:scalar 255 255 2555) (gc:vec-char) 
+				    (gc:scalar 0 0 255) (gc:scalar 255 255 2555) (gc:make-vector-char) 
 				    +not-draw-single-points+)
 		      (imshow window-name-3 all-matches))
 		    (with-mat ((all-matches (mat)))
 		      (draw-matches object keypoints-a image keypoints-b matches all-matches 
-				    (gc:scalar-all 255) (gc:scalar-all -1) (gc:vec-char) 
+				    (gc:scalar-all 255) (gc:scalar-all -1) (gc:make-vector-char) 
 				    +draw-rich-keypoints+)
 		      (imshow window-name-4 all-matches))
 		    (loop
@@ -10813,13 +11321,55 @@ two keypoints (circles). The FLAGS parameters are defined as follows:
 
 
 
-
+========================================================================================================================================
 FEATURES2D - COMMON INTERFACES OF DESCRIPTOR MATCHERS
+========================================================================================================================================
 
 
+========================================================================================================================================
+BF-MATCHER
+========================================================================================================================================
+
+Brute-force matcher constructor.
+
+Note: Both BF-MATCHER and MAKE-BF-MATCHER are provided in this library. The first, to match OpenCV's naming 
+conventions, the second, to adhere to Common Lisp naming conventions. Except for the name, they are 
+the same function. I use the BF-MATCHER function in the examples in this file because it will make them 
+easier to compare with OpenCV examples you find online, thus making this library easier to learn.
+
+C++: BFMatcher::BFMatcher(int normType=NORM_L2, bool crossCheck=false )
+
+LISP-CV:  (BF-MATCHER &OPTIONAL ((NORM-TYPE :INT) +NORM-L2+) ((CROSS-CHECK :BOOLEAN) NIL)) => FEATURE-2D
+
+LISP-CV:  (MAKE-BF-MATCHER &OPTIONAL ((NORM-TYPE :INT) +NORM-L2+) ((CROSS-CHECK :BOOLEAN) NIL)) => FEATURE-2D
+
+Note: In this library, to make all the FEATURES2D functions work together nicely, I had to make 
+      the three functions BF-MATCHER, BRISK and SURF the same type, FEATURE-2D. 
+
+    Parameters:	
+
+        NORM-TYPE - One of +NORM-L1+, +NORM-L2+, +NORM-HAMMING+, +NORM-HAMMING2+. L1 and L2 norms 
+                    are preferable choices for SIFT and SURF descriptors, +NORM-HAMMING+ should be 
+                    used with ORB, BRISK and BRIEF, +NORM-HAMMING2+ should be used with ORB when 
+                    (EQ WTA-K 3) or (EQ WTA-K 4) (see ORB constructor description).
+
+        CROSS-CHECK - If it is false, this is will be default BF-MATCHER behaviour when it finds the 
+                      k nearest neighbors for each query descriptor. If (EQ CROSS-CHECK T), then the 
+                      (KNN-MATCH) method with (EQ K 1) will only return pairs (i,j) such that for i-th 
+                      query descriptor the j-th descriptor in the matcher’s collection is the nearest 
+                      and vice versa, i.e. the BF-MATCHER will only return consistent pairs. Such technique 
+                      usually produces best results with minimal number of outliers when there are enough 
+                      matches. This is alternative to the ratio test, used by D. Lowe in SIFT paper.
 
 
+Example:
+
+See BRISK-EXAMPLE in this file.
+
+
+========================================================================================================================================
 DESCRIP-MATCHER-MATCH
+========================================================================================================================================
 
 Finds the best match for each descriptor from a query set.
 
@@ -10854,18 +11404,23 @@ Example:
 See BRISK-EXAMPLE
 
 
-
-=========================================================================================================================================
+========================================================================================================================================
 OBJDETECT - CASCADE CLASSIFICATION
-=========================================================================================================================================
+========================================================================================================================================
 
 
-
+========================================================================================================================================
 CASCADE-CLASSIFIER
+========================================================================================================================================
 
 
 Creates a CASCADE-CLASSIFIER object or loads a classifier from a file.
 
+Note: Both CASCADE-CLASSIFIER and MAKE-CASCADE-CLASSIFIER are provided in this library. The first, 
+to match OpenCV's naming conventions, the second, to adhere to Common Lisp naming conventions. Except 
+for the name, they are the same function. I use the CASCADE-CLASSIFIER function in the examples in this 
+file because it will make them easier to compare with OpenCV examples you find online, thus making this 
+library easier to learn.
 
 C++: CascadeClassifier::CascadeClassifier()
 
@@ -10873,7 +11428,11 @@ C++: CascadeClassifier::CascadeClassifier(const string& filename)
 
 LISP-CV: (CASCADE-CLASSIFIER) => CASCADE-CLASSIFIER
 
+LISP-CV: (MAKE-CASCADE-CLASSIFIER) => CASCADE-CLASSIFIER
+
 LISP-CV: (CASCADE-CLASSIFIER (FILENAME *STRING)) => CASCADE-CLASSIFIER
+
+LISP-CV: (MAKE-CASCADE-CLASSIFIER (FILENAME *STRING)) => CASCADE-CLASSIFIER
 
 
     Parameters:	
@@ -10886,16 +11445,16 @@ LISP-CV: (CASCADE-CLASSIFIER (FILENAME *STRING)) => CASCADE-CLASSIFIER
 Example:
 
 
-;Create an uninitialized CASCADE-CLASSIFIER object
+Create an uninitialized CASCADE-CLASSIFIER object
 
 CV> (DEFPARAMETER FACE-CASCADE (CASCADE-CLASSIFIER))
 
 FACE-CASCADE
 
 
-;Create a CASCADE-CLASSIFIER object initialized with an XML classifier 
+Create a CASCADE-CLASSIFIER object initialized with an XML classifier 
 
-CV> (DEFPARAMETER FACE-CASCADE-NAME "<opencv_source_directory>/data/haarcascades/haarcascade_frontalface_alt.xml")
+CV> (DEFPARAMETER FACE-CASCADE-NAME "<opencv-source-directory>/data/haarcascades/haarcascade_frontalface_alt.xml")
 
 FACE-CASCADE-NAME
 
@@ -10905,8 +11464,9 @@ FACE-CASCADE
 
 
 
-
+========================================================================================================================================
 CASCADE-CLASSIFIER-LOAD
+========================================================================================================================================
 
 Loads a classifier from a file.
 
@@ -10937,12 +11497,14 @@ FACE-CASCADE
 
 CV> (CASCADE-CLASSIFIER-LOAD FACE-CASCADE FACE-CASCADE-NAME)  ;Load the Classifier
 
-T ;<--- Operation successful
+T <--- Operation successful
 
 
 
-
+========================================================================================================================================
 DETECT-MULTI-SCALE
+========================================================================================================================================
+
 
 Detects objects of different sizes in the input image. The detected objects are returned as a list of rectangles.
 
@@ -10952,7 +11514,7 @@ C++: void CascadeClassifier::detectMultiScale(InputArray image, vector<Rect>& ob
 
 LISP-CV: (DETECT-MULTI-SCALE (SELF CASCADE-CLASSIFIER) (IMAGE MAT) (OBJECTS VECTOR-RECT) &OPTIONAL 
                             ((SCALE-FACTOR :DOUBLE) 1.1D0) ((MIN-NEIGHBORS :INT) 3) ((FLAGS :INT) 0) 
-                           ((MIN-SIZE SIZE) (SIZE)) ((MAX-SIZE SIZE) (SIZE))) => :VOID
+                           ((MIN-SIZE SIZE) (SIZE-0)) ((MAX-SIZE SIZE) (SIZE-0))) => :VOID
 
 C++: void CascadeClassifier::detectMultiScale(InputArray image, vector<Rect>& objects, vector<int>& numDetections, 
                                               double scaleFactor=1.1, int minNeighbors=3, int flags=0, 
@@ -10960,7 +11522,7 @@ C++: void CascadeClassifier::detectMultiScale(InputArray image, vector<Rect>& ob
 
 LISP-CV: (DETECT-MULTI-SCALE (SELF CASCADE-CLASSIFIER) (IMAGE MAT) (OBJECTS VECTOR-RECT) (NUM-DETECTIONS VECTOR-INT) 
                               &OPTIONAL (SCALE-FACTOR :DOUBLE) 1.1D0) ((MIN-NEIGHBORS :INT) 3) ((FLAGS :INT) 0)
-                            ((MIN-SIZE SIZE) (SIZE)) ((MAX-SIZE SIZE) (SIZE))) => :VOID
+                            ((MIN-SIZE SIZE) (SIZE-0)) ((MAX-SIZE SIZE) (SIZE-0))) => :VOID
 
 C++: void CascadeClassifier::detectMultiScale(const Mat& image, vector<Rect>& objects, std::vector<int>& rejectLevels, 
                                               vector<double>& levelWeights, double scaleFactor = 1.1, int minNeighbors = 3, 
@@ -10968,8 +11530,8 @@ C++: void CascadeClassifier::detectMultiScale(const Mat& image, vector<Rect>& ob
                                               bool outputRejectLevels = false )
 
 LISP-CV: (DETECT-MULTI-SCALE (SELF CASCADE-CLASSIFIER) (IMAGE MAT) (OBJECTS VECTOR-RECT) (NUM-DETECTIONS VECTOR-INT) &OPTIONAL 
-         (SCALE-FACTOR :DOUBLE) 1.1D0) ((MIN-NEIGHBORS :INT) 3) ((FLAGS :INT) 0) ((MIN-SIZE SIZE) (SIZE)) 
-         ((MAX-SIZE SIZE) (SIZE))) => :VOID
+         (SCALE-FACTOR :DOUBLE) 1.1D0) ((MIN-NEIGHBORS :INT) 3) ((FLAGS :INT) 0) ((MIN-SIZE SIZE) (SIZE-0)) 
+         ((MAX-SIZE SIZE) (SIZE-0))) => :VOID
 
 
     Parameters:	
@@ -11008,7 +11570,7 @@ This function is parallelized with the TBB library.
 
 ;Global variables
 
-(defparameter face-cascade-name "<open-cv-src-dir>/data/haarcascades/haarcascade_frontalface_alt.xml")
+(defparameter face-cascade-name "<opencv-src-dir>/data/haarcascades/haarcascade_frontalface_alt.xml")
 
 ;Create CASCADE-CLASSIFIER object
 (defparameter face-cascade (cascade-classifier))
@@ -11029,7 +11591,7 @@ This function is parallelized with the TBB library.
 	(index-biggest 0)
 	(area-biggest 0) 
 	(faces-list 0))
-    (with-vector-rect ((faces (vec-rect)))
+    (with-vector-rect ((faces (vector-rect)))
       (with-mat ((frame-gray (mat))
 		 (res (mat))
 		 (gray (mat)))
@@ -11040,7 +11602,7 @@ This function is parallelized with the TBB library.
 	  (detect-multi-scale face-cascade frame-gray faces size-factor 
 			      num-buffers +cascade-do-canny-pruning+ face-size) 1)
 	;Convert VECTOR-RECT to a Lisp list for speed
-	(setf faces-list (vec-rect :to-lisp-list faces))
+	(setf faces-list (vector-rect :to-lisp-list faces))
 	;Set Region of Interest...
 	(with-rect ((roi (rect)))
 	  ;Iterate through all current elements (detected faces)
@@ -11050,7 +11612,7 @@ This function is parallelized with the TBB library.
 	    (setf area-current (* (rect-width (nth index-current faces-list))  ;AREA-CURRENT is area 
    				  (rect-height (nth index-current faces-list)))) ;of current element
             ;INDEX-BIGGEST is index of the biggest element
-	    (setf roi (rect-clone (nth index-biggest faces-list))) 
+	    (setf roi (gc:clone (nth index-biggest faces-list))) 
 
 	    ;Get the area of biggest element, at the 
             ;beginning it is same as current element
@@ -11061,7 +11623,7 @@ This function is parallelized with the TBB library.
             (if (> area-current area-biggest)
 		(progn 
 		  (setf index-biggest index-current)
-		  (setf roi (rect-clone (nth index-biggest faces-list)))) nil)
+		  (setf roi (gc:clone (nth index-biggest faces-list)))) nil)
 
 	    (setf crop (gc:roi frame roi))
 	    ;This will be needed later while saving images
@@ -11069,7 +11631,7 @@ This function is parallelized with the TBB library.
 	    ;Convert cropped image to Grayscale
 	    (cvt-color crop gray +bgr2gray+)
 	    ;Form a filename
-	    (setf filename (concatenate 'string "/home/user/Pictures/my-face/my-face-" 
+	    (setf filename (concatenate 'string "/home/users/Pictures/my-face/my-face-" 
 					(write-to-string filenumber) ".png"))
 	    (incf filenumber)
 
@@ -11136,9 +11698,9 @@ This function is parallelized with the TBB library.
 
 
 
-=========================================================================================================================================
+========================================================================================================================================
 ML - NORMAL BAYES CLASSIFIER
-=========================================================================================================================================
+========================================================================================================================================
 
 
 
@@ -11146,17 +11708,25 @@ NORMAL-BAYES-CLASSIFIER
 
 Default and training constructors.
 
+Note: Both NORMAL-BAYES-CLASSIFIER and MAKE-NORMAL-BAYES-CLASSIFIER are provided in this library. 
+The first, to match OpenCV's naming conventions, the second, to adhere to Common Lisp naming conventions. 
+Except for the name, they are the same function. I use the NORMAL-BAYES-CLASSIFIER function in the examples 
+in this file because it will make them easier to compare with OpenCV examples you find online, thus making this 
+library easier to learn.
+
 C++: CvNormalBayesClassifier::CvNormalBayesClassifier()
 
 C++: CvNormalBayesClassifier::CvNormalBayesClassifier(const Mat& trainData, const Mat& responses, const Mat& varIdx=Mat(), 
                                                       const Mat& sampleIdx=Mat() )
 
 LISP-CV: (NORMAL-BAYES-CLASSIFIER &OPTIONAL (TRAIN-DATA MAT) (RESPONSES MAT) ((VAR-IDX MAT) (MAT) GIVEN-VAR-IDX) 
-                                ((SAMPLE-IDX MAT) (MAT) GIVEN-SAMPLE-IDX)) => NORMAL-BAYES-CLASSIFIER
+                                           ((SAMPLE-IDX MAT) (MAT) GIVEN-SAMPLE-IDX)) => NORMAL-BAYES-CLASSIFIER
+
+LISP-CV: (MAKE-NORMAL-BAYES-CLASSIFIER &OPTIONAL (TRAIN-DATA MAT) (RESPONSES MAT) ((VAR-IDX MAT) (MAT) GIVEN-VAR-IDX) 
+                                                ((SAMPLE-IDX MAT) (MAT) GIVEN-SAMPLE-IDX)) => NORMAL-BAYES-CLASSIFIER
 
 
 The constructors follow conventions of (STAT-MODEL). See (STAT-MODEL-TRAIN) for parameters descriptions.
-
 
 
 Example:
@@ -11456,16 +12026,21 @@ See NORMAL-BAYES-CLASSIFIER-EXAMPLE in this file.
 
 
 
-=========================================================================================================================================
+========================================================================================================================================
 ML - K-NEAREST NEIGHBORS
-=========================================================================================================================================
+========================================================================================================================================
 
 
 
 K-NEAREST
 
-
 Default and training constructors.
+
+Note: Both K-NEAREST and MAKE-K-NEAREST are provided in this library. The first, to match OpenCV's 
+naming conventions, the second, to adhere to Common Lisp naming conventions. Except for the name, 
+they are the same function. I use the K-NEAREST function in the examples in this file because it 
+will make them easier to compare with OpenCV examples you find online, thus making this library 
+easier to learn.
 
 C++: CvKNearest::CvKNearest()
 
@@ -11473,6 +12048,9 @@ C++: CvKNearest::CvKNearest(const Mat& trainData, const Mat& responses, const Ma
                             int max_k=32 )
 
 LISP-CV: (K-NEAREST (&OPTIONAL (TRAIN-DATA MAT) (RESPONSES MAT) ((SAMPLE-IDX MAT) (NULL-POINTER)) ((IS-REGRESSION :BOOLEAN) NIL) 
+                    ((MAX-K :INT) 32))) => K-NEAREST
+
+LISP-CV: (MAKE-K-NEAREST (&OPTIONAL (TRAIN-DATA MAT) (RESPONSES MAT) ((SAMPLE-IDX MAT) (NULL-POINTER)) ((IS-REGRESSION :BOOLEAN) NIL) 
                     ((MAX-K :INT) 32))) => K-NEAREST
 
 
@@ -11825,20 +12403,27 @@ See the K-NEAREST-EXAMPLE in this library
 
 
 
-=========================================================================================================================================
+========================================================================================================================================
 ML - DECISION TREES
-=========================================================================================================================================
+========================================================================================================================================
 
 
-
+========================================================================================================================================
 D-TREE
+========================================================================================================================================
 
 A D-TREE object constructor.
 
+Note: Both D-TREE and MAKE-D-TREE are provided in this library. The first, to match OpenCV's naming 
+conventions, the second, to adhere to Common Lisp naming conventions. Except for the name, they are 
+the same function. I use the D-TREE function in the examples in this file because it will make them 
+easier to compare with OpenCV examples you find online, thus making this library easier to learn.
 
 C++: CvDTree::CvDTree()
 
 LISP-CV: (D-TREE) => D-TREE
+
+LISP-CV: (MAKE-D-TREE) => D-TREE
 
 
 This function implements a decision tree as described in the beginning of this link:
@@ -11966,7 +12551,7 @@ Example:
       ;; Define output node as numerical
       (setf (at var-type 0 1 :uint) +var-numerical+)
       (setf (at var-type 0 2 :uint) +var-numerical+)
-      (d-tree-train d-tree training-data +row-sample+ training-classes mat mat var-type)
+      (d-tree-train d-tree training-data +row-sample+ training-classes mat mat var-type mat (d-tree-params))
       (dotimes (i (rows test-data))
 	(with-mat ((sample (row test-data i)))
 	  (setf prediction (d-tree-predict d-tree sample))
@@ -12171,12 +12756,17 @@ Example:
 			 (return)))))))))))))
 
 
-
-
-
+========================================================================================================================================
 D-TREE-PARAMS
+========================================================================================================================================
 
 The constructors.
+
+Note: Both D-TREE-PARAMS and MAKE-D-TREE-PARAMS are provided in this library. The first, to match 
+OpenCV's naming conventions, the second, to adhere to Common Lisp naming conventions. Except for the 
+name, they are the same function. I use the D-TREE-PARAMS function in the examples in this file because 
+it will make them easier to compare with OpenCV examples you find online, thus making this library easier 
+to learn.
 
 C++: CvDTreeParams::CvDTreeParams()
 
@@ -12184,7 +12774,12 @@ C++: CvDTreeParams::CvDTreeParams(int max_depth, int min_sample_count, float reg
                                   int max_categories, int cv_folds, bool use_1se_rule, bool truncate_pruned_tree, const float* priors)
 
 LISP-CV: (D-TREE-PARAMS (&OPTIONAL (MAX-DEPTH :INT) (MIN-SAMPLE-COUNT :INT) (REGRESSION-ACCURACY :FLOAT) (USE-SURROGATES :BOOLEAN) 
-                        (MAX-CATEGORIES :INT) (FOLDS :INT) (USE-1SE-RULE :BOOLEAN) (TRUNCATE-PRUNED-TREE:BOOLEAN) (PRIORS :POINTER))   
+                        (MAX-CATEGORIES :INT) (FOLDS :INT) (USE-1SE-RULE :BOOLEAN) (TRUNCATE-PRUNED-TREE:BOOLEAN) (PRIORS :POINTER)) 
+                         => D-TREE-PARAMS
+
+LISP-CV: (MAKE-D-TREE-PARAMS (&OPTIONAL (MAX-DEPTH :INT) (MIN-SAMPLE-COUNT :INT) (REGRESSION-ACCURACY :FLOAT) 
+                             (USE-SURROGATES :BOOLEAN) (MAX-CATEGORIES :INT) (FOLDS :INT) (USE-1SE-RULE :BOOLEAN) 
+                             (TRUNCATE-PRUNED-TREE:BOOLEAN) (PRIORS :POINTER)) => D-TREE-PARAMS
 
 
     Parameters:	
@@ -12327,15 +12922,21 @@ See D-TREE-EXAMPLE in this file.
 
 
 
-=========================================================================================================================================
+========================================================================================================================================
 ML - NEURAL NETWORKS
-=========================================================================================================================================
+========================================================================================================================================
 
 
-
+========================================================================================================================================
 ANN-MLP
+========================================================================================================================================
 
 The constructors.
+
+Note: Both ANN-MLP and MAKE-ANN-MLP are provided in this library. The first, to match OpenCV's naming 
+conventions, the second, to adhere to Common Lisp naming conventions. Except for the name, they are 
+the same function. I use the ANN-MLP function in the examples in this file because it will make them 
+easier to compare with OpenCV examples you find online, thus making this library easier to learn.
 
 C++: CvANN_MLP::CvANN_MLP()
 
@@ -12343,6 +12944,9 @@ C++: CvANN_MLP::CvANN_MLP(const CvMat* layerSizes, int activateFunc=CvANN_MLP::S
 
 LISP-CV: (ANN-MLP &OPTIONAL (LAYER-SIZES MAT) ((ACTIVATE-FUNC :INT) +ANN-MLP-SIGMOID-SYM+) ((FPARAM1 :DOUBLE) 0D0) 
                             ((FPARAM2 :DOUBLE) 0D0)) => ANN-MLP
+
+LISP-CV: (MAKE-ANN-MLP &OPTIONAL (LAYER-SIZES MAT) ((ACTIVATE-FUNC :INT) +ANN-MLP-SIGMOID-SYM+) ((FPARAM1 :DOUBLE) 0D0) 
+                                ((FPARAM2 :DOUBLE) 0D0)) => ANN-MLP
 
 The advanced constructor allows to create MLP with the specified topology. See (ANN-MLP-CREATE) for 
 details.
@@ -12387,7 +12991,7 @@ Example:
 ;; accuracy is affected the equations and equation's par-
 ;; ameters you choose for the (F) function.
 
-(defun evaluate (predicted actual &optional p a (*t 0) (f 0)) 
+(defun evaluate (predicted actual &optional p a (*t 0) (f 0)) ann-mlp-e
   (if (eq (rows predicted) (rows actual))
       (dotimes (i (rows actual))
 	(setf p (at predicted i 0 :float))
@@ -12666,10 +13270,17 @@ Example:
 See ANN-MLP-EXAMPLE in this file.
 
 
-
+========================================================================================================================================
 ANN-MLP-TRAIN-PARAMS
+========================================================================================================================================
 
 The constructors.
+
+Note: Both ANN-MLP-PARAMS and MAKE-ANN-MLP-PARAMS are provided in this library. The first, to match 
+OpenCV's naming conventions, the second, to adhere to Common Lisp naming conventions. Except for the 
+name, they are the same function. I use the ANN-MLP-PARAMS function in the examples in this file because 
+it will make them easier to compare with OpenCV examples you find online, thus making this library easier 
+to learn.
 
 C++: CvANN_MLP_TrainParams::CvANN_MLP_TrainParams()
 
@@ -12677,6 +13288,9 @@ C++: CvANN_MLP_TrainParams::CvANN_MLP_TrainParams(CvTermCriteria term_crit, int 
 
 LISP-CV: (ANN-MLP-TRAIN-PARAMS (TERM-CRIT TERM-CRITERIA) (TRAIN-METHOD :INT) (PARAM1 :DOUBLE) ((PARAM2 :DOUBLE) 0.0D0)) 
                                 => ANN-MLP-TRAIN-PARAMS
+
+LISP-CV: (MAKE-ANN-MLP-TRAIN-PARAMS (TERM-CRIT TERM-CRITERIA) (TRAIN-METHOD :INT) (PARAM1 :DOUBLE) ((PARAM2 :DOUBLE) 0.0D0)) 
+                                     => ANN-MLP-TRAIN-PARAMS
 
     Parameters:	
 
@@ -12741,9 +13355,9 @@ See ANN-MLP-EXAMPLE in this file.
 
 
 
-=========================================================================================================================================
+========================================================================================================================================
 PHOTO - INPAINTING
-=========================================================================================================================================
+========================================================================================================================================
 
 
 
@@ -12862,9 +13476,9 @@ Example:
 
 
 
-=========================================================================================================================================
+========================================================================================================================================
 PHOTO - DECOLORIZATION
-=========================================================================================================================================
+========================================================================================================================================
 
 
 
@@ -12916,9 +13530,9 @@ This function is to be applied on color images.
 
 
 
-=========================================================================================================================================
+========================================================================================================================================
 PHOTO - SEAMLESS CLONING
-=========================================================================================================================================
+========================================================================================================================================
 
 
 
@@ -13250,9 +13864,9 @@ color of the destination image.
 
 
 
-=========================================================================================================================================
+========================================================================================================================================
 PHOTO - NON-PHOTOREALISTIC RENDERING
-=========================================================================================================================================
+========================================================================================================================================
 
 
 
@@ -13431,23 +14045,41 @@ LISP-CV: (STYLIZATION (SRC MAT) (DEST MAT) &OPTIONAL ((SIGMA-S :FLOAT) 60F0) ((S
 
 
 
-
+========================================================================================================================================
 NON-FREE - FEATURE DETECTION AND DESCRIPTION
+========================================================================================================================================
 
 
-
+========================================================================================================================================
 SURF
+========================================================================================================================================
 
 The SURF extractor constructors.
+
+Note: Both SURF and MAKE-SURF are provided in this library. The first, to match OpenCV's naming 
+conventions, the second, to adhere to Common Lisp naming conventions. Except for the name, they 
+are the same function. I use the SURF function in the examples in this file because it will make 
+them easier to compare with OpenCV examples you find online, thus making this library easier to 
+learn.
 
 C++: SURF::SURF()
 
 LISP-CV: (SURF) => FEATURE-2D
 
+LISP-CV: (MAKE-SURF) => FEATURE-2D
+
 C++: SURF::SURF(double hessianThreshold, int nOctaves=4, int nOctaveLayers=2, bool extended=true, bool upright=false )
 
 LISP-CV: (SURF (HESSIAN-THRESHOLD :DOUBLE) &OPTIONAL ((N-OCTAVES :INT) 4) 
-                 ((EXTENDED :BOOLEAN) T) ((UPRIGHT :BOOLEAN) NIL)) => FEATURE-2D
+              ((EXTENDED :BOOLEAN) T) ((UPRIGHT :BOOLEAN) NIL)) => FEATURE-2D
+
+LISP-CV: (MAKE-SURF (HESSIAN-THRESHOLD :DOUBLE) &OPTIONAL ((N-OCTAVES :INT) 4) 
+                   ((EXTENDED :BOOLEAN) T) ((UPRIGHT :BOOLEAN) NIL)) => FEATURE-2D
+
+
+Note: In this library, to make all the FEATURES2D functions work together nicely, I had to make 
+      the three functions BF-MATCHER, BRISK and SURF the same type, FEATURE-2D. 
+
 
     Parameters:	
 
@@ -13478,13 +14110,13 @@ LISP-CV: (SURF (HESSIAN-THRESHOLD :DOUBLE) &OPTIONAL ((N-OCTAVES :INT) 4)
 	 (img-2 (gc:imread filename-2 +load-image-grayscale+))
          (min-hessian 400d0) 
          (detector (gc:surf min-hessian))
-	 (keypoints-1 (gc:vec-key-point))
-	 (keypoints-2 (gc:vec-key-point))
+	 (keypoints-1 (gc:vector-key-point))
+	 (keypoints-2 (gc:vector-key-point))
          (extractor (gc:surf))
 	 (descriptors-1 (gc:mat))
 	 (descriptors-2 (gc:mat))
 	 (matcher (gc:bf-matcher +norm-l2+))
-	 (matches (gc:vec-dmatch))
+	 (matches (gc:vector-dmatch))
 	 (img-matches (gc:mat))
 	 (window-name "Image Matches - SURF Example"))
     (if (empty (or img-1 img-2)) 
@@ -13511,9 +14143,9 @@ LISP-CV: (SURF (HESSIAN-THRESHOLD :DOUBLE) &OPTIONAL ((N-OCTAVES :INT) 4)
 
 
 
-=========================================================================================================================================
+========================================================================================================================================
 CONTRIB - COLORMAPS IN OPENCV
-=========================================================================================================================================
+========================================================================================================================================
 
 
 
@@ -13647,17 +14279,32 @@ If the previous call to VIDEO-CAPTURE constructor or CAP-IS-OPEN succeeded, the 
 
 SCALAR
 
-
 SCALAR constructor.
 
+Note: The functions SCALAR, SCALAR-ALL, MAKE-SCALAR and MAKE-SCALAR-ALL are provided in this library. 
+The first two, are provided to match OpenCV's naming conventions, the second two, to adhere to Common 
+Lisp naming conventions. Except for the difference in the names, SCALAR and SCALAR-ALL have the same 
+functionality as MAKE-SCALAR and MAKE-SCALAR-ALL(respectively). I use the SCALAR and the SCALAR-ALL 
+functions in the examples in this file because it makes them easier to compare with OpenCV examples 
+you find online, thus making this library easier to learn.
 
-C++: Scalar_<_Tp>::Scalar_(_Tp v0, _Tp v1, _Tp v2, _Tp v3)
+C++:  Scalar_::Scalar_();
 
-LISP-CV:  (SCALAR ((VAL0 :DOUBLE) &OPTIONAL ((VAL1 :DOUBLE) 0) ((VAL2 :DOUBLE) 0) ((VAL3 :DOUBLE) 0)))
+LISP-CV:  (SCALAR) => SCALAR
 
-C++: Scalar_<_Tp> Scalar_<_Tp>::all(_Tp v0)
+LISP-CV:  (MAKE-SCALAR) => SCALAR
 
-LISP-CV:  (SCALAR-ALL (VAL0123 :DOUBLE))
+C++: Scalar_::Scalar_(_Tp v0, _Tp v1, _Tp v2, _Tp v3)
+
+LISP-CV:  (SCALAR ((VAL0 :DOUBLE) &OPTIONAL ((VAL1 :DOUBLE) 0) ((VAL2 :DOUBLE) 0) ((VAL3 :DOUBLE) 0))) => SCALAR
+
+LISP-CV:  (MAKE-SCALAR ((VAL0 :DOUBLE) &OPTIONAL ((VAL1 :DOUBLE) 0) ((VAL2 :DOUBLE) 0) ((VAL3 :DOUBLE) 0))) => SCALAR
+
+C++: Scalar_::Scalar_<_Tp>::all(_Tp v0)
+
+LISP-CV:  (SCALAR-ALL (VAL0123 :DOUBLE)) => SCALAR
+
+LISP-CV:  (MAKE-SCALAR-ALL (VAL0123 :DOUBLE)) => SCALAR
 
 
     Parameters:	
@@ -13673,26 +14320,26 @@ LISP-CV:  (SCALAR-ALL (VAL0123 :DOUBLE))
         VAL0123 - Value of all scalar elements.
 
 
-The function SCALAR is a SCALAR constructor. It returns a pointer to an up to 4 element scalar. Only 
-VAL0 is required, the rest are optional. The function SCALAR-ALL returns a pointer to 4 element scalar 
-with all elements having the same value.
+The functions SCALAR and MAKE-SCALAR are SCALAR constructors. They return a pointer to an up to 4 
+element scalar. Only VAL0 is required, the rest are optional. Both the functions SCALAR-ALL and 
+MAKE-SCALAR-ALL return a pointer to a 4 element scalar with all elements having the same value.
 
 
 ;; Still gets errors mem-reffing SCALAR-1 and SCALAR-2, willl be fixed soon
 
 (defun scalar-example ()
 
-(with-scalar ((scalar-1 (scalar 0 255 0))
-	     (scalar-2 (scalar-all 255)))
-		(format t "~%SCALAR-1 = (~a, ~a, ~a)~%~%" 
-			(? scalar-1 :double 0)
-			(? scalar-1 :double 1)
-			(? scalar-1 :double 2))
-		(format t "~%SCALAR-2 = (~a, ~a, ~a, ~a)~%~%" 
-			(? scalar-2 :double 0)
-			(? scalar-2 :double 1)
-			(? scalar-2 :double 2)
-			(? scalar-2 :double 3))))
+  (with-scalar ((scalar-1 (scalar 0 255 0))
+		(scalar-2 (scalar-all 255)))
+    (format t "~%SCALAR-1 = (~a, ~a, ~a)~%~%" 
+	    (? scalar-1 :double 0)
+	    (? scalar-1 :double 1)
+	    (? scalar-1 :double 2))
+    (format t "~%SCALAR-2 = (~a, ~a, ~a, ~a)~%~%" 
+	    (? scalar-2 :double 0)
+	    (? scalar-2 :double 1)
+	    (? scalar-2 :double 2)
+	    (? scalar-2 :double 3))))
 
 
 
@@ -13851,35 +14498,35 @@ CIRCLE-EXAMPLE:
 MAT-ZEROS
 
 Returns a zero array of the specified size and type.
-todo figure out if I do all of these
+
+Note: Both MAT-ZEROS and MAKE-MAT-ZEROS are provided in this library. The first, to match OpenCV's 
+naming conventions, the second, to adhere to Common Lisp naming conventions. Except for the name, 
+they are the same function. I use the MAT-ZEROS function in the examples in this file because it 
+will make them easier to compare with OpenCV examples you find online, thus making this library 
+easier to learn.
+
 C++: static MatExpr Mat::zeros(int rows, int cols, int type)
 
-LISP-CV: (MAT-ZEROS (ROWS :INT) (COLS :INT) (TYPE :INT))
+LISP-CV: (MAT-ZEROS (ROWS :INT) (COLS :INT) (TYPE :INT)) => MAT
 
-C++: static MatExpr Mat::zeros(Size size, int type)
-
-C++: static MatExpr Mat::zeros(int ndims, const int* sz, int type)
+LISP-CV: (MAKE-MAT-ZEROS (ROWS :INT) (COLS :INT) (TYPE :INT)) => MAT
 
 
     Parameters:	
-
-        NDIMS - Array dimensionality.
 
         ROWS - Number of rows.
 
         COLS - Number of columns.
 
-        SIZE - Alternative to the matrix size specification (SIZE COLS ROWS).
-
-        SZ - Array of integers specifying the array shape.
-
         TYPE - Created matrix type.
+
 
 The method returns a Matlab-style zero array initializer. It can be used to quickly form a constant
 array as a function parameter, part of a matrix expression, or as a matrix initializer.
 
-(DEFPARAMETER A (MAT))
-(SETF A (MAT-ZEROS 3 3 +32F+))
+CV> (DEFPARAMETER A (MAT))
+
+CV> (SETF A (MAT-ZEROS 3 3 +32F+))
 
 In the example above, a new matrix is allocated only if A is not a 3x3 floating-point matrix. Other-
 wise, the existing matrix A is filled with zeros.
@@ -13901,42 +14548,31 @@ wise, the existing matrix A is filled with zeros.
     (destroy-window window-name)))
 
 
-Mat::ones
-todo figure out if I do all of these
+MAT-ONES
+
 Returns an array of all 1’s of the specified size and type.
 
 C++: static MatExpr Mat::ones(int rows, int cols, int type)
 
-LISP-CV: (MAT-ONES (ROWS :INT) (COLS :INT) (TYPE :INT))
-
-C++: static MatExpr Mat::ones(Size size, int type)
-
-C++: static MatExpr Mat::ones(int ndims, const int* sz, int type)
+LISP-CV: (MAT-ONES (ROWS :INT) (COLS :INT) (TYPE :INT)) => MAT
 
 
     Parameters:	
-
-        NDIMS - Array dimensionality.
 
         ROWS - Number of rows.
 
         COLS - Number of columns.
 
-        SIZE - Alternative to the matrix size specification Size(cols, rows).
-
-        SZ - Array of integers specifying the array shape.
-
         TYPE - Created matrix type.
 
 
-The method returns a Matlab-style 1’s array initializer, similarly to MAT-ZEROS. Note that using th-
-is method you can initialize an array with an arbitrary value, using the following Matlab idiom:
+The method returns a Matlab-style 1’s array initializer, similarly to MAT-ZEROS. Note that using this
+method you can initialize an array with an arbitrary value, using the following Matlab idiom:
 
-Mat A = Mat::ones(100, 100, CV_8U)*3; // make 100x100 matrix filled with 3. todo
+(GC:SCALE (GC:<< (GC:MAT-ONES 100 100 +8U+)) 3D0)
 
-The above operation does not form a 100x100 matrix of 1’s and then multiply it by 3. Instead, it ju-
-st remembers the scale factor (3 in this case) and use it when actually invoking the matrix initial-
-izer.
+The above operation does not form a 100x100 matrix of 1’s and then multiply it by 3. Instead, it just 
+remembers the scale factor (3 in this case) and uses it when actually invoking the matrix initializer.
 
 
 (defun mat-ones-example ()
@@ -13953,6 +14589,7 @@ izer.
     (imshow window-name mat)
     (loop while (not (= (wait-key 0) 27)))
     (destroy-window window-name)))
+
 
 
 MAT-EYE
@@ -13978,7 +14615,7 @@ to (MAT-ONES), you can use a scale operation to create a scaled identity matrix 
 
 ;; Make a 4x4 diagonal matrix with 0.1's on the diagonal.
 
-(DEFPARAMETER A (SCALE (<< (MAT-EYE 4 4 +32F+)) 0.1D0))
+(DEFPARAMETER A (GC:SCALE (GC:<< (GC:MAT-EYE 4 4 +32F+)) 0.1D0))
 
 
 (defun mat-eye-example ()
@@ -14275,20 +14912,31 @@ VIDEO-WRITER
 
 VIDEO-WRITER constructors
 
+Note: Both VIDEO-WRITER and MAKE-VIDEO-WRITER are provided in this library. The first, to match OpenCV's 
+naming conventions, the second, to adhere to Common Lisp naming conventions. Except for the name, they are 
+the same function. I use the VIDEO-WRITER function in the examples in this file because it will make them 
+easier to compare with OpenCV examples you find online, thus making this library easier to learn.
+
 C++: VideoWriter::VideoWriter()
 
 LISP-CV: (VIDEO-WRITER) => VIDEO-WRITER
 
+LISP-CV: (MAKE-VIDEO-WRITER) => VIDEO-WRITER
+
 C++: VideoWriter::VideoWriter(const string& filename, int fourcc, double fps, Size frameSize, bool isColor=true)
 
 LISP-CV: (VIDEO-WRITER (FILENAME *STRING) (FOURCC :INT) (FPS :DOUBLE) (FRAME-SIZE SIZE) ((IS-COLOR :INT) T)) => VIDEO-WRITER
+
+LISP-CV: (MAKE-VIDEO-WRITER (FILENAME *STRING) (FOURCC :INT) (FPS :DOUBLE) (FRAME-SIZE SIZE) ((IS-COLOR :INT) T)) => VIDEO-WRITER
 
 
     Parameters:	
 
         FILENAME - Name of the output video file.
 
-todo        FOURCC - 4-character code of codec used to compress the frames. For example, CV_FOURCC('P','I','M,'1') is a MPEG-1 codec, CV_FOURCC('M','J','P','G') is a motion-jpeg codec etc. List of codes can be obtained at Video Codecs by FOURCC page.
+        FOURCC - 4-character code of codec used to compress the frames. For example, CV_FOURCC('P','I','M,'1') 
+                 is a MPEG-1 codec, CV_FOURCC('M','J','P','G') is a motion-jpeg codec etc. List of codes can be 
+                 obtained at Video Codecs by FOURCC page.(todo)
 
         FPS - Framerate of the created video stream.
 
@@ -14298,8 +14946,8 @@ todo        FOURCC - 4-character code of codec used to compress the frames. For 
                    will work with grayscale frames (the flag is currently supported on Windows only)
 
 
-The constructors/functions initialize video writers. On Linux FFMPEG is used to write videos; on Wi-
-ndows FFMPEG or VFW is used; on MacOSX QTKit is used.
+The constructors/functions initialize video writers. On Linux FFMPEG is used to write videos; on Windows 
+FFMPEG or VFW is used; on MacOSX QTKit is used.
 
 
 (defun video-writer-example (filename &optional	
@@ -14312,8 +14960,8 @@ ndows FFMPEG or VFW is used; on MacOSX QTKit is used.
 	   (dheight (rational (cap-get cap +cap-prop-frame-height+)))
 	   (dwidth (rational (cap-get cap +cap-prop-frame-width+))))
       ;; Initialize the VIDEO-WRITER object 
-      (with-video-writer ((o-video-writer (video-writer filename 1196444237 ; todo
-						       20.0d0 (size width height) 1))) 
+      (with-video-writer ((o-video-writer (make-video-writer filename 1196444237 ; todo
+							     20.0d0 (size width height) 1))) 
 	(if (not (cap-is-open cap))
 	    (return-from video-writer-example 
 	      (format t "ERROR: Cannot open the video file")))
@@ -14355,7 +15003,7 @@ LISP-CV: (VIDEO-WRITER-IS-OPEN (SELF VIDEO-WRITER)) :BOOLEAN
     (let* (; Initialize the VideoWriter object 
 	   (o-video-writer (video-writer filename 1196444237 ; todo
 					 20.0d0 (size 640 480) 1)))
-      (format t "If VIDEO-WRITER is open a T will be displayed, else NIL: ~a"
+      (format t "~%If VIDEO-WRITER is open a T will be displayed, else NIL: ~a~%~%"
 	      (video-writer-is-open o-video-writer)))))
 
 
@@ -14384,6 +15032,9 @@ e as has been specified when opening the video writer.
 (defun video-writer-write-example (filename &optional 
 					      (camera-index *camera-index*))
 
+  "Saves the camera feed to a video file. The save 
+   location is specified by the FILENAME parameter."
+
   (with-capture (cap (video-capture camera-index)) 
     (let* ((window-name "VIDEO-WRITER-WRITE Example")
 	   (o-video-writer (video-writer filename 1196444237 
@@ -14391,14 +15042,14 @@ e as has been specified when opening the video writer.
       (if (not (cap-is-open cap)) 
 	  (return-from video-writer-write-example 
 	    (format t "ERROR: Cannot open the video file")))
-      (if (not (princ (video-writer-is-open o-video-writer))) 
+      (if (not (video-writer-is-open o-video-writer)) 
 	  (return-from video-writer-write-example 
 	    (format t "ERROR: Failed to write the video"))) 
       (named-window window-name +window-normal+)
       (move-window window-name 759 175)
       (do* ((frame 0))
 	   ((plusp (wait-key *millis-per-frame*)) 
-	    (format t "Key is pressed by user"))
+	    (format t "~%~%Key is pressed by user~%~%"))
 	(setf frame (mat))
 	(cap-read cap frame) 
 	(video-writer-write o-video-writer frame) 
@@ -14406,42 +15057,58 @@ e as has been specified when opening the video writer.
       (destroy-window window-name))))
 
 
+
 CLONE
 
-Creates a full copy of the array and the underlying data.
+Creates a full copy of a matrix and the underlying data or a full copy of a RECT object. 
 
 C++: Mat Mat::clone() const
 
-LISP-CV: (MAT-CLONE (SELF MAT)) => MAT
+LISP-CV: (CLONE (SELF MAT)) => MAT
+
+C: Rect* cv_Rect_clone(Rect* self) 
+
+LISP-CV: (CLONE (SELF RECT)) => RECT
 
 
     Parameters:	
 
-        SELF - Pointer to a matrix
+        SELF - Pointer to a matrix or a rectangle.
 
+MAT:
 
-The method creates a full copy of the array. The original TODO step[] is not taken into account. So
-, the array copy is a continuous array occupying (* (TOTAL) (ELEM-SIZE)) bytes.
+This method creates a full copy of array. The original (*STEP), is not taken into account. So, 
+the array copy is a continuous array occupying (* (TOTAL) (ELEM-SIZE)) bytes.
+
+Note (*STEP) is a binding for the OpenCV Mat class 'step[]' member.
+
+RECT:
+
+This method creates a full copy of a RECT object. It is a convenience function for creating a clone 
+of a RECT object created in C and bound in Lisp.
+
+Note: See RECT-EXAMPLE in this file for an example that uses this CLONE method on a RECT object.
 
 
 (defun clone-example ()
 
-        ; Create data
-  (let* ((m1-data (alloc :float '(53.0f0 62.0f0 85.0f0 64.0f0 23.0f0 
-				   97.0f0 52.0f0 16.0f0 12.0f0)))
-         ; Create matrix M1 and fill it with data
-	 (m1 (mat 3 3 +32f+ m1-data))
-         ; Create a clone of matrix M1 called M2
-         (m2 (clone m1)))
-    ; Print the elements of natrix M2 in a loop
-    (dotimes (i (rows m2))
-      (dotimes (j (cols m2))
-        ; AT retrieves elements of M2, FORMAT 
-        ; prints the elements to the screen 
-	(format t "~a" (at m2 i j :float))
-	(princ #\Space))
-      (princ #\Newline))
-      (free m1-data)))
+  ;Create data
+  (with-object ((m1-data (alloc :float '(53.0f0 62.0f0 85.0f0 64.0f0 23.0f0 
+					 97.0f0 52.0f0 16.0f0 12.0f0))))
+    ;Create matrix M1 and fill it with data
+    (with-mat ((m1 (mat 3 3 +32f+ m1-data))
+	       ;Create a clone of matrix M1
+	       (m2 (clone m1)))
+      (format t "~%M2 = ~%~%")
+      ;Print the elements of natrix M2 in a loop
+      (dotimes (i (rows m2))
+	(dotimes (j (cols m2))
+	  ;AT retrieves elements of M2, FORMAT 
+	  ;prints the elements to the screen 
+	  (format t "~a" (at m2 i j :float))
+	  (princ #\Space))
+	(princ #\Newline))
+      (format t "~%"))))
 
 
 TOTAL
@@ -14570,9 +15237,22 @@ RECT
 
 RECT constructor.
 
+Note: Both RECT and MAKE-RECT are provided in this library. The first, to match OpenCV's naming 
+conventions, the second, to adhere to Common Lisp naming conventions. Except for the name, they are 
+the same function. I use the RECT function in the examples in this file because it will make them 
+easier to compare with OpenCV examples you find online, thus making this library easier to learn.
+
+C++: Rect_()
+
+LISP-CV:  (RECT) => RECT
+
+LISP-CV:  (MAKE-RECT) => RECT
+
 C++: Rect_(_Tp _x, _Tp _y, _Tp _width, _Tp _height);
 
 LISP-CV:  (RECT (X :INT) (Y :INT) (:WIDTH :INT) (HEIGHT :INT)) => RECT
+
+LISP-CV:  (MAKE-RECT (X :INT) (Y :INT) (:WIDTH :INT) (HEIGHT :INT)) => RECT
 
 C++: _Tp x, y, width, height;
 
@@ -14596,9 +15276,9 @@ C++: Point_<_Tp> br() const;
 
 LISP-CV: (RECT-BR (SELF RECT)) => POINT
 
-C++ See cv_Rect_clone in LISP-CV-MASTER/SRC/RECT.CPP
+C: Rect* cv_Rect_clone(Rect* self) 
 
-LISP-CV: (RECT-CLONE (SELF RECT)) => RECT
+LISP-CV: (CLONE (SELF RECT)) => RECT 
 
 
     Parameters:	
@@ -14607,14 +15287,14 @@ LISP-CV: (RECT-CLONE (SELF RECT)) => RECT
 
         X - X-coordinate of the rectangle.
 
-        Y -	Y-coordinate of the rectangle.
+        Y - Y-coordinate of the rectangle.
 
         WIDTH - Width of the rectangle.
 
         HEIGHT - Height of the rectangle.
 
 
-The function RECT stores coordinates of a rectangle.
+The functions RECT and MAKE-RECT store coordinates of a rectangle.
 
 The function RECT-X retrieves the x coordinate of the rectangle.
 
@@ -14624,12 +15304,15 @@ The function RECT-WIDTH retrieves the WIDTH of the rectangle.
 
 The function RECT-HEIGHT retrieves the HEIGHT of the rectangle.
 
-The function RECT-SIZE retrieves the size (width, height) of the rectangle.
+The function RECT-SIZE retrieves the size (width, height) of the rectangle. You can also use the 
+SIZE method in this library to access the size of a RECT object. See SIZE-EXAMPLE in this file.
 
 The function RECT-TL retrieves the top-left corner of the rectangle.
 
 The function RECT-BR retrieves the bottom-right corner of the rectangle.
 
+The method CLONE creates a full copy of the rectangle. It is a convenience function for creating 
+a clone of a RECT object. It was created from scratch in C and then bound in Lisp.
 
 
 (defun rect-example (x y width height)
@@ -14642,8 +15325,8 @@ The function RECT-BR retrieves the bottom-right corner of the rectangle.
   ;GLE goes out of scope. DEL-RECT frees the memory a-
   ;llocated by RECT
   
-  (format t "~%~%RECTANGLE:~%~%")
-  (with-rect (rectangle (rect x y width height))
+  (format t "~%RECTANGLE:~%")
+  (with-rect ((rectangle (rect x y width height)))
     (let* ((x (rect-x rectangle))
 	   (y (rect-y rectangle))
 	   (width (rect-width rectangle))
@@ -14663,12 +15346,12 @@ The function RECT-BR retrieves the bottom-right corner of the rectangle.
 	      (point-x br-corner)
 	      (point-y br-corner)))
 
-   ;Create a clone of RECTANGLE and find its size(width, 
-   ;height), location and size(x, y, width, height) and 
-   ;its top-left and bottom-right corner
+  ;Create a clone of RECTANGLE and find its size(width, 
+  ;height), location and size(x, y, width, height) and 
+  ;its top-left and bottom-right corner
 
     (format t "~%~%RECTANGLE-CLONE:~%")
-    (with-rect (rectangle-clone (rect-clone rectangle)) 
+    (with-rect ((rectangle-clone (clone rectangle))) 
       (let* ((clone-x (rect-x rectangle-clone))
 	     (clone-y (rect-y rectangle-clone))
 	     (clone-width (rect-width rectangle-clone))
@@ -14676,7 +15359,7 @@ The function RECT-BR retrieves the bottom-right corner of the rectangle.
              (clone-size (rect-size rectangle-clone))
 	     (clone-tl-corner (rect-tl rectangle-clone))
 	     (clone-br-corner (rect-br rectangle-clone)))
-	(format t "~%~%The (x, y, width, height) of RECTANGLE-CLONE = (~a, ~a, ~a, ~a)~%" 
+	(format t "~%The (x, y, width, height) of RECTANGLE-CLONE = (~a, ~a, ~a, ~a)~%" 
 		clone-x clone-y clone-width clone-height)
 	(format t "~%The size(width, height) of RECTANGLE-CLONE = (~a, ~a)~%" 
 		(width clone-size)
@@ -14690,71 +15373,10 @@ The function RECT-BR retrieves the bottom-right corner of the rectangle.
 
 
 
-DOT
 
-Dot product computed in double-precision arithmetics.
-
-C++:  _Tp dot(const Point_& pt) const;
-
-LISP-CV: (DOT (SELF POINT) (OTHER POINT)) => :INT
-
-LISP-CV: (DOT (SELF POINT-2D) (OTHER POINT-2D)) => :DOUBLE
-
-LISP-CV: (DOT (SELF POINT-2F) (OTHER POINT-2F)) => :FLOAT
-
-C++"  _Tp dot(const Point3_& pt) const;
-
-LISP-CV: (DOT (SELF POINT-3D) (OTHER POINT-3D)) => :DOUBLE
-
-LISP-CV: (DOT (SELF POINT-3F) (OTHER POINT-3F)) => :FLOAT
-
-LISP-CV: (DOT (SELF POINT-3I) (OTHER POINT-3I)) => :INT
-
-
-    Parameters:	
-
-        SELF - A POINT object.
-         
-        OTHER - A POINT object.
-
-
-
-(defun dot-example ()
-
-  "This example uses the function DOT to 
-   find The dot product of all the POINT
-   type objects in this library."
-
-  (with-point ((point-1 (point 1 2))
-	       (point-2 (point 3 4)))
-    (format t "~%The dot product of POINT-1 and POINT-2 = ~a~%~%"  
-	    (dot point-1 point-2)))
-  (with-point-2d ((point-2d-1 (point-2d 1.0d0 2.0d0))
-		  (point-2d-2 (point-2d 3.0d0 4.0d0)))
-    (format t "~%The dot product of POINT-2D-1 and POINT-2D-2 = ~a~%~%"  
-	    (dot point-2d-1 point-2d-2)))
-  (with-point-2f ((point-2f-1 (point-2f 1.0f0 2.0f0))
-		  (point-2f-2 (point-2f 3.0f0 4.0f0)))
-    (format t "~%The dot product of POINT-2F-1 and POINT-2F-2 = ~a~%~%"  
-	    (dot-2f point-2f-1 point-2f-2)))
-  (with-point-3d ((point-3d-1 (point-3d 13.0d0 14.0d0 15.0d0))
-		  (point-3d-2 (point-3d 16.0d0 17.0d0 18.0d0)))
-    (format t "~%The dot product of POINT-3D-1 and POINT-3D-2 = ~a~%~%"  
-	    (dot-3d point-3d-1 point-3d-2)))
-  (with-point-3f ((point-3f-1 (point-3f 7.0f0 8.0f0 9.0f0))
-		  (point-3f-2 (point-3f 10.0f0 11.0f0 12.0f0)))
-    (format t "~%The dot product of POINT-3F-1 and POINT-3F-2 = ~a~%~%"  
-	    (dot point-3f-1 point-3f-2)))
-  (with-point-3i ((point-3i-1 (point-3i 1 2 3))
-		  (point-3i-2 (point-3i 4 5 6)))
-    (format t "~%The dot product of POINT-3I-1 and POINT-3I-2 = ~a~%~%"  
-	    (dot point-3i-1 point-3i-2))))
-
-
-
-=========================================================================================================================================
+========================================================================================================================================
 LISP-CV - MACROS AND EXTRA FUNCTIONS:
-=========================================================================================================================================
+========================================================================================================================================
 
 
 
@@ -14973,37 +15595,119 @@ LISP-CV: (DEL-SCALAR (SELF SCALAR)) => :VOID
 
 LISP-CV: (DEL-SIZE (SELF SIZE)) => :VOID
 
-LISP-CV: (DEL-SIZE2F (SELF SIZE2F)) => :VOID
+LISP-CV: (DEL-SIZE-2F (SELF SIZE-2F)) => :VOID
 
 LISP-CV: (DEL-STD-STRING (SELF *STRING)) => :VOID
 
 LISP-CV: (DEL-TERM-CRIT (SELF TERM-CRITERIA)) => :VOID
 
+LISP-CV: (DEL-VEC-2B (SELF VEC-2B)) => :VOID
+
+LISP-CV: (DEL-VEC-3B (SELF VEC-3B)) => :VOID
+
+LISP-CV: (DEL-VEC-4B (SELF VEC-4B)) => :VOID
+
+LISP-CV: (DEL-VEC-2D (SELF VEC-2D)) => :VOID
+
+LISP-CV: (DEL-VEC-3D (SELF VEC-3D)) => :VOID
+
+LISP-CV: (DEL-VEC-4D (SELF VEC-4D)) => :VOID
+
+LISP-CV: (DEL-VEC-6D (SELF VEC-6D)) => :VOID
+
+LISP-CV: (DEL-VEC-2F (SELF VEC-2F)) => :VOID
+
+LISP-CV: (DEL-VEC-3F (SELF VEC-3F)) => :VOID
+
+LISP-CV: (DEL-VEC-4F (SELF VEC-4F)) => :VOID
+
+LISP-CV: (DEL-VEC-2I (SELF VEC-2I)) => :VOID
+
+LISP-CV: (DEL-VEC-3I (SELF VEC-3I)) => :VOID
+
 LISP-CV: (DEL-VEC-4I (SELF VEC-4I)) => :VOID
 
-LISP-CV: (DEL-VEC-CHAR (SELF VECTOR-CHAR)) => :VOID
+LISP-CV: (DEL-VEC-6I (SELF VEC-6I)) => :VOID
 
-LISP-CV: (DEL-VEC-DBL (SELF VECTOR-DOUBLE)) => :VOID
+LISP-CV: (DEL-VEC-8I (SELF VEC-8I)) => :VOID
 
-LISP-CV: (DEL-VEC-DM (SELF VECTOR-DMATCH)) => :VOID
+LISP-CV: (DEL-VEC-2S (SELF VEC-2S)) => :VOID
 
-LISP-CV: (DEL-VEC-FLT (SELF VECTOR-FLOAT)) => :VOID
+LISP-CV: (DEL-VEC-3S (SELF VEC-3S)) => :VOID
 
-LISP-CV: (DEL-VEC-INT (SELF VECTOR-INT)) => :VOID
+LISP-CV: (DEL-VEC-4S (SELF VEC-4S)) => :VOID
 
-LISP-CV: (DEL-VEC-KP (SELF VECTOR-KEY-POINT)) => :VOID
+LISP-CV: (DEL-VEC-2W (SELF VEC-2w)) => :VOID
 
-LISP-CV: (DEL-VEC-MAT (SELF VECTOR-MAT)) => :VOID
+LISP-CV: (DEL-VEC-3W (SELF VEC-3W)) => :VOID
 
-LISP-CV: (DEL-VEC-POINT (SELF VECTOR-POINT)) => :VOID
+LISP-CV: (DEL-VEC-4W (SELF VEC-4W)) => :VOID
 
-LISP-CV: (DEL-VEC-POINT-2F (SELF VECTOR-POINT-2F)) => :VOID
+LISP-CV: (DEL-VECTOR-CHAR (SELF VECTOR-CHAR)) => :VOID
 
-LISP-CV: (DEL-VEC-RECT (SELF VECTOR-RECT)) => :VOID
+LISP-CV: (DEL-VECTOR-DOUBLE (SELF VECTOR-DOUBLE)) => :VOID
 
-LISP-CV: (DEL-VEC-UCHAR (SELF VECTOR-UCHAR)) => :VOID
+LISP-CV: (DEL-VECTOR-DMATCH (SELF VECTOR-DMATCH)) => :VOID
 
-LISP-CV: (DEL-VEC-VEC-4I (SELF VECTOR-VEC-4I)) => :VOID
+LISP-CV: (DEL-VECTOR-FLOAT (SELF VECTOR-FLOAT)) => :VOID
+
+LISP-CV: (DEL-VECTOR-INT (SELF VECTOR-INT)) => :VOID
+
+LISP-CV: (DEL-VECTOR-KEY-POINT (SELF VECTOR-KEY-POINT)) => :VOID
+
+LISP-CV: (DEL-VECTOR-MAT (SELF VECTOR-MAT)) => :VOID
+
+LISP-CV: (DEL-VECTOR-POINT (SELF VECTOR-POINT)) => :VOID
+
+LISP-CV: (DEL-VECTOR-POINT-2F (SELF VECTOR-POINT-2F)) => :VOID
+
+LISP-CV: (DEL-VECTOR-RECT (SELF VECTOR-RECT)) => :VOID
+
+LISP-CV: (DEL-VECTOR-UCHAR (SELF VECTOR-UCHAR)) => :VOID
+
+LISP-CV: (DEL-VECTOR-VEC-2B (SELF VECTOR-VEC-2B)) => :VOID
+
+LISP-CV: (DEL-VECTOR-VEC-3B (SELF VECTOR-VEC-3B)) => :VOID
+
+LISP-CV: (DEL-VECTOR-VEC-4B (SELF VECTOR-VEC-4B)) => :VOID
+
+LISP-CV: (DEL-VECTOR-VEC-2D (SELF VECTOR-VEC-2D)) => :VOID
+
+LISP-CV: (DEL-VECTOR-VEC-3D (SELF VECTOR-VEC-3D)) => :VOID
+
+LISP-CV: (DEL-VECTOR-VEC-4D (SELF VECTOR-VEC-4D)) => :VOID
+
+LISP-CV: (DEL-VECTOR-VEC-6D (SELF VECTOR-VEC-6D)) => :VOID
+
+LISP-CV: (DEL-VECTOR-VEC-2F (SELF VECTOR-VEC-2F)) => :VOID
+
+LISP-CV: (DEL-VECTOR-VEC-3F (SELF VECTOR-VEC-3F)) => :VOID
+
+LISP-CV: (DEL-VECTOR-VEC-4F (SELF VECTOR-VEC-4F)) => :VOID
+
+LISP-CV: (DEL-VECTOR-VEC-6F (SELF VECTOR-VEC-6F)) => :VOID
+
+LISP-CV: (DEL-VECTOR-VEC-2I (SELF VECTOR-VEC-2I)) => :VOID
+
+LISP-CV: (DEL-VECTOR-VEC-3I (SELF VECTOR-VEC-3I)) => :VOID
+
+LISP-CV: (DEL-VECTOR-VEC-4I (SELF VECTOR-VEC-4I)) => :VOID
+
+LISP-CV: (DEL-VECTOR-VEC-6I (SELF VECTOR-VEC-6I)) => :VOID
+
+LISP-CV: (DEL-VECTOR-VEC-8I (SELF VECTOR-VEC-8I)) => :VOID
+
+LISP-CV: (DEL-VECTOR-VEC-2S (SELF VECTOR-VEC-2S)) => :VOID
+
+LISP-CV: (DEL-VECTOR-VEC-3S (SELF VECTOR-VEC-3S)) => :VOID
+
+LISP-CV: (DEL-VECTOR-VEC-4S (SELF VECTOR-VEC-4S)) => :VOID
+
+LISP-CV: (DEL-VECTOR-VEC-2W (SELF VECTOR-VEC-2W)) => :VOID
+
+LISP-CV: (DEL-VECTOR-VEC-3W (SELF VECTOR-VEC-3W)) => :VOID
+
+LISP-CV: (DEL-VECTOR-VEC-4W (SELF VECTOR-VEC-4W)) => :VOID
 
 LISP-CV: (DEL-VID-CAP (SELF VIDEO-CAPTURE)) => :VOID
 
@@ -15027,93 +15731,8 @@ Note: Each DEL-* function has a companion WITH-* macro that calls the associated
 the * goes out of scope, automatically. See <lisp-cv-source directory>/with-macros.lisp for the associated 
 WITH-* macro.
 
-The function DEL deletes anything(may not be safe on all implementations)
-
-The function DEL-ANN-MLP deletes a ANN-MLP object.
-
-The function DEL-ANN-MLP-TRAIN-PARAMS deletes a ANN-MLP-TRAIN-PARAMS object.
-
-The function DEL-CASC-CLASS deletes a CASCADE-CLASSIFIER object.
-
-The function DEL-D-TREE deletes a D-TREE object.
-
-The function DEL-D-TREE-PARAMS deletes a D-TREE-PARAMS object.
-
-The function DEL-DMATCH deletes a DMATCH object.
-
-The function DEL-FEATURE-2D deletes a FEATURE-2D object.
-
-The function DEL-HOG-DESCRIPTOR deletes a HOG-DESCRIPTOR object.
-
-The function DEL-K-NEAREST deletes a K-NEAREST object.
-
-The function DEL-KP deletes a KEY-POINT object.
-
-The function DEL-MAT deletes a MAT object.
-
-The function DEL-MAT-EXPR deletes a MAT-EXPR object.
-
-The function DEL-NORMAL-BAYES-CLASSIFIER deletes a NORMAL-BAYES-CLASSIFIER object.
-
-The function DEL-POINT deletes a POINT object.
-
-The function DEL-POINT-2D deletes a POINT-2D object.
-
-The function DEL-POINT-2F deletes a POINT-2F object.
-
-The function DEL-POINT-3D deletes a POINT-3D object.
-
-The function DEL-POINT-3F deletes a POINT-3F object.
-
-The function DEL-POINT-3I deletes a POINT-3I object.
-
-The function DEL-RANGE deletes a RANGE object.
-
-The function DEL-RECT deletes a RECT object.
-
-The function DEL-ROT-RECT deletes a ROTATED-RECT object.
-
-The function DEL-RNG deletes a RNG object.
-
-The function DEL-SCALAR deletes a SCALAR object.
-
-The function DEL-SIZE deletes a SIZE object.
-
-The function DEL-SIZE2F deletes a SIZE2F object.
-
-The function DEL-STD-STRING deletes a *STRING object.
-
-The function DEL-TERM-CRIT deletes a TERM-CRITERIA object.
-
-The function DEL-VEC-4I deletes a VEC-4I object.
-
-The function DEL-VEC-CHAR deletes a VECTOR-CHAR object.
-
-The function DEL-VEC-DBL deletes a VECTOR-DOUBLE object.
-
-The function DEL-VEC-DM deletes a VECTOR-DMATCH object.
-
-The function DEL-VEC-FLT deletes a VECTOR-FLOAT object.
-
-The function DEL-VEC-INT deletes a VECTOR-INT object.
-
-The function DEL-VEC-KP deletes a VECTOR-KEY-POINT object.
-
-The function DEL-VEC-MAT deletes a VECTOR-MAT object.
-
-The function DEL-VEC-POINT deletes a VECTOR-POINT object.
-
-The function DEL-VEC-POINT-2F deletes a VECTOR-POINT-2F object.
-
-The function DEL-VEC-RECT deletes a VECTOR-RECT object.
-
-The function DEL-VEC-UCHAR deletes a VECTOR-UCHAR object.
-
-The function DEL-VEC-VEC-4I deletes a VECTOR-VEC-4I object.
-
-The function DEL-VID-CAP deletes a VIDEO-CAPTURE object.
-
-The function DEL-VID-WRITER deletes a VIDEO-WRITER object.
+The function DEL deletes anything(may not be safe on all implementations). Every other DEL-* function 
+deletes a * object. 
 
 
 Example:
@@ -15238,20 +15857,20 @@ Example:
 
 
 
-=========================================================================================================================================
+========================================================================================================================================
 
-VECTOR
+VECTOR-*
 
 Bindings for the C++ VECTOR class.
 
 C++: template < class T, class Alloc = allocator<T> > class vector; // generic template
 
-LISP-CV: See description.
+LISP-CV: See Examples.
 
 
     Parameters:	
 
-       See description.
+       See Examples.
 
 
 The bindings for the C++ vector class, so far, are:
@@ -15259,37 +15878,35 @@ The bindings for the C++ vector class, so far, are:
 
 LISP-CV  <===>  C++              
 ===========================     
-VEC-CHAR <===> vector<char>
+VECTOR-CHAR <===> vector<char>
 ===============================      
-VEC-DMATCH <===> vector<DMatch>      
-===============================      
-VEC-DOUBLE <===> vector<double> 
+VECTOR-DMATCH <===> vector<DMatch> (VECTOR-DMATCH operates a differently from the rest.
+===============================     See note at the end of the VECTOR-* documentation)    
+VECTOR-DOUBLE <===> vector<double> 
 =============================      
-VEC-FLOAT <===> vector<float>
+VECTOR-FLOAT <===> vector<float>
 =============================    
-VEC-INT <===>  vector<int>
+VECTOR-INT <===>  vector<int>
 ====================================      
-VEC-KEY-POINT <===> vector<KeyPoint>
+VECTOR-KEY-POINT <===> vector<KeyPoint>
 ====================================     
-VEC-POINT <===> vector<Point>
+VECTOR-POINT <===> vector<Point>
 ==================================      
-VEC-POINT-2F <===> vector<Point2f>
+VECTOR-POINT-2F <===> vector<Point2f>
 =================================  
-VEC-RECT <===> vector<Rect>
+VECTOR-RECT <===> vector<Rect>
 =============================     
-VEC-UCHAR <===> vector<uchar>
+VECTOR-UCHAR <===> vector<uchar>
 ==============================    
-VEC-VEC-4I <===> vector<Vec4i>
+VECTOR-VEC-4I <===> vector<Vec4i>
 ==============================
 
 
-
-Description:
-
+Examples:
 
 
-Vectors with numbers as elements, VEC-CHAR, VEC-DOUBLE, VEC-FLOAT, VEC-INT and VEC-UCHAR operate as 
-follows:(I use VEC-FLOAT as an example of the 5 aforementioned vector types). 
+Vectors with numbers as elements, VECTOR-CHAR, VECTOR-DOUBLE, VECTOR-FLOAT, VECTOR-INT and VECTOR-UCHAR operate as 
+follows:(I use VECTOR-FLOAT as an example of the 5 aforementioned vector types). 
 
 The idea behind the vector macros in Lisp-CV is you use them primarily to pass data to and from the 
 underlying OpenCV code only. The reason being, due to the nature of wrapping the C++ vector class in 
@@ -15334,7 +15951,7 @@ Now, once you have created your vector as above and performed whatever operation
 it, you can convert that vector to a C++ vector as so:
 
 
-CV> (DEFPARAMETER B (VEC-FLOAT A))
+CV> (DEFPARAMETER B (VECTOR-FLOAT A))
 
 B
 
@@ -15344,20 +15961,28 @@ CV> B
 #<STD-VECTOR-FLOAT {1006BA6983}> <--- A CLOS object, STD-VECTOR-FLOAT type, pointing to a vector<float>
 
 
-That's all there is to it. Now it can be passed to any Lisp-CV binding for OpenCV or C++ that will 
-accept it.
+
+The VECTOR-* functions are basically for convenience and are a little slow(between .250 and 2 seconds 
+depending on the type of operation they are used for). If you would like to pass an uninitialized VECTOR-* 
+to a function that will use it to store data, it is faster to use the MAKE-VECTOR-* functions e.g.
+
+CV> (DEFPARAMETER A (MAKE-VECTOR-FLOAT))
+
+
+That's all there is to it. Now a vector<type> can be passed to any Lisp-CV binding for OpenCV or C++ that 
+will accept it.
 
 
 Now, if an OpenCV or C++ binding in this library outputs a STD-VECTOR-FLOAT(vector<float>) type object
 (again, using vector<float> as an example of all number based C++ vector types). You can convert that 
 back to a Lisp list or a Lisp vector like so:(variable B being a #<STD-VECTOR-FLOAT {1006BA6983}>:)
 
-CV> (VEC-FLOAT :TO-LISP-LIST B)
+CV> (VECTOR-FLOAT :TO-LISP-LIST B)
 
 (1.0 2.0 3.0)
 
 
-CV> (VEC-FLOAT :TO-LISP-VEC B)
+CV> (VECTOR-FLOAT :TO-LISP-VEC B)
 
 #(1.0 2.0 3.0)
 
@@ -15369,7 +15994,7 @@ The ability to retrieve the length of a C++ vector is built into the Lisp-CV vec
 quite fast as well. You just evaluate as follows(using variable B from above):
 
 
-CV> (VEC-FLOAT :LENGTH B)
+CV> (VECTOR-FLOAT :LENGTH B)
 
 3  <--- Vector B length
 
@@ -15378,7 +16003,7 @@ If you would like to created an unititialized pointer to a vector<float> to pass
 evaluate:
 
 
-CV> (VEC-FLOAT)
+CV> (VECTOR-FLOAT)
 
 
 #<STD-VECTOR-FLOAT {100352FEA3}> <--- Output is an object pointing to an uninitialized vector<float>.
@@ -15390,13 +16015,13 @@ the below:
 
 
 
-CV> (VEC-FLOAT '(1f0 2f0 3f0)) 
+CV> (VECTOR-FLOAT '(1f0 2f0 3f0)) 
 
 
-CV> (VEC-FLOAT (LIST 1f0 2f0 3f0)) 
+CV> (VECTOR-FLOAT (LIST 1f0 2f0 3f0)) 
 
 
-CV> (VEC-FLOAT (VECTOR 1f0 2f0 3f0))  
+CV> (VECTOR-FLOAT (VECTOR 1f0 2f0 3f0))  
 
 
 #<STD-VECTOR-FLOAT {100352FEA3}> <--- Output is a CLOS object pointing to an initialized vector<float>.
@@ -15412,40 +16037,39 @@ CV> (DEFPARAMETER A (VECTOR 1F0 2F0 3F0 4F0 5F0))
 A
 
 
-CV> (VEC-FLOAT A)  <--- this only takes about 0.699 seconds for a million iterations
+CV> (VECTOR-FLOAT A)  <--- this only takes about 0.699 seconds for a million iterations
 
 
 
-The functionality to retrieve data from an initialized vector is built into the vector functions. So 
-to retrieve data from a vector you evaluate as follows(vector elements are zero-based):
+The functionality to retrieve data from an initialized vector is built into the VECTOR-* functions.
+To retrieve data from a vector you evaluate as follows(vector elements are zero-based):
 
 
-CV> (DEFPARAMETER A (VEC-FLOAT '(1F0 2F0 3F0)))
+CV> (DEFPARAMETER A (VECTOR-FLOAT '(1F0 2F0 3F0)))
 
 A
 
-CV> (VEC-FLOAT A)  <--- Access the 0th element of A.
+CV> (VECTOR-FLOAT A)  <--- Access the 0th element of A.
 
 1.0
 
-CV> (VEC-FLOAT A 1)   <---Access the 1st element of A.
+CV> (VECTOR-FLOAT A 1)   <---Access the 1st element of A.
 
 2.0
 
-CV> (VEC-FLOAT A 2)  <---Access the 2nd element of A.
+CV> (VECTOR-FLOAT A 2)  <---Access the 2nd element of A.
 
 3.0
 
 
-
-Vectors with objects as their elements, VEC-DMATCH, VEC-KEY-POINT, VEC-POINT, VEC-POINT-2F,
-VEC-RECT and VEC-VEC-4I operate as follows:(I use VEC-POINT as an example of the six vectors.)
+Vectors with objects as their elements, VECTOR-DMATCH, VECTOR-KEY-POINT, VECTOR-POINT, VECTOR-POINT-2F,
+VECTOR-RECT and VECTOR-VECTOR-4I operate as follows:(I use VECTOR-POINT as an example of the six vectors.)
 
 
 If you would like to created an uninitialized vector, you evaluate:
 
 
-CV> (VEC-POINT)
+CV> (VECTOR-POINT)
 
 #<STD-VECTOR-POINT {1007B187B3}> <--- Output is a object pointing to an uninitialized POINT vector.
 
@@ -15453,7 +16077,7 @@ CV> (VEC-POINT)
 If you would like to created an initialized vector, you evaluate:
 
 
-CV> (VEC-POINT (LIST (POINT 1 2) (POINT 3 4)))
+CV> (VECTOR-POINT (LIST (POINT 1 2) (POINT 3 4)))
 
 #<STD-VECTOR-POINT {1002DBE013}> <--- Output is a object pointing to an initialized POINT vector.
 
@@ -15465,23 +16089,23 @@ The functionality to retrieve data from an initialized vector of objects is buil
 function. You just evaluate as follows(vector elements are zero-based):
 
 
-CV> (DEFPARAMETER A (VEC-POINT (LIST (POINT 1 2) (POINT 3 4)))) <--- Create an initialized vector A.
+CV> (DEFPARAMETER A (VECTOR-POINT (LIST (POINT 1 2) (POINT 3 4)))) <--- Create an initialized vector A.
 
 A 
 
 
-CV> (VEC-POINT A 0)  <--- Access the 0th POINT in vector A
+CV> (VECTOR-POINT A 0)  <--- Access the 0th POINT in vector A
 
 #<CV-POINT {1003D4FA73}> 
 
 
-CV> (VEC-POINT A 1)  <--- Access the 1st POINT in vector A
+CV> (VECTOR-POINT A 1)  <--- Access the 1st POINT in vector A
 
 #<CV-POINT {10042AB633}> 
 
 
 
-CV> (VEC-POINT A 0 0) <--- Access the 0th element of the 0th POINT in vector A.
+CV> (VECTOR-POINT A 0 0) <--- Access the 0th element of the 0th POINT in vector A.
 
 1
 
@@ -15489,11 +16113,11 @@ CV> (VECT-POINT A 0 1) <--- Access the 1st element of the 0th POINT in vector A.
 
 2
 
-CV> (VEC-POINT A 1 0) <--- Access the 0th element of the 1st POINT in vector A.
+CV> (VECTOR-POINT A 1 0) <--- Access the 0th element of the 1st POINT in vector A.
 
 3
 
-CV> (VEC-POINT A 1 1) <--- Access the 1st element of the 1st POINT in vector A.
+CV> (VECTOR-POINT A 1 1) <--- Access the 1st element of the 1st POINT in vector A.
 
 4
 
@@ -15501,13 +16125,13 @@ CV> (VEC-POINT A 1 1) <--- Access the 1st element of the 1st POINT in vector A.
 And, also, as above, you can convert the POINT vector back to a Lisp list or vector as follows:
 
 
-CV> (VEC-POINT :TO-LISP-LIST A)
+CV> (VECTOR-POINT :TO-LISP-LIST A)
 
 
 (#<CV-POINT {1006C49DA3}> #<CV-POINT {1006C49E03}>)  <--- Lisp list
 
 
-CV> (VEC-POINT :TO-LISP-VEC A)
+CV> (VECTOR-POINT :TO-LISP-VEC A)
 
 
 #(#<CV-POINT {1006C49DA3}> #<CV-POINT {1006C49E03}>)  <--- Lisp vector
@@ -15516,38 +16140,42 @@ CV> (VEC-POINT :TO-LISP-VEC A)
 And also retrieve the length of the vector:
 
 
-(VEC-POINT :LENGTH A)
+(VECTOR-POINT :LENGTH A)
 
 2  <--- Vector a length,
 
 
 
-Note: For VEC-DMATCH. When accessing the numerical content of of the objects in a VECTOR-DMATCH, 
-you must supply the type of the element you are attempting to access as the last parameter e.g.
+Note: For VECTOR-DMATCH. When accessing the numerical content of of the objects in a VECTOR-DMATCH, 
+you must supply the type, of the element you are attempting to access, as the last parameter e.g.
 
 
-CV> (DEFPARAMETER A (VEC-DMATCH (VECTOR (DMATCH 1 2 3F0) (DMATCH 1 2 3F0))))
+CV> (DEFPARAMETER A (VECTOR-DMATCH (VECTOR (DMATCH 1 2 3F0) (DMATCH 1 2 3F0))))
 
 A
 
-CV> (VEC-DMATCH A 0 0 :INT)
+CV> (VECTOR-DMATCH A 0 0 :INT)
 
 1
 
-CV> (VEC-DMATCH A 0 1 :INT)
+CV> (VECTOR-DMATCH A 0 1 :INT)
 
 2
 
-CV> (VEC-DMATCH A 0 2 :FLOAT)  
+If a VECTOR-DMATCH contains a 3 element DMATCH, the value you entered 
+as the 3rd parameter will be accessible at the 4th index(This is just 
+a workaround until I come up with a better solution) e.g.
+
+CV> (VECTOR-DMATCH A 0 2 :FLOAT)  
     
 #<SINGLE-FLOAT quiet NaN>                                
 
-CV> (VEC-DMATCH A 0 2 :INT)
+CV> (VECTOR-DMATCH A 0 2 :INT) 
+                                    
+-1                                   
+                                     
+CV> (VECTOR-DMATCH A 0 3 :FLOAT) 
 
--1
-
-CV> (VEC-DMATCH A 0 3 :FLOAT)  <--- If a VECTOR-DMATCH contains a 3 element DMATCH, the value you entered 
-                                    as the 3rd parameter will be accessible at the 4th index. 
 3.0
-=========================================================================================================================================
+========================================================================================================================================
 

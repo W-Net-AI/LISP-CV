@@ -100,7 +100,6 @@
 				  (destroy-window ,winname)))
 
 
-
 ;; void setMouseCallback(const string& winname, MouseCallback onMouse, void* userdata=0)
 ;;void cv_setMouseCallback(const char* winname, MouseCallback onMouse, void* userdata)
 (defcfun ("cv_setMouseCallback" %set-mouse-callback) :void
@@ -141,9 +140,8 @@
 
 ;; VideoCapture::VideoCapture()
 ;; VideoCapture* cv_create_VideoCapture() 
-(defcfun ("cv_create_VideoCapture" video-capture0) video-capture 
+(defcfun ("cv_create_VideoCapture" video-capture-0) video-capture 
   "VideoCapture constructor")
-
 
 ;; VideoCapture::VideoCapture(int device)
 ;; VideoCapture* cv_create_VideoCapture1_0(int device)
@@ -151,21 +149,28 @@
 	      "VideoCapture constructor"
 	      (device :int))
 
-
 ;; VideoCapture::VideoCapture(const string& filename)
 ;; VideoCapture* cv_create_VideoCapture1(String* filename) {
-(defcfun ("cv_create_VideoCapture1" video-capture-fn) video-capture
+(defcfun ("cv_create_VideoCapture1" video-capture-file) video-capture
 	 "VideoCapture constructor"
 	 (filename *string))
 
-
 (defun video-capture (&optional src)
        (cond ((eq src nil)
-	      (video-capture0))
+	      (video-capture-0))
 	      ((numberp src)
 	       (video-capture-dev src))
 	       ((stringp src) 
-		(video-capture-fn (%c-string-to-string src (length src))))
+		(video-capture-file (%c-string-to-string src (length src))))
+		(t nil)))
+
+(defun make-video-capture (&optional src)
+       (cond ((eq src nil)
+	      (video-capture-0))
+	      ((numberp src)
+	       (video-capture-dev src))
+	       ((stringp src) 
+		(video-capture-file (%c-string-to-string src (length src))))
 		(t nil)))
 
 
@@ -226,21 +231,20 @@
   (img mat)
   (params vector-int))
 
-(defun imwrite (filename img &optional (params (vec-int) given-params) return)
+(defun imwrite (filename img &optional (params (make-vector-int) given-params) return)
   "Saves an image to a specified file."
   (setf return (%imwrite filename img params))
-  (if given-params nil (del-vec-int params))
+  (if given-params nil (del-vector-int params))
   return)
 
 
 ;; VideoWriter* cv_create_VideoWriter() 
-(defcfun ("cv_create_VideoWriter" video-writer0) video-writer
+(defcfun ("cv_create_VideoWriter" video-writer-0) video-writer
 	 "VIDEO-WRITER constructor")
-
 
 ;; VideoWriter::VideoWriter(const string& filename, int fourcc, double fps, Size frameSize, bool isColor) 
 ;; VideoWriter* cv_create_VideoWriter5(String* filename, int fourcc, double fps, Size* frameSize, bool isColor)
-(defcfun ("cv_create_VideoWriter5" video-writer5) video-writer
+(defcfun ("cv_create_VideoWriter5" video-writer-5) video-writer
 	 (filename *string)
 	 (fourcc :int)
 	 (fps :double)
@@ -250,9 +254,17 @@
 (defun video-writer (&optional filename fourcc fps frame-size (is-color t))
        "VIDEO-WRITER constructor"  
        (cond ((eq filename nil)
-	      (video-writer0))
+	      (video-writer-0))
 	      (filename
-	       (video-writer5 (%c-string-to-string filename (length filename)) fourcc fps frame-size is-color))
+	       (video-writer-5 (%c-string-to-string filename (length filename)) fourcc fps frame-size is-color))
+	       (t nil)))
+
+(defun make-video-writer (&optional filename fourcc fps frame-size (is-color t))
+       "VIDEO-WRITER constructor"  
+       (cond ((eq filename nil)
+	      (video-writer-0))
+	      (filename
+	       (video-writer-5 (%c-string-to-string filename (length filename)) fourcc fps frame-size is-color))
 	       (t nil)))
 
 

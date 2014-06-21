@@ -27,3 +27,6 @@
 ;;Thank you to Willem Rein Oudshoorn from CFFI-DEVEL who has made possible my inclusion of finalizers 
 ;;in this library. He has helped me to iron out a few bugs and has answered quite a few questions of 
 ;;mine. The knowledge I gained from those answers has really made this a much better library.
+
+;;Thanks to all the awesome programmers at the FreeNode channel #LISP for all of their help and guidance 
+;;on this project thus far.

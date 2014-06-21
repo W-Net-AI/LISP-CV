@@ -76,6 +76,12 @@
 (defgeneric dot (self other)
   (:documentation "Used for all bindings with a dot member"))
 
+(defgeneric size (arg &rest args)
+  (:documentation "Used for all bindings with a size member."))
+
+(defgeneric clone (self)
+  (:documentation "Used for all bindings with a clone member."))
+
 
 ;;; Basic Structures
 
@@ -121,9 +127,9 @@
 
 ;; _Tp area() const
 ;; float cv_Size2f_area(Size2f* self) 
-(defcfun ("cv_Size2f_area" area2f) :float
-  "Gets the area of a SIZE2F construct"
-  (self size2f))
+(defcfun ("cv_Size2f_area" area-2f) :float
+  "Gets the area of a SIZE-2F construct"
+  (self size-2f))
 
 
 ;; Mat* cv_Mat_assign(Mat* self, Mat* m) 
@@ -153,9 +159,12 @@
 
 ;; Mat Mat::clone() const
 ;; Mat* cv_Mat_clone(Mat* self) 
-(defcfun ("cv_Mat_clone" clone) mat
-  "Creates a full copy of the array and the underlying data."
+(defcfun ("cv_Mat_clone" clone-mat) mat
   (self mat))
+
+(defmethod clone ((self cv-mat))
+  "Creates a full copy of the array and the underlying data."
+  (clone-mat self))
 
 
 ;; Mat Mat::colRange(int startcol, int endcol) const
@@ -248,33 +257,41 @@
 
 ;; DMatch::DMatch()
 ;; DMatch* cv_create_DMatch() 
-(defcfun ("cv_create_DMatch" dmatch0) dmatch
-  "DMatch constructor")
+(defcfun ("cv_create_DMatch" dmatch-0) dmatch)
 
 ;; DMatch( int _queryIdx, int _trainIdx, float _distance ) 
 ;; DMatch* cv_create_DMatch3(int _queryIdx, int _trainIdx, float _distance)
-(defcfun ("cv_create_DMatch3" dmatch3) dmatch
-  "DMatch constructor"
+(defcfun ("cv_create_DMatch3" dmatch-3) dmatch
   (query-idx :int)
   (train-idx :int)
   (distance :float))
 
 ;; DMatch( int _queryIdx, int _trainIdx, int _imgIdx, float _distance )
 ;; DMatch* cv_create_DMatch4(int _queryIdx, int _trainIdx, int _imgIdx, float _distance)
-(defcfun ("cv_create_DMatch4" dmatch4) dmatch
-  "DMatch constructor"
+(defcfun ("cv_create_DMatch4" dmatch-4) dmatch
   (query-idx :int)
   (train-idx :int)
   (img-idx :int)
   (distance :float))
 
 (defun dmatch (&rest args)
+  "DMatch constructor"
        (cond ((eq (first args) nil)
-	      (dmatch0))
+	      (dmatch-0))
 	      ((and (first args) (not (fourth args)))
-	       (dmatch3 (first args) (second args) (third args)))
+	       (dmatch-3 (first args) (second args) (third args)))
 	       ((fourth args)
-		(dmatch4 (first args) (second args) (third args) (fourth args)))
+		(dmatch-4 (first args) (second args) (third args) (fourth args)))
+		(t nil)))
+
+(defun make-dmatch (&rest args)
+  "DMatch constructor"
+       (cond ((eq (first args) nil)
+	      (dmatch-0))
+	      ((and (first args) (not (fourth args)))
+	       (dmatch-3 (first args) (second args) (third args)))
+	       ((fourth args)
+		(dmatch-4 (first args) (second args) (third args) (fourth args)))
 		(t nil)))
 
 
@@ -367,19 +384,19 @@
 
 ;; _Tp width, height
 ;; float cv_Size2f_height(Size* self) 
-(defcfun ("cv_Size2f_height" height2f) :float
-  "Gets the height of a SIZE2F"
-  (self size2f))
+(defcfun ("cv_Size2f_height" height-2f) :float
+  "Gets the height of a SIZE-2F"
+  (self size-2f))
 
 
 ;; KeyPoint::KeyPoint()
 ;; KeyPoint* cv_create_KeyPoint()
-(defcfun ("cv_create_KeyPoint" key-point0) key-point
+(defcfun ("cv_create_KeyPoint" key-point-0) key-point
   "KEY-POINT constructor")
 
 ;; KeyPoint::KeyPoint(float x, float y, float _size, float _angle=-1, float _response=0, int _octave=0, int _class_id=-1)
 ;; KeyPoint* cv_create_KeyPoint7(float x, float y, float _size, float _angle, float _response, int _octave, int _class_id)
-(defcfun ("cv_create_KeyPoint7" key-point7) key-point
+(defcfun ("cv_create_KeyPoint7" key-point-7) key-point
   "KEY-POINT constructor"
   (x :float)
   (y :float)
@@ -389,11 +406,20 @@
   (octave :int)
   (class-id :int))
 
+
 (defun key-point (&optional x y size (angle -1) (response 0) (octave 0) (class-id -1))
        (cond ((eq x nil)
-	      (key-point0))
+	      (key-point-0))
 	      (x
-	       (key-point7 x y size angle response octave class-id))
+	       (key-point-7 x y size angle response octave class-id))
+	       (t nil)))
+
+;;h
+(defun make-key-point (&optional x y size (angle -1) (response 0) (octave 0) (class-id -1))
+       (cond ((eq x nil)
+	      (key-point-0))
+	      (x
+	       (key-point-7 x y size angle response octave class-id))
 	       (t nil)))
 
 ;; Mat::Mat()
@@ -404,7 +430,7 @@
 
 ;; Mat::Mat(int rows, int cols, int type, void* data) 
 ;; Mat* cv_create_Mat_with_data(int rows, int cols, int type, void* data)
-(defcfun ("cv_create_Mat_with_data" %mat-data) mat
+(defcfun ("cv_create_Mat_with_data" mat-data) mat
 	 (rows :int)
 	 (cols :int)
 	 (type :int)
@@ -412,18 +438,18 @@
 
 
 (let ((previous nil))
-     (defun %%mat-data (rows cols type &rest args)
+     (defun make-mat-data (rows cols type &rest args)
 	    (unless (equal (second args) (car previous))
 		    (setf previous (cons (second args) (foreign-alloc (first args) 
 								      :initial-contents (second args)))))
-								      (%mat-data rows cols type (cdr previous))))
+								      (mat-data rows cols type (cdr previous))))
 
 
 ;; double Mat::dot(InputArray m) const
 ;; double cv_Mat_dot(Mat* self, Mat* m)
 (defcfun ("cv_Mat_dot" mat-dot) :double
   (self mat)
-  (m mat))
+  (other mat))
 
 (defmethod dot ((self cv-mat) (other cv-mat))
   (mat-dot self other))
@@ -464,15 +490,15 @@
 
 ;; Mat::Mat(const Mat& m, const Range& rowRange, const Range& colRange=Range::all() )
 ;; Mat* cv_Mat_get_Range(Mat* self, Range* rowRange, Range* colRange)
-(defcfun ("cv_Mat_with_Range" %mat-range) mat
+(defcfun ("cv_Mat_with_Range" mat-range) mat
   "MAT constructor with Range parameters."
   (self mat)
   (row-range range)
   (col-range range))
 
 
-(defun mat-range (self row-range &optional (col-range (range-all) given-col-range))
-  (let ((return (%mat-range self row-range col-range)))
+(defun make-mat-range (self row-range &optional (col-range (range-all) given-col-range))
+  (let ((return (mat-range self row-range col-range)))
     (if given-col-range nil (del-range col-range))
     return))
 
@@ -483,6 +509,10 @@
   "Returns a matrix size."
   (self mat))
 
+(defmethod size ((arg cv-mat) &rest args)
+  args
+  (mat-size arg))
+
 
 ;; int Mat::type() const
 ;; int cv_Mat_type(Mat* self)
@@ -492,7 +522,16 @@
 
 ;; Mat::Mat(int rows, int cols, int type)
 ;; Mat* cv_create_Mat_typed(int rows, int cols, int type)
-(defcfun ("cv_create_Mat_typed" %mat-typed) mat
+(defcfun ("cv_create_Mat_typed" mat-typed) mat
+  "MAT constructor with a row, column and type parameter."
+  (rows :int)
+  (cols :int)
+  (type :int))
+
+
+;; Mat::Mat(int rows, int cols, int type)
+;; Mat* cv_create_Mat_typed(int rows, int cols, int type)
+(defcfun ("cv_create_Mat_typed" make-mat-typed) mat
   "MAT constructor with a row, column and type parameter."
   (rows :int)
   (cols :int)
@@ -501,7 +540,7 @@
 
 ;; Mat::Mat(int rows, int cols, int type, const Scalar& s)
 ;; Mat* cv_create_Mat_with_value(int rows, int cols, int type, Scalar* s)
-(defcfun ("cv_create_Mat_with_value" %mat-value) mat
+(defcfun ("cv_create_Mat_with_value" mat-value) mat
 	 (rows :int)
 	 (cols :int)
 	 (type :int)
@@ -509,14 +548,13 @@
 
 
 (let ((previous nil))
-     (defun %%mat-value (rows cols type s)
+     (defun make-mat-value (rows cols type s)
 	    (unless (equal s (car previous))
 		    (setf previous (cons s (scalar (if (first s) (first s) 0) 
 						   (if (second s) (second s) 0) 
 						   (if (third s) (third s) 0) 
 						   (if (fourth s) (fourth s) 0)))))
-						   (%mat-value rows cols type (cdr previous))))
-
+						   (mat-value rows cols type (cdr previous))))
 
 
 ;;; MAT
@@ -529,34 +567,63 @@
   (cond ((eq (first args) nil) (%mat))
 
 	((typep (second args) 'cv-range)
-	 (apply #'mat-range args))
+	 (apply #'make-mat-range args))
 	
 	((and (eq (fourth args) nil) (first args)) 
-	 (apply #'%mat-typed args))
+	 (apply #'mat-typed args))
 	
 	((typep (fourth args) 'cv-scalar)
-	 (apply #'%mat-value args))
+	 (apply #'mat-value args))
 	
 	((listp (fourth args))
-	 (apply #'%%mat-value args))
+	 (apply #'make-mat-value args))
 	
 	((pointerp (fourth args))
-	 (apply #'%mat-data args))
+	 (apply #'mat-data args))
 	
 	((listp (fifth args))
-	 (apply #'%%mat-data args))
-
+	 (apply #'make-mat-data args))
 	
 	(t nil)))
 
 
+(defun make-mat (&rest args)
+  
+  "MAT constructor"  
+  
+  (cond ((eq (first args) nil) (%mat))
 
-;;; MAT
+	((typep (second args) 'cv-range)
+	 (apply #'make-mat-range args))
+	
+	((and (eq (fourth args) nil) (first args)) 
+	 (apply #'mat-typed args))
+	
+	((typep (fourth args) 'cv-scalar)
+	 (apply #'mat-value args))
+	
+	((listp (fourth args))
+	 (apply #'make-mat-value args))
+	
+	((pointerp (fourth args))
+	 (apply #'mat-data args))
+	
+	((listp (fifth args))
+	 (apply #'make-mat-data args))
+	
+	(t nil)))
 
 
 ;; static MatExpr Mat::zeros(int rows, int cols, int type)
 ;; Mat* cv_create_zeros(int rows, int cols, int type)
 (defcfun ("cv_create_zeros" mat-zeros) mat
+  (rows :int)
+  (cols :int)
+  (type :int))
+
+;; static MatExpr Mat::zeros(int rows, int cols, int type)
+;; Mat* cv_create_zeros(int rows, int cols, int type)
+(defcfun ("cv_create_zeros" make-mat-zeros) mat
   (rows :int)
   (cols :int)
   (type :int))
@@ -578,22 +645,29 @@
 
 ;; Point_()
 ;; Point2##t * cv_create_Point2##t ( tn x,  tn y)
-(defcfun ("cv_create_Point2i" point0) point
-  "Point constructor")
+(defcfun ("cv_create_Point2i" point-0) point)
 
 ;; Point_(_Tp _x, _Tp _y)
 ;; Point2##t * cv_create_Point2##t ( tn x,  tn y) 
-(defcfun ("cv_create_Point2i" point2) point
-  "Point constructor"
+(defcfun ("cv_create_Point2i" point-2) point
   (x :int)
   (y :int))
 
-
 (defun point (&optional x y)
+  "Point constructor"
        (cond ((eq (or x y) nil)
-	      (point0))
+	      (point-0))
 	      ((and x y)
-	       (point2 x y))
+	       (point-2 x y))
+	       
+	       (t nil)))
+
+(defun make-point (&optional x y)
+  "Point constructor"
+       (cond ((eq (or x y) nil)
+	      (point-0))
+	      ((and x y)
+	       (point-2 x y))
 	       
 	       (t nil)))
 
@@ -614,23 +688,28 @@
 
 ;; typedef Point_<double> Point2d
 ;; Point2##t * cv_create_Point2##t ( tn x,  tn y) 
-(defcfun ("cv_create_Point2d" point-2d0) point-2d 
+(defcfun ("cv_create_Point2d" point-2d-0) point-2d 
 	 "Point2d constructor")
-
 
 ;; typedef Point_<double> Point2d
 ;; Point2##t * cv_create_Point2##t ( tn x,  tn y)  
-(defcfun ("cv_create_Point2d" point-2d2) point-2d 
+(defcfun ("cv_create_Point2d" point-2d-2) point-2d 
 	 "Point2d constructor"
 	 (x :double)
 	 (y :double))
 
-
 (defun point-2d (&optional x y)
        (cond ((eq (or x y) nil)
-	      (point-2d0))
+	      (point-2d-0))
 	      ((and x y)
-	       (point-2d2 x y))
+	       (point-2d-2 x y))
+	       (t nil)))
+
+(defun make-point-2d (&optional x y)
+       (cond ((eq (or x y) nil)
+	      (point-2d-0))
+	      ((and x y)
+	       (point-2d-2 x y))
 	       (t nil)))
 
 
@@ -650,25 +729,29 @@
 
 ;; typedef Point_<float> Point2f
 ;; tn cv_Point2##t##_getX( Point2##t * self) 
-(defcfun ("cv_create_Point2f" point-2f0) point-2f 
+(defcfun ("cv_create_Point2f" point-2f-0) point-2f 
 	 "Point2f constructor")
-
-
 
 ;; typedef Point_<float> Point2f
 ;; Point2##t * cv_create_Point2##t ( tn x,  tn y)  
-(defcfun ("cv_create_Point2f" point-2f2) point-2f 
+(defcfun ("cv_create_Point2f" point-2f-2) point-2f 
 	 "Point2f constructor"
 	 (x :float)
 	 (y :float))
 
-
 (defun point-2f (&optional x y)
        (cond ((eq (or x y) nil)
-	      (point-2f0))
+	      (point-2f-0))
 	      ((and x y)
-	       (point-2f2 x y))
-	       (t strinil)))
+	       (point-2f-2 x y))
+	       (t nil)))
+
+(defun make-point-2f (&optional x y)
+       (cond ((eq (or x y) nil)
+	      (point-2f-0))
+	      ((and x y)
+	       (point-2f-2 x y))
+	       (t nil)))
 
 
 ;; _Tp x, y;
@@ -678,7 +761,7 @@
   (self point-2f))
 
 
-;; _Tp x, y;
+;; _Tp x, y;wordpress how to I make multiple pages private
 ;; float cv_Point2f_getY(Point2f* self) 
 (defcfun ("cv_Point2f_getY" point-2f-y) :float
   "Retrieves y coordinate of a point-2f"
@@ -687,24 +770,29 @@
 
 ;; typedef Point3_<double> Point3d
 ;; Point3##t * cv_create_Point3##t ( tn x,  tn y,  tn z) 
-(defcfun ("cv_create_Point3d" point-3d0) point-3d 
+(defcfun ("cv_create_Point3d" point-3d-0) point-3d 
 	 "Point3d constructotr")
-
 
 ;; typedef Point3_<double> Point3d
 ;; Point3##t * cv_create_Point3##t ( tn x,  tn y,  tn z) 
-(defcfun ("cv_create_Point3d" point-3d2) point-3d 
+(defcfun ("cv_create_Point3d" point-3d-2) point-3d 
 	 "Point3d constructor"
 	 (x :double)
 	 (y :double)
 	 (z :double))
 
-
 (defun point-3d (&optional x y z)
        (cond ((eq (or x y) nil)
-	      (point-3d0))
+	      (point-3d-0))
 	      ((and x y)
-	       (point-3d2 x y z))
+	       (point-3d-2 x y z))
+	       (t nil)))
+
+(defun make-point-3d (&optional x y z)
+       (cond ((eq (or x y) nil)
+	      (point-3d-0))
+	      ((and x y)
+	       (point-3d-2 x y z))
 	       (t nil)))
 
 
@@ -731,24 +819,29 @@
 
 ;; typedef Point3_<double> Point3d
 ;; Point3##t * cv_create_Point3##t ( tn x,  tn y,  tn z)  
-(defcfun ("cv_create_Point3f" point-3f0) point-3f 
+(defcfun ("cv_create_Point3f" point-3f-0) point-3f 
 	 "Point3f constructor")
-
 
 ;; typedef Point3_<double> Point3d
 ;; Point3##t * cv_create_Point3##t ( tn x,  tn y,  tn z)  
-(defcfun ("cv_create_Point3f" point-3f2) point-3f 
+(defcfun ("cv_create_Point3f" point-3f-2) point-3f 
 	 "Point3f constructor"
 	 (x :float)
 	 (y :float)
 	 (z :float))
 
-
 (defun point-3f (&optional x y z)
        (cond ((eq (or x y) nil)
-	      (point-3f0))
+	      (point-3f-0))
 	      ((and x y)
-	       (point-3f2 x y z))
+	       (point-3f-2 x y z))
+	       (t nil)))
+
+(defun make-point-3f (&optional x y z)
+       (cond ((eq (or x y) nil)
+	      (point-3f-0))
+	      ((and x y)
+	       (point-3f-2 x y z))
 	       (t nil)))
 
 
@@ -775,24 +868,29 @@
 
 ;; typedef Point3_<double> Point3d
 ;; Point3##t * cv_create_Point3##t ( tn x,  tn y,  tn z)  
-(defcfun ("cv_create_Point3i" point-3i0) point-3i 
+(defcfun ("cv_create_Point3i" point-3i-0) point-3i 
 	 "Point3i constructor")
-
 
 ;; typedef Point3_<double> Point3d
 ;; Point3##t * cv_create_Point3##t ( tn x,  tn y,  tn z)  
-(defcfun ("cv_create_Point3i" point-3i2) point-3i 
+(defcfun ("cv_create_Point3i" point-3i-2) point-3i 
 	 "Point3i constructor"
 	 (x :int)
 	 (y :int)
 	 (z :int))
 
-
 (defun point-3i (&optional x y z)
        (cond ((eq (or x y) nil)
-	      (point-3i0))
+	      (point-3i-0))
 	      ((and x y)
-	       (point-3i2 x y z))
+	       (point-3i-2 x y z))
+	       (t nil)))
+
+(defun make-point-3i (&optional x y z)
+       (cond ((eq (or x y) nil)
+	      (point-3i-0))
+	      ((and x y)
+	       (point-3i-2 x y z))
 	       (t nil)))
 
 
@@ -867,10 +965,24 @@
   (start :int)
   (end :int))
 
+;; Range::Range(int _start, int _end)
+;; Range* cv_create_Range(int _start, int _end) 
+(defcfun ("cv_create_Range" make-range) range
+  "Range constructor"
+  (start :int)
+  (end :int))
+
 
 ;; static Range::Range all()
 ;; Range* cv_create_RangeAll()
 (defcfun ("cv_create_RangeAll" range-all) range
+  "Range constructor - Returns a special variable 
+   that means “the whole sequence” or “the whole 
+   range”")
+
+;; static Range::Range all()
+;; Range* cv_create_RangeAll()
+(defcfun ("cv_create_RangeAll" make-range-all) range
   "Range constructor - Returns a special variable 
    that means “the whole sequence” or “the whole 
    range”")
@@ -905,6 +1017,10 @@
    span that has been stored as a RANGE object."
   (self range))
 
+(defmethod size ((arg cv-range) &rest args)
+  args
+  (range-size arg))
+
 
 ;; int Range::start
 ;; int cv_Range_getstart(Range* self) 
@@ -915,13 +1031,12 @@
 
 ;; Rect_()
 ;; Rect* cv_create_Rect() 
-(defcfun ("cv_create_Rect" rect0) rect 
+(defcfun ("cv_create_Rect" rect-0) rect 
 	 "RECT constructor.")
-
 
 ;; Rect_(_Tp _x, _Tp _y, _Tp _width, _Tp _height)
 ;; Rect* cv_create_Rect4(int x, int y, int width, int height) 
-(defcfun ("cv_create_Rect4" rect4) rect
+(defcfun ("cv_create_Rect4" rect-4) rect
   "RECT constructor."
   (x :int)
   (y :int)
@@ -930,9 +1045,16 @@
 
 (defun rect (&optional x y width height)
        (cond ((eq (or x y) nil)
-	      (rect0))
+	      (rect-0))
 	      ((and x y)
-	       (rect4 x y width height))
+	       (rect-4 x y width height))
+	       (t nil)))
+
+(defun make-rect (&optional x y width height)
+       (cond ((eq (or x y) nil)
+	      (rect-0))
+	      ((and x y)
+	       (rect-4 x y width height))
 	       (t nil)))
 
 
@@ -946,8 +1068,12 @@
 ;; Rect_(_Tp _x, _Tp _y, _Tp _width, _Tp _height)
 ;; _Tp x, y, width, height
 ;; Rect* cv_Rect_clone(Rect* self)
-(defcfun ("cv_Rect_clone" rect-clone) rect
+(defcfun ("cv_Rect_clone" clone-rect) rect
   (self rect))
+
+(defmethod clone ((self cv-rect))
+  "Creates a full copy of a RECT object"
+  (clone-rect self))
 
 
 ;; _Tp x, y, width, height
@@ -961,6 +1087,10 @@
 (defcfun ("cv_Rect_size" rect-size) size 
 	 "Size (width, height) of the rectangle."
 	 (self rect))
+
+(defmethod size ((arg cv-rect) &rest args)
+  args
+  (rect-size arg))
 
 
 ;; Point_<_Tp> tl() const
@@ -1020,7 +1150,7 @@
 
 ;; RotatedRect(const Point2f& center, const Size2f& size, float angle)
 ;; RotatedRect* cv_create_RotatedRect(Point2f* center, Size2f* size, float angle)
-(defcfun ("cv_create_RotatedRect" %rotated-rect) rotated-rect
+(defcfun ("cv_create_RotatedRect" make-rotated-rect) rotated-rect
   (center point)
   (size size)
   (angle :float))
@@ -1048,7 +1178,7 @@
 (defun rotated-rect (&rest args)
        (cond
 	((and (third args) (not (fourth args)))
-	 (%rotated-rect (first args) (second args) (third args)))
+	 (make-rotated-rect (first args) (second args) (third args)))
 	 ((or (eq ':c (first args)) (eq ':center (first args)))
 	  (rotated-rect-center (second args)))
 	  ((or (eq :s (first args)) (eq :size (first args))) 
@@ -1079,7 +1209,6 @@
 (defcfun ("cv_Mat_rows" rows) :int
   (self mat))
 
-
 ;; Scalar_<_Tp>::Scalar_(_Tp v0, _Tp v1, _Tp v2, _Tp v3)
 ;; Scalar* cv_create_Scalar(double val0, (double val1, double val2, double val3)
 (defcfun ("cv_create_Scalar" %scalar) scalar
@@ -1088,8 +1217,11 @@
 	 (val2 :double)
 	 (val3 :double))
 
-
 (defun scalar (&optional (val1 0d0) (val2 0d0) (val3 0d0) (val4 0d0))
+       "SCALAR constructor"
+	      (%scalar (coerce val1 'double-float) (coerce val2 'double-float) (coerce val3 'double-float) (coerce val4 'double-float)))
+
+(defun make-scalar (&optional (val1 0d0) (val2 0d0) (val3 0d0) (val4 0d0))
        "SCALAR constructor"
 	      (%scalar (coerce val1 'double-float) (coerce val2 'double-float) (coerce val3 'double-float) (coerce val4 'double-float)))
 
@@ -1099,8 +1231,12 @@
 (defcfun ("cv_create_scalarAll" %scalar-all) scalar
   (val0123 :double))
 
-
 (defun scalar-all (val0123)
+       "SCALAR conctctor - Initializes all of 
+        the scalar values 0...3 with val0123"
+       (%scalar-all (coerce val0123 'double-float)))
+
+(defun make-scalar-all (val0123)
        "SCALAR conctctor - Initializes all of 
         the scalar values 0...3 with val0123"
        (%scalar-all (coerce val0123 'double-float)))
@@ -1115,28 +1251,31 @@
 
 ;; Size_()
 ;; Size* cv_create_Size() 
-(defcfun ("cv_create_Size" size0) size
+(defcfun ("cv_create_Size" size-0) size
   "Create SIZE construct")
-
 
 ;; Size_(_Tp _width, _Tp _height)
 ;; cv_create_Size2(double width, double height)
-(defcfun ("cv_create_Size2" size2) size
+(defcfun ("cv_create_Size2" size-2) size
   "SIZE constructor"
   (width :double)
   (height :double))
 
+(defmethod size ((arg null) &rest args)
+  args
+  (if (eq arg nil) (size-0) nil))
 
-(defun size (&optional arg1 arg2)
+(defmethod size ((arg real) &rest args)
+  (size-2 (coerce arg 'double-float) (coerce (or (first args) 0) 'double-float)))
+
+(defun make-size (&optional arg1 arg2)
   (cond ((null arg1)
-	 (size0))
+	 (size-0))
 	
 	((numberp arg1) 
-	 (size2 (coerce arg1 'double-float) 
+	 (size-2 (coerce arg1 'double-float) 
 		(coerce arg2 'double-float)))
-	
-	((typep arg1 'cv-mat) (mat-size arg1))
-	((typep arg1 'cv-range) (range-size arg1))
+
 	(t nil)))
 
 
@@ -1156,24 +1295,29 @@
 
 ;; Size_<float>()
 ;; Size2f* cv_create_Size2f(float width, float height)
-(defcfun ("cv_create_Size2f" size2f0) size2f
-  "Size2f constructor")
-
+(defcfun ("cv_create_Size2f" size-2f-0) size-2f)
 
 ;; Size_<float>(float width, float height)
 ;; Size2f* cv_create_Size2f(float width, float height)
-(defcfun ("cv_create_Size2f" size2f2) size2f
-  "Size2f constructor"
+(defcfun ("cv_create_Size2f" size-2f-2) size-2f
   (width :float)
   (height :float))
 
+(defun size-2f (&optional (width nil) (height nil))
+  "SIZE-2F constructor"
+  (cond ((eq (or width height) nil)
+	 (size-2f-0))
+	 ((and width height)
+	  (size-2f-2 width height))
+	  (t nil)))
 
-(defun size2f (&optional (width nil) (height nil))
-       (cond ((eq (or width height) nil)
-	      (size2f0))
-	      ((and width height)
-	       (size2f2 width height))
-	       (t nil)))
+(defun make-size-2f (&optional (width nil) (height nil))
+  "SIZE-2F constructor"
+  (cond ((eq (or width height) nil)
+	 (size-2f-0))
+	 ((and width height)
+	  (size-2f-2 width height))
+	  (t nil)))
 
 
 ;; size_t cv_Mat_get_Step(Mat* self) 
@@ -1191,22 +1335,27 @@
 
 ;; TermCriteria::TermCriteria(int type, int maxCount, double epsilon)
 ;; TermCriteria* cv_create_TermCriteria(int type, int maxCount, double epsilon) 
-(defcfun ("cv_create_TermCriteria" term-criteria0) term-criteria)
-
+(defcfun ("cv_create_TermCriteria" term-criteria-0) term-criteria)
 
 ;; TermCriteria::TermCriteria(int type, int maxCount, double epsilon)
 ;; TermCriteria* cv_create_TermCriteria(int type, int maxCount, double epsilon) 
-(defcfun ("cv_create_TermCriteria3" term-criteria3) term-criteria
+(defcfun ("cv_create_TermCriteria3" term-criteria-3) term-criteria
   (type :int)
   (max-count :int)
   (epsilon :double))
 
-
 (defun term-criteria (&optional type max-count epsilon)
        (cond ((eq type nil)
-	      (term-criteria0))
+	      (term-criteria-0))
 	      (type
-	       (term-criteria3 type max-count epsilon))
+	       (term-criteria-3 type max-count epsilon))
+	       (t nil)))
+
+(defun make-term-criteria (&optional type max-count epsilon)
+       (cond ((eq type nil)
+	      (term-criteria-0))
+	      (type
+	       (term-criteria-3 type max-count epsilon))
 	       (t nil)))
 
 
@@ -1217,7 +1366,634 @@
   (self mat))
 
 
+;; typedef Vec<uchar, 2> Vec2b;
+;; Vec2b* cv_create_Vec2b()
+(defcfun ("cv_create_Vec2b" vec-2b-0) vec-2b)
 
+;; typedef Vec<uchar, 2> Vec2b;
+;; Vec2b* cv_create_Vec2b_2(uchar val0, uchar val1)
+(defcfun ("cv_create_Vec2b_2" vec-2b-2) vec-2b
+  (val0 :uchar)
+  (val1 :uchar))
+
+(defun vec-2b (&optional val0 val1)
+  "VEC-2B constructor"
+  (cond ((null val0)
+	 (vec-2b-0))
+	(val0
+	 (vec-2b-2 val0 val1))
+	(t nil)))
+
+(defun make-vec-2b (&optional val0 val1)
+  "VEC-2B constructor"
+  (cond ((null val0)
+	 (vec-2b-0))
+	(val0
+	 (vec-2b-2 val0 val1))
+	(t nil)))
+
+
+;; typedef Vec<uchar, 3> Vec3b;
+;; Vec3b* cv_create_Vec3b()
+(defcfun ("cv_create_Vec3b" vec-3b-0) vec-3b)
+
+;; typedef Vec<uchar, 3> Vec3b;
+;; Vec3b* cv_create_Vec3b_3(uchar val0, uchar val1, uchar val2)
+(defcfun ("cv_create_Vec3b_3" vec-3b-3) vec-3b
+  (val0 :uchar)
+  (val1 :uchar)
+  (val2 :uchar))
+
+(defun vec-3b (&optional val0 val1 val2)
+  "VEC-3B constructor"
+  (cond ((null val0)
+	 (vec-3b-0))
+	(val0
+	 (vec-3b-3 val0 val1 val2))
+	(t nil)))
+
+(defun make-vec-3b (&optional val0 val1 val2)
+  "VEC-3B constructor"
+  (cond ((null val0)
+	 (vec-3b-0))
+	(val0
+	 (vec-3b-3 val0 val1 val2))
+	(t nil)))
+
+
+;; typedef Vec<uchar, 4> Vec4b;
+;; Vec4b* cv_create_Vec4b()
+(defcfun ("cv_create_Vec4b" vec-4b-0) vec-4b)
+
+;; typedef Vec<uchar, 4> Vec4b;
+;; Vec4b* cv_create_Vec4b_4(uchar val0, uchar val1, uchar val2, uchar val3)
+(defcfun ("cv_create_Vec4b_4" vec-4b-4) vec-4b
+  (val0 :uchar)
+  (val1 :uchar)
+  (val2 :uchar)
+  (val3 :uchar))
+
+(defun vec-4b (&optional val0 val1 val2 val3)
+  "VEC-4B constructor"
+  (cond ((null val0)
+	 (vec-4b-0))
+	(val0
+	 (vec-4b-4 val0 val1 val2 val3))
+	(t nil)))
+
+(defun make-vec-4b (&optional val0 val1 val2 val3)
+  "VEC-4B constructor"
+  (cond ((null val0)
+	 (vec-4b-0))
+	(val0
+	 (vec-4b-4 val0 val1 val2 val3))
+	(t nil)))
+
+
+;; typedef Vec<double, 2> Vec2d;
+;; Vec2d* cv_create_Vec2d()
+(defcfun ("cv_create_Vec2d" vec-2d-0) vec-2d)
+
+;; typedef Vec<double, 2> Vec2d;
+;; Vec2d* cv_create_Vec2d_2(double val0, double val1)
+(defcfun ("cv_create_Vec2d_2" vec-2d-2) vec-2d
+  (val0 :double)
+  (val1 :double))
+
+(defun vec-2d (&optional val0 val1)
+  "VEC-2D constructor"
+  (cond ((null val0)
+	 (vec-2d-0))
+	(val0
+	 (vec-2d-2 val0 val1))
+	(t nil)))
+
+(defun make-vec-2d (&optional val0 val1)
+  "VEC-2D constructor"
+  (cond ((null val0)
+	 (vec-2d-0))
+	(val0
+	 (vec-2d-2 val0 val1))
+	(t nil)))
+
+
+;; typedef Vec<double, 3> Vec3d;
+;; Vec3d* cv_create_Vec3d()
+(defcfun ("cv_create_Vec3d" vec-3d-0) vec-3d)
+
+;; typedef Vec<double, 3> Vec3d;
+;; Vec3d* cv_create_Vec3d_3(double val0, double val1, double val2)
+(defcfun ("cv_create_Vec3d_3" vec-3d-3) vec-3d
+  (val0 :double)
+  (val1 :double)
+  (val2 :double))
+
+(defun vec-3d (&optional val0 val1 val2)
+  "VEC-3D constructor"
+  (cond ((null val0)
+	 (vec-3d-0))
+	(val0
+	 (vec-3d-3 val0 val1 val2))
+	(t nil)))
+
+(defun make-vec-3d (&optional val0 val1 val2)
+  "VEC-3D constructor"
+  (cond ((null val0)
+	 (vec-3d-0))
+	(val0
+	 (vec-3d-3 val0 val1 val2))
+	(t nil)))
+
+
+;; typedef Vec<double, 4> Vec4d;
+;; Vec4d* cv_create_Vec4d()
+(defcfun ("cv_create_Vec4d" vec-4d-0) vec-4d)
+
+;; typedef Vec<double, 4> Vec4d;
+;; Vec4d* cv_create_Vec4d_4(double val0, double val1, double val2, double val3)
+(defcfun ("cv_create_Vec4d_4" vec-4d-4) vec-4d
+  (val0 :double)
+  (val1 :double)
+  (val2 :double)
+  (val3 :double))
+
+(defun vec-4d (&optional val0 val1 val2 val3)
+  "VEC-4D constructor"
+  (cond ((null val0)
+	 (vec-4d-0))
+	(val0
+	 (vec-4d-4 val0 val1 val2 val3))
+	(t nil)))
+
+(defun make-vec-4d (&optional val0 val1 val2 val3)
+  "VEC-4D constructor"
+  (cond ((null val0)
+	 (vec-4d-0))
+	(val0
+	 (vec-4d-4 val0 val1 val2 val3))
+	(t nil)))
+
+
+;; typedef Vec<double, 6> Vec6d;
+;; Vec6d* cv_create_Vec6d()
+(defcfun ("cv_create_Vec6d" vec-6d-0) vec-6d)
+
+;; typedef Vec<double, 6> Vec6d;
+;; Vec6d* cv_create_Vec6d_6(double val0, double val1, double val2, double val3, double val4, double val5)
+(defcfun ("cv_create_Vec6d_6" vec-6d-6) vec-6d
+  (val0 :double)
+  (val1 :double)
+  (val2 :double)
+  (val3 :double)
+  (val4 :double)
+  (val5 :double))
+
+(defun vec-6d (&optional val0 val1 val2 val3 val4 val5)
+  "VEC-6D constructor"
+  (cond ((null val0)
+	 (vec-6d-0))
+	(val0
+	 (vec-6d-6 val0 val1 val2 val3 val4 val5))
+	(t nil)))
+
+(defun make-vec-6d (&optional val0 val1 val2 val3 val4 val5)
+  "VEC-6D constructor"
+  (cond ((null val0)
+	 (vec-6d-0))
+	(val0
+	 (vec-6d-6 val0 val1 val2 val3 val4 val5))
+	(t nil)))
+
+
+;; typedef Vec<float, 2> Vec2f
+;; Vec2f* cv_create_Vec2f()
+(defcfun ("cv_create_Vec2f" vec-2f-0) (cv::vec-2f :garbage-collect t))
+
+;; typedef Vec<float, 2> Vec2f
+;; Vec2f* cv_create_Vec2f_2(float val0, float val1)
+(defcfun ("cv_create_Vec2f_2" vec-2f-2) (cv::vec-2f :garbage-collect t)
+  (val0 :float)
+  (val1 :float))
+
+(defun vec-2f (&optional val0 val1)
+  "VEC-2F constructor"
+  (cond ((null val0)
+	 (vec-2f-0))
+	(val0
+	 (vec-2f-2 val0 val1))
+	(t nil)))
+
+(defun make-vec-2f (&optional val0 val1)
+  "VEC-2F constructor"
+  (cond ((null val0)
+	 (vec-2f-0))
+	(val0
+	 (vec-2f-2 val0 val1))
+	(t nil)))
+
+
+;; typedef Vec<float, 3> Vec3f
+;; Vec3f* cv_create_Vec3f()
+(defcfun ("cv_create_Vec3f" vec-3f-0) (cv::vec-3f :garbage-collect t))
+
+;; typedef Vec<float, 3> Vec3f
+;; Vec3f* cv_create_Vec3f_3(float val0, float val1, int val2)
+(defcfun ("cv_create_Vec3f_3" vec-3f-3) (cv::vec-3f :garbage-collect t)
+  (val0 :float)
+  (val1 :float)
+  (val2 :float))
+
+(defun vec-3f (&optional val0 val1 val2)
+  "VEC-3F constructor"
+  (cond ((null val0)
+	 (vec-3f-0))
+	(val0
+	 (vec-3f-3 val0 val1 val2))
+	(t nil)))
+
+(defun make-vec-3f (&optional val0 val1 val2)
+  "VEC-3F constructor"
+  (cond ((null val0)
+	 (vec-3f-0))
+	(val0
+	 (vec-3f-3 val0 val1 val2))
+	(t nil)))
+
+
+;; typedef Vec<float, 4> Vec4f
+;; Vec4f* cv_create_Vec4f()
+(defcfun ("cv_create_Vec4f" vec-4f-0) vec-4f)
+
+;; typedef Vec<float, 4> Vec4f
+;; Vec4f* cv_create_Vec4f_4(float val0, float val1, float val2, float val3)
+(defcfun ("cv_create_Vec4f_4" vec-4f-4) vec-4f 
+  (val0 :float)
+  (val1 :float)
+  (val2 :float)
+  (val3 :float))
+
+(defun vec-4f (&optional val0 val1 val2 val3)
+  "VEC-4F constructor"
+  (cond ((null val0)
+	 (vec-4f-0))
+	(val0
+	 (vec-4f-4 val0 val1 val2 val3))
+	(t nil)))
+
+(defun make-vec-4f (&optional val0 val1 val2 val3)
+  "VEC-4F constructor"
+  (cond ((null val0)
+	 (vec-4f-0))
+	(val0
+	 (vec-4f-4 val0 val1 val2 val3))
+	(t nil)))
+
+
+;; typedef Vec<float, 6> Vec6f;
+;; Vec6f* cv_create_Vec6f()
+(defcfun ("cv_create_Vec6f" vec-6f-0) vec-6f)
+
+;; typedef Vec<float, 6> Vec6f;
+;; Vec6f* cv_create_Vec6f_6(float val0, float val1, float val2, float val3, float val4, float val5)
+(defcfun ("cv_create_Vec6f_6" vec-6f-6) vec-6f
+  (val0 :float)
+  (val1 :float)
+  (val2 :float)
+  (val3 :float)
+  (val4 :float)
+  (val5 :float))
+
+(defun vec-6f (&optional val0 val1 val2 val3 val4 val5)
+  "VEC-6F constructor"
+  (cond ((null val0)
+	 (vec-6f-0))
+	(val0
+	 (vec-6f-6 val0 val1 val2 val3 val4 val5))
+	(t nil)))
+
+(defun make-vec-6f (&optional val0 val1 val2 val3 val4 val5)
+  "VEC-6F constructor"
+  (cond ((null val0)
+	 (vec-6f-0))
+	(val0
+	 (vec-6f-6 val0 val1 val2 val3 val4 val5))
+	(t nil)))
+
+
+;; typedef Vec<int, 2> Vec2i;
+;; Vec2i* cv_create_Vec2i()
+(defcfun ("cv_create_Vec2i" vec-2i-0) vec-2i)
+
+;; typedef Vec<int, 2> Vec2i;
+;; Vec2i* cv_create_Vec2i_2(int val0, int val1)
+(defcfun ("cv_create_Vec2i_2" vec-2i-2) vec-2i
+  (val0 :int)
+  (val1 :int))
+
+(defun vec-2i (&optional val0 val1)
+  "VEC-2I constructor"
+  (cond ((null val0)
+	 (vec-2i-0))
+	(val0
+	 (vec-2i-2 val0 val1))
+	(t nil)))
+
+(defun make-vec-2i (&optional val0 val1)
+  "VEC-2I constructor"
+  (cond ((null val0)
+	 (vec-2i-0))
+	(val0
+	 (vec-2i-2 val0 val1))
+	(t nil)))
+
+
+;; typedef Vec<int, 3> Vec3i;
+;; Vec3i* cv_create_Vec3i()
+(defcfun ("cv_create_Vec3i" vec-3i-0) vec-3i)
+
+;; typedef Vec<int, 3> Vec3i;
+;; Vec3i* cv_create_Vec3i_3(int val0, int val1, int val2)
+(defcfun ("cv_create_Vec3i_3" vec-3i-3) vec-3i
+  (val0 :int)
+  (val1 :int)
+  (val2 :int))
+
+(defun vec-3i (&optional val0 val1 val2)
+  "VEC-3I constructor"
+  (cond ((null val0)
+	 (vec-3i-0))
+	(val0
+	 (vec-3i-3 val0 val1 val2))
+	(t nil)))
+
+(defun make-vec-3i (&optional val0 val1 val2)
+  "VEC-3I constructor"
+  (cond ((null val0)
+	 (vec-3i-0))
+	(val0
+	 (vec-3i-3 val0 val1 val2))
+	(t nil)))
+
+
+;; typedef Vec<int, 4> Vec4i;
+;; Vec4i* cv_create_Vec4i()
+(defcfun ("cv_create_Vec4i" vec-4i-0) vec-4i)
+
+;; typedef Vec<int, 4> Vec4i;
+;; Vec4i* cv_create_Vec4i_4(int val0, int val1, int val2, int val3)
+(defcfun ("cv_create_Vec4i_4" vec-4i-4) vec-4i
+  (val0 :int)
+  (val1 :int)
+  (val2 :int)
+  (val3 :int))
+
+(defun vec-4i (&optional val0 val1 val2 val3)
+  "VEC-4I constructor"
+  (cond ((null val0)
+	 (vec-4i-0))
+	(val0
+	 (vec-4i-4 val0 val1 val2 val3))
+	(t nil)))
+
+(defun make-vec-4i (&optional val0 val1 val2 val3)
+  "VEC-4I constructor"
+  (cond ((null val0)
+	 (vec-4i-0))
+	(val0
+	 (vec-4i-4 val0 val1 val2 val3))
+	(t nil)))
+
+
+;; typedef Vec<int, 6> Vec6i;
+;; Vec6i* cv_create_Vec6i()
+(defcfun ("cv_create_Vec6i" vec-6i-0) vec-6i)
+
+;; typedef Vec<int, 6> Vec6i;
+;; Vec6i* cv_create_Vec6i_6(int val0, int val1, int val2, int val3, int val4, int val5)
+(defcfun ("cv_create_Vec6i_6" vec-6i-6) vec-6i
+  (val0 :int)
+  (val1 :int)
+  (val2 :int)
+  (val3 :int)
+  (val4 :int)
+  (val5 :int))
+
+(defun vec-6i (&optional val0 val1 val2 val3 val4 val5)
+  "VEC-6I constructor"
+  (cond ((null val0)
+	 (vec-6i-0))
+	(val0
+	 (vec-6i-6 val0 val1 val2 val3 val4 val5))
+	(t nil)))
+
+(defun make-vec-6i (&optional val0 val1 val2 val3 val4 val5)
+  "VEC-6I constructor"
+  (cond ((null val0)
+	 (vec-6i-0))
+	(val0
+	 (vec-6i-6 val0 val1 val2 val3 val4 val5))
+	(t nil)))
+
+
+;; typedef Vec<int, 8> Vec8i;
+;; Vec8i* cv_create_Vec8i() 
+(defcfun ("cv_create_Vec8i" vec-8i-0) vec-8i)
+
+;; typedef Vec<int, 8> Vec8i;
+;; Vec8i* cv_create_Vec8i_8(int val0, int val1, int val2, int val3, int val4, int val5, int val6, int val7) 
+(defcfun ("cv_create_Vec8i_8" vec-8i-8) vec-8i
+  (val0 :int)
+  (val1 :int)
+  (val2 :int)
+  (val3 :int)
+  (val4 :int)
+  (val5 :int)
+  (val6 :int)
+  (val7 :int))
+
+(defun vec-8i (&optional val0 val1 val2 val3 val4 val5 val6 val7)
+  "VEC-8I constructor"
+  (cond ((null val0)
+	 (vec-8i-0))
+	(val0
+	 (vec-8i-8 val0 val1 val2 val3 val4 val5 val6 val7))
+	(t nil)))
+
+(defun make-vec-8i (&optional val0 val1 val2 val3 val4 val5 val6 val7)
+  "VEC-8I constructor"
+  (cond ((null val0)
+	 (vec-8i-0))
+	(val0
+	 (vec-8i-8 val0 val1 val2 val3 val4 val5 val6 val7))
+	(t nil)))
+
+
+;; typedef Vec<short, 2> Vec2s;
+;; Vec2s* cv_create_Vec2s()
+(defcfun ("cv_create_Vec2s" vec-2s-0) vec-2s)
+
+;; typedef Vec<short, 2> Vec2s;
+;; Vec2s* cv_create_Vec2s_2(short val0, short val1)
+(defcfun ("cv_create_Vec2s_2" vec-2s-2) vec-2s
+  (val0 :short)
+  (val1 :short))
+
+(defun vec-2s (&optional val0 val1)
+  "VEC-2S constructor"
+  (cond ((null val0)
+	 (vec-2s-0))
+	(val0
+	 (vec-2s-2 val0 val1))
+	(t nil)))
+
+(defun make-vec-2s (&optional val0 val1)
+  "VEC-2S constructor"
+  (cond ((null val0)
+	 (vec-2s-0))
+	(val0
+	 (vec-2s-2 val0 val1))
+	(t nil)))
+
+
+;; typedef Vec<short, 3> Vec3s;
+;; Vec3s* cv_create_Vec3s()
+(defcfun ("cv_create_Vec3s" vec-3s-0) vec-3s)
+
+;; typedef Vec<short, 3> Vec3s;
+;; Vec3s* cv_create_Vec3s_3(short val0, short val1, short val2)
+(defcfun ("cv_create_Vec3s_3" vec-3s-3) vec-3s
+  (val0 :short)
+  (val1 :short)
+  (val2 :short))
+
+(defun vec-3s (&optional val0 val1 val2)
+  "VEC-3S constructor"
+  (cond ((null val0)
+	 (vec-3s-0))
+	(val0
+	 (vec-3s-3 val0 val1 val2))
+	(t nil)))
+
+(defun make-vec-3s (&optional val0 val1 val2)
+  "VEC-3S constructor"
+  (cond ((null val0)
+	 (vec-3s-0))
+	(val0
+	 (vec-3s-3 val0 val1 val2))
+	(t nil)))
+
+
+;; typedef Vec<short, 4> Vec4s;
+;; Vec4s* cv_create_Vec4s()
+(defcfun ("cv_create_Vec4s" vec-4s-0) vec-4s)
+
+;; typedef Vec<short, 4> Vec4s;
+;; Vec4s* cv_create_Vec4s_4(short val0, short val1, short val2, short val3)
+(defcfun ("cv_create_Vec4s_4" vec-4s-4) vec-4s
+  (val0 :short)
+  (val1 :short)
+  (val2 :short)
+  (val3 :short))
+
+(defun vec-4s (&optional val0 val1 val2 val3)
+  "VEC-4S constructor"
+  (cond ((null val0)
+	 (vec-4s-0))
+	(val0
+	 (vec-4s-4 val0 val1 val2 val3))
+	(t nil)))
+
+(defun make-vec-4s (&optional val0 val1 val2 val3)
+  "VEC-4S constructor"
+  (cond ((null val0)
+	 (vec-4s-0))
+	(val0
+	 (vec-4s-4 val0 val1 val2 val3))
+	(t nil)))
+
+
+;; typedef Vec<ushort, 2> Vec2w;
+;; Vec2w* cv_create_Vec2w()
+(defcfun ("cv_create_Vec2w" vec-2w-0) vec-2w)
+
+;; typedef Vec<ushort, 2> Vec2w;
+;; Vec2w* cv_create_Vec2w_2(ushort val0, ushort val1)
+(defcfun ("cv_create_Vec2w_2" vec-2w-2) vec-2w
+  (val0 :ushort)
+  (val1 :ushort))
+
+(defun vec-2w (&optional val0 val1)
+  "VEC-2W constructor"
+  (cond ((null val0)
+	 (vec-2w-0))
+	(val0
+	 (vec-2w-2 val0 val1))
+	(t nil)))
+
+(defun make-vec-2w (&optional val0 val1)
+  "VEC-2W constructor"
+  (cond ((null val0)
+	 (vec-2w-0))
+	(val0
+	 (vec-2w-2 val0 val1))
+	(t nil)))
+
+
+;; typedef Vec<ushort, 3> Vec3w;
+;; Vec3w* cv_create_Vec3w()
+(defcfun ("cv_create_Vec3w" vec-3w-0) vec-3w)
+
+;; typedef Vec<ushort, 3> Vec3w;
+;; Vec3w* cv_create_Vec3w_3(ushort val0, ushort val1, ushort val2)
+(defcfun ("cv_create_Vec3w_3" vec-3w-3) vec-3w
+  (val0 :ushort)
+  (val1 :ushort)
+  (val2 :ushort))
+
+(defun vec-3w (&optional val0 val1 val2)
+  "VEC-3W constructor"
+  (cond ((null val0)
+	 (vec-3w-0))
+	(val0
+	 (vec-3w-3 val0 val1 val2))
+	(t nil)))
+
+(defun make-vec-3w (&optional val0 val1 val2)
+  "VEC-3W constructor"
+  (cond ((null val0)
+	 (vec-3w-0))
+	(val0
+	 (vec-3w-3 val0 val1 val2))
+	(t nil)))
+
+
+;; typedef Vec<ushort, 4> Vec4w;
+;; Vec4w* cv_create_Vec4w()
+(defcfun ("cv_create_Vec4w" vec-4w-0) vec-4w)
+
+;; typedef Vec<ushort, 4> Vec4w;
+;; Vec4w* cv_create_Vec4w_4(ushort val0, ushort val1, ushort val2, ushort val3)
+(defcfun ("cv_create_Vec4w_4" vec-4w-4) vec-4w
+  (val0 :ushort)
+  (val1 :ushort)
+  (val2 :ushort)
+  (val3 :ushort))
+
+(defun vec-4w (&optional val0 val1 val2 val3)
+  "VEC-4W constructor"
+  (cond ((null val0)
+	 (vec-4w-0))
+	(val0
+	 (vec-4w-4 val0 val1 val2 val3))
+	(t nil)))
+
+(defun make-vec-4w (&optional val0 val1 val2 val3)
+  "VEC-4W constructor"
+  (cond ((null val0)
+	 (vec-4w-0))
+	(val0
+	 (vec-4w-4 val0 val1 val2 val3))
+	(t nil)))
 
 
 ;; _Tp width, height
@@ -1229,9 +2005,9 @@
 
 ;; _Tp width, height
 ;; float cv_Size2f_width(Size* self) 
-(defcfun ("cv_Size2f_width" width2f) :float
-  "Gets the width of a SIZE2F"
-  (self size2f))
+(defcfun ("cv_Size2f_width" width-2f) :float
+  "Gets the width of a SIZE-2F"
+  (self size-2f))
 
 
 ;;; Basic Structures
@@ -1297,7 +2073,7 @@
   (dest mat)
   (mask mat))
 
-(defun bitwise-and (src1 src2 dest &optional (mask (mat) given-mask))
+(defun bitwise-and (src1 src2 dest &optional (mask (%mat) given-mask))
   "Calculates the per-element bit-wise conjunction of two arrays."
   (%bitwise-and src1 src2 dest mask)
   (if given-mask nil (del-mat mask)))
@@ -1310,7 +2086,7 @@
   (dest mat)
   (mask mat))
 
-(defun bitwise-not (src dest &optional (mask (mat) given-mask))
+(defun bitwise-not (src dest &optional (mask (%mat) given-mask))
   "Inverts every bit of an array."
   (%bitwise-not src dest mask)
   (if given-mask nil (del-mat mask)))
@@ -1324,10 +2100,10 @@
   (dest mat)
   (mask mat))
 
-(defun bitwise-or (src1 src2 dest &optional (mask (mat) given-mask))
+(defun bitwise-or (src1 src2 dest &optional (mask (%mat) given-mask))
   "Calculates the per-element bit-wise disjunction of two arrays."
   (%bitwise-or src1 src2 dest mask)
-  (if given-mat nil (del-mat mask)))
+  (if given-mask nil (del-mat mask)))
 
 
 ;; void bitwise_xor(InputArray src1, InputArray src2, OutputArray dst, InputArray mask=noArray())
@@ -1339,7 +2115,7 @@
   (dest mat)
   (mask mat))
 
-(defun bitwise-xor (src1 src2 dest &optional (mask (mat) given-mask))
+(defun bitwise-xor (src1 src2 dest &optional (mask (%mat) given-mask))
   "Calculates the per-element bit-wise disjunction of two arrays."
   (%bitwise-xor src1 src2 dest mask)
   (if given-mask nil (del-mat mask)))
@@ -1357,6 +2133,19 @@
 (defun calc-covar-matrix (samples covar mean flags &optional (ctype +64f+))
        "Calculates the covariance matrix of a set of vectors."
        (%calc-covar-matrix samples covar mean flags ctype))
+
+
+;; bool checkRange(InputArray a, bool quiet=true, Point* pos=0, double minVal=-DBL_MAX, double maxVal=DBL_MAX )
+;; bool cv_checkRange(Mat* a, bool quiet, Point* pos, double minVal, double maxVal) 
+(defcfun ("cv_checkRange" %check-range) :boolean
+  (a mat)
+  (quiet :boolean)
+  (pos point)
+  (min-val :double)
+  (max-val :double))
+
+(defun check-range (a &optional (quiet t) (pos (null-pointer)) (min-val +-dbl-max+) (max-val +dbl-max+))
+  (%check-range a quiet pos min-val max-val))
 
 
 ;; void completeSymm(InputOutputArray mtx, bool lowerToUpper=false)
@@ -1499,7 +2288,7 @@
   (src mat)
   (mask mat))
 
-(defun mean (src &optional (mask (mat) given-mask))
+(defun mean (src &optional (mask (%mat) given-mask))
   "Calculates an average mean of array elements."
   (let ((return (%mean src mask)))
   (if given-mask nil (del-mat mask))
@@ -1516,7 +2305,7 @@
   (max-loc point)
   (mask mat))
 
-(defun min-max-loc (src min-val &optional (max-val (null-pointer)) (min-loc (null-pointer)) (max-loc (null-pointer)) (mask (mat) given-mask))
+(defun min-max-loc (src min-val &optional (max-val (null-pointer)) (min-loc (null-pointer)) (max-loc (null-pointer)) (mask (%mat) given-mask))
   "Finds the global minimum and maximum in an array."
   (%min-max-loc src min-val max-val min-loc max-loc mask)
   (if given-mask nil (del-mat mask)))
@@ -1532,7 +2321,7 @@
   (scale :double)
   (dtype :int))
 
-(defun mul-transposed (src dest a-t-a &optional (delta (mat) given-delta) (scale 1d0) (dtype -1)) 
+(defun mul-transposed (src dest a-t-a &optional (delta (%mat) given-delta) (scale 1d0) (dtype -1)) 
        (%mul-transposed src dest a-t-a delta scale dtype)
        (if given-delta nil (del-mat delta)))
 
@@ -1566,12 +2355,12 @@
   (norm-type :int)
   (mask mat))
 
-(defun %norm3 (src1 &optional (norm-type +norm-l2+) (mask (mat) given-mask) return) 
+(defun %norm3 (src1 &optional (norm-type +norm-l2+) (mask (%mat) given-mask) return) 
   (setf return (%%norm3 src1 norm-type mask))
   (if given-mask nil (del-mat mask)) 
   return)
 
-(defun %norm4 (src1 src2 &optional (norm-type +norm-l2+) (mask (mat) given-mask) return)
+(defun %norm4 (src1 src2 &optional (norm-type +norm-l2+) (mask (%mat) given-mask) return)
   (%%norm4 src1 src2 norm-type mask)
   (if given-mask nil (del-mat mask)) 
   return)
@@ -1597,7 +2386,7 @@
   (dtype :int)
   (mask mat))
 
-(defun normalize (src dest &optional (alpha 1) (beta 0) (norm-type  +norm-l2+) (dtype -1) (mask (mat) given-mask))
+(defun normalize (src dest &optional (alpha 1) (beta 0) (norm-type  +norm-l2+) (dtype -1) (mask (%mat) given-mask))
   "Normalizes the norm or value range of an array."
   (%normalize src dest alpha beta norm-type  dtype  mask)
   (if given-mask nil (del-mat mask)))
@@ -1645,15 +2434,19 @@
 (defcfun ("cv_create_RNG" %rng) rng 
 	 "RNG constructor")
 
-
 ;; RNG::RNG(uint64 state)
 ;; RNG* cv_create_RNG_state(uint64 state)
 (defcfun ("cv_create_RNG_state" rng-state) rng 
 	 "RNG constructor -  sets the RNG state to the specified value."
 	 (state :uint64))
 
-
 (defun rng (&optional (state nil))
+       (cond ((eq state nil)
+	      (%rng))
+	      ((integerp state) (rng-state state))
+	      (t nil)))
+
+(defun make-rng (&optional (state nil))
        (cond ((eq state nil)
 	      (%rng))
 	      ((integerp state) (rng-state state))
@@ -1680,7 +2473,7 @@
   (mask mat)
   (dtype :int))
 
-(defun subtract (src1 src2 dest &optional (mask (mat) given-mask) (dtype -1))
+(defun subtract (src1 src2 dest &optional (mask (%mat) given-mask) (dtype -1))
   "Calculates the per-element difference between two arrays or array and a scalar."
   (%subtract src1 src2 dest mask dtype)
   (if given-mask nil (del-mat mask)))
@@ -1734,16 +2527,20 @@
 ;;; Drawing Functions
 
 
-;; BGR value constructor macro 
-
 (defmacro bgr (b g r)
 	  "BGR value constructor macro"
 	  `(scalar ,b ,g ,r))
 
+(defmacro make-bgr (b g r)
+	  "BGR value constructor macro"
+	  `(scalar ,b ,g ,r))
 
-;; RGB value constructor macro 
 
 (defmacro rgb (r g b)
+	  "BGR value constructor macro"
+	  `(scalar ,b ,g ,r))
+
+(defmacro make-rgb (r g b)
 	  "BGR value constructor macro"
 	  `(scalar ,b ,g ,r))
 
@@ -1762,6 +2559,14 @@
 (defun circle (img center radius color &optional (thickness 1) (line-type 8) (shift 0))
        "Draws a circle."
        (%circle img center radius color thickness line-type shift))
+
+
+;; bool clipLine(Rect imgRect, Point& pt1, Point& pt2)
+;; bool cv_clipLine(Rect* imgRect, Point* pt1, Point* pt2)
+(defcfun ("cv_clipLine" clip-line) :boolean
+  (img-rect rect)
+  (pt1 point)
+  (pt2 point))
 
 
 ;; void ellipse(Mat& img, const RotatedRect& box, const Scalar& color, int thickness=1, int lineType=8)
@@ -1808,7 +2613,7 @@
 
 ;; Size getTextSize(const string& text, int fontFace, double fontScale, int thickness, int* baseLine)
 ;; Size* cv_getTextSize(String* text, int fontFace, double fontScale, int thickness, int* baseLine)
-(defcfun ("cv_getTextSize" %get-text-size) (:pointer size)
+(defcfun ("cv_getTextSize" %get-text-size) size
   (text *string)
   (font-face :int)
   (font-scale :double)

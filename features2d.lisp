@@ -16,8 +16,11 @@
   (octaves :int)
   (pattern-scale :float))
 
-
 (defun brisk (&optional (thresh 30) (octaves 3) (pattern-scale 1.0f0))
+  "The BRISK constructor"
+   (%brisk thresh octaves pattern-scale))
+
+(defun make-brisk (&optional (thresh 30) (octaves 3) (pattern-scale 1.0f0))
   "The BRISK constructor"
    (%brisk thresh octaves pattern-scale))
 
@@ -44,7 +47,7 @@
   (key-points vector-key-point)
   (mask mat))
 
-(defun feature-detector-detect (self image keypoints &optional (mask (mat) given-mask))
+(defun feature-detector-detect (self image keypoints &optional (mask (%mat) given-mask))
   "Detects keypoints in an image."
   (%feature-detector-detect self image keypoints mask)
   (if given-mask nil (del-mat mask)))
@@ -76,6 +79,11 @@
   "Brute-force matcher constructor."
    (%bf-matcher norm-type cross-check))
 
+(defun make-bf-matcher (&optional (norm-type +norm-l2+) (cross-check nil))
+  "Brute-force matcher constructor."
+   (%bf-matcher norm-type cross-check))
+
+
 ;; Ptr<DescriptorMatcher> DescriptorMatcher::create(const string& descriptorMatcherType)
 ;; DescriptorMatcher* cv_DescriptorMatcher_create1_2(DescriptorMatcher* self, String* descriptorMatcherType) 
 (defcfun ("cv_DescriptorMatcher_create1_2" %descrip-matcher-create) feature-2d
@@ -97,7 +105,7 @@
   (matches vector-dmatch)
   (mask mat))
 
-(defun descrip-matcher-match (self query-descriptors train-descriptors matches &optional (mask (mat) given-mask))
+(defun descrip-matcher-match (self query-descriptors train-descriptors matches &optional (mask (%mat) given-mask))
   "Finds the best match for each descriptor from a query set."
   (%descrip-matcher-match self query-descriptors train-descriptors matches mask)
   (if given-mask nil (del-mat mask)))
@@ -130,12 +138,12 @@
 (defun draw-matches (img1 keypoints1 img2 keypoints2 matches1to2 out-img &optional 
 									  (match-color (scalar-all -1) given-match-color) 
 									  (single-point-color (scalar-all -1) given-single-point-color) 
-									  (matches-mask (vec-char) given-matches-mask) 
+									  (matches-mask (make-vector-char) given-matches-mask) 
 									  (flags +default+))
   "Draws the found matches of keypoints from two images."
   (%draw-matches img1 keypoints1 img2 keypoints2 matches1to2 out-img match-color single-point-color matches-mask flags)
   (if given-match-color nil (del-scalar match-color)) 
   (if given-single-point-color nil (del-scalar single-point-color)) 
-  (if given-matches-mask nil (del-vec-char matches-mask)))
+  (if given-matches-mask nil (del-vector-char matches-mask)))
 
 
