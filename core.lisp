@@ -414,7 +414,7 @@
 	       (key-point-7 x y size angle response octave class-id))
 	       (t nil)))
 
-;;h
+
 (defun make-key-point (&optional x y size (angle -1) (response 0) (octave 0) (class-id -1))
        (cond ((eq x nil)
 	      (key-point-0))
