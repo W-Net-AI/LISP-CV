@@ -565,3 +565,5 @@
 (defcfun ("cv_delete_VideoWriter" del-vid-writer) :void
   "Calls delete on a VIDEO-WRITER object."
   (self video-writer))
+
+;

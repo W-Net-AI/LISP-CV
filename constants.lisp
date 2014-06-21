@@ -628,3 +628,4 @@
   (+colormap-pink+ 10)
   (+colormap-hot+ 11)
 )
+;

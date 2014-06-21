@@ -354,4 +354,5 @@
 (defun set-window-property (winname prop-id prop-value)
        "Changes parameters of a window dynamically."
        (%set-window-property  (%c-string-to-string winname (length winname)) prop-id (coerce prop-value 'double-float)))
+;
 

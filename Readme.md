@@ -191,7 +191,7 @@ or
 gedit ~/.clisprc
 ```
 
-If you don't have it already, add this to the top of your ~/.sbclrc or ~/.clisprc file.
+If you don't have it already, add this to the top of your ~/.sbclrc or ~/.clisprc file
 ```
 (require :asdf)
 ;put all subdirectories of quicklisp\software into asdf:*central-registry*

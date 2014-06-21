@@ -146,4 +146,4 @@
   (if given-single-point-color nil (del-scalar single-point-color)) 
   (if given-matches-mask nil (del-vector-char matches-mask)))
 
-
+;
