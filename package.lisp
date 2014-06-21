@@ -339,6 +339,9 @@
    #:vector-point-2f
    #:vector-rect
    #:vector-uchar
+   #:vector-vec-2b
+   #:vector-vec-3b
+   #:vector-vec-4b
    #:vector-vec-2d
    #:vector-vec-3d
    #:vector-vec-4d
@@ -1593,4 +1596,4 @@
    #:apply-color-map
 ))
 
-
+;

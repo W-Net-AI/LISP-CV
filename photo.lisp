@@ -166,3 +166,5 @@
    ideal for stylization, as they can abstract regions of low cont-
    rast while preserving, or enhancing, high-contrast features."
        (%stylization src dest sigma-s sigma-r))
+
+;
