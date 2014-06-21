@@ -778,4 +778,4 @@
      (unwind-protect (progn ,@body)
        (mapcar #!(del-vid-writer %1) ,(cons 'list (mapcar #!(car %1) bind)))
        (values))))
-
+;
