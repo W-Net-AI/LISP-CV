@@ -37,5 +37,3 @@
 		 (hessian-threshold
 		  (surf-5 hessian-threshold n-octaves n-octave-layers extended upright))
 		 (t nil)))
-
-;

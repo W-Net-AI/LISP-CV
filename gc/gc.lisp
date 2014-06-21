@@ -3314,5 +3314,3 @@
 		  (mem-ref (cv::c-pointer (mem-aref (cv::vec-vec-2s-to-c-arr ,x) 'cv::vec-2s ,y)) :short (* ,z 2))))
 	     (t (error "incorrect input. 
   ~%See VECTOR-VEC-2S documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%"))))))
-
-;

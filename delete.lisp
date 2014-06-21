@@ -251,6 +251,11 @@
   "Calls delete on a VEC-4D object."
   (self vec-4d))
 
+;; void operator delete  ( void* ptr )
+;; void cv_delete_Vec6d(Vec6d* self)
+(defcfun ("cv_delete_Vec6d" del-vec-6d) :void
+  "Calls delete on a VEC-6D object."
+  (self vec-6d))
 
 ;; void operator delete  ( void* ptr )
 ;; void cv_delete_Vec2f(Vec2f* self)
@@ -341,6 +346,20 @@
 (defcfun ("cv_delete_Vec2w" del-vec-2w) :void
   "Calls delete on a VEC-2W object."
   (self vec-2w))
+
+
+;; void operator delete  ( void* ptr )
+;; void cv_delete_Vec3w(Vec3w* self)
+(defcfun ("cv_delete_Vec3w" del-vec-3w) :void
+  "Calls delete on a VEC-3W object."
+  (self vec-3w))
+
+
+;; void operator delete  ( void* ptr )
+;; void cv_delete_Vec4w(Vec4w* self)
+(defcfun ("cv_delete_Vec4w" del-vec-4w) :void
+  "Calls delete on a VEC-4W object."
+  (self vec-4w))
 
 
 ;; void operator delete  ( void* ptr )
@@ -464,6 +483,13 @@
 
 ;; void operator delete  ( void* ptr )
 ;; void delete_std_vector##tn( vector_##t * v)
+(defcfun ("delete_std_vectorv6d" del-vector-vec-6d) :void
+  "Calls delete on a VECTOR-VEC-6D object."
+  (self vector-vec-6d))
+
+
+;; void operator delete  ( void* ptr )
+;; void delete_std_vector##tn( vector_##t * v)
 (defcfun ("delete_std_vectorv2f" del-vector-vec-2f) :void
   "Calls delete on a VECTOR-VEC-2F object."
   (self vector-vec-2f))
@@ -554,6 +580,20 @@
 
 
 ;; void operator delete  ( void* ptr )
+;; void delete_std_vector##tn( vector_##t * v)
+(defcfun ("delete_std_vectorv3w" del-vector-vec-3w) :void
+  "Calls delete on a VECTOR-VEC-3W object."
+  (self vector-vec-3w))
+
+
+;; void operator delete  ( void* ptr )
+;; void delete_std_vector##tn( vector_##t * v)
+(defcfun ("delete_std_vectorv4w" del-vector-vec-4w) :void
+  "Calls delete on a VECTOR-VEC-4W object."
+  (self vector-vec-4w))
+
+
+;; void operator delete  ( void* ptr )
 ;; void cv_delete_VideoCapture(VideoCapture* self)
 (defcfun ("cv_delete_VideoCapture" del-vid-cap) :void
   "Calls delete on a VIDEO-CAPTURE object."
@@ -565,5 +605,3 @@
 (defcfun ("cv_delete_VideoWriter" del-vid-writer) :void
   "Calls delete on a VIDEO-WRITER object."
   (self video-writer))
-
-;

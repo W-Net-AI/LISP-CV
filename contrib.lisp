@@ -1,7 +1,7 @@
 ;;;; -*- mode: lisp; indent-tabs: nil -*-
 ;;;; contrib.lisp
 ;;;; OpenCV bindings
-;;;; Contributed/Experimental Stuff.
+;;;; Contributed/Experimental Stuff
 
 (in-package :lisp-cv)
 

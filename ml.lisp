@@ -276,5 +276,3 @@
        (if term-crit
 	   (ann-mlp-train-params-4 term-crit train-method param1 param2)
 	   (ann-mlp-train-params-0)))
-
-;

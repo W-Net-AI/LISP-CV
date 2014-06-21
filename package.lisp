@@ -147,40 +147,40 @@
    #:del-vec-3w
    #:del-vec-4w
    #:del-vector-char
-   #:del-vec-dbl
-   #:del-vec-dm
-   #:del-vec-flt
-   #:del-vec-int
-   #:del-vec-kp
-   #:del-vec-mat
-   #:del-vec-point
-   #:del-vec-point-2f
-   #:del-vec-rect
-   #:del-vec-uchar
-   #:del-vec-vec-2b
-   #:del-vec-vec-3b
-   #:del-vec-vec-4b
-   #:del-vec-vec-2d
-   #:del-vec-vec-3d
-   #:del-vec-vec-4d
-   #:del-vec-vec-6d
-   #:del-vec-vec-2f
-   #:del-vec-vec-3f
-   #:del-vec-vec-4f 
-   #:del-vec-vec-6f
-   #:del-vec-vec-2i
-   #:del-vec-vec-3i
-   #:del-vec-vec-4i
-   #:del-vec-vec-6i
-   #:del-vec-vec-8i
-   #:del-vec-vec-2s
-   #:del-vec-vec-3s
-   #:del-vec-vec-4s
-   #:del-vec-vec-2w
-   #:del-vec-vec-3w
-   #:del-vec-vec-4w
+   #:del-vector-double
+   #:del-vector-dmatch
+   #:del-vector-float
+   #:del-vector-int
+   #:del-vector-key-point
+   #:del-vector-mat
+   #:del-vector-point
+   #:del-vector-point-2f
+   #:del-vector-rect
+   #:del-vector-uchar
+   #:del-vector-vec-2b
+   #:del-vector-vec-3b
+   #:del-vector-vec-4b
+   #:del-vector-vec-2d
+   #:del-vector-vec-3d
+   #:del-vector-vec-4d
+   #:del-vector-vec-6d
+   #:del-vector-vec-2f
+   #:del-vector-vec-3f
+   #:del-vector-vec-4f 
+   #:del-vector-vec-6f
+   #:del-vector-vec-2i
+   #:del-vector-vec-3i
+   #:del-vector-vec-4i
+   #:del-vector-vec-6i
+   #:del-vector-vec-8i
+   #:del-vector-vec-2s
+   #:del-vector-vec-3s
+   #:del-vector-vec-4s
+   #:del-vector-vec-2w
+   #:del-vector-vec-3w
+   #:del-vector-vec-4w
    #:del-vid-cap
-   #:del-vid-writer35
+   #:del-vid-writer
 
 
 ;; WITH-MACROS
@@ -1596,4 +1596,4 @@
    #:apply-color-map
 ))
 
-;
+

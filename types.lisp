@@ -102,7 +102,7 @@
 (defmethod translate-from-foreign (c-pointer (c-type vector-dmatch))
   (let ((vector-dmatch  (make-instance 'std-vector-dmatch :c-pointer c-pointer)))
     (when (garbage-collect c-type)
-      (tg:finalize vector-dmatch (lambda () (del-vector-dm c-pointer))))
+      (tg:finalize vector-dmatch (lambda () (del-vector-dmatch c-pointer))))
     vector-dmatch))
 
 
@@ -128,7 +128,7 @@
 (defmethod translate-from-foreign (c-pointer (c-type vector-double))
   (let ((vector-double  (make-instance 'std-vector-double :c-pointer c-pointer)))
     (when (garbage-collect c-type)
-      (tg:finalize vector-double (lambda () (del-vector-dbl c-pointer))))
+      (tg:finalize vector-double (lambda () (del-vector-double c-pointer))))
     vector-double))
 
 
@@ -154,7 +154,7 @@
 (defmethod translate-from-foreign (c-pointer (c-type vector-float))
   (let ((vector-float  (make-instance 'std-vector-float :c-pointer c-pointer)))
     (when (garbage-collect c-type)
-      (tg:finalize vector-float (lambda () (del-vector-flt c-pointer))))
+      (tg:finalize vector-float (lambda () (del-vector-float c-pointer))))
     vector-float))
 
 
@@ -206,7 +206,7 @@
 (defmethod translate-from-foreign (c-pointer (c-type vector-key-point))
   (let ((vector-key-point  (make-instance 'std-vector-key-point :c-pointer c-pointer)))
     (when (garbage-collect c-type)
-      (tg:finalize vector-key-point (lambda () (del-vector-kp c-pointer))))
+      (tg:finalize vector-key-point (lambda () (del-vector-key-point c-pointer))))
     vector-key-point))
 
 
@@ -1405,7 +1405,7 @@
 (defmethod translate-from-foreign (c-pointer (c-type vec-2b))
   (let ((vec-2b (make-instance 'cv-vec-2b :c-pointer c-pointer)))
     (when (garbage-collect c-type)
-      (tg:finalize vec-2b (lambda () (del-vector-2b c-pointer))))
+      (tg:finalize vec-2b (lambda () (del-vec-2b c-pointer))))
     vec-2b))
 
 
@@ -1431,7 +1431,7 @@
 (defmethod translate-from-foreign (c-pointer (c-type vec-3b))
   (let ((vec-3b (make-instance 'cv-vec-3b :c-pointer c-pointer)))
     (when (garbage-collect c-type)
-      (tg:finalize vec-3b (lambda () (del-vector-3b c-pointer))))
+      (tg:finalize vec-3b (lambda () (del-vec-3b c-pointer))))
     vec-3b))
 
 
@@ -1457,7 +1457,7 @@
 (defmethod translate-from-foreign (c-pointer (c-type vec-4b))
   (let ((vec-4b (make-instance 'cv-vec-4b :c-pointer c-pointer)))
     (when (garbage-collect c-type)
-      (tg:finalize vec-4b (lambda () (del-vector-4b c-pointer))))
+      (tg:finalize vec-4b (lambda () (del-vec-4b c-pointer))))
     vec-4b))
 
 
@@ -1484,7 +1484,7 @@
 (defmethod translate-from-foreign (c-pointer (c-type vec-2d))
   (let ((vec-2d (make-instance 'cv-vec-2d :c-pointer c-pointer)))
     (when (garbage-collect c-type)
-      (tg:finalize vec-2d (lambda () (del-vector-2d c-pointer))))
+      (tg:finalize vec-2d (lambda () (del-vec-2d c-pointer))))
     vec-2d))
 
 
@@ -1510,7 +1510,7 @@
 (defmethod translate-from-foreign (c-pointer (c-type vec-3d))
   (let ((vec-3d (make-instance 'cv-vec-3d :c-pointer c-pointer)))
     (when (garbage-collect c-type)
-      (tg:finalize vec-3d (lambda () (del-vector-3d c-pointer))))
+      (tg:finalize vec-3d (lambda () (del-vec-3d c-pointer))))
     vec-3d))
 
 
@@ -1536,7 +1536,7 @@
 (defmethod translate-from-foreign (c-pointer (c-type vec-4d))
   (let ((vec-4d (make-instance 'cv-vec-4d :c-pointer c-pointer)))
     (when (garbage-collect c-type)
-      (tg:finalize vec-4d (lambda () (del-vector-4d c-pointer))))
+      (tg:finalize vec-4d (lambda () (del-vec-4d c-pointer))))
     vec-4d))
 
 
@@ -1562,7 +1562,7 @@
 (defmethod translate-from-foreign (c-pointer (c-type vec-2f))
   (let ((vec-2f (make-instance 'cv-vec-2f :c-pointer c-pointer)))
     (when (garbage-collect c-type)
-      (tg:finalize vec-2f (lambda () (del-vector-2f c-pointer))))
+      (tg:finalize vec-2f (lambda () (del-vec-2f c-pointer))))
     vec-2f))
 
 
@@ -1588,7 +1588,7 @@
 (defmethod translate-from-foreign (c-pointer (c-type vec-3f))
   (let ((vec-3f (make-instance 'cv-vec-3f :c-pointer c-pointer)))
     (when (garbage-collect c-type)
-      (tg:finalize vec-3f (lambda () (del-vector-3f c-pointer))))
+      (tg:finalize vec-3f (lambda () (del-vec-3f c-pointer))))
     vec-3f))
 
 
@@ -1614,7 +1614,7 @@
 (defmethod translate-from-foreign (c-pointer (c-type vec-4f))
   (let ((vec-4f (make-instance 'cv-vec-4f :c-pointer c-pointer)))
     (when (garbage-collect c-type)
-      (tg:finalize vec-4f (lambda () (del-vector-4f c-pointer))))
+      (tg:finalize vec-4f (lambda () (del-vec-4f c-pointer))))
     vec-4f))
 
 
@@ -1640,7 +1640,7 @@
 (defmethod translate-from-foreign (c-pointer (c-type vec-6d))
   (let ((vec-6d (make-instance 'cv-vec-6d :c-pointer c-pointer)))
     (when (garbage-collect c-type)
-      (tg:finalize vec-6d (lambda () (del-vector-6d c-pointer))))
+      (tg:finalize vec-6d (lambda () (del-vec-6d c-pointer))))
     vec-6d))
 
 
@@ -1666,7 +1666,7 @@
 (defmethod translate-from-foreign (c-pointer (c-type vec-6f))
   (let ((vec-6f (make-instance 'cv-vec-6f :c-pointer c-pointer)))
     (when (garbage-collect c-type)
-      (tg:finalize vec-6f (lambda () (del-vector-6f c-pointer))))
+      (tg:finalize vec-6f (lambda () (del-vec-6f c-pointer))))
     vec-6f))
 
 
@@ -1692,7 +1692,7 @@
 (defmethod translate-from-foreign (c-pointer (c-type vec-2i))
   (let ((vec-2i (make-instance 'cv-vec-2i :c-pointer c-pointer)))
     (when (garbage-collect c-type)
-      (tg:finalize vec-2i (lambda () (del-vector-2i c-pointer))))
+      (tg:finalize vec-2i (lambda () (del-vec-2i c-pointer))))
     vec-2i))
 
 
@@ -1718,7 +1718,7 @@
 (defmethod translate-from-foreign (c-pointer (c-type vec-3i))
   (let ((vec-3i (make-instance 'cv-vec-3i :c-pointer c-pointer)))
     (when (garbage-collect c-type)
-      (tg:finalize vec-3i (lambda () (del-vector-3i c-pointer))))
+      (tg:finalize vec-3i (lambda () (del-vec-3i c-pointer))))
     vec-3i))
 
 
@@ -1744,7 +1744,7 @@
 (defmethod translate-from-foreign (c-pointer (c-type vec-4i))
   (let ((vec-4i (make-instance 'cv-vec-4i :c-pointer c-pointer)))
     (when (garbage-collect c-type)
-      (tg:finalize vec-4i (lambda () (del-vector-4i c-pointer))))
+      (tg:finalize vec-4i (lambda () (del-vec-4i c-pointer))))
     vec-4i))
 
 
@@ -1770,7 +1770,7 @@
 (defmethod translate-from-foreign (c-pointer (c-type vec-6i))
   (let ((vec-6i (make-instance 'cv-vec-6i :c-pointer c-pointer)))
     (when (garbage-collect c-type)
-      (tg:finalize vec-6i (lambda () (del-vector-6i c-pointer))))
+      (tg:finalize vec-6i (lambda () (del-vec-6i c-pointer))))
     vec-6i))
 
 
@@ -1796,7 +1796,7 @@
 (defmethod translate-from-foreign (c-pointer (c-type vec-8i))
   (let ((vec-8i (make-instance 'cv-vec-8i :c-pointer c-pointer)))
     (when (garbage-collect c-type)
-      (tg:finalize vec-8i (lambda () (del-vector-8i c-pointer))))
+      (tg:finalize vec-8i (lambda () (del-vec-8i c-pointer))))
     vec-8i))
 
 
@@ -1822,7 +1822,7 @@
 (defmethod translate-from-foreign (c-pointer (c-type vec-2s))
   (let ((vec-2s (make-instance 'cv-vec-2s :c-pointer c-pointer)))
     (when (garbage-collect c-type)
-      (tg:finalize vec-2s (lambda () (del-vector-2s c-pointer))))
+      (tg:finalize vec-2s (lambda () (del-vec-2s c-pointer))))
     vec-2s))
 
 
@@ -1848,7 +1848,7 @@
 (defmethod translate-from-foreign (c-pointer (c-type vec-3s))
   (let ((vec-3s (make-instance 'cv-vec-3s :c-pointer c-pointer)))
     (when (garbage-collect c-type)
-      (tg:finalize vec-3s (lambda () (del-vector-3s c-pointer))))
+      (tg:finalize vec-3s (lambda () (del-vec-3s c-pointer))))
     vec-3s))
 
 
@@ -1874,7 +1874,7 @@
 (defmethod translate-from-foreign (c-pointer (c-type vec-4s))
   (let ((vec-4s (make-instance 'cv-vec-4s :c-pointer c-pointer)))
     (when (garbage-collect c-type)
-      (tg:finalize vec-4s (lambda () (del-vector-4s c-pointer))))
+      (tg:finalize vec-4s (lambda () (del-vec-4s c-pointer))))
     vec-4s))
 
 
@@ -1900,7 +1900,7 @@
 (defmethod translate-from-foreign (c-pointer (c-type vec-2w))
   (let ((vec-2w (make-instance 'cv-vec-2w :c-pointer c-pointer)))
     (when (garbage-collect c-type)
-      (tg:finalize vec-2w (lambda () (del-vector-2w c-pointer))))
+      (tg:finalize vec-2w (lambda () (del-vec-2w c-pointer))))
     vec-2w))
 
 
@@ -1926,7 +1926,7 @@
 (defmethod translate-from-foreign (c-pointer (c-type vec-3w))
   (let ((vec-3w (make-instance 'cv-vec-3w :c-pointer c-pointer)))
     (when (garbage-collect c-type)
-      (tg:finalize vec-3w (lambda () (del-vector-3w c-pointer))))
+      (tg:finalize vec-3w (lambda () (del-vec-3w c-pointer))))
     vec-3w))
 
 
@@ -1952,7 +1952,7 @@
 (defmethod translate-from-foreign (c-pointer (c-type vec-4w))
   (let ((vec-4w (make-instance 'cv-vec-4w :c-pointer c-pointer)))
     (when (garbage-collect c-type)
-      (tg:finalize vec-4w (lambda () (del-vector-4w c-pointer))))
+      (tg:finalize vec-4w (lambda () (del-vec-4w c-pointer))))
     vec-4w))
 
 
@@ -2267,4 +2267,4 @@
 
 
 
-;
+
