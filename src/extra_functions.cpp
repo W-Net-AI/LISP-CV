@@ -266,6 +266,10 @@ MatExpr* cv_abs(Mat* m) {
 	return new MatExpr(cv::abs(*m));
 }
 
+float cv_RotatedRect_angle(RotatedRect* self) {
+    return self->angle;
+}
+
 Rect* cv_RotatedRect_boundingRect(RotatedRect* self) {
     return new Rect(self->boundingRect());
 }

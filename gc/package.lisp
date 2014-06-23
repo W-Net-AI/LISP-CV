@@ -290,6 +290,7 @@
    #:>>
    #:add
    #:adjust-roi
+   #:br
    #:clone
    #:col-range
    #:diag
@@ -357,33 +358,16 @@
    #:mat-zeros
    #:mul
    #:point
-   #:point-init
    #:point-2d
-   #:point-2d-x
-   #:point-2d-y
    #:point-2f
-   #:point-2f-x
-   #:point-2f-y
    #:point-3d
-   #:point-3d-x
-   #:point-3d-y
-   #:point-3d-z
    #:point-3f
-   #:point-3f-x
-   #:point-3f-y
-   #:point-3f-z
    #:point-3i
-   #:point-3i-x
-   #:point-3i-y
-   #:point-3i-z
    #:promote
    #:range
    #:range-all
    #:rect
-   #:rect-br
-   #:rect-clone
    #:rect-size
-   #:rect-tl
    #:reshape
    #:reshape-rows
    #:roi
@@ -399,6 +383,7 @@
    #:size-2f
    #:sub
    #:term-criteria
+   #:tl
    #:vec-2b
    #:vec-3b
    #:vec-4b

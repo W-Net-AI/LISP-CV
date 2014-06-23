@@ -14,6 +14,7 @@
 ;; Scalar* cv_create_morphologyDefaultBorderValue()
 (defcfun ("cv_create_morphologyDefaultBorderValue" morphology-default-border-value) scalar)
 
+
 ;; static inline Scalar morphologyDefaultBorderValue() { return Scalar::all(DBL_MAX); }
 ;; Scalar* cv_create_morphologyDefaultBorderValue()
 (defcfun ("cv_create_morphologyDefaultBorderValue" make-morphology-default-border-value) scalar)
@@ -33,6 +34,7 @@
   (sigma-space :double)
   (border-type :int))
 
+
 (defun bilateral-filter (src dest d sigma-color sigma-space &optional (border-type +border-default+))
        "Applies the bilateral filter to an image."
        (%bilateral-filter src dest d sigma-color sigma-space border-type))
@@ -46,6 +48,7 @@
   (ksize size)
   (anchor point)
   (border-type :int))
+
 
 (defun blur (src dest ksize &optional (anchor (point -1 -1) given-anchor) (border-type +border-default+))
   "Blurs an image using the normalized box filter."
@@ -80,6 +83,7 @@
   (border-type :int)
   (border-value scalar))
 
+
 (defun dilate (src dest kernel &optional (anchor (point -1 -1) given-anchor) (iterations 1) (border-type +border-constant+) (border-value (morphology-default-border-value) given-border-value))
   "Dilates an image by using a specific structuring element."
   (%dilate src dest kernel anchor iterations border-type border-value)
@@ -98,6 +102,7 @@
   (border-type :int)
   (border-value scalar))
 
+
 (defun erode (src dest kernel &optional (anchor (point -1 -1) given-anchor) (iterations 1) (border-type +border-constant+) (border-value (morphology-default-border-value) given-border-value))
   "Dilates an image by using a specific structuring element."
   (%erode src dest kernel anchor iterations border-type border-value)
@@ -115,6 +120,7 @@
   (anchor point)
   (delta :double)
   (border-type :int))
+
 
 (defun filter-2d (src dest ddepth kernel &optional (anchor (point -1 -1) given-anchor) (delta 0d0) (border-type +border-default+))
   "Convolves an image with the kernel."
@@ -160,6 +166,7 @@
   (border-type :int)
   (border-value scalar))
 
+
 (defun morphology-ex (src dest op kernel &optional (anchor (point -1 -1) given-anchor) (iterations 1) (border-type +border-constant+) 
 					   (border-value (morphology-default-border-value)))
   "Performs advanced morphological transformations."
@@ -173,6 +180,7 @@
   (shape :int)
   (ksize size)
   (kernel point))
+
 
 (defun get-structuring-element (shape ksize &optional (kernel (point -1 -1) given-kernel) return) 
   "Returns a structuring element of the specified size and shape for morphological operations."
@@ -192,6 +200,7 @@
   (delta :double)
   (border-type :int))
 
+
 (defun laplacian (src dest ddepth &optional (ksize 1) (scale 1d0) (delta 0d0) (border-type +border-default+))
        "Calculates the Laplacian of an image."
        (%laplacian src dest ddepth ksize scale delta border-type))
@@ -204,6 +213,7 @@
 	 (dest mat)
 	 (dstsize size)
 	 (border-type :int))
+
 
 (defun pyr-down (src dest &optional (dstsize (size-0) given-dstsize) (border-type +border-default+))
   "Blurs an image and downsamples it."
@@ -218,6 +228,7 @@
   (dest mat)
   (dstsize size)
   (border-type :int))
+
 
 (defun pyr-up (src dest &optional (dstsize (size-0) given-dstsize) (border-type +border-default+))
   "Upsamples an image and then blurs it."
@@ -237,6 +248,7 @@
   (delta :double)
   (border-type :int))
 
+
 (defun scharr (src dest ddepth dx dy &optional (scale 1) (delta 1d0) (border-type +border-default+))
        "Calculates the first x- or y- image derivative using Scharr operator."
        (%scharr src dest ddepth dx dy scale delta border-type))
@@ -255,6 +267,7 @@
   (scale :double)
   (delta :double)
   (border-type :int))
+
 
 (defun sobel (src dest ddepth dx dy &optional (ksize 3) (scale 1d0) (delta 0d0) (border-type +border-default+))
        "Calculates the first, second, third, or mixed image derivatives using an extended Sobel operator."
@@ -277,6 +290,7 @@
   (border-mode :int)
   (border-value scalar))
 
+
 (defun remap (src dest map1 map2 interpolation &optional (border-mode +border-constant+) (border-value (scalar) given-border-value))
   "Sets all or some of the array elements to the specified value."
   (%remap src dest map1 map2 interpolation border-mode border-value)
@@ -292,6 +306,7 @@
   (fx :double)
   (fy :double)
   (interpolation :int))
+
 
 (defun resize (src dest dsize &optional (fx 0d0) (fy 0d0) (interpolation +inter-linear+))
   "Resizes an image."
@@ -321,6 +336,7 @@
   (code :int)
   (dest-cn :int))
 
+
 (defun cvt-color (src dest code &optional (dest-cn 0))
   "Converts an image from one cofmisclor space to another."
    (%cvt-color src dest code dest-cn))
@@ -336,6 +352,7 @@
   (mask-size :int)
   (dst-type :int))
 
+
 ;; void distanceTransform(InputArray src, OutputArray dst, OutputArray labels, int distanceType, int maskSize, 
 ;; int labelType=DIST_LABEL_CCOMP )
 ;; void cv_distanceTransform(Mat* src, Mat* dst, Mat* labels, int distanceType, int maskSize, int labelType)
@@ -348,11 +365,14 @@
   (mask-size :int)
   (label-type :int))
 
+
 (defun %distance-transform (src dest *labels distance-type mask-size &optional (label-type +dist-label-ccomp+))
   (%%distance-transform src dest *labels distance-type mask-size label-type))
 
+
 (defun distance-transform5 (src dest distance-type mask-size &optional (dst-type +32f+))
   (%distance-transform5 src dest distance-type mask-size dst-type))
+
 
 (defun distance-transform (&rest args)
   (if (typep (third args) 'cv-mat)
@@ -399,6 +419,7 @@
 	 (high-thresh :double)
 	 (aperture-size :int)
 	 (l2-gradient :boolean))
+
 
 (defun canny (image edges low-thresh high-thresh &optional (aperture-size 3) (l2-gradient nil))       
   "Finds edges in an image using the [Canny86] algorithm."

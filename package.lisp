@@ -673,10 +673,14 @@
    #:>>
    #:add
    #:adjust-roi
+   #:angle
    #:area
    #:area-2f
-   #:rect-br
+   #:bounding-rect
+   #:br
+   #:center
    #:channels
+   #:class-id
    #:clone
    #:col-range
    #:cols
@@ -686,6 +690,7 @@
    #:data
    #:depth
    #:diag
+   #:distance
    #:div
    #:dmatch
    #:dot
@@ -700,8 +705,9 @@
    #:empty
    #:force
    #:height
-   #:inv
    #:height-2f
+   #:img-idx
+   #:inv
    #:is-continuous
    #:key-point
    #:locate-roi
@@ -756,12 +762,12 @@
    #:mat-eye
    #:mat-ones
    #:mat-range
-   #:mat-size
    #:mat-type
    #:mat-typed
    #:mat-value
    #:mat-zeros
    #:mul
+   #:octave
    #:point
    #:point-x
    #:point-y
@@ -785,18 +791,15 @@
    #:point-3i-z
    #:promote
    #:ptr
+   #:query-idx
    #:range
    #:range-end
    #:range-all
    #:range-start
    #:rect
-   #:rect-height
-   #:rect-size
-   #:rect-width
-   #:rect-x
-   #:rect-y
    #:reshape
    #:reshape-rows
+   #:response
    #:roi
    #:rotated-rect
    #:rotated-rect-bounding-rect
@@ -808,6 +811,7 @@
    #:scalar
    #:scalar-all
    #:scale
+   #:size
    #:size-assgn-to
    #:size-from-point
    #:size-2f
@@ -816,9 +820,10 @@
    #:width-2f
    #:*step
    #:sub
-   #:rect-tl
+   #:tl
    #:term-criteria
    #:total
+   #:train-idx
    #:vec-2b
    #:vec-3b
    #:vec-4b
@@ -841,6 +846,9 @@
    #:vec-2w
    #:vec-3w
    #:vec-4w
+   #:x
+   #:y
+   #:z
 
 ;; core - Dynamic Structures
 

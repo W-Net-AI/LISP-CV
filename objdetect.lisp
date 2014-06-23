@@ -15,11 +15,13 @@
 (defcfun ("cv_create_CascadeClassifier" cascade-classifier-0) cascade-classifier
   "CASCADE-CLASSIFIER construct.")
 
+
 ;; CascadeClassifier::CascadeClassifier(const string& filename)
 ;; CascadeClassifier* cv_create_CascadeClassifier1(String* filename)
 (defcfun ("cv_create_CascadeClassifier1" cascade-classifier-1) cascade-classifier
   "Loads a classifier from a file."
   (filename *string))
+
 
 (defun cascade-classifier (&optional filename)
   (cond ((eq filename nil)
@@ -27,6 +29,7 @@
 	(filename
 	 (cascade-classifier-1 (%c-string-to-string filename (length filename))))
 	(t nil)))
+
 
 (defun make-cascade-classifier (&optional filename)
   (cond ((eq filename nil)
@@ -43,6 +46,7 @@
   (self cascade-classifier)
   (filename *string))
 
+
 (defun cascade-classifier-load (self filename)
   "Loads a classifier from a file."
   (%cascade-classifier-load self (%c-string-to-string filename (length filename))))
@@ -54,6 +58,7 @@
 ;; void cv_CascadeClassifier_detectMultiScale(CascadeClassifier* self, Mat* image, vector_Rect* objects, double scaleFactor, 
 ;; int minNeighbors, int flags, Size* minSize, Size* maxSize)
 
+
 (defcfun ("cv_CascadeClassifier_detectMultiScale" %%detect-multi-scale) :void
   (self cascade-classifier)
   (image mat)
@@ -63,6 +68,7 @@
   (flags :int)
   (min-size size)
   (max-size size))
+
 
 (defun %detect-multi-scale (self image objects &optional (scale-factor 1.1d0) (min-neighbors 3) (flags 0) (min-size (size-0) given-min-size) (max-size (size-0) given-max-size))
   "Detects objects of different sizes in the input image. The detected objects are returned as a list of rectangles."
@@ -75,6 +81,7 @@
 
 ;; void cv_CascadeClassifier_detectMultiScale8(CascadeClassifier* self, Mat* image, vector_Rect* objects, 
 ;; vector_int* numDetections, double scaleFactor, int minNeighbors, int flags, Size* minSize, Size* maxSize)
+
 
 (defcfun ("cv_CascadeClassifier_detectMultiScale8" %%detect-multi-scale8) :void
   (self cascade-classifier)

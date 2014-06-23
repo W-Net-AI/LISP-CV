@@ -49,6 +49,7 @@
   (green-mul :float)
   (blue-mul :float))
 
+
 (defun color-change (src mask dest &optional (red-mul 1.0f0) (green-mul 1.0f0) (blue-mul 1.0f0))
   "Given an original color image, two differently colored 
    versions of this image can be mixed seamlessly."
@@ -63,6 +64,7 @@
    (dest mat)
    (alpha :float)
    (beta :float))
+
 
 (defun illumination-change (src mask dest &optional (alpha 0.2f0) (beta 0.4f0))
   "Applying an appropriate non-linear transformation to the gradient field 
@@ -98,6 +100,7 @@
    (high-threshold :double)
    (kernal-size :int))
 
+
 (defun texture-flattening (src mask dest &optional (low-threshold 30d0) (high-threshold 45d0) (kernal-size 3))
   "By retaining only the gradients at edge locations, before integrating with the Poisson solver, one 
    washes out the texture of the selected region, giving its contents a flat aspect. Here Canny Edge 
@@ -109,6 +112,7 @@
 ;;; Non-Photorealistic Rendering
 
 
+
 ;; void detailEnhance(InputArray src, OutputArray dst, float sigma_s=10, float sigma_r=0.15f)
 ;; void cv_detailEnhance(Mat* src, Mat* dst, float sigma_s, float sigma_r) 
 (defcfun ("cv_detailEnhance" %detail-enhance) :void
@@ -116,6 +120,7 @@
   (dest mat)
   (sigma-s :float)
   (sigma-r :float))
+
 
 (defun detail-enhance (src dest &optional (sigma-s 60f0) (sigma-r 0.45f0))
   "This filter enhances the details of a particular image."
@@ -130,6 +135,7 @@
    (flags :int)
    (sigma-s :float)
    (sigma-r :float))
+
 
 (defun edge-preserving-filter (src dest &optional (flags 1) (sigma-s 60f0) (sigma-r 0.4f0))
   "Filtering is the fundamental operation in image and video processing. Edge
@@ -147,6 +153,7 @@
   (sigma-r :float)
   (shade-factor :float))
 
+
 (defun pencil-sketch (src dest1 dest2 &optional (sigma-s 60f0) (sigma-r 0.07f0) (shade-factor 0.02f0))
   "Pencil-like non-photorealistic line drawing."
   (%pencil-sketch src dest1 dest2 sigma-s sigma-r shade-factor))
@@ -159,6 +166,7 @@
    (dest mat)
    (sigma-s :float)
    (sigma-r :float))
+
 
 (defun stylization (src dest &optional (sigma-s 60f0) (sigma-r 0.45f0))
   "Stylization aims to produce digital imagery with a wide variety 

@@ -43,6 +43,7 @@
   "Destroys a window."
   (winname *string))
 
+
 (defun destroy-window (winname)
        "Destroys a window."
        (%destroy-window (%c-string-to-string winname (length winname))))
@@ -53,6 +54,7 @@
 (defcfun ("cv_getTrackbarPos" %get-trackbar-pos) :int
   (trackbarname *string)
   (winname *string))
+
 
 (defun get-trackbar-pos (trackbarname winname)
   "Returns the trackbar position."
@@ -90,9 +92,11 @@
   (winname *string)
   (flags :int))
 
+
 (defun named-window (winname &optional (flags +window-autosize+))
        "Creates a window."
        (%named-window (%c-string-to-string winname (length winname)) flags))
+
 
 (defmacro with-named-window ((winname &optional (flags +window-autosize+)) &body body)
 	  `(unwind-protect (progn (named-window ,winname ,flags)
@@ -120,6 +124,7 @@
   (winname *string)
   (pos :int))
 
+
 (defun set-trackbar-pos (trackbarname winname pos)
   "Sets the trackbar position."
   (%set-trackbar-pos (%c-string-to-string trackbarname (length trackbarname)) (%c-string-to-string winname (length winname))  pos))
@@ -129,6 +134,7 @@
 ;; int cv_waitKey(int delay)
 (defcfun ("cv_waitKey" %wait-key) :int
   (delay :int))
+
 
 (defun wait-key (&optional (delay 0))
   "Waits for a pressed key."
@@ -143,17 +149,20 @@
 (defcfun ("cv_create_VideoCapture" video-capture-0) video-capture 
   "VideoCapture constructor")
 
+
 ;; VideoCapture::VideoCapture(int device)
 ;; VideoCapture* cv_create_VideoCapture1_0(int device)
 (cffi:defcfun ("cv_create_VideoCapture1_0" video-capture-dev) video-capture
 	      "VideoCapture constructor"
 	      (device :int))
 
+
 ;; VideoCapture::VideoCapture(const string& filename)
 ;; VideoCapture* cv_create_VideoCapture1(String* filename) {
 (defcfun ("cv_create_VideoCapture1" video-capture-file) video-capture
 	 "VideoCapture constructor"
 	 (filename *string))
+
 
 (defun video-capture (&optional src)
        (cond ((eq src nil)
@@ -163,6 +172,7 @@
 	       ((stringp src) 
 		(video-capture-file (%c-string-to-string src (length src))))
 		(t nil)))
+
 
 (defun make-video-capture (&optional src)
        (cond ((eq src nil)
@@ -220,6 +230,7 @@
   (filename *string)
   (flags :int))
 
+
 (defun imread (filename &optional (flags 1))
        (%imread (%c-string-to-string filename (length filename)) flags))
 
@@ -230,6 +241,7 @@
   (filename :string)
   (img mat)
   (params vector-int))
+
 
 (defun imwrite (filename img &optional (params (make-vector-int) given-params) return)
   "Saves an image to a specified file."
@@ -242,6 +254,7 @@
 (defcfun ("cv_create_VideoWriter" video-writer-0) video-writer
 	 "VIDEO-WRITER constructor")
 
+
 ;; VideoWriter::VideoWriter(const string& filename, int fourcc, double fps, Size frameSize, bool isColor) 
 ;; VideoWriter* cv_create_VideoWriter5(String* filename, int fourcc, double fps, Size* frameSize, bool isColor)
 (defcfun ("cv_create_VideoWriter5" video-writer-5) video-writer
@@ -251,6 +264,7 @@
 	 (frame-size size)
 	 (is-color :boolean))
 
+
 (defun video-writer (&optional filename fourcc fps frame-size (is-color t))
        "VIDEO-WRITER constructor"  
        (cond ((eq filename nil)
@@ -258,6 +272,7 @@
 	      (filename
 	       (video-writer-5 (%c-string-to-string filename (length filename)) fourcc fps frame-size is-color))
 	       (t nil)))
+
 
 (defun make-video-writer (&optional filename fourcc fps frame-size (is-color t))
        "VIDEO-WRITER constructor"  
@@ -350,6 +365,7 @@
   (winname *string)
   (prop-id :int)
   (prop-value :double))
+
 
 (defun set-window-property (winname prop-id prop-value)
        "Changes parameters of a window dynamically."

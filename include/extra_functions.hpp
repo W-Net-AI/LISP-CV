@@ -76,6 +76,7 @@ CvSVMParams* cv_create_CvSVMParams();
 //CvSVMParams* cv_create_CvSVMParams10(int svm_type, int kernel_type, double degree, double gamma, double coef0, double Cvalue, double nu, double p, CvMat class_weights, TermCriteria term_crit);
 void cv_displayOverlay(String* winname, String* text, int delayms);
 MatExpr* cv_abs(Mat* m);
+float cv_RotatedRect_angle(RotatedRect* self);
 Rect* cv_RotatedRect_boundingRect(RotatedRect* self);
 MatExpr* cv_Mat_div(Mat* m1, Mat* m2);
 FeatureDetector* cv_FeatureDetector_create2(FeatureDetector* self, const char* detectorType);

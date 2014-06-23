@@ -31,6 +31,7 @@
 		  (surf-5 hessian-threshold n-octaves n-octave-layers extended upright))
 		 (t nil)))
 
+
 (defun make-surf (&optional hessian-threshold (n-octaves 4) (n-octave-layers 2) (extended t) (upright nil))
 	   (cond ((eq hessian-threshold nil)
 		  (surf-0))

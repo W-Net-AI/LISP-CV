@@ -336,9 +336,9 @@ CFFI: mem-aref ptr type &optional (index 0)
 
 CFFI: (setf (mem-aref ptr type &optional (index 0)) new-value) 
 
-LISP-CV: (AT (SELF MAT) (I :INT) (J :INT) (TYPE :KEYWORD)) 
+LISP-CV: (AT (SELF MAT) (I :INT) (J :INT) (TYPE KEYWORD)) 
 
-LISP-CV: (AT (SELF MAT) (I :INT) (J :INT) (TYPE :KEYWORD)) 
+LISP-CV: (AT (SELF MAT) (I :INT) (J :INT) (TYPE KEYWORD)) 
 
 
     Parameters:	
@@ -805,8 +805,9 @@ CV> (DEPTH A)
 1   ;The type of the matrix elements are 1(+8S+) - 8-bit signed integer
 
 
-
+========================================================================================================================================
 DMATCH
+========================================================================================================================================
 
 DMATCH constructor.
 
@@ -814,6 +815,7 @@ Note: Both DMATCH and MAKE-DMATCH are provided in this library. The first, to ma
 conventions, the second, to adhere to Common Lisp naming conventions. Except for the name, they are 
 the same function. I use the DMATCH function in the examples in this file because it will make them 
 easier to compare with OpenCV examples you find online, thus making this library easier to learn.
+
 
 C++: DMatch() : queryIdx(-1), trainIdx(-1), imgIdx(-1),
                 distance(std::numeric_limits<float>::max()) {}
@@ -834,9 +836,27 @@ C++: DMatch( int _queryIdx, int _trainIdx, int _imgIdx, float _distance ) :
              queryIdx(_queryIdx), trainIdx(_trainIdx), imgIdx(_imgIdx),
              distance(_distance) {}
 
+
 LISP-CV: (DMATCH (QUERY-IDX :INT) (TRAIN-IDX :INT) (IMG-IDX :INT) (DISTANCE :FLOAT)) => DMATCH
 
 LISP-CV: (MAKE-DMATCH (QUERY-IDX :INT) (TRAIN-IDX :INT) (IMG-IDX :INT) (DISTANCE :FLOAT)) => DMATCH
+
+
+C++: int DMatch::queryIdx
+
+LISP-CV: (QUERY-IDX (SELF DMATCH)) => :INT  
+
+C++: int DMatch::trainIdx 
+
+LISP-CV: (TRAIN-IDX (SELF DMATCH)) => :INT 
+
+C++: int DMatch::imgIdx   
+
+LISP-CV: (IMG-IDX (SELF DMATCH)) => :INT 
+
+C++: float DMatch::distance
+
+LISP-CV: (DISTANCE (SELF DMATCH)) => :FLOAT
 
 
     Parameters:	
@@ -1363,7 +1383,7 @@ submatrix within the original matrix. The function LOCATE-ROI does exactly that.
 		       (locate-roi frame roi-size roi-loc)
 		       ;Print location of submatrix
 		       (format t "Location of FRAME region of interest (~a, ~a)~%~%" 
-			       (point-x roi-loc) (point-y roi-loc))
+			       (x roi-loc) (y roi-loc))
 		       ;Print size of parent matrix
 		       (format t "Size of FRAME (~a, ~a)~%~%" 
 			       (width roi-size) (height roi-size))
@@ -1575,11 +1595,9 @@ LISP-CV:  (MAKE-POINT (X :INT) (Y :INT)) => POINT
 
 C++: _Tp x, y;
 
-LISP-CV: (POINT-X (SELF POINT)) => :INT
+LISP-CV: (X (SELF POINT)) => :INT
 
-C++: _Tp x, y;
-
-LISP-CV: (POINT-Y (SELF POINT)) => :INT
+LISP-CV: (Y (SELF POINT)) => :INT
 
 
     Parameters:	
@@ -1591,25 +1609,23 @@ LISP-CV: (POINT-Y (SELF POINT)) => :INT
         Y - Y-coordinate of the point.
 
 
-POINT creates a 2D point with integer coordinates (usually zero-based). The functions POINT-X and  
-POINT-Y are used to extract the x,y coordinates of a point.
+POINT creates a 2D point with integer coordinates (usually zero-based). The methods X and Y are used 
+to extract the x,y coordinates of a point.
 
 
 (defun point-example (x y)
 
-  "In this example we create an unitialized 
-   and an initialized point with the functi-
-   on POINT. The x,y coordinates of the poi-
-   nt are retrieved, with functions POINT-X 
-   and POINT-Y, and printed."
+  "In this example we create an uninitialized 
+   and an initialized integer point with the 
+   function POINT and then print their values."
 
   (with-point ((initialized-point (point))
 	       (point (point x y)))
     (format t "~%Pointer to initialized point: ~a~%~%" 
 	    initialized-point)
     (format t "POINT (x, y) = (~a, ~a)~%~%" 
-	    (point-x point)
-	    (point-y point))))
+	    (x point)
+	    (y point))))
 
 
 
@@ -1634,11 +1650,9 @@ LISP-CV: (MAKE-POINT-2D (X :INT) (Y :INT)) => POINT-2D
 
 C++: _Tp x, y
 
-LISP-CV: (POINT-2D-X (SELF POINT-2D)) => :DOUBLE
+LISP-CV: (X (SELF POINT-2D)) => :DOUBLE
 
-C++: _Tp x, y
-
-LISP-CV: (POINT-2D-Y (SELF POINT-2D)) => :DOUBLE
+LISP-CV: (Y (SELF POINT-2D)) => :DOUBLE
 
 
     Parameters:	
@@ -1650,25 +1664,24 @@ LISP-CV: (POINT-2D-Y (SELF POINT-2D)) => :DOUBLE
         Y - Y-coordinate of the point.
 
 
-POINT-2D creates a 2D point with double-float coordinates (usually zero-based). Functions POINT-2D-X 
-and POINT-2D-Y are used to extract the x,y coordinates of the double float point.
+POINT-2D creates a 2D point with double-float coordinates (usually zero-based). Methods X and Y are 
+used to extract the x,y coordinates of the double float point.
 
 
 (defun point-2d-example (x y)
 
   "In this example we create an uninitialized 
-   point-2d with the function POINT-2D. Then, w-
-   e create an initialized point-2d and list t-
-   he x,y,z coordinates with the functions PO-
-   INT2D-X and POINT-2D-Y."
+   and an initialized double float point with 
+   the function POINT-2D and then print their 
+   values."
 
   (let* ((point-2d-un-init (point-2d))
 	 (point-2d (point-2d x y)))
     (format t "~%Pointer to POINT-2D: ~a~%~%" 
 	    point-2d-un-init)
     (format t "POINT-2D (x, y) = (~a, ~a)~%~%" 
-	    (point-2d-x point-2d)
-	    (point-2d-y point-2d))))
+	    (x point-2d)
+	    (y point-2d))))
 
 
 
@@ -1693,11 +1706,9 @@ LISP-CV:  (MAKE-POINT-2F (X :FLOAT) (Y :FLOAT)) => POINT-2F
 
 C++: _Tp x, y
 
-LISP-CV: (POINT-2F-X (SELF POINT-2F)) => :INT
+LISP-CV: (X (SELF POINT-2F)) => :FLOAT
 
-C++: _Tp x, y
-
-LISP-CV: (POINT-2F-Y (SELF POINT-2F)) => :INT
+LISP-CV: (Y (SELF POINT-2F)) => :FLOAT
 
 
     Parameters:	
@@ -1709,25 +1720,24 @@ LISP-CV: (POINT-2F-Y (SELF POINT-2F)) => :INT
         Y - Y-coordinate of the point.
 
 
-POINT-2F creates a 2D point with single float coordinates (usually zero-based). Functions POINT-2F-X 
-and POINT-2F-Y are used to extract the x,y coordinates the single float point.
+POINT-2F creates a 2D point with single float coordinates (usually zero-based). Methods X and Y are 
+used to extract the x,y coordinates the single float point.
 
 
 (defun point-2f-example (x y)
 
   "In this example we create an uninitialized 
-   point-2f with the function POINT-2F. Then, w-
-   e create an initialized point-2f and list t-
-   he x,y coordinates with the functions POIN-
-   T2F-X and POINT-2F-Y."
+   and an initialized single float point with 
+   the function POINT-2F and then print their 
+   values."
 
   (let* ((point-2f-un-init (point-2f))
 	 (point-2f (point-2f x y)))
     (format t "~%Pointer to POINT-2F: ~a~%~%" 
 	    point-2f-un-init)
     (format t "POINT-2F (x, y) = (~a, ~a)~%~%" 
-	    (point-2f-x point-2f)
-	    (point-2f-y point-2f))))
+	    (x point-2f)
+	    (y point-2f))))
 
 
 
@@ -1752,15 +1762,11 @@ LISP-CV:  (MAKE-POINT-3D (X :DOUBLE) (Y :DOUBLE) (Z :DOUBLE)) => POINT-3D
 
 C++: _Tp x, y, z
 
-LISP-CV: (POINT-3D-X (SELF POINT-3D)) => :DOUBLE
+LISP-CV: (X (SELF POINT-3D)) => :DOUBLE
 
-C++: _Tp x, y, z
+LISP-CV: (Y (SELF POINT-3D)) => :DOUBLE
 
-LISP-CV: (POINT-3D-Y (SELF POINT-3D)) => :DOUBLE
-
-C++: _Tp x, y, z
-
-LISP-CV: (POINT-3D-Z (SELF POINT-3D)) => :DOUBLE
+LISP-CV: (Z (SELF POINT-3D)) => :DOUBLE
 
 
     Parameters:	
@@ -1774,26 +1780,25 @@ LISP-CV: (POINT-3D-Z (SELF POINT-3D)) => :DOUBLE
         Z - Z-coordinate of the point.
 
 
-POINT-3D creates a 3D point with double float coordinates (usually zero-based). Functions POINT-3D-X, 
-POINT-3D-Y AND POINT-3D-Z are used to extract the x,y,Z coordinates the double float point.
+POINT-3D creates a 3D point with double float coordinates (usually zero-based). methods X, Y and Z 
+are used to extract the x,y,Z coordinates the double float point.
 
 
 (defun point-3d-example (x y z)
 
   "In this example we create an uninitialized 
-   point-3d with the function POINT-3D. Then, w-
-   e create an initialized point-3d and list t-
-   he x,y,z coordinates with the functions PO-
-   INT3D-X, POINT-3D-Y and POINT-3D-Z."
+   and an initialized double float point with 
+   the function POINT-3D and then print their 
+   values."
 
   (let* ((point-3d-un-init (point-3d))
-        (point-3d (point-3d x y z)))
+	 (point-3d (point-3d x y z)))
     (format t "~%Pointer to POINT-3D: ~a~%~%" 
 	    point-3d-un-init)
     (format t "POINT-3D (x, y, z) = (~a, ~a, ~a)~%~%" 
-	    (point-3d-x point-3d)
-	    (point-3d-y point-3d)
-            (point-3d-z point-3d))))
+	    (x point-3d)
+	    (y point-3d)
+            (z point-3d))))
 
 
 
@@ -1818,11 +1823,11 @@ LISP-CV:  (MAKE-POINT-3F (X :FLOAT) (Y :FLOAT) (Z :FLOAT)) => POINT-3F
 
 C++: _Tp x, y, z
 
-LISP-CV: (POINT-3F-X (SELF POINT-3F)) => :FLOAT
+LISP-CV: (X (SELF POINT-3F)) => :FLOAT
 
-C++: _Tp x, y, z
+LISP-CV: (Y (SELF POINT-3F)) => :FLOAT
 
-LISP-CV: (POINT-3F-Y (SELF POINT-3F)) => :FLOAT
+LISP-CV: (Z (SELF POINT-3F)) => :FLOAT
 
 
     Parameters:	
@@ -1836,27 +1841,25 @@ LISP-CV: (POINT-3F-Y (SELF POINT-3F)) => :FLOAT
         Z - Z-coordinate of the point.
 
 
-POINT-3F creates a 3D point with single float coordinates (usually zero-based). Functions POINT-3F-X, 
-POINT3-F-Y and POINT-3F-Z are used to extract the x,y,Z coordinates the single float point.
+POINT-3F creates a 3D point with single float coordinates (usually zero-based). Methods X, Y and Z 
+are used to extract the x,y,Z coordinates the single float point.
 
 
 (defun point-3f-example (x y z)
 
   "In this example we create an uninitialized 
-   point-3f with the function POINT-3F. Then, w-
-   e create an initialized point-3f and list t-
-   he x,y,z coordinates with the functions PO-
-   INT3F-X, POINT-3F-Y and POINT-3F-Z."
+   and an initialized single float point with 
+   the function POINT-3F and then print their 
+   values."
 
   (let* ((point-3f-un-init (point-3f))
 	 (point-3f (point-3f x y z)))
     (format t "~%Pointer to POINT-3F: ~a~%~%" 
 	    point-3f-un-init)
     (format t "POINT-3F (x, y, z) = (~a, ~a, ~a)~%~%" 
-	    (point-3f-x point-3f)
-	    (point-3f-y point-3f)
-            (point-3f-z point-3f))))
-
+	    (x point-3f)
+	    (y point-3f)
+            (z point-3f))))
 
 
 POINT-3I
@@ -1880,11 +1883,11 @@ LISP-CV:  (MAKE-POINT-3I (X :INT) (Y :INT) (Z :INT)) => POINT-3I
 
 C++: _Tp x, y, z
 
-LISP-CV: (POINT-3I-X (SELF POINT-3I)) => :INT
+LISP-CV: (X (SELF POINT-3I)) => :INT
 
-C++: _Tp x, y, z
+LISP-CV: (Y (SELF POINT-3I)) => :INT
 
-LISP-CV: (POINT-3I-Y (SELF POINT-3I)) => :INT
+LISP-CV: (Z (SELF POINT-3I)) => :INT
 
 
     Parameters:	
@@ -1898,27 +1901,24 @@ LISP-CV: (POINT-3I-Y (SELF POINT-3I)) => :INT
         Z - Z-coordinate of the point.
 
 
-POINT-3I creates a 3D point with integer coordinates (usually zero-based). Functions POINT-3I-X, 
-POINT-3I-Y and POINT-3I-Z are used to extract the x,y,Z coordinates of the type integer point.
+POINT-3I creates a 3D point with integer coordinates (usually zero-based). Methods X, Y and Z are 
+used to extract the x,y,Z coordinates of the type integer point.
 
 
 (defun point-3i-example (x y z)
 
   "In this example we create an uninitialized 
-   point-3i with the function POINT-3I. Then, w-
-   e create an initialized point-3i and list t-
-   he x,y,z coordinates with the functions PO-
-   INT3I-X, POINT-3I-Y and POINT-3I-Z."
+   and an initialized integer point with the 
+   function POINT-3I and print their values."
 
   (let* ((point-3i-un-init (point-3i))
 	 (point-3i (point-3i x y z)))
     (format t "~%Pointer to POINT-3I: ~a~%~%" 
 	    point-3i-un-init)
     (format t "POINT-3I (x, y, z) = (~a, ~a, ~a)~%~%" 
-	    (point-3i-x point-3i)
-	    (point-3i-y point-3i)
-            (point-3i-z point-3i))))
-
+	    (x point-3i)
+	    (y point-3i)
+            (z point-3i))))
 
 
 PRINT-MAT
@@ -2251,14 +2251,10 @@ ROTATED-RECT
 Functions representing rotated (i.e. not up-right) rectangles on a plane and the associated functions 
 used to retrieve their values.
 
-Note: Both ROTATED-RECT and MAKE-ROTATED-RECT are provided in this library. The first, to match OpenCV's 
-naming conventions, the second, to adhere to Common Lisp naming conventions. MAKE-ROTATED-RECT is the function 
-used to construct a ROTATED-RECT object and that is its only function. ROTATED-RECT has the same functionality 
-as MAKE-ROTATED-RECT but when the keyword :BOUNDING-RECT, :CENTER or :SIZE is supplied as the first parameter 
-and an already instantiated ROTATED-RECT object is supplied as the second parameter, the ROTATED-RECT function 
-will return the corresponding value of the supplied ROTATED-RECT object. I use the ROTATED-RECT function in the 
-examples in this file because it will make them easier to compare with OpenCV examples you find online, thus making 
-this library easier to learn.
+Note: Both ROTATED-RECT and MAKE-ROTATED-RECT are provided in this library. The first, to match OpenCV's naming 
+conventions, the second, to adhere to Common Lisp naming conventions. Except for the name, they are 
+the same function. I use the ROTATED-RECT function in the examples in this file because it will make them 
+easier to compare with OpenCV examples you find online, thus making this library easier to learn.
 
 C++: RotatedRect::RotatedRect(const Point2f& center, const Size2f& size, float angle)
 
@@ -2266,17 +2262,21 @@ LISP-CV: (ROTATED-RECT (CENTER POINT) (SIZE SIZE) (ANGLE :FLOAT)) => ROTATED-REC
 
 LISP-CV: (MAKE-ROTATED-RECT (CENTER POINT) (SIZE SIZE) (ANGLE :FLOAT)) => ROTATED-RECT
 
+C++: float RotatedRect::angle const
+
+LISP-CV: (ANGLE (SELF ROTATED-RECT)) => :FLOAT
+
 C++: Rect RotatedRect::boundingRect() const
 
-LISP-CV: (ROTATED-RECT :BOUNDING-RECT (SELF ROTATED-RECT)) => RECT
+LISP-CV: (BOUNDING-RECT (SELF ROTATED-RECT)) => RECT
 
 C++: Point2f RotatedRect::center() 
 
-LISP-CV: (ROTATED-RECT :CENTER (SELF ROTATED-RECT)) => POINT
+LISP-CV: (CENTER (SELF ROTATED-RECT)) => POINT
 
 C++: Size2f RotatedRect::size() 
 
-LISP-CV: (ROTATED-RECT :SIZE (SELF ROTATED-RECT)) => SIZE
+LISP-CV: (SIZE (SELF ROTATED-RECT)) => SIZE
 
 
         Parameters:	
@@ -2293,19 +2293,24 @@ LISP-CV: (ROTATED-RECT :SIZE (SELF ROTATED-RECT)) => SIZE
 
 (defun rotated-rect-example ()
 
-  ;;Set the ROTATED-RECT location
+  ;;Set the ROTATED-RECT center
   (let* ((box-loc (point 0 0))
 	 ;;Set the ROTATED-RECT size
 	 (box-size (size 100 100))
 	 ;;Set the ROTATED-RECT angle
 	 (box-angle 360f0)
-	 (box (rotated-rect box-loc box-size box-angle)))
+         ;;Create the ROTATED-RECT object
+	 (box (rotated-rect box-loc box-size box-angle))
+         ;;Access the ROTATED-RECT BOUNDING-RECT member
+         (bounding-rect (bounding-rect box)))
     (format t "~%The location of the ROTATED-RECT = (~a, ~a)~%" 
-	    (point-x (rotated-rect :center box)) (point-y (rotated-rect :center box)))
+	    (x (center box)) (y (center box)))
     (format t "~%The (width, height) of the ROTATED-RECT = (~a, ~a)~%" 
-	    (width (rotated-rect :size box)) (height (rotated-rect :size box)))
-    (format t "~%The angle of the ROTATED-RECT = ~a~%~%" box-angle)))
-
+	    (width (size box)) (height (size box)))
+    (format t "~%The angle of the ROTATED-RECT = ~a~%~%" (angle box))
+(format t "Bounding rectangle of the ROTATED-RECT = ~a~%~%" bounding-rect)
+    (format t "(x, y, width, height) of BOUNDING-RECT = (~a, ~a, ~a, ~a)~%~%" 
+	  (x bounding-rect) (y bounding-rect) (width bounding-rect) (height bounding-rect))))
 
 
 
@@ -2525,7 +2530,7 @@ C++: int Range::size() const;
 
 LISP-CV: (SIZE (SELF RANGE)) => :INT
 
-C++: Rect_::Size_<_Tp> size() const;
+C++: Size_<_Tp> size() const;
 
 LISP-CV: (SIZE (SELF RECT)) => SIZE
 
@@ -4780,9 +4785,9 @@ See also
                            ;Run MIN-MAX-LOC to set point 
                            ;coordinates for each match
 			   (min-max-loc matches minval maxval minloc maxloc)
-			   (rectangle frame (gc:point (point-x minloc) (point-y minloc)) 
-				      (gc:point (+ (point-x minloc) (cols tpl)) 
-					     (+ (point-y minloc) (rows tpl))) 
+			   (rectangle frame (gc:point (x minloc) (y minloc)) 
+				      (gc:point (+ (x minloc) (cols tpl)) 
+					     (+ (y minloc) (rows tpl))) 
 				      color 10 0 0)
 			   ;Show image, template and matches in a window
 			   (imshow window-name-1 tpl)
@@ -5088,9 +5093,9 @@ for a description and formulae
 			     ;Run MIN-MAX-LOC to set point 
 			     ;coordinates for each match
 			     (min-max-loc matches minval maxval minloc maxloc)
-			     (rectangle frame (gc:point (point-x minloc) (point-y minloc)) 
-					(gc:point (+ (point-x minloc) (cols templ)) 
-						  (+ (point-y minloc) (rows templ))) 
+			     (rectangle frame (gc:point (x minloc) (y minloc)) 
+					(gc:point (+ (x minloc) (cols templ)) 
+						  (+ (y minloc) (rows templ))) 
 					color 10 0 0)
 			     ;Show image, template and matches and DEST in a window
 			     (imshow window-name-1 templ)
@@ -6059,19 +6064,19 @@ That is, the following code renders some text, the tight box surrounding it, and
 	    (with-point((text-org (point (round (/ (- (cols img) (width text-size)) 2)) 
 					 (round (/ (- (rows img) (height text-size)) 2))))
                         ;; Set rectangle coordinates
-			(pt1 (point (point-x text-org) (round (+ (point-y text-org) 
+			(pt1 (point (x text-org) (round (+ (y text-org) 
 								 (mem-aref base-line :int)))))
 
-			(pt2 (point (round (+ (point-x text-org) (width text-size))) 
-				    (round (- (point-y text-org) (height text-size))))))
+			(pt2 (point (round (+ (x text-org) (width text-size))) 
+				    (round (- (y text-org) (height text-size))))))
 
 	      (with-scalar ((color (scalar 0 0 255)))
                 ;; Draw the box 
 		(rectangle img pt1 pt2 color)
-		(with-point ((pt1 (point (point-x text-org) (round (+ (point-y text-org) 
+		(with-point ((pt1 (point (x text-org) (round (+ (y text-org) 
 								      thickness))))
-			     (pt2 (point (+ (point-x text-org) (round (width text-size))) 
-					 (+ (point-y text-org) thickness))))
+			     (pt2 (point (+ (x text-org) (round (width text-size))) 
+					 (+ (y text-org) thickness))))
                   ;; Draw the baseline 
 		  (line img pt1 pt2 color)
 
@@ -13426,7 +13431,7 @@ Example:
 	      (progn
 		(setf pt (gc:point x y))
 		(setf color (gc:scalar-all 255))
-		(if (< (point-x prev-pt) 0)
+		(if (< (x prev-pt) 0)
 		    (setf prev-pt pt))
 		(line in-paint-mask prev-pt pt color 5 8 0)
 		(line img prev-pt pt color 5 8 0)
@@ -14288,19 +14293,19 @@ functionality as MAKE-SCALAR and MAKE-SCALAR-ALL(respectively). I use the SCALAR
 functions in the examples in this file because it makes them easier to compare with OpenCV examples 
 you find online, thus making this library easier to learn.
 
-C++:  Scalar_::Scalar_();
+C++:  Scalar_();
 
 LISP-CV:  (SCALAR) => SCALAR
 
 LISP-CV:  (MAKE-SCALAR) => SCALAR
 
-C++: Scalar_::Scalar_(_Tp v0, _Tp v1, _Tp v2, _Tp v3)
+C++: Scalar_(_Tp v0, _Tp v1, _Tp v2, _Tp v3)
 
 LISP-CV:  (SCALAR ((VAL0 :DOUBLE) &OPTIONAL ((VAL1 :DOUBLE) 0) ((VAL2 :DOUBLE) 0) ((VAL3 :DOUBLE) 0))) => SCALAR
 
 LISP-CV:  (MAKE-SCALAR ((VAL0 :DOUBLE) &OPTIONAL ((VAL1 :DOUBLE) 0) ((VAL2 :DOUBLE) 0) ((VAL3 :DOUBLE) 0))) => SCALAR
 
-C++: Scalar_::Scalar_<_Tp>::all(_Tp v0)
+C++: Scalar_<_Tp>::all(_Tp v0)
 
 LISP-CV:  (SCALAR-ALL (VAL0123 :DOUBLE)) => SCALAR
 
@@ -15340,11 +15345,11 @@ a clone of a RECT object. It was created from scratch in C and then bound in Lis
 	      (width size)
 	      (height size))
       (format t "~%The top-left corner of RECTANGLE = (~a, ~a)~%" 
-	      (point-x tl-corner)
-	      (point-y tl-corner))
+	      (x tl-corner)
+	      (y tl-corner))
       (format t "~%The bottom-right corner of RECTANGLE = (~a, ~a)~%" 
-	      (point-x br-corner)
-	      (point-y br-corner)))
+	      (x br-corner)
+	      (y br-corner)))
 
   ;Create a clone of RECTANGLE and find its size(width, 
   ;height), location and size(x, y, width, height) and 
@@ -15365,11 +15370,11 @@ a clone of a RECT object. It was created from scratch in C and then bound in Lis
 		(width clone-size)
 		(height clone-size))
 	(format t "~%The top-left corner of RECTANGLE-CLONE = (~a, ~a)~%" 
-		(point-x clone-tl-corner)
-		(point-y clone-tl-corner))
+		(x clone-tl-corner)
+		(y clone-tl-corner))
 	(format t "~%The bottom-right corner of RECTANGLE-CLONE = (~a, ~a)~%~%" 
-		(point-x clone-br-corner)
-		(point-y clone-br-corner))))))
+		(x clone-br-corner)
+		(y clone-br-corner))))))
 
 
 
@@ -15742,11 +15747,11 @@ CV> (DEFPARAMETER A (POINT 1 2)) ;A POINT is created
 
 A
 
-CV> (POINT-X A) ;The x coordinate of A is retrieved
+CV> (X A) ;The x coordinate of A is retrieved
 
 1
 
-CV> (POINT-Y A) ;The y coordinate of A is retrieved
+CV> (Y A) ;The y coordinate of A is retrieved
 
 2
 
@@ -15755,11 +15760,11 @@ CV> (DEL-POINT A) ; A is deleted with DEL-POINT
 ; No value
 
 
-CV> (POINT-X A) ; The memory has been deallocated
+CV> (X A) ; The memory has been deallocated
 
 0
 
-CV> (POINT-Y A)
+CV> (Y A)
 
 0
 
@@ -15880,7 +15885,7 @@ LISP-CV  <===>  C++
 ===========================     
 VECTOR-CHAR <===> vector<char>
 ===============================      
-VECTOR-DMATCH <===> vector<DMatch> (VECTOR-DMATCH operates a differently from the rest.
+VECTOR-DMATCH <===> vector<DMatch> (VECTOR-DMATCH operates differently from the rest.
 ===============================     See note at the end of the VECTOR-* documentation)    
 VECTOR-DOUBLE <===> vector<double> 
 =============================      
@@ -16142,7 +16147,7 @@ And also retrieve the length of the vector:
 
 (VECTOR-POINT :LENGTH A)
 
-2  <--- Vector a length,
+2  <--- Vector A length
 
 
 
@@ -16163,19 +16168,31 @@ CV> (VECTOR-DMATCH A 0 1 :INT)
 2
 
 If a VECTOR-DMATCH contains a 3 element DMATCH, the value you entered 
-as the 3rd parameter will be accessible at the 4th index(This is just 
-a workaround until I come up with a better solution) e.g.
+as the 3rd parameter will be accessible at the 4th index because on a
+3 element DMATCH the 3rd parameter contains the value of the OpenCV C++ 
+DMatch class distance member and that member is the fourth member in the 
+OpenCV DMatch class. If you access the value at the 3rd index you will be 
+retrieving the value of the OpenCv DMatch class imgIdx(IMG-IDX in Lisp-CV) 
+member which is of int type and has a default value of -1, e.g:
 
-CV> (VECTOR-DMATCH A 0 2 :FLOAT)  
-    
-#<SINGLE-FLOAT quiet NaN>                                
 
-CV> (VECTOR-DMATCH A 0 2 :INT) 
+CV> (VECTOR-DMATCH A 0 2 :INT) <== IMG-IDX 
                                     
 -1                                   
                                      
-CV> (VECTOR-DMATCH A 0 3 :FLOAT) 
+CV> (VECTOR-DMATCH A 0 3 :FLOAT) <== DISTANCE
 
 3.0
+
+You may also use the accessor methods as below:
+
+CV> (IMG-IDX (VECTOR-DMATCH A 0))
+
+-1
+
+CV> (DISTANCE (VECTOR-DMATCH A 0))
+
+3.0
+
 ========================================================================================================================================
 

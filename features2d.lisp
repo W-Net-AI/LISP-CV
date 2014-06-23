@@ -16,9 +16,11 @@
   (octaves :int)
   (pattern-scale :float))
 
+
 (defun brisk (&optional (thresh 30) (octaves 3) (pattern-scale 1.0f0))
   "The BRISK constructor"
    (%brisk thresh octaves pattern-scale))
+
 
 (defun make-brisk (&optional (thresh 30) (octaves 3) (pattern-scale 1.0f0))
   "The BRISK constructor"
@@ -34,6 +36,7 @@
   (self feature-2d)
   (detector-type :string))
 
+
 (defun feature-detector-create (self detector-type)
   "Creates a feature detector by its name."
    (%feature-detector-create self detector-type))
@@ -46,6 +49,7 @@
   (image mat)
   (key-points vector-key-point)
   (mask mat))
+
 
 (defun feature-detector-detect (self image keypoints &optional (mask (%mat) given-mask))
   "Detects keypoints in an image."
@@ -75,9 +79,11 @@
   (norm-type :int)
   (cross-check :boolean))
 
+
 (defun bf-matcher (&optional (norm-type +norm-l2+) (cross-check nil))
   "Brute-force matcher constructor."
    (%bf-matcher norm-type cross-check))
+
 
 (defun make-bf-matcher (&optional (norm-type +norm-l2+) (cross-check nil))
   "Brute-force matcher constructor."
@@ -90,9 +96,11 @@
   (self feature-2d)
   (descriptor-matcher-type *string))
 
+
 (defun descrip-matcher-create (self descriptor-matcher-type)
   "Creates a descriptor matcher of a given type with the default parameters (using default constructor)."
    (%descrip-matcher-create self (%c-string-to-string descriptor-matcher-type (length descriptor-matcher-type))))
+
 
 
 ;; void DescriptorMatcher::match(const Mat& queryDescriptors, const Mat& trainDescriptors, 
@@ -104,6 +112,7 @@
   (train-descriptors mat)
   (matches vector-dmatch)
   (mask mat))
+
 
 (defun descrip-matcher-match (self query-descriptors train-descriptors matches &optional (mask (%mat) given-mask))
   "Finds the best match for each descriptor from a query set."
