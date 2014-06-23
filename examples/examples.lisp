@@ -962,11 +962,11 @@ POINT-*
   (with-point-2f ((point-2f-1 (point-2f 1.0f0 2.0f0))
 		  (point-2f-2 (point-2f 3.0f0 4.0f0)))
     (format t "~%The dot product of POINT-2F-1 and POINT-2F-2 = ~a~%~%"  
-	    (dot-2f point-2f-1 point-2f-2)))
+	    (dot point-2f-1 point-2f-2)))
   (with-point-3d ((point-3d-1 (point-3d 13.0d0 14.0d0 15.0d0))
 		  (point-3d-2 (point-3d 16.0d0 17.0d0 18.0d0)))
     (format t "~%The dot product of POINT-3D-1 and POINT-3D-2 = ~a~%~%"  
-	    (dot-3d point-3d-1 point-3d-2)))
+	    (dot point-3d-1 point-3d-2)))
   (with-point-3f ((point-3f-1 (point-3f 7.0f0 8.0f0 9.0f0))
 		  (point-3f-2 (point-3f 10.0f0 11.0f0 12.0f0)))
     (format t "~%The dot product of POINT-3F-1 and POINT-3F-2 = ~a~%~%"  
@@ -2598,9 +2598,9 @@ LISP-CV: (MAKE-SIZE-2F (WIDTH :FLOAT) (HEIGHT :FLOAT)) => SIZE
 
 C++: _Tp width, height
 
-LISP-CV: (WIDTH-2F (SELF SIZE-2F)) => :INT
+LISP-CV: (WIDTH (SELF SIZE-2F)) => :INT
 
-LISP-CV: (HEIGHT-2F (SELF SIZE-2F)) => :INT
+LISP-CV: (HEIGHT (SELF SIZE-2F)) => :INT
 
 
     Parameters:	
@@ -11614,8 +11614,8 @@ This function is parallelized with the TBB library.
 	  (dotimes (index-current (length faces-list))
 	    ;Get the area of current element (detected face)
             ;AREA-CURRENT is area of current element
-	    (setf area-current (* (rect-width (nth index-current faces-list))  ;AREA-CURRENT is area 
-   				  (rect-height (nth index-current faces-list)))) ;of current element
+	    (setf area-current (* (width (nth index-current faces-list))  ;AREA-CURRENT is area 
+   				  (height (nth index-current faces-list)))) ;of current element
             ;INDEX-BIGGEST is index of the biggest element
 	    (setf roi (gc:clone (nth index-biggest faces-list))) 
 
@@ -11623,8 +11623,8 @@ This function is parallelized with the TBB library.
             ;beginning it is same as current element
         
             ;AREA-BIGGEST is area of the biggest element
-	    (setf area-biggest (* (rect-width (nth index-biggest faces-list)) 
-                                  (rect-height (nth index-biggest faces-list)))) 
+	    (setf area-biggest (* (width (nth index-biggest faces-list)) 
+                                  (height (nth index-biggest faces-list)))) 
             (if (> area-current area-biggest)
 		(progn 
 		  (setf index-biggest index-current)
@@ -11642,18 +11642,18 @@ This function is parallelized with the TBB library.
 
 	    (imwrite filename gray)
 	    ;Display detected faces on main window - live stream from camera
-	    (with-point ((pt1 (point (rect-x (nth index-current faces-list)) 
-				     (rect-y (nth index-current faces-list))))
-			 (pt2 (point (+ (rect-x (nth index-current faces-list)) 
-					(rect-height (nth index-current faces-list)))
-				     (+ (rect-y (nth index-current faces-list)) 
-					(rect-width (nth index-current faces-list))))))
+	    (with-point ((pt1 (point (x (nth index-current faces-list)) 
+				     (y (nth index-current faces-list))))
+			 (pt2 (point (+ (x (nth index-current faces-list)) 
+					(height (nth index-current faces-list)))
+				     (+ (y (nth index-current faces-list)) 
+					(width (nth index-current faces-list))))))
 	      (with-scalar ((color1 (scalar 0 255 0)))
 		(rectangle frame pt1 pt2 color1 2 8 0))))
 
 	(setf text (concatenate 'string "Crop area size: " 
-				(write-to-string (rect-width roi)) "x" 
-				(write-to-string (rect-height roi)) " Filename: " 
+				(write-to-string (width roi)) "x" 
+				(write-to-string (height roi)) " Filename: " 
 				(write-to-string filename))))
 	(with-point ((org (point 30 30)))
 	  (with-scalar ((color2 (scalar 0 0 255)))	
@@ -11667,7 +11667,7 @@ This function is parallelized with the TBB library.
 				     (width *default-width*)
 				     (height *default-height*))
 
-  ;Setting width/height to 2 less than default width-height vastly
+  ;Setting width/height to 2 less than default width/height vastly
   ;improves the speed of DETECT-MULTI-SCALE in this example
   (with-captured-camera (cap cam :width (- width 2) :height (- height 2))
     (let ((window-name "Original - DETECT-MULTI-SCALE Example"))
@@ -15261,25 +15261,25 @@ LISP-CV:  (MAKE-RECT (X :INT) (Y :INT) (:WIDTH :INT) (HEIGHT :INT)) => RECT
 
 C++: _Tp x, y, width, height;
 
-LISP-CV: (RECT-X (SELF RECT)) => :INT
+LISP-CV: (X (SELF RECT)) => :INT
 
-LISP-CV: (RECT-Y (SELF RECT)) => :INT
+LISP-CV: (Y (SELF RECT)) => :INT
 
-LISP-CV: (RECT-WIDTH (SELF RECT)) => :INT
+LISP-CV: (WIDTH (SELF RECT)) => :INT
 
-LISP-CV: (RECT-HEIGHT (SELF RECT)) => :INT
+LISP-CV: (HEIGHT (SELF RECT)) => :INT
 
 C++: Size_<_Tp> size() const;
 
-LISP-CV: (RECT-SIZE (SELF RECT)) => SIZE
+LISP-CV: (SIZE (SELF RECT)) => SIZE
 
 C++: Point_<_Tp> tl() const;
 
-LISP-CV: (RECT-TL (SELF RECT)) => POINT
+LISP-CV: (TL (SELF RECT)) => POINT
 
 C++: Point_<_Tp> br() const;
 
-LISP-CV: (RECT-BR (SELF RECT)) => POINT
+LISP-CV: (BR (SELF RECT)) => POINT
 
 C: Rect* cv_Rect_clone(Rect* self) 
 
@@ -15332,13 +15332,13 @@ a clone of a RECT object. It was created from scratch in C and then bound in Lis
   
   (format t "~%RECTANGLE:~%")
   (with-rect ((rectangle (rect x y width height)))
-    (let* ((x (rect-x rectangle))
-	   (y (rect-y rectangle))
-	   (width (rect-width rectangle))
-	   (height (rect-height rectangle))
-           (size (rect-size rectangle))
-	   (tl-corner (rect-tl rectangle))
-	   (br-corner (rect-br rectangle)))
+    (let* ((x (x rectangle))
+	   (y (y rectangle))
+	   (width (width rectangle))
+	   (height (height rectangle))
+           (size (size rectangle))
+	   (tl-corner (tl rectangle))
+	   (br-corner (br rectangle)))
       (format t "~%The (x, y, width, height) of RECTANGLE = (~a, ~a, ~a, ~a)~%" 
 	      x y width height)
       (format t "~%The size(width, height) of RECTANGLE = (~a, ~a)~%" 
@@ -15357,13 +15357,13 @@ a clone of a RECT object. It was created from scratch in C and then bound in Lis
 
     (format t "~%~%RECTANGLE-CLONE:~%")
     (with-rect ((rectangle-clone (clone rectangle))) 
-      (let* ((clone-x (rect-x rectangle-clone))
-	     (clone-y (rect-y rectangle-clone))
-	     (clone-width (rect-width rectangle-clone))
-	     (clone-height (rect-height rectangle-clone))
-             (clone-size (rect-size rectangle-clone))
-	     (clone-tl-corner (rect-tl rectangle-clone))
-	     (clone-br-corner (rect-br rectangle-clone)))
+      (let* ((clone-x (x rectangle-clone))
+	     (clone-y (y rectangle-clone))
+	     (clone-width (width rectangle-clone))
+	     (clone-height (height rectangle-clone))
+             (clone-size (size rectangle-clone))
+	     (clone-tl-corner (tl rectangle-clone))
+	     (clone-br-corner (br rectangle-clone)))
 	(format t "~%The (x, y, width, height) of RECTANGLE-CLONE = (~a, ~a, ~a, ~a)~%" 
 		clone-x clone-y clone-width clone-height)
 	(format t "~%The size(width, height) of RECTANGLE-CLONE = (~a, ~a)~%" 

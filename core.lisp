@@ -1313,27 +1313,6 @@
 	(t nil)))
 
 
-;; Size* cv_Size_assignTo(Size* self, Size* other) 
-(defcfun ("cv_Size_assignTo" size-assgn-to) size
-  "Assign data from one SIZE object to another,
-   OTHER to SELF."
-  (self size)
-  (other size))
-
-
-;; Size* cv_Size_fromPoint(Point* p)
-(defcfun ("cv_Size_fromPoint" size-from-point) size
-  "Create a SIZE object from POINT data."
-  (p point))
-
-
-;; _Tp width, height
-;; double cv_Size_height(Size* self) 
-(defcfun ("cv_Size_height" size-height) :double
-  "Gets the height of a SIZE construct"
-  (self size))
-
-
 ;; Size_<float>()
 ;; Size2f* cv_create_Size2f(float width, float height)
 (defcfun ("cv_create_Size2f" size-2f-0) size-2f)
@@ -1372,17 +1351,38 @@
 
 
 ;; _Tp width, height
-;; double cv_Size_width(Size* self) 
-(defcfun ("cv_Size_width" size-width) :double
-  "Gets the width of a SIZE construct"
-  (self size))
-
-
-;; _Tp width, height
 ;; float cv_Size2f_width(Size* self) 
 (defcfun ("cv_Size2f_width" size-2f-width) :float
   "Gets the width of a SIZE-2F"
   (self size-2f))
+
+
+;; Size* cv_Size_assignTo(Size* self, Size* other) 
+(defcfun ("cv_Size_assignTo" size-assgn-to) size
+  "Assign data from one SIZE object to another,
+   OTHER to SELF."
+  (self size)
+  (other size))
+
+
+;; Size* cv_Size_fromPoint(Point* p)
+(defcfun ("cv_Size_fromPoint" size-from-point) size
+  "Create a SIZE object from POINT data."
+  (p point))
+
+
+;; _Tp width, height
+;; double cv_Size_height(Size* self) 
+(defcfun ("cv_Size_height" size-height) :double
+  "Gets the height of a SIZE construct"
+  (self size))
+
+
+;; _Tp width, height
+;; double cv_Size_width(Size* self) 
+(defcfun ("cv_Size_width" size-width) :double
+  "Gets the width of a SIZE construct"
+  (self size)) 
 
 
 ;; size_t cv_Mat_get_Step(Mat* self) 
@@ -2176,16 +2176,16 @@
   (mat-dot self other))
 
 
+(defmethod dot ((self cv-point) (other cv-point))
+  (dot-2i self other))
+
+
 (defmethod dot ((self cv-point-2d) (other cv-point-2d))
   (dot-2d self other))
 
 
 (defmethod dot ((self cv-point-2f) (other cv-point-2f))
   (dot-2f self other))
-
-
-(defmethod dot ((self cv-point) (other cv-point))
-  (dot-2i self other))
 
 
 (defmethod dot ((self cv-point-3d) (other cv-point-3d))
@@ -2209,7 +2209,7 @@
 
 
 (defmethod height ((self cv-size-2f))
-  (mem-aref (c-pointer self) :int 1))
+  (mem-aref (c-pointer self) :float 1))
 
 
 (defmethod size ((arg cv-key-point) &rest args)
@@ -2256,7 +2256,7 @@
 
 
 (defmethod width ((self cv-size-2f))
-  (mem-aref (c-pointer self) :int))
+  (mem-aref (c-pointer self) :float))
 
 
 (defmethod x ((self cv-key-point))
