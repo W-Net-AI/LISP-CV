@@ -66,6 +66,7 @@
 (defcfun ("cv_Mat_clone" clone-mat) (cv::mat :garbage-collect t)
 	 (self cv::mat))
 
+
 (defmethod clone ((self cv::cv-mat))
   "Creates a full copy of the array and the underlying data."
   (clone-mat self))
@@ -94,6 +95,7 @@
 	 (self cv::mat)
 	 (d :int))
 
+
 (defun diag (self &optional (d 0))
        "Extracts a diagonal from a matrix."
        (%diag self d))
@@ -111,6 +113,7 @@
 (defcfun ("cv_create_DMatch" dmatch-0) (cv::dmatch :garbage-collect t)
 	 "DMatch constructor")
 
+
 ;; DMatch( int _queryIdx, int _trainIdx, float _distance ) 
 ;; DMatch* cv_create_DMatch3(int _queryIdx, int _trainIdx, float _distance)
 (defcfun ("cv_create_DMatch3" dmatch-3) (cv::dmatch :garbage-collect t)
@@ -118,6 +121,7 @@
 	 (query-idx :int)
 	 (train-idx :int)
 	 (distance :float))
+
 
 ;; DMatch( int _queryIdx, int _trainIdx, int _imgIdx, float _distance )
 ;; DMatch* cv_create_DMatch4(int _queryIdx, int _trainIdx, int _imgIdx, float _distance)
@@ -128,6 +132,7 @@
 	 (img-idx :int)
 	 (distance :float))
 
+
 (defun dmatch (&rest args)
        (cond ((eq (first args) nil)
 	      (dmatch-0))
@@ -136,6 +141,7 @@
 	       ((fourth args)
 		(dmatch-4 (first args) (second args) (third args) (fourth args)))
 		(t nil)))
+
 
 (defun make-dmatch (&rest args)
        (cond ((eq (first args) nil)
@@ -157,6 +163,7 @@
 ;; KeyPoint* cv_create_KeyPoint()
 (defcfun ("cv_create_KeyPoint" key-point-0) (cv::key-point :garbage-collect t)
 	 "KEY-POINT constructor")
+
 
 ;; KeyPoint::KeyPoint(float x, float y, float _size, float _angle=-1, float _response=0, int _octave=0, int _class_id=-1)
 ;; KeyPoint* cv_create_KeyPoint7(float x, float y, float _size, float _angle, float _response, int _octave, int _class_id)
@@ -200,6 +207,7 @@
 	 (cols :int)
 	 (type :int)
 	 (data :pointer))
+
 
 (let ((previous nil))
      (defun make-mat-data (rows cols type &rest args)
@@ -253,6 +261,7 @@
 (defcfun ("cv_Mat_size" mat-size) (cv::size :garbage-collect t)
 	 (self cv::mat))
 
+
 (defmethod size ((arg cv::cv-mat) &rest args)
   args
   (mat-size arg))
@@ -272,6 +281,7 @@
 	 (rows :int)
 	 (cols :int)
 	 (type :int))
+
 
 (defcfun ("cv_create_Mat_typed" make-mat-typed) (cv::mat :garbage-collect t)
 	 "MAT constructor with a row, column and type parameter."
@@ -357,6 +367,7 @@
 	(t nil)))
 
 
+
 ;; static MatExpr Mat::zeros(int rows, int cols, int type)
 ;; Mat* cv_create_zeros(int rows, int cols, int type)
 (defcfun ("cv_create_zeros" mat-zeros) (cv::mat :garbage-collect t)
@@ -384,11 +395,13 @@
 ;; Point2##t * cv_create_Point2##t ( tn x,  tn y)
 (defcfun ("cv_create_Point2i" point-0) (cv::point :garbage-collect t))
 
+
 ;; Point_(_Tp _x, _Tp _y)
 ;; Point2##t * cv_create_Point2##t ( tn x,  tn y) 
 (defcfun ("cv_create_Point2i" point-2) (cv::point :garbage-collect t)
 	 (x :int)
 	 (y :int))
+
 
 (defun point (&optional x y)
   "Point constructor"
@@ -397,6 +410,7 @@
 	      ((and x y)
 	       (point-2 x y))
 	       (t nil)))
+
 
 (defun make-point (&optional x y)
   "Point constructor"
@@ -426,6 +440,7 @@
 (defcfun ("cv_create_Point2d" point-2d-0) (cv::point-2d :garbage-collect t) 
 	 "Point2d constructor")
 
+
 ;; typedef Point_<double> Point2d
 ;; Point2##t * cv_create_Point2##t ( tn x,  tn y)  
 (defcfun ("cv_create_Point2d" point-2d-2) (cv::point-2d :garbage-collect t) 
@@ -433,12 +448,14 @@
 	 (x :double)
 	 (y :double))
 
+
 (defun point-2d (&optional x y)
        (cond ((eq (or x y) nil)
 	      (point-2d-0))
 	      ((and x y)
 	       (point-2d-2 x y))
 	       (t nil)))
+
 
 (defun make-point-2d (&optional x y)
        (cond ((eq (or x y) nil)
@@ -467,6 +484,7 @@
 (defcfun ("cv_create_Point2f" point-2f-0) (cv::point-2f :garbage-collect t) 
 	 "Point2f constructor")
 
+
 ;; typedef Point_<float> Point2f
 ;; Point2##t * cv_create_Point2##t ( tn x,  tn y)  
 (defcfun ("cv_create_Point2f" point-2f-2) (cv::point-2f :garbage-collect t) 
@@ -474,12 +492,14 @@
 	 (x :float)
 	 (y :float))
 
+
 (defun point-2f (&optional x y)
        (cond ((eq (or x y) nil)
 	      (point-2f-0))
 	      ((and x y)
 	       (point-2f-2 x y))
 	       (t nil)))
+
 
 (defun make-point-2f (&optional x y)
        (cond ((eq (or x y) nil)
@@ -508,6 +528,7 @@
 (defcfun ("cv_create_Point3d" point-3d-0) (cv::point-3d :garbage-collect t) 
 	 "Point3d constructotr")
 
+
 ;; typedef Point3_<double> Point3d
 ;; Point3##t * cv_create_Point3##t ( tn x,  tn y,  tn z) 
 (defcfun ("cv_create_Point3d" point-3d-2) (cv::point-3d :garbage-collect t) 
@@ -516,12 +537,14 @@
 	 (y :double)
 	 (z :double))
 
+
 (defun point-3d (&optional x y z)
        (cond ((eq (or x y) nil)
 	      (point-3d-0))
 	      ((and x y)
 	       (point-3d-2 x y z))
 	       (t nil)))
+
 
 (defun make-point-3d (&optional x y z)
        (cond ((eq (or x y) nil)
@@ -609,6 +632,7 @@
 (defcfun ("cv_create_Point3i" point-3i-0) (cv::point-3i :garbage-collect t) 
 	 "Point3i constructor")
 
+
 ;; typedef Point3_<double> Point3d
 ;; Point3##t * cv_create_Point3##t ( tn x,  tn y,  tn z)  
 (defcfun ("cv_create_Point3i" point-3i-2) (cv::point-3i :garbage-collect t)
@@ -617,12 +641,14 @@
 	 (y :int)
 	 (z :int))
 
+
 (defun point-3i (&optional x y z)
        (cond ((eq (or x y) nil)
 	      (point-3i-0))
 	      ((and x y)
 	       (point-3i-2 x y z))
 	       (t nil)))
+
 
 (defun make-point-3i (&optional x y z)
        (cond ((eq (or x y) nil)
@@ -677,6 +703,7 @@
   (start :int)
   (end :int))
 
+
 ;; Range::Range(int _start, int _end)
 ;; Range* cv_create_Range(int _start, int _end) 
 (defcfun ("cv_create_Range" make-range) (cv::range :garbage-collect t)
@@ -692,6 +719,7 @@
    that means “the whole sequence” or “the whole 
    range”")
 
+
 ;; static Range::Range all()
 ;; Range* cv_create_RangeAll()
 (defcfun ("cv_create_RangeAll" make-range-all) (cv::range :garbage-collect t)
@@ -705,6 +733,7 @@
 (defcfun ("cv_create_Rect" rect-0) (cv::rect :garbage-collect t) 
 	 "RECT constructor.")
 
+
 ;; Rect_(_Tp _x, _Tp _y, _Tp _width, _Tp _height)
 ;; Rect* cv_create_Rect4(int x, int y, int width, int height) 
 (defcfun ("cv_create_Rect4" rect-4) (cv::rect :garbage-collect t)
@@ -714,12 +743,14 @@
 	 (width :int)
 	 (height :int))
 
+
 (defun rect (&optional x y width height)
        (cond ((eq (or x y) nil)
 	      (rect-0))
 	      ((and x y)
 	       (rect-4 x y width height))
 	       (t nil)))
+
 
 (defun make-rect (&optional x y width height)
        (cond ((eq (or x y) nil)
@@ -742,6 +773,7 @@
 (defcfun ("cv_Rect_clone" clone-rect) (cv::rect :garbage-collect t)
 	 (self cv::rect))
 
+
 (defmethod clone ((self cv::cv-rect))
   "Creates a full copy of a RECT object."
   (clone-rect self))
@@ -752,6 +784,7 @@
 (defcfun ("cv_Rect_size" rect-size) (cv::size :garbage-collect t) 
 	 "Size (width, height) of the rectangle."
 	 (self cv::rect))
+
 
 (defmethod size ((arg cv::cv-rect) &rest args)
   args
@@ -770,6 +803,7 @@
 (defcfun ("cv_Mat_reshape" %reshape) (cv::mat :garbage-collect t)
 	 (self cv::mat)
 	 (cn :int))
+
 
 ;; Mat Mat::reshape(int cn, int rows=0) const
 ;; Mat* cv_Mat_reshape_rows(Mat* self, int cn, int rows) 
@@ -859,9 +893,11 @@
 	 (val2 :double)
 	 (val3 :double))
 
+
 (defun scalar (&optional (val1 0d0) (val2 0d0) (val3 0d0) (val4 0d0))
        "SCALAR constructor"
        (%scalar (coerce val1 'double-float) (coerce val2 'double-float) (coerce val3 'double-float) (coerce val4 'double-float)))
+
 
 (defun make-scalar (&optional (val1 0d0) (val2 0d0) (val3 0d0) (val4 0d0))
        "SCALAR constructor"
@@ -873,9 +909,11 @@
 (defcfun ("cv_create_scalarAll" %scalar-all) (cv::scalar :garbage-collect t)
 	 (val0123 :double))
 
+
 (defun scalar-all (val0123)
        "SCALAR conctctor - initializes all of the scalar values 0...3 with val0123"
        (%scalar-all (coerce val0123 'double-float)))
+
 
 (defun make-scalar-all (val0123)
        "SCALAR conctctor - initializes all of the scalar values 0...3 with val0123"
@@ -887,6 +925,7 @@
 (defcfun ("cv_create_Size" size-0) (cv::size :garbage-collect t)
 	 "Create SIZE construct")
 
+
 ;; Size_(_Tp _width, _Tp _height)
 ;; cv_create_Size2(double width, double height)
 (defcfun ("cv_create_Size2" size-2) (cv::size :garbage-collect t)
@@ -894,12 +933,15 @@
 	 (width :double)
 	 (height :double))
 
+
 (defmethod size ((arg null) &rest args)
   args
   (if (eq arg nil) (size-0) nil))
 
+
 (defmethod size ((arg real) &rest args)
   (size-2 (coerce arg 'double-float) (coerce (or (first args) 0) 'double-float)))
+
 
 (defun make-size (&optional arg1 arg2)
   (cond ((null arg1)
@@ -930,11 +972,13 @@
 ;; Size2f* cv_create_Size2f(float width, float height)
 (defcfun ("cv_create_Size2f" size-2f-0) (cv::size-2f :garbage-collect t))
 
+
 ;; Size_<float>(float width, float height)
 ;; Size2f* cv_create_Size2f(float width, float height)
 (defcfun ("cv_create_Size2f" size-2f-2) (cv::size-2f :garbage-collect t)
 	 (width :float)
 	 (height :float))
+
 
 (defun size-2f (&optional (width nil) (height nil))
   "SIZE-2F constructor"
@@ -943,6 +987,7 @@
 	 ((and width height)
 	  (size-2f-2 width height))
 	  (t nil)))
+
 
 (defun make-size-2f (&optional (width nil) (height nil))
   "SIZE-2F constructor"
@@ -964,6 +1009,7 @@
 ;; TermCriteria* cv_create_TermCriteria(int type, int maxCount, double epsilon) 
 (defcfun ("cv_create_TermCriteria" term-criteria-0) (cv::term-criteria :garbage-collect t))
 
+
 ;; TermCriteria::TermCriteria(int type, int maxCount, double epsilon)
 ;; TermCriteria* cv_create_TermCriteria(int type, int maxCount, double epsilon) 
 (defcfun ("cv_create_TermCriteria3" term-criteria-3) (cv::term-criteria :garbage-collect t)
@@ -971,12 +1017,14 @@
 	 (max-count :int)
 	 (epsilon :double))
 
+
 (defun term-criteria (&optional type max-count epsilon)
        (cond ((eq type nil)
 	      (term-criteria-0))
 	      (type
 	       (term-criteria-3 type max-count epsilon))
 	       (t nil)))
+
 
 (defun make-term-criteria (&optional type max-count epsilon)
        (cond ((eq type nil)
@@ -990,11 +1038,13 @@
 ;; Vec2b* cv_create_Vec2b()
 (defcfun ("cv_create_Vec2b" vec-2b-0) (cv::vec-2b :garbage-collect t))
 
+
 ;; typedef Vec<uchar, 2> Vec2b
 ;; Vec2b* cv_create_Vec2b_2(uchar val0, uchar val1)
 (defcfun ("cv_create_Vec2b_2" vec-2b-2) (cv::vec-2b :garbage-collect t)
   (val0 :uchar)
   (val1 :uchar))
+
 
 (defun vec-2b (&optional val0 val1)
   "VEC-2B constructor"
@@ -1003,6 +1053,7 @@
 	(val0
 	 (vec-2b-2 val0 val1))
 	(t nil)))
+
 
 (defun make-vec-2b (&optional val0 val1)
   "VEC-2B constructor"
@@ -1017,12 +1068,14 @@
 ;; Vec3b* cv_create_Vec3b()
 (defcfun ("cv_create_Vec3b" vec-3b-0) (cv::vec-3b :garbage-collect t))
 
+
 ;; typedef Vec<uchar, 3> Vec3b
 ;; Vec3b* cv_create_Vec3b_3(uchar val0, uchar val1, uchar val2)
 (defcfun ("cv_create_Vec3b_3" vec-3b-3) (cv::vec-3b :garbage-collect t)
   (val0 :uchar)
   (val1 :uchar)
   (val2 :uchar))
+
 
 (defun vec-3b (&optional val0 val1 val2)
   "VEC-3B constructor"
@@ -1031,6 +1084,7 @@
 	(val0
 	 (vec-3b-3 val0 val1 val2))
 	(t nil)))
+
 
 (defun make-vec-3b (&optional val0 val1 val2)
   "VEC-3B constructor"
@@ -1045,6 +1099,7 @@
 ;; Vec4b* cv_create_Vec4b()
 (defcfun ("cv_create_Vec4b" vec-4b-0) (cv::vec-4b :garbage-collect t))
 
+
 ;; typedef Vec<uchar, 4> Vec4b
 ;; Vec4b* cv_create_Vec4b_4(uchar val0, uchar val1, uchar val2, uchar val3)
 (defcfun ("cv_create_Vec4b_4" vec-4b-4) (cv::vec-4b :garbage-collect t)
@@ -1053,6 +1108,7 @@
   (val2 :uchar)
   (val3 :uchar))
 
+
 (defun vec-4b (&optional val0 val1 val2 val3)
   "VEC-4B constructor"
   (cond ((null val0)
@@ -1060,6 +1116,7 @@
 	(val0
 	 (vec-4b-4 val0 val1 val2 val3))
 	(t nil)))
+
 
 (defun make-vec-4b (&optional val0 val1 val2 val3)
   "VEC-4B constructor"
@@ -1074,11 +1131,13 @@
 ;; Vec2d* cv_create_Vec2d()
 (defcfun ("cv_create_Vec2d" vec-2d-0) (cv::vec-2d :garbage-collect t))
 
+
 ;; typedef Vec<double, 2> Vec2d
 ;; Vec2d* cv_create_Vec2d_2(double val0, double val1)
 (defcfun ("cv_create_Vec2d_2" vec-2d-2) (cv::vec-2d :garbage-collect t)
   (val0 :double)
   (val1 :double))
+
 
 (defun vec-2d (&optional val0 val1)
   "VEC-2D constructor"
@@ -1087,6 +1146,7 @@
 	(val0
 	 (vec-2d-2 val0 val1))
 	(t nil)))
+
 
 (defun make-vec-2d (&optional val0 val1)
   "VEC-2D constructor"
@@ -1101,12 +1161,14 @@
 ;; Vec3d* cv_create_Vec3d()
 (defcfun ("cv_create_Vec3d" vec-3d-0) (cv::vec-3d :garbage-collect t))
 
+
 ;; typedef Vec<double, 3> Vec3d
 ;; Vec3d* cv_create_Vec3d_3(double val0, double val1, double val2)
 (defcfun ("cv_create_Vec3d_3" vec-3d-3) (cv::vec-3d :garbage-collect t)
   (val0 :double)
   (val1 :double)
   (val2 :double))
+
 
 (defun vec-3d (&optional val0 val1 val2)
   "VEC-3D constructor"
@@ -1115,6 +1177,7 @@
 	(val0
 	 (vec-3d-3 val0 val1 val2))
 	(t nil)))
+
 
 (defun make-vec-3d (&optional val0 val1 val2)
   "VEC-3D constructor"
@@ -1129,6 +1192,7 @@
 ;; Vec4d* cv_create_Vec4d()
 (defcfun ("cv_create_Vec4d" vec-4d-0) (cv::vec-4d :garbage-collect t))
 
+
 ;; typedef Vec<double, 4> Vec4d
 ;; Vec4d* cv_create_Vec4d_4(double val0, double val1, double val2, double val3)
 (defcfun ("cv_create_Vec4d_4" vec-4d-4) (cv::vec-4d :garbage-collect t)
@@ -1137,6 +1201,7 @@
   (val2 :double)
   (val3 :double))
 
+
 (defun vec-4d (&optional val0 val1 val2 val3)
   "VEC-4D constructor"
   (cond ((null val0)
@@ -1144,6 +1209,7 @@
 	(val0
 	 (vec-4d-4 val0 val1 val2 val3))
 	(t nil)))
+
 
 (defun make-vec-4d (&optional val0 val1 val2 val3)
   "VEC-4D constructor"
@@ -1158,6 +1224,7 @@
 ;; Vec6d* cv_create_Vec6d()
 (defcfun ("cv_create_Vec6d" vec-6d-0) (cv::vec-6d :garbage-collect t))
 
+
 ;; typedef Vec<double, 6> Vec6d
 ;; Vec6d* cv_create_Vec6d_6(double val0, double val1, double val2, double val3, double val4, double val5)
 (defcfun ("cv_create_Vec6d_6" vec-6d-6) (cv::vec-6d :garbage-collect t)
@@ -1168,6 +1235,7 @@
   (val4 :double)
   (val5 :double))
 
+
 (defun vec-6d (&optional val0 val1 val2 val3 val4 val5)
   "VEC-6D constructor"
   (cond ((null val0)
@@ -1175,6 +1243,7 @@
 	(val0
 	 (vec-6d-6 val0 val1 val2 val3 val4 val5))
 	(t nil)))
+
 
 (defun make-vec-6d (&optional val0 val1 val2 val3 val4 val5)
   "VEC-6D constructor"
@@ -1189,11 +1258,13 @@
 ;; Vec2f* cv_create_Vec2f()
 (defcfun ("cv_create_Vec2f" vec-2f-0) (cv::vec-2f :garbage-collect t))
 
+
 ;; typedef Vec<float, 2> Vec2f
 ;; Vec2f* cv_create_Vec2f_2(float val0, float val1)
 (defcfun ("cv_create_Vec2f_2" vec-2f-2) (cv::vec-2f :garbage-collect t)
   (val0 :float)
   (val1 :float))
+
 
 (defun vec-2f (&optional val0 val1)
   "VEC-2F constructor"
@@ -1216,12 +1287,14 @@
 ;; Vec3f* cv_create_Vec3f()
 (defcfun ("cv_create_Vec3f" vec-3f-0) (cv::vec-3f :garbage-collect t))
 
+
 ;; typedef Vec<float, 3> Vec3f
 ;; Vec3f* cv_create_Vec3f_3(float val0, float val1, int val2)
 (defcfun ("cv_create_Vec3f_3" vec-3f-3) (cv::vec-3f :garbage-collect t)
   (val0 :float)
   (val1 :float)
   (val2 :float))
+
 
 (defun vec-3f (&optional val0 val1 val2)
   "VEC-3F constructor"
@@ -1230,6 +1303,7 @@
 	(val0
 	 (vec-3f-3 val0 val1 val2))
 	(t nil)))
+
 
 (defun make-vec-3f (&optional val0 val1 val2)
   "VEC-3F constructor"
@@ -1244,6 +1318,7 @@
 ;; Vec4f* cv_create_Vec4f()
 (defcfun ("cv_create_Vec4f" vec-4f-0) (cv::vec-4f :garbage-collect t))
 
+
 ;; typedef Vec<float, 4> Vec4f
 ;; Vec4f* cv_create_Vec4f_4(float val0, float val1, float val2, float val3)
 (defcfun ("cv_create_Vec4f_4" vec-4f-4) (cv::vec-4f :garbage-collect t)
@@ -1252,6 +1327,7 @@
   (val2 :float)
   (val3 :float))
 
+
 (defun vec-4f (&optional val0 val1 val2 val3)
   "VEC-4F constructor"
   (cond ((null val0)
@@ -1259,6 +1335,7 @@
 	(val0
 	 (vec-4f-4 val0 val1 val2 val3))
 	(t nil)))
+
 
 (defun make-vec-4f (&optional val0 val1 val2 val3)
   "VEC-4F constructor"
@@ -1273,6 +1350,7 @@
 ;; Vec6f* cv_create_Vec6f()
 (defcfun ("cv_create_Vec6f" vec-6f-0) (cv::vec-6f :garbage-collect t))
 
+
 ;; typedef Vec<float, 6> Vec6f
 ;; Vec6f* cv_create_Vec6f_6(float val0, float val1, float val2, float val3, float val4, float val5)
 (defcfun ("cv_create_Vec6f_6" vec-6f-6) (cv::vec-6f :garbage-collect t)
@@ -1283,6 +1361,7 @@
   (val4 :float)
   (val5 :float))
 
+
 (defun vec-6f (&optional val0 val1 val2 val3 val4 val5)
   "VEC-6F constructor"
   (cond ((null val0)
@@ -1290,6 +1369,7 @@
 	(val0
 	 (vec-6f-6 val0 val1 val2 val3 val4 val5))
 	(t nil)))
+
 
 (defun make-vec-6f (&optional val0 val1 val2 val3 val4 val5)
   "VEC-6F constructor"
@@ -1304,11 +1384,13 @@
 ;; Vec2i* cv_create_Vec2i()
 (defcfun ("cv_create_Vec2i" vec-2i-0) (cv::vec-2i :garbage-collect t))
 
+
 ;; typedef Vec<int, 2> Vec2i
 ;; Vec2i* cv_create_Vec2i_2(int val0, int val1)
 (defcfun ("cv_create_Vec2i_2" vec-2i-2) (cv::vec-2i :garbage-collect t)
   (val0 :int)
   (val1 :int))
+
 
 (defun vec-2i (&optional val0 val1)
   "VEC-2I constructor"
@@ -1317,6 +1399,7 @@
 	(val0
 	 (vec-2i-2 val0 val1))
 	(t nil)))
+
 
 (defun make-vec-2i (&optional val0 val1)
   "VEC-2I constructor"
@@ -1331,12 +1414,14 @@
 ;; Vec3i* cv_create_Vec3i()
 (defcfun ("cv_create_Vec3i" vec-3i-0) (cv::vec-3i :garbage-collect t))
 
+
 ;; typedef Vec<int, 3> Vec3i
 ;; Vec3i* cv_create_Vec3i_3(int val0, int val1, int val2)
 (defcfun ("cv_create_Vec3i_3" vec-3i-3) (cv::vec-3i :garbage-collect t)
   (val0 :int)
   (val1 :int)
   (val2 :int))
+
 
 (defun vec-3i (&optional val0 val1 val2)
   "VEC-3I constructor"
@@ -1345,6 +1430,7 @@
 	(val0
 	 (vec-3i-3 val0 val1 val2))
 	(t nil)))
+
 
 (defun make-vec-3i (&optional val0 val1 val2)
   "VEC-3I constructor"
@@ -1359,6 +1445,7 @@
 ;; Vec4i* cv_create_Vec4i()
 (defcfun ("cv_create_Vec4i" vec-4i-0) (cv::vec-4i :garbage-collect t))
 
+
 ;; typedef Vec<int, 4> Vec4i
 ;; Vec4i* cv_create_Vec4i_4(int val0, int val1, int val2, int val3)
 (defcfun ("cv_create_Vec4i_4" vec-4i-4) (cv::vec-4i :garbage-collect t)
@@ -1367,6 +1454,7 @@
   (val2 :int)
   (val3 :int))
 
+
 (defun vec-4i (&optional val0 val1 val2 val3)
   "VEC-4I constructor"
   (cond ((null val0)
@@ -1374,6 +1462,7 @@
 	(val0
 	 (vec-4i-4 val0 val1 val2 val3))
 	(t nil)))
+
 
 (defun make-vec-4i (&optional val0 val1 val2 val3)
   "VEC-4I constructor"
@@ -1388,6 +1477,7 @@
 ;; Vec6i* cv_create_Vec6i()
 (defcfun ("cv_create_Vec6i" vec-6i-0) (cv::vec-6i :garbage-collect t))
 
+
 ;; typedef Vec<int, 6> Vec6i
 ;; Vec6i* cv_create_Vec6i_6(int val0, int val1, int val2, int val3, int val4, int val5)
 (defcfun ("cv_create_Vec6i_6" vec-6i-6) (cv::vec-6i :garbage-collect t)
@@ -1398,6 +1488,7 @@
   (val4 :int)
   (val5 :int))
 
+
 (defun vec-6i (&optional val0 val1 val2 val3 val4 val5)
   "VEC-6I constructor"
   (cond ((null val0)
@@ -1405,6 +1496,7 @@
 	(val0
 	 (vec-6i-6 val0 val1 val2 val3 val4 val5))
 	(t nil)))
+
 
 (defun make-vec-6i (&optional val0 val1 val2 val3 val4 val5)
   "VEC-6I constructor"
@@ -1419,6 +1511,7 @@
 ;; Vec8i* cv_create_Vec8i() 
 (defcfun ("cv_create_Vec8i" vec-8i-0) (cv::vec-8i :garbage-collect t))
 
+
 ;; typedef Vec<int, 8> Vec8i
 ;; Vec8i* cv_create_Vec8i_8(int val0, int val1, int val2, int val3, int val4, int val5, int val6, int val7) 
 (defcfun ("cv_create_Vec8i_8" vec-8i-8) (cv::vec-8i :garbage-collect t)
@@ -1431,6 +1524,7 @@
   (val6 :int)
   (val7 :int))
 
+
 (defun vec-8i (&optional val0 val1 val2 val3 val4 val5 val6 val7)
   "VEC-8I constructor"
   (cond ((null val0)
@@ -1438,6 +1532,7 @@
 	(val0
 	 (vec-8i-8 val0 val1 val2 val3 val4 val5 val6 val7))
 	(t nil)))
+
 
 (defun make-vec-8i (&optional val0 val1 val2 val3 val4 val5 val6 val7)
   "VEC-8I constructor"
@@ -1452,11 +1547,13 @@
 ;; Vec2s* cv_create_Vec2s()
 (defcfun ("cv_create_Vec2s" vec-2s-0) (cv::vec-2s :garbage-collect t))
 
+
 ;; typedef Vec<short, 2> Vec2s
 ;; Vec2s* cv_create_Vec2s_2(short val0, short val1)
 (defcfun ("cv_create_Vec2s_2" vec-2s-2) (cv::vec-2s :garbage-collect t)
   (val0 :short)
   (val1 :short))
+
 
 (defun vec-2s (&optional val0 val1)
   "VEC-2S constructor"
@@ -1465,6 +1562,7 @@
 	(val0
 	 (vec-2s-2 val0 val1))
 	(t nil)))
+
 
 (defun make-vec-2s (&optional val0 val1)
   "VEC-2S constructor"
@@ -1479,12 +1577,14 @@
 ;; Vec3s* cv_create_Vec3s()
 (defcfun ("cv_create_Vec3s" vec-3s-0) (cv::vec-3s :garbage-collect t))
 
+
 ;; typedef Vec<short, 3> Vec3s
 ;; Vec3s* cv_create_Vec3s_3(short val0, short val1, short val2)
 (defcfun ("cv_create_Vec3s_3" vec-3s-3) (cv::vec-3s :garbage-collect t)
   (val0 :short)
   (val1 :short)
   (val2 :short))
+
 
 (defun vec-3s (&optional val0 val1 val2)
   "VEC-3S constructor"
@@ -1493,6 +1593,7 @@
 	(val0
 	 (vec-3s-3 val0 val1 val2))
 	(t nil)))
+
 
 (defun make-vec-3s (&optional val0 val1 val2)
   "VEC-3S constructor"
@@ -1507,6 +1608,7 @@
 ;; Vec4s* cv_create_Vec4s()
 (defcfun ("cv_create_Vec4s" vec-4s-0) (cv::vec-4s :garbage-collect t))
 
+
 ;; typedef Vec<short, 4> Vec4s
 ;; Vec4s* cv_create_Vec4s_4(short val0, short val1, short val2, short val3)
 (defcfun ("cv_create_Vec4s_4" vec-4s-4) (cv::vec-4s :garbage-collect t)
@@ -1515,6 +1617,7 @@
   (val2 :short)
   (val3 :short))
 
+
 (defun vec-4s (&optional val0 val1 val2 val3)
   "VEC-4S constructor"
   (cond ((null val0)
@@ -1522,6 +1625,7 @@
 	(val0
 	 (vec-4s-4 val0 val1 val2 val3))
 	(t nil)))
+
 
 (defun make-vec-4s (&optional val0 val1 val2 val3)
   "VEC-4S constructor"
@@ -1536,11 +1640,13 @@
 ;; Vec2w* cv_create_Vec2w()
 (defcfun ("cv_create_Vec2w" vec-2w-0) (cv::vec-2w :garbage-collect t))
 
+
 ;; typedef Vec<ushort, 2> Vec2w
 ;; Vec2w* cv_create_Vec2w_2(ushort val0, ushort val1)
 (defcfun ("cv_create_Vec2w_2" vec-2w-2) (cv::vec-2w :garbage-collect t)
   (val0 :ushort)
   (val1 :ushort))
+
 
 (defun vec-2w (&optional val0 val1)
   "VEC-2W constructor"
@@ -1549,6 +1655,7 @@
 	(val0
 	 (vec-2w-2 val0 val1))
 	(t nil)))
+
 
 (defun make-vec-2w (&optional val0 val1)
   "VEC-2W constructor"
@@ -1563,12 +1670,14 @@
 ;; Vec3w* cv_create_Vec3w()
 (defcfun ("cv_create_Vec3w" vec-3w-0) (cv::vec-3w :garbage-collect t))
 
+
 ;; typedef Vec<ushort, 3> Vec3w
 ;; Vec3w* cv_create_Vec3w_3(ushort val0, ushort val1, ushort val2)
 (defcfun ("cv_create_Vec3w_3" vec-3w-3) (cv::vec-3w :garbage-collect t)
   (val0 :ushort)
   (val1 :ushort)
   (val2 :ushort))
+
 
 (defun vec-3w (&optional val0 val1 val2)
   "VEC-3W constructor"
@@ -1577,6 +1686,7 @@
 	(val0
 	 (vec-3w-3 val0 val1 val2))
 	(t nil)))
+
 
 (defun make-vec-3w (&optional val0 val1 val2)
   "VEC-3W constructor"
@@ -1591,6 +1701,7 @@
 ;; Vec4w* cv_create_Vec4w()
 (defcfun ("cv_create_Vec4w" vec-4w-0) (cv::vec-4w :garbage-collect t))
 
+
 ;; typedef Vec<ushort, 4> Vec4w
 ;; Vec4w* cv_create_Vec4w_4(ushort val0, ushort val1, ushort val2, ushort val3)
 (defcfun ("cv_create_Vec4w_4" vec-4w-4) (cv::vec-4w :garbage-collect t)
@@ -1599,6 +1710,7 @@
   (val2 :ushort)
   (val3 :ushort))
 
+
 (defun vec-4w (&optional val0 val1 val2 val3)
   "VEC-4W constructor"
   (cond ((null val0)
@@ -1606,6 +1718,7 @@
 	(val0
 	 (vec-4w-4 val0 val1 val2 val3))
 	(t nil)))
+
 
 (defun make-vec-4w (&optional val0 val1 val2 val3)
   "VEC-4W constructor"
@@ -1642,6 +1755,7 @@
 	 (src cv::mat)
 	 (mask cv::mat))
 
+
 (defun mean (src &optional (mask (%mat) given-mask) return)
   "Calculates an average mean of array elements."
   (setf return (%mean src mask))
@@ -1653,17 +1767,20 @@
 (defcfun ("cv_create_RNG" %rng) (cv::rng :garbage-collect t) 
 	 "RNG constructor")
 
+
 ;; RNG::RNG(uint64 state)
 ;; RNG* cv_create_RNG_state(uint64 state)
 (defcfun ("cv_create_RNG_state" rng-state) (cv::rng :garbage-collect t) 
 	 "RNG constructor -  sets the RNG state to the specified value."
 	 (state :uint64))
 
+
 (defun rng (&optional (state nil))
        (cond ((eq state nil)
 	      (%rng))
 	      ((integerp state) (rng-state state))
 	      (t nil)))
+
 
 (defun make-rng (&optional (state nil))
        (cond ((eq state nil)
@@ -1680,13 +1797,13 @@
 
 
 
-
 ;;; CORE - Drawing Functions
 
 
 (defmacro bgr (b g r)
 	  "BGR value constructor macro"
 	  `(scalar ,b ,g ,r))
+
 
 (defmacro make-bgr (b g r)
 	  "BGR value constructor macro"
@@ -1696,6 +1813,7 @@
 (defmacro rgb (r g b)
 	  "BGR value constructor macro"
 	  `(scalar ,b ,g ,r))
+
 
 (defmacro make-rgb (r g b)
 	  "BGR value constructor macro"
@@ -1707,9 +1825,11 @@
 
 ;;; IMGPROC - Macros
 
+
 ;; static inline Scalar morphologyDefaultBorderValue() { return Scalar::all(DBL_MAX); }
 ;; Scalar* cv_create_morphologyDefaultBorderValue()
 (defcfun ("cv_create_morphologyDefaultBorderValue" morphology-default-border-value) (cv::scalar :garbage-collect t))
+
 
 ;; static inline Scalar morphologyDefaultBorderValue() { return Scalar::all(DBL_MAX); }
 ;; Scalar* cv_create_morphologyDefaultBorderValue()
@@ -1725,6 +1845,7 @@
 	 (shape :int)
 	 (ksize cv::size)
 	 (kernel cv::point))
+
 
 (defun get-structuring-element (shape ksize &optional (kernel (cv::point -1 -1) given-kernel) return) 
   "Returns a structuring element of the specified size and shape for morphological operations."
@@ -1748,17 +1869,20 @@
 (defcfun ("cv_create_VideoCapture" video-capture-0) (cv::video-capture :garbage-collect t) 
 	 "VideoCapture constructor")
 
+
 ;; VideoCapture::VideoCapture(int device)
 ;; VideoCapture* cv_create_VideoCapture1_0(int device)
 (cffi:defcfun ("cv_create_VideoCapture1_0" video-capture-dev) (cv::video-capture :garbage-collect t)
 	      "VideoCapture constructor"
 	      (device :int))
 
+
 ;; VideoCapture::VideoCapture(const string& filename)
 ;; VideoCapture* cv_create_VideoCapture1(String* filename) 
 (defcfun ("cv_create_VideoCapture1" video-capture-file) (cv::video-capture :garbage-collect t)
 	 "VideoCapture constructor"
 	 (filename cv::*string))
+
 
 (defun video-capture (&optional src)
        (cond ((eq src nil)
@@ -1768,6 +1892,7 @@
 	       ((stringp src) 
 		(video-capture-file (c-string-to-string src (length src))))
 		(t nil)))
+
 
 (defun make-video-capture (&optional src)
        (cond ((eq src nil)
@@ -1785,6 +1910,7 @@
 	 (filename cv::*string)
 	 (flags :int))
 
+
 (defun imread (filename &optional (flags 1))
        (%imread (c-string-to-string filename (length filename)) flags))
 
@@ -1792,6 +1918,7 @@
 ;; VideoWriter* cv_create_VideoWriter() 
 (defcfun ("cv_create_VideoWriter" video-writer-0) (cv::video-writer :garbage-collect t)
 	 "VIDEO-WRITER constructor")
+
 
 ;; VideoWriter::VideoWriter(const string& filename, int fourcc, double fps, Size frameSize, bool isColor) 
 ;; VideoWriter* cv_create_VideoWriter5(String* filename, int fourcc, double fps, Size* frameSize, bool isColor)
@@ -1802,6 +1929,7 @@
 	 (frame-size cv::size)
 	 (is-color :boolean))
 
+
 (defun video-writer (&optional filename fourcc fps frame-size (is-color t))
        "VIDEO-WRITER constructor"  
        (cond ((eq filename nil)
@@ -1809,6 +1937,7 @@
 	      (filename
 	       (video-writer-5 (c-string-to-string filename (length filename)) fourcc fps frame-size is-color))
 	       (t nil)))
+
 
 (defun make-video-writer (&optional filename fourcc fps frame-size (is-color t))
        "VIDEO-WRITER constructor"  
@@ -1834,9 +1963,11 @@
 	 (norm-type :int)
 	 (cross-check :boolean))
 
+
 (defun bf-matcher (&optional (norm-type cv::+norm-l2+) (cross-check nil))
        "Brute-force matcher constructor."
        (%bf-matcher norm-type cross-check))
+
 
 (defun make-bf-matcher (&optional (norm-type cv::+norm-l2+) (cross-check nil))
        "Brute-force matcher constructor."
@@ -1850,9 +1981,11 @@
 	 (octaves :int)
 	 (pattern-scale :float))
 
+
 (defun brisk (&optional (thresh 30) (octaves 3) (pattern-scale 1.0f0))
        "The BRISK constructor"
        (%brisk thresh octaves pattern-scale))
+
 
 (defun make-brisk (&optional (thresh 30) (octaves 3) (pattern-scale 1.0f0))
        "The BRISK constructor"
@@ -1879,11 +2012,13 @@
 (defcfun ("cv_create_CascadeClassifier" cascade-classifier-0) (cv::cascade-classifier :garbage-collect t)
 	 "CASCADE-CLASSIFIER construct.")
 
+
 ;; CascadeClassifier::CascadeClassifier(const string& filename)
 ;; CascadeClassifier* cv_create_CascadeClassifier1(String* filename)
 (defcfun ("cv_create_CascadeClassifier1" cascade-classifier-1) (cv::cascade-classifier :garbage-collect t)
 	 "Loads a classifier from a file."
 	 (filename cv::*string))
+
 
 (defun cascade-classifier (&optional filename)
        (cond ((eq filename nil)
@@ -1891,6 +2026,7 @@
 	      (filename
 	       (cascade-classifier-1 (c-string-to-string filename (length filename))))
 	       (t nil)))
+
 
 (defun make-cascade-classifier (&optional filename)
        (cond ((eq filename nil)
@@ -1911,6 +2047,7 @@
 ;; CvNormalBayesClassifier* cv_create_CvNormalBayesClassifier()
 (defcfun ("cv_create_CvNormalBayesClassifier" normal-bayes-classifier-0) (cv::normal-bayes-classifier :garbage-collect t))
 
+
 ;; CvNormalBayesClassifier::CvNormalBayesClassifier(const Mat& trainData, const Mat& responses, const Mat& varIdx=Mat(), 
 ;;                                                  const Mat& sampleIdx=Mat() )
 ;; CvNormalBayesClassifier* cv_create_CvNormalBayesClassifier4(Mat* trainData, Mat* responses, Mat* varIdx, Mat* sampleIdx) 
@@ -1920,6 +2057,7 @@
   (var-idx cv::mat)
   (sample-idx cv::mat))
 
+
 (defun normal-bayes-classifier (&optional train-data responses  (var-idx (%mat) given-var-idx) (sample-idx (%mat) given-sample-idx))
   (let ((return (if train-data
 		    (normal-bayes-classifier-4 train-data responses  var-idx sample-idx)
@@ -1927,6 +2065,7 @@
     (if given-var-idx nil (cv::del-mat var-idx))
     (if given-sample-idx nil (cv::del-mat sample-idx)) 
     return))
+
 
 (defun make-normal-bayes-classifier (&optional train-data responses  (var-idx (%mat) given-var-idx) (sample-idx (%mat) given-sample-idx))
   (let ((return (if train-data
@@ -1945,6 +2084,7 @@
 ;; CvKNearest* cv_create_CvKNearest() 
 (defcfun ("cv_create_CvKNearest" k-nearest-0) (cv::k-nearest :garbage-collect t))
 
+
 ;; CvKNearest::CvKNearest(const CvMat* trainData, const CvMat* responses, const CvMat* sampleIdx=0, bool isRegression=false, 
 ;;                        int max_k=32 )
 ;; CvKNearest* cv_create_CvKNearest5(Mat* trainData, Mat* responses, Mat* sampleIdx, bool isRegression, int max_k) 
@@ -1955,10 +2095,12 @@
   (is-regression :boolean)
   (max-k :int))
 
+
 (defun k-nearest (&optional train-data responses (sample-idx (null-pointer)) (is-regression nil) (max-k 32))
   (if train-data
       (k-nearest-5 train-data responses sample-idx is-regression max-k)
       (k-nearest-0)))
+
 
 (defun make-k-nearest (&optional train-data responses (sample-idx (null-pointer)) (is-regression nil) (max-k 32))
   (if train-data
@@ -1973,6 +2115,7 @@
 ;; CvDTree* cv_create_CvDTree() 
 (defcfun ("cv_create_CvDTree" d-tree) (cv::d-tree :garbage-collect t))
 
+
 ;; CvDTree:CvDTree()
 ;; CvDTree* cv_create_CvDTree() 
 (defcfun ("cv_create_CvDTree" make-d-tree) (cv::d-tree :garbage-collect t))
@@ -1981,6 +2124,7 @@
 ;; CvDTreeParams::CvDTreeParams()
 ;; CvDTreeParams* cv_create_CvDTreeParams()
 (defcfun ("cv_create_CvDTreeParams" d-tree-params-0) (cv::d-tree-params :garbage-collect t))
+
 
 ;; CvDTreeParams::CvDTreeParams(int max_depth, int min_sample_count, float regression_accuracy, bool use_surrogates, 
 ;;                              int max_categories, int cv_folds, bool use_1se_rule, bool truncate_pruned_tree, const float* priors)
@@ -1998,6 +2142,7 @@
   (truncate-pruned-tree :boolean)
   (priors :pointer))
 
+
 (defun d-tree-params (&optional max-depth min-sample-count regression-accuracy use-surrogates max-categories folds use-1se-rule
 			truncate-pruned-tree priors)
   (if max-depth
@@ -2014,6 +2159,7 @@
 ;; CvANN_MLP* cv_create_CvANN_MLP()
 (defcfun ("cv_create_CvANN_MLP" ann-mlp-0) (cv::ann-mlp :garbage-collect t))
 
+
 ;; CvANN_MLP::CvANN_MLP(const CvMat* layerSizes, int activateFunc=CvANN_MLP::SIGMOID_SYM, double fparam1=0, double fparam2=0 )
 ;; CvANN_MLP* cv_create_CvANN_MLP4(Mat* layerSizes, int activateFunc, double fparam1, double fparam2) 
 (defcfun ("cv_create_CvANN_MLP4" ann-mlp-4) (cv::ann-mlp :garbage-collect t)
@@ -2022,10 +2168,12 @@
   (fparam1 :double)
   (fparam2 :double))
 
+
 (defun ann-mlp (&optional layer-sizes (activate-func cv::+ann-mlp-sigmoid-sym+) (fparam1 0d0) (fparam2 0d0))
   (if layer-sizes
       (ann-mlp-4 layer-sizes activate-func fparam1 fparam2)
       (ann-mlp-0)))
+
 
 (defun make-ann-mlp (&optional layer-sizes (activate-func cv::+ann-mlp-sigmoid-sym+) (fparam1 0d0) (fparam2 0d0))
   (if layer-sizes
@@ -2037,6 +2185,7 @@
 ;; CvANN_MLP_TrainParams* cv_create_CvANN_MLP_TrainParams()
 (defcfun ("cv_create_CvANN_MLP_TrainParams" ann-mlp-train-params-0) (cv::ann-mlp-train-params :garbage-collect t))
 
+
 ;; CvANN_MLP_TrainParams::CvANN_MLP_TrainParams(CvTermCriteria term_crit, int train_method, double param1, double param2=0 )
 ;; CvANN_MLP_TrainParams* cv_create_CvANN_MLP_TrainParams4(TermCriteria* term_crit, int train_method, double param1, double param2)
 (defcfun ("cv_create_CvANN_MLP_TrainParams" ann-mlp-train-params-4) (cv::ann-mlp-train-params :garbage-collect t)
@@ -2045,10 +2194,12 @@
   (param1 :double)
   (param2 :double))
 
+
 (defun ann-mlp-train-params (&optional term-crit train-method param1 (param2 0))
        (if term-crit
 	   (ann-mlp-train-params-4 term-crit train-method param1 param2)
 	   (ann-mlp-train-params-0)))
+
 
 (defun make-ann-mlp-train-params (&optional term-crit train-method param1 (param2 0))
        (if term-crit
@@ -2082,6 +2233,7 @@
 	       (surf-5 hessian-threshold n-octaves n-octave-layers extended upright))
 	       (t nil)))
 
+
 (defun make-surf (&optional hessian-threshold (n-octaves 4) (n-octave-layers 2) (extended t) (upright nil))
        (cond ((eq hessian-threshold nil)
 	      (surf-0))
@@ -2090,17 +2242,19 @@
 	       (t nil)))
 
 
+
 ;;; VECTORS
 
 
-;; template < class T, class Alloc = allocator<T> > class vector
+
+;; template < class T, class Alloc = allocator<T> > class vector.
 ;; vector_##t * create_std_vector##tn()
-(defcfun ("create_std_vectorc" make-vector-char) (cv::vector-char :garbage-collect t))
+(defcfun ("create_std_vectorc" make-vector-char) cv::vector-char)
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
-(defcfun ("carray_to_std_vectorc" c-arr-to-vec-char) (cv::vector-char :garbage-collect t)
+(defcfun ("carray_to_std_vectorc" c-arr-to-vec-char) cv::vector-char
   (a :pointer)
   (len :unsigned-int))
 
@@ -2113,43 +2267,40 @@
     (c-arr-to-vec-char (cdr previous) (length a))))
 
 
-(defmacro vector-char (&rest args)
+(defun vector-char (&rest args)
   (if (fourth args)
       (error "odd number of args to VECTOR-CHAR")
       nil)
-  (let ((x (gensym))
-        (y (gensym))
-        (z (gensym)))
-    `(let ((,x (first (list ,@args)))
-	   (,y (second (list ,@args)))
-           (,z (third (list ,@args))))
-       (cond ((eq ,x nil)
+    (let ((x (first args))
+	   (y (second args))
+           (z (third args)))
+       (cond ((null x)
 	      (make-vector-char))
-	     ((or (vectorp ,x) (listp ,x))
-	      (arr-to-vec-char ,x))
-	     ((eq :length ,x)
-	      (cv::vec-char-length ,y))
-	     ((and (eq :to-lisp-list ,x))
-	      (cv::vec-char-to-lisp-list ,y))
-	     ((and (eq :to-lisp-vec ,x))
-	      (cv::vec-char-to-lisp-vec ,y ,z))
-	     ((typep ,x 'cv::std-vector-char)
-	      (if (eq ,y nil)
-		  (mem-aref (cv::vec-char-to-c-arr ,x) :char) 
-		  (mem-aref (cv::vec-char-to-c-arr ,x) :char ,y)))
+	     ((and (or (vectorp x) (listp x)) (null y))
+	      (arr-to-vec-char x))
+	     ((eq :length x)
+	      (cv::vec-char-length y))
+	     ((and (eq :to-lisp-list x))
+	      (cv::vec-char-to-lisp-list y))
+	     ((and (eq :to-lisp-vec x))
+	      (cv::vec-char-to-lisp-vec y z))
+	     ((typep x 'cv::std-vector-char)
+	      (if (eq y nil)
+		  (mem-aref (cv::vec-char-to-c-arr x) :char) 
+		  (mem-aref (cv::vec-char-to-c-arr x) :char y)))
 	     (t (error "incorrect input. 
-                   ~%See VECTOR-CHAR documentation in <LISP-CV-SOURCE-DIR>/EXAMPLES.LISP~%"))))))
+                   ~%See VECTOR-CHAR documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%")))))
 
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * create_std_vector##tn()
-(defcfun ("create_std_vectordm" make-vector-dmatch) (cv::vector-dmatch :garbage-collect t))
+(defcfun ("create_std_vectordm" make-vector-dmatch) cv::vector-dmatch)
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
-(defcfun ("carray_to_std_vectordm" c-arr-to-vec-dmatch) (cv::vector-dmatch :garbage-collect t)
+(defcfun ("carray_to_std_vectordm" c-arr-to-vec-dmatch) cv::vector-dmatch
   (a :pointer)
   (len :unsigned-int))
 
@@ -2162,47 +2313,43 @@
     (c-arr-to-vec-dmatch (cdr previous) (length a))))
 
 
-(defmacro vector-dmatch (&rest args)
+(defun vector-dmatch (&rest args)
   (if (fifth args)
       (error "odd number of args to VECTOR-DMATCH")
       nil)
-  (let ((x (gensym))
-        (y (gensym))
-        (z (gensym))
-        (type (gensym)))
-    `(let ((,x (first (list ,@args)))
-	   (,y (second (list ,@args)))
-           (,z (third (list ,@args)))
-           (,type (fourth (list ,@args))))
-       (cond ((eq ,x nil)
+    (let ((w (first args))
+           (x (second args))
+	   (y (third args))
+           (z (fourth args)))
+       (cond ((eq w nil)
 	      (make-vector-dmatch))
-	     ((or (vectorp ,x) (listp ,x))
-	      (arr-to-vec-dmatch ,x))
-	     ((eq :length ,x)
-	      (cv::vec-dmatch-length ,y))
-	     ((and (eq :to-lisp-list ,x))
-	      (cv::vec-dmatch-to-lisp-list ,y))
-	     ((and (eq :to-lisp-vec ,x))
-	      (cv::vec-dmatch-to-lisp-vec ,y))
-	     ((and (typep ,x 'cv::std-vector-dmatch) ,y)
-	      (if (eq ,z nil)
-		  (mem-aref (cv::vec-dmatch-to-c-arr ,x) 'cv::dmatch ,y)
-		  (if (null ,type)
-		      (mem-aref (cv::c-pointer (mem-aref (cv::vec-dmatch-to-c-arr ,x) 'cv::dmatch ,y)) :int ,z)
-		      (mem-aref (cv::c-pointer (mem-aref (cv::vec-dmatch-to-c-arr ,x) 'cv::dmatch ,y)) ,type ,z)))) 
+	     ((and (or (vectorp w) (listp w)) (null x))
+	      (arr-to-vec-dmatch w))
+	     ((eq :length w)
+	      (vec-dmatch-length x))
+	     ((and (eq :to-lisp-list w))
+	      (vec-dmatch-to-lisp-list x))
+	     ((and (eq :to-lisp-vec w))
+	      (vec-dmatch-to-lisp-vec x))
+	     ((and (typep w 'cv::std-vector-dmatch) x)
+	      (if (eq y nil)
+		  (mem-aref (cv::vec-dmatch-to-c-arr w) 'cv::dmatch x)
+		  (if z
+		      (mem-aref (cv::c-pointer (mem-aref (cv::vec-dmatch-to-c-arr w) 'cv::dmatch x)) z y)
+		      (error "must supply a type as the fourth parameter")))) 
 	     (t (error "incorrect input. 
-  ~%See VECTOR-DMATCH documentation in <LISP-CV-SOURCE-DIR>/EXAMPLES.LISP~%"))))))
+  ~%See VECTOR-DMATCH documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%")))))
 
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * create_std_vector##tn()
-(defcfun ("create_std_vectord" make-vector-double) (cv::vector-double :garbage-collect t))
+(defcfun ("create_std_vectord" make-vector-double) cv::vector-double)
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
-(defcfun ("carray_to_std_vectord" c-arr-to-vec-double) (cv::vector-double :garbage-collect t)
+(defcfun ("carray_to_std_vectord" c-arr-to-vec-double) cv::vector-double
   (a :pointer)
   (len :unsigned-int))
 
@@ -2215,41 +2362,39 @@
     (c-arr-to-vec-double (cdr previous) (length a))))
 
 
-(defmacro vector-double (&rest args)
+(defun vector-double (&rest args)
   (if (third args)
       (error "odd number of args to VECTOR-DOUBLE")
       nil)
-  (let ((x (gensym))
-        (y (gensym)))
-    `(let ((,x (first (list ,@args)))
-	   (,y (second (list ,@args))))
-       (cond ((eq ,x nil)
+    (let ((x (first args))
+	   (y (second args)))
+       (cond ((null x)
 	      (make-vector-double))
-	     ((or (vectorp ,x) (listp ,x))
-	      (arr-to-vec-double ,x))
-	     ((eq :length ,x)
-	      (cv::vec-double-length ,y))
-	     ((and (eq :to-lisp-list ,x))
-	      (cv::vec-double-to-lisp-list ,y))
-	     ((and (eq :to-lisp-vec ,x))
-	      (cv::vec-double-to-lisp-vec ,y))
-	     ((typep ,x 'cv::std-vector-double)
-	      (if (eq ,y nil)
-		  (mem-aref (cv::vec-double-to-c-arr ,x) :double) 
-		  (mem-aref (cv::vec-double-to-c-arr ,x) :double ,y)))
+	     ((and (or (vectorp x) (listp x)) (null y))
+	      (arr-to-vec-double x))
+	     ((eq :length x)
+	      (cv::vec-double-length y))
+	     ((and (eq :to-lisp-list x))
+	      (cv::vec-double-to-lisp-list y))
+	     ((and (eq :to-lisp-vec x))
+	      (cv::vec-double-to-lisp-vec y))
+	     ((typep x 'cv::std-vector-double)
+	      (if (eq y nil)
+		  (mem-aref (cv::vec-double-to-c-arr x) :double) 
+		  (mem-aref (cv::vec-double-to-c-arr x) :double y)))
 	     (t (error "incorrect input. 
-                   ~%See VECTOR-DOUBLE documentation in <LISP-CV-SOURCE-DIR>/EXAMPLES.LISP~%"))))))
+                   ~%See VECTOR-DOUBLE documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%")))))
 
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * create_std_vector##tn()
-(defcfun ("create_std_vectorf" make-vector-float) (cv::vector-float :garbage-collect t))
+(defcfun ("create_std_vectorf" make-vector-float) cv::vector-float)
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
-(defcfun ("carray_to_std_vectorf" c-arr-to-vec-float) (cv::vector-float :garbage-collect t)
+(defcfun ("carray_to_std_vectorf" c-arr-to-vec-float) cv::vector-float
   (a :pointer)
   (len :unsigned-int))
 
@@ -2262,41 +2407,39 @@
     (c-arr-to-vec-float (cdr previous) (length a))))
 
 
-(defmacro vector-float (&rest args)
+(defun vector-float (&rest args)
   (if (third args)
       (error "odd number of args to VECTOR-FLOAT")
       nil)
-  (let ((x (gensym))
-        (y (gensym)))
-    `(let ((,x (first (list ,@args)))
-	   (,y (second (list ,@args))))
-       (cond ((eq ,x nil)
+    (let ((x (first args))
+	   (y (second args)))
+       (cond ((null x)
 	      (make-vector-float))
-	     ((or (vectorp ,x) (listp ,x))
-	      (arr-to-vec-float ,x))
-	     ((eq :length ,x)
-	      (cv::vec-float-length ,y))
-	     ((and (eq :to-lisp-list ,x))
-	      (cv::vec-float-to-lisp-list ,y))
-	     ((and (eq :to-lisp-vec ,x))
-	      (cv::vec-float-to-lisp-vec ,y))
-	     ((typep ,x 'cv::std-vector-float)
-	      (if (eq ,y nil)
-		  (mem-aref (cv::vec-float-to-c-arr ,x) :float) 
-		  (mem-aref (cv::vec-float-to-c-arr ,x) :float ,y)))
+	     ((and (or (vectorp x) (listp x)) (null y))
+	      (arr-to-vec-float x))
+	     ((eq :length x)
+	      (cv::vec-float-length y))
+	     ((and (eq :to-lisp-list x))
+	      (cv::vec-float-to-lisp-list y))
+	     ((and (eq :to-lisp-vec x))
+	      (cv::vec-float-to-lisp-vec y))
+	     ((typep x 'cv::std-vector-float)
+	      (if (eq y nil)
+		  (mem-aref (cv::vec-float-to-c-arr x) :float) 
+		  (mem-aref (cv::vec-float-to-c-arr x) :float y)))
 	     (t (error "incorrect input. 
-                   ~%See VECTOR-FLOAT documentation in <LISP-CV-SOURCE-DIR>/EXAMPLES.LISP~%"))))))
+                   ~%See VECTOR-FLOAT documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%")))))
 
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * create_std_vector##tn()
-(defcfun ("create_std_vectori" make-vector-int) (cv::vector-int :garbage-collect t))
+(defcfun ("create_std_vectori" make-vector-int) cv::vector-int)
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
-(defcfun ("carray_to_std_vectori" c-arr-to-vec-int) (cv::vector-int :garbage-collect t)
+(defcfun ("carray_to_std_vectori" c-arr-to-vec-int) cv::vector-int
   (a :pointer)
   (len :unsigned-int))
 
@@ -2309,41 +2452,39 @@
     (c-arr-to-vec-int (cdr previous) (length a))))
 
 
-(defmacro vector-int (&rest args)
+(defun vector-int (&rest args)
   (if (third args)
       (error "odd number of args to VECTOR-INT")
       nil)
-  (let ((x (gensym))
-        (y (gensym)))
-    `(let ((,x (first (list ,@args)))
-	   (,y (second (list ,@args))))
-       (cond ((eq ,x nil)
+    (let ((x (first args))
+	   (y (second args)))
+       (cond ((null x)
 	      (make-vector-int))
-	     ((or (vectorp ,x) (listp ,x))
-	      (arr-to-vec-int ,x))
-	     ((eq :length ,x)
-	      (cv::vec-int-length ,y))
-	     ((and (eq :to-lisp-list ,x))
-	      (cv::vec-int-to-lisp-list ,y))
-	     ((and (eq :to-lisp-vec ,x))
-	      (cv::vec-int-to-lisp-vec ,y))
-	     ((typep ,x 'cv::std-vector-int)
-	      (if (eq ,y nil)
-		  (mem-aref (cv::vec-int-to-c-arr ,x) :int) 
-		  (mem-aref (cv::vec-int-to-c-arr ,x) :int ,y)))
+	     ((and (or (vectorp x) (listp x)) (null y))
+	      (arr-to-vec-int x))
+	     ((eq :length x)
+	      (cv::vec-int-length y))
+	     ((and (eq :to-lisp-list x))
+	      (cv::vec-int-to-lisp-list y))
+	     ((and (eq :to-lisp-vec x))
+	      (cv::vec-int-to-lisp-vec y))
+	     ((typep x 'cv::std-vector-int)
+	      (if (eq y nil)
+		  (mem-aref (cv::vec-int-to-c-arr x) :int) 
+		  (mem-aref (cv::vec-int-to-c-arr x) :int y)))
 	     (t (error "incorrect input. 
-                   ~%See VECTOR-INT documentation in <LISP-CV-SOURCE-DIR>/EXAMPLES.LISP~%"))))))
+                   ~%See VECTOR-INT documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%")))))
 
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * create_std_vector##tn()
-(defcfun ("create_std_vectorkp" make-vector-key-point) (cv::vector-key-point :garbage-collect t))
+(defcfun ("create_std_vectorkp" make-vector-key-point) cv::vector-key-point)
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
-(defcfun ("carray_to_std_vectorkp" c-arr-to-vec-key-point) (cv::vector-key-point :garbage-collect t)
+(defcfun ("carray_to_std_vectorkp" c-arr-to-vec-key-point) cv::vector-key-point
   (a :pointer)
   (len :unsigned-int))
 
@@ -2356,47 +2497,90 @@
     (c-arr-to-vec-key-point (cdr previous) (length a))))
 
 
-(defmacro vector-key-point (&rest args)
+(defun vector-key-point (&rest args)
   (if (fourth args)
       (error "odd number of args to VECTOR-KEY-POINT")
       nil)
-  (let ((x (gensym))
-        (y (gensym))
-        (z (gensym)))
-    `(let ((,x (first (list ,@args)))
-	   (,y (second (list ,@args)))
-           (,z (third (list ,@args))))
-       (cond ((eq ,x nil)
+    (let ((x (first args))
+	   (y (second args))
+           (z (third args)))
+       (cond ((null x)
 	      (make-vector-key-point))
-	     ((or (vectorp ,x) (listp ,x))
-	      (arr-to-vec-key-point ,x))
-	     ((eq :length ,x)
-	      (cv::vec-key-point-length ,y))
-	     ((and (eq :to-lisp-list ,x))
-	      (cv::vec-key-point-to-lisp-list ,y))
-	     ((and (eq :to-lisp-vec ,x))
-	      (cv::vec-key-point-to-lisp-vec ,y))
-	     ((and (typep ,x 'cv::std-vector-key-point) ,y)
-	      (if (eq ,z nil)
-		  (mem-aref (cv::vec-key-point-to-c-arr ,x) 'cv::key-point ,y)
-		  (if (< ,z 5)  (mem-aref (cv::c-pointer 
-					   (mem-aref (cv::vec-key-point-to-c-arr ,x) 
-						     'cv::key-point ,y)) :float ,z)
+	     ((and (or (vectorp x) (listp x)) (null y))
+	      (arr-to-vec-key-point x))
+	     ((eq :length x)
+	      (cv::vec-key-point-length y))
+	     ((and (eq :to-lisp-list x))
+	      (cv::vec-key-point-to-lisp-list y))
+	     ((and (eq :to-lisp-vec x))
+	      (cv::vec-key-point-to-lisp-vec y))
+	     ((and (typep x 'cv::std-vector-key-point) y)
+	      (if (eq z nil)
+		  (mem-aref (cv::vec-key-point-to-c-arr x) 'cv::key-point y)
+		  (if (< z 5)  (mem-aref (cv::c-pointer 
+					   (mem-aref (cv::vec-key-point-to-c-arr x) 
+						     'cv::key-point y)) :float z)
 		      (mem-aref (cv::c-pointer 
-				 (mem-aref (cv::vec-key-point-to-c-arr ,x) 'cv::key-point ,y)) :int ,z))))
+				 (mem-aref (cv::vec-key-point-to-c-arr x) 'cv::key-point y)) :int z))))
 	     (t (error "incorrect input. 
-  ~%See VECTOR-KEY-POINT documentation in <LISP-CV-SOURCE-DIR>/EXAMPLES.LISP~%"))))))
+  ~%See VECTOR-KEY-POINT documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%")))))
 
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * create_std_vector##tn()
-(defcfun ("create_std_vectorp" make-vector-point) (cv::vector-point :garbage-collect t))
+(defcfun ("create_std_vectorm" make-vector-mat) cv::vector-mat)
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
-(defcfun ("carray_to_std_vectorp" c-arr-to-vec-point) (cv::vector-point :garbage-collect t)
+(defcfun ("carray_to_std_vectorm" c-arr-to-vec-mat) cv::vector-mat
+  (a :pointer)
+  (len :unsigned-int))
+
+
+(let ((previous nil))
+  (defun arr-to-vec-mat (a)
+    (unless (equal a (car previous))
+      (setf previous (cons a (foreign-alloc :pointer :initial-contents
+					    (mapcar #!(cv::c-pointer %1) (coerce a 'list))))))
+    (c-arr-to-vec-mat (cdr previous) (length a))))
+
+
+(defun vector-mat (&rest args)
+  (if (fourth args)
+      (error "odd number of args to VECTOR-MAT")
+      nil)
+    (let ((x (first args))
+	   (y (second args))
+           (z (third args)))
+       (cond ((null x)
+	      (make-vector-mat))
+	     ((and (or (vectorp x) (listp x)) (null y))
+	      (arr-to-vec-mat x))
+	     ((eq :length x)
+	      (cv::vec-mat-length y))
+	     ((and (eq :to-lisp-list x))
+	      (cv::vec-mat-to-lisp-list y))
+	     ((and (eq :to-lisp-vec x))
+	      (cv::vec-mat-to-lisp-vec y))
+	     ((and (typep x 'cv::std-vector-mat) y)
+	      (if (eq z nil)
+		  (mem-aref (cv::vec-mat-to-c-arr x) 'cv::mat y)
+		  (mem-aref (cv::c-pointer (mem-aref (cv::vec-mat-to-c-arr x) 'cv::mat y)) :int z)))
+	     (t (error "incorrect input. 
+  ~%See VECTOR-MAT documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%")))))
+
+
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_##t * create_std_vector##tn()
+(defcfun ("create_std_vectorp" make-vector-point) cv::vector-point)
+
+
+;; template < class T, class Alloc = allocator<T> > class vector
+;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
+(defcfun ("carray_to_std_vectorp" c-arr-to-vec-point) cv::vector-point
   (a :pointer)
   (len :unsigned-int))
 
@@ -2409,43 +2593,40 @@
     (c-arr-to-vec-point (cdr previous) (length a))))
 
 
-(defmacro vector-point (&rest args)
+(defun vector-point (&rest args)
   (if (fourth args)
       (error "odd number of args to VECTOR-POINT")
       nil)
-  (let ((x (gensym))
-        (y (gensym))
-        (z (gensym)))
-    `(let ((,x (first (list ,@args)))
-	   (,y (second (list ,@args)))
-           (,z (third (list ,@args))))
-       (cond ((eq ,x nil)
+    (let ((x (first args))
+	   (y (second args))
+           (z (third args)))
+       (cond ((null x)
 	      (make-vector-point))
-	     ((or (vectorp ,x) (listp ,x))
-	      (arr-to-vec-point ,x))
-	     ((eq :length ,x)
-	      (cv::vec-point-length ,y))
-	     ((and (eq :to-lisp-list ,x))
-	      (cv::vec-point-to-lisp-list ,y))
-	     ((and (eq :to-lisp-vec ,x))
-	      (cv::vec-point-to-lisp-vec ,y))
-	     ((and (typep ,x 'cv::std-vector-point) ,y)
-	      (if (eq ,z nil)
-		  (mem-aref (cv::vec-point-to-c-arr ,x) 'cv::point ,y)
-		  (mem-aref (cv::c-pointer (mem-aref (cv::vec-point-to-c-arr ,x) 'cv::point ,y)) :int ,z)))
+	     ((and (or (vectorp x) (listp x)) (null y))
+	      (arr-to-vec-point x))
+	     ((eq :length x)
+	      (cv::vec-point-length y))
+	     ((and (eq :to-lisp-list x))
+	      (cv::vec-point-to-lisp-list y))
+	     ((and (eq :to-lisp-vec x))
+	      (cv::vec-point-to-lisp-vec y))
+	     ((and (typep x 'cv::std-vector-point) y)
+	      (if (eq z nil)
+		  (mem-aref (cv::vec-point-to-c-arr x) 'cv::point y)
+		  (mem-aref (cv::c-pointer (mem-aref (cv::vec-point-to-c-arr x) 'cv::point y)) :int z)))
 	     (t (error "incorrect input. 
-  ~%See VECTOR-POINT documentation in <LISP-CV-SOURCE-DIR>/EXAMPLES.LISP~%"))))))
+  ~%See VECTOR-POINT documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%")))))
 
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * create_std_vector##tn()
-(defcfun ("create_std_vectorp2f" make-vector-point-2f) (cv::vector-point-2f :garbage-collect t))
+(defcfun ("create_std_vectorp2f" make-vector-point-2f) cv::vector-point-2f)
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
-(defcfun ("carray_to_std_vectorp2f" c-arr-to-vec-point-2f) (cv::vector-point-2f :garbage-collect t)
+(defcfun ("carray_to_std_vectorp2f" c-arr-to-vec-point-2f) cv::vector-point-2f
   (a :pointer)
   (len :unsigned-int))
 
@@ -2458,43 +2639,40 @@
     (c-arr-to-vec-point-2f (cdr previous) (length a))))
 
 
-(defmacro vector-point-2f (&rest args)
+(defun vector-point-2f (&rest args)
   (if (fourth args)
       (error "odd number of args to VECTOR-POINT-2F")
       nil)
-  (let ((x (gensym))
-        (y (gensym))
-        (z (gensym)))
-    `(let ((,x (first (list ,@args)))
-	   (,y (second (list ,@args)))
-           (,z (third (list ,@args))))
-       (cond ((eq ,x nil)
+    (let ((x (first args))
+	   (y (second args))
+           (z (third args)))
+       (cond ((null x)
 	      (make-vector-point-2f))
-	     ((or (vectorp ,x) (listp ,x))
-	      (arr-to-vec-point-2f ,x))
-	     ((eq :length ,x)
-	      (cv::vec-point-2f-length ,y))
-	     ((and (eq :to-lisp-list ,x))
-	      (cv::vec-point-2f-to-lisp-list ,y))
-	     ((and (eq :to-lisp-vec ,x))
-	      (cv::vec-point-2f-to-lisp-vec ,y))
-	     ((and (typep ,x 'cv::std-vector-point-2f) ,y)
-	      (if (eq ,z nil)
-		  (mem-aref (cv::vec-point-2f-to-c-arr ,x) 'cv::point-2f ,y)
-		  (mem-aref (cv::c-pointer (mem-aref (cv::vec-point-2f-to-c-arr ,x) 'cv::point-2f ,y)) :float ,z)))
+	     ((and (or (vectorp x) (listp x)) (null y))
+	      (arr-to-vec-point-2f x))
+	     ((eq :length x)
+	      (cv::vec-point-2f-length y))
+	     ((and (eq :to-lisp-list x))
+	      (cv::vec-point-2f-to-lisp-list y))
+	     ((and (eq :to-lisp-vec x))
+	      (cv::vec-point-2f-to-lisp-vec y))
+	     ((and (typep x 'cv::std-vector-point-2f) y)
+	      (if (eq z nil)
+		  (mem-aref (cv::vec-point-2f-to-c-arr x) 'cv::point-2f y)
+		  (mem-aref (cv::c-pointer (mem-aref (cv::vec-point-2f-to-c-arr x) 'cv::point-2f y)) :float z)))
 	     (t (error "incorrect input. 
-  ~%See VECTOR-POINT-2F documentation in <LISP-CV-SOURCE-DIR>/EXAMPLES.LISP~%"))))))
+  ~%See VECTOR-POINT-2F documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%")))))
 
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * create_std_vector##tn()
-(defcfun ("create_std_vectorr" make-vector-rect) (cv::vector-rect :garbage-collect t))
+(defcfun ("create_std_vectorr" make-vector-rect) cv::vector-rect)
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
-(defcfun ("carray_to_std_vectorr" c-arr-to-vec-rect) (cv::vector-rect :garbage-collect t)
+(defcfun ("carray_to_std_vectorr" c-arr-to-vec-rect) cv::vector-rect
   (a :pointer)
   (len :unsigned-int))
 
@@ -2507,32 +2685,29 @@
     (c-arr-to-vec-rect (cdr previous) (length a))))
 
 
-(defmacro vector-rect (&rest args)
+(defun vector-rect (&rest args)
   (if (fourth args)
       (error "odd number of args to VECTOR-RECT")
       nil)
-  (let ((x (gensym))
-        (y (gensym))
-        (z (gensym)))
-    `(let ((,x (first (list ,@args)))
-	   (,y (second (list ,@args)))
-           (,z (third (list ,@args))))
-       (cond ((eq ,x nil)
+    (let ((x (first args))
+	   (y (second args))
+           (z (third args)))
+       (cond ((null x)
 	      (make-vector-rect))
-	     ((or (vectorp ,x) (listp ,x))
-	      (arr-to-vec-rect ,x))
-	     ((eq :length ,x)
-	      (cv::vec-rect-length ,y))
-	     ((and (eq :to-lisp-list ,x))
-	      (cv::vec-rect-to-lisp-list ,y))
-	     ((and (eq :to-lisp-vec ,x))
-	      (cv::vec-rect-to-lisp-vec ,y))
-	     ((and (typep ,x 'cv::std-vector-rect) ,y)
-	      (if (eq ,z nil)
-		  (mem-aref (cv::vec-rect-to-c-arr ,x) 'cv::rect ,y)
-		  (mem-aref (cv::c-pointer (mem-aref (cv::vec-rect-to-c-arr ,x) 'cv::rect ,y)) :int ,z)))
+	     ((and (or (vectorp x) (listp x)) (null y))
+	      (arr-to-vec-rect x))
+	     ((eq :length x)
+	      (cv::vec-rect-length y))
+	     ((and (eq :to-lisp-list x))
+	      (cv::vec-rect-to-lisp-list y))
+	     ((and (eq :to-lisp-vec x))
+	      (cv::vec-rect-to-lisp-vec y z))
+	     ((and (typep x 'cv::std-vector-rect) y)
+	      (if (eq z nil)
+		  (mem-aref (cv::vec-rect-to-c-arr x) 'cv::rect y)
+		  (mem-aref (cv::c-pointer (mem-aref (cv::vec-rect-to-c-arr x) 'cv::rect y)) :int z)))
 	     (t (error "incorrect input. 
-  ~%See VECTOR-RECT documentation in <LISP-CV-SOURCE-DIR>/EXAMPLES.LISP~%"))))))
+  ~%See VECTOR-RECT documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%")))))
 
 
 
@@ -2556,89 +2731,39 @@
     (c-arr-to-vec-uchar (cdr previous) (length a))))
 
 
-(defmacro vector-uchar (&rest args)
+(defun vector-uchar (&rest args)
   (if (third args)
       (error "odd number of args to VECTOR-UCHAR")
       nil)
-  (let ((x (gensym))
-        (y (gensym)))
-    `(let ((,x (first (list ,@args)))
-	   (,y (second (list ,@args))))
-       (cond ((eq ,x nil)
+    (let ((x (first args))
+	   (y (second args)))
+       (cond ((null x)
 	      (make-vector-uchar))
-	     ((or (vectorp ,x) (listp ,x))
-	      (arr-to-vec-uchar ,x))
-	     ((eq :length ,x)
-	      (cv::vec-uchar-length ,y))
-	     ((and (eq :to-lisp-list ,x))
-	      (cv::vec-uchar-to-lisp-list ,y))
-	     ((and (eq :to-lisp-vec ,x))
-	      (cv::vec-uchar-to-lisp-vec ,y))
-	     ((typep ,x 'cv::std-vector-uchar)
-	      (if (eq ,y nil)
-		  (mem-aref (cv::vec-uchar-to-c-arr ,x) :uchar) 
-		  (mem-aref (cv::vec-uchar-to-c-arr ,x) :uchar ,y)))
+	     ((and (or (vectorp x) (listp x)) (null y))
+	      (arr-to-vec-uchar x))
+	     ((eq :length x)
+	      (cv::vec-uchar-length y))
+	     ((and (eq :to-lisp-list x))
+	      (cv::vec-uchar-to-lisp-list y))
+	     ((and (eq :to-lisp-vec x))
+	      (cv::vec-uchar-to-lisp-vec y))
+	     ((typep x 'cv::std-vector-uchar)
+	      (if (eq y nil)
+		  (mem-aref (cv::vec-uchar-to-c-arr x) :uchar) 
+		  (mem-aref (cv::vec-uchar-to-c-arr x) :uchar y)))
 	     (t (error "incorrect input. 
-                   ~%See VECTOR-UCHAR documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%"))))))
-
-
-;; template < class T, class Alloc = allocator<T> > class vector
-;; vector_##t * create_std_vector##tn()
-(defcfun ("create_std_vectorv2b" make-vector-vec-2b) (cv::vector-vec-2b :garbage-collect t))
-
-
-;; template < class T, class Alloc = allocator<T> > class vector
-;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
-(defcfun ("carray_to_std_vectorv2b" c-arr-to-vec-vec-2b) (cv::vector-vec-2b :garbage-collect t)
-  (a :pointer)
-  (len :unsigned-int))
-
-
-(let ((previous nil))
-  (defun arr-to-vec-vec-2b (a)
-    (unless (equal a (car previous))
-      (setf previous (cons a (foreign-alloc :pointer :initial-contents
-					    (mapcar #!(cv::c-pointer %1) (coerce a 'list))))))
-    (c-arr-to-vec-vec-2b (cdr previous) (length a))))
-
-
-(defmacro vector-vec-2b (&rest args)
-  (if (fourth args)
-      (error "odd number of args to VECTOR-VEC-2B")
-      nil)
-  (let ((x (gensym))
-        (y (gensym))
-        (z (gensym)))
-    `(let ((,x (first (list ,@args)))
-	   (,y (second (list ,@args)))
-           (,z (third (list ,@args))))
-       (cond ((eq ,x nil)
-	      (make-vector-vec-2b))
-	     ((or (vectorp ,x) (listp ,x))
-	      (arr-to-vec-vec-2b ,x))
-	     ((eq :length ,x)
-	      (cv::vec-vec-2b-length ,y))
-	     ((and (eq :to-lisp-list ,x))
-	      (cv::vec-vec-2b-to-lisp-list ,y))
-	     ((and (eq :to-lisp-vec ,x))
-	      (cv::vec-vec-2b-to-lisp-vec ,y))
-	     ((and (typep ,x 'cv::std-vector-vec-2b) ,y)
-	      (if (eq ,z nil)
-		  (mem-aref (cv::vec-vec-2b-to-c-arr ,x) 'cv::vec-2b ,y)
-		  (mem-aref (cv::c-pointer (mem-aref (cv::vec-vec-2b-to-c-arr ,x) 'cv::vec-2b ,y)) :int ,z)))
-	     (t (error "incorrect input. 
-  ~%See VECTOR-VEC-2B documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%"))))))
+                   ~%See VECTOR-UCHAR documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%")))))
 
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * create_std_vector##tn()
-(defcfun ("create_std_vectorv2d" make-vector-vec-2d) (cv::vector-vec-2d :garbage-collect t))
+(defcfun ("create_std_vectorv2d" make-vector-vec-2d) cv::vector-vec-2d)
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
-(defcfun ("carray_to_std_vectorv2d" c-arr-to-vec-vec-2d) (cv::vector-vec-2d :garbage-collect t)
+(defcfun ("carray_to_std_vectorv2d" c-arr-to-vec-vec-2d) cv::vector-vec-2d
   (a :pointer)
   (len :unsigned-int))
 
@@ -2651,43 +2776,40 @@
     (c-arr-to-vec-vec-2d (cdr previous) (length a))))
 
 
-(defmacro vector-vec-2d (&rest args)
+(defun vector-vec-2d (&rest args)
   (if (fourth args)
       (error "odd number of args to VECTOR-VEC-2D")
       nil)
-  (let ((x (gensym))
-        (y (gensym))
-        (z (gensym)))
-    `(let ((,x (first (list ,@args)))
-	   (,y (second (list ,@args)))
-           (,z (third (list ,@args))))
-       (cond ((eq ,x nil)
+    (let ((x (first args))
+	   (y (second args))
+           (z (third args)))
+       (cond ((null x)
 	      (make-vector-vec-2d))
-	     ((or (vectorp ,x) (listp ,x))
-	      (arr-to-vec-vec-2d ,x))
-	     ((eq :length ,x)
-	      (cv::vec-vec-2d-length ,y))
-	     ((and (eq :to-lisp-list ,x))
-	      (cv::vec-vec-2d-to-lisp-list ,y))
-	     ((and (eq :to-lisp-vec ,x))
-	      (cv::vec-vec-2d-to-lisp-vec ,y))
-	     ((and (typep ,x 'cv::std-vector-vec-2d) ,y)
-	      (if (eq ,z nil)
-		  (mem-aref (cv::vec-vec-2d-to-c-arr ,x) 'cv::vec-2d ,y)
-		  (mem-aref (cv::c-pointer (mem-aref (cv::vec-vec-2d-to-c-arr ,x) 'cv::vec-2d ,y)) :double ,z)))
+	     ((and (or (vectorp x) (listp x)) (null y))
+	      (arr-to-vec-vec-2d x))
+	     ((eq :length x)
+	      (cv::vec-vec-2d-length y))
+	     ((and (eq :to-lisp-list x))
+	      (cv::vec-vec-2d-to-lisp-list y))
+	     ((and (eq :to-lisp-vec x))
+	      (cv::vec-vec-2d-to-lisp-vec y))
+	     ((and (typep x 'cv::std-vector-vec-2d) y)
+	      (if (eq z nil)
+		  (mem-aref (cv::vec-vec-2d-to-c-arr x) 'cv::vec-2d y)
+		  (mem-aref (cv::c-pointer (mem-aref (cv::vec-vec-2d-to-c-arr x) 'cv::vec-2d y)) :double z)))
 	     (t (error "incorrect input. 
-  ~%See VECTOR-VEC-2D documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%"))))))
+  ~%See VECTOR-VEC-2D documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%")))))
 
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * create_std_vector##tn()
-(defcfun ("create_std_vectorv3d" make-vector-vec-3d) (cv::vector-vec-3d :garbage-collect t))
+(defcfun ("create_std_vectorv3d" make-vector-vec-3d) cv::vector-vec-3d)
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
-(defcfun ("carray_to_std_vectorv3d" c-arr-to-vec-vec-3d) (cv::vector-vec-3d :garbage-collect t)
+(defcfun ("carray_to_std_vectorv3d" c-arr-to-vec-vec-3d) cv::vector-vec-3d
   (a :pointer)
   (len :unsigned-int))
 
@@ -2700,43 +2822,40 @@
     (c-arr-to-vec-vec-3d (cdr previous) (length a))))
 
 
-(defmacro vector-vec-3d (&rest args)
+(defun vector-vec-3d (&rest args)
   (if (fourth args)
       (error "odd number of args to VECTOR-VEC-3D")
       nil)
-  (let ((x (gensym))
-        (y (gensym))
-        (z (gensym)))
-    `(let ((,x (first (list ,@args)))
-	   (,y (second (list ,@args)))
-           (,z (third (list ,@args))))
-       (cond ((eq ,x nil)
+    (let ((x (first args))
+	   (y (second args))
+           (z (third args)))
+       (cond ((null x)
 	      (make-vector-vec-3d))
-	     ((or (vectorp ,x) (listp ,x))
-	      (arr-to-vec-vec-3d ,x))
-	     ((eq :length ,x)
-	      (cv::vec-vec-3d-length ,y))
-	     ((and (eq :to-lisp-list ,x))
-	      (cv::vec-vec-3d-to-lisp-list ,y))
-	     ((and (eq :to-lisp-vec ,x))
-	      (cv::vec-vec-3d-to-lisp-vec ,y))
-	     ((and (typep ,x 'cv::std-vector-vec-3d) ,y)
-	      (if (eq ,z nil)
-		  (mem-aref (cv::vec-vec-3d-to-c-arr ,x) 'cv::vec-3d ,y)
-		  (mem-aref (cv::c-pointer (mem-aref (cv::vec-vec-3d-to-c-arr ,x) 'cv::vec-3d ,y)) :double ,z)))
+	     ((and (or (vectorp x) (listp x)) (null y))
+	      (arr-to-vec-vec-3d x))
+	     ((eq :length x)
+	      (cv::vec-vec-3d-length y))
+	     ((and (eq :to-lisp-list x))
+	      (cv::vec-vec-3d-to-lisp-list y))
+	     ((and (eq :to-lisp-vec x))
+	      (cv::vec-vec-3d-to-lisp-vec y))
+	     ((and (typep x 'cv::std-vector-vec-3d) y)
+	      (if (eq z nil)
+		  (mem-aref (cv::vec-vec-3d-to-c-arr x) 'cv::vec-3d y)
+		  (mem-aref (cv::c-pointer (mem-aref (cv::vec-vec-3d-to-c-arr x) 'cv::vec-3d y)) :double z)))
 	     (t (error "incorrect input. 
-  ~%See VECTOR-VEC-3D documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%"))))))
+  ~%See VECTOR-VEC-3D documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%")))))
 
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * create_std_vector##tn()
-(defcfun ("create_std_vectorv4d" make-vector-vec-4d) (cv::vector-vec-4d :garbage-collect t))
+(defcfun ("create_std_vectorv4d" make-vector-vec-4d) cv::vector-vec-4d)
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
-(defcfun ("carray_to_std_vectorv4d" c-arr-to-vec-vec-4d) (cv::vector-vec-4d :garbage-collect t)
+(defcfun ("carray_to_std_vectorv4d" c-arr-to-vec-vec-4d) cv::vector-vec-4d
   (a :pointer)
   (len :unsigned-int))
 
@@ -2749,43 +2868,40 @@
     (c-arr-to-vec-vec-4d (cdr previous) (length a))))
 
 
-(defmacro vector-vec-4d (&rest args)
+(defun vector-vec-4d (&rest args)
   (if (fourth args)
       (error "odd number of args to VECTOR-VEC-4D")
       nil)
-  (let ((x (gensym))
-        (y (gensym))
-        (z (gensym)))
-    `(let ((,x (first (list ,@args)))
-	   (,y (second (list ,@args)))
-           (,z (third (list ,@args))))
-       (cond ((eq ,x nil)
+    (let ((x (first args))
+	   (y (second args))
+           (z (third args)))
+       (cond ((null x)
 	      (make-vector-vec-4d))
-	     ((or (vectorp ,x) (listp ,x))
-	      (arr-to-vec-vec-4d ,x))
-	     ((eq :length ,x)
-	      (cv::vec-vec-4d-length ,y))
-	     ((and (eq :to-lisp-list ,x))
-	      (cv::vec-vec-4d-to-lisp-list ,y))
-	     ((and (eq :to-lisp-vec ,x))
-	      (cv::vec-vec-4d-to-lisp-vec ,y))
-	     ((and (typep ,x 'cv::std-vector-vec-4d) ,y)
-	      (if (eq ,z nil)
-		  (mem-aref (cv::vec-vec-4d-to-c-arr ,x) 'cv::vec-4d ,y)
-		  (mem-aref (cv::c-pointer (mem-aref (cv::vec-vec-4d-to-c-arr ,x) 'cv::vec-4d ,y)) :double ,z)))
+	     ((and (or (vectorp x) (listp x)) (null y))
+	      (arr-to-vec-vec-4d x))
+	     ((eq :length x)
+	      (cv::vec-vec-4d-length y))
+	     ((and (eq :to-lisp-list x))
+	      (cv::vec-vec-4d-to-lisp-list y))
+	     ((and (eq :to-lisp-vec x))
+	      (cv::vec-vec-4d-to-lisp-vec y))
+	     ((and (typep x 'cv::std-vector-vec-4d) y)
+	      (if (eq z nil)
+		  (mem-aref (cv::vec-vec-4d-to-c-arr x) 'cv::vec-4d y)
+		  (mem-aref (cv::c-pointer (mem-aref (cv::vec-vec-4d-to-c-arr x) 'cv::vec-4d y)) :double z)))
 	     (t (error "incorrect input. 
-  ~%See VECTOR-VEC-4D documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%"))))))
+  ~%See VECTOR-VEC-4D documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%")))))
 
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * create_std_vector##tn()
-(defcfun ("create_std_vectorv6d" make-vector-vec-6d) (cv::vector-vec-6d :garbage-collect t))
+(defcfun ("create_std_vectorv6d" make-vector-vec-6d) cv::vector-vec-6d)
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
-(defcfun ("carray_to_std_vectorv6d" c-arr-to-vec-vec-6d) (cv::vector-vec-6d :garbage-collect t)
+(defcfun ("carray_to_std_vectorv6d" c-arr-to-vec-vec-6d) cv::vector-vec-6d
   (a :pointer)
   (len :unsigned-int))
 
@@ -2798,43 +2914,40 @@
     (c-arr-to-vec-vec-6d (cdr previous) (length a))))
 
 
-(defmacro vector-vec-6d (&rest args)
+(defun vector-vec-6d (&rest args)
   (if (fourth args)
       (error "odd number of args to VECTOR-VEC-6D")
       nil)
-  (let ((x (gensym))
-        (y (gensym))
-        (z (gensym)))
-    `(let ((,x (first (list ,@args)))
-	   (,y (second (list ,@args)))
-           (,z (third (list ,@args))))
-       (cond ((eq ,x nil)
+    (let ((x (first args))
+	   (y (second args))
+           (z (third args)))
+       (cond ((null x)
 	      (make-vector-vec-6d))
-	     ((or (vectorp ,x) (listp ,x))
-	      (arr-to-vec-vec-6d ,x))
-	     ((eq :length ,x)
-	      (cv::vec-vec-6d-length ,y))
-	     ((and (eq :to-lisp-list ,x))
-	      (cv::vec-vec-6d-to-lisp-list ,y))
-	     ((and (eq :to-lisp-vec ,x))
-	      (cv::vec-vec-6d-to-lisp-vec ,y))
-	     ((and (typep ,x 'cv::std-vector-vec-6d) ,y)
-	      (if (eq ,z nil)
-		  (mem-aref (cv::vec-vec-6d-to-c-arr ,x) 'cv::vec-6d ,y)
-		  (mem-aref (cv::c-pointer (mem-aref (cv::vec-vec-6d-to-c-arr ,x) 'cv::vec-6d ,y)) :double ,z)))
+	     ((and (or (vectorp x) (listp x)) (null y))
+	      (arr-to-vec-vec-6d x))
+	     ((eq :length x)
+	      (cv::vec-vec-6d-length y))
+	     ((and (eq :to-lisp-list x))
+	      (cv::vec-vec-6d-to-lisp-list y))
+	     ((and (eq :to-lisp-vec x))
+	      (cv::vec-vec-6d-to-lisp-vec y))
+	     ((and (typep x 'cv::std-vector-vec-6d) y)
+	      (if (eq z nil)
+		  (mem-aref (cv::vec-vec-6d-to-c-arr x) 'cv::vec-6d y)
+		  (mem-aref (cv::c-pointer (mem-aref (cv::vec-vec-6d-to-c-arr x) 'cv::vec-6d y)) :double z)))
 	     (t (error "incorrect input. 
-  ~%See VECTOR-VEC-6D documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%"))))))
+  ~%See VECTOR-VEC-6D documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%")))))
 
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * create_std_vector##tn()
-(defcfun ("create_std_vectorv2f" make-vector-vec-2f) (cv::vector-vec-2f :garbage-collect t))
+(defcfun ("create_std_vectorv2f" make-vector-vec-2f) cv::vector-vec-2f)
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
-(defcfun ("carray_to_std_vectorv2f" c-arr-to-vec-vec-2f) (cv::vector-vec-2f :garbage-collect t)
+(defcfun ("carray_to_std_vectorv2f" c-arr-to-vec-vec-2f) cv::vector-vec-2f
   (a :pointer)
   (len :unsigned-int))
 
@@ -2847,43 +2960,40 @@
     (c-arr-to-vec-vec-2f (cdr previous) (length a))))
 
 
-(defmacro vector-vec-2f (&rest args)
+(defmacro vec-vec-2f (&rest args)
   (if (fourth args)
       (error "odd number of args to VECTOR-VEC-2F")
       nil)
-  (let ((x (gensym))
-        (y (gensym))
-        (z (gensym)))
-    `(let ((,x (first (list ,@args)))
-	   (,y (second (list ,@args)))
-           (,z (third (list ,@args))))
-       (cond ((eq ,x nil)
+    (let ((x (first args))
+	   (y (second args))
+           (z (third args)))
+       (cond ((null x)
 	      (make-vector-vec-2f))
-	     ((or (vectorp ,x) (listp ,x))
-	      (arr-to-vec-vec-2f ,x))
-	     ((eq :length ,x)
-	      (cv::vec-vec-2f-length ,y))
-	     ((and (eq :to-lisp-list ,x))
-	      (cv::vec-vec-2f-to-lisp-list ,y))
-	     ((and (eq :to-lisp-vec ,x))
-	      (cv::vec-vec-2f-to-lisp-vec ,y))
-	     ((and (typep ,x 'cv::std-vector-vec-2f) ,y)
-	      (if (eq ,z nil)
-		  (mem-aref (cv::vec-vec-2f-to-c-arr ,x) 'cv::vec-2f ,y)
-		  (mem-aref (cv::c-pointer (mem-aref (cv::vec-vec-2f-to-c-arr ,x) 'cv::vec-2f ,y)) :float ,z)))
+	     ((and (or (vectorp x) (listp x)) (null y))
+	      (arr-to-vec-vec-2f x))
+	     ((eq :length x)
+	      (cv::vec-vec-2f-length y))
+	     ((and (eq :to-lisp-list x))
+	      (cv::vec-vec-2f-to-lisp-list y))
+	     ((and (eq :to-lisp-vec x))
+	      (cv::vec-vec-2f-to-lisp-vec y))
+	     ((and (typep x 'cv::std-vector-vec-2f) y)
+	      (if (eq z nil)
+		  (mem-aref (cv::vec-vec-2f-to-c-arr x) 'cv::vec-2f y)
+		  (mem-aref (cv::c-pointer (mem-aref (cv::vec-vec-2f-to-c-arr x) 'cv::vec-2f y)) :float z)))
 	     (t (error "incorrect input. 
-  ~%See VECTOR-VEC-2F documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%"))))))
+  ~%See VECTOR-VEC-2F documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%")))))
 
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * create_std_vector##tn()
-(defcfun ("create_std_vectorv3f" make-vector-vec-3f) (cv::vector-vec-3f :garbage-collect t))
+(defcfun ("create_std_vectorv3f" make-vector-vec-3f) cv::vector-vec-3f)
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
-(defcfun ("carray_to_std_vectorv3f" c-arr-to-vec-vec-3f) (cv::vector-vec-3f :garbage-collect t)
+(defcfun ("carray_to_std_vectorv3f" c-arr-to-vec-vec-3f) cv::vector-vec-3f
   (a :pointer)
   (len :unsigned-int))
 
@@ -2896,43 +3006,40 @@
     (c-arr-to-vec-vec-3f (cdr previous) (length a))))
 
 
-(defmacro vector-vec-3f (&rest args)
+(defun vector-vec-3f (&rest args)
   (if (fourth args)
       (error "odd number of args to VECTOR-VEC-3F")
       nil)
-  (let ((x (gensym))
-        (y (gensym))
-        (z (gensym)))
-    `(let ((,x (first (list ,@args)))
-	   (,y (second (list ,@args)))
-           (,z (third (list ,@args))))
-       (cond ((eq ,x nil)
+    (let ((x (first args))
+	   (y (second args))
+           (z (third args)))
+       (cond ((null x)
 	      (make-vector-vec-3f))
-	     ((or (vectorp ,x) (listp ,x))
-	      (arr-to-vec-vec-3f ,x))
-	     ((eq :length ,x)
-	      (cv::vec-vec-3f-length ,y))
-	     ((and (eq :to-lisp-list ,x))
-	      (cv::vec-vec-3f-to-lisp-list ,y))
-	     ((and (eq :to-lisp-vec ,x))
-	      (cv::vec-vec-3f-to-lisp-vec ,y))
-	     ((and (typep ,x 'cv::std-vector-vec-3f) ,y)
-	      (if (eq ,z nil)
-		  (mem-aref (cv::vec-vec-3f-to-c-arr ,x) 'cv::vec-3f ,y)
-		  (mem-aref (cv::c-pointer (mem-aref (cv::vec-vec-3f-to-c-arr ,x) 'cv::vec-3f ,y)) :float ,z)))
+	     ((and (or (vectorp x) (listp x)) (null y))
+	      (arr-to-vec-vec-3f x))
+	     ((eq :length x)
+	      (cv::vec-vec-3f-length y))
+	     ((and (eq :to-lisp-list x))
+	      (cv::vec-vec-3f-to-lisp-list y))
+	     ((and (eq :to-lisp-vec x))
+	      (cv::vec-vec-3f-to-lisp-vec y))
+	     ((and (typep x 'cv::std-vector-vec-3f) y)
+	      (if (eq z nil)
+		  (mem-aref (cv::vec-vec-3f-to-c-arr x) 'cv::vec-3f y)
+		  (mem-aref (cv::c-pointer (mem-aref (cv::vec-vec-3f-to-c-arr x) 'cv::vec-3f y)) :float z)))
 	     (t (error "incorrect input. 
-  ~%See VECTOR-VEC-3F documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%"))))))
+  ~%See VECTOR-VEC-3F documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%")))))
 
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * create_std_vector##tn()
-(defcfun ("create_std_vectorv4f" make-vector-vec-4f) (cv::vector-vec-4f :garbage-collect t))
+(defcfun ("create_std_vectorv4f" make-vector-vec-4f) cv::vector-vec-4f)
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
-(defcfun ("carray_to_std_vectorv4f" c-arr-to-vec-vec-4f) (cv::vector-vec-4f :garbage-collect t)
+(defcfun ("carray_to_std_vectorv4f" c-arr-to-vec-vec-4f) cv::vector-vec-4f
   (a :pointer)
   (len :unsigned-int))
 
@@ -2945,43 +3052,40 @@
     (c-arr-to-vec-vec-4f (cdr previous) (length a))))
 
 
-(defmacro vector-vec-4f (&rest args)
+(defun vector-vec-4f (&rest args)
   (if (fourth args)
       (error "odd number of args to VECTOR-VEC-4F")
       nil)
-  (let ((x (gensym))
-        (y (gensym))
-        (z (gensym)))
-    `(let ((,x (first (list ,@args)))
-	   (,y (second (list ,@args)))
-           (,z (third (list ,@args))))
-       (cond ((eq ,x nil)
+    (let ((x (first args))
+	   (y (second args))
+           (z (third args)))
+       (cond ((null x)
 	      (make-vector-vec-4f))
-	     ((or (vectorp ,x) (listp ,x))
-	      (arr-to-vec-vec-4f ,x))
-	     ((eq :length ,x)
-	      (cv::vec-vec-4f-length ,y))
-	     ((and (eq :to-lisp-list ,x))
-	      (cv::vec-vec-4f-to-lisp-list ,y))
-	     ((and (eq :to-lisp-vec ,x))
-	      (cv::vec-vec-4f-to-lisp-vec ,y))
-	     ((and (typep ,x 'cv::std-vector-vec-4f) ,y)
-	      (if (eq ,z nil)
-		  (mem-aref (cv::vec-vec-4f-to-c-arr ,x) 'cv::vec-4f ,y)
-		  (mem-aref (cv::c-pointer (mem-aref (cv::vec-vec-4f-to-c-arr ,x) 'cv::vec-4f ,y)) :float ,z)))
+	     ((and (or (vectorp x) (listp x)) (null y))
+	      (arr-to-vec-vec-4f x))
+	     ((eq :length x)
+	      (cv::vec-vec-4f-length y))
+	     ((and (eq :to-lisp-list x))
+	      (cv::vec-vec-4f-to-lisp-list y))
+	     ((and (eq :to-lisp-vec x))
+	      (cv::vec-vec-4f-to-lisp-vec y))
+	     ((and (typep x 'cv::std-vector-vec-4f) y)
+	      (if (eq z nil)
+		  (mem-aref (cv::vec-vec-4f-to-c-arr x) 'cv::vec-4f y)
+		  (mem-aref (cv::c-pointer (mem-aref (cv::vec-vec-4f-to-c-arr x) 'cv::vec-4f y)) :float z)))
 	     (t (error "incorrect input. 
-  ~%See VECTOR-VEC-4F documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%"))))))
+  ~%See VECTOR-VEC-4F documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%")))))
 
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * create_std_vector##tn()
-(defcfun ("create_std_vectorv6f" make-vector-vec-6f) (cv::vector-vec-6f :garbage-collect t))
+(defcfun ("create_std_vectorv6f" make-vector-vec-6f) cv::vector-vec-6f)
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
-(defcfun ("carray_to_std_vectorv6f" c-arr-to-vec-vec-6f) (cv::vector-vec-6f :garbage-collect t)
+(defcfun ("carray_to_std_vectorv6f" c-arr-to-vec-vec-6f) cv::vector-vec-6f
   (a :pointer)
   (len :unsigned-int))
 
@@ -2994,43 +3098,40 @@
     (c-arr-to-vec-vec-6f (cdr previous) (length a))))
 
 
-(defmacro vector-vec-6f (&rest args)
+(defun vector-vec-6f (&rest args)
   (if (fourth args)
       (error "odd number of args to VECTOR-VEC-6F")
       nil)
-  (let ((x (gensym))
-        (y (gensym))
-        (z (gensym)))
-    `(let ((,x (first (list ,@args)))
-	   (,y (second (list ,@args)))
-           (,z (third (list ,@args))))
-       (cond ((eq ,x nil)
+    (let ((x (first args))
+	   (y (second args))
+           (z (third args)))
+       (cond ((null x)
 	      (make-vector-vec-6f))
-	     ((or (vectorp ,x) (listp ,x))
-	      (arr-to-vec-vec-6f ,x))
-	     ((eq :length ,x)
-	      (cv::vec-vec-6f-length ,y))
-	     ((and (eq :to-lisp-list ,x))
-	      (cv::vec-vec-6f-to-lisp-list ,y))
-	     ((and (eq :to-lisp-vec ,x))
-	      (cv::vec-vec-6f-to-lisp-vec ,y))
-	     ((and (typep ,x 'cv::std-vector-vec-6f) ,y)
-	      (if (eq ,z nil)
-		  (mem-aref (cv::vec-vec-6f-to-c-arr ,x) 'cv::vec-6f ,y)
-		  (mem-aref (cv::c-pointer (mem-aref (cv::vec-vec-6f-to-c-arr ,x) 'cv::vec-6f ,y)) :float ,z)))
+	     ((and (or (vectorp x) (listp x)) (null y))
+	      (arr-to-vec-vec-6f x))
+	     ((eq :length x)
+	      (cv::vec-vec-6f-length y))
+	     ((and (eq :to-lisp-list x))
+	      (cv::vec-vec-6f-to-lisp-list y))
+	     ((and (eq :to-lisp-vec x))
+	      (cv::vec-vec-6f-to-lisp-vec y))
+	     ((and (typep x 'cv::std-vector-vec-6f) y)
+	      (if (eq z nil)
+		  (mem-aref (cv::vec-vec-6f-to-c-arr x) 'cv::vec-6f y)
+		  (mem-aref (cv::c-pointer (mem-aref (cv::vec-vec-6f-to-c-arr x) 'cv::vec-6f y)) :float z)))
 	     (t (error "incorrect input. 
-  ~%See VECTOR-VEC-6F documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%"))))))
+  ~%See VECTOR-VEC-6F documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%")))))
 
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * create_std_vector##tn()
-(defcfun ("create_std_vectorv2i" make-vector-vec-2i) (cv::vector-vec-2i :garbage-collect t))
+(defcfun ("create_std_vectorv2i" make-vector-vec-2i) cv::vector-vec-2i)
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
-(defcfun ("carray_to_std_vectorv2i" c-arr-to-vec-vec-2i) (cv::vector-vec-2i :garbage-collect t)
+(defcfun ("carray_to_std_vectorv2i" c-arr-to-vec-vec-2i) cv::vector-vec-2i
   (a :pointer)
   (len :unsigned-int))
 
@@ -3043,43 +3144,40 @@
     (c-arr-to-vec-vec-2i (cdr previous) (length a))))
 
 
-(defmacro vector-vec-2i (&rest args)
+(defun vector-vec-2i (&rest args)
   (if (fourth args)
       (error "odd number of args to VECTOR-VEC-2I")
       nil)
-  (let ((x (gensym))
-        (y (gensym))
-        (z (gensym)))
-    `(let ((,x (first (list ,@args)))
-	   (,y (second (list ,@args)))
-           (,z (third (list ,@args))))
-       (cond ((eq ,x nil)
+    (let ((x (first args))
+	   (y (second args))
+           (z (third args)))
+       (cond ((null x)
 	      (make-vector-vec-2i))
-	     ((or (vectorp ,x) (listp ,x))
-	      (arr-to-vec-vec-2i ,x))
-	     ((eq :length ,x)
-	      (cv::vec-vec-2i-length ,y))
-	     ((and (eq :to-lisp-list ,x))
-	      (cv::vec-vec-2i-to-lisp-list ,y))
-	     ((and (eq :to-lisp-vec ,x))
-	      (cv::vec-vec-2i-to-lisp-vec ,y))
-	     ((and (typep ,x 'cv::std-vector-vec-2i) ,y)
-	      (if (eq ,z nil)
-		  (mem-aref (cv::vec-vec-2i-to-c-arr ,x) 'cv::vec-2i ,y)
-		  (mem-aref (cv::c-pointer (mem-aref (cv::vec-vec-2i-to-c-arr ,x) 'cv::vec-2i ,y)) :int ,z)))
+	     ((and (or (vectorp x) (listp x)) (null y))
+	      (arr-to-vec-vec-2i x))
+	     ((eq :length x)
+	      (cv::vec-vec-2i-length y))
+	     ((and (eq :to-lisp-list x))
+	      (cv::vec-vec-2i-to-lisp-list y))
+	     ((and (eq :to-lisp-vec x))
+	      (cv::vec-vec-2i-to-lisp-vec y))
+	     ((and (typep x 'cv::std-vector-vec-2i) y)
+	      (if (eq z nil)
+		  (mem-aref (cv::vec-vec-2i-to-c-arr x) 'cv::vec-2i y)
+		  (mem-aref (cv::c-pointer (mem-aref (cv::vec-vec-2i-to-c-arr x) 'cv::vec-2i y)) :int z)))
 	     (t (error "incorrect input. 
-  ~%See VECTOR-VEC-2I documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%"))))))
+  ~%See VECTOR-VEC-2I documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%")))))
 
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * create_std_vector##tn()
-(defcfun ("create_std_vectorv3i" make-vector-vec-3i) (cv::vector-vec-3i :garbage-collect t))
+(defcfun ("create_std_vectorv3i" make-vector-vec-3i) cv::vector-vec-3i)
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
-(defcfun ("carray_to_std_vectorv3i" c-arr-to-vec-vec-3i) (cv::vector-vec-3i :garbage-collect t)
+(defcfun ("carray_to_std_vectorv3i" c-arr-to-vec-vec-3i) cv::vector-vec-3i
   (a :pointer)
   (len :unsigned-int))
 
@@ -3092,43 +3190,40 @@
     (c-arr-to-vec-vec-3i (cdr previous) (length a))))
 
 
-(defmacro vector-vec-3i (&rest args)
+(defun vector-vec-3i (&rest args)
   (if (fourth args)
       (error "odd number of args to VECTOR-VEC-3I")
       nil)
-  (let ((x (gensym))
-        (y (gensym))
-        (z (gensym)))
-    `(let ((,x (first (list ,@args)))
-	   (,y (second (list ,@args)))
-           (,z (third (list ,@args))))
-       (cond ((eq ,x nil)
+    (let ((x (first args))
+	   (y (second args))
+           (z (third args)))
+       (cond ((null x)
 	      (make-vector-vec-3i))
-	     ((or (vectorp ,x) (listp ,x))
-	      (arr-to-vec-vec-3i ,x))
-	     ((eq :length ,x)
-	      (cv::vec-vec-3i-length ,y))
-	     ((and (eq :to-lisp-list ,x))
-	      (cv::vec-vec-3i-to-lisp-list ,y))
-	     ((and (eq :to-lisp-vec ,x))
-	      (cv::vec-vec-3i-to-lisp-vec ,y))
-	     ((and (typep ,x 'cv::std-vector-vec-3i) ,y)
-	      (if (eq ,z nil)
-		  (mem-aref (cv::vec-vec-3i-to-c-arr ,x) 'cv::vec-3i ,y)
-		  (mem-aref (cv::c-pointer (mem-aref (cv::vec-vec-3i-to-c-arr ,x) 'cv::vec-3i ,y)) :int ,z)))
+	     ((and (or (vectorp x) (listp x)) (null y))
+	      (arr-to-vec-vec-3i x))
+	     ((eq :length x)
+	      (cv::vec-vec-3i-length y))
+	     ((and (eq :to-lisp-list x))
+	      (cv::vec-vec-3i-to-lisp-list y))
+	     ((and (eq :to-lisp-vec x))
+	      (cv::vec-vec-3i-to-lisp-vec y))
+	     ((and (typep x 'cv::std-vector-vec-3i) y)
+	      (if (eq z nil)
+		  (mem-aref (cv::vec-vec-3i-to-c-arr x) 'cv::vec-3i y)
+		  (mem-aref (cv::c-pointer (mem-aref (cv::vec-vec-3i-to-c-arr x) 'cv::vec-3i y)) :int z)))
 	     (t (error "incorrect input. 
-  ~%See VECTOR-VEC-3I documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%"))))))
+  ~%See VECTOR-VEC-3I documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%")))))
 
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * create_std_vector##tn()
-(defcfun ("create_std_vectorv4i" make-vector-vec-4i) (cv::vector-vec-4i :garbage-collect t))
+(defcfun ("create_std_vectorv4i" make-vector-vec-4i) cv::vector-vec-4i)
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
-(defcfun ("carray_to_std_vectorv4i" c-arr-to-vec-vec-4i) (cv::vector-vec-4i :garbage-collect t)
+(defcfun ("carray_to_std_vectorv4i" c-arr-to-vec-vec-4i) cv::vector-vec-4i
   (a :pointer)
   (len :unsigned-int))
 
@@ -3141,43 +3236,40 @@
     (c-arr-to-vec-vec-4i (cdr previous) (length a))))
 
 
-(defmacro vector-vec-4i (&rest args)
+(defun vector-vec-4i (&rest args)
   (if (fourth args)
       (error "odd number of args to VECTOR-VEC-4I")
       nil)
-  (let ((x (gensym))
-        (y (gensym))
-        (z (gensym)))
-    `(let ((,x (first (list ,@args)))
-	   (,y (second (list ,@args)))
-           (,z (third (list ,@args))))
-       (cond ((eq ,x nil)
+    (let ((x (first args))
+	   (y (second args))
+           (z (third args)))
+       (cond ((null x)
 	      (make-vector-vec-4i))
-	     ((or (vectorp ,x) (listp ,x))
-	      (arr-to-vec-vec-4i ,x))
-	     ((eq :length ,x)
-	      (cv::vec-vec-4i-length ,y))
-	     ((and (eq :to-lisp-list ,x))
-	      (cv::vec-vec-4i-to-lisp-list ,y))
-	     ((and (eq :to-lisp-vec ,x))
-	      (cv::vec-vec-4i-to-lisp-vec ,y))
-	     ((and (typep ,x 'cv::std-vector-vec-4i) ,y)
-	      (if (eq ,z nil)
-		  (mem-aref (cv::vec-vec-4i-to-c-arr ,x) 'cv::vec-4i ,y)
-		  (mem-aref (cv::c-pointer (mem-aref (cv::vec-vec-4i-to-c-arr ,x) 'cv::vec-4i ,y)) :int ,z)))
+	     ((and (or (vectorp x) (listp x)) (null y))
+	      (arr-to-vec-vec-4i x))
+	     ((eq :length x)
+	      (cv::vec-vec-4i-length y))
+	     ((and (eq :to-lisp-list x))
+	      (cv::vec-vec-4i-to-lisp-list y))
+	     ((and (eq :to-lisp-vec x))
+	      (cv::vec-vec-4i-to-lisp-vec y))
+	     ((and (typep x 'cv::std-vector-vec-4i) y)
+	      (if (eq z nil)
+		  (mem-aref (cv::vec-vec-4i-to-c-arr x) 'cv::vec-4i y)
+		  (mem-aref (cv::c-pointer (mem-aref (cv::vec-vec-4i-to-c-arr x) 'cv::vec-4i y)) :int z)))
 	     (t (error "incorrect input. 
-  ~%See VECTOR-VEC-4I documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%"))))))
+  ~%See VECTOR-VEC-4I documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%")))))
 
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * create_std_vector##tn()
-(defcfun ("create_std_vectorv6i" make-vector-vec-6i) (cv::vector-vec-6i :garbage-collect t))
+(defcfun ("create_std_vectorv6i" make-vector-vec-6i) cv::vector-vec-6i)
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
-(defcfun ("carray_to_std_vectorv6i" c-arr-to-vec-vec-6i) (cv::vector-vec-6i :garbage-collect t)
+(defcfun ("carray_to_std_vectorv6i" c-arr-to-vec-vec-6i) cv::vector-vec-6i
   (a :pointer)
   (len :unsigned-int))
 
@@ -3190,43 +3282,40 @@
     (c-arr-to-vec-vec-6i (cdr previous) (length a))))
 
 
-(defmacro vector-vec-6i (&rest args)
+(defun vector-vec-6i (&rest args)
   (if (fourth args)
       (error "odd number of args to VECTOR-VEC-6I")
       nil)
-  (let ((x (gensym))
-        (y (gensym))
-        (z (gensym)))
-    `(let ((,x (first (list ,@args)))
-	   (,y (second (list ,@args)))
-           (,z (third (list ,@args))))
-       (cond ((eq ,x nil)
+    (let ((x (first args))
+	   (y (second args))
+           (z (third args)))
+       (cond ((null x)
 	      (make-vector-vec-6i))
-	     ((or (vectorp ,x) (listp ,x))
-	      (arr-to-vec-vec-6i ,x))
-	     ((eq :length ,x)
-	      (cv::vec-vec-6i-length ,y))
-	     ((and (eq :to-lisp-list ,x))
-	      (cv::vec-vec-6i-to-lisp-list ,y))
-	     ((and (eq :to-lisp-vec ,x))
-	      (cv::vec-vec-6i-to-lisp-vec ,y))
-	     ((and (typep ,x 'cv::std-vector-vec-6i) ,y)
-	      (if (eq ,z nil)
-		  (mem-aref (cv::vec-vec-6i-to-c-arr ,x) 'cv::vec-6i ,y)
-		  (mem-aref (cv::c-pointer (mem-aref (cv::vec-vec-6i-to-c-arr ,x) 'cv::vec-6i ,y)) :int ,z)))
+	     ((and (or (vectorp x) (listp x)) (null y))
+	      (arr-to-vec-vec-6i x))
+	     ((eq :length x)
+	      (cv::vec-vec-6i-length y))
+	     ((and (eq :to-lisp-list x))
+	      (cv::vec-vec-6i-to-lisp-list y))
+	     ((and (eq :to-lisp-vec x))
+	      (cv::vec-vec-6i-to-lisp-vec y))
+	     ((and (typep x 'cv::std-vector-vec-6i) y)
+	      (if (eq z nil)
+		  (mem-aref (cv::vec-vec-6i-to-c-arr x) 'cv::vec-6i y)
+		  (mem-aref (cv::c-pointer (mem-aref (cv::vec-vec-6i-to-c-arr x) 'cv::vec-6i y)) :int z)))
 	     (t (error "incorrect input. 
-  ~%See VECTOR-VEC-6I documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%"))))))
+  ~%See VECTOR-VEC-6I documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%")))))
 
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * create_std_vector##tn()
-(defcfun ("create_std_vectorv8i" make-vector-vec-8i) (cv::vector-vec-8i :garbage-collect t))
+(defcfun ("create_std_vectorv8i" make-vector-vec-8i) cv::vector-vec-8i)
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
-(defcfun ("carray_to_std_vectorv8i" c-arr-to-vec-vec-8i) (cv::vector-vec-8i :garbage-collect t)
+(defcfun ("carray_to_std_vectorv8i" c-arr-to-vec-vec-8i) cv::vector-vec-8i
   (a :pointer)
   (len :unsigned-int))
 
@@ -3239,78 +3328,28 @@
     (c-arr-to-vec-vec-8i (cdr previous) (length a))))
 
 
-(defmacro vector-vec-8i (&rest args)
+(defun vector-vec-8i (&rest args)
   (if (fourth args)
       (error "odd number of args to VECTOR-VEC-8I")
       nil)
-  (let ((x (gensym))
-        (y (gensym))
-        (z (gensym)))
-    `(let ((,x (first (list ,@args)))
-	   (,y (second (list ,@args)))
-           (,z (third (list ,@args))))
-       (cond ((eq ,x nil)
+    (let ((x (first args))
+	   (y (second args))
+           (z (third args)))
+       (cond ((null x)
 	      (make-vector-vec-8i))
-	     ((or (vectorp ,x) (listp ,x))
-	      (arr-to-vec-vec-8i ,x))
-	     ((eq :length ,x)
-	      (cv::vec-vec-8i-length ,y))
-	     ((and (eq :to-lisp-list ,x))
-	      (cv::vec-vec-8i-to-lisp-list ,y))
-	     ((and (eq :to-lisp-vec ,x))
-	      (cv::vec-vec-8i-to-lisp-vec ,y))
-	     ((and (typep ,x 'cv::std-vector-vec-8i) ,y)
-	      (if (eq ,z nil)
-		  (mem-aref (cv::vec-vec-8i-to-c-arr ,x) 'cv::vec-8i ,y)
-		  (mem-aref (cv::c-pointer (mem-aref (cv::vec-vec-8i-to-c-arr ,x) 'cv::vec-8i ,y)) :int ,z)))
+	     ((and (or (vectorp x) (listp x)) (null y))
+	      (arr-to-vec-vec-8i x))
+	     ((eq :length x)
+	      (cv::vec-vec-8i-length y))
+	     ((and (eq :to-lisp-list x))
+	      (cv::vec-vec-8i-to-lisp-list y))
+	     ((and (eq :to-lisp-vec x))
+	      (cv::vec-vec-8i-to-lisp-vec y))
+	     ((and (typep x 'cv::std-vector-vec-8i) y)
+	      (if (eq z nil)
+		  (mem-aref (cv::vec-vec-8i-to-c-arr x) 'cv::vec-8i y)
+		  (mem-aref (cv::c-pointer (mem-aref (cv::vec-vec-8i-to-c-arr x) 'cv::vec-8i y)) :int z)))
 	     (t (error "incorrect input. 
-  ~%See VECTOR-VEC-8I documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%"))))))
+  ~%See VECTOR-VEC-8I documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%")))))
 
 
-
-;; template < class T, class Alloc = allocator<T> > class vector
-;; vector_##t * create_std_vector##tn()
-(defcfun ("create_std_vectorv2s" make-vector-vec-2s) (cv::vector-vec-2s :garbage-collect t))
-
-
-;; template < class T, class Alloc = allocator<T> > class vector
-;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
-(defcfun ("carray_to_std_vectorv2s" c-arr-to-vec-vec-2s) (cv::vector-vec-2s :garbage-collect t)
-  (a :pointer)
-  (len :unsigned-int))
-
-
-(let ((previous nil))
-  (defun arr-to-vec-vec-2s (a)
-    (unless (equal a (car previous))
-      (setf previous (cons a (foreign-alloc :pointer :initial-contents
-					    (mapcar #!(cv::c-pointer %1) (coerce a 'list))))))
-    (c-arr-to-vec-vec-2s (cdr previous) (length a))))
-
-
-(defmacro vector-vec-2s (&rest args)
-  (if (fourth args)
-      (error "odd number of args to VECTOR-VEC-2S")
-      nil)
-  (let ((x (gensym))
-        (y (gensym))
-        (z (gensym)))
-    `(let ((,x (first (list ,@args)))
-	   (,y (second (list ,@args)))
-           (,z (third (list ,@args))))
-       (cond ((eq ,x nil)
-	      (make-vector-vec-2s))
-	     ((or (vectorp ,x) (listp ,x))
-	      (arr-to-vec-vec-2s ,x))
-	     ((eq :length ,x)
-	      (cv::vec-vec-2s-length ,y))
-	     ((and (eq :to-lisp-list ,x))
-	      (cv::vec-vec-2s-to-lisp-list ,y))
-	     ((and (eq :to-lisp-vec ,x))
-	      (cv::vec-vec-2s-to-lisp-vec ,y))
-	     ((and (typep ,x 'cv::std-vector-vec-2s) ,y)
-	      (if (eq ,z nil)
-		  (mem-aref (cv::vec-vec-2s-to-c-arr ,x) 'cv::vec-2s ,y)
-		  (mem-ref (cv::c-pointer (mem-aref (cv::vec-vec-2s-to-c-arr ,x) 'cv::vec-2s ,y)) :short (* ,z 2))))
-	     (t (error "incorrect input. 
-  ~%See VECTOR-VEC-2S documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%"))))))

@@ -36,3 +36,25 @@
 	(get_num_valid :pointer)
 	(set_num_valid :pointer))
 
+
+
+;; KEY-POINT1
+
+
+;(cffi:defcstruct key-point1
+	;(x :float)
+;        (y :float)
+	;(size :float)
+;	(angle :float)
+	;(response :float)
+;	(octave :int)
+	;(class-id :int))
+
+
+
+;; MAT1
+
+
+
+
+ 
