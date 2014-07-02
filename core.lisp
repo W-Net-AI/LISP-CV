@@ -1230,7 +1230,7 @@
   (startrow :int)
   (endrow :int))
 
-
+;
 ;; Mat Mat::row(int y) const
 ;; Mat* cv_Mat_getRow(Mat* self, int y) 
 (defcfun ("cv_Mat_getRow" row) mat
