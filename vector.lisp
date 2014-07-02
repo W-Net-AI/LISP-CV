@@ -164,6 +164,7 @@
   ~%See VECTOR-DMATCH documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%")))))
 
 
+
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; vector_##t * create_std_vector##tn()
 (defcfun ("create_std_vectord" make-vector-double) vector-double)

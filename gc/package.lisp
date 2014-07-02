@@ -412,6 +412,9 @@
 
 ;; core - Operations on Arrays
 
+   #:*abs
+   #:*trace
+   #:inv
    #:mean
    #:make-rng
    #:rng
@@ -433,6 +436,9 @@
    #:get-structuring-element
 
 ;; imgproc - Geometric Image Transformations
+
+   #:get-affine-transform
+   #:get-rotation-matrix-2d
 
 ;; imgproc - Miscellaneous Image Transformations
    

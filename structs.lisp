@@ -39,6 +39,7 @@
 
 
 ;; KEY-POINT1
+;; try (:actual-type (:pointer (:struct key-point)))
 
 
 ;(cffi:defcstruct key-point1

@@ -902,6 +902,7 @@
    #:*log
    #:*max
    #:*min
+   #:*trace
    #:abs-diff
    #:add-weighted
    #:bitwise-and
@@ -1090,8 +1091,11 @@
    #:+inter-area+ 
    #:+inter-lanczos4+ 
 
+   #:get-affine-transform
+   #:get-rotation-matrix-2d
    #:remap
    #:resize
+   #:warp-affine
 
 ;; imgproc - Miscellaneous Image Transformations
 
@@ -1369,6 +1373,7 @@
    #:set-mouse-callback
    #:set-trackbar-pos
    #:named-window
+   #:start-window-thread
    #:wait-key
    #:with-named-window
 

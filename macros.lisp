@@ -130,11 +130,13 @@
 
 ;; MEM-AREF macro
 
- (defmacro ? (ptr type &optional (index 0))
-       (cond (type
-	      `(mem-aref ,ptr ,type , index))
-	     (t nil)))
 
+(defmacro ? (ptr type &optional (index 0))
+  `(cond ((pointerp ,ptr)
+	  (mem-aref ,ptr ,type ,index))
+	 ((not (pointerp ,ptr))
+	  (mem-aref (c-pointer ,ptr) ,type  ,index))
+          (t 0)))
 
 
 ;; RUN

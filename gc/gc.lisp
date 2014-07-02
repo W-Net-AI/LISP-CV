@@ -885,9 +885,14 @@
 	 (endrow :int))
 
 
+;; Scalar::Scalar()
+;; Scalar* cv_create_Scalar0()
+(defcfun ("cv_create_Scalar0" scalar-0) (cv::scalar :garbage-collect t))
+
+
 ;; Scalar_<_Tp>::Scalar_(_Tp v0, _Tp v1, _Tp v2, _Tp v3)
-;; Scalar* cv_create_Scalar(double val0, (double val1, double val2, double val3)
-(defcfun ("cv_create_Scalar" %scalar) (cv::scalar :garbage-collect t) 
+;; Scalar* cv_create_Scalar4(double val0, (double val1, double val2, double val3)
+(defcfun ("cv_create_Scalar4" scalar-4) (cv::scalar :garbage-collect t) 
 	 (val0 :double)
 	 (val1 :double)
 	 (val2 :double)
@@ -896,12 +901,12 @@
 
 (defun scalar (&optional (val1 0d0) (val2 0d0) (val3 0d0) (val4 0d0))
        "SCALAR constructor"
-       (%scalar (coerce val1 'double-float) (coerce val2 'double-float) (coerce val3 'double-float) (coerce val4 'double-float)))
+       (scalar-4 (coerce val1 'double-float) (coerce val2 'double-float) (coerce val3 'double-float) (coerce val4 'double-float)))
 
 
 (defun make-scalar (&optional (val1 0d0) (val2 0d0) (val3 0d0) (val4 0d0))
        "SCALAR constructor"
-       (%scalar (coerce val1 'double-float) (coerce val2 'double-float) (coerce val3 'double-float) (coerce val4 'double-float)))
+       (scalar-4 (coerce val1 'double-float) (coerce val2 'double-float) (coerce val3 'double-float) (coerce val4 'double-float)))
 
 
 ;; Scalar_<_Tp> Scalar_<_Tp>::all(_Tp v0)
@@ -1741,6 +1746,13 @@
 	 (m cv::mat))
 
 
+;; Scalar trace(InputArray mtx)
+;; Scalar* cv_trace(Mat* mtx)
+(defcfun ("cv_trace" *trace) (cv::scalar :garbage-collect t)
+  "Returns the trace of a matrix."
+  (mtx cv::mat))
+
+
 ;; MatExpr Mat::inv(int method=DECOMP_LU) const
 ;; MatExpr* cv_Mat_inv_mat(Mat* self, int method)
 (defcfun ("cv_Mat_inv_mat" inv) (cv::mat-expr :garbage-collect t) 
@@ -1852,6 +1864,26 @@
   (setf return (%get-structuring-element shape ksize kernel))
   (if given-kernel nil (cv::del-point kernel)) 
   return)
+
+
+;;; IMGPROC - Geometric Image Transformations
+
+
+;; Mat getAffineTransform(InputArray src, InputArray dst)
+;; Mat* cv_getAffineTransform(Mat* src, Mat* dst) 
+(defcfun ("cv_getAffineTransform" get-affine-transform) (cv::mat :garbage-collect t)
+  "Calculates an affine transform from three pairs of the corresponding points."
+  (src cv::mat)
+  (dest cv::mat))
+
+
+;; Mat getRotationMatrix2D(Point2f center, double angle, double scale)
+;; Mat* cv_getRotationMatrix2D(Point2f* center, double angle, double scale)
+(defcfun ("cv_getRotationMatrix2D" get-rotation-matrix-2d) (cv::mat :garbage-collect t)
+  "Calculates an affine matrix of 2D rotation."
+  (center cv::point-2f)
+  (angle :double)  
+  (scale :double))
 
 
 
@@ -2326,11 +2358,11 @@
 	     ((and (or (vectorp w) (listp w)) (null x))
 	      (arr-to-vec-dmatch w))
 	     ((eq :length w)
-	      (vec-dmatch-length x))
+	      (cv::vec-dmatch-length x))
 	     ((and (eq :to-lisp-list w))
-	      (vec-dmatch-to-lisp-list x))
+	      (cv::vec-dmatch-to-lisp-list x))
 	     ((and (eq :to-lisp-vec w))
-	      (vec-dmatch-to-lisp-vec x))
+	      (cv::vec-dmatch-to-lisp-vec x))
 	     ((and (typep w 'cv::std-vector-dmatch) x)
 	      (if (eq y nil)
 		  (mem-aref (cv::vec-dmatch-to-c-arr w) 'cv::dmatch x)

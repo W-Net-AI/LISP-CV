@@ -11,6 +11,9 @@ extern "C" {
 typedef vector<Vec4i> vector_Vec4i;
 typedef vector<Vec2s> vector_Vec2s;
 
+Scalar* cv_create_Scalar0();
+Scalar* cv_create_Scalar4(double val0, double val1, double val2, double val3);
+
 Vec2s* std_vector_get_element( vector_Vec2s * v
                             , unsigned int vectorIdx
                             , unsigned int elementIdx );

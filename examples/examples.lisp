@@ -806,6 +806,52 @@ CV> (DEPTH A)
 1   ;The type of the matrix elements are 1(+8S+) - 8-bit signed integer
 
 
+
+========================================================================================================================================
+DIV
+========================================================================================================================================
+
+Divides matrix M1 by matrix M2.
+
+C++: MatExpr / operator
+
+LISP-CV: (DIV (M1 MAT) (M2 MAT)) => MAT-EXPR
+
+
+    Parameters:	
+
+        M1 - A matrix.
+
+        M2 - A matrix.
+
+
+The function DIV divides the elements of matrix M1 by the elements of matrix M2 in order. Both matrices 
+must be the same size. You may need to coerce the result of DIV, the return value, back to type MAT with 
+the function (FORCE), (or the shorthand version (>>)) to use in other functions. 
+
+
+(defun div-example ()
+
+  "Matrix M1 is divided by M2 with the function DIV.
+   Matrix M1, M2 and the result(RESULT) are then pri-
+   nted."
+
+  (with-object ((m1-data (alloc :float '(53.0f0 62.0f0 85.0f0 64.0f0 23.0f0 
+					 97.0f0 52.0f0 16.0f0 12.0f0)))
+		(m2-data (alloc :float '(64.0f0 22.0f0 64.0f0 15.0f0 11.0f0 
+					 17.0f0 42.0f0 16.0f0 88.0f0))))
+    (with-mat ((m1 (mat 3 3 +32f+ m1-data))
+	       (m2 (mat 3 3 +32f+ m2-data)))
+      (with-mat-expr ((result (div m1 m2)))
+	(format t "~%M1 =~%~%" )
+	(print-mat m1 :float)
+	(format t "~%M2 =~%~%" )
+	(print-mat m2 :float)
+	(format t "~%RESULT =~%~%" )
+	(print-mat (t:>> result) :float)
+	(format t "~%" )))))
+
+
 ========================================================================================================================================
 DMATCH
 ========================================================================================================================================
@@ -2888,7 +2934,9 @@ TODO(Reference example of function that uses TERM-CRITERIA)
 CORE - OPERATIONS ON ARRAYS
 ========================================================================================================================================
 
+========================================================================================================================================
 *ABS
+========================================================================================================================================
 
 Calculates an absolute value of each matrix element.
 
@@ -2936,10 +2984,11 @@ Matrix Expressions(MAT-EXPR), (ABS-DIFF), (CONVERT-SCALE-ABS)
 	  (format t "~%"))))))
 
 
+========================================================================================================================================
 *EXP
+========================================================================================================================================
 
 Calculates the exponent of every array element.
-
 
 C++: void exp(InputArray src, OutputArray dst)
 
@@ -2997,8 +3046,9 @@ See also:
       (format t "~%"))))
 
 
-
+========================================================================================================================================
 *LOG
+========================================================================================================================================
 
 Calculates the natural logarithm of every array element.
 
@@ -3030,7 +3080,6 @@ Note: This function is named *LOG instead of LOG because, LOG is the name of a C
 See also:
 
 (*EXP), (CART-TO-POLAR), (POLAR-TO-CART), (PHASE), (POW), (*SQRT), (MAGNITUDE)
-
 
 
 (defun *log-example (filename)
@@ -3082,8 +3131,9 @@ See also:
     (destroy-all-windows)))
 
 
-
+========================================================================================================================================
 *MAX
+========================================================================================================================================
 
 Calculates per-element maximum of two arrays.
 
@@ -3194,8 +3244,9 @@ See also:
 			 (return)))))))))))))
 
 
-
+========================================================================================================================================
 *MIN
+========================================================================================================================================
 
 Calculates per-element minimum of two arrays.
 
@@ -3213,8 +3264,9 @@ LISP-CV: (*MIN (SRC1 MAT) (SRC2 MAT) (DEST MAT)) => :VOID
         DEST - Output array of the same size and type as SRC1.
 
 
-The function *MIN calculates the per-element minimum of two arrays. When the input array is multi-channel, 
-each channel is compared with value independently.
+The function *MIN calculates the per-element minimum of two arrays. When the input array is multi-
+channel, each channel is compared with value independently.
+
 
 Note: This function is named *MIN instead of MIN because, MIN is the name of a Common Lisp function.
 
@@ -3225,7 +3277,7 @@ See also:
 
 
 
-(defun *min-example (&optional (camera-index 0)
+(defun *min-example (&optional (cam 0)
 		       (width *default-width*)
 		       (height *default-height*))
 
@@ -3236,93 +3288,127 @@ See also:
    rackbar changes the scalar value the ASSGN-VAL function us-
    es to decide what to set each element of MAT-3 to."
 
-  (with-capture (cap (video-capture camera-index))   
-       ;Create two matrices: MAT-1 and MAT-2(used to show how *MIN works)
-    (let* ((mat-1 (mat 3 3 +32s+ (alloc :int '(1 2 3 4 5 6 7 8 9))))
-	   (mat-2 (mat 3 3 +32s+ (alloc :int '(9 8 7 6 5 4 3 2 1))))
-           ;Create destination matrix of same size and type: DEST
-           (dest (mat 3 3 +32s+))
-           ;Create 3 matrices used to hold 
-           ;data we use later in the example
-           (mat-3 (mat height width +8u+))
-           (mat-4 (mat height width +8u+))
-           (mat-5 (mat height width +8u+))
-           ;Allocate :int pointer for trackbar to change
-           (val (alloc :int '(128)))
-	   (window-name-1 "MAT-3 after THRESHOLD - *MIN-Example")
-	   (window-name-2 "MAT-5 after ASSGN-VAL - *MIN-Example")
-	   (window-name-3 "MAT-4 after *MIN - *MIN-Example")) 
-      ;Set CAP to default width and height
-      (cap-set cap +cap-prop-frame-width+ width)
-      (cap-set cap +cap-prop-frame-height+ height)
-      ;Create windows and move to specified locations
-      (named-window window-name-1 +window-normal+)
-      (named-window window-name-2 +window-normal+)
-      (named-window window-name-3 +window-normal+)
-      (move-window window-name-1 310 175)
-      (move-window window-name-2 760 175)
-      (move-window window-name-3 1210 175)
-      ;Print MAT-1
-      (format t "MAT-1:~%~%")
-      (dotimes (i (cols mat-1))
-	(dotimes (j (rows mat-1))
-	  (princ (at mat-1 i j :int))
-	  (princ #\Space))
-	(princ #\Newline))
-      (format t "~%~%")
-      ;Print MAT-2
-      (format t "MAT-2:~%~%")
-      (dotimes (i (cols mat-2))
-	(dotimes (j (rows mat-2))
-	  (princ (at mat-2 i j :int))
-	  (princ #\Space))
-	(princ #\Newline))
-      (format t "~%~%")
-      ;Find per element minimum of 
-      ;MAT-1 and MAT-2, set to DEST
-      (*min mat-1 mat-2 dest)
-      ;Print DEST
-      (format t "Per element minimum of MAT-1 and  MAT-2:~%~%")
-      (dotimes (i (cols dest))
-	(dotimes (j (rows dest))
-	  (princ (at dest i j :int))
-	  (princ #\Space))
-	(princ #\Newline))
-      (format t "~%~%")
-      (do* ((frame 0))
-	   ((plusp (wait-key *millis-per-frame*)) 
-	    (format t "Key is pressed by user"))
-        ;Set camera feed to FRAME
-	(setf frame (mat))
-	(cap-read cap frame)
-        ;Convert FRAME to 1 channel 
-        ;grayscale image, set to mat-1
-        ;FRAME stays the same
-	(cvt-color frame mat-3 +bgr2gray+)
-        ;Convert FRAME to 1 channel 
-        ;grayscale image, set to mat-4
-        ;FRAME stays the same
-	(cvt-color frame mat-4  +bgr2gray+)
-        ;Apply a fixed-level threshold to 
-        ;each array element of mat-3
-	(threshold mat-3 mat-3 128d0 255d0 +thresh-binary-inv+)
-        ;Create trackbar on middle window which changes 
-        ;the scalar value ASSGN-VAL uses in the next step
-        (create-trackbar "Value of mat-3" window-name-2 val 255)
-        ;Assign each element of mat-5 a scalar value
-	(assgn-val mat-5 (scalar (mem-aref val :int)))
-        ;Find the minimum of each element 
-        ;of mat-4 AND mat-5, set to mat-4
-        (*min mat-4 mat-5 mat-4)
-        ;Show mat-3, mat-5 and mat-4 in windows
-	(imshow window-name-1 mat-3)
-	(imshow window-name-2 mat-5)
-	(imshow window-name-3 mat-4)) 
-      (destroy-all-windows))))
+  ;Create video capture, CAP. Set CAP to default width and height
+  (with-captured-camera (cap cam :width width :height height)   
+    ;Create two matrices: MAT-1 and MAT-2(used to show how *MIN works)
+    (with-mat ((mat-1 (mat 3 3 +32s+ (alloc :int '(1 2 3 4 5 6 7 8 9))))
+	       (mat-2 (mat 3 3 +32s+ (alloc :int '(9 8 7 6 5 4 3 2 1))))
+	       ;Create destination matrix of same size and type, DEST
+	       (dest (mat 3 3 +32s+))
+	       ;Create 3 matrices used to hold the
+	       ;data we use later in the example
+	       (mat-3 (mat height width +8u+))
+	       (mat-4 (mat height width +8u+))
+	       (mat-5 (mat height width +8u+)))
+      ;Allocate int pointer for trackbar to change
+      (with-object ((val (alloc :int '(128))))
+	(let ((window-name-1 "MAT-3 after THRESHOLD - *MIN-Example")
+	      (window-name-2 "MAT-5 after ASSGN-VAL - *MIN-Example")
+	      (window-name-3 "MAT-4 after *MIN - *MIN-Example")) 
+	  ;Create windows and move to specified locations
+	  (with-named-window (window-name-1 +window-normal+)
+	    (with-named-window (window-name-2 +window-normal+)
+	      (with-named-window (window-name-3 +window-normal+)
+		(move-window window-name-1 310 175)
+		(move-window window-name-2 760 175)
+		(move-window window-name-3 1210 175)
+		;Print MAT-1
+		(format t "~%MAT-1:~%~%")
+		(print-mat mat-1 :int)
+		(format t "~%~%")
+		;Print MAT-2
+		(format t "MAT-2:~%~%")
+		(print-mat mat-2 :int)
+		(format t "~%")
+		;Find per element minimum of 
+		;MAT-1 and MAT-2, set to DEST
+		(*min mat-1 mat-2 dest)
+	     	;Print DEST
+		(format t "Per element minimum of MAT-1 and  MAT-2:~%~%")
+		(print-mat dest :int)
+		(format t "~%")
+		(loop
+		   ;Set camera feed to FRAME
+		   (with-mat ((frame (mat)))
+		     (cap-read cap frame)
+		     ;Convert FRAME to 1 channel grayscale 
+                     ;image, set to MAT-3. FRAME stays the 
+                     ;same
+		     (cvt-color frame mat-3 +bgr2gray+)
+		     ;Convert FRAME to 1 channel grayscale 
+                     ;image, set to MAT-4. FRAME stays the 
+                     ;same
+		     (cvt-color frame mat-4  +bgr2gray+)
+		     ;Apply a fixed-level threshold to 
+		     ;each array element of MAT-3
+		     (threshold mat-3 mat-3 128d0 255d0 +thresh-binary-inv+)
+		     ;Create a trackbar on the middle window which changes 
+		     ;the scalar value ASSGN-VAL will use in the next step
+		     (create-trackbar "Value of mat-3" window-name-2 val 255)
+
+		     ;Assign each element of MAT-5 a scalar value
+
+		     ;Note: The 't:' prefix to SCALAR toggles its 
+		     ;finalizer to true. Also, '?' is a macro for 
+		     ;CFFI::MEM-AREF
+
+		     (assgn-val mat-5 (t:scalar (? val :int)))
+		     ;Find the minimum of each element 
+		     ;of MAT-4 AND MAT-5, set to MAT-4
+		     (*min mat-4 mat-5 mat-4)
+		     ;Show MAT-3, MAT-4 and MAT-5 in windows
+		     (imshow window-name-1 mat-3)
+		     (imshow window-name-2 mat-5)
+		     (imshow window-name-3 mat-4)) 
+		   (let ((c (wait-key 33)))
+		     (when (= c 27)
+		       (return))))))))))))
 
 
+========================================================================================================================================
+*TRACE
+========================================================================================================================================
 
+Returns the trace of a matrix.
+
+C++: Scalar trace(InputArray mtx)
+
+LISP-CV: (*TRACE (MTX MAT)) => SCALAR
+
+
+    Parameters:	
+
+        MTX - Input matrix.
+
+The function *TRACE returns the sum of the diagonal elements of the matrix MTX.
+
+
+See OpenCV Documentation at this link...
+
+http://docs.opencv.org/trunk/modules/core/doc/operations_on_arrays.html?highlight=trace#trace
+
+...for the formula.
+
+
+Note: This function is named *TRACE instead of TRACE because, TRACE is the name of a Common Lisp macro.
+
+
+Example:
+
+
+(defun *trace-example ()
+  ;Create a 3x3 matrix called MTX
+  (with-mat ((mtx (mat 3 3 +8u+ :uchar '(1 2 3 4 5 6 7 8 9))))
+    ;Print MTX
+    (format t "~%MTX = ~%~%")
+    (print-mat mtx :uchar)
+    ;Print the sum of the diagonal of MTX
+    (format t "~%The sum of the diagonal of MTX is ~a~%~%" (? (*trace mtx) :double))))
+
+
+========================================================================================================================================
 ABSDIFF
+========================================================================================================================================
 
 Calculates the per-element absolute difference between two arrays or between an array and a scalar.
 
@@ -8046,10 +8132,261 @@ Example 2:
 IMGPROC - GEOMETRIC IMAGE TRANSFORMATIONS
 ========================================================================================================================================
 
+========================================================================================================================================
+GET-AFFINE-TRANSFORM
+========================================================================================================================================
 
+Calculates an affine transform from three pairs of the corresponding points.
+
+C++: Mat getAffineTransform(InputArray src, InputArray dst)
+
+LISP-CV: (GET-AFFINE-TRANSFORM (SRC MAT) (DEST MAT)) => MAT
+
+
+    Parameters:	
+
+        SRC - Coordinates of triangle vertices in the source image.
+
+        DST - Coordinates of the corresponding triangle vertices in the destination image.
+
+
+The function calculates the 2x3 matrix of an affine transform so that:
+
+
+See OpenCv documentation at this link:
+
+http://docs.opencv.org/trunk/modules/imgproc/doc/geometric_transformations.html?highlight=warpaff#getaffinetransform
+
+for the formulae.
+
+
+See also:
+
+(WARP-AFFINE), (TRANSFORM)
+
+
+Example:
+
+
+(defun get-affine-transform-example (filename)
+
+  "This example is similar to the WARP-AFFINE-EXAMPLE, except that 
+   trackbars are added so that you can adjust the values of all of 
+   the points given to GET-AFFINE-TRANSFORM. This will help you to 
+   better understand the math behind the operation of the function."
+
+  ;Load the image
+  (with-mat ((src (imread filename 1))         
+             (src-tri (mat 3 2 +32f+))
+             (dst-tri (mat 3 2 +32f+))
+	     ;Set the destination image to the same 
+	     ;type and size as the source image
+             (warp-dst (mat-zeros (rows src) (cols src) (mat-type src)))
+             (warp-rotate-dst (mat)))
+    (if (empty src) 
+	(return-from get-affine-transform-example 
+	  (format t "Image not loaded")))
+    (let ((window-name "GET-AFFINE-TRANSFORM Example"))
+      (with-named-window (window-name +window-normal+)
+	(set-window-property window-name +wnd-prop-fullscreen+ 
+			     +window-fullscreen+)
+        ;Allocate memory to hold the point values the trackbar can 
+        ;adjust that will later be given to GET-AFFINE-TRANSFORM
+	(with-object ((src-tri-1 (alloc :int 0))
+		      (src-tri-2 (alloc :int 0))
+		      (src-tri-3 (alloc :int (list (cols src))))
+		      (src-tri-4 (alloc :int 0))
+		      (src-tri-5 (alloc :int 0))
+		      (src-tri-6 (alloc :int (list (rows src))))
+		      (dst-tri-1 (alloc :int (list (cols src))))
+		      (dst-tri-2 (alloc :int (list (rows src))))
+		      (dst-tri-3 (alloc :int (list (cols src))))
+		      (dst-tri-4 (alloc :int (list (rows src))))
+		      (dst-tri-5 (alloc :int (list (cols src))))
+		      (dst-tri-6 (alloc :int (list (rows src)))))
+	  ;Create the trackbars used to adjust the values of the 
+	  ;elements in the SRC-TRI and the DST-TRI matrices
+	  (create-trackbar "SRC-TRI 1" window-name src-tri-1 10000)
+	  (create-trackbar "SRC-TRI 2" window-name src-tri-2 10000)
+	  (create-trackbar "SRC-TRI 3" window-name src-tri-3 10000)
+	  (create-trackbar "SRC-TRI 4" window-name src-tri-4 10000)
+	  (create-trackbar "SRC-TRI 5" window-name src-tri-5 3000)
+	  (create-trackbar "SRC-TRI 6" window-name src-tri-6 5000)
+	  (create-trackbar "DST-TRI 1" window-name dst-tri-1 200000)
+	  (create-trackbar "DST-TRI 2" window-name dst-tri-2 200000)
+	  (create-trackbar "DST-TRI 3" window-name dst-tri-3 200000)
+	  (create-trackbar "DST-TRI 4" window-name dst-tri-4 200000)
+	  (create-trackbar "DST-TRI 5" window-name dst-tri-5 200000)
+	  (create-trackbar "DST-TRI 6" window-name dst-tri-6 200000)
+	  (loop
+	     ;Set 3 points, provided by the position of the 
+	     ;trackbars, both in the src image and the dst 
+	     ;image, that are used to calculate the Affine 
+	     ;Transform
+	     (setf (at src-tri 0 0 :float) (coerce (? src-tri-1 :int) 'single-float)) 
+	     (setf (at src-tri 0 1 :float) (coerce (? src-tri-2 :int) 'single-float)) 
+	     (setf (at src-tri 1 0 :float) (- (? src-tri-3 :int) 1f0))
+	     (setf (at src-tri 1 1 :float) (coerce (? src-tri-4 :int) 'single-float))
+	     (setf (at src-tri 2 0 :float) (coerce (? src-tri-5 :int) 'single-float)) 
+	     (setf (at src-tri 2 1 :float) (- (? src-tri-6 :int) 1f0))
+	     (setf (at dst-tri 0 0 :float) (* (? dst-tri-1 :int) 0.0f0)) 
+	     (setf (at dst-tri 0 1 :float) (* (? dst-tri-2 :int) 0.33f0))
+	     (setf (at dst-tri 1 0 :float) (* (? dst-tri-3 :int) 0.85f0))
+	     (setf (at dst-tri 1 1 :float) (* (? dst-tri-4 :int) 0.25f0))
+	     (setf (at dst-tri 2 0 :float) (* (? dst-tri-5 :int) 0.15f0))
+	     (setf (at dst-tri 2 1 :float) (* (? dst-tri-6 :int) 0.7f0))
+	     (with-size ((warp-dest-size (size warp-dst)))
+	       ;Get the Affine Transform
+	       (with-mat ((warp-mat (get-affine-transform src-tri dst-tri))) 
+		 ;Apply the Affine Transform, just found, to SRC
+		 (warp-affine src warp-dst warp-mat warp-dest-size)
+
+		 ;==Rotating the image after Warp==;
+
+		 ;Compute a rotation matrix with respect to the center of the image
+		 (with-point-2f ((center (point-2f (/ (cols src) 2f0) (/ (rows src) 2f0))))
+		   (let ((angle -50d0)
+			 (scale 0.6d0))
+		     ;Get the rotation matrix with the specifications above
+		     (with-mat ((rot-mat (get-rotation-matrix-2d center angle scale)))
+		       ;Rotate the warped image
+		       (warp-affine warp-dst warp-rotate-dst rot-mat warp-dest-size)
+		       ;Show what you got
+		       (imshow window-name warp-rotate-dst)
+		       (let ((c (wait-key 33)))
+			 (when (= c 27)
+			   (return))))))))))))))
+
+
+========================================================================================================================================
+GET-ROTATION-MATRIX-2D
+========================================================================================================================================
+
+Calculates an affine matrix of 2D rotation.
+
+C++: Mat getRotationMatrix2D(Point2f center, double angle, double scale)
+
+LISP-CV: (GET-ROTATION-MATRIX-2D) (CENTER POINT-2F) (ANGLE :DOUBLE) (SCALE :DOUBLE)) => MAT
+
+
+    Parameters:	
+
+        CENTER - Center of the rotation in the source image.
+
+        ANGLE - Rotation angle in degrees. Positive values mean counter-clockwise rotation (the 
+                coordinate origin is assumed to be the top-left corner).
+
+        SCALE - Isotropic scale factor.
+
+
+The function calculates the following matrix:
+
+
+See OpenCV documentation at this link:
+
+http://docs.opencv.org/trunk/modules/imgproc/doc/geometric_transformations.html?highlight=warpaff#getrotationmatrix2d
+
+for the formulae.
+
+
+The transformation maps the rotation center to itself. If this is not the target, adjust the shift.
+
+
+See also:
+
+(GET-AFFINE-TRANSFORM), (WARP-AFFINE), (TRANSFORM)
+
+
+Example:
+
+
+(defun get-rotation-matrix-2d-example (filename)
+
+  "This example is similar to the WARP-AFFINE-EXAMPLE except that 
+   trackbars are added that you can use to adjust the CENTER, the 
+   ANGLE and the SCALE values given to the GET-ROTATION-MATRIX-2D 
+   function."
+
+  ;Load the image
+  (with-mat ((src (imread filename 1))         
+             (src-tri (mat 3 2 +32f+))
+             (dst-tri (mat 3 2 +32f+))
+	     ;Create destination image of the same 
+	     ;type and size as the source image
+             (warp-dst (mat-zeros (rows src) (cols src) (mat-type src)))
+             (warp-rotate-dst (mat)))
+    (if (empty src) 
+	(return-from get-rotation-matrix-2d-example 
+	  (format t "Image not loaded")))
+    (let ((window-name "Adjust CENTER, ANGLE and SCALE of the image - GET-ROTATION-MATRIX-2D Example"))
+      (with-named-window (window-name +window-autosize+)
+	(move-window window-name (cols src) 175)
+	;Allocate memory to hold the integer values 
+        ;the trackbar can adjust
+	(with-object ((center-x-val (alloc :int 2))
+                      (center-y-val (alloc :int 2))
+		      (angle-val (alloc :int 50))
+		      (scale-val (alloc :int 6))) 
+	  ;Create the trackbars used to adjust the CENTER, ANGLE and 
+          ;SCALE parameters of the function GET-ROTATION-MATRIX-2D
+	  (create-trackbar "CENTER X" window-name center-x-val 10)
+	  (create-trackbar "CENTER Y" window-name center-y-val 10)
+	  (create-trackbar "ANGLE" window-name angle-val 360)
+	  (create-trackbar "SCALE" window-name scale-val 1000)
+	  (loop
+	     ;Set three points both in the src and dst images 
+             ;that are used to calculate the Affine Transform
+	     (setf (at src-tri 0 0 :float) 0f0) 
+	     (setf (at src-tri 0 1 :float) 0f0) 
+	     (setf (at src-tri 1 0 :float) (- (cols src) 1f0))
+	     (setf (at src-tri 1 1 :float) 0f0)
+	     (setf (at src-tri 2 0 :float) 0f0) 
+	     (setf (at src-tri 2 1 :float) (- (rows src) 1f0))
+	     (setf (at dst-tri 0 0 :float) (* (rows src) 0.0f0)) 
+	     (setf (at dst-tri 0 1 :float) (* (rows src) 0.33f0))
+	     (setf (at dst-tri 1 0 :float) (* (cols src) 0.85f0)) 
+	     (setf (at dst-tri 1 1 :float) (* (rows src) 0.25f0))
+	     (setf (at dst-tri 2 0 :float) (* (cols src) 0.15f0)) 
+	     (setf (at dst-tri 2 1 :float) (* (rows src) 0.7f0))
+	     (with-size ((warp-dest-size (size warp-dst)))
+	       ;Get the Affine Transform
+	       (with-mat ((warp-mat (get-affine-transform src-tri dst-tri))) 
+		 ;Apply the Affine Transform, just found, to SRC
+		 (warp-affine src warp-dst warp-mat warp-dest-size)
+
+		 ;Compute a rotation matrix with respect 
+                 ;to the center of the image
+
+                 ;Note: the '?' is a macro for CFFI::MEM-AREF
+
+		 (with-point-2f ((center (point-2f (/ (cols src) 
+						      (coerce 
+						       (+ (? center-x-val :int) 1) 
+						       'single-float)) 
+						   (/ (rows src) 
+						      (coerce 
+						       (+ (? center-y-val :int) 1) 
+						       'single-float)))))
+		   (let ((angle (* (? angle-val :int) -1.0d0))
+			 (scale (*  (? scale-val :int) 0.1d0)))
+		     ;Get the rotation matrix with the specifications above
+		     (with-mat ((rot-mat (get-rotation-matrix-2d center angle scale)))
+		       ;Rotate the warped image
+		       (warp-affine warp-dst warp-rotate-dst rot-mat warp-dest-size)
+		       ;Show what you got
+		       (imshow window-name warp-rotate-dst)
+		       (let ((c (wait-key 33)))
+			 (when (= c 27)
+			   (return))))))))))))))
+
+
+========================================================================================================================================
 REMAP
+========================================================================================================================================
+
 
 Applies a generic geometrical transformation to an image.
+
 
 C++: void remap(InputArray src, OutputArray dst, InputArray map1, InputArray map2, int interpolation, int borderMode=BORDER_CONSTANT, const Scalar& borderValue=Scalar())
 
@@ -8174,9 +8511,9 @@ Example:
 	   (return))))))
 
 
-
+========================================================================================================================================
 RESIZE
-
+========================================================================================================================================
 
 Resizes an image.
 
@@ -8277,15 +8614,133 @@ See also:
 		   (return))))))))))
 
 
+========================================================================================================================================
+WARP-AFFINE
+========================================================================================================================================
+
+
+Applies an affine transformation to an image.
+
+
+C++: void warpAffine(InputArray src, OutputArray dst, InputArray M, Size dsize, int flags=INTER_LINEAR, 
+                     int borderMode=BORDER_CONSTANT, const Scalar& borderValue=Scalar())
+
+LISP-CV:  (WARP-AFFINE (SRC MAT) (DEST MAT) (M MAT) (DSIZE SIZE) &OPTIONAL ((FLAGS :INT) +INTER-LINEAR+) 
+                      ((BORDER-MODE :INT) +BORDER-CONSTANT+) ((BORDER-VALUE SCALAR) (SCALAR-0) GIVEN-BORDER-VALUE)) => :VOID
+
+
+    Parameters:	
+
+        SRC - Input image.
+
+        DEST - Output image that has the size DSIZE and the same type as SRC.
+
+        M - 2x3 transformation matrix.
+
+        DSIZE - Size of the output image.
+
+        FLAGS - Combination of interpolation methods (see (RESIZE) ) and the optional flag +WARP-INVERSE-MAP+ 
+                that means that M is the inverse transformation ( DST ---> SRC ).
+
+        BORDER-MODE - Pixel extrapolation method (see (BORDER-INTERPOLATE) ); when...
+               
+                        (EQ BORDER-MODE +BORDER-TRANSPARENT+), 
+
+                      ...it means that the pixels in the destination image corresponding to the “outliers” in 
+                      the source image are not modified by the function.
+
+        BORDER-VALUE - Value used in case of a constant border; by default, it is 0.
+
+
+The function WARP-AFFINE transforms the source image using the specified matrix:
+
+
+See OpenCV documentation at this link for the formula.
+
+http://docs.opencv.org/trunk/modules/imgproc/doc/geometric_transformations.html?highlight=warpaff#warpaffine
+
+
+When the flag +WARP-INVERSE-MAP+ is set. Otherwise, the transformation is first inverted with (INVERT-AFFINE-TRANSFORM) 
+and then put in the formula above instead of M . The function cannot operate in-place.
+
+
+See also:
+
+(WARP-PERSPECTIVE), (RESIZE), (REMAP), (GET-RECT-SUB-PIX), (TRANSFORM)
+
+
+
+(defun warp-affine-example (filename)
+
+  ;Load the image
+  (with-mat ((src (imread filename 1))         
+             (src-tri (mat 3 2 +32f+))
+             (dst-tri (mat 3 2 +32f+))
+	     ;Set the destination image to the same 
+             ;type and size as the source image
+             (warp-dst (mat-zeros (rows src) (cols src) (mat-type src)))
+             (warp-rotate-dst (mat)))
+    (if (empty src) 
+	(return-from warp-affine-example 
+	  (format t "Image not loaded")))
+    (let ((source-window "Source image - WARP-AFFINE Example")
+          (warp-window "Warp - WARP-AFFINE Example")
+	  (warp-rotate-window "Warp + Rotate - WARP-AFFINE Example"))
+      (with-named-window (source-window +window-normal+)
+	(with-named-window (warp-window +window-normal+)
+	  (with-named-window (warp-rotate-window +window-normal+)
+	    (move-window source-window 310 175)
+	    (move-window warp-window 760 175)
+	    (move-window warp-rotate-window 1210 175)
+	    ;Set 3 points both in the src image and the dst image 
+            ;that are used to calculate the Affine Transform
+	    (setf (at src-tri 0 0 :float) 0f0) 
+	    (setf (at src-tri 0 1 :float) 0f0) 
+	    (setf (at src-tri 1 0 :float) (- (cols src) 1f0))
+	    (setf (at src-tri 1 1 :float) 0f0)
+	    (setf (at src-tri 2 0 :float) 0f0) 
+	    (setf (at src-tri 2 1 :float) (- (rows src) 1f0))
+	    (setf (at dst-tri 0 0 :float) (* (rows src) 0.0f0)) 
+	    (setf (at dst-tri 0 1 :float) (* (rows src) 0.33f0))
+	    (setf (at dst-tri 1 0 :float) (* (cols src) 0.85f0)) 
+	    (setf (at dst-tri 1 1 :float) (* (rows src) 0.25f0))
+	    (setf (at dst-tri 2 0 :float) (* (cols src) 0.15f0)) 
+	    (setf (at dst-tri 2 1 :float) (* (rows src) 0.7f0))
+	    (with-size ((warp-dest-size (size warp-dst)))
+	      ;Get the Affine Transform
+	      (with-mat ((warp-mat (get-affine-transform src-tri dst-tri))) 
+		;Apply the Affine Transform, just found, to SRC
+		(warp-affine src warp-dst warp-mat warp-dest-size)
+
+	        ;==Rotating the image after Warp==;
+
+		;Compute a rotation matrix with respect to the center of the image
+		(with-point-2f ((center (point-2f (/ (cols src) 2f0) (/ (rows src) 2f0))))
+		  (let ((angle -50d0)
+			(scale 0.6d0))
+		    ;Get the rotation matrix with the specifications above
+		    (with-mat ((rot-mat (get-rotation-matrix-2d center angle scale)))
+		      ;Rotate the warped image
+		      (warp-affine warp-dst warp-rotate-dst rot-mat warp-dest-size)
+		      ;Show what you got
+		      (imshow source-window src)
+		      (imshow warp-window warp-dst)
+		      (imshow warp-rotate-window warp-rotate-dst)
+		      (loop
+			 (let ((c (wait-key 33)))
+			   (when (= c 27)
+			     (return)))))))))))))))
+
+
 
 ========================================================================================================================================
 IMGPROC - MISCELLANEOUS IMAGE TRANSFORMATIONS:
 ========================================================================================================================================
 
 
-
+========================================================================================================================================
 ADAPTIVE-THRESHOLD
-
+========================================================================================================================================
 
 Applies an adaptive threshold to an array.
 
@@ -8294,7 +8749,7 @@ C++: void adaptiveThreshold(InputArray src, OutputArray dst, double maxValue, in
      int blockSize, double C)
 
 LISP-CV: (ADAPTIVE-THRESHOLD (SRC MAT) (DEST MAT) (MAX-VALUE :DOUBLE) (ADAPTIVE-METHOD :INT) (THRESHOLD-TYPE :INT) 
-         (BLOCKSIZE :INT) (C :DOUBLE))
+         (BLOCKSIZE :INT) (C :DOUBLE)) => :VOID
 
 
     Parameters:	
@@ -8325,6 +8780,7 @@ See OpenCV documentation for a description and formulae:
 http://docs.opencv.org/trunk/modules/imgproc/doc/miscellaneous_transformations.html?highlight=adaptiveth#adaptivethreshold
 
 The function can process the image in-place.
+
 
 See also:
 
@@ -10253,8 +10709,9 @@ The function returns the current position of the specified trackbar.
 		     (return)))))))))))
 
     
-    
+========================================================================================================================================
 IMSHOW
+========================================================================================================================================
 
 Displays an image in the specified window.
 
@@ -10288,20 +10745,24 @@ to fit the window. The function may scale the image, depending on its depth:
   "Opens the image FILENAME and shows it 
    in a window with IMSHOW."
 
-  (let* ((image (imread filename 1))
-	 (window-name "IMSHOW Example"))
+  (with-mat ((image (imread filename 1)))
     (if (empty image) 
 	(return-from imshow-example 
 	  (format t "Image not loaded")))
-    (named-window window-name +window-normal+)
-    (move-window window-name 759 175)
-    (imshow window-name image)
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name)))
+    (let ((window-name "IMSHOW Example"))
+      (with-named-window (window-name +window-normal+)
+	(move-window window-name 759 175)
+	(imshow window-name image)
+	(loop
+	   (let ((c (wait-key 33)))
+	     (when (= c 27)
+	       (return))))))))
 
 
 
+========================================================================================================================================
 MOVE-WINDOW
+========================================================================================================================================
 
 Moves window to the specified position
 
@@ -10332,8 +10793,9 @@ LISP-CV: (MOVE-WINDOW (WINNAME *STRING) (X :INT) (Y :INT)) => VOID
     (destroy-window window-name))
 
 
-
+========================================================================================================================================
 NAMED-WINDOW
+========================================================================================================================================
 
 
 Creates a window.
@@ -10361,31 +10823,32 @@ LISP-CV: (NAMED-WINDOW (WINNAME *STRING) &OPTIONAL ((FLAGS :INT) +WINDOW-AUTOSIZ
             +WINDOW-OPENGL+ If this is set, the window will be created with OpenGL support.
 
 
-The function NAMED-WINDOW creates a window that can be used as a placeholder for images and trackba-
-rs. Created windows are referred to by their names.
+The function NAMED-WINDOW creates a window that can be used as a placeholder for images and trackbars. 
+Created windows are referred to by their names.
 
 If a window with the same name already exists, the function does nothing.
 
-You can call (DESTROY-WINDOW) or (DESTROY-ALL-WINDOWS) to close the window and de-allocate any asso-
-ciated memory usage. For a simple program, you do not really have to call these functions because a-
-ll the resources and windows of the application are closed automatically by the operating system up-
-on exit.
+You can call (DESTROY-WINDOW) or (DESTROY-ALL-WINDOWS) to close the window and de-allocate any associated 
+memory usage. For a simple program, you do not really have to call these functions because all the resources 
+and windows of the application are closed automatically by the operating system upon exit.
+
 
 Note:
 
 Qt backend supports additional flags:
 
-        +WINDOW-NORMAL+ or +WINDOW-AUTOSIZE+: +WINDOW-NORMAL+ enables you to resize the window, wher-
-        eas +WINDOW-AUTOSIZE adjusts automatically the window size to fit the displayed image (see 
-        (IMSHOW) ), and you cannot change the window size manually.
+        +WINDOW-NORMAL+ or +WINDOW-AUTOSIZE+: +WINDOW-NORMAL+ enables you to resize the window, whereas 
+        +WINDOW-AUTOSIZE adjusts automatically the window size to fit the displayed image (see (IMSHOW) ), 
+        and you cannot change the window size manually.
 
-        +WINDOW-FREERATIO+ or +WINDOW-KEEPRATIO+: +WINDOW-FREERATIO+ adjusts the image with no resp-
-        ect to its ratio, whereas +WINDOW-KEEPRATIO keeps the image ratio. 
+        +WINDOW-FREERATIO+ or +WINDOW-KEEPRATIO+: +WINDOW-FREERATIO+ adjusts the image with no respect to 
+        its ratio, whereas +WINDOW-KEEPRATIO keeps the image ratio. 
         
-        +GUI-NORMAL+ or +GUI-EXPANDED+: +GUI-NORMAL+ is the old way to draw the window without stat-
-        usbar and toolbar, whereas +GUI-EXPANDED+ is a new enhanced GUI.
+        +GUI-NORMAL+ or +GUI-EXPANDED+: +GUI-NORMAL+ is the old way to draw the window without statusbar 
+        and toolbar, whereas +GUI-EXPANDED+ is a new enhanced GUI.
 
 By default, (= FLAGS (LOGIOR +WINDOW-AUTOSIZE+  +WINDOW-KEEPRATIO+  +GUI-EXPANDED+))
+
 
 
 (defun named-window-example ()
@@ -10398,6 +10861,7 @@ By default, (= FLAGS (LOGIOR +WINDOW-AUTOSIZE+  +WINDOW-KEEPRATIO+  +GUI-EXPANDE
     (named-window window-name +window-normal+)
     (loop while (not (= (wait-key 0) 27)))
     (destroy-window window-name)))
+
 
 
 
@@ -10548,32 +11012,65 @@ The function sets the position of the specified trackbar in the specified window
 
 
 
+========================================================================================================================================
+START-WINDOW-THREAD
+========================================================================================================================================
+
+
+Creates a separate thread that will manage window events.
+
+
+C++: int startWindowThread()
+
+LISP-CV: (START-WINDOW-THREAD) => :INT
+
+
+(defun start-window-thread-example ()
+
+  (let* ((window-name "START-WINDOW-THREAD Example"))
+    ;Start the window thread
+    (start-window-thread)
+    ;Open a window
+    (named-window window-name +window-normal+)
+    ;Wait until a key gets pressed inside the window
+    (loop while (not (= (wait-key 0) 27)))
+    ;Close the window
+    (destroy-window window-name)))
+
+
+
+========================================================================================================================================
 WAIT-KEY
+========================================================================================================================================
+
 
 Waits for a pressed key.
 
+
 C++: int waitKey(int delay=0)
 
-LISP-CV: (WAIT-KEY &OPTIONAL ((DELAY :INT) 0))
+LISP-CV: (WAIT-KEY &OPTIONAL ((DELAY :INT) 0)) => :INT
+
 
     Parameters:	DELAY - Delay in milliseconds. 0 is the special value that means “forever”.
 
-The function WAIT-KEY waits for a key event infinitely when (<= DELAY 0), for DELAY milliseconds wh-
-en it is positive. Since the OS has a minimum time between switching threads, the function will not 
-wait exactly delay ms, it will wait at least delay ms, depending on what else is running on your co-
-mputer at that time. It returns the code of the pressed key or -1 if no key was pressed before the 
-specified time had elapsed.
 
-Note
+The function WAIT-KEY waits for a key event infinitely when (<= DELAY 0), for DELAY milliseconds when 
+it is positive. Since the OS has a minimum time between switching threads, the function will not wait 
+exactly delay ms, it will wait at least delay ms, depending on what else is running on your computer 
+at that time. It returns the code of the pressed key or -1 if no key was pressed before the specified 
+time had elapsed.
 
-This function is the only method in HighGUI that can fetch and handle events, so it needs to be cal-
-led periodically for normal event processing unless HighGUI is used within an environment that take-
-s care of event processing.
+Note:
 
-Note
+This function is the only method in HighGUI that can fetch and handle events, so it needs to be called 
+periodically for normal event processing unless HighGUI is used within an environment that takes care 
+of event processing.
 
-The function only works if there is at least one HighGUI window created and the window is active. I-
-f there are several HighGUI windows, any of them can be active.
+Note:
+
+The function only works if there is at least one HighGUI window created and the window is active. If 
+there are several HighGUI windows, any of them can be active.
 
 
 (defun wait-key-example ()
@@ -14331,7 +14828,6 @@ element scalar. Only VAL0 is required, the rest are optional. Both the functions
 MAKE-SCALAR-ALL return a pointer to a 4 element scalar with all elements having the same value.
 
 
-;; Still gets errors mem-reffing SCALAR-1 and SCALAR-2, willl be fixed soon
 
 (defun scalar-example ()
 
@@ -14858,61 +15354,6 @@ to type MAT with the function (FORCE), (or the shorthand version (>>)) to use in
     (free m2-data)))
 
 
-DIV
-
-Divides matrix M1 by matrix M2.
-
-C++: MatExpr / operator
-
-LISP-CV: (DIV (M1 MAT) (M2 MAT)) => MAT-EXPR
-
-
-    Parameters:	
-
-        M1 - A matrix.
-
-        M2 - A matrix.
-
-
-The function DIV divides the elements of matrix M1 by the elements of matrix M2 in order. Both matrices 
-must be the same size. You may need to coerce the result of DIV, the return value, back to type MAT with 
-the function (FORCE), (or the shorthand version (>>)) to use in other functions. 
-
-
-(defun div-example ()
-
-  "Matrix M1 is divided by M2 with the function DIV.
-   Matrix M1, M2 and the result(RESULT) are then pri-
-   nted."
-
-  (let* ((m1-data (alloc :float '(53.0f0 62.0f0 85.0f0 64.0f0 23.0f0 
-				  97.0f0 52.0f0 16.0f0 12.0f0)))
-	 (m2-data (alloc :float '(64.0f0 22.0f0 64.0f0 15.0f0 11.0f0 
-				  17.0f0 42.0f0 16.0f0 88.0f0)))
-	 (m1 (mat 3 3 +32f+ m1-data))
-         (m2 (mat 3 3 +32f+ m2-data))
-         (result (div m1 m2)))
-    (dotimes (i (rows m1))
-      (dotimes (j (cols m1))
-	(format t "~a" (at m1 i j :float))
-	(princ #\Space))
-      (princ #\Newline))
-    (format t "~%~%")
-    (dotimes (i (rows m2))
-      (dotimes (j (cols m2))
-	(format t "~a" (at m2 i j :float))
-	(princ #\Space))
-      (princ #\Newline))
-    (format t "~%~%")
-    (dotimes (i 3)
-      (dotimes (j 3)
-	(format t "~a" (at (>> result) i j :float))
-	(princ #\Space))
-      (princ #\Newline))
-    (free m1-data)
-    (free m2-data)))
-
-
 
 VIDEO-WRITER
 
@@ -15411,7 +15852,11 @@ complete n iterations, because all you have to do is go back one in the REPL his
 Example:
 
 
-CV> ($  (sleep 1) 5)
+(defun $-example ()
+  ($ (sleep 1) 5))
+
+
+CV: ($-example)
 
 Evaluation took:
   5.0000 seconds of real time

@@ -98,12 +98,6 @@
        (%named-window (%c-string-to-string winname (length winname)) flags))
 
 
-(defmacro with-named-window ((winname &optional (flags +window-autosize+)) &body body)
-	  `(unwind-protect (progn (named-window ,winname ,flags)
-				  ,@body)
-				  (destroy-window ,winname)))
-
-
 ;; void setMouseCallback(const string& winname, MouseCallback onMouse, void* userdata=0)
 ;;void cv_setMouseCallback(const char* winname, MouseCallback onMouse, void* userdata)
 (defcfun ("cv_setMouseCallback" %set-mouse-callback) :void
@@ -130,6 +124,12 @@
   (%set-trackbar-pos (%c-string-to-string trackbarname (length trackbarname)) (%c-string-to-string winname (length winname))  pos))
 
 
+;; int startWindowThread()
+;; int cv_startWindowThread()
+(defcfun ("cv_startWindowThread" start-window-thread) :int
+  "Creates a separate thread that will manage window events")
+
+
 ;; int waitKey(int delay=0)
 ;; int cv_waitKey(int delay)
 (defcfun ("cv_waitKey" %wait-key) :int
@@ -139,6 +139,13 @@
 (defun wait-key (&optional (delay 0))
   "Waits for a pressed key."
   (%wait-key delay))
+
+
+(defmacro with-named-window ((winname &optional (flags +window-autosize+)) &body body)
+	  `(unwind-protect (progn (named-window ,winname ,flags)
+				  ,@body)
+				  (destroy-window ,winname)))
+
 
 
 ;;; Reading and Writing Images and Video

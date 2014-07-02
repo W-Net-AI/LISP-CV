@@ -274,8 +274,26 @@
        (%sobel src dest ddepth dx dy ksize scale delta border-type))
 
 
+
 ;;; Geometric Image Transformations
 
+
+
+;; Mat getAffineTransform(InputArray src, InputArray dst)
+;; Mat* cv_getAffineTransform(Mat* src, Mat* dst) 
+(defcfun ("cv_getAffineTransform" get-affine-transform) mat
+  "Calculates an affine transform from three pairs of the corresponding points."
+  (src mat)
+  (dest mat))
+
+
+;; Mat getRotationMatrix2D(Point2f center, double angle, double scale)
+;; Mat* cv_getRotationMatrix2D(Point2f* center, double angle, double scale)
+(defcfun ("cv_getRotationMatrix2D" get-rotation-matrix-2d) mat
+  "Calculates an affine matrix of 2D rotation."
+  (center point-2f)
+  (angle :double)  
+  (scale :double))
 
 
 ;; void remap(InputArray src, OutputArray dst, InputArray map1, InputArray map2, int interpolation, int borderMode=BORDER_CONSTANT, const Scalar& borderValue=Scalar())
@@ -313,7 +331,29 @@
   (%resize src dest dsize fx fy interpolation))
 
 
+;; void warpAffine(InputArray src, OutputArray dst, InputArray M, Size dsize, int flags=INTER_LINEAR, 
+;; int borderMode=BORDER_CONSTANT, const Scalar& borderValue=Scalar())
+;; void cv_warpAffine(Mat* src, Mat* dst, Mat* M, Size* dsize, int flags, int borderMode, Scalar* borderValue) 
+(defcfun ("cv_warpAffine" %warp-affine) :void
+  (src mat)
+  (dest mat)
+  (m mat)
+  (dsize size)
+  (flags :int)
+  (border-mode :int)
+  (border-value scalar))
+
+
+(defun warp-affine (src dest m dsize &optional (flags +inter-linear+) (border-mode +border-constant+) 
+                   (border-value (scalar-0) given-border-value)) 
+       "Applies an affine transformation to an image."
+       (%warp-affine src dest m dsize flags border-mode border-value)
+       (if given-border-value nil (del-scalar border-value)))
+
+
+
 ;;; Miscellaneous Image Transformations
+
 
 
 ;; void adaptiveThreshold(InputArray src, OutputArray dst, double maxValue, int adaptiveMethod, int thresholdType, int blockSize, double C)

@@ -1244,9 +1244,14 @@
   (self mat))
 
 
-;; Scalar_<_Tp>::Scalar_(_Tp v0, _Tp v1, _Tp v2, _Tp v3)
-;; Scalar* cv_create_Scalar(double val0, (double val1, double val2, double val3)
-(defcfun ("cv_create_Scalar" %scalar) scalar
+;; Scalar::Scalar()
+;; Scalar* cv_create_Scalar0()
+(defcfun ("cv_create_Scalar0" scalar-0) scalar)
+
+
+;; Scalar::Scalar(double v0, double v1, double v2, double v3)
+;; Scalar* cv_create_Scalar4(double val0, (double val1, double val2, double val3)
+(defcfun ("cv_create_Scalar4" scalar-4) scalar
 	 (val0 :double)
 	 (val1 :double)
 	 (val2 :double)
@@ -1255,12 +1260,12 @@
 
 (defun scalar (&optional (val1 0d0) (val2 0d0) (val3 0d0) (val4 0d0))
        "SCALAR constructor"
-	      (%scalar (coerce val1 'double-float) (coerce val2 'double-float) (coerce val3 'double-float) (coerce val4 'double-float)))
+	      (scalar-4 (coerce val1 'double-float) (coerce val2 'double-float) (coerce val3 'double-float) (coerce val4 'double-float)))
 
 
 (defun make-scalar (&optional (val1 0d0) (val2 0d0) (val3 0d0) (val4 0d0))
        "SCALAR constructor"
-	      (%scalar (coerce val1 'double-float) (coerce val2 'double-float) (coerce val3 'double-float) (coerce val4 'double-float)))
+	      (scalar-4 (coerce val1 'double-float) (coerce val2 'double-float) (coerce val3 'double-float) (coerce val4 'double-float)))
 
 
 ;; Scalar_<_Tp> Scalar_<_Tp>::all(_Tp v0)
@@ -2362,6 +2367,22 @@
   (m mat))
 
 
+;; void exp(InputArray src, OutputArray dst)
+;; void cv_exp(Mat* src, Mat* dst)
+(defcfun ("cv_exp" *exp) :void
+  "Calculates the exponent of every array element."
+  (src mat)
+  (dest mat))
+
+
+;; void log(InputArray src, OutputArray dst)
+;; void cv_log(Mat* src, Mat* dst)
+(defcfun ("cv_log" *log) :int
+  "Calculates the natural logarithm of every array element."
+  (src mat)
+  (dest mat))
+
+
 ;; void max(InputArray src1, InputArray src2, OutputArray dst)
 ;; void cv_max(Mat* src1, Mat* src2, Mat* dst)
 (defcfun ("cv_max" *max) :void 
@@ -2378,6 +2399,13 @@
 	 (src1 mat)
 	 (src2 mat)
 	 (dest mat))
+
+
+;; Scalar trace(InputArray mtx)
+;; Scalar* cv_trace(Mat* mtx)
+(defcfun ("cv_trace" *trace) scalar
+  "Returns the trace of a matrix."
+  (mtx mat))
 
 
 ;; C++: void absdiff(InputArray src1, InputArray src2, OutputArray dst)
@@ -2553,14 +2581,6 @@
 	       (t nil)))
 
 
-;; void exp(InputArray src, OutputArray dst)
-;; void cv_exp(Mat* src, Mat* dst)
-(defcfun ("cv_exp" *exp) :void
-  "Calculates the exponent of every array element."
-  (src mat)
-  (dest mat))
-
-
 ;; void flip(InputArray src, OutputArray dst, int flipCode)
 ;; void cv_flip(Mat* src, Mat* dst, int flipCode)
 (defcfun ("cv_flip" flip) :void
@@ -2605,14 +2625,6 @@
 ;; bool cv_Mat_isContinuous(Mat* self) 
 (defcfun ("cv_Mat_isContinuous" is-continuous) :boolean
   (self mat))
-
-
-;; void log(InputArray src, OutputArray dst)
-;; void cv_log(Mat* src, Mat* dst)
-(defcfun ("cv_log" *log) :int
-  "Calculates the natural logarithm of every array element."
-  (src mat)
-  (dest mat))
 
 
 ;; void magnitude(InputArray x, InputArray y, OutputArray magnitude)
