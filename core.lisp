@@ -72,7 +72,7 @@
   (len :unsigned-int))
 
 
-;;; DEFGENERIC (*defgeneric functions are placed here so the whole file can use them*)
+;;; DEFGENERIC (*defgeneric functions are placed here so the whole library can use them*)
 
 
 (defgeneric angle (self)
@@ -87,11 +87,23 @@
 (defgeneric clone (self)
   (:documentation "Used for all class bindings with a CLONE member."))
 
+(defgeneric compute (self &rest args)
+  (:documentation "Used for all class bindings with a COMPUTE member."))
+
+(defgeneric create (self &rest args)
+  (:documentation "Used for all class bindings with a CREATE member."))
+
+(defgeneric detect (self &rest args)
+  (:documentation "Used for all class bindings with a DETECT member."))
+
 (defgeneric dot (self other)
   (:documentation "Used for all class bindings with a DOT member"))
 
 (defgeneric height (self)
   (:documentation "Used for all class bindings with an HEIGHT member."))
+
+(defgeneric match (arg &rest args)
+  (:documentation "Used for all class bindings with a MATCH member."))
 
 (defgeneric size (arg &rest args)
   (:documentation "Used for all class bindings with a SIZE member."))

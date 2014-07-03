@@ -79,7 +79,7 @@
 
 ;; void operator delete  ( void* ptr )
 ;; void cv_delete_KeyPoint(KeyPoint* self)
-(defcfun ("cv_delete_KeyPoint" del-kp) :void
+(defcfun ("cv_delete_KeyPoint" del-key-point) :void
   "Calls delete on a KEY-POINT object."
   (self key-point))
 

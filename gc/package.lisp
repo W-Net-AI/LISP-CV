@@ -438,6 +438,7 @@
 ;; imgproc - Geometric Image Transformations
 
    #:get-affine-transform
+   #:get-perspective-transform
    #:get-rotation-matrix-2d
 
 ;; imgproc - Miscellaneous Image Transformations

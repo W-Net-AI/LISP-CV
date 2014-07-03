@@ -133,9 +133,9 @@
 
 (defmacro ? (ptr type &optional (index 0))
   `(cond ((pointerp ,ptr)
-	  (mem-aref ,ptr ,type ,index))
+	  (return-from ? (mem-aref ,ptr ,type ,index)))
 	 ((not (pointerp ,ptr))
-	  (mem-aref (c-pointer ,ptr) ,type  ,index))
+	  (return-from ? mem-aref (c-pointer ,ptr) ,type  ,index))
           (t 0)))
 
 

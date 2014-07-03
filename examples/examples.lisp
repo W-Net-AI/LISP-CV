@@ -92,8 +92,9 @@ ADD, the return value, back to type MAT with the function (FORCE), (or the short
 	  (format t "~%"))))))
 
 
-
+========================================================================================================================================
 ADJUST-ROI
+========================================================================================================================================
 
 Adjusts a submatrix size and position within the parent matrix.
 
@@ -133,7 +134,7 @@ increased in the upward direction.
 The function is used internally by the OpenCV filtering functions, like (FILTER-2D) , morphological 
 operations, and so on.
 
-See also
+See also:
 
 (COPY-MAKE-BORDER)
 
@@ -188,8 +189,9 @@ See also
       (destroy-all-windows))))
 
 
-
+========================================================================================================================================
 ASSGN
+========================================================================================================================================
 
 Assign a matrices data to another matrix.
 
@@ -257,8 +259,9 @@ CV> (PRINT-MAT B :DOUBLE)
 NIL
 
 
-
+========================================================================================================================================
 ASSGN-VAL
+========================================================================================================================================
 
 Assign a scalar value to a matrix.
 
@@ -326,8 +329,9 @@ need to access the return value of ASSGN-VAL to complete the operation,
 		   (when (= c 27)
 		     (return)))))))))))
 
-
+========================================================================================================================================
 AT
+========================================================================================================================================
 
 Returns a reference to the specified array element.
 
@@ -379,8 +383,9 @@ The example below initializes a Hilbert matrix:
       (princ #\Newline)))) 
 
 
-
+========================================================================================================================================
 CHANNELS
+========================================================================================================================================
 
 Returns the number of matrix channels.
 
@@ -392,7 +397,7 @@ LISP-CV: (CHANNELS (SELF MAT)) => :INT
 
         SELF - A matrix.  
 
-The method returns the number of matrix channels.
+This function returns the number of matrix channels.
 
 
 (defun channels-example (filename)
@@ -429,7 +434,9 @@ The method returns the number of matrix channels.
 		 (return)))))))))
 
 
+========================================================================================================================================
 COL-RANGE
+========================================================================================================================================
 
 Creates a matrix header for the specified column span.
 
@@ -478,8 +485,9 @@ The method makes a new header for the specified column span of the matrix. Simil
       (free data)))
 
 
-
+========================================================================================================================================
 COLS
+========================================================================================================================================
 
 Returns number or cols in MAT.
 
@@ -505,9 +513,9 @@ nsions.
     (format t "~%The number of columns in MAT = ~a~%~%" (cols mat))))
 
 
-
-
+========================================================================================================================================
 COPY-TO
+========================================================================================================================================
 
 Copies the matrix to another one.
 
@@ -628,8 +636,9 @@ newly allocated matrix is initialized with all zeros before copying the data.
 		 (return)))))))))
 
 
-
+========================================================================================================================================
 CROSS
+========================================================================================================================================
 
 Computes a cross-product of two 3-element vectors.
 
@@ -676,8 +685,9 @@ shape and type as operands.
 	(format t "~%~%")))))
 
 
-
+========================================================================================================================================
 DATA
+========================================================================================================================================
 
 Pointer to MAT data.
 
@@ -704,23 +714,23 @@ te the address of a matrix element. (COLS) is needed because the matrix can be p
 ix or because there can be some padding space in the end of each row for a proper alignment.
 
 
-
 (defun data-example (filename)
 
-  (let ((window-name "DATA Example")
-	;;Variables used to hold the 
-	;;BGR image pixel values
-	(b 0)
-	(g 0)
-	(r 0)
-        ;;INPUT is a pointer 
-        ;;to the IMG data
-	(input (data img))) 
-    ;;Read image
-    (with-mat ((img (imread filename 1))) 
-      (if (empty img) 
-	  (return-from data-example 
-	    (format t "Image not loaded")))
+  ;;Read image
+  (with-mat ((img (imread filename 1))) 
+    (if (empty img) 
+	(return-from data-example 
+	  (format t "Image not loaded")))
+
+    (let ((window-name "DATA Example")
+	  ;;Variables used to hold the 
+	  ;;BGR image pixel values
+	  (b 0)
+	  (g 0)
+	  (r 0)
+	  ;;INPUT is a pointer 
+	  ;;to the IMG data
+	  (input (data img))) 
       (with-named-window (window-name +window-normal+)
 	(move-window window-name 759 175)
 	;;In a loop access IMG pixel data using the STEP* 
@@ -747,8 +757,9 @@ ix or because there can be some padding space in the end of each row for a prope
 	       (return))))))))
 
 
-
+========================================================================================================================================
 DEPTH
+========================================================================================================================================
 
 Returns the depth of a matrix element.
 
@@ -804,7 +815,6 @@ CV> (MAT-TYPE A)
 CV> (DEPTH A)
 
 1   ;The type of the matrix elements are 1(+8S+) - 8-bit signed integer
-
 
 
 ========================================================================================================================================
@@ -929,8 +939,9 @@ Example:
 TODO (Write an example showing how to create DMatch manually, add to vector and send to DRAW-MATCHES)
 
 
-
+========================================================================================================================================
 DOT
+========================================================================================================================================
 
 Note: This is a overloaded method that computes the dot product of elements in both MAT and POINT-* 
 objects. THe documentation is revealed pertaining to both.
@@ -1044,8 +1055,9 @@ MAT
       (format t "~%The dot product of A and B = ~a~%~%" (dot a b)))))
 
 
-
+========================================================================================================================================
 ELEM-SIZE
+========================================================================================================================================
 
 
 Returns the matrix element size in bytes.
@@ -1070,8 +1082,9 @@ Example:
 See STEP1 example.
 
 
-
+========================================================================================================================================
 ELEM-SIZE1
+========================================================================================================================================
 
 
 Returns the size of each matrix element channel in bytes.
@@ -1096,8 +1109,9 @@ Example:
 See STEP1 example.
 
 
-
+========================================================================================================================================
 EMPTY
+========================================================================================================================================
 
 Returns true if a MAT or RANGE object is empty.
 
@@ -1155,8 +1169,9 @@ CV> (EMPTY C)
 T
 
 
-
+========================================================================================================================================
 INV
+========================================================================================================================================
 
 Inverses a matrix.
 
@@ -1239,8 +1254,9 @@ back to type MAT with the function (FORCE), (or the shorthand version (>>)) to u
         (format t "~%")))))
 
 
-
+========================================================================================================================================
 IS-CONTINOUS
+========================================================================================================================================
 
 Reports whether the matrix is continuous or not.
 
@@ -1310,8 +1326,9 @@ no longer have this property.
 			   (return))))))))))))))
 
 
-
+========================================================================================================================================
 KEY-POINT
+========================================================================================================================================
 
 KEYPOINT constructor.
 
@@ -1362,8 +1379,9 @@ Example:
 TODO(Write example using DRAW KEYPOINTS to draw random keypoints)
 
 
-
+========================================================================================================================================
 LOCATE-ROI
+========================================================================================================================================
 
 Locates the matrix header within a parent matrix.
 
@@ -1441,8 +1459,9 @@ submatrix within the original matrix. The function LOCATE-ROI does exactly that.
 			 (return)))))))))))))
 
 
-
+========================================================================================================================================
 MAT
+========================================================================================================================================
 
 Creates a matrix
 
@@ -1574,8 +1593,9 @@ will be coming to this library as well.
       ($ (progn (setf manual (mat)) (del-mat manual)) 2592000))))
 
 
-
+========================================================================================================================================
 MUL
+========================================================================================================================================
 
 Finds the product of two matrices.
 
@@ -1618,8 +1638,9 @@ functions.
 	  (print-mat forced-result :float)
 	  (format t "~%"))))))
 
-
+========================================================================================================================================
 POINT
+========================================================================================================================================
 
 POINT constructor.
 
@@ -1675,8 +1696,9 @@ to extract the x,y coordinates of a point.
 	    (y point))))
 
 
-
+========================================================================================================================================
 POINT-2D
+========================================================================================================================================
 
 POINT-2D constructor.
 
@@ -1731,8 +1753,9 @@ used to extract the x,y coordinates of the double float point.
 	    (y point-2d))))
 
 
-
+========================================================================================================================================
 POINT-2F
+========================================================================================================================================
 
 POINT-2F constructor.
 
@@ -1787,8 +1810,9 @@ used to extract the x,y coordinates the single float point.
 	    (y point-2f))))
 
 
-
+========================================================================================================================================
 POINT-3D
+========================================================================================================================================
 
 POINT-3D constructor.
 
@@ -1848,8 +1872,9 @@ are used to extract the x,y,Z coordinates the double float point.
             (z point-3d))))
 
 
-
+========================================================================================================================================
 POINT-3F
+========================================================================================================================================
 
 POINT-3F constructor.
 
@@ -1909,7 +1934,9 @@ are used to extract the x,y,Z coordinates the single float point.
             (z point-3f))))
 
 
+========================================================================================================================================
 POINT-3I
+========================================================================================================================================
 
 POINT-3I constructor.
 
@@ -1968,7 +1995,9 @@ used to extract the x,y,Z coordinates of the type integer point.
             (z point-3i))))
 
 
+========================================================================================================================================
 PRINT-MAT
+========================================================================================================================================
 
 Prints 2D matrices
 
@@ -2009,9 +2038,9 @@ This is now the sole contents of <LISP-CV-SRC-DIR>/DATA/DATA.TXT
 1 1 1 
 1 1 1 
 
-
-
-PROMOTE 
+========================================================================================================================================
+PROMOTE
+========================================================================================================================================
 
 Coverts a MAT to MAT-EXPR
 
@@ -2065,9 +2094,9 @@ Example:
 
 (<<-example)
 
-
-
+========================================================================================================================================
 PTR
+========================================================================================================================================
 
 Returns a pointer to the specified matrix row.
 
@@ -2162,8 +2191,9 @@ This function returns a pointer to the specified matrix row.
 		 (return)))))))))
 
 
-
+========================================================================================================================================
 RANGE
+========================================================================================================================================
 
 Range constructor.
 
@@ -2228,9 +2258,150 @@ To retrieve the size of the matrix row or column span held in a RANGE object or 
 or not a RANGE object is empty, use the functions SIZE and EMPTY. Documentation and examples for SIZE
 and EMPTY are in this file.
 
+========================================================================================================================================
+RECT
+========================================================================================================================================
+
+RECT constructor.
+
+Note: Both RECT and MAKE-RECT are provided in this library. The first, to match OpenCV's naming 
+conventions, the second, to adhere to Common Lisp naming conventions. Except for the name, they are 
+the same function. I use the RECT function in the examples in this file because it will make them 
+easier to compare with OpenCV examples you find online, thus making this library easier to learn.
+
+C++: Rect::Rect()
+
+LISP-CV:  (RECT) => RECT
+
+LISP-CV:  (MAKE-RECT) => RECT
+
+C++: Rect::Rect(int x, int y, int width, int height)
+
+LISP-CV:  (RECT (X :INT) (Y :INT) (:WIDTH :INT) (HEIGHT :INT)) => RECT
+
+LISP-CV:  (MAKE-RECT (X :INT) (Y :INT) (:WIDTH :INT) (HEIGHT :INT)) => RECT
+
+C++: int x, y, width, height
+
+LISP-CV: (X (SELF RECT)) => :INT
+
+LISP-CV: (Y (SELF RECT)) => :INT
+
+LISP-CV: (WIDTH (SELF RECT)) => :INT
+
+LISP-CV: (HEIGHT (SELF RECT)) => :INT
+
+C++: Rect::size() const;
+
+LISP-CV: (SIZE (SELF RECT)) => SIZE
+
+C++: Rect::tl() const;
+
+LISP-CV: (TL (SELF RECT)) => POINT
+
+C++: Rect::br() const;
+
+LISP-CV: (BR (SELF RECT)) => POINT
+
+C: Rect* cv_Rect_clone(Rect* self) 
+
+LISP-CV: (CLONE (SELF RECT)) => RECT 
 
 
+    Parameters:	
+
+        SELF - A rectangle.
+
+        X - X-coordinate of the rectangle.
+
+        Y - Y-coordinate of the rectangle.
+
+        WIDTH - Width of the rectangle.
+
+        HEIGHT - Height of the rectangle.
+
+
+The functions RECT and MAKE-RECT store coordinates of a rectangle.
+
+The method X retrieves the x coordinate of the rectangle.
+
+The method Y retrieves the y coordinate of the rectangle.
+
+The method WIDTH retrieves the width of the rectangle.
+
+The method HEIGHT retrieves the height of the rectangle.
+
+The method SIZE retrieves the size (width, height) of the rectangle. You can also use the 
+SIZE method in this library to access the size of a RECT object. See SIZE-EXAMPLE in this file.
+
+The function TL retrieves the top-left corner of the rectangle.
+
+The function BR retrieves the bottom-right corner of the rectangle.
+
+The method CLONE creates a full copy of the rectangle. It is a convenience function for creating 
+a clone of a RECT object. It was created from scratch in C and then bound in Lisp.
+
+
+(defun rect-example (x y width height)
+
+  ;Create a rectangle and find its size(width, height), 
+  ;location and size(x, y, width, height) and its top-
+  ;left and bottom-right corner
+
+  ;WITH-RECT calls DEL-RECT automatically when RECTAN-
+  ;GLE goes out of scope. DEL-RECT frees the memory a-
+  ;llocated by RECT
+  
+  (format t "~%RECTANGLE:~%")
+  (with-rect ((rectangle (rect x y width height)))
+    (let* ((x (x rectangle))
+	   (y (y rectangle))
+	   (width (width rectangle))
+	   (height (height rectangle))
+           (size (size rectangle))
+	   (tl-corner (tl rectangle))
+	   (br-corner (br rectangle)))
+      (format t "~%The (x, y, width, height) of RECTANGLE = (~a, ~a, ~a, ~a)~%" 
+	      x y width height)
+      (format t "~%The size(width, height) of RECTANGLE = (~a, ~a)~%" 
+	      (width size)
+	      (height size))
+      (format t "~%The top-left corner of RECTANGLE = (~a, ~a)~%" 
+	      (x tl-corner)
+	      (y tl-corner))
+      (format t "~%The bottom-right corner of RECTANGLE = (~a, ~a)~%" 
+	      (x br-corner)
+	      (y br-corner)))
+
+  ;Create a clone of RECTANGLE and find its size(width, 
+  ;height), location and size(x, y, width, height) and 
+  ;its top-left and bottom-right corner
+
+    (format t "~%~%RECTANGLE-CLONE:~%")
+    (with-rect ((rectangle-clone (clone rectangle))) 
+      (let* ((clone-x (x rectangle-clone))
+	     (clone-y (y rectangle-clone))
+	     (clone-width (width rectangle-clone))
+	     (clone-height (height rectangle-clone))
+             (clone-size (size rectangle-clone))
+	     (clone-tl-corner (tl rectangle-clone))
+	     (clone-br-corner (br rectangle-clone)))
+	(format t "~%The (x, y, width, height) of RECTANGLE-CLONE = (~a, ~a, ~a, ~a)~%" 
+		clone-x clone-y clone-width clone-height)
+	(format t "~%The size(width, height) of RECTANGLE-CLONE = (~a, ~a)~%" 
+		(width clone-size)
+		(height clone-size))
+	(format t "~%The top-left corner of RECTANGLE-CLONE = (~a, ~a)~%" 
+		(x clone-tl-corner)
+		(y clone-tl-corner))
+	(format t "~%The bottom-right corner of RECTANGLE-CLONE = (~a, ~a)~%~%" 
+		(x clone-br-corner)
+		(y clone-br-corner))))))
+
+
+========================================================================================================================================
 RESHAPE
+========================================================================================================================================
 
 Changes the shape and/or the number of channels of a 2D matrix without copying the data.
 
@@ -2292,8 +2463,9 @@ and/or different number of channels. Any combination is possible if:
 
 
 
-
+========================================================================================================================================
 ROTATED-RECT
+========================================================================================================================================
 
 Functions representing rotated (i.e. not up-right) rectangles on a plane and the associated functions 
 used to retrieve their values.
@@ -2360,8 +2532,9 @@ LISP-CV: (SIZE (SELF ROTATED-RECT)) => SIZE
 	  (x bounding-rect) (y bounding-rect) (width bounding-rect) (height bounding-rect))))
 
 
-
+========================================================================================================================================
 ROW-RANGE
+========================================================================================================================================
 
 Creates a matrix header for the specified row span.
 
@@ -2410,15 +2583,16 @@ functions, this is an O(1) operation.
       (format t "~%")))
 
 
-
+========================================================================================================================================
 ROWS
-
+========================================================================================================================================
 
 Returns number or rows in MAT.
 
 C++: int rows, cols
 
 LISP-CV: (ROWS (SELF MAT)) => :INT
+
 
     Parameters:	
 
@@ -2438,10 +2612,11 @@ ons.
 
 
 
-
+========================================================================================================================================
 SCALE
+========================================================================================================================================
 
-Finds the product a matrix and a scalar..
+Finds the product of a matrix and a scalar..
 
 C++: MatExpr * operator
 
@@ -2723,12 +2898,11 @@ CV> (HEIGHT C)
 480.0d0
 
 
-
+========================================================================================================================================
 SIZE-FROM-POINT
-
+========================================================================================================================================
 
 Create a SIZE object from POINT data.
-
 
 C: Size* cv_Size_fromPoint(Point* p)
 
@@ -2760,56 +2934,58 @@ CV> (HEIGHT B)
 2.0d0
 
 
-
-
-STEP*
+========================================================================================================================================
+*STEP
+========================================================================================================================================
 
 Used to compute address of a matrix element
 
-C++: MStep step
+C++: Mat::step
 
 LISP-CV: (STEP (SELF MAT)) => :UNSIGNED-INT
 
     Parameters:	
 
-        SELF  a pointer to matrix(MAT construc
-
+        SELF  a pointer to matrix(MAT) object
 
 This function is used to compute the address of a matrix element. The image step gives you the dist-
 ance in bytes between the first element of one row and the first element of the next row. This func-
-tion is named STEP*, because the name STEP conflicts with a Lisp Macro.
+tion is named *STEP, because the name STEP conflicts with a Lisp Macro.
 
 
-(defun step*-example (filename)
-  ;; load image
-  (let* ((img (imread filename 1))    (loop while (not (= (wait-key 0) 27)))
-	 ;; variables used to access a pixel value.
-         ;; BGR - Blue,Green,Red is the default co-
-         ;; lor format in LisP-CV.
-	 (input (data img))
-         ;; variables used to hold the BGR image pixel value
-	 (b 0)
-	 (g 0)
-	 (r 0)
-	 (window-name "STEP* Example"))
-    (if (empty img) 
-	(return-from step*-example 
-	  (format t "Image not loaded")))
-    (named-window window-name +window-normal+)
-    (move-window window-name 759 175)
-    ;; access pixel value at x = 0, y = 0 using the STEP* function
-    (setf b (mem-aref input :uchar 
-		      (+  (* (step* img) 0) 0)))
-    (setf g (mem-aref input :uchar 
-		      (+ (+  (* (step* img) 0) 0) 1)))
-    (setf r (mem-aref input :uchar 
-		      (+ (+  (* (step* img) 0) 0) 2)))
-    ;; print the 0,0 pixel value
-    (format t "The pixel value at 0,0 is: (~a,~a,~a) " b g r)
-    (imshow window-name img)
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name)))
+Example:
 
+
+(defun *step-example (filename)
+  ;Load image
+  (with-mat ((img (imread filename 1)))   
+    ;Variables used to access the pixel data.
+    ;BGR(Blue,Green,Red) is the default color
+    ;format in OpenCV and therefore LisP-CV.
+    (let ((b 0)
+	  (g 0)
+	  (r 0)
+	  (input (data img))
+	  (window-name "*STEP Example"))
+      (if (empty img) 
+	  (return-from *step-example 
+	    (format t "Image not loaded")))
+      (with-named-window (window-name +window-normal+)
+	(move-window window-name 759 175)
+	;Get pixel value at element 0,0 of IMG
+	(setf b (mem-aref input :uchar 
+			  (+  (* (*step img) 0) 0)))
+	(setf g (mem-aref input :uchar 
+			  (+ (+  (* (*step img) 0) 0) 1)))
+	(setf r (mem-aref input :uchar 
+			  (+ (+  (* (*step img) 0) 0) 2)))
+	;Print the 0,0 pixel value
+	(format t "~%The pixel value at 0,0 is: (~a,~a,~a)~%" b g r)
+	(imshow window-name img)
+	(loop 
+	   (let ((c (wait-key 33)))
+	     (when (= c 27)
+	       (return))))))))
 
 
 STEP1
@@ -8175,12 +8351,12 @@ Example:
    the points given to GET-AFFINE-TRANSFORM. This will help you to 
    better understand the math behind the operation of the function."
 
-  ;Load the image
+  ;Load the image.
   (with-mat ((src (imread filename 1))         
              (src-tri (mat 3 2 +32f+))
              (dst-tri (mat 3 2 +32f+))
 	     ;Set the destination image to the same 
-	     ;type and size as the source image
+	     ;type and size as the source image.
              (warp-dst (mat-zeros (rows src) (cols src) (mat-type src)))
              (warp-rotate-dst (mat)))
     (if (empty src) 
@@ -8190,68 +8366,114 @@ Example:
       (with-named-window (window-name +window-normal+)
 	(set-window-property window-name +wnd-prop-fullscreen+ 
 			     +window-fullscreen+)
-        ;Allocate memory to hold the point values the trackbar can 
-        ;adjust that will later be given to GET-AFFINE-TRANSFORM
+	;Allocate memory to hold the values that the trackbar can 
+	;adjust that will later be given to GET-AFFINE-TRANSFORM.
 	(with-object ((src-tri-1 (alloc :int 0))
 		      (src-tri-2 (alloc :int 0))
 		      (src-tri-3 (alloc :int (list (cols src))))
+		      (src-tri-subt-3 (alloc :int 1))
 		      (src-tri-4 (alloc :int 0))
 		      (src-tri-5 (alloc :int 0))
 		      (src-tri-6 (alloc :int (list (rows src))))
+		      (src-tri-subt-6 (alloc :int 1))
 		      (dst-tri-1 (alloc :int (list (cols src))))
+                      (dst-tri-mult-1 (alloc :int 0))
 		      (dst-tri-2 (alloc :int (list (rows src))))
+		      (dst-tri-mult-2 (alloc :int 33))
 		      (dst-tri-3 (alloc :int (list (cols src))))
+		      (dst-tri-mult-3 (alloc :int 85))
 		      (dst-tri-4 (alloc :int (list (rows src))))
+		      (dst-tri-mult-4 (alloc :int 25))
 		      (dst-tri-5 (alloc :int (list (cols src))))
-		      (dst-tri-6 (alloc :int (list (rows src)))))
+		      (dst-tri-mult-5 (alloc :int 15))
+		      (dst-tri-6 (alloc :int (list (rows src))))
+		      (dst-tri-mult-6 (alloc :int 7)))
+
 	  ;Create the trackbars used to adjust the values of the 
-	  ;elements in the SRC-TRI and the DST-TRI matrices
+	  ;elements in the SRC-TRI matrix.
+
+          ;When the values are set into the SRC-TRI matrix in the 
+	  ;WARP-AFFINE-EXAMPLE, two subtrahends are involved. The
+	  ;'ST SUBT 3' and 'ST SUBT 6' trackbars adjust those two
+          ;subtrahends.
+
 	  (create-trackbar "SRC-TRI 1" window-name src-tri-1 10000)
 	  (create-trackbar "SRC-TRI 2" window-name src-tri-2 10000)
 	  (create-trackbar "SRC-TRI 3" window-name src-tri-3 10000)
+	  (create-trackbar "ST SUBT 3" window-name src-tri-subt-3 3000)
 	  (create-trackbar "SRC-TRI 4" window-name src-tri-4 10000)
 	  (create-trackbar "SRC-TRI 5" window-name src-tri-5 3000)
 	  (create-trackbar "SRC-TRI 6" window-name src-tri-6 5000)
-	  (create-trackbar "DST-TRI 1" window-name dst-tri-1 200000)
-	  (create-trackbar "DST-TRI 2" window-name dst-tri-2 200000)
-	  (create-trackbar "DST-TRI 3" window-name dst-tri-3 200000)
+	  (create-trackbar "ST SUBT 6" window-name src-tri-subt-6 5000)
+
+	  ;Create the trackbars used to adjust the values of the 
+	  ;elements in the DST-TRI matrix.
+
+	  ;When the values are set into the DST-TRI matrix in the 
+	  ;WARP-AFFINE-EXAMPLE, six multiplicands are involved. t-
+	  ;he 'DT MULT *' trackbars adjust the six multiplicands.
+
+	  (create-trackbar "DST-TRI 1" window-name dst-tri-1 20000)
+	  (create-trackbar "DT MULT 1" window-name dst-tri-mult-1 4000)
+	  (create-trackbar "DST-TRI 2" window-name dst-tri-2 23000)
+	  (create-trackbar "DT MULT 2" window-name dst-tri-mult-2 4000)
+	  (create-trackbar "DST-TRI 3" window-name dst-tri-3 120000)
+	  (create-trackbar "DT MULT 3" window-name dst-tri-mult-3 15000)
 	  (create-trackbar "DST-TRI 4" window-name dst-tri-4 200000)
+	  (create-trackbar "DT MULT 4" window-name dst-tri-mult-4 100000)
 	  (create-trackbar "DST-TRI 5" window-name dst-tri-5 200000)
+	  (create-trackbar "DT MULT 5" window-name dst-tri-mult-5 142000)
 	  (create-trackbar "DST-TRI 6" window-name dst-tri-6 200000)
+	  (create-trackbar "DT MULT 6" window-name dst-tri-mult-6 7000)
+
 	  (loop
-	     ;Set 3 points, provided by the position of the 
-	     ;trackbars, both in the src image and the dst 
-	     ;image, that are used to calculate the Affine 
-	     ;Transform
+
+	     ;Based on the position of the trackbars, set three points 
+	     ;both in the src image and the dst image, that will next 
+	     ;be used to calculate the Affine Transform.
+
+             ;Note: the '?' is a macro for CFFI::MEM-AREF. It is used 
+             ;to get the values inside the memory locations that were 
+             ;allocated by the ALLOC functions above.
+
 	     (setf (at src-tri 0 0 :float) (coerce (? src-tri-1 :int) 'single-float)) 
 	     (setf (at src-tri 0 1 :float) (coerce (? src-tri-2 :int) 'single-float)) 
-	     (setf (at src-tri 1 0 :float) (- (? src-tri-3 :int) 1f0))
+	     (setf (at src-tri 1 0 :float) (- (? src-tri-3 :int) 
+					      (coerce (? src-tri-subt-3 :int) 'single-float)))
 	     (setf (at src-tri 1 1 :float) (coerce (? src-tri-4 :int) 'single-float))
 	     (setf (at src-tri 2 0 :float) (coerce (? src-tri-5 :int) 'single-float)) 
-	     (setf (at src-tri 2 1 :float) (- (? src-tri-6 :int) 1f0))
-	     (setf (at dst-tri 0 0 :float) (* (? dst-tri-1 :int) 0.0f0)) 
-	     (setf (at dst-tri 0 1 :float) (* (? dst-tri-2 :int) 0.33f0))
-	     (setf (at dst-tri 1 0 :float) (* (? dst-tri-3 :int) 0.85f0))
-	     (setf (at dst-tri 1 1 :float) (* (? dst-tri-4 :int) 0.25f0))
-	     (setf (at dst-tri 2 0 :float) (* (? dst-tri-5 :int) 0.15f0))
-	     (setf (at dst-tri 2 1 :float) (* (? dst-tri-6 :int) 0.7f0))
+	     (setf (at src-tri 2 1 :float) (- (? src-tri-6 :int) 
+					      (coerce (? src-tri-subt-6 :int) 'single-float)))
+	     (setf (at dst-tri 0 0 :float) (* (? dst-tri-1 :int) 
+					      (* (? dst-tri-mult-1 :int) 0.01f0))) 
+	     (setf (at dst-tri 0 1 :float) (* (? dst-tri-2 :int) 
+					      (* (? dst-tri-mult-2 :int) 0.01f0)))
+	     (setf (at dst-tri 1 0 :float) (* (? dst-tri-3 :int) 
+					      (* (? dst-tri-mult-3 :int) 0.01f0)))
+	     (setf (at dst-tri 1 1 :float) (* (? dst-tri-4 :int) 
+					      (* (? dst-tri-mult-4 :int) 0.01f0)))
+	     (setf (at dst-tri 2 0 :float) (* (? dst-tri-5 :int) 
+					      (* (? dst-tri-mult-5 :int) 0.01f0)))
+	     (setf (at dst-tri 2 1 :float) (* (? dst-tri-6 :int) 
+					      (* (? dst-tri-mult-6 :int) 0.1f0)))
+
 	     (with-size ((warp-dest-size (size warp-dst)))
-	       ;Get the Affine Transform
+	       ;Get the Affine Transform.
 	       (with-mat ((warp-mat (get-affine-transform src-tri dst-tri))) 
-		 ;Apply the Affine Transform, just found, to SRC
+		 ;Apply the Affine Transform, just found, to SRC.
 		 (warp-affine src warp-dst warp-mat warp-dest-size)
 
-		 ;==Rotating the image after Warp==;
+		 #| Rotating the image after Warp |#
 
-		 ;Compute a rotation matrix with respect to the center of the image
+	         ;Compute a rotation matrix with respect to the image center.
 		 (with-point-2f ((center (point-2f (/ (cols src) 2f0) (/ (rows src) 2f0))))
 		   (let ((angle -50d0)
 			 (scale 0.6d0))
-		     ;Get the rotation matrix with the specifications above
+		     ;Get the rotation matrix with the above specifications.
 		     (with-mat ((rot-mat (get-rotation-matrix-2d center angle scale)))
-		       ;Rotate the warped image
+		       ;Rotate the warped image.
 		       (warp-affine warp-dst warp-rotate-dst rot-mat warp-dest-size)
-		       ;Show what you got
+		       ;Show the result.
 		       (imshow window-name warp-rotate-dst)
 		       (let ((c (wait-key 33)))
 			 (when (= c 27)
@@ -8318,7 +8540,7 @@ Example:
     (if (empty src) 
 	(return-from get-rotation-matrix-2d-example 
 	  (format t "Image not loaded")))
-    (let ((window-name "Adjust CENTER, ANGLE and SCALE of the image - GET-ROTATION-MATRIX-2D Example"))
+    (let ((window-name "Trackbars adjust CENTER, ANGLE and SCALE of the image - GET-ROTATION-MATRIX-2D Example"))
       (with-named-window (window-name +window-autosize+)
 	(move-window window-name (cols src) 175)
 	;Allocate memory to hold the integer values 
@@ -8378,6 +8600,273 @@ Example:
 		       (let ((c (wait-key 33)))
 			 (when (= c 27)
 			   (return))))))))))))))
+
+
+
+========================================================================================================================================
+GET-PERSPECTIVE-TRANSFORM
+========================================================================================================================================
+
+Calculates a perspective transform from four pairs of the corresponding points.
+
+C++: Mat getPerspectiveTransform(InputArray src, InputArray dst)
+
+LISP-CV: (get-perspective-transform) (src mat) (dst mat)) => MAT
+
+
+    Parameters:	
+
+        SRC - Coordinates of quadrangle vertices in the source image.
+
+        DST - Coordinates of the corresponding quadrangle vertices in the destination image.
+
+
+The function calculates the 3x3 matrix of a perspective transform so that:
+
+
+See OpenCV documentation at this link:
+
+http://docs.opencv.org/trunk/modules/imgproc/doc/geometric_transformations.html#getperspectivetransform
+
+for the formulae.
+
+
+See also:
+
+(FIND-HOMOGRAPHY), (WARP-PERSPECTIVE), (PERSPECTIVE-TRANSFORM)
+
+
+Example:
+
+
+(defun get-perspective-transform-example (&optional 
+					    (cam *camera-index*) 
+					    (width *default-width*)
+					    (height *default-height*))
+
+  "Trackbars are added here so that you can adjust the values of 
+   the points given to GET-PERSPECTIVE-TRANSFORM. Taking note of 
+   the values and how they affect the camera output will help in 
+   understanding the math behind the operation of the function."
+
+  ;Create VIDEO-CAPTURE and set to default width and height,
+  (with-captured-camera (cap cam :width width :height height)
+    (if (not (cap-is-open cap)) 
+	(return-from get-perspective-transform-example 
+	  (format t "Cannot open the video camera")))
+    ;Input Quadilateral or Image plane coordinates.
+    (with-mat ((input-quad (mat 4 2 +32f+))
+	       ;Output Quadilateral or World plane coordinates.
+	       (output-quad (mat 4 2 +32f+))
+	       ;Create Lambda Matrix filled with zeros and set 
+               ;to the same type/size as the camera feed.
+	       (lambda (mat-zeros height width +8u+)))
+      ;Create a fullscreen window
+      (let ((window-name "GET-PERSPECTIVE-TRANSFORM Example"))
+	(with-named-window (window-name +window-normal+)
+	  (set-window-property window-name +wnd-prop-fullscreen+ 
+			       +window-fullscreen+)
+	  ;Allocate memory to hold the values that the trackbar can 
+	  ;adjust that will be given to GET-PERSPECTIVE-TRANSFORM.
+	  (with-object ((input-quad-0-x (alloc :int 95))
+			(input-quad-0-y (alloc :int 72))
+			(input-quad-1-x (alloc :int 407))
+			(input-quad-1-y (alloc :int 31))
+			(input-quad-2-x (alloc :int 513))
+			(input-quad-2-y (alloc :int 331))
+			(input-quad-3-x (alloc :int 172))
+			(input-quad-3-y (alloc :int 440))
+			(output-quad-0-x (alloc :int 0))
+			(output-quad-0-y (alloc :int 0))
+			(output-quad-1-x (alloc :int (list width)))
+			(output-quad-1-x-subt (alloc :int 1))
+			(output-quad-1-y (alloc :int 0))
+			(output-quad-2-x (alloc :int (list width)))
+			(output-quad-2-x-subt (alloc :int 1))
+			(output-quad-2-y (alloc :int (list height)))
+			(output-quad-2-y-subt (alloc :int 1))
+			(output-quad-3-x (alloc :int 0))
+			(output-quad-3-y (alloc :int (list height)))
+			(output-quad-3-y-subt (alloc :int 1)))
+
+	    ;Create the trackbars used to adjust the values of the 
+	    ;elements in the INPUT-QUAD matrix. INPUT-QUAD is the 
+            ;src matrix parameter of GET-PERSPECTIVE-TRANSFORM.
+
+	    (create-trackbar "IQ 0 X" window-name input-quad-0-x 383)
+	    (create-trackbar "IQ 0 Y" window-name input-quad-0-y 463)
+	    (create-trackbar "IQ 1 X" window-name input-quad-1-x 1449)
+	    (create-trackbar "IQ 1 Y" window-name input-quad-1-y 266)
+	    (create-trackbar "IQ 2 X" window-name input-quad-2-x 100000)
+	    (create-trackbar "IQ 2 Y" window-name input-quad-2-y 2013)
+	    (create-trackbar "IQ 3 X" window-name input-quad-3-x 551)
+	    (create-trackbar "IQ 3 Y" window-name input-quad-3-y 14878)
+
+	    ;Create the trackbars used to adjust the values of the 
+	    ;elements in the OUTPUT-QUAD matrix. OUTPUT-QUAD is the 
+            ;dest matrix parameter of GET-PERSPECTIVE-TRANSFORM.
+
+	    ;When the values are set (with SETF below) into the OUTPUT-QUAD 
+	    ;matrix six subtrahends are involved. the 'SUBT * *' trackbars 
+	    ;adjust those six subtrahends.
+
+	    (create-trackbar "OQ 0 X" window-name output-quad-0-x 638)
+	    (create-trackbar "OQ 0 Y" window-name output-quad-0-y 480)
+	    (create-trackbar "OQ 1 X" window-name output-quad-1-x 21099)
+	    (create-trackbar "SUBT 1 X" window-name output-quad-1-x-subt 21099)
+	    (create-trackbar "OQ 1 Y" window-name output-quad-1-y 477)
+	    (create-trackbar "OQ 2 X" window-name output-quad-2-x 10000)
+	    (create-trackbar "SUBT 2 X" window-name output-quad-2-x-subt 10000)
+	    (create-trackbar "OQ 2 Y" window-name output-quad-2-y 100000)
+	    (create-trackbar "SUBT 2 Y" window-name output-quad-2-y-subt 100000)
+	    (create-trackbar "OQ 3 X" window-name output-quad-3-x 636)
+	    (create-trackbar "OQ 3 Y" window-name output-quad-3-y 100000)
+	    (create-trackbar "SUBT 3 Y" window-name output-quad-3-y-subt 478)
+
+	    (loop
+	       ;Input and Output matrices.
+	       (with-mat ((input (mat)) 
+			  (output (mat)))
+		 ;Set camera feed to INPUT.
+		 (cap-read cap input)
+
+		 ;The 4 points that select quadilateral on the input, 
+		 ;from element 0x0 of INPUT-QUAD in clockwise order. 
+                 ;The four points are the sides of the rect box used 
+                 ;as input. 
+
+		 ;Note: the '?' is a macro for CFFI::MEM-AREF. It is 
+		 ;used to get the values inside the memory locations 
+		 ;that were allocated by the ALLOC functions above.
+
+		 (setf (at input-quad 0 0 :float) (coerce (? input-quad-0-x :int) 'single-float)) 
+		 (setf (at input-quad 0 1 :float) (coerce (? input-quad-0-y :int) 'single-float)) 
+		 (setf (at input-quad 1 0 :float) (coerce (? input-quad-1-x :int) 'single-float)) 
+		 (setf (at input-quad 1 1 :float) (coerce (? input-quad-1-y :int) 'single-float)) 
+		 (setf (at input-quad 2 0 :float) (coerce (? input-quad-2-x :int) 'single-float)) 
+		 (setf (at input-quad 2 1 :float) (coerce (? input-quad-2-y :int) 'single-float)) 
+		 (setf (at input-quad 3 0 :float) (coerce (? input-quad-3-x :int) 'single-float)) 
+		 (setf (at input-quad 3 1 :float) (coerce (? input-quad-3-y :int) 'single-float)) 
+
+		 ;The 4 points where mapping is to be done, from 
+                 ;element 0x0 of OUTPUT-QUAD in clockwise order.
+
+		 (setf (at output-quad 0 0 :float) (coerce (? output-quad-0-x :int) 'single-float)) 
+		 (setf (at output-quad 0 1 :float) (coerce (? output-quad-0-y :int) 'single-float)) 
+		 (setf (at output-quad 1 0 :float) 
+		       (- (? output-quad-1-x :int) (coerce (? output-quad-1-x-subt :int) 
+							   'single-float))) 
+		 (setf (at output-quad 1 1 :float) (coerce (? output-quad-1-y :int) 'single-float)) 
+		 (setf (at output-quad 2 0 :float) 
+		       (- (? output-quad-2-x :int) (coerce (? output-quad-2-x-subt :int) 
+							   'single-float))) 
+		 (setf (at output-quad 2 1 :float) 
+		       (- (? output-quad-2-y :int) (coerce (? output-quad-2-y-subt :int) 
+							   'single-float))) 
+		 (setf (at output-quad 3 0 :float) (coerce (? output-quad-3-x :int) 'single-float)) 
+		 (setf (at output-quad 3 1 :float) 
+		       (- (? output-quad-3-y :int) (coerce (? output-quad-3-y-subt :int) 
+							   'single-float))) 
+		 ;Get the Perspective Transform Matrix e.g. lambda
+		 (with-mat ((lambda (get-perspective-transform input-quad output-quad)))
+		   ;Apply the Perspective Transform Matrix 
+                   ;just found to the camera feed.
+                   (with-size ((output-size (size output)))
+		     (warp-perspective input output lambda output-size))
+		   ;Display output
+		   (imshow window-name output)
+		   (let ((c (wait-key 33)))
+		     (when (= c 27)
+		       (return))))))))))))
+
+
+
+========================================================================================================================================
+INVERT-AFFINE-TRANSFORM
+========================================================================================================================================
+
+Inverts an affine transformation.
+
+C++: void invertAffineTransform(InputArray M, OutputArray iM)
+
+LISP-CV: (INVERT-AFFINE-TRANSFORM (M MAT) (I-M MAT)) => :VOID
+
+
+    Parameters:	
+
+        M – Original affine transformation.
+
+        I-M – Output reverse affine transformation.
+
+
+The function computes an inverse affine transformation represented by 2x3 matrix M:
+
+
+See OpenCv documentation at this link:
+
+http://docs.opencv.org/trunk/modules/imgproc/doc/geometric_transformations.html?highlight=warpp#invertaffinetransform
+
+for the formula.
+
+
+The result is also a 2x3 matrix of the same type as M .
+
+
+(defun invert-affine-transform-example (filename)
+
+	    ;Load the image
+  (with-mat ((src (imread filename 1))         
+             (src-tri (mat 3 2 +32f+))
+             (dst-tri (mat 3 2 +32f+))
+	     ;Set the dst matrices to the same 
+	     ;type and size as the src image
+             (warp-dst (mat-zeros (rows src) (cols src) (mat-type src)))
+             (inverted-warp-dst (mat-zeros (rows src) (cols src) (mat-type src))))
+    (if (empty src) 
+	(return-from invert-affine-transform-example 
+	  (format t "Image not loaded")))
+    (let ((source-window "Source - INVERT-AFFINE-TRANSFORM Example")
+          (warp-window "Warp - INVERT-AFFINE-TRANSFORM Example")
+	  (inverted-warp-window "Inverted - INVERT-AFFINE-TRANSFORM Example"))
+      (with-named-window (source-window +window-normal+)
+	(with-named-window (warp-window +window-normal+)
+	  (with-named-window (inverted-warp-window +window-normal+)
+	    (move-window source-window 310 175)
+	    (move-window warp-window 760 175)
+	    (move-window inverted-warp-window 1210 175)
+	    ;Show SRC in window 
+            (imshow source-window src)
+	    ;Set three points here, both in the src and dst  
+	    ;images, used to calculate the Affine Transform
+	    (setf (at src-tri 0 0 :float) 0f0) 
+	    (setf (at src-tri 0 1 :float) 0f0) 
+	    (setf (at src-tri 1 0 :float) (- (cols src) 1f0))
+	    (setf (at src-tri 1 1 :float) 0f0)
+	    (setf (at src-tri 2 0 :float) 0f0) 
+	    (setf (at src-tri 2 1 :float) (- (rows src) 1f0))
+	    (setf (at dst-tri 0 0 :float) (* (rows src) 0.0f0)) 
+	    (setf (at dst-tri 0 1 :float) (* (rows src) 0.33f0))
+	    (setf (at dst-tri 1 0 :float) (* (cols src) 0.85f0)) 
+	    (setf (at dst-tri 1 1 :float) (* (rows src) 0.25f0))
+	    (setf (at dst-tri 2 0 :float) (* (cols src) 0.15f0)) 
+	    (setf (at dst-tri 2 1 :float) (* (rows src) 0.7f0))
+	    (with-size ((warp-dest-size (size warp-dst)))
+	      ;Get the Affine Transform
+	      (with-mat ((warp-mat (get-affine-transform src-tri dst-tri))) 
+		;Apply the Affine Transform, just found, to SRC
+		(warp-affine src warp-dst warp-mat warp-dest-size)
+		;Show the transformed SRC in a window
+		(imshow warp-window warp-dst)
+		;Invert the Affine Transform...
+		(invert-affine-transform warp-mat warp-mat)
+	        ;...Apply to SRC
+		(warp-affine src inverted-warp-dst warp-mat warp-dest-size)
+		;Show the Inverted Affine Transform in a window
+		(imshow inverted-warp-window inverted-warp-dst)
+		(loop
+		   (let ((c (wait-key 33)))
+		     (when (= c 27)
+		       (return))))))))))))
 
 
 ========================================================================================================================================
@@ -8712,7 +9201,7 @@ See also:
 		;Apply the Affine Transform, just found, to SRC
 		(warp-affine src warp-dst warp-mat warp-dest-size)
 
-	        ;==Rotating the image after Warp==;
+	        #| Rotating the image after Warp |#
 
 		;Compute a rotation matrix with respect to the center of the image
 		(with-point-2f ((center (point-2f (/ (cols src) 2f0) (/ (rows src) 2f0))))
@@ -11323,23 +11812,29 @@ http://docs.opencv.org/modules/features2d/doc/feature_detection_and_description.
    will get deleted though, within 30 seconds. It's best to 
    start this program with a good amount of available RAM.
 
-   Don't let this example make you nervous, it is basically 
-   12 FEATURE-DETECTOR-CREATE-EXAMPLE's stacked, in one. I'm
-   basically just showing, in a quick easy to see fashion, h-
-   ow the THRESH, OUTPUT and PATTERN-SCALE parameters of the 
-   function BRISK affect it's output. Each of the 12 windows 
-   has the function call used to set those parameters printe-
-   d on the titlebar, so you don't have to look through the 
-   code to get the effect of this example. For example, if y-
-   ou see this on the windows titlebar: (BRISK 0 0 0.0f0), t-
-   hen you know the BRISK parameter set for that window is: 
+   Don't let this example make you nervous, it's basically 
+   12 FEATURE-DETECTOR-CREATE-EXAMPLEs stacked, in one. I'm
+   basically just showing, in a quick easy to see fashion, 
+   how the THRESH, OUTPUT and PATTERN-SCALE parameters of t-
+   he function BRISK's parameters affect it's output. Each 
+   of the 12 windows has the function call used to set the 
+   parameters printed on the titlebar, so you don't have to 
+   look through the code to get the effect of this example. 
+   For example, if you see this on the windows titlebar: 
+
+                   (BRISK 0 0 0.0f0)
+ 
+   then you know the BRISK parameter set for that window is: 
 
        THRESH = 0, OCTAVES  = 0, PATTERN-SCALE = 0.0f0.
 
-   Note: Try using the box.png and the box_in_scene.png from
-   the LISP-CV-MASTER/IMAGES directory to get a better under-
-   standing of this example the first time you run it. And, 
-   just be aware, this example takes a few seconds to start."
+   Note: Try using box.png and box_in_scene.png from the:
+    
+     LISP-CV-MASTER/IMAGES 
+
+   directory to get a better understanding of this example 
+   the first time you run it. And, just be aware, this exa-
+   mple takes a few seconds to start."
 
   ;; read two images in grayscale, first the object you want to track,
   (let* ((gray-a (gc:imread filename-1 +load-image-grayscale+))
@@ -11424,18 +11919,20 @@ http://docs.opencv.org/modules/features2d/doc/feature_detection_and_description.
       (setf (aref all-matches-arr i) (gc:mat))
       ;; find matches, between the two images, 12 times,
       ;; each using a different set of BRISK parameters
-      (feature-detector-create (aref brisk-arr i) "BRISK")
+      (create (aref brisk-arr i) "BRISK")
       ;; detect keypoints in the image GRAY-A
-      (feature-detector-detect (aref brisk-arr i) gray-a (aref keypoints-a-arr i))
+      (detect (aref brisk-arr i) gray-a (aref keypoints-a-arr i))
       ;; Compute the descriptors for a set of keypoints detected in GRAY-A
-      (feat-2d-compute (aref brisk-arr i) gray-a (aref keypoints-a-arr i) (aref descriptors-a-arr i))
+      (compute (aref brisk-arr i) gray-a (aref keypoints-a-arr i) 
+				  (aref descriptors-a-arr i))
       ;; detect keypoints in the image GRAY-B
-      (feature-detector-detect (aref brisk-arr i) gray-b (aref keypoints-b-arr i))
+      (detect (aref brisk-arr i) gray-b (aref keypoints-b-arr i))
       ;; compute the descriptors for a set of keypoints detected in GRAY-B
-      (feat-2d-compute (aref brisk-arr i) gray-b (aref keypoints-b-arr i) (aref descriptors-b-arr i))
+      (compute (aref brisk-arr i) gray-b (aref keypoints-b-arr i) 
+				  (aref descriptors-b-arr i))
       ;; find the best match for each descriptor
-      (descrip-matcher-match (aref matcher-arr i) (aref descriptors-a-arr i) 
-			     (aref descriptors-b-arr i) (aref matches-arr i))
+      (match (aref matcher-arr i) (aref descriptors-a-arr i) 
+				(aref descriptors-b-arr i) (aref matches-arr i))
       ;; draw the found matches
       (draw-matches gray-a (aref keypoints-a-arr i) gray-b (aref keypoints-b-arr i) 
 		    (aref matches-arr i) (aref all-matches-arr i) 
@@ -11450,7 +11947,6 @@ http://docs.opencv.org/modules/features2d/doc/feature_detection_and_description.
       (destroy-window (aref window-name-arr i)))))
 
 
-
 ========================================================================================================================================
 FEATURES2D - COMMON INTERFACES OF FEATURE DETECTORS
 ========================================================================================================================================
@@ -11460,14 +11956,21 @@ FEATURE-DETECTOR-CREATE
 
 Creates a feature detector by its name.
 
+Note: The function FEATURE-DETECTOR-CREATE and the method CREATE, are provided in this library. 
+Both, the function and the method, have the same functionality and can be used interchangeably.
+I use the method in the examples in this file but since other functions also have a companion 
+defmethod named CREATE I named the example for FEATURE-DETECTOR-CREATE with the function name.
+
 C++: Ptr<FeatureDetector> FeatureDetector::create(const string& detectorType)
 
 LISP-CV: (FEATURE-DETECTOR-CREATE (SELF FEATURE-2D) (DETECTOR-TYPE :STRING)) => FEATURE-2D 
 
+LISP-CV: (CREATE (SELF FEATURE-2D) (DETECTOR-TYPE :STRING)) => FEATURE-2D 
+
 
     Parameters:	
 
-        SELF - A pointer to a BRISK object
+        SELF - A FEATURE-2D object e.g. BRISK
 
         DETECTOR-TYPE - Feature detector type:
 
@@ -11507,7 +12010,7 @@ Also a combined format is supported: feature detector adapter name:
   (let* ((thresh 60)
 	 (octaves 4)
 	 (pattern-scale 2.0f0)
-	 (window-name "All Matches - FEATURE-DETECTOR-CREATE Example"))
+	 (window-name "All Matches - CREATE Example"))
     ;; read some images in grayscale -> The object you want to track
     (with-mat ((gray-a (imread filename-1 +load-image-grayscale+))
 	       ;; The image the object is a part of
@@ -11526,17 +12029,17 @@ Also a combined format is supported: feature detector adapter name:
 			  (matcher (bf-matcher)))
 	  (with-vector-dmatch ((matches (vector-dmatch)))
 	    ;; create a feature detector
-	    (feature-detector-create briskd "STAR")
+	    (create briskd "STAR")
 	    ;; detect keypoints in the image GRAY-A
-	    (feature-detector-detect briskd gray-a keypoints-a)
+	    (detect briskd gray-a keypoints-a)
 	    ;; Compute the descriptors for a set of keypoints detected in GRAY-A
-	    (feat-2d-compute briskd gray-a keypoints-a descriptors-a)
+	    (compute briskd gray-a keypoints-a descriptors-a)
 	    ;; detect keypoints in the image GRAY-B
-	    (feature-detector-detect briskd gray-b keypoints-b)
+	    (detect briskd gray-b keypoints-b)
 	    ;; Compute the descriptors for a set of keypoints detected in GRAY-B
-	    (feat-2d-compute briskd gray-b keypoints-b descriptors-b)
+	    (compute briskd gray-b keypoints-b descriptors-b)
 	    ;; find the best match for each descriptor
-	    (descrip-matcher-match matcher descriptors-a descriptors-b matches)
+	    (match matcher descriptors-a descriptors-b matches)
 	    (with-named-window (window-name +window-normal+)
 	      (move-window window-name 759 175)
 	      (with-scalar ((scalar (scalar-all -1)))
@@ -11558,9 +12061,16 @@ FEATURE-DETECTOR-DETECT
 
 Detects keypoints in an image.
 
+Note: The function FEATURE-DETECTOR-DETECT and the method DETECT, are provided in this library. 
+Both, the function and the method, have the same functionality and can be used interchangeably.
+I use the method in the examples in this file but since other functions also have a companion 
+defmethod named DETECT I named the example for FEATURE-DETECTOR-DETECT with the function name.
+
 C++: void FeatureDetector::detect(InputArray image, vector<KeyPoint>& keypoints, InputArray mask=noArray() ) const
 
 LISP-CV: (FEATURE-DETECTOR-DETECT (SELF FEATURE-2D) (IMAGE MAT) (KEYPOINTS KEY-POINT) &OPTIONAL ((MASK MAT) (MAT) GIVEN-MASK)) => :VOID
+
+LISP-CV: (DETECT (SELF FEATURE-2D) (IMAGE MAT) (KEYPOINTS KEY-POINT) &OPTIONAL ((MASK MAT) (MAT) GIVEN-MASK)) => :VOID
 
     Parameters:	
 
@@ -11576,9 +12086,9 @@ LISP-CV: (FEATURE-DETECTOR-DETECT (SELF FEATURE-2D) (IMAGE MAT) (KEYPOINTS KEY-P
 
 
 (defun feature-detector-detect-example (&optional 
-				       (cam *camera-index*) 
-				       (width *default-width*)
-				       (height *default-height*))
+			 (cam *camera-index*) 
+			 (width *default-width*)
+			 (height *default-height*))
 
   (with-captured-camera (cap cam :width width :height height)
     ;;Initialize the template location, dimension and 
@@ -11614,7 +12124,7 @@ LISP-CV: (FEATURE-DETECTOR-DETECT (SELF FEATURE-2D) (IMAGE MAT) (KEYPOINTS KEY-P
           ;;Trackbar to set the hessian keypoint detector threshold
 	  (create-trackbar "MIN-HESSIAN" window-name min-hessian 100000) 
 	  (loop ;;Were using the camera feed as the image here and a
-	        ;;region of interest of the feed as the template
+	     ;;region of interest of the feed as the template
 	     (with-mat ((frame (mat)))
 	       (cap-read cap frame)
 	       ;;Instantiate logic for the location/dimensions 
@@ -11644,16 +12154,16 @@ LISP-CV: (FEATURE-DETECTOR-DETECT (SELF FEATURE-2D) (IMAGE MAT) (KEYPOINTS KEY-P
 		   (with-feature-2d ((detector (surf (coerce (? min-hessian :int) 
 							     'double-float)))
                                      (extractor (gc:surf)))
-		     ;;-- Step 1: Detect keypoints in the image 
-                     ;;-- and template using FEATURE-DETECTOR-DETECT
-		     (feature-detector-detect detector template keypoints-1)
-		     (feature-detector-detect detector frame keypoints-2)
+		     ;;-- Step 1: Detect keypoints in the
+                     ;;-- image and template using DETECT
+		     (detect detector template keypoints-1)
+		     (detect detector frame keypoints-2)
 		     ;;-- Step 2: Calculate descriptors(feature vectors) 
                      ;;-- using the keypoints detected in the last step
-		     (feat-2d-compute extractor template keypoints-1 descriptors-1)
-		     (feat-2d-compute extractor frame keypoints-2 descriptors-2)
+		     (compute extractor template keypoints-1 descriptors-1)
+		     (compute extractor frame keypoints-2 descriptors-2)
 		     ;;-- Step 3: Match descriptor vectors with a brute force matcher
-		     (descrip-matcher-match matcher descriptors-1 descriptors-2 matches)
+		     (match matcher descriptors-1 descriptors-2 matches)
 		     ;;-- Draw matches
 		     (draw-matches template keypoints-1 frame keypoints-2 matches img-matches)
 		     ;;-- Show detected matches
@@ -11661,6 +12171,41 @@ LISP-CV: (FEATURE-DETECTOR-DETECT (SELF FEATURE-2D) (IMAGE MAT) (KEYPOINTS KEY-P
 	       (let ((c (wait-key 33)))
 		 (when (= c 27)
 		   (return))))))))))
+
+
+========================================================================================================================================
+FEATURES2D - COMMON INTERFACES OF DESCRIPTOR EXTRACTORS
+========================================================================================================================================
+
+DESCRIPTOR-EXTRACTOR-COMPUTE
+
+Computes the descriptors for a set of keypoints detected in an image
+
+Note: The function DESCRIPTOR-EXTRACTOR-COMPUTE and the method COMPUTE, are provided in this library. 
+Both, the function and the method, have the same functionality and can be used interchangeably. I use 
+the method in the examples in this file, but, since other functions have a companion defmethod named 
+COMPUTE, I named the example for DESCRIPTOR-EXTRACTOR-COMPUTE with the function name.
+
+C++: void DescriptorExtractor::compute(InputArray image, vector<KeyPoint>& keypoints, OutputArray descriptors) const
+
+LISP-CV: (DESCRIPTOR-EXTRACTOR-COMPUTE (SELF FEATURE-2D) (IMAGE MAT) (KEYPOINTS VECTOR-KEY-POINT) (DESCRIPTORS MAT)) => FEATURE-2D
+
+LISP-CV: (COMPUTE (SELF FEATURE-2D) (IMAGE MAT) (KEYPOINTS VECTOR-KEY-POINT) (DESCRIPTORS MAT)) => FEATURE-2D
+
+    Parameters:	
+
+        IMAGE - Image.
+
+        KEYPOINTS - Input collection of keypoints. Keypoints for which a descriptor cannot be computed 
+                    are removed. Sometimes new keypoints can be added, for example: SIFT duplicates keypoint 
+                    with several dominant orientations (for each orientation).
+
+        DESCRIPTORS - Computed descriptors. 
+
+
+Example:
+
+See the FEATURE-DETECTOR-CREATE-EXAMPLE in this file.
 
 
 ========================================================================================================================================
@@ -11783,17 +12328,17 @@ two keypoints (circles). The FLAGS parameters are defined as follows:
 			  (format t "Both images were not loaded")))
 
 		    ;; create a feature detector
-		    (feature-detector-create briskd "SimpleBlob")
+		    (create briskd "SimpleBlob")
 		    ;; detect keypoints in OBJECT
-		    (feature-detector-detect briskd object keypoints-a)
+		    (detect briskd object keypoints-a)
 		    ;; Compute the descriptors for a set of keypoints detected in object
-		    (feat-2d-compute briskd object keypoints-a descriptors-a)
+		    (compute briskd object keypoints-a descriptors-a)
 		    ;; detect keypoints in IMAGE
-		    (feature-detector-detect briskd image keypoints-b)
+		    (detect briskd image keypoints-b)
 		    ;; Compute the descriptors for a set of keypoints detected in IMAGE
-		    (feat-2d-compute briskd image keypoints-b descriptors-b)
+		    (compute briskd image keypoints-b descriptors-b)
 		    ;; find the best match for each descriptor
-		    (descrip-matcher-match matcher descriptors-a descriptors-b matches)
+		    (match matcher descriptors-a descriptors-b matches)
 		    ;; draw the found matches and show in a window 
                     ;; four times, each with different parameters
 		    ;; output matrix
@@ -11871,20 +12416,28 @@ See BRISK-EXAMPLE in this file.
 
 
 ========================================================================================================================================
-DESCRIP-MATCHER-MATCH
+DESCRIPTOR-MATCHER-MATCH
 ========================================================================================================================================
 
 Finds the best match for each descriptor from a query set.
 
+Note: The function DESCRIPTOR-MATCHER-MATCH and the method MATCH, are provided in this library. 
+Both, the function and the method, have the same functionality and can be used interchangeably. 
+I use the method in the examples in this file, but, since other functions also have a companion 
+defmethod named MATCH, I named the example for DESCRIPTOR-MATCHER-MATCH with the function name.
+
 C++: void DescriptorMatcher::match(InputArray queryDescriptors, InputArray trainDescriptors, vector<DMatch>& matches, 
      InputArray mask=noArray() ) const
 
-LISP-CV: (DESCRIP-MATCHER-MATCH (SELF FEATURE-2D) (QUERY-DESCRIPTORS MAT) (TRAIN-DESCRIPTORS MAT) 
+LISP-CV: (DESCRIPTOR-MATCHER-MATCH (SELF FEATURE-2D) (QUERY-DESCRIPTORS MAT) (TRAIN-DESCRIPTORS MAT) 
+         (MATCHES VECTOR-DMATCH) (MASK MAT)) => :VOID
+
+LISP-CV: (MATCH (SELF FEATURE-2D) (QUERY-DESCRIPTORS MAT) (TRAIN-DESCRIPTORS MAT) 
          (MATCHES VECTOR-DMATCH) (MASK MAT)) => :VOID
 
     Parameters:	
 
-        SELF - A FEATURE-2D contruct e.g. BF-MATCHER
+        SELF - A FEATURE-2D object e.g. BF-MATCHER
 
         QUERY-DESCRIPTORS - Query set of descriptors.
 
@@ -14628,13 +15181,13 @@ Note: In this library, to make all the FEATURES2D functions work together nicely
     (with-named-window (window-name +window-normal+)
       (move-window window-name 759 175)
       ;;-- Step 1: Detect the keypoints using SURF Detector
-      (feature-detector-detect detector img-1 keypoints-1)
-      (feature-detector-detect detector img-2 keypoints-2)
+      (detect detector img-1 keypoints-1)
+      (detect detector img-2 keypoints-2)
       ;;-- Step 2: Calculate descriptors (feature vectors)
-      (feat-2d-compute extractor img-1 keypoints-1 descriptors-1)
-      (feat-2d-compute extractor img-2 keypoints-2 descriptors-2)
+      (compute extractor img-1 keypoints-1 descriptors-1)
+      (compute extractor img-2 keypoints-2 descriptors-2)
       ;-- Step 3: Matching descriptor vectors with a brute force matcher
-      (descrip-matcher-match matcher descriptors-1 descriptors-2 matches)
+      (match matcher descriptors-1 descriptors-2 matches)
       ;;-- Draw matches
       (draw-matches img-1 keypoints-1 img-2 keypoints-2 matches img-matches)
       ;;-- Show detected matches
@@ -15680,146 +16233,6 @@ returns a pointer to the resultant sub-array header.
       (destroy-window window-name))))
 
 
-RECT
-
-RECT constructor.
-
-Note: Both RECT and MAKE-RECT are provided in this library. The first, to match OpenCV's naming 
-conventions, the second, to adhere to Common Lisp naming conventions. Except for the name, they are 
-the same function. I use the RECT function in the examples in this file because it will make them 
-easier to compare with OpenCV examples you find online, thus making this library easier to learn.
-
-C++: Rect_()
-
-LISP-CV:  (RECT) => RECT
-
-LISP-CV:  (MAKE-RECT) => RECT
-
-C++: Rect_(_Tp _x, _Tp _y, _Tp _width, _Tp _height);
-
-LISP-CV:  (RECT (X :INT) (Y :INT) (:WIDTH :INT) (HEIGHT :INT)) => RECT
-
-LISP-CV:  (MAKE-RECT (X :INT) (Y :INT) (:WIDTH :INT) (HEIGHT :INT)) => RECT
-
-C++: _Tp x, y, width, height;
-
-LISP-CV: (X (SELF RECT)) => :INT
-
-LISP-CV: (Y (SELF RECT)) => :INT
-
-LISP-CV: (WIDTH (SELF RECT)) => :INT
-
-LISP-CV: (HEIGHT (SELF RECT)) => :INT
-
-C++: Size_<_Tp> size() const;
-
-LISP-CV: (SIZE (SELF RECT)) => SIZE
-
-C++: Point_<_Tp> tl() const;
-
-LISP-CV: (TL (SELF RECT)) => POINT
-
-C++: Point_<_Tp> br() const;
-
-LISP-CV: (BR (SELF RECT)) => POINT
-
-C: Rect* cv_Rect_clone(Rect* self) 
-
-LISP-CV: (CLONE (SELF RECT)) => RECT 
-
-
-    Parameters:	
-
-        SELF - A rectangle.
-
-        X - X-coordinate of the rectangle.
-
-        Y - Y-coordinate of the rectangle.
-
-        WIDTH - Width of the rectangle.
-
-        HEIGHT - Height of the rectangle.
-
-
-The functions RECT and MAKE-RECT store coordinates of a rectangle.
-
-The function RECT-X retrieves the x coordinate of the rectangle.
-
-The function RECT-Y retrieves the y coordinate of the rectangle.
-
-The function RECT-WIDTH retrieves the WIDTH of the rectangle.
-
-The function RECT-HEIGHT retrieves the HEIGHT of the rectangle.
-
-The function RECT-SIZE retrieves the size (width, height) of the rectangle. You can also use the 
-SIZE method in this library to access the size of a RECT object. See SIZE-EXAMPLE in this file.
-
-The function RECT-TL retrieves the top-left corner of the rectangle.
-
-The function RECT-BR retrieves the bottom-right corner of the rectangle.
-
-The method CLONE creates a full copy of the rectangle. It is a convenience function for creating 
-a clone of a RECT object. It was created from scratch in C and then bound in Lisp.
-
-
-(defun rect-example (x y width height)
-
-  ;Create a rectangle and find its size(width, height), 
-  ;location and size(x, y, width, height) and its top-
-  ;left and bottom-right corner
-
-  ;WITH-RECT calls DEL-RECT automatically when RECTAN-
-  ;GLE goes out of scope. DEL-RECT frees the memory a-
-  ;llocated by RECT
-  
-  (format t "~%RECTANGLE:~%")
-  (with-rect ((rectangle (rect x y width height)))
-    (let* ((x (x rectangle))
-	   (y (y rectangle))
-	   (width (width rectangle))
-	   (height (height rectangle))
-           (size (size rectangle))
-	   (tl-corner (tl rectangle))
-	   (br-corner (br rectangle)))
-      (format t "~%The (x, y, width, height) of RECTANGLE = (~a, ~a, ~a, ~a)~%" 
-	      x y width height)
-      (format t "~%The size(width, height) of RECTANGLE = (~a, ~a)~%" 
-	      (width size)
-	      (height size))
-      (format t "~%The top-left corner of RECTANGLE = (~a, ~a)~%" 
-	      (x tl-corner)
-	      (y tl-corner))
-      (format t "~%The bottom-right corner of RECTANGLE = (~a, ~a)~%" 
-	      (x br-corner)
-	      (y br-corner)))
-
-  ;Create a clone of RECTANGLE and find its size(width, 
-  ;height), location and size(x, y, width, height) and 
-  ;its top-left and bottom-right corner
-
-    (format t "~%~%RECTANGLE-CLONE:~%")
-    (with-rect ((rectangle-clone (clone rectangle))) 
-      (let* ((clone-x (x rectangle-clone))
-	     (clone-y (y rectangle-clone))
-	     (clone-width (width rectangle-clone))
-	     (clone-height (height rectangle-clone))
-             (clone-size (size rectangle-clone))
-	     (clone-tl-corner (tl rectangle-clone))
-	     (clone-br-corner (br rectangle-clone)))
-	(format t "~%The (x, y, width, height) of RECTANGLE-CLONE = (~a, ~a, ~a, ~a)~%" 
-		clone-x clone-y clone-width clone-height)
-	(format t "~%The size(width, height) of RECTANGLE-CLONE = (~a, ~a)~%" 
-		(width clone-size)
-		(height clone-size))
-	(format t "~%The top-left corner of RECTANGLE-CLONE = (~a, ~a)~%" 
-		(x clone-tl-corner)
-		(y clone-tl-corner))
-	(format t "~%The bottom-right corner of RECTANGLE-CLONE = (~a, ~a)~%~%" 
-		(x clone-br-corner)
-		(y clone-br-corner))))))
-
-
-
 
 ========================================================================================================================================
 LISP-CV - MACROS AND EXTRA FUNCTIONS:
@@ -15963,9 +16376,9 @@ CV> (MEM-AREF B :INT 2)
 3
 
 
-
+========================================================================================================================================
 CONTINUABLE
-
+========================================================================================================================================
 
 Catches any error and gives the option to ignore it and continue.
 
@@ -15979,17 +16392,54 @@ LISP-CV: (CONTINUABLE &BODY BODY)
 
 Macro included for reference:
 
-
 (defmacro continuable (&body body)
   `(restart-case
        (progn ,@body)
      (continue () :report "Continue"  )))
 
 
+Example:
 
 
+(defparameter filename "")
+
+(defun continuable-example ()
+
+  "You can update this program as it runs! 
+
+   First, run M-x SLIME-COMPILE-AND-LOAD-FILE.
+
+   Then, evaluate (LIVE-CODE-EDITING-EXAMPLE). 
+
+   Now, Switch to the REPL, even though it is 
+   not active.
+
+   Next, evaluate (SETF FILENAME <NEW VALUE>) 
+   to update the FILENAME parameter which will 
+   update the image being shown in the window. 
+   
+   Note: After evaluating SETF once you'll get 
+   the REPL back."
+
+  (format t "Enter a filename:~%~%")
+  (let ((filename (read))
+        (window-name "CONTINUABLE-EXAMPLE")
+        (image 0)
+	(x 0))
+    (with-named-window (window-name +window-normal+)
+      (move-window window-name 759 175)
+      (loop
+	 (with-mat ((image (imread filename 1)))
+	   (update-swank)
+	   (continuable (imshow window-name image)))
+	 (let ((c (wait-key 33)))
+	   (when (= c 27)
+	     (return)))))))
+
+
+========================================================================================================================================
 DEL andd DEL-*
-
+========================================================================================================================================
 
 Deletes allocated memory
 
@@ -16014,7 +16464,7 @@ LISP-CV: (DEL-HOG-DESCRIPTOR (SELF HOG-DESCRIPTOR)) => :VOID
 
 LISP-CV: (DEL-K-NEAREST (SELF K-NEAREST)) => :VOID
 
-LISP-CV: (DEL-KP (SELF KEY-POINT)) => :VOID
+LISP-CV: (DEL-KEY-POINT (SELF KEY-POINT)) => :VOID
 
 LISP-CV: (DEL-MAT (SELF MAT)) => :VOID
 
@@ -16248,17 +16698,18 @@ CV> (MEM-REF A :INT)
 0
 
 
-
+========================================================================================================================================
 UPDATE-SWANK
+========================================================================================================================================
 
 
-Grabs SWANK connections and tells it to handle requests. Call this every loop in the main loop of your 
-program.
+Grabs SWANK connection and tells it to handle requests. 
 
 
 LISP-CV: (UPDATE-SWANK)
 
-     Parameters: None
+
+Call this every loop in the main loop of your program.
 
 
 Function included for reference:
@@ -16277,9 +16728,9 @@ Function included for reference:
 Example:
 
 
-(defvar n (/ 1 1))
+(defparameter n (/ 1 1))
 
-(defun live-code-editing-example (filename)
+(defun update-swank-example (filename)
 
   "You can update this program as it runs! Just run 
    M-x SLIME-COMPILE-AND-LOAD-FILE then at the REPL 
@@ -16289,28 +16740,27 @@ Example:
    will change the strobe effect. After you running 
    SETF once you will get the REPL back"
 
-  (let ((image (imread filename 1))
-	(x 0)
-	(window-name "test"))
-    (named-window window-name +window-normal+)
-    (move-window window-name 759 175)
-    (do* ((value (scalar 0 0 0)))
-	 ((plusp (wait-key *millis-per-frame*)) 
-	  (format t "Key is pressed by user"))
-      (incf x 1)
-      (if (= x 2) (progn (assgn-val image value)  (decf x 2)))
-      (update-swank)
-      (continuable (imshow window-name image))
-      (del-mat image)
-      (setf image (imread filename 1))
-      (sleep n))
-    (destroy-window window-name)))
-
+  (let ((window-name "UPDATE-SWANK-EXAMPLE")
+	(x 0))
+    (with-named-window (window-name +window-normal+)
+      (move-window window-name 759 175)
+      (loop
+	 (with-mat ((image (imread filename 1)))
+	   (incf x 1)
+	   (with-scalar ((value (scalar 0 0 0)))
+	     (if (= x 2) (progn (assgn-val image value) (decf x 2))))
+	   (update-swank)
+	   (continuable (imshow window-name image)))
+	 (with-mat ((image (imread filename 1)))
+	   (sleep n)
+	   (let ((c (wait-key 33)))
+	     (when (= c 27)
+	       (return))))))))
 
 
 ========================================================================================================================================
-
 VECTOR-*
+========================================================================================================================================
 
 Bindings for the C++ VECTOR class.
 

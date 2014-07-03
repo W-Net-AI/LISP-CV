@@ -105,7 +105,7 @@
    #:del-feature-2d
    #:del-hog-descriptor
    #:del-k-nearest
-   #:del-kp
+   #:del-key-point
    #:del-mat
    #:del-mat-expr
    #:del-normal-bayes-classifier
@@ -191,7 +191,7 @@
    #:with-d-tree-params
    #:with-feature-2d
    #:with-hog-descriptor
-   #:with-keypoint
+   #:with-key-point
    #:with-k-nearest
    #:with-mat
    #:with-mat-expr
@@ -633,6 +633,23 @@
    #:vec-vec-4w-to-lisp-vec
 
 
+;; DEFMETHODS
+
+   #:angle
+   #:bounding-rect
+   #:center
+   #:clone
+   #:compute
+   #:create
+   #:detect
+   #:dot
+   #:height
+   #:match
+   #:width
+   #:x
+   #:y
+   #:z
+
 ;; core - Basic Structures
    
    #:+8uc1+
@@ -673,15 +690,11 @@
    #:>>
    #:add
    #:adjust-roi
-   #:angle
    #:area
    #:area-2f
-   #:bounding-rect
    #:br
-   #:center
    #:channels
    #:class-id
-   #:clone
    #:col-range
    #:cols
    #:convert-to
@@ -693,7 +706,6 @@
    #:distance
    #:div
    #:dmatch
-   #:dot
    #:dot-2d
    #:dot-2f
    #:dot-2i
@@ -704,7 +716,6 @@
    #:elem-size1
    #:empty
    #:force
-   #:height
    #:height-2f
    #:img-idx
    #:inv
@@ -811,12 +822,10 @@
    #:scalar
    #:scalar-all
    #:scale
-   #:size
    #:size-assgn-to
    #:size-from-point
    #:size-2f
    #:step1
-   #:width
    #:width-2f
    #:*step
    #:sub
@@ -846,9 +855,6 @@
    #:vec-2w
    #:vec-3w
    #:vec-4w
-   #:x
-   #:y
-   #:z
 
 ;; core - Dynamic Structures
 
@@ -1092,10 +1098,13 @@
    #:+inter-lanczos4+ 
 
    #:get-affine-transform
+   #:get-perspective-transform
    #:get-rotation-matrix-2d
+   #:invert-affine-transform
    #:remap
    #:resize
    #:warp-affine
+   #:warp-perspective
 
 ;; imgproc - Miscellaneous Image Transformations
 
@@ -1460,19 +1469,18 @@
 
 ;; features2d - Common Interfaces of Feature Detectors
 
-   #:feature-detector-create
+   #:feature-detector-create 
    #:feature-detector-detect
 
 ;; features2d - Common Interfaces of Descriptor Extractors
 
-   #:feat-2d-compute
-
+   #:descriptor-extractor-compute
 
 ;; features2d - Common Interfaces of Descriptor Matchers
 
    #:bf-matcher
-   #:descrip-matcher-create 
-   #:descrip-matcher-match
+   #:descriptor-matcher-create 
+   #:descriptor-matcher-match
    #:make-bf-matcher
 
 ;;; features2d - Drawing Function of Keypoints and Matches

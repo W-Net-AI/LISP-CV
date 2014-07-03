@@ -964,7 +964,7 @@
 (defmethod translate-from-foreign (c-pointer (c-type key-point))
   (let ((key-point  (make-instance 'cv-key-point :c-pointer c-pointer)))
     (when (garbage-collect c-type)
-      (tg:finalize key-point (lambda () (del-kp c-pointer))))
+      (tg:finalize key-point (lambda () (del-key-point c-pointer))))
     key-point))
 
 

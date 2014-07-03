@@ -6,7 +6,9 @@
 (in-package :lisp-cv)
 
 
+
 ;;; Feature Detection and Description
+
 
 
 ;; BRISK::BRISK(int thresh=30, int octaves=3, float patternScale=1.0f)
@@ -27,7 +29,9 @@
    (%brisk thresh octaves pattern-scale))
 
 
+
 ;;; Common Interfaces of Feature Detectors
+
 
 
 ;; Ptr<FeatureDetector> FeatureDetector::create(const string& detectorType)
@@ -40,6 +44,11 @@
 (defun feature-detector-create (self detector-type)
   "Creates a feature detector by its name."
    (%feature-detector-create self detector-type))
+
+
+(defmethod create ((self cv-feature-2d) &rest args)
+  "Creates a feature detector by its name."
+   (%feature-detector-create self (first args)))
 
 
 ;; void FeatureDetector::detect(const Mat& image, vector<KeyPoint>& keypoints, const Mat& mask=Mat() ) const
@@ -57,20 +66,33 @@
   (if given-mask nil (del-mat mask)))
 
 
+(defmethod detect ((self cv-feature-2d) &rest args)
+  "Detects keypoints in an image."
+   (apply #'feature-detector-detect self args))
+
+
+
 ;;; Common Interfaces of Descriptor Extractors
+
 
 
 ;; void DescriptorExtractor::compute(const Mat& image, vector<KeyPoint>& keypoints, Mat& descriptors) const
 ;; void cv_Feature2D_compute3(Feature2D* self, Mat* image, vector_KeyPoint* keypoints, Mat* descriptors) {
-(defcfun ("cv_Feature2D_compute3" feat-2d-compute) feature-2d
-  "Computes the descriptors for a set of keypoints detected in an image."
+(defcfun ("cv_Feature2D_compute3" descriptor-extractor-compute) feature-2d
   (self feature-2d)
   (image mat)
   (keypoints vector-key-point)
   (descriptors mat))
 
 
+(defmethod compute ((self cv-feature-2d) &rest args)
+  "Computes the descriptors for a set of keypoints detected in an image."
+   (apply #'descriptor-extractor-compute self args))
+
+
+
 ;;; Common Interfaces of Descriptor Matchers
+
 
 
 ;; BFMatcher::BFMatcher(int normType=NORM_L2, bool crossCheck=false )
@@ -92,21 +114,25 @@
 
 ;; Ptr<DescriptorMatcher> DescriptorMatcher::create(const string& descriptorMatcherType)
 ;; DescriptorMatcher* cv_DescriptorMatcher_create1_2(DescriptorMatcher* self, String* descriptorMatcherType) 
-(defcfun ("cv_DescriptorMatcher_create1_2" %descrip-matcher-create) feature-2d
+(defcfun ("cv_DescriptorMatcher_create1_2" %descriptor-matcher-create) feature-2d
   (self feature-2d)
   (descriptor-matcher-type *string))
 
 
-(defun descrip-matcher-create (self descriptor-matcher-type)
+(defun descriptor-matcher-create (self descriptor-matcher-type)
   "Creates a descriptor matcher of a given type with the default parameters (using default constructor)."
-   (%descrip-matcher-create self (%c-string-to-string descriptor-matcher-type (length descriptor-matcher-type))))
+   (%descriptor-matcher-create self (%c-string-to-string descriptor-matcher-type (length descriptor-matcher-type))))
 
+
+(defmethod create ((self cv-feature-2d) &rest args)
+  "Creates a descriptor matcher of a given type with the default parameters (using default constructor)."
+   (%descriptor-matcher-create self (%c-string-to-string (first args) (length (first args)))))
 
 
 ;; void DescriptorMatcher::match(const Mat& queryDescriptors, const Mat& trainDescriptors, 
 ;; vector<DMatch>& matches, const Mat& mask=Mat() ) const
 ;;void cv_DescriptorMatcher_match(DescriptorMatcher* self, Mat* queryDescriptors, Mat* trainDescriptors, vector_DMatch* matches, Mat* mask)
-(defcfun ("cv_DescriptorMatcher_match" %descrip-matcher-match) :void
+(defcfun ("cv_DescriptorMatcher_match" %descriptor-matcher-match) :void
   (self feature-2d)
   (query-descriptors mat)
   (train-descriptors mat)
@@ -114,14 +140,20 @@
   (mask mat))
 
 
-(defun descrip-matcher-match (self query-descriptors train-descriptors matches &optional (mask (%mat) given-mask))
+(defun descriptor-matcher-match (self query-descriptors train-descriptors matches &optional (mask (%mat) given-mask))
   "Finds the best match for each descriptor from a query set."
-  (%descrip-matcher-match self query-descriptors train-descriptors matches mask)
+  (%descriptor-matcher-match self query-descriptors train-descriptors matches mask)
   (if given-mask nil (del-mat mask)))
+
+
+(defmethod match ((self cv-feature-2d) &rest args)
+  "Finds the best match for each descriptor from a query set."
+   (apply #'descriptor-matcher-match self args))
 
 
 
 ;;; Drawing Function of Keypoints and Matches
+
 
 
 ;; void drawMatches(const Mat& img1, const vector<KeyPoint>& keypoints1, const Mat& img2, const vector<KeyPoint>& keypoints2, 

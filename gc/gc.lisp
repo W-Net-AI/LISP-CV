@@ -1877,6 +1877,14 @@
   (dest cv::mat))
 
 
+;; Mat getPerspectiveTransform(InputArray src, InputArray dst)
+;; Mat* cv_getPerspectiveTransform(Mat* src, Mat* dst)
+(defcfun ("cv_getPerspectiveTransform" get-perspective-transform) (cv::mat :garbage-collect t)
+  "Calculates a perspective transform from four pairs of the corresponding points."
+  (src cv::mat)
+  (dest cv::mat))
+
+
 ;; Mat getRotationMatrix2D(Point2f center, double angle, double scale)
 ;; Mat* cv_getRotationMatrix2D(Point2f* center, double angle, double scale)
 (defcfun ("cv_getRotationMatrix2D" get-rotation-matrix-2d) (cv::mat :garbage-collect t)

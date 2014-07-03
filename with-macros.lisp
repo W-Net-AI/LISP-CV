@@ -79,12 +79,12 @@
        (values))))
 
 
-(defmacro with-keypoint (bind &body body)
-  "Ensures DEL-KP gets called when 
-   a KEYPOINT object goes out of scope."
+(defmacro with-key-point (bind &body body)
+  "Ensures DEL-KEY-POINT gets called when 
+   a KEY-POINT object goes out of scope."
   `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
      (unwind-protect (progn ,@body)
-       (mapcar #!(del-kp %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (mapcar #!(del-key-point %1) ,(cons 'list (mapcar #!(car %1) bind)))
        (values))))
 
 

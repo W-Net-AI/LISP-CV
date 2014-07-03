@@ -287,6 +287,14 @@
   (dest mat))
 
 
+;; Mat getPerspectiveTransform(InputArray src, InputArray dst)
+;; Mat* cv_getPerspectiveTransform(Mat* src, Mat* dst)
+(defcfun ("cv_getPerspectiveTransform" get-perspective-transform) mat
+  "Calculates a perspective transform from four pairs of the corresponding points."
+  (src mat)
+  (dst mat))
+
+
 ;; Mat getRotationMatrix2D(Point2f center, double angle, double scale)
 ;; Mat* cv_getRotationMatrix2D(Point2f* center, double angle, double scale)
 (defcfun ("cv_getRotationMatrix2D" get-rotation-matrix-2d) mat
@@ -294,6 +302,14 @@
   (center point-2f)
   (angle :double)  
   (scale :double))
+
+
+;; void invertAffineTransform(InputArray M, OutputArray iM)
+;; void cv_invertAffineTransform(Mat* M, Mat* iM)
+(defcfun ("cv_invertAffineTransform" invert-affine-transform) :void
+  "Inverts an affine transformation."
+  (m mat)
+  (i-m mat))
 
 
 ;; void remap(InputArray src, OutputArray dst, InputArray map1, InputArray map2, int interpolation, int borderMode=BORDER_CONSTANT, const Scalar& borderValue=Scalar())
@@ -349,6 +365,26 @@
        "Applies an affine transformation to an image."
        (%warp-affine src dest m dsize flags border-mode border-value)
        (if given-border-value nil (del-scalar border-value)))
+
+
+;; void warpPerspective(InputArray src, OutputArray dst, InputArray M, Size dsize, int flags=INTER_LINEAR, 
+;;                      int borderMode=BORDER_CONSTANT, const Scalar& borderValue=Scalar())
+;; void cv_warpPerspective(Mat* src, Mat* dst, Mat* M, Size* dsize, int flags, int borderMode, Scalar* borderValue)
+(defcfun ("cv_warpPerspective" %warp-perspective) :void
+  (src mat)
+  (dest mat)
+  (m mat)
+  (dsize size)
+  (flags :int)
+  (border-mode :int)
+  (border-value scalar))
+
+
+(defun warp-perspective (src dest m dsize &optional (flags +inter-linear+) (border-mode +border-constant+) 
+					    (border-value (scalar-0) given-border-value)) 
+					    "Applies a perspective transformation to an image."
+					    (%warp-perspective src dest m dsize flags border-mode border-value)
+					    (if given-border-value nil (del-scalar border-value)))
 
 
 
