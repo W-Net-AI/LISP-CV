@@ -70,6 +70,24 @@
        (values))))
 
 
+(defmacro with-file-node (bind &body body)
+  "Ensures DEL-FILE-NODE gets called when 
+   a FILE-NODE object goes out of scope."
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-file-node %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
+
+
+(defmacro with-file-storage (bind &body body)
+  "Ensures DEL-FILE-STORAGE gets called when 
+   a FILE-STORAGE object goes out of scope."
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-file-storage %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
+
+
 (defmacro with-hog-descriptor (bind &body body)
   "Ensures DEL-HOG-DESCRIPTOR gets called when 
    a HOG-DESCRIPTOR object goes out of scope."

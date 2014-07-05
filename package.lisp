@@ -102,6 +102,8 @@
    #:del-dmatch
    #:del-d-tree
    #:del-d-tree-params
+   #:del-file-node
+   #:del-file-storage
    #:del-feature-2d
    #:del-hog-descriptor
    #:del-k-nearest
@@ -189,6 +191,8 @@
    #:with-dmatch
    #:with-d-tree
    #:with-d-tree-params
+   #:with-file-node
+   #:with-file-storage
    #:with-feature-2d
    #:with-hog-descriptor
    #:with-key-point
@@ -280,6 +284,8 @@
    #:d-tree-node
    #:d-tree-params
    #:feature-2d
+   #:file-node
+   #:file-storage
    #:hog-descriptor
    #:key-point
    #:k-nearest
@@ -299,7 +305,6 @@
    #:rng
    #:rotated-rect
    #:scalar
-   #:size
    #:size-2f
    #:*string
    #:svm
@@ -645,7 +650,10 @@
    #:dot
    #:height
    #:match
+   #:release
+   #:size
    #:width
+   #:write
    #:x
    #:y
    #:z
@@ -945,6 +953,8 @@
    #:uniform
 
 ;; core - Drawing Functions
+
+
    #:+aa+
    #:+font-hershey-simplex+
    #:+font-hershey-plain+
@@ -967,8 +977,17 @@
    #:put-text
    #:rgb
 
-;; core - Utility and System Functions and Macros
+;; core - XML/YAML Persistence
 
+   #:+file-storage-read+
+   #:+file-storage-write+
+   #:+file-storage-append+
+   #:+file-storage-memory+
+
+   #:file-storage
+   #:make-file-storage
+
+;; core - Utility and System Functions and Macros
 
    #:+cpu-none+
    #:+cpu-mm+
@@ -1040,7 +1059,6 @@
    #:get-tick-count
    #:get-tick-frequency
 
-
 ;; imgproc - Image Filtering
 
    #:+ipl-border-constant+
@@ -1085,7 +1103,6 @@
    #:pyr-up
    #:scharr
    #:sobel
-
 
 ;; imgproc - Geometric Image Transformations
 
@@ -1469,18 +1486,11 @@
 
 ;; features2d - Common Interfaces of Feature Detectors
 
-   #:feature-detector-create 
-   #:feature-detector-detect
-
 ;; features2d - Common Interfaces of Descriptor Extractors
-
-   #:descriptor-extractor-compute
 
 ;; features2d - Common Interfaces of Descriptor Matchers
 
    #:bf-matcher
-   #:descriptor-matcher-create 
-   #:descriptor-matcher-match
    #:make-bf-matcher
 
 ;;; features2d - Drawing Function of Keypoints and Matches
@@ -1491,7 +1501,6 @@
    #:+draw-rich-keypoints+
 
    #:draw-matches
-
 
 ;;; objdetect
 
@@ -1510,7 +1519,6 @@
    #:cascade-classifier-load
    #:detect-multi-scale
    #:make-cascade-classifier
-
 
 ;;; ml
 
@@ -1616,5 +1624,3 @@
 
    #:apply-color-map
 ))
-
-

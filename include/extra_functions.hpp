@@ -1,69 +1,98 @@
-#include <opencv2/opencv.hpp>
-#include <opencv2/nonfree.hpp>
-#include <vector>
-using namespace cv;
-using namespace std;
-using namespace flann;
-using namespace cvflann;
+/*
+* =====================================================================================
+*
+* Filename: excluded_functions.hpp
+*
+* Description: Functions that the generator outputs incorrectly, either by them entirely
+* or by outputting them with incorrectly specified types.
+*
+* Version: 1.0
+* Created: 04/13/2014 12:00:46 AM
+* Revision: none
+* Compiler: g++
+*
+* Author: Arjun Comar
+*
+* =====================================================================================
+*/
+
+#include <opencv2/c/opencv_generated.hpp>
+
+#define ADD_VEC_FUNC_HEADERS_0_0(t) \
+    Vec2##t * cv_create_0_Vec2##t(); \
+    Vec3##t * cv_create_0_Vec3##t(); \
+    Vec4##t * cv_create_0_Vec4##t(); \
+
+#define ADD_VEC_FUNC_HEADERS_0_1(t) \
+    Vec6##t * cv_create_0_Vec6##t(); \
+
+#define ADD_VEC_FUNC_HEADERS_0_2(t) \
+    Vec8##t * cv_create_0_Vec8##t(); \
+
+#define ADD_VEC_FUNC_HEADERS_1(t, tn) \
+    Vec2##t * cv_create_Vec2##t(tn v0, tn v1); \
+    Vec3##t * cv_create_Vec3##t(tn v0, tn v1, tn v2); \
+    Vec4##t * cv_create_Vec4##t(tn v0, tn v1, tn v2, tn v3); \
+
+#define ADD_VEC_FUNC_HEADERS_2(t, tn) \
+    Vec6##t * cv_create_Vec6##t(tn v0,  tn v1, tn v2, tn v3. tn v4, tn v5); \
+
+#define ADD_VEC_FUNC_HEADERS_3(t, tn) \
+    Vec8##t * cv_create_Vec8##t(tn v0, tn v1, tn v2, tn v3, tn v4, tn v5, tn v6, tn v7); \
+
+#define ADD_WRITE_FUNC_HEADERS_0(t, tn) \
+typedef vector< tn > vector_##tn; \
+    void cv_FileNode_write_number_##t(FileStorage* fs, String* name,  tn value); \
+
+#define ADD_WRITE_FUNC_HEADERS_1(t, tn) \
+    void cv_FileNode_write_pointer_##t(FileStorage* fs, String* name,  tn* value); \
+
+#define ADD_READ_FUNC_HEADERS_0(t, tn) \
+    void cv_FileNode_read_number_##t (FileNode* fs, tn value,  tn default_value); \
+
+#define ADD_READ_FUNC_HEADERS_1(t, tn) \
+    void cv_FileNode_read_pointer_##t(FileNode* fs, tn* value,  tn* default_value); \
+
+#define ADD_READ_FUNC_HEADERS_2(t, tn) \
+    void cv_FileNode_read_pointer_vkp(FileNode* node, tn* keypoints); \
 
 extern "C" {
-
-typedef vector<Vec4i> vector_Vec4i;
-typedef vector<Vec2s> vector_Vec2s;
-
+ADD_VEC_FUNC_HEADER_0_0(b);
+ADD_VEC_FUNC_HEADER_0_0(d);
+ADD_VEC_FUNC_HEADER_0_0(f);
+ADD_VEC_FUNC_HEADER_0_0(i);
+ADD_VEC_FUNC_HEADER_0_0(s);
+ADD_VEC_FUNC_HEADER_0_0(w);
+ADD_VEC_FUNC_HEADER_0_1(d);
+ADD_VEC_FUNC_HEADER_0_1(f);
+ADD_VEC_FUNC_HEADER_0_1(i);
+ADD_VEC_FUNC_HEADER_0_2(i);
+ADD_VEC_FUNC_HEADER_1(b, uchar);
+ADD_VEC_FUNC_HEADER_1(d, double);
+ADD_VEC_FUNC_HEADER_1(f, float);
+ADD_VEC_FUNC_HEADER_1(i, int);
+ADD_VEC_FUNC_HEADER_1(s, short);
+ADD_VEC_FUNC_HEADER_1(w, ushort);
+ADD_VEC_FUNC_HEADER_2(d, double);
+ADD_VEC_FUNC_HEADER_2(f, float);
+ADD_VEC_FUNC_HEADER_2(i, int);
+ADD_VEC_FUNC_HEADER_3(i, int);
+ADD_WRITE_FUNC_HEADERS_0(i, int);
+ADD_WRITE_FUNC_HEADERS_0(f, float);
+ADD_WRITE_FUNC_HEADERS_0(d, double);
+ADD_WRITE_FUNC_HEADERS_1(s, String);
+ADD_WRITE_FUNC_HEADERS_1(m, Mat);
+ADD_WRITE_FUNC_HEADERS_1(vkp, vector_KeyPoint);
+ADD_READ_FUNC_HEADERS_0(i, int);
+ADD_READ_FUNC_HEADERS_0(f, float);
+ADD_READ_FUNC_HEADERS_0(d, double);
+ADD_READ_FUNC_HEADERS_1(s, String);
+ADD_READ_FUNC_HEADERS_1(m, Mat);
+ADD_WRITE_FUNC_HEADERS_2(vkp, vector_KeyPoint);
+void cv_FileNode_read_pointer_vkp (FileNode* fs, vector_KeyPoint* keypoints):
+//FileNode* cv_FileNode_assignVal(FileStorage* fs);
 Scalar* cv_create_Scalar0();
 Scalar* cv_create_Scalar4(double val0, double val1, double val2, double val3);
-
-Vec2s* std_vector_get_element( vector_Vec2s * v
-                            , unsigned int vectorIdx
-                            , unsigned int elementIdx );
-Vec2s* item( int const i, vector_Vec2s const& v );
-Vec2b* cv_create_Vec2b();
-Vec2b* cv_create_Vec2b_2(uchar val0, uchar val1);
-Vec3b* cv_create_Vec3b();
-Vec3b* cv_create_Vec3b_3(uchar val0, uchar val1, uchar val2);
-Vec4b* cv_create_Vec4b();
-Vec4b* cv_create_Vec4b_4(uchar val0, uchar val1, uchar val2, uchar val3);
-Vec2d* cv_create_Vec2d(); 
-Vec2d* cv_create_Vec2d_2(double val0, double val1);
-Vec3d* cv_create_Vec3d();
-Vec3d* cv_create_Vec3d_3(double val0, double val1, double val2);
-Vec4d* cv_create_Vec4d();
-Vec4d* cv_create_Vec4d_4(double val0, double val1, double val2, double val3);
-Vec6d* cv_create_Vec6d(); 
-Vec6d* cv_create_Vec6d_6(double val0, double val1, double val2, double val3, double val4, double val5);
-Vec2f* cv_create_Vec2f();
-Vec2f* cv_create_Vec2f_2(float val0, float val1);
-Vec3f* cv_create_Vec3f();
-Vec3f* cv_create_Vec3f_3(float val0, float val1, float val2) ;
-Vec4f* cv_create_Vec4f();
-Vec4f* cv_create_Vec4f_4(float val0, float val1, float val2, float val3) ;
-Vec6f* cv_create_Vec6f(); 
-Vec6f* cv_create_Vec6f_6(float val0, float val1, float val2, float val3, float val4, float val5);
-Vec2i* cv_create_Vec2i();
-Vec2i* cv_create_Vec2i_2(int val0, int val1);
-Vec3i* cv_create_Vec3i();
-Vec3i* cv_create_Vec3i_3(int val0, int val1, int val2);
-Vec4i* cv_create_Vec4i(); 
-Vec4i* cv_create_Vec4i_4(int val0, int val1, int val2, int val3);
-Vec6i* cv_create_Vec6i();
-Vec6i* cv_create_Vec6i_6(int val0, int val1, int val2, int val3, int val4, int val5);
-Vec8i* cv_create_Vec8i();
-Vec8i* cv_create_Vec8i_8(int val0, int val1, int val2, int val3, int val4, int val5, int val6, int val7);
-Vec2s* cv_create_Vec2s();
-Vec2s* cv_create_Vec2s_2(short val0, short val1);
-Vec3s* cv_create_Vec3s();
-Vec3s* cv_create_Vec3s_3(short val0, short val1, short val2) ;
-Vec4s* cv_create_Vec4s();
-Vec4s* cv_create_Vec4s_4(short val0, short val1, short val2, short val3);
-Vec2w* cv_create_Vec2w();
-Vec2w* cv_create_Vec2w_2(ushort val0, ushort val1);
-Vec3w* cv_create_Vec3w();
-Vec3w* cv_create_Vec3w_3(ushort val0, ushort val1, ushort val2);
-Vec4w* cv_create_Vec4w();
-Vec4w* cv_create_Vec4w_4(ushort val0, ushort val1, ushort val2, ushort val3);
-void cv_LineSegmentDetector_detect2(LineSegmentDetector* self, Mat* _image, vector_Vec4i* _lines, Mat* width, Mat* prec, Mat* nfa);
-void cv_LineSegmentDetector_drawSegments2(LineSegmentDetector* self, Mat* _image, vector_Vec4i* lines);
 CvDTreeParams* cv_create_CvDTreeParams();
 CvDTreeParams* cv_create_CvDTreeParams9(int max_depth, int min_sample_count, float regression_accuracy, bool use_surrogates, int max_categories, int cv_folds, bool use_1se_rule, bool truncate_pruned_tree, const float* priors);
 Mat* cv_Mat_with_Range(Mat* self, Range* rowRange, Range* colRange);
@@ -114,6 +143,8 @@ void cv_delete_DMatch(DMatch* ptr);
 void cv_delete_CvDTree(CvDTree* self);
 void cv_delete_CvDTreeParams(CvDTreeParams* self);
 void cv_delete_Feature2D(Feature2D* self);
+void cv_delete_FileNode(FileNode* self);
+void cv_delete_FileStorage(FileStorage* self);
 void cv_delete_HOGDescriptor(HOGDescriptor* self);
 void cv_delete_KeyPoint(KeyPoint* self);
 void cv_delete_CvKNearest(CvKNearest* self);
@@ -156,8 +187,4 @@ void cv_delete_Vec3w(Vec3w* self);
 void cv_delete_Vec4w(Vec4w* self);
 void cv_delete_VideoCapture(VideoCapture* self);
 void cv_delete_VideoWriter(VideoWriter* self);
-
 }
-
-
-//

@@ -131,12 +131,11 @@
 ;; MEM-AREF macro
 
 
+(defun resolve-pointer (ptr)
+  (if (pointerp ptr) ptr (c-pointer ptr)))
+
 (defmacro ? (ptr type &optional (index 0))
-  `(cond ((pointerp ,ptr)
-	  (return-from ? (mem-aref ,ptr ,type ,index)))
-	 ((not (pointerp ,ptr))
-	  (return-from ? mem-aref (c-pointer ,ptr) ,type  ,index))
-          (t 0)))
+  `(mem-aref (resolve-pointer ,ptr) ,type ,index))
 
 
 ;; RUN

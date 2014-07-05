@@ -37,7 +37,7 @@
 (defmacro continuable (&body body)
 	  `(restart-case
 	    (progn ,@body)
-	    (continue () :report "Continue"  )))
+	    (continue () :report "Continue")))
 
 
 (defun update-swank ()
@@ -56,6 +56,16 @@
 
 ;; Regular version 
 
+
+;; %STRING is for internal use.
+
+;; stdstring* create_std_string()
+  "Creates a *STRING object."
+(defcfun ("create_std_string" %string) *string)
+
+
+;; Version for external use.
+
 ;; string* std_cstringToString(char* s, size_t len) 
 (defcfun ("cstring_to_std_string" c-string-to-string) *string
   "Converts C string to C++"
@@ -63,7 +73,7 @@
   (len :unsigned-int))
 
 
-;; Version for internal GC in the LISP-CV package
+;; Version for internal GC.
 
 ;; string* std_cstringToString(char* s, size_t len) 
 (defcfun ("cstring_to_std_string" %c-string-to-string) (cv::*string :garbage-collect t)
@@ -105,11 +115,20 @@
 (defgeneric match (arg &rest args)
   (:documentation "Used for all class bindings with a MATCH member."))
 
+(defgeneric release (self)
+  (:documentation "Used for all class bindings with a RELEASE member."))
+
 (defgeneric size (arg &rest args)
   (:documentation "Used for all class bindings with a SIZE member."))
 
 (defgeneric width (self)
   (:documentation "Used for all class bindings with an WIDTH member."))
+
+(defgeneric *write (fs name value)
+  (:documentation "Used for all class bindings with an WRITE member."))
+
+(defgeneric *read (fs value &optional default-value)
+  (:documentation "Used for all class bindings with an READ member."))
 
 (defgeneric x (self)
   (:documentation "Used for all class bindings with an X member."))
@@ -205,8 +224,8 @@
   (self mat))
 
 
-;; Rect_(_Tp _x, _Tp _y, _Tp _width, _Tp _height)
-;; _Tp x, y, width, height
+;; Rect::Rect(int x, int y, int width, int height)
+;; int x, y, width, height
 ;; Rect* cv_Rect_clone(Rect* self)
 (defcfun ("cv_Rect_clone" rect-clone) rect
   (self rect))
@@ -672,12 +691,12 @@
 
 
 ;; Point_()
-;; Point2##t * cv_create_Point2##t ( tn x,  tn y)
+;; Point2##t * cv_create_Point2##(tn x, tn y)
 (defcfun ("cv_create_Point2i" point-0) point)
 
 
 ;; Point_(_Tp _x, _Tp _y)
-;; Point2##t * cv_create_Point2##t ( tn x,  tn y) 
+;; Point2##t * cv_create_Point2##(tn x, tn y) 
 (defcfun ("cv_create_Point2i" point-2) point
   (x :int)
   (y :int))
@@ -717,13 +736,13 @@
 
 
 ;; typedef Point_<double> Point2d
-;; Point2##t * cv_create_Point2##t ( tn x,  tn y) 
+;; Point2##t * cv_create_Point2##(tn x, tn y) 
 (defcfun ("cv_create_Point2d" point-2d-0) point-2d 
 	 "Point2d constructor")
 
 
 ;; typedef Point_<double> Point2d
-;; Point2##t * cv_create_Point2##t ( tn x,  tn y)  
+;; Point2##t * cv_create_Point2##(tn x, tn y)  
 (defcfun ("cv_create_Point2d" point-2d-2) point-2d 
 	 "Point2d constructor"
 	 (x :double)
@@ -767,7 +786,7 @@
 
 
 ;; typedef Point_<float> Point2f
-;; Point2##t * cv_create_Point2##t ( tn x,  tn y)  
+;; Point2##t * cv_create_Point2##(tn x, tn y)  
 (defcfun ("cv_create_Point2f" point-2f-2) point-2f 
 	 "Point2f constructor"
 	 (x :float)
@@ -805,13 +824,13 @@
 
 
 ;; typedef Point3_<double> Point3d
-;; Point3##t * cv_create_Point3##t ( tn x,  tn y,  tn z) 
+;; Point3##t * cv_create_Point3##(tn x, tn y, tn z) 
 (defcfun ("cv_create_Point3d" point-3d-0) point-3d 
 	 "Point3d constructotr")
 
 
 ;; typedef Point3_<double> Point3d
-;; Point3##t * cv_create_Point3##t ( tn x,  tn y,  tn z) 
+;; Point3##t * cv_create_Point3##(tn x, tn y, tn z) 
 (defcfun ("cv_create_Point3d" point-3d-2) point-3d 
 	 "Point3d constructor"
 	 (x :double)
@@ -857,13 +876,13 @@
 
 
 ;; typedef Point3_<double> Point3d
-;; Point3##t * cv_create_Point3##t ( tn x,  tn y,  tn z)  
+;; Point3##t * cv_create_Point3##(tn x, tn y, tn z)  
 (defcfun ("cv_create_Point3f" point-3f-0) point-3f 
 	 "Point3f constructor")
 
 
 ;; typedef Point3_<double> Point3d
-;; Point3##t * cv_create_Point3##t ( tn x,  tn y,  tn z)  
+;; Point3##t * cv_create_Point3##(tn x, tn y, tn z)  
 (defcfun ("cv_create_Point3f" point-3f-2) point-3f 
 	 "Point3f constructor"
 	 (x :float)
@@ -909,13 +928,13 @@
 
 
 ;; typedef Point3_<double> Point3d
-;; Point3##t * cv_create_Point3##t ( tn x,  tn y,  tn z)  
+;; Point3##t * cv_create_Point3##(tn x, tn y, tn z)  
 (defcfun ("cv_create_Point3i" point-3i-0) point-3i 
 	 "Point3i constructor")
 
 
 ;; typedef Point3_<double> Point3d
-;; Point3##t * cv_create_Point3##t ( tn x,  tn y,  tn z)  
+;; Point3##t * cv_create_Point3##(tn x, tn y, tn z)  
 (defcfun ("cv_create_Point3i" point-3i-2) point-3i 
 	 "Point3i constructor"
 	 (x :int)
@@ -1264,38 +1283,44 @@
 ;; Scalar::Scalar(double v0, double v1, double v2, double v3)
 ;; Scalar* cv_create_Scalar4(double val0, (double val1, double val2, double val3)
 (defcfun ("cv_create_Scalar4" scalar-4) scalar
-	 (val0 :double)
-	 (val1 :double)
-	 (val2 :double)
-	 (val3 :double))
+	 (v0 :double)
+	 (v1 :double)
+	 (v2 :double)
+	 (v3 :double))
 
 
-(defun scalar (&optional (val1 0d0) (val2 0d0) (val3 0d0) (val4 0d0))
-       "SCALAR constructor"
-	      (scalar-4 (coerce val1 'double-float) (coerce val2 'double-float) (coerce val3 'double-float) (coerce val4 'double-float)))
+(defun scalar (&optional (v1 0d0) (v2 0d0) (v3 0d0) (v4 0d0))
+  "SCALAR constructor"
+  (if (null v1) 
+      (scalar-0)
+      (scalar-4 (coerce v1 'double-float) (coerce v2 'double-float) 
+		(coerce v3 'double-float) (coerce v4 'double-float))))
 
 
-(defun make-scalar (&optional (val1 0d0) (val2 0d0) (val3 0d0) (val4 0d0))
-       "SCALAR constructor"
-	      (scalar-4 (coerce val1 'double-float) (coerce val2 'double-float) (coerce val3 'double-float) (coerce val4 'double-float)))
+(defun make-scalar (&optional (v1 0d0) (v2 0d0) (v3 0d0) (v4 0d0))
+  "SCALAR constructor"
+  (if (null v1) 
+      (scalar-0)
+      (scalar-4 (coerce v1 'double-float) (coerce v2 'double-float) 
+		(coerce v3 'double-float) (coerce v4 'double-float))))
 
 
-;; Scalar_<_Tp> Scalar_<_Tp>::all(_Tp v0)
+;; Scalar::Scalar::all(double v0)
 ;; Scalar* cv_create_scalarAll(double val0123)
 (defcfun ("cv_create_scalarAll" %scalar-all) scalar
-  (val0123 :double))
+  (v0 :double))
 
 
-(defun scalar-all (val0123)
+(defun scalar-all (v0)
        "SCALAR conctctor - Initializes all of 
-        the scalar values 0...3 with val0123"
-       (%scalar-all (coerce val0123 'double-float)))
+        the scalar values 0...3 with V0"
+       (%scalar-all (coerce v0 'double-float)))
 
 
-(defun make-scalar-all (val0123)
+(defun make-scalar-all (v0)
        "SCALAR conctctor - Initializes all of 
-        the scalar values 0...3 with val0123"
-       (%scalar-all (coerce val0123 'double-float)))
+        the scalar values 0...3 with v0"
+       (%scalar-all (coerce v0 'double-float)))
 
 
 ;; MatExpr * operator
@@ -1456,921 +1481,708 @@
 
 
 ;; typedef Vec<uchar, 2> Vec2b;
-;; Vec2b* cv_create_Vec2b()
-(defcfun ("cv_create_Vec2b" vec-2b-0) vec-2b)
+;; Vec2##t * cv_create_0_Vec2##t()
+(defcfun ("cv_create_0_Vec2b" vec-2b-0) vec-2b)
 
 
 ;; typedef Vec<uchar, 2> Vec2b;
-;; Vec2b* cv_create_Vec2b_2(uchar val0, uchar val1)
-(defcfun ("cv_create_Vec2b_2" vec-2b-2) vec-2b
-  (val0 :uchar)
-  (val1 :uchar))
+;; Vec2##t * cv_create_Vec2##t(tn v0, tn v1)
+(defcfun ("cv_create_Vec2b" vec-2b-2) vec-2b
+  (v0 :uchar)
+  (v1 :uchar))
 
 
-(defun vec-2b (&optional val0 val1)
+(defun vec-2b (&optional v0 v1)
   "VEC-2B constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-2b-0))
-	(val0
-	 (vec-2b-2 val0 val1))
+	(v0
+	 (vec-2b-2 v0 v1))
 	(t nil)))
 
 
-(defun make-vec-2b (&optional val0 val1)
+(defun make-vec-2b (&optional v0 v1)
   "VEC-2B constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-2b-0))
-	(val0
-	 (vec-2b-2 val0 val1))
+	(v0
+	 (vec-2b-2 v0 v1))
 	(t nil)))
 
 
 ;; typedef Vec<uchar, 3> Vec3b;
-;; Vec3b* cv_create_Vec3b()
-(defcfun ("cv_create_Vec3b" vec-3b-0) vec-3b)
+;; Vec3##t * cv_create_0_Vec3##t()
+(defcfun ("cv_create_0_Vec3b" vec-3b-0) vec-3b)
 
 
 ;; typedef Vec<uchar, 3> Vec3b;
-;; Vec3b* cv_create_Vec3b_3(uchar val0, uchar val1, uchar val2)
-(defcfun ("cv_create_Vec3b_3" vec-3b-3) vec-3b
-  (val0 :uchar)
-  (val1 :uchar)
-  (val2 :uchar))
+;; Vec3##t * cv_create_Vec3##t(tn v0, tn v1, tn v2)
+(defcfun ("cv_create_Vec3b" vec-3b-3) vec-3b
+  (v0 :uchar)
+  (v1 :uchar)
+  (v2 :uchar))
 
 
-(defun vec-3b (&optional val0 val1 val2)
+(defun vec-3b (&optional v0 v1 v2)
   "VEC-3B constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-3b-0))
-	(val0
-	 (vec-3b-3 val0 val1 val2))
+	(v0
+	 (vec-3b-3 v0 v1 v2))
 	(t nil)))
 
 
-(defun make-vec-3b (&optional val0 val1 val2)
+(defun make-vec-3b (&optional v0 v1 v2)
   "VEC-3B constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-3b-0))
-	(val0
-	 (vec-3b-3 val0 val1 val2))
+	(v0
+	 (vec-3b-3 v0 v1 v2))
 	(t nil)))
 
 
 ;; typedef Vec<uchar, 4> Vec4b;
-;; Vec4b* cv_create_Vec4b()
-(defcfun ("cv_create_Vec4b" vec-4b-0) vec-4b)
+;; Vec4##t * cv_create_0_Vec4##()
+(defcfun ("cv_create_0_Vec4b" vec-4b-0) vec-4b)
 
 
 ;; typedef Vec<uchar, 4> Vec4b;
-;; Vec4b* cv_create_Vec4b_4(uchar val0, uchar val1, uchar val2, uchar val3)
-(defcfun ("cv_create_Vec4b_4" vec-4b-4) vec-4b
-  (val0 :uchar)
-  (val1 :uchar)
-  (val2 :uchar)
-  (val3 :uchar))
+;; Vec4##t * cv_create_Vec4##(tn v0, tn v1, tn v2, tn v3)
+(defcfun ("cv_create_Vec4b" vec-4b-4) vec-4b
+  (v0 :uchar)
+  (v1 :uchar)
+  (v2 :uchar)
+  (v3 :uchar))
 
 
-(defun vec-4b (&optional val0 val1 val2 val3)
+(defun vec-4b (&optional v0 v1 v2 v3)
   "VEC-4B constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-4b-0))
-	(val0
-	 (vec-4b-4 val0 val1 val2 val3))
+	(v0
+	 (vec-4b-4 v0 v1 v2 v3))
 	(t nil)))
 
 
-(defun make-vec-4b (&optional val0 val1 val2 val3)
+(defun make-vec-4b (&optional v0 v1 v2 v3)
   "VEC-4B constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-4b-0))
-	(val0
-	 (vec-4b-4 val0 val1 val2 val3))
+	(v0
+	 (vec-4b-4 v0 v1 v2 v3))
 	(t nil)))
 
 
 ;; typedef Vec<double, 2> Vec2d;
-;; Vec2d* cv_create_Vec2d()
-(defcfun ("cv_create_Vec2d" vec-2d-0) vec-2d)
+;; Vec2##t * cv_create_0_Vec2##()
+(defcfun ("cv_create_0_Vec2d" vec-2d-0) vec-2d)
 
 
 ;; typedef Vec<double, 2> Vec2d;
-;; Vec2d* cv_create_Vec2d_2(double val0, double val1)
-(defcfun ("cv_create_Vec2d_2" vec-2d-2) vec-2d
-  (val0 :double)
-  (val1 :double))
+;; Vec2##t * cv_create_Vec2##(tn v0, tn v1)
+(defcfun ("cv_create_Vec2d" vec-2d-2) vec-2d
+  (v0 :double)
+  (v1 :double))
 
 
-(defun vec-2d (&optional val0 val1)
+(defun vec-2d (&optional v0 v1)
   "VEC-2D constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-2d-0))
-	(val0
-	 (vec-2d-2 val0 val1))
+	(v0
+	 (vec-2d-2 v0 v1))
 	(t nil)))
 
 
-(defun make-vec-2d (&optional val0 val1)
+(defun make-vec-2d (&optional v0 v1)
   "VEC-2D constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-2d-0))
-	(val0
-	 (vec-2d-2 val0 val1))
+	(v0
+	 (vec-2d-2 v0 v1))
 	(t nil)))
 
 
 ;; typedef Vec<double, 3> Vec3d;
-;; Vec3d* cv_create_Vec3d()
-(defcfun ("cv_create_Vec3d" vec-3d-0) vec-3d)
+;; Vec3##t * cv_create_0_Vec3##()
+(defcfun ("cv_create_0_Vec3d" vec-3d-0) vec-3d)
 
 
 ;; typedef Vec<double, 3> Vec3d;
-;; Vec3d* cv_create_Vec3d_3(double val0, double val1, double val2)
-(defcfun ("cv_create_Vec3d_3" vec-3d-3) vec-3d
-  (val0 :double)
-  (val1 :double)
-  (val2 :double))
+;; Vec3##t * cv_create_Vec3##(tn v0, tn v1, tn v2)
+(defcfun ("cv_create_Vec3d" vec-3d-3) vec-3d
+  (v0 :double)
+  (v1 :double)
+  (v2 :double))
 
 
-(defun vec-3d (&optional val0 val1 val2)
+(defun vec-3d (&optional v0 v1 v2)
   "VEC-3D constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-3d-0))
-	(val0
-	 (vec-3d-3 val0 val1 val2))
+	(v0
+	 (vec-3d-3 v0 v1 v2))
 	(t nil)))
 
 
-(defun make-vec-3d (&optional val0 val1 val2)
+(defun make-vec-3d (&optional v0 v1 v2)
   "VEC-3D constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-3d-0))
-	(val0
-	 (vec-3d-3 val0 val1 val2))
+	(v0
+	 (vec-3d-3 v0 v1 v2))
 	(t nil)))
 
 
 ;; typedef Vec<double, 4> Vec4d;
-;; Vec4d* cv_create_Vec4d()
-(defcfun ("cv_create_Vec4d" vec-4d-0) vec-4d)
+;; Vec4##t * cv_create_0_Vec4##()
+(defcfun ("cv_create_0_Vec4d" vec-4d-0) vec-4d)
 
 
 ;; typedef Vec<double, 4> Vec4d;
-;; Vec4d* cv_create_Vec4d_4(double val0, double val1, double val2, double val3)
-(defcfun ("cv_create_Vec4d_4" vec-4d-4) vec-4d
-  (val0 :double)
-  (val1 :double)
-  (val2 :double)
-  (val3 :double))
+;; Vec4##t * cv_create_Vec4##(tn v0, tn v1, tn v2, tn v3)
+(defcfun ("cv_create_Vec4d" vec-4d-4) vec-4d
+  (v0 :double)
+  (v1 :double)
+  (v2 :double)
+  (v3 :double))
 
 
-(defun vec-4d (&optional val0 val1 val2 val3)
+(defun vec-4d (&optional v0 v1 v2 v3)
   "VEC-4D constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-4d-0))
-	(val0
-	 (vec-4d-4 val0 val1 val2 val3))
+	(v0
+	 (vec-4d-4 v0 v1 v2 v3))
 	(t nil)))
 
 
-(defun make-vec-4d (&optional val0 val1 val2 val3)
+(defun make-vec-4d (&optional v0 v1 v2 v3)
   "VEC-4D constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-4d-0))
-	(val0
-	 (vec-4d-4 val0 val1 val2 val3))
+	(v0
+	 (vec-4d-4 v0 v1 v2 v3))
 	(t nil)))
 
 
 ;; typedef Vec<double, 6> Vec6d;
-;; Vec6d* cv_create_Vec6d()
-(defcfun ("cv_create_Vec6d" vec-6d-0) vec-6d)
+;; Vec6##t * cv_create_0_Vec6##()
+(defcfun ("cv_create_0_Vec6d" vec-6d-0) vec-6d)
 
 
 ;; typedef Vec<double, 6> Vec6d;
-;; Vec6d* cv_create_Vec6d_6(double val0, double val1, double val2, double val3, double val4, double val5)
-(defcfun ("cv_create_Vec6d_6" vec-6d-6) vec-6d
-  (val0 :double)
-  (val1 :double)
-  (val2 :double)
-  (val3 :double)
-  (val4 :double)
-  (val5 :double))
+;; Vec6##t * cv_create_Vec6##(tn v0, tn v1, tn v2, tn v3, tn v4, tn v5)
+(defcfun ("cv_create_Vec6d" vec-6d-6) vec-6d
+  (v0 :double)
+  (v1 :double)
+  (v2 :double)
+  (v3 :double)
+  (v4 :double)
+  (v5 :double))
 
 
-(defun vec-6d (&optional val0 val1 val2 val3 val4 val5)
+(defun vec-6d (&optional v0 v1 v2 v3 v4 v5)
   "VEC-6D constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-6d-0))
-	(val0
-	 (vec-6d-6 val0 val1 val2 val3 val4 val5))
+	(v0
+	 (vec-6d-6 v0 v1 v2 v3 v4 v5))
 	(t nil)))
 
 
-(defun make-vec-6d (&optional val0 val1 val2 val3 val4 val5)
+(defun make-vec-6d (&optional v0 v1 v2 v3 v4 v5)
   "VEC-6D constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-6d-0))
-	(val0
-	 (vec-6d-6 val0 val1 val2 val3 val4 val5))
+	(v0
+	 (vec-6d-6 v0 v1 v2 v3 v4 v5))
 	(t nil)))
 
 
 ;; typedef Vec<float, 2> Vec2f
-;; Vec2f* cv_create_Vec2f()
-(defcfun ("cv_create_Vec2f" vec-2f-0) (cv::vec-2f :garbage-collect t))
+;; Vec2##t * cv_create_0_Vec2##()
+(defcfun ("cv_create_0_Vec2f" vec-2f-0) vec-2f)
 
 
 ;; typedef Vec<float, 2> Vec2f
-;; Vec2f* cv_create_Vec2f_2(float val0, float val1)
-(defcfun ("cv_create_Vec2f_2" vec-2f-2) (cv::vec-2f :garbage-collect t)
-  (val0 :float)
-  (val1 :float))
+;; Vec2##t * cv_create_Vec2##(tn v0, tn v1)
+(defcfun ("cv_create_Vec2f" vec-2f-2) vec-2f
+  (v0 :float)
+  (v1 :float))
 
 
-(defun vec-2f (&optional val0 val1)
+(defun vec-2f (&optional v0 v1)
   "VEC-2F constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-2f-0))
-	(val0
-	 (vec-2f-2 val0 val1))
+	(v0
+	 (vec-2f-2 v0 v1))
 	(t nil)))
 
 
-(defun make-vec-2f (&optional val0 val1)
+(defun make-vec-2f (&optional v0 v1)
   "VEC-2F constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-2f-0))
-	(val0
-	 (vec-2f-2 val0 val1))
+	(v0
+	 (vec-2f-2 v0 v1))
 	(t nil)))
 
 
 ;; typedef Vec<float, 3> Vec3f
-;; Vec3f* cv_create_Vec3f()
-(defcfun ("cv_create_Vec3f" vec-3f-0) (cv::vec-3f :garbage-collect t))
+;; Vec3##t * cv_create_0_Vec3##()
+(defcfun ("cv_create_0_Vec3f" vec-3f-0) (cv::vec-3f :garbage-collect t))
 
 
 ;; typedef Vec<float, 3> Vec3f
-;; Vec3f* cv_create_Vec3f_3(float val0, float val1, int val2)
-(defcfun ("cv_create_Vec3f_3" vec-3f-3) (cv::vec-3f :garbage-collect t)
-  (val0 :float)
-  (val1 :float)
-  (val2 :float))
+;; Vec3##t * cv_create_Vec3##(tn v0, tn v1, tn v2)
+(defcfun ("cv_create_Vec3f" vec-3f-3) (cv::vec-3f :garbage-collect t)
+  (v0 :float)
+  (v1 :float)
+  (v2 :float))
 
 
-(defun vec-3f (&optional val0 val1 val2)
+(defun vec-3f (&optional v0 v1 v2)
   "VEC-3F constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-3f-0))
-	(val0
-	 (vec-3f-3 val0 val1 val2))
+	(v0
+	 (vec-3f-3 v0 v1 v2))
 	(t nil)))
 
 
-(defun make-vec-3f (&optional val0 val1 val2)
+(defun make-vec-3f (&optional v0 v1 v2)
   "VEC-3F constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-3f-0))
-	(val0
-	 (vec-3f-3 val0 val1 val2))
+	(v0
+	 (vec-3f-3 v0 v1 v2))
 	(t nil)))
 
 
 ;; typedef Vec<float, 4> Vec4f
-;; Vec4f* cv_create_Vec4f()
-(defcfun ("cv_create_Vec4f" vec-4f-0) vec-4f)
+;; Vec4##t * cv_create_0_Vec4##()
+(defcfun ("cv_create_0_Vec4f" vec-4f-0) vec-4f)
 
 
 ;; typedef Vec<float, 4> Vec4f
-;; Vec4f* cv_create_Vec4f_4(float val0, float val1, float val2, float val3)
-(defcfun ("cv_create_Vec4f_4" vec-4f-4) vec-4f 
-  (val0 :float)
-  (val1 :float)
-  (val2 :float)
-  (val3 :float))
+;; Vec4##t * cv_create_Vec4##(tn v0, tn v1, tn v2, tn v3)
+(defcfun ("cv_create_Vec4f" vec-4f-4) vec-4f 
+  (v0 :float)
+  (v1 :float)
+  (v2 :float)
+  (v3 :float))
 
 
-(defun vec-4f (&optional val0 val1 val2 val3)
+(defun vec-4f (&optional v0 v1 v2 v3)
   "VEC-4F constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-4f-0))
-	(val0
-	 (vec-4f-4 val0 val1 val2 val3))
+	(v0
+	 (vec-4f-4 v0 v1 v2 v3))
 	(t nil)))
 
 
-(defun make-vec-4f (&optional val0 val1 val2 val3)
+(defun make-vec-4f (&optional v0 v1 v2 v3)
   "VEC-4F constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-4f-0))
-	(val0
-	 (vec-4f-4 val0 val1 val2 val3))
+	(v0
+	 (vec-4f-4 v0 v1 v2 v3))
 	(t nil)))
 
 
 ;; typedef Vec<float, 6> Vec6f;
-;; Vec6f* cv_create_Vec6f()
-(defcfun ("cv_create_Vec6f" vec-6f-0) vec-6f)
+;; Vec6##t * cv_create_0_Vec6##()
+(defcfun ("cv_create_0_Vec6f" vec-6f-0) vec-6f)
 
 
 ;; typedef Vec<float, 6> Vec6f;
-;; Vec6f* cv_create_Vec6f_6(float val0, float val1, float val2, float val3, float val4, float val5)
-(defcfun ("cv_create_Vec6f_6" vec-6f-6) vec-6f
-  (val0 :float)
-  (val1 :float)
-  (val2 :float)
-  (val3 :float)
-  (val4 :float)
-  (val5 :float))
+;; Vec6##t * cv_create_Vec6##(tn v0, tn v1, tn v2, tn v3, tn v4, tn v5)
+(defcfun ("cv_create_Vec6f" vec-6f-6) vec-6f
+  (v0 :float)
+  (v1 :float)
+  (v2 :float)
+  (v3 :float)
+  (v4 :float)
+  (v5 :float))
 
 
-(defun vec-6f (&optional val0 val1 val2 val3 val4 val5)
+(defun vec-6f (&optional v0 v1 v2 v3 v4 v5)
   "VEC-6F constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-6f-0))
-	(val0
-	 (vec-6f-6 val0 val1 val2 val3 val4 val5))
+	(v0
+	 (vec-6f-6 v0 v1 v2 v3 v4 v5))
 	(t nil)))
 
 
-(defun make-vec-6f (&optional val0 val1 val2 val3 val4 val5)
+(defun make-vec-6f (&optional v0 v1 v2 v3 v4 v5)
   "VEC-6F constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-6f-0))
-	(val0
-	 (vec-6f-6 val0 val1 val2 val3 val4 val5))
+	(v0
+	 (vec-6f-6 v0 v1 v2 v3 v4 v5))
 	(t nil)))
 
 
 
 ;; typedef Vec<int, 2> Vec2i;
-;; Vec2i* cv_create_Vec2i()
-(defcfun ("cv_create_Vec2i" vec-2i-0) vec-2i)
+;; Vec2##t * cv_create_0_Vec2##()
+(defcfun ("cv_create_0_Vec2i" vec-2i-0) vec-2i)
 
 
 ;; typedef Vec<int, 2> Vec2i;
-;; Vec2i* cv_create_Vec2i_2(int val0, int val1)
-(defcfun ("cv_create_Vec2i_2" vec-2i-2) vec-2i
-  (val0 :int)
-  (val1 :int))
+;; Vec2##t * cv_create_Vec2##(tn v0, tn v1)
+(defcfun ("cv_create_Vec2i" vec-2i-2) vec-2i
+  (v0 :int)
+  (v1 :int))
 
 
-(defun vec-2i (&optional val0 val1)
+(defun vec-2i (&optional v0 v1)
   "VEC-2I constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-2i-0))
-	(val0
-	 (vec-2i-2 val0 val1))
+	(v0
+	 (vec-2i-2 v0 v1))
 	(t nil)))
 
 
-(defun make-vec-2i (&optional val0 val1)
+(defun make-vec-2i (&optional v0 v1)
   "VEC-2I constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-2i-0))
-	(val0
-	 (vec-2i-2 val0 val1))
+	(v0
+	 (vec-2i-2 v0 v1))
 	(t nil)))
 
 
 ;; typedef Vec<int, 3> Vec3i;
-;; Vec3i* cv_create_Vec3i()
-(defcfun ("cv_create_Vec3i" vec-3i-0) vec-3i)
+;; Vec3##t * cv_create_0_Vec3##()
+(defcfun ("cv_create_0_Vec3i" vec-3i-0) vec-3i)
 
 
 ;; typedef Vec<int, 3> Vec3i;
-;; Vec3i* cv_create_Vec3i_3(int val0, int val1, int val2)
-(defcfun ("cv_create_Vec3i_3" vec-3i-3) vec-3i
-  (val0 :int)
-  (val1 :int)
-  (val2 :int))
+;; Vec3##t * cv_create_Vec3##(tn v0, tn v1, tn v2)
+(defcfun ("cv_create_Vec3i" vec-3i-3) vec-3i
+  (v0 :int)
+  (v1 :int)
+  (v2 :int))
 
 
-(defun vec-3i (&optional val0 val1 val2)
+(defun vec-3i (&optional v0 v1 v2)
   "VEC-3I constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-3i-0))
-	(val0
-	 (vec-3i-3 val0 val1 val2))
+	(v0
+	 (vec-3i-3 v0 v1 v2))
 	(t nil)))
 
 
-(defun make-vec-3i (&optional val0 val1 val2)
+(defun make-vec-3i (&optional v0 v1 v2)
   "VEC-3I constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-3i-0))
-	(val0
-	 (vec-3i-3 val0 val1 val2))
+	(v0
+	 (vec-3i-3 v0 v1 v2))
 	(t nil)))
 
 
 
 ;; typedef Vec<int, 4> Vec4i;
-;; Vec4i* cv_create_Vec4i()
-(defcfun ("cv_create_Vec4i" vec-4i-0) vec-4i)
+;; Vec4##t * cv_create_0_Vec4##()
+(defcfun ("cv_create_0_Vec4i" vec-4i-0) vec-4i)
 
 
 ;; typedef Vec<int, 4> Vec4i;
-;; Vec4i* cv_create_Vec4i_4(int val0, int val1, int val2, int val3)
-(defcfun ("cv_create_Vec4i_4" vec-4i-4) vec-4i
-  (val0 :int)
-  (val1 :int)
-  (val2 :int)
-  (val3 :int))
+;; Vec4##t * cv_create_Vec4##(tn v0, tn v1, tn v2, tn v3)
+(defcfun ("cv_create_Vec4i" vec-4i-4) vec-4i
+  (v0 :int)
+  (v1 :int)
+  (v2 :int)
+  (v3 :int))
 
-(defun vec-4i (&optional val0 val1 val2 val3)
+(defun vec-4i (&optional v0 v1 v2 v3)
   "VEC-4I constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-4i-0))
-	(val0
-	 (vec-4i-4 val0 val1 val2 val3))
+	(v0
+	 (vec-4i-4 v0 v1 v2 v3))
 	(t nil)))
 
 
-(defun make-vec-4i (&optional val0 val1 val2 val3)
+(defun make-vec-4i (&optional v0 v1 v2 v3)
   "VEC-4I constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-4i-0))
-	(val0
-	 (vec-4i-4 val0 val1 val2 val3))
+	(v0
+	 (vec-4i-4 v0 v1 v2 v3))
 	(t nil)))
 
 
 ;; typedef Vec<int, 6> Vec6i;
-;; Vec6i* cv_create_Vec6i()
-(defcfun ("cv_create_Vec6i" vec-6i-0) vec-6i)
+;; Vec6##t * cv_create_0_Vec6##()
+(defcfun ("cv_create_0_Vec6i" vec-6i-0) vec-6i)
 
 
 ;; typedef Vec<int, 6> Vec6i;
-;; Vec6i* cv_create_Vec6i_6(int val0, int val1, int val2, int val3, int val4, int val5)
-(defcfun ("cv_create_Vec6i_6" vec-6i-6) vec-6i
-  (val0 :int)
-  (val1 :int)
-  (val2 :int)
-  (val3 :int)
-  (val4 :int)
-  (val5 :int))
+;; Vec6##t * cv_create_Vec6##(tn v0, tn v1, tn v2, tn v3, tn v4, tn v5)
+(defcfun ("cv_create_Vec6i" vec-6i-6) vec-6i
+  (v0 :int)
+  (v1 :int)
+  (v2 :int)
+  (v3 :int)
+  (v4 :int)
+  (v5 :int))
 
 
-(defun vec-6i (&optional val0 val1 val2 val3 val4 val5)
+(defun vec-6i (&optional v0 v1 v2 v3 v4 v5)
   "VEC-6I constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-6i-0))
-	(val0
-	 (vec-6i-6 val0 val1 val2 val3 val4 val5))
+	(v0
+	 (vec-6i-6 v0 v1 v2 v3 v4 v5))
 	(t nil)))
 
 
-(defun make-vec-6i (&optional val0 val1 val2 val3 val4 val5)
+(defun make-vec-6i (&optional v0 v1 v2 v3 v4 v5)
   "VEC-6I constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-6i-0))
-	(val0
-	 (vec-6i-6 val0 val1 val2 val3 val4 val5))
+	(v0
+	 (vec-6i-6 v0 v1 v2 v3 v4 v5))
 	(t nil)))
 
 
 ;; typedef Vec<int, 8> Vec8i;
-;; Vec8i* cv_create_Vec8i() 
-(defcfun ("cv_create_Vec8i" vec-8i-0) vec-8i)
+;; Vec8##t * cv_create_0_Vec8##() 
+(defcfun ("cv_create_0_Vec8i" vec-8i-0) vec-8i)
 
 
 ;; typedef Vec<int, 8> Vec8i;
-;; Vec8i* cv_create_Vec8i_8(int val0, int val1, int val2, int val3, int val4, int val5, int val6, int val7) 
-(defcfun ("cv_create_Vec8i_8" vec-8i-8) vec-8i
-  (val0 :int)
-  (val1 :int)
-  (val2 :int)
-  (val3 :int)
-  (val4 :int)
-  (val5 :int)
-  (val6 :int)
-  (val7 :int))
+;; Vec8##t * cv_create_Vec8##(tn v0, tn v1, tn v2, tn v3, tn v4, tn v5, tn v6, tn v7)
+(defcfun ("cv_create_Vec8i" vec-8i-8) vec-8i
+  (v0 :int)
+  (v1 :int)
+  (v2 :int)
+  (v3 :int)
+  (v4 :int)
+  (v5 :int)
+  (v6 :int)
+  (v7 :int))
 
 
-(defun vec-8i (&optional val0 val1 val2 val3 val4 val5 val6 val7)
+(defun vec-8i (&optional v0 v1 v2 v3 v4 v5 v6 v7)
   "VEC-8I constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-8i-0))
-	(val0
-	 (vec-8i-8 val0 val1 val2 val3 val4 val5 val6 val7))
+	(v0
+	 (vec-8i-8 v0 v1 v2 v3 v4 v5 v6 v7))
 	(t nil)))
 
 
-(defun make-vec-8i (&optional val0 val1 val2 val3 val4 val5 val6 val7)
+(defun make-vec-8i (&optional v0 v1 v2 v3 v4 v5 v6 v7)
   "VEC-8I constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-8i-0))
-	(val0
-	 (vec-8i-8 val0 val1 val2 val3 val4 val5 val6 val7))
+	(v0
+	 (vec-8i-8 v0 v1 v2 v3 v4 v5 v6 v7))
 	(t nil)))
 
 
 ;; typedef Vec<short, 2> Vec2s;
-;; Vec2s* cv_create_Vec2s()
-(defcfun ("cv_create_Vec2s" vec-2s-0) vec-2s)
+;; Vec2##t * cv_create_0_Vec2##()
+(defcfun ("cv_create_0_Vec2s" vec-2s-0) vec-2s)
 
 
 ;; typedef Vec<short, 2> Vec2s;
-;; Vec2s* cv_create_Vec2s_2(short val0, short val1)
-(defcfun ("cv_create_Vec2s_2" vec-2s-2) vec-2s
-  (val0 :short)
-  (val1 :short))
+;; Vec2##t * cv_create_Vec2##(tn v0, tn v1)
+(defcfun ("cv_create_Vec2s" vec-2s-2) vec-2s
+  (v0 :short)
+  (v1 :short))
 
 
-(defun vec-2s (&optional val0 val1)
+(defun vec-2s (&optional v0 v1)
   "VEC-2S constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-2s-0))
-	(val0
-	 (vec-2s-2 val0 val1))
+	(v0
+	 (vec-2s-2 v0 v1))
 	(t nil)))
 
 
-(defun make-vec-2s (&optional val0 val1)
+(defun make-vec-2s (&optional v0 v1)
   "VEC-2S constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-2s-0))
-	(val0
-	 (vec-2s-2 val0 val1))
+	(v0
+	 (vec-2s-2 v0 v1))
 	(t nil)))
 
 
 ;; typedef Vec<short, 3> Vec3s;
-;; Vec3s* cv_create_Vec3s()
-(defcfun ("cv_create_Vec3s" vec-3s-0) vec-3s)
+;; Vec3##t * cv_create_0_Vec3##()
+(defcfun ("cv_create_0_Vec3s" vec-3s-0) vec-3s)
 
 
 ;; typedef Vec<short, 3> Vec3s;
-;; Vec3s* cv_create_Vec3s_3(short val0, short val1, short val2)
-(defcfun ("cv_create_Vec3s_3" vec-3s-3) vec-3s
-  (val0 :short)
-  (val1 :short)
-  (val2 :short))
+;; Vec3##t * cv_create_Vec3##(tn v0, tn v1, tn v2)
+(defcfun ("cv_create_Vec3s" vec-3s-3) vec-3s
+  (v0 :short)
+  (v1 :short)
+  (v2 :short))
 
 
-(defun vec-3s (&optional val0 val1 val2)
+(defun vec-3s (&optional v0 v1 v2)
   "VEC-3S constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-3s-0))
-	(val0
-	 (vec-3s-3 val0 val1 val2))
+	(v0
+	 (vec-3s-3 v0 v1 v2))
 	(t nil)))
 
 
-(defun make-vec-3s (&optional val0 val1 val2)
+(defun make-vec-3s (&optional v0 v1 v2)
   "VEC-3S constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-3s-0))
-	(val0
-	 (vec-3s-3 val0 val1 val2))
+	(v0
+	 (vec-3s-3 v0 v1 v2))
 	(t nil)))
 
 
 ;; typedef Vec<short, 4> Vec4s;
-;; Vec4s* cv_create_Vec4s()
-(defcfun ("cv_create_Vec4s" vec-4s-0) vec-4s)
+;; Vec4##t * cv_create_0_Vec4##()
+(defcfun ("cv_create_0_Vec4s" vec-4s-0) vec-4s)
 
 
 ;; typedef Vec<short, 4> Vec4s;
-;; Vec4s* cv_create_Vec4s_4(short val0, short val1, short val2, short val3)
-(defcfun ("cv_create_Vec4s_4" vec-4s-4) vec-4s
-  (val0 :short)
-  (val1 :short)
-  (val2 :short)
-  (val3 :short))
+;; Vec4##t * cv_create_Vec4##(tn v0, tn v1, tn v2, tn v3)
+(defcfun ("cv_create_Vec4s" vec-4s-4) vec-4s
+  (v0 :short)
+  (v1 :short)
+  (v2 :short)
+  (v3 :short))
 
 
-(defun vec-4s (&optional val0 val1 val2 val3)
+(defun vec-4s (&optional v0 v1 v2 v3)
   "VEC-4S constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-4s-0))
-	(val0
-	 (vec-4s-4 val0 val1 val2 val3))
+	(v0
+	 (vec-4s-4 v0 v1 v2 v3))
 	(t nil)))
 
 
-(defun make-vec-4s (&optional val0 val1 val2 val3)
+(defun make-vec-4s (&optional v0 v1 v2 v3)
   "VEC-4S constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-4s-0))
-	(val0
-	 (vec-4s-4 val0 val1 val2 val3))
+	(v0
+	 (vec-4s-4 v0 v1 v2 v3))
 	(t nil)))
 
 
 ;; typedef Vec<ushort, 2> Vec2w;
-;; Vec2w* cv_create_Vec2w()
-(defcfun ("cv_create_Vec2w" vec-2w-0) vec-2w)
+;; Vec2##t * cv_create_0_Vec2##()
+(defcfun ("cv_create_0_Vec2w" vec-2w-0) vec-2w)
 
 
 ;; typedef Vec<ushort, 2> Vec2w;
-;; Vec2w* cv_create_Vec2w_2(ushort val0, ushort val1)
-(defcfun ("cv_create_Vec2w_2" vec-2w-2) vec-2w
-  (val0 :ushort)
-  (val1 :ushort))
+;; Vec2##t * cv_create_Vec2##(tn v0, tn v1)
+(defcfun ("cv_create_Vec2w" vec-2w-2) vec-2w
+  (v0 :ushort)
+  (v1 :ushort))
 
 
-(defun vec-2w (&optional val0 val1)
+(defun vec-2w (&optional v0 v1)
   "VEC-2W constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-2w-0))
-	(val0
-	 (vec-2w-2 val0 val1))
+	(v0
+	 (vec-2w-2 v0 v1))
 	(t nil)))
 
 
-(defun make-vec-2w (&optional val0 val1)
+(defun make-vec-2w (&optional v0 v1)
   "VEC-2W constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-2w-0))
-	(val0
-	 (vec-2w-2 val0 val1))
+	(v0
+	 (vec-2w-2 v0 v1))
 	(t nil)))
-
 
 
 ;; typedef Vec<ushort, 3> Vec3w;
-;; Vec3w* cv_create_Vec3w()
-(defcfun ("cv_create_Vec3w" vec-3w-0) vec-3w)
+;; Vec3##t * cv_create_0_Vec3##()
+(defcfun ("cv_create_0_Vec3w" vec-3w-0) vec-3w)
 
 
 ;; typedef Vec<ushort, 3> Vec3w;
-;; Vec3w* cv_create_Vec3w_3(ushort val0, ushort val1, ushort val2)
-(defcfun ("cv_create_Vec3w_3" vec-3w-3) vec-3w
-  (val0 :ushort)
-  (val1 :ushort)
-  (val2 :ushort))
+;; Vec3##t * cv_create_Vec3##(tn v0, tn v1, tn v2)
+(defcfun ("cv_create_Vec3w" vec-3w-3) vec-3w
+  (v0 :ushort)
+  (v1 :ushort)
+  (v2 :ushort))
 
 
-(defun vec-3w (&optional val0 val1 val2)
+(defun vec-3w (&optional v0 v1 v2)
   "VEC-3W constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-3w-0))
-	(val0
-	 (vec-3w-3 val0 val1 val2))
+	(v0
+	 (vec-3w-3 v0 v1 v2))
 	(t nil)))
 
 
-(defun make-vec-3w (&optional val0 val1 val2)
+(defun make-vec-3w (&optional v0 v1 v2)
   "VEC-3W constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-3w-0))
-	(val0
-	 (vec-3w-3 val0 val1 val2))
+	(v0
+	 (vec-3w-3 v0 v1 v2))
 	(t nil)))
 
 
 ;; typedef Vec<ushort, 4> Vec4w;
-;; Vec4w* cv_create_Vec4w()
-(defcfun ("cv_create_Vec4w" vec-4w-0) vec-4w)
+;; Vec4##t * cv_create_0_Vec4##()
+(defcfun ("cv_create_0_Vec4w" vec-4w-0) vec-4w)
 
 
 ;; typedef Vec<ushort, 4> Vec4w;
-;; Vec4w* cv_create_Vec4w_4(ushort val0, ushort val1, ushort val2, ushort val3)
-(defcfun ("cv_create_Vec4w_4" vec-4w-4) vec-4w
-  (val0 :ushort)
-  (val1 :ushort)
-  (val2 :ushort)
-  (val3 :ushort))
+;; Vec4##t * cv_create_Vec4##(tn v0, tn v1, tn v2, tn v3)
+(defcfun ("cv_create_Vec4w" vec-4w-4) vec-4w
+  (v0 :ushort)
+  (v1 :ushort)
+  (v2 :ushort)
+  (v3 :ushort))
 
 
-(defun vec-4w (&optional val0 val1 val2 val3)
+(defun vec-4w (&optional v0 v1 v2 v3)
   "VEC-4W constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-4w-0))
-	(val0
-	 (vec-4w-4 val0 val1 val2 val3))
+	(v0
+	 (vec-4w-4 v0 v1 v2 v3))
 	(t nil)))
 
 
-(defun make-vec-4w (&optional val0 val1 val2 val3)
+(defun make-vec-4w (&optional v0 v1 v2 v3)
   "VEC-4W constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-4w-0))
-	(val0
-	 (vec-4w-4 val0 val1 val2 val3))
+	(v0
+	 (vec-4w-4 v0 v1 v2 v3))
 	(t nil)))
-
-
-
-;;;DEFMETHOD's
-
-
-
-(defmethod angle ((self cv-key-point))
-  (mem-aref (c-pointer self) :float 3))
-
-
-(defmethod angle ((self cv-rotated-rect))
-  "The rotation angle. When the angle is 0, 90, 180, 270 
-    etc., the rectangle becomes an up-right rectangle."
-  (rotated-rect-angle self))
-
-
-(defmethod bounding-rect ((self cv-rotated-rect))
-  "Returns the minimal up-right rectangle 
-   containing the rotated rectangle."
-  (rotated-rect-bounding-rect self))
-
-
-(defmethod center ((self cv-rotated-rect))
-  "The rectangle mass center."
-  (rotated-rect-center self))
-
-
-(defmethod clone ((self cv-mat))
-  "Creates a full copy of the array and the underlying data."
-  (mat-clone self))
-
-
-(defmethod clone ((self cv-rect))
-  "Creates a full copy of a RECT object"
-  (rect-clone self))
-
-
-(defmethod dot ((self cv-mat) (other cv-mat))
-  (mat-dot self other))
-
-
-(defmethod dot ((self cv-point) (other cv-point))
-  (dot-2i self other))
-
-
-(defmethod dot ((self cv-point-2d) (other cv-point-2d))
-  (dot-2d self other))
-
-
-(defmethod dot ((self cv-point-2f) (other cv-point-2f))
-  (dot-2f self other))
-
-
-(defmethod dot ((self cv-point-3d) (other cv-point-3d))
-  (dot-3d self other))
-
-
-(defmethod dot ((self cv-point-3f) (other cv-point-3f))
-  (dot-3f self other))
-
-
-(defmethod dot ((self cv-point-3i) (other cv-point-3i))
-  (dot-3i self other))
-
-
-(defmethod height ((self cv-rect))
-  (mem-aref (c-pointer self) :int 2))
-
-
-(defmethod height ((self cv-size))
-  (mem-aref (c-pointer self) :int 1))
-
-
-(defmethod height ((self cv-size-2f))
-  (mem-aref (c-pointer self) :float 1))
-
-
-(defmethod size ((arg cv-key-point) &rest args)
-  args
-  (mem-aref (c-pointer arg) :float 2))
-
-
-(defmethod size ((arg cv-mat) &rest args)
-  args
-  (mat-size arg))
-
-
-(defmethod size ((arg cv-range) &rest args)
-  args
-  (range-size arg))
-
-
-(defmethod size ((arg cv-rect) &rest args)
-  args
-  (rect-size arg))
-
-
-(defmethod size ((arg cv-rotated-rect) &rest args)
-  "Width and height of the rectangle."
-  args
-  (rotated-rect-size arg))
-
-
-(defmethod size ((arg null) &rest args)
-  args
-  (if (eq arg nil) (size-0) nil))
-
-
-(defmethod size ((arg real) &rest args)
-  (size-2 (coerce arg 'double-float) (coerce (or (first args) 0) 'double-float)))
-
-
-(defmethod width ((self cv-rect))
-  (mem-aref (c-pointer self) :int 3))
-
-
-(defmethod width ((self cv-size))
-  (mem-aref (c-pointer self) :int))
-
-
-(defmethod width ((self cv-size-2f))
-  (mem-aref (c-pointer self) :float))
-
-
-(defmethod x ((self cv-key-point))
-  (mem-aref (c-pointer self) :float))
-
-
-(defmethod x ((self cv-point))
- "Retrieves X coordinate of a POINT object."
-  (mem-aref (c-pointer self) :int))
-
-
-(defmethod x ((self cv-point-2d))
-  "Retrieves X coordinate of a POINT-2D object."
-  (mem-aref (c-pointer self) :double))
-
-
-(defmethod x ((self cv-point-2f))
-  "Retrieves X coordinate of a POINT-2F object."
-  (mem-aref (c-pointer self) :float))
-
-
-(defmethod x ((self cv-point-3d))
-  "Retrieves X coordinate of a POINT-3D object."
-  (mem-aref (c-pointer self) :double))
-'
-
-(defmethod x ((self cv-point-3f))
-  "Retrieves X coordinate of a POINT-3F object."
-  (mem-aref (c-pointer self) :float))
-
-
-(defmethod x ((self cv-point-3i))
-  "Retrieves X coordinate of a POINT-3I object."
-  (mem-aref (c-pointer self) :int))
-
-
-(defmethod x ((self cv-rect))
-  (mem-aref (c-pointer self) :int))
-
-
-(defmethod y ((self cv-key-point))
-  (mem-aref (c-pointer self) :float 1))
-
-
-(defmethod y ((self cv-point))
-  "Retrieves Y coordinate of a POINT object."
-  (mem-aref (c-pointer self) :int 1))
-
-
-(defmethod y ((self cv-point-2d))
-  "Retrieves Y coordinate of a POINT-2D object."
-  (mem-aref (c-pointer self) :double 1))
-
-
-(defmethod y ((self cv-point-2f))
-  "Retrieves Y coordinate of a POINT-2F object."
-  (mem-aref (c-pointer self) :float 1))
-
-
-(defmethod y ((self cv-point-3d))
-  "Retrieves Y coordinate of a POINT-3D object."
-  (mem-aref (c-pointer self) :double 1))
-
-
-(defmethod y ((self cv-point-3f))
-  "Retrieves Y coordinate of a POINT-3F object."
-  (mem-aref (c-pointer self) :float 1))
-
-
-(defmethod y ((self cv-point-3i))
-  "Retrieves Y coordinate of a POINT-3I object."
-  (mem-aref (c-pointer self) :int 1))
-
-
-(defmethod y ((self cv-rect))
-  (mem-aref (c-pointer self) :int 1))
-
-
-(defmethod z ((self cv-point-3d))
-  "Retrieves Z coordinate of a POINT-3D object."
-  (mem-aref (c-pointer self) :double 2))
-
-
-(defmethod z ((self cv-point-3f))
-  "Retrieves Z coordinate of a POINT-3F object."
-  (mem-aref (c-pointer self) :float 2))
-
-
-(defmethod z ((self cv-point-3i))
-  "Retrieves Z coordinate of a POINT-3I object."
-  (mem-aref (c-pointer self) :int 2))
 
 
 ;;; Basic Structures
 
 
+
 ;;; Operations on Arrays
+
 
 
 ;; MatExpr abs(const Mat& m)
@@ -3077,7 +2889,105 @@
 
 
 
+;;; XML/YAML Persistence
+
+
+
+;; void write( FileStorage& fs, const String& name, double value )
+;; void cv_FileNode_write_number_##(FileStorage* fs, String* name, tn value)
+(defcfun ("cv_FileNode_write_number_d" file-node-write-double) :void
+  (fs file-storage)
+  (name *string)
+  (value :double))
+
+
+;; void write( FileStorage& fs, const String& name, float value )
+;; void cv_FileNode_write_number_##(FileStorage* fs, String* name, tn value)
+(defcfun ("cv_FileNode_write_number_f" file-node-write-float) :void
+  (fs file-storage)
+  (name *string)
+  (value :float))
+
+
+;; void write( FileStorage& fs, const String& name, int value )
+;; void cv_FileNode_write_number_##(FileStorage* fs, String* name, tn value)
+(defcfun ("cv_FileNode_write_number_i" file-node-write-int) :void
+  (fs file-storage)
+  (name *string)
+  (value :int))
+
+
+;; void write( FileStorage& fs, const String& name, const std::vector<KeyPoint>& value)
+;; void cv_FileNode_write_pointer_##(FileStorage* fs, String* name, tn* value)
+(defcfun ("cv_FileNode_write_pointer_m" file-node-write-mat) :void
+  (fs file-storage)
+  (name *string)
+  (value mat))
+
+
+;; void write( FileStorage& fs, const String& name, const String& value )
+;; void cv_FileNode_write_pointer_##(FileStorage* fs, String* name, tn* value)
+(defcfun ("cv_FileNode_write_pointer_s" file-node-write-string) :void
+  (fs file-storage)
+  (name *string)
+  (value *string))
+
+
+;; void write( FileStorage& fs, const String& name, const std::vector<KeyPoint>& value)
+;; void cv_FileNode_write_pointer_##(FileStorage* fs, String* name, tn* value)
+(defcfun ("cv_FileNode_write_pointer_vkp" file-node-write-key-point) :void
+  (fs file-storage)
+  (name *string)
+  (value vector-key-point))
+
+
+;; FileStorage::FileStorage()
+;; FileStorage* cv_create_FileStorage()
+(defcfun ("cv_create_FileStorage" file-storage-0) file-storage)
+
+
+;; FileStorage::FileStorage(const String& source, int flags, const String& encoding=String())
+;; FileStorage* cv_create_FileStorage3(String* source, int flags, String* encoding)
+(defcfun ("cv_create_FileStorage3" %file-storage-3) file-storage
+  (source *string)
+  (flags :int)
+  (encoding *string))
+
+
+(defun file-storage-3 (&optional source flags (encoding (%string) given-encoding))
+  (let ((return (%file-storage-3 (%c-string-to-string source (length source)) flags 
+				 (if given-encoding 
+				     (%c-string-to-string encoding (length encoding)) 
+				     encoding))))
+    (if given-encoding nil (del-std-string encoding))
+    return))
+
+
+(defun file-storage (&rest args)
+  (cond ((null args)
+	 (file-storage-0))
+	(args
+	 (apply #'file-storage-3 args))
+	(t nil)))
+
+
+(defun make-file-storage (&rest args)
+  (cond ((null args)
+	 (file-storage-0))
+	(args
+	 (apply #'file-storage-3 args))
+	(t nil)))
+
+
+;; void FileStorage::release()
+;; void cv_FileStorage_release(FileStorage* self)
+(defcfun ("cv_FileStorage_release" file-storage-release) :void
+  (self file-storage))
+
+
+
 ;;; Utility and System Functions and Macros
+
 
 
 ;; bool checkHardwareSupport(int feature)
@@ -3120,4 +3030,246 @@
   "Calculates a square root of array elements."
   (src mat)
   (dest mat))
+
+
+
+
+;;;DEFMETHOD's
+
+
+
+(defmethod angle ((self cv-key-point))
+  (mem-aref (c-pointer self) :float 3))
+
+
+(defmethod angle ((self cv-rotated-rect))
+  "The rotation angle. When the angle is 0, 90, 180, 270 
+    etc., the rectangle becomes an up-right rectangle."
+  (rotated-rect-angle self))
+
+
+(defmethod bounding-rect ((self cv-rotated-rect))
+  "Returns the minimal up-right rectangle 
+   containing the rotated rectangle."
+  (rotated-rect-bounding-rect self))
+
+
+(defmethod center ((self cv-rotated-rect))
+  "The rectangle mass center."
+  (rotated-rect-center self))
+
+
+(defmethod clone ((self cv-mat))
+  "Creates a full copy of the array and the underlying data."
+  (mat-clone self))
+
+
+(defmethod clone ((self cv-rect))
+  "Creates a full copy of a RECT object"
+  (rect-clone self))
+
+
+(defmethod dot ((self cv-mat) (other cv-mat))
+  (mat-dot self other))
+
+
+(defmethod dot ((self cv-point) (other cv-point))
+  (dot-2i self other))
+
+
+(defmethod dot ((self cv-point-2d) (other cv-point-2d))
+  (dot-2d self other))
+
+
+(defmethod dot ((self cv-point-2f) (other cv-point-2f))
+  (dot-2f self other))
+
+
+(defmethod dot ((self cv-point-3d) (other cv-point-3d))
+  (dot-3d self other))
+
+
+(defmethod dot ((self cv-point-3f) (other cv-point-3f))
+  (dot-3f self other))
+
+
+(defmethod dot ((self cv-point-3i) (other cv-point-3i))
+  (dot-3i self other))
+
+
+(defmethod height ((self cv-rect))
+  (mem-aref (c-pointer self) :int 2))
+
+
+(defmethod height ((self cv-size))
+  (mem-aref (c-pointer self) :int 1))
+
+
+(defmethod height ((self cv-size-2f))
+  (mem-aref (c-pointer self) :float 1))
+
+
+(defmethod release ((self cv-file-storage))
+  (file-storage-release self))
+
+
+(defmethod size ((arg cv-key-point) &rest args)
+  args
+  (mem-aref (c-pointer arg) :float 2))
+
+
+(defmethod size ((arg cv-mat) &rest args)
+  args
+  (mat-size arg))
+
+
+(defmethod size ((arg cv-range) &rest args)
+  args
+  (range-size arg))
+
+
+(defmethod size ((arg cv-rect) &rest args)
+  args
+  (rect-size arg))
+
+
+(defmethod size ((arg cv-rotated-rect) &rest args)
+  "Width and height of the rectangle."
+  args
+  (rotated-rect-size arg))
+
+
+(defmethod size ((arg null) &rest args)
+  args
+  (if (eq arg nil) (size-0) nil))
+
+
+(defmethod size ((arg real) &rest args)
+  (size-2 (coerce arg 'double-float) (coerce (or (first args) 0) 'double-float)))
+
+
+(defmethod width ((self cv-rect))
+  (mem-aref (c-pointer self) :int 3))
+
+
+(defmethod width ((self cv-size))
+  (mem-aref (c-pointer self) :int))
+
+
+(defmethod width ((self cv-size-2f))
+  (mem-aref (c-pointer self) :float))
+
+
+(defmethod *write ((fs cv-file-storage) (name string) (value float))
+  (if (typep value 'double-float)
+      (file-node-write-double fs (%c-string-to-string name (length name)) value)
+      (file-node-write-float fs (%c-string-to-string name (length name)) value)))
+
+
+(defmethod *write ((fs cv-file-storage) (name string) (value integer))
+  (file-node-write-int fs (%c-string-to-string name (length name)) value))
+
+
+(defmethod *write ((fs cv-file-storage) (name string) (value cv-mat))
+  (file-node-write-mat fs (%c-string-to-string name (length name)) value))
+
+
+(defmethod *write ((fs cv-file-storage) (name string) (value string))
+  (file-node-write-string fs (%c-string-to-string name (length name)) 
+		       (%c-string-to-string value (length value))))
+
+
+(defmethod *write ((fs cv-file-storage) (name string) (value std-vector-key-point))
+  (file-node-write-key-point fs (%c-string-to-string name (length name)) value))
+
+
+(defmethod x ((self cv-key-point))
+  (mem-aref (c-pointer self) :float))
+
+
+(defmethod x ((self cv-point))
+ "Retrieves X coordinate of a POINT object."
+  (mem-aref (c-pointer self) :int))
+
+
+(defmethod x ((self cv-point-2d))
+  "Retrieves X coordinate of a POINT-2D object."
+  (mem-aref (c-pointer self) :double))
+
+
+(defmethod x ((self cv-point-2f))
+  "Retrieves X coordinate of a POINT-2F object."
+  (mem-aref (c-pointer self) :float))
+
+
+(defmethod x ((self cv-point-3d))
+  "Retrieves X coordinate of a POINT-3D object."
+  (mem-aref (c-pointer self) :double))
+'
+
+(defmethod x ((self cv-point-3f))
+  "Retrieves X coordinate of a POINT-3F object."
+  (mem-aref (c-pointer self) :float))
+
+
+(defmethod x ((self cv-point-3i))
+  "Retrieves X coordinate of a POINT-3I object."
+  (mem-aref (c-pointer self) :int))
+
+
+(defmethod x ((self cv-rect))
+  (mem-aref (c-pointer self) :int))
+
+
+(defmethod y ((self cv-key-point))
+  (mem-aref (c-pointer self) :float 1))
+
+
+(defmethod y ((self cv-point))
+  "Retrieves Y coordinate of a POINT object."
+  (mem-aref (c-pointer self) :int 1))
+
+
+(defmethod y ((self cv-point-2d))
+  "Retrieves Y coordinate of a POINT-2D object."
+  (mem-aref (c-pointer self) :double 1))
+
+
+(defmethod y ((self cv-point-2f))
+  "Retrieves Y coordinate of a POINT-2F object."
+  (mem-aref (c-pointer self) :float 1))
+
+
+(defmethod y ((self cv-point-3d))
+  "Retrieves Y coordinate of a POINT-3D object."
+  (mem-aref (c-pointer self) :double 1))
+
+
+(defmethod y ((self cv-point-3f))
+  "Retrieves Y coordinate of a POINT-3F object."
+  (mem-aref (c-pointer self) :float 1))
+
+
+(defmethod y ((self cv-point-3i))
+  "Retrieves Y coordinate of a POINT-3I object."
+  (mem-aref (c-pointer self) :int 1))
+
+
+(defmethod y ((self cv-rect))
+  (mem-aref (c-pointer self) :int 1))
+
+
+(defmethod z ((self cv-point-3d))
+  "Retrieves Z coordinate of a POINT-3D object."
+  (mem-aref (c-pointer self) :double 2))
+
+
+(defmethod z ((self cv-point-3f))
+  "Retrieves Z coordinate of a POINT-3F object."
+  (mem-aref (c-pointer self) :float 2))
+
+
+(defmethod z ((self cv-point-3i))
+  "Retrieves Z coordinate of a POINT-3I object."
+  (mem-aref (c-pointer self) :int 2))
 

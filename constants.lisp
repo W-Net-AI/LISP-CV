@@ -210,6 +210,10 @@
   (+covar-scale+ 4)
   (+covar-rows+ 8)
   (+covar-cols+ 16)
+  (+file-storage-read+ 0)
+  (+file-storage-write+ 1)
+  (+file-storage-append+ 2)
+  (+file-storage-memory+ 4)
 
 
 ;;; highgui

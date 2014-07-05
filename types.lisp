@@ -943,6 +943,57 @@
 
 
 
+;; FILE-NODE
+
+
+(define-foreign-type file-node ()
+  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+                     :garbage-collect))
+  (:actual-type :pointer)
+  (:simple-parser file-node))
+
+
+(defclass cv-file-node ()
+  ((c-pointer :reader c-pointer :initarg :c-pointer)))
+
+
+(defmethod translate-to-foreign ((lisp-value cv-file-node) (c-type file-node))
+  (values  (c-pointer lisp-value) lisp-value))
+
+
+(defmethod translate-from-foreign (c-pointer (c-type file-node))
+  (let ((file-node  (make-instance 'cv-file-node :c-pointer c-pointer)))
+    (when (garbage-collect c-type)
+      (tg:finalize file-node (lambda () (del-file-node c-pointer))))
+    file-node))
+
+
+
+;; FILE-STORAGE
+
+
+(define-foreign-type file-storage ()
+  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+                     :garbage-collect))
+  (:actual-type :pointer)
+  (:simple-parser file-storage))
+
+
+(defclass cv-file-storage ()
+  ((c-pointer :reader c-pointer :initarg :c-pointer)))
+
+
+(defmethod translate-to-foreign ((lisp-value cv-file-storage) (c-type file-storage))
+  (values  (c-pointer lisp-value) lisp-value))
+
+
+(defmethod translate-from-foreign (c-pointer (c-type file-storage))
+  (let ((file-storage  (make-instance 'cv-file-storage :c-pointer c-pointer)))
+    (when (garbage-collect c-type)
+      (tg:finalize file-storage (lambda () (del-file-storage c-pointer))))
+    file-storage))
+
+
 ;; KEY-POINT
 
 
@@ -2129,7 +2180,7 @@
 (defmethod translate-from-foreign (c-pointer (c-type ann-mlp))
   (let ((ann-mlp  (make-instance 'cv-ann-mlp :c-pointer c-pointer)))
     (when (garbage-collect c-type)
-      (tg:finalize ann-mlp (lambda () (del-std-string c-pointer))))
+      (tg:finalize ann-mlp (lambda () (del-ann-mlp c-pointer))))
     ann-mlp))
 
 

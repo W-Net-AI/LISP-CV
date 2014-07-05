@@ -1039,698 +1039,700 @@
 	       (t nil)))
 
 
-;; typedef Vec<uchar, 2> Vec2b
-;; Vec2b* cv_create_Vec2b()
-(defcfun ("cv_create_Vec2b" vec-2b-0) (cv::vec-2b :garbage-collect t))
+;; typedef Vec<uchar, 2> Vec2b;
+;; Vec2##t * cv_create_0_Vec2##t()
+(defcfun ("cv_create_0_Vec2b" vec-2b-0) (cv::vec-2b :garbage-collect t))
 
 
-;; typedef Vec<uchar, 2> Vec2b
-;; Vec2b* cv_create_Vec2b_2(uchar val0, uchar val1)
-(defcfun ("cv_create_Vec2b_2" vec-2b-2) (cv::vec-2b :garbage-collect t)
-  (val0 :uchar)
-  (val1 :uchar))
+;; typedef Vec<uchar, 2> Vec2b;
+;; Vec2##t * cv_create_Vec2##t(tn v0,  tn v1)
+(defcfun ("cv_create_Vec2b" vec-2b-2) (cv::vec-2b :garbage-collect t)
+  (v0 :uchar)
+  (v1 :uchar))
 
 
-(defun vec-2b (&optional val0 val1)
+(defun vec-2b (&optional v0 v1)
   "VEC-2B constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-2b-0))
-	(val0
-	 (vec-2b-2 val0 val1))
+	(v0
+	 (vec-2b-2 v0 v1))
 	(t nil)))
 
 
-(defun make-vec-2b (&optional val0 val1)
+(defun make-vec-2b (&optional v0 v1)
   "VEC-2B constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-2b-0))
-	(val0
-	 (vec-2b-2 val0 val1))
+	(v0
+	 (vec-2b-2 v0 v1))
 	(t nil)))
 
 
-;; typedef Vec<uchar, 3> Vec3b
-;; Vec3b* cv_create_Vec3b()
-(defcfun ("cv_create_Vec3b" vec-3b-0) (cv::vec-3b :garbage-collect t))
+;; typedef Vec<uchar, 3> Vec3b;
+;; Vec3##t * cv_create_0_Vec3##t()
+(defcfun ("cv_create_0_Vec3b" vec-3b-0) (cv::vec-3b :garbage-collect t))
 
 
-;; typedef Vec<uchar, 3> Vec3b
-;; Vec3b* cv_create_Vec3b_3(uchar val0, uchar val1, uchar val2)
-(defcfun ("cv_create_Vec3b_3" vec-3b-3) (cv::vec-3b :garbage-collect t)
-  (val0 :uchar)
-  (val1 :uchar)
-  (val2 :uchar))
+;; typedef Vec<uchar, 3> Vec3b;
+;; Vec3##t * cv_create_Vec3##t(tn v0,  tn v1, tn v2)
+(defcfun ("cv_create_Vec3b" vec-3b-3) (cv::vec-3b :garbage-collect t)
+  (v0 :uchar)
+  (v1 :uchar)
+  (v2 :uchar))
 
 
-(defun vec-3b (&optional val0 val1 val2)
+(defun vec-3b (&optional v0 v1 v2)
   "VEC-3B constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-3b-0))
-	(val0
-	 (vec-3b-3 val0 val1 val2))
+	(v0
+	 (vec-3b-3 v0 v1 v2))
 	(t nil)))
 
 
-(defun make-vec-3b (&optional val0 val1 val2)
+(defun make-vec-3b (&optional v0 v1 v2)
   "VEC-3B constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-3b-0))
-	(val0
-	 (vec-3b-3 val0 val1 val2))
+	(v0
+	 (vec-3b-3 v0 v1 v2))
 	(t nil)))
 
 
-;; typedef Vec<uchar, 4> Vec4b
-;; Vec4b* cv_create_Vec4b()
-(defcfun ("cv_create_Vec4b" vec-4b-0) (cv::vec-4b :garbage-collect t))
+;; typedef Vec<uchar, 4> Vec4b;
+;; Vec4##t * cv_create_0_Vec4##()
+(defcfun ("cv_create_0_Vec4b" vec-4b-0) (cv::vec-4b :garbage-collect t))
 
 
-;; typedef Vec<uchar, 4> Vec4b
-;; Vec4b* cv_create_Vec4b_4(uchar val0, uchar val1, uchar val2, uchar val3)
-(defcfun ("cv_create_Vec4b_4" vec-4b-4) (cv::vec-4b :garbage-collect t)
-  (val0 :uchar)
-  (val1 :uchar)
-  (val2 :uchar)
-  (val3 :uchar))
+;; typedef Vec<uchar, 4> Vec4b;
+;; Vec4##t * cv_create_Vec4##(tn v0,  tn v1, tn v2, tn v3)
+(defcfun ("cv_create_Vec4b" vec-4b-4) (cv::vec-4b :garbage-collect t)
+  (v0 :uchar)
+  (v1 :uchar)
+  (v2 :uchar)
+  (v3 :uchar))
 
 
-(defun vec-4b (&optional val0 val1 val2 val3)
+(defun vec-4b (&optional v0 v1 v2 v3)
   "VEC-4B constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-4b-0))
-	(val0
-	 (vec-4b-4 val0 val1 val2 val3))
+	(v0
+	 (vec-4b-4 v0 v1 v2 v3))
 	(t nil)))
 
 
-(defun make-vec-4b (&optional val0 val1 val2 val3)
+(defun make-vec-4b (&optional v0 v1 v2 v3)
   "VEC-4B constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-4b-0))
-	(val0
-	 (vec-4b-4 val0 val1 val2 val3))
+	(v0
+	 (vec-4b-4 v0 v1 v2 v3))
 	(t nil)))
 
 
-;; typedef Vec<double, 2> Vec2d
-;; Vec2d* cv_create_Vec2d()
-(defcfun ("cv_create_Vec2d" vec-2d-0) (cv::vec-2d :garbage-collect t))
+;; typedef Vec<double, 2> Vec2d;
+;; Vec2##t * cv_create_0_Vec2##()
+(defcfun ("cv_create_0_Vec2d" vec-2d-0) (cv::vec-2d :garbage-collect t))
 
 
-;; typedef Vec<double, 2> Vec2d
-;; Vec2d* cv_create_Vec2d_2(double val0, double val1)
-(defcfun ("cv_create_Vec2d_2" vec-2d-2) (cv::vec-2d :garbage-collect t)
-  (val0 :double)
-  (val1 :double))
+;; typedef Vec<double, 2> Vec2d;
+;; Vec2##t * cv_create_Vec2##(tn v0,  tn v1)
+(defcfun ("cv_create_Vec2d" vec-2d-2) (cv::vec-2d :garbage-collect t)
+  (v0 :double)
+  (v1 :double))
 
 
-(defun vec-2d (&optional val0 val1)
+(defun vec-2d (&optional v0 v1)
   "VEC-2D constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-2d-0))
-	(val0
-	 (vec-2d-2 val0 val1))
+	(v0
+	 (vec-2d-2 v0 v1))
 	(t nil)))
 
 
-(defun make-vec-2d (&optional val0 val1)
+(defun make-vec-2d (&optional v0 v1)
   "VEC-2D constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-2d-0))
-	(val0
-	 (vec-2d-2 val0 val1))
+	(v0
+	 (vec-2d-2 v0 v1))
 	(t nil)))
 
 
-;; typedef Vec<double, 3> Vec3d
-;; Vec3d* cv_create_Vec3d()
-(defcfun ("cv_create_Vec3d" vec-3d-0) (cv::vec-3d :garbage-collect t))
+;; typedef Vec<double, 3> Vec3d;
+;; Vec3##t * cv_create_0_Vec3##()
+(defcfun ("cv_create_0_Vec3d" vec-3d-0) (cv::vec-3d :garbage-collect t))
 
 
-;; typedef Vec<double, 3> Vec3d
-;; Vec3d* cv_create_Vec3d_3(double val0, double val1, double val2)
-(defcfun ("cv_create_Vec3d_3" vec-3d-3) (cv::vec-3d :garbage-collect t)
-  (val0 :double)
-  (val1 :double)
-  (val2 :double))
+;; typedef Vec<double, 3> Vec3d;
+;; Vec3##t * cv_create_Vec3##(tn v0,  tn v1, tn v2)
+(defcfun ("cv_create_Vec3d" vec-3d-3) (cv::vec-3d :garbage-collect t)
+  (v0 :double)
+  (v1 :double)
+  (v2 :double))
 
 
-(defun vec-3d (&optional val0 val1 val2)
+(defun vec-3d (&optional v0 v1 v2)
   "VEC-3D constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-3d-0))
-	(val0
-	 (vec-3d-3 val0 val1 val2))
+	(v0
+	 (vec-3d-3 v0 v1 v2))
 	(t nil)))
 
 
-(defun make-vec-3d (&optional val0 val1 val2)
+(defun make-vec-3d (&optional v0 v1 v2)
   "VEC-3D constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-3d-0))
-	(val0
-	 (vec-3d-3 val0 val1 val2))
+	(v0
+	 (vec-3d-3 v0 v1 v2))
 	(t nil)))
 
 
-;; typedef Vec<double, 4> Vec4d
-;; Vec4d* cv_create_Vec4d()
-(defcfun ("cv_create_Vec4d" vec-4d-0) (cv::vec-4d :garbage-collect t))
+;; typedef Vec<double, 4> Vec4d;
+;; Vec4##t * cv_create_0_Vec4##()
+(defcfun ("cv_create_0_Vec4d" vec-4d-0) (cv::vec-4d :garbage-collect t))
 
 
-;; typedef Vec<double, 4> Vec4d
-;; Vec4d* cv_create_Vec4d_4(double val0, double val1, double val2, double val3)
-(defcfun ("cv_create_Vec4d_4" vec-4d-4) (cv::vec-4d :garbage-collect t)
-  (val0 :double)
-  (val1 :double)
-  (val2 :double)
-  (val3 :double))
+;; typedef Vec<double, 4> Vec4d;
+;; Vec4##t * cv_create_Vec4##(tn v0,  tn v1, tn v2, tn v3)
+(defcfun ("cv_create_Vec4d" vec-4d-4) (cv::vec-4d :garbage-collect t)
+  (v0 :double)
+  (v1 :double)
+  (v2 :double)
+  (v3 :double))
 
 
-(defun vec-4d (&optional val0 val1 val2 val3)
+(defun vec-4d (&optional v0 v1 v2 v3)
   "VEC-4D constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-4d-0))
-	(val0
-	 (vec-4d-4 val0 val1 val2 val3))
+	(v0
+	 (vec-4d-4 v0 v1 v2 v3))
 	(t nil)))
 
 
-(defun make-vec-4d (&optional val0 val1 val2 val3)
+(defun make-vec-4d (&optional v0 v1 v2 v3)
   "VEC-4D constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-4d-0))
-	(val0
-	 (vec-4d-4 val0 val1 val2 val3))
+	(v0
+	 (vec-4d-4 v0 v1 v2 v3))
 	(t nil)))
 
 
-;; typedef Vec<double, 6> Vec6d
-;; Vec6d* cv_create_Vec6d()
-(defcfun ("cv_create_Vec6d" vec-6d-0) (cv::vec-6d :garbage-collect t))
+;; typedef Vec<double, 6> Vec6d;
+;; Vec6##t * cv_create_0_Vec6##()
+(defcfun ("cv_create_0_Vec6d" vec-6d-0) (cv::vec-6d :garbage-collect t))
 
 
-;; typedef Vec<double, 6> Vec6d
-;; Vec6d* cv_create_Vec6d_6(double val0, double val1, double val2, double val3, double val4, double val5)
-(defcfun ("cv_create_Vec6d_6" vec-6d-6) (cv::vec-6d :garbage-collect t)
-  (val0 :double)
-  (val1 :double)
-  (val2 :double)
-  (val3 :double)
-  (val4 :double)
-  (val5 :double))
+;; typedef Vec<double, 6> Vec6d;
+;; Vec6##t * cv_create_Vec6##(tn v0,  tn v1, tn v2, tn v3, tn v4, tn v5)
+(defcfun ("cv_create_Vec6d" vec-6d-6) (cv::vec-6d :garbage-collect t)
+  (v0 :double)
+  (v1 :double)
+  (v2 :double)
+  (v3 :double)
+  (v4 :double)
+  (v5 :double))
 
 
-(defun vec-6d (&optional val0 val1 val2 val3 val4 val5)
+(defun vec-6d (&optional v0 v1 v2 v3 v4 v5)
   "VEC-6D constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-6d-0))
-	(val0
-	 (vec-6d-6 val0 val1 val2 val3 val4 val5))
+	(v0
+	 (vec-6d-6 v0 v1 v2 v3 v4 v5))
 	(t nil)))
 
 
-(defun make-vec-6d (&optional val0 val1 val2 val3 val4 val5)
+(defun make-vec-6d (&optional v0 v1 v2 v3 v4 v5)
   "VEC-6D constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-6d-0))
-	(val0
-	 (vec-6d-6 val0 val1 val2 val3 val4 val5))
+	(v0
+	 (vec-6d-6 v0 v1 v2 v3 v4 v5))
 	(t nil)))
 
 
 ;; typedef Vec<float, 2> Vec2f
-;; Vec2f* cv_create_Vec2f()
-(defcfun ("cv_create_Vec2f" vec-2f-0) (cv::vec-2f :garbage-collect t))
+;; Vec2##t * cv_create_0_Vec2##()
+(defcfun ("cv_create_0_Vec2f" vec-2f-0) (cv::vec-2f :garbage-collect t))
 
 
 ;; typedef Vec<float, 2> Vec2f
-;; Vec2f* cv_create_Vec2f_2(float val0, float val1)
-(defcfun ("cv_create_Vec2f_2" vec-2f-2) (cv::vec-2f :garbage-collect t)
-  (val0 :float)
-  (val1 :float))
+;; Vec2##t * cv_create_Vec2##(tn v0,  tn v1)
+(defcfun ("cv_create_Vec2f" vec-2f-2) (cv::vec-2f :garbage-collect t)
+  (v0 :float)
+  (v1 :float))
 
 
-(defun vec-2f (&optional val0 val1)
+(defun vec-2f (&optional v0 v1)
   "VEC-2F constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-2f-0))
-	(val0
-	 (vec-2f-2 val0 val1))
+	(v0
+	 (vec-2f-2 v0 v1))
 	(t nil)))
 
-(defun make-vec-2f (&optional val0 val1)
+
+(defun make-vec-2f (&optional v0 v1)
   "VEC-2F constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-2f-0))
-	(val0
-	 (vec-2f-2 val0 val1))
+	(v0
+	 (vec-2f-2 v0 v1))
 	(t nil)))
 
 
 ;; typedef Vec<float, 3> Vec3f
-;; Vec3f* cv_create_Vec3f()
-(defcfun ("cv_create_Vec3f" vec-3f-0) (cv::vec-3f :garbage-collect t))
+;; Vec3##t * cv_create_0_Vec3##()
+(defcfun ("cv_create_0_Vec3f" vec-3f-0) (cv::vec-3f :garbage-collect t))
 
 
 ;; typedef Vec<float, 3> Vec3f
-;; Vec3f* cv_create_Vec3f_3(float val0, float val1, int val2)
-(defcfun ("cv_create_Vec3f_3" vec-3f-3) (cv::vec-3f :garbage-collect t)
-  (val0 :float)
-  (val1 :float)
-  (val2 :float))
+;; Vec3##t * cv_create_Vec3##(tn v0,  tn v1, tn v2)
+(defcfun ("cv_create_Vec3f" vec-3f-3) (cv::vec-3f :garbage-collect t)
+  (v0 :float)
+  (v1 :float)
+  (v2 :float))
 
 
-(defun vec-3f (&optional val0 val1 val2)
+(defun vec-3f (&optional v0 v1 v2)
   "VEC-3F constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-3f-0))
-	(val0
-	 (vec-3f-3 val0 val1 val2))
+	(v0
+	 (vec-3f-3 v0 v1 v2))
 	(t nil)))
 
 
-(defun make-vec-3f (&optional val0 val1 val2)
+(defun make-vec-3f (&optional v0 v1 v2)
   "VEC-3F constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-3f-0))
-	(val0
-	 (vec-3f-3 val0 val1 val2))
+	(v0
+	 (vec-3f-3 v0 v1 v2))
 	(t nil)))
 
 
 ;; typedef Vec<float, 4> Vec4f
-;; Vec4f* cv_create_Vec4f()
-(defcfun ("cv_create_Vec4f" vec-4f-0) (cv::vec-4f :garbage-collect t))
+;; Vec4##t * cv_create_0_Vec4##()
+(defcfun ("cv_create_0_Vec4f" vec-4f-0) (cv::vec-4f :garbage-collect t))
 
 
 ;; typedef Vec<float, 4> Vec4f
-;; Vec4f* cv_create_Vec4f_4(float val0, float val1, float val2, float val3)
-(defcfun ("cv_create_Vec4f_4" vec-4f-4) (cv::vec-4f :garbage-collect t)
-  (val0 :float)
-  (val1 :float)
-  (val2 :float)
-  (val3 :float))
+;; Vec4##t * cv_create_Vec4##(tn v0,  tn v1, tn v2, tn v3)
+(defcfun ("cv_create_Vec4f" vec-4f-4) (cv::vec-4f :garbage-collect t) 
+  (v0 :float)
+  (v1 :float)
+  (v2 :float)
+  (v3 :float))
 
 
-(defun vec-4f (&optional val0 val1 val2 val3)
+(defun vec-4f (&optional v0 v1 v2 v3)
   "VEC-4F constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-4f-0))
-	(val0
-	 (vec-4f-4 val0 val1 val2 val3))
+	(v0
+	 (vec-4f-4 v0 v1 v2 v3))
 	(t nil)))
 
 
-(defun make-vec-4f (&optional val0 val1 val2 val3)
+(defun make-vec-4f (&optional v0 v1 v2 v3)
   "VEC-4F constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-4f-0))
-	(val0
-	 (vec-4f-4 val0 val1 val2 val3))
+	(v0
+	 (vec-4f-4 v0 v1 v2 v3))
 	(t nil)))
 
 
-;; typedef Vec<float, 6> Vec6f
-;; Vec6f* cv_create_Vec6f()
-(defcfun ("cv_create_Vec6f" vec-6f-0) (cv::vec-6f :garbage-collect t))
+;; typedef Vec<float, 6> Vec6f;
+;; Vec6##t * cv_create_0_Vec6##()
+(defcfun ("cv_create_0_Vec6f" vec-6f-0) (cv::vec-6f :garbage-collect t))
 
 
-;; typedef Vec<float, 6> Vec6f
-;; Vec6f* cv_create_Vec6f_6(float val0, float val1, float val2, float val3, float val4, float val5)
-(defcfun ("cv_create_Vec6f_6" vec-6f-6) (cv::vec-6f :garbage-collect t)
-  (val0 :float)
-  (val1 :float)
-  (val2 :float)
-  (val3 :float)
-  (val4 :float)
-  (val5 :float))
+;; typedef Vec<float, 6> Vec6f;
+;; Vec6##t * cv_create_Vec6##(tn v0,  tn v1, tn v2, tn v3, tn v4, tn v5)
+(defcfun ("cv_create_Vec6f" vec-6f-6) (cv::vec-6f :garbage-collect t)
+  (v0 :float)
+  (v1 :float)
+  (v2 :float)
+  (v3 :float)
+  (v4 :float)
+  (v5 :float))
 
 
-(defun vec-6f (&optional val0 val1 val2 val3 val4 val5)
+(defun vec-6f (&optional v0 v1 v2 v3 v4 v5)
   "VEC-6F constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-6f-0))
-	(val0
-	 (vec-6f-6 val0 val1 val2 val3 val4 val5))
+	(v0
+	 (vec-6f-6 v0 v1 v2 v3 v4 v5))
 	(t nil)))
 
 
-(defun make-vec-6f (&optional val0 val1 val2 val3 val4 val5)
+(defun make-vec-6f (&optional v0 v1 v2 v3 v4 v5)
   "VEC-6F constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-6f-0))
-	(val0
-	 (vec-6f-6 val0 val1 val2 val3 val4 val5))
+	(v0
+	 (vec-6f-6 v0 v1 v2 v3 v4 v5))
 	(t nil)))
 
 
-;; typedef Vec<int, 2> Vec2i
-;; Vec2i* cv_create_Vec2i()
-(defcfun ("cv_create_Vec2i" vec-2i-0) (cv::vec-2i :garbage-collect t))
+
+;; typedef Vec<int, 2> Vec2i;
+;; Vec2##t * cv_create_0_Vec2##()
+(defcfun ("cv_create_0_Vec2i" vec-2i-0) (cv::vec-2i :garbage-collect t))
 
 
-;; typedef Vec<int, 2> Vec2i
-;; Vec2i* cv_create_Vec2i_2(int val0, int val1)
-(defcfun ("cv_create_Vec2i_2" vec-2i-2) (cv::vec-2i :garbage-collect t)
-  (val0 :int)
-  (val1 :int))
+;; typedef Vec<int, 2> Vec2i;
+;; Vec2##t * cv_create_Vec2##(tn v0,  tn v1)
+(defcfun ("cv_create_Vec2i" vec-2i-2) (cv::vec-2i :garbage-collect t)
+  (v0 :int)
+  (v1 :int))
 
 
-(defun vec-2i (&optional val0 val1)
+(defun vec-2i (&optional v0 v1)
   "VEC-2I constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-2i-0))
-	(val0
-	 (vec-2i-2 val0 val1))
+	(v0
+	 (vec-2i-2 v0 v1))
 	(t nil)))
 
 
-(defun make-vec-2i (&optional val0 val1)
+(defun make-vec-2i (&optional v0 v1)
   "VEC-2I constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-2i-0))
-	(val0
-	 (vec-2i-2 val0 val1))
+	(v0
+	 (vec-2i-2 v0 v1))
 	(t nil)))
 
 
-;; typedef Vec<int, 3> Vec3i
-;; Vec3i* cv_create_Vec3i()
-(defcfun ("cv_create_Vec3i" vec-3i-0) (cv::vec-3i :garbage-collect t))
+;; typedef Vec<int, 3> Vec3i;
+;; Vec3##t * cv_create_0_Vec3##()
+(defcfun ("cv_create_0_Vec3i" vec-3i-0) (cv::vec-3i :garbage-collect t))
 
 
-;; typedef Vec<int, 3> Vec3i
-;; Vec3i* cv_create_Vec3i_3(int val0, int val1, int val2)
-(defcfun ("cv_create_Vec3i_3" vec-3i-3) (cv::vec-3i :garbage-collect t)
-  (val0 :int)
-  (val1 :int)
-  (val2 :int))
+;; typedef Vec<int, 3> Vec3i;
+;; Vec3##t * cv_create_Vec3##(tn v0,  tn v1, tn v2)
+(defcfun ("cv_create_Vec3i" vec-3i-3) (cv::vec-3i :garbage-collect t)
+  (v0 :int)
+  (v1 :int)
+  (v2 :int))
 
 
-(defun vec-3i (&optional val0 val1 val2)
+(defun vec-3i (&optional v0 v1 v2)
   "VEC-3I constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-3i-0))
-	(val0
-	 (vec-3i-3 val0 val1 val2))
+	(v0
+	 (vec-3i-3 v0 v1 v2))
 	(t nil)))
 
 
-(defun make-vec-3i (&optional val0 val1 val2)
+(defun make-vec-3i (&optional v0 v1 v2)
   "VEC-3I constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-3i-0))
-	(val0
-	 (vec-3i-3 val0 val1 val2))
+	(v0
+	 (vec-3i-3 v0 v1 v2))
 	(t nil)))
 
 
-;; typedef Vec<int, 4> Vec4i
-;; Vec4i* cv_create_Vec4i()
-(defcfun ("cv_create_Vec4i" vec-4i-0) (cv::vec-4i :garbage-collect t))
+
+;; typedef Vec<int, 4> Vec4i;
+;; Vec4##t * cv_create_0_Vec4##()
+(defcfun ("cv_create_0_Vec4i" vec-4i-0) (cv::vec-4i :garbage-collect t))
 
 
-;; typedef Vec<int, 4> Vec4i
-;; Vec4i* cv_create_Vec4i_4(int val0, int val1, int val2, int val3)
-(defcfun ("cv_create_Vec4i_4" vec-4i-4) (cv::vec-4i :garbage-collect t)
-  (val0 :int)
-  (val1 :int)
-  (val2 :int)
-  (val3 :int))
+;; typedef Vec<int, 4> Vec4i;
+;; Vec4##t * cv_create_Vec4##(tn v0,  tn v1, tn v2, tn v3)
+(defcfun ("cv_create_Vec4i" vec-4i-4) (cv::vec-4i :garbage-collect t)
+  (v0 :int)
+  (v1 :int)
+  (v2 :int)
+  (v3 :int))
 
-
-(defun vec-4i (&optional val0 val1 val2 val3)
+(defun vec-4i (&optional v0 v1 v2 v3)
   "VEC-4I constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-4i-0))
-	(val0
-	 (vec-4i-4 val0 val1 val2 val3))
+	(v0
+	 (vec-4i-4 v0 v1 v2 v3))
 	(t nil)))
 
 
-(defun make-vec-4i (&optional val0 val1 val2 val3)
+(defun make-vec-4i (&optional v0 v1 v2 v3)
   "VEC-4I constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-4i-0))
-	(val0
-	 (vec-4i-4 val0 val1 val2 val3))
+	(v0
+	 (vec-4i-4 v0 v1 v2 v3))
 	(t nil)))
 
 
-;; typedef Vec<int, 6> Vec6i
-;; Vec6i* cv_create_Vec6i()
-(defcfun ("cv_create_Vec6i" vec-6i-0) (cv::vec-6i :garbage-collect t))
+;; typedef Vec<int, 6> Vec6i;
+;; Vec6##t * cv_create_0_Vec6##()
+(defcfun ("cv_create_0_Vec6i" vec-6i-0) (cv::vec-6i :garbage-collect t))
 
 
-;; typedef Vec<int, 6> Vec6i
-;; Vec6i* cv_create_Vec6i_6(int val0, int val1, int val2, int val3, int val4, int val5)
-(defcfun ("cv_create_Vec6i_6" vec-6i-6) (cv::vec-6i :garbage-collect t)
-  (val0 :int)
-  (val1 :int)
-  (val2 :int)
-  (val3 :int)
-  (val4 :int)
-  (val5 :int))
+;; typedef Vec<int, 6> Vec6i;
+;; Vec6##t * cv_create_Vec6##(tn v0,  tn v1, tn v2, tn v3, tn v4, tn v5)
+(defcfun ("cv_create_Vec6i" vec-6i-6) (cv::vec-6i :garbage-collect t)
+  (v0 :int)
+  (v1 :int)
+  (v2 :int)
+  (v3 :int)
+  (v4 :int)
+  (v5 :int))
 
 
-(defun vec-6i (&optional val0 val1 val2 val3 val4 val5)
+(defun vec-6i (&optional v0 v1 v2 v3 v4 v5)
   "VEC-6I constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-6i-0))
-	(val0
-	 (vec-6i-6 val0 val1 val2 val3 val4 val5))
+	(v0
+	 (vec-6i-6 v0 v1 v2 v3 v4 v5))
 	(t nil)))
 
 
-(defun make-vec-6i (&optional val0 val1 val2 val3 val4 val5)
+(defun make-vec-6i (&optional v0 v1 v2 v3 v4 v5)
   "VEC-6I constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-6i-0))
-	(val0
-	 (vec-6i-6 val0 val1 val2 val3 val4 val5))
+	(v0
+	 (vec-6i-6 v0 v1 v2 v3 v4 v5))
 	(t nil)))
 
 
-;; typedef Vec<int, 8> Vec8i
-;; Vec8i* cv_create_Vec8i() 
-(defcfun ("cv_create_Vec8i" vec-8i-0) (cv::vec-8i :garbage-collect t))
+;; typedef Vec<int, 8> Vec8i;
+;; Vec8##t * cv_create_0_Vec8##() 
+(defcfun ("cv_create_0_Vec8i" vec-8i-0) (cv::vec-8i :garbage-collect t))
 
 
-;; typedef Vec<int, 8> Vec8i
-;; Vec8i* cv_create_Vec8i_8(int val0, int val1, int val2, int val3, int val4, int val5, int val6, int val7) 
-(defcfun ("cv_create_Vec8i_8" vec-8i-8) (cv::vec-8i :garbage-collect t)
-  (val0 :int)
-  (val1 :int)
-  (val2 :int)
-  (val3 :int)
-  (val4 :int)
-  (val5 :int)
-  (val6 :int)
-  (val7 :int))
+;; typedef Vec<int, 8> Vec8i;
+;; Vec8##t * cv_create_Vec8##(tn v0,  tn v1, tn v2, tn v3, tn v4, tn v5, tn v6, tn v7)
+(defcfun ("cv_create_Vec8i" vec-8i-8) (cv::vec-8i :garbage-collect t)
+  (v0 :int)
+  (v1 :int)
+  (v2 :int)
+  (v3 :int)
+  (v4 :int)
+  (v5 :int)
+  (v6 :int)
+  (v7 :int))
 
 
-(defun vec-8i (&optional val0 val1 val2 val3 val4 val5 val6 val7)
+(defun vec-8i (&optional v0 v1 v2 v3 v4 v5 v6 v7)
   "VEC-8I constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-8i-0))
-	(val0
-	 (vec-8i-8 val0 val1 val2 val3 val4 val5 val6 val7))
+	(v0
+	 (vec-8i-8 v0 v1 v2 v3 v4 v5 v6 v7))
 	(t nil)))
 
 
-(defun make-vec-8i (&optional val0 val1 val2 val3 val4 val5 val6 val7)
+(defun make-vec-8i (&optional v0 v1 v2 v3 v4 v5 v6 v7)
   "VEC-8I constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-8i-0))
-	(val0
-	 (vec-8i-8 val0 val1 val2 val3 val4 val5 val6 val7))
+	(v0
+	 (vec-8i-8 v0 v1 v2 v3 v4 v5 v6 v7))
 	(t nil)))
 
 
-;; typedef Vec<short, 2> Vec2s
-;; Vec2s* cv_create_Vec2s()
-(defcfun ("cv_create_Vec2s" vec-2s-0) (cv::vec-2s :garbage-collect t))
+;; typedef Vec<short, 2> Vec2s;
+;; Vec2##t * cv_create_0_Vec2##()
+(defcfun ("cv_create_0_Vec2s" vec-2s-0) (cv::vec-2s :garbage-collect t))
 
 
-;; typedef Vec<short, 2> Vec2s
-;; Vec2s* cv_create_Vec2s_2(short val0, short val1)
-(defcfun ("cv_create_Vec2s_2" vec-2s-2) (cv::vec-2s :garbage-collect t)
-  (val0 :short)
-  (val1 :short))
+;; typedef Vec<short, 2> Vec2s;
+;; Vec2##t * cv_create_Vec2##(tn v0,  tn v1)
+(defcfun ("cv_create_Vec2s" vec-2s-2) (cv::vec-2s :garbage-collect t)
+  (v0 :short)
+  (v1 :short))
 
 
-(defun vec-2s (&optional val0 val1)
+(defun vec-2s (&optional v0 v1)
   "VEC-2S constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-2s-0))
-	(val0
-	 (vec-2s-2 val0 val1))
+	(v0
+	 (vec-2s-2 v0 v1))
 	(t nil)))
 
 
-(defun make-vec-2s (&optional val0 val1)
+(defun make-vec-2s (&optional v0 v1)
   "VEC-2S constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-2s-0))
-	(val0
-	 (vec-2s-2 val0 val1))
+	(v0
+	 (vec-2s-2 v0 v1))
 	(t nil)))
 
 
-;; typedef Vec<short, 3> Vec3s
-;; Vec3s* cv_create_Vec3s()
-(defcfun ("cv_create_Vec3s" vec-3s-0) (cv::vec-3s :garbage-collect t))
+;; typedef Vec<short, 3> Vec3s;
+;; Vec3##t * cv_create_0_Vec3##()
+(defcfun ("cv_create_0_Vec3s" vec-3s-0) (cv::vec-3s :garbage-collect t))
 
 
-;; typedef Vec<short, 3> Vec3s
-;; Vec3s* cv_create_Vec3s_3(short val0, short val1, short val2)
-(defcfun ("cv_create_Vec3s_3" vec-3s-3) (cv::vec-3s :garbage-collect t)
-  (val0 :short)
-  (val1 :short)
-  (val2 :short))
+;; typedef Vec<short, 3> Vec3s;
+;; Vec3##t * cv_create_Vec3##(tn v0,  tn v1, tn v2)
+(defcfun ("cv_create_Vec3s" vec-3s-3) (cv::vec-3s :garbage-collect t)
+  (v0 :short)
+  (v1 :short)
+  (v2 :short))
 
 
-(defun vec-3s (&optional val0 val1 val2)
+(defun vec-3s (&optional v0 v1 v2)
   "VEC-3S constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-3s-0))
-	(val0
-	 (vec-3s-3 val0 val1 val2))
+	(v0
+	 (vec-3s-3 v0 v1 v2))
 	(t nil)))
 
 
-(defun make-vec-3s (&optional val0 val1 val2)
+(defun make-vec-3s (&optional v0 v1 v2)
   "VEC-3S constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-3s-0))
-	(val0
-	 (vec-3s-3 val0 val1 val2))
+	(v0
+	 (vec-3s-3 v0 v1 v2))
 	(t nil)))
 
 
-;; typedef Vec<short, 4> Vec4s
-;; Vec4s* cv_create_Vec4s()
-(defcfun ("cv_create_Vec4s" vec-4s-0) (cv::vec-4s :garbage-collect t))
+;; typedef Vec<short, 4> Vec4s;
+;; Vec4##t * cv_create_0_Vec4##()
+(defcfun ("cv_create_0_Vec4s" vec-4s-0) (cv::vec-4s :garbage-collect t))
 
 
-;; typedef Vec<short, 4> Vec4s
-;; Vec4s* cv_create_Vec4s_4(short val0, short val1, short val2, short val3)
-(defcfun ("cv_create_Vec4s_4" vec-4s-4) (cv::vec-4s :garbage-collect t)
-  (val0 :short)
-  (val1 :short)
-  (val2 :short)
-  (val3 :short))
+;; typedef Vec<short, 4> Vec4s;
+;; Vec4##t * cv_create_Vec4##(tn v0,  tn v1, tn v2, tn v3)
+(defcfun ("cv_create_Vec4s" vec-4s-4) (cv::vec-4s :garbage-collect t)
+  (v0 :short)
+  (v1 :short)
+  (v2 :short)
+  (v3 :short))
 
 
-(defun vec-4s (&optional val0 val1 val2 val3)
+(defun vec-4s (&optional v0 v1 v2 v3)
   "VEC-4S constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-4s-0))
-	(val0
-	 (vec-4s-4 val0 val1 val2 val3))
+	(v0
+	 (vec-4s-4 v0 v1 v2 v3))
 	(t nil)))
 
 
-(defun make-vec-4s (&optional val0 val1 val2 val3)
+(defun make-vec-4s (&optional v0 v1 v2 v3)
   "VEC-4S constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-4s-0))
-	(val0
-	 (vec-4s-4 val0 val1 val2 val3))
+	(v0
+	 (vec-4s-4 v0 v1 v2 v3))
 	(t nil)))
 
 
-;; typedef Vec<ushort, 2> Vec2w
-;; Vec2w* cv_create_Vec2w()
-(defcfun ("cv_create_Vec2w" vec-2w-0) (cv::vec-2w :garbage-collect t))
+;; typedef Vec<ushort, 2> Vec2w;
+;; Vec2##t * cv_create_0_Vec2##()
+(defcfun ("cv_create_0_Vec2w" vec-2w-0) (cv::vec-2w :garbage-collect t))
 
 
-;; typedef Vec<ushort, 2> Vec2w
-;; Vec2w* cv_create_Vec2w_2(ushort val0, ushort val1)
-(defcfun ("cv_create_Vec2w_2" vec-2w-2) (cv::vec-2w :garbage-collect t)
-  (val0 :ushort)
-  (val1 :ushort))
+;; typedef Vec<ushort, 2> Vec2w;
+;; Vec2##t * cv_create_Vec2##(tn v0,  tn v1)
+(defcfun ("cv_create_Vec2w" vec-2w-2) (cv::vec-2w :garbage-collect t)
+  (v0 :ushort)
+  (v1 :ushort))
 
 
-(defun vec-2w (&optional val0 val1)
+(defun vec-2w (&optional v0 v1)
   "VEC-2W constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-2w-0))
-	(val0
-	 (vec-2w-2 val0 val1))
+	(v0
+	 (vec-2w-2 v0 v1))
 	(t nil)))
 
 
-(defun make-vec-2w (&optional val0 val1)
+(defun make-vec-2w (&optional v0 v1)
   "VEC-2W constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-2w-0))
-	(val0
-	 (vec-2w-2 val0 val1))
+	(v0
+	 (vec-2w-2 v0 v1))
 	(t nil)))
 
 
-;; typedef Vec<ushort, 3> Vec3w
-;; Vec3w* cv_create_Vec3w()
-(defcfun ("cv_create_Vec3w" vec-3w-0) (cv::vec-3w :garbage-collect t))
+;; typedef Vec<ushort, 3> Vec3w;
+;; Vec3##t * cv_create_0_Vec3##()
+(defcfun ("cv_create_0_Vec3w" vec-3w-0) (cv::vec-3w :garbage-collect t))
 
 
-;; typedef Vec<ushort, 3> Vec3w
-;; Vec3w* cv_create_Vec3w_3(ushort val0, ushort val1, ushort val2)
-(defcfun ("cv_create_Vec3w_3" vec-3w-3) (cv::vec-3w :garbage-collect t)
-  (val0 :ushort)
-  (val1 :ushort)
-  (val2 :ushort))
+;; typedef Vec<ushort, 3> Vec3w;
+;; Vec3##t * cv_create_Vec3##(tn v0,  tn v1, tn v2)
+(defcfun ("cv_create_Vec3w" vec-3w-3) (cv::vec-3w :garbage-collect t)
+  (v0 :ushort)
+  (v1 :ushort)
+  (v2 :ushort))
 
 
-(defun vec-3w (&optional val0 val1 val2)
+(defun vec-3w (&optional v0 v1 v2)
   "VEC-3W constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-3w-0))
-	(val0
-	 (vec-3w-3 val0 val1 val2))
+	(v0
+	 (vec-3w-3 v0 v1 v2))
 	(t nil)))
 
 
-(defun make-vec-3w (&optional val0 val1 val2)
+(defun make-vec-3w (&optional v0 v1 v2)
   "VEC-3W constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-3w-0))
-	(val0
-	 (vec-3w-3 val0 val1 val2))
+	(v0
+	 (vec-3w-3 v0 v1 v2))
 	(t nil)))
 
 
-;; typedef Vec<ushort, 4> Vec4w
-;; Vec4w* cv_create_Vec4w()
-(defcfun ("cv_create_Vec4w" vec-4w-0) (cv::vec-4w :garbage-collect t))
+;; typedef Vec<ushort, 4> Vec4w;
+;; Vec4##t * cv_create_0_Vec4##()
+(defcfun ("cv_create_0_Vec4w" vec-4w-0) (cv::vec-4w :garbage-collect t))
 
 
-;; typedef Vec<ushort, 4> Vec4w
-;; Vec4w* cv_create_Vec4w_4(ushort val0, ushort val1, ushort val2, ushort val3)
-(defcfun ("cv_create_Vec4w_4" vec-4w-4) (cv::vec-4w :garbage-collect t)
-  (val0 :ushort)
-  (val1 :ushort)
-  (val2 :ushort)
-  (val3 :ushort))
+;; typedef Vec<ushort, 4> Vec4w;
+;; Vec4##t * cv_create_Vec4##(tn v0,  tn v1, tn v2, tn v3)
+(defcfun ("cv_create_Vec4w" vec-4w-4) (cv::vec-4w :garbage-collect t)
+  (v0 :ushort)
+  (v1 :ushort)
+  (v2 :ushort)
+  (v3 :ushort))
 
 
-(defun vec-4w (&optional val0 val1 val2 val3)
+(defun vec-4w (&optional v0 v1 v2 v3)
   "VEC-4W constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-4w-0))
-	(val0
-	 (vec-4w-4 val0 val1 val2 val3))
+	(v0
+	 (vec-4w-4 v0 v1 v2 v3))
 	(t nil)))
 
 
-(defun make-vec-4w (&optional val0 val1 val2 val3)
+(defun make-vec-4w (&optional v0 v1 v2 v3)
   "VEC-4W constructor"
-  (cond ((null val0)
+  (cond ((null v0)
 	 (vec-4w-0))
-	(val0
-	 (vec-4w-4 val0 val1 val2 val3))
+	(v0
+	 (vec-4w-4 v0 v1 v2 v3))
 	(t nil)))
 
 

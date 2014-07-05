@@ -64,6 +64,20 @@
 
 
 ;; void operator delete  ( void* ptr )
+;; void cv_delete_FileNode(FileNode* self)
+(defcfun ("cv_delete_FileNode" del-file-node) :void
+  "Calls delete on a FILE-NODE object."
+  (self file-node))
+
+
+;; void operator delete  ( void* ptr )
+;; void cv_delete_FileStorage(FileStorage* self)
+(defcfun ("cv_delete_FileStorage" del-file-storage) :void
+  "Calls delete on a FILE-STORAGE object."
+  (self file-storage))
+
+
+;; void operator delete  ( void* ptr )
 ;; void cv_delete_HOGDescriptor(HOGDescriptor* self)
 (defcfun ("cv_delete_HOGDescriptor" del-hog-descriptor) :void
   "Calls delete on a HOG-DESCRIPTOR object."

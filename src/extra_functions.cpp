@@ -1,15 +1,140 @@
-#include <opencv2/c/opencv_generated.hpp>
-using namespace cv;
-using namespace std;
-using namespace flann;
-using namespace cvflann;
+/*
+* =====================================================================================
+*
+* Filename: excluded_functions.cpp
+*
+* Description: Functions that the generator outputs incorrectly, either by them entirely
+* or by outputting them with incorrectly specified types.
+*
+* Version: 1.0
+* Created: 04/13/2014 12:06:39 AM
+* Revision: none
+* Compiler: g++
+*
+* Author: Arjun Comar
+*
+* =====================================================================================
+*/
+#include <opencv2/c/excluded_functions.hpp>
 
 
-#include "/home/w/quicklisp/dists/quicklisp/software/lisp-cv-master/include/extra_functions.hpp"
+#define ADD_VEC_FUNC_IMPL_0_0(t) \
+    Vec2##t * cv_create_0_Vec2##t() { \
+        return new Vec2##t ();\
+    } \
+    Vec3##t * cv_create_0_Vec3##t() { \
+        return new Vec3##t ();\
+    } \
+    Vec4##t * cv_create_0_Vec4##t() { \
+        return new Vec4##t ();\
+    } \
 
+#define ADD_VEC_FUNC_IMPL_0_1(t) \
+    Vec6##t * cv_create_0_Vec6##t() { \
+        return new Vec6##t ();\
+    } \
+
+#define ADD_VEC_FUNC_IMPL_0_2(t) \
+    Vec8##t * cv_create_0_Vec8##t() { \
+        return new Vec8##t ();\
+    } \
+
+#define ADD_VEC_FUNC_IMPL_1(t, tn) \
+    Vec2##t * cv_create_Vec2##t(tn v0, tn v1) { \
+        return new Vec2##t (v0, v1);\
+    } \
+    Vec3##t * cv_create_Vec3##t(tn v0, tn v1, tn v2) { \
+        return new Vec3##t (v0, v1, v2);\
+    } \
+    Vec4##t * cv_create_Vec4##t(tn v0, tn v1, tn v2, tn v3) { \
+        return new Vec4##t (v0, v1, v2, v3);\
+    } \
+
+#define ADD_VEC_FUNC_IMPL_2(t, tn) \
+    Vec6##t * cv_create_Vec6##t(tn v0, tn v1, tn v2, tn v3, tn v4, tn v5) { \
+        return new Vec6##t (v0, v1, v2, v3, v4, v5);\
+    } \
+
+#define ADD_VEC_FUNC_IMPL_3(t, tn) \
+    Vec8##t * cv_create_Vec8##t(tn v0, tn v1, tn v2, tn v3, tn v4, tn v5, tn v6, tn v7) { \
+        return new Vec8##t (v0, v1, v2, v3, v4, v5, v6, v7);\
+    } \
+
+#define ADD_WRITE_FUNC_IMPL_0(t, tn) \
+    void cv_FileNode_write_number_##t(FileStorage* fs, String* name, tn value) { \
+        write(*fs, *name, value);\
+} \
+
+#define ADD_WRITE_FUNC_IMPL_1(t, tn) \
+    void cv_FileNode_write_pointer_##t(FileStorage* fs, String* name, tn* value) { \
+        write(*fs, *name, *value);\
+} \
+
+#define ADD_READ_FUNC_IMPL_0(t, tn) \
+    void cv_FileNode_read_number_##t(FileNode* node, tn name, tn default_value) { \
+        read(*node, name, default_value);\
+} \
+
+#define ADD_READ_FUNC_IMPL_1(t, tn) \
+    void cv_FileNode_read_pointer_##t(FileNode* node, tn* name, tn* default_value) { \
+        read(*node, *name, *default_value);\
+} \
+
+#define ADD_READ_FUNC_IMPL_2(t, tn) \
+void cv_FileNode_read_pointer_##t(FileNode* node, vector_KeyPoint* keypoints) { \
+    read(*node, *keypoints);\
+} \
 
 extern "C" {
 
+ADD_VEC_FUNC_IMPL_0_0(b);
+ADD_VEC_FUNC_IMPL_0_0(d);
+ADD_VEC_FUNC_IMPL_0_0(f);
+ADD_VEC_FUNC_IMPL_0_0(i);
+ADD_VEC_FUNC_IMPL_0_0(s);
+ADD_VEC_FUNC_IMPL_0_0(w);
+
+ADD_VEC_FUNC_IMPL_0_1(d);
+ADD_VEC_FUNC_IMPL_0_1(f);
+ADD_VEC_FUNC_IMPL_0_1(i);
+
+ADD_VEC_FUNC_IMPL_0_2(i);
+
+ADD_VEC_FUNC_IMPL_1(b, uchar);
+ADD_VEC_FUNC_IMPL_1(d, double);
+ADD_VEC_FUNC_IMPL_1(f, float);
+ADD_VEC_FUNC_IMPL_1(i, int);
+ADD_VEC_FUNC_IMPL_1(s, short);
+ADD_VEC_FUNC_IMPL_1(w, ushort);
+
+ADD_VEC_FUNC_IMPL_2(d, double);
+ADD_VEC_FUNC_IMPL_2(f, float);
+ADD_VEC_FUNC_IMPL_2(i, int);
+
+ADD_VEC_FUNC_IMPL_3(i, int);
+
+ADD_WRITE_FUNC_IMPL_0(d, double);
+ADD_WRITE_FUNC_IMPL_0(f, float);
+ADD_WRITE_FUNC_IMPL_0(i, int);
+
+ADD_WRITE_FUNC_IMPL_1(s, String);
+ADD_WRITE_FUNC_IMPL_1(m, Mat);
+ADD_WRITE_FUNC_IMPL_1(vkp, vector_KeyPoint);
+
+ADD_READ_FUNC_IMPL_0(d, double);
+ADD_READ_FUNC_IMPL_0(f, float);
+ADD_READ_FUNC_IMPL_0(i, int);
+
+ADD_READ_FUNC_IMPL_1(s, String);
+ADD_READ_FUNC_IMPL_1(m, Mat);
+
+ADD_READ_FUNC_IMPL_2(vkp, vector_KeyPoint);
+
+//FileNode* cv_FileNode_assignVal(FileStorage* fs) {
+//    FileNode* fn = new FileNode;
+//    *fn = *fs;
+//    return fn;
+//}
 
 Scalar* cv_create_Scalar0()
 {
@@ -19,202 +144,6 @@ Scalar* cv_create_Scalar0()
 Scalar* cv_create_Scalar4(double val0, double val1, double val2, double val3)
 {
     return new Scalar(val0, val1, val2, val3);
-}
-
-
-Vec2s* std_vector_get_element( vector_Vec2s * v
-                            , unsigned int vectorIdx
-                            , unsigned int elementIdx ) {
-    return new Vec2s((*v)[ vectorIdx ]);
-}
-
- Vec2s* item( int const i, vector_Vec2s const& v )
- {
-     return new Vec2s(v[i]);
- }
-
-void cv_LineSegmentDetector_detect2(LineSegmentDetector* self, Mat* _image, vector_Vec4i* _lines, Mat* width, Mat* prec, Mat* nfa) {
-	self->detect(*_image, *_lines, *width, *prec, *nfa);
-}
-
-void cv_LineSegmentDetector_drawSegments2(LineSegmentDetector* self, Mat* _image, vector_Vec4i* lines) {
-	self->drawSegments(*_image, *lines);
-}
-
-Vec2b* cv_create_Vec2b() {
-    return new Vec2b();
-}
-
-Vec2b* cv_create_Vec2b_2(uchar val0, uchar val1) {
-    return new Vec2b(val0, val1);
-}
-
-Vec3b* cv_create_Vec3b() {
-    return new Vec3b();
-}
-
-Vec3b* cv_create_Vec3b_3(uchar val0, uchar val1, uchar val2) {
-    return new Vec3b(val0, val1, val2);
-}
-
-Vec4b* cv_create_Vec4b() {
-    return new Vec4b();
-}
-
-Vec4b* cv_create_Vec4b_4(uchar val0, uchar val1, uchar val2, uchar val3) {
-    return new Vec4b(val0, val1, val2, val3);
-}
-
-Vec2d* cv_create_Vec2d() {
-    return new Vec2d();
-}
-
-Vec2d* cv_create_Vec2d_2(double val0, double val1) {
-    return new Vec2d(val0, val1);
-}
-
-Vec3d* cv_create_Vec3d() {
-    return new Vec3d();
-}
-
-Vec3d* cv_create_Vec3d_3(double val0, double val1, double val2) {
-    return new Vec3d(val0, val1, val2);
-}
-
-Vec4d* cv_create_Vec4d() {
-    return new Vec4d();
-}
-
-Vec4d* cv_create_Vec4d_4(double val0, double val1, double val2, double val3) {
-    return new Vec4d(val0, val1, val2, val3);
-}
-
-Vec6d* cv_create_Vec6d() {
-    return new Vec6d();
-}
-
-Vec6d* cv_create_Vec6d_6(double val0, double val1, double val2, double val3, double val4, double val5) {
-    return new Vec6d(val0, val1, val2, val3, val4, val5);
-}
-
-Vec2f* cv_create_Vec2f() {
-    return new Vec2f();
-}
-
-Vec2f* cv_create_Vec2f_2(float val0, float val1) {
-    return new Vec2f(val0, val1);
-}
-
-Vec3f* cv_create_Vec3f() {
-    return new Vec3f();
-}
-
-Vec3f* cv_create_Vec3f_3(float val0, float val1, float val2) {
-    return new Vec3f(val0, val1, val2);
-}
-
-Vec4f* cv_create_Vec4f() {
-    return new Vec4f();
-}
-
-Vec4f* cv_create_Vec4f_4(float val0, float val1, float val2, float val3) {
-    return new Vec4f(val0, val1, val2, val3);
-}
-
-Vec6f* cv_create_Vec6f() {
-    return new Vec6f();
-}
-
-Vec6f* cv_create_Vec6f_6(float val0, float val1, float val2, float val3, float val4, float val5) {
-    return new Vec6f(val0, val1, val2, val3, val4, val5);
-}
-
-Vec2i* cv_create_Vec2i() {
-    return new Vec2i();
-}
-
-Vec2i* cv_create_Vec2i_2(int val0, int val1) {
-    return new Vec2i(val0, val1);
-}
-
-Vec3i* cv_create_Vec3i() {
-    return new Vec3i();
-}
-
-Vec3i* cv_create_Vec3i_3(int val0, int val1, int val2) {
-    return new Vec3i(val0, val1, val2);
-}
-
-Vec4i* cv_create_Vec4i() {
-    return new Vec4i();
-}
-
-Vec4i* cv_create_Vec4i_4(int val0, int val1, int val2, int val3) {
-    return new Vec4i(val0, val1, val2, val3);
-}
-
-Vec6i* cv_create_Vec6i() {
-    return new Vec6i();
-}
-
-Vec6i* cv_create_Vec6i_6(int val0, int val1, int val2, int val3, int val4, int val5) {
-    return new Vec6i(val0, val1, val2, val3, val4, val5);
-}
-
-Vec8i* cv_create_Vec8i() {
-    return new Vec8i();
-}
-
-Vec8i* cv_create_Vec8i_8(int val0, int val1, int val2, int val3, int val4, int val5, int val6, int val7) {
-    return new Vec8i(val0, val1, val2, val3, val4, val5, val6, val7);
-}
-
-Vec2s* cv_create_Vec2s() {
-    return new Vec2s();
-}
-
-Vec2s* cv_create_Vec2s_2(short val0, short val1) {
-    return new Vec2s(val0, val1);
-}
-
-Vec3s* cv_create_Vec3s() {
-    return new Vec3s();
-}
-
-Vec3s* cv_create_Vec3s_3(short val0, short val1, short val2) {
-    return new Vec3s(val0, val1, val2);
-}
-
-Vec4s* cv_create_Vec4s() {
-    return new Vec4s();
-}
-
-Vec4s* cv_create_Vec4s_4(short val0, short val1, short val2, short val3) {
-    return new Vec4s(val0, val1, val2, val3);
-}
-
-Vec2w* cv_create_Vec2w() {
-    return new Vec2w();
-}
-
-Vec2w* cv_create_Vec2w_2(ushort val0, ushort val1) {
-    return new Vec2w(val0, val1);
-}
-
-Vec3w* cv_create_Vec3w() {
-    return new Vec3w();
-}
-
-Vec3w* cv_create_Vec3w_3(ushort val0, ushort val1, ushort val2) {
-    return new Vec3w(val0, val1, val2);
-}
-
-Vec4w* cv_create_Vec4w() {
-    return new Vec4w();
-}
-
-Vec4w* cv_create_Vec4w_4(ushort val0, ushort val1, ushort val2, ushort val3) {
-    return new Vec4w(val0, val1, val2, val3);
 }
 
 CvDTreeParams* cv_create_CvDTreeParams() {
@@ -256,7 +185,6 @@ int cv_Range_getend(Range* self) {
 void cv_HOGDescriptor_detectMultiScale9_2(HOGDescriptor* self, Mat* img, vector_Rect* foundLocations, double hitThreshold, Size* winStride, Size* padding, double scale, double finalThreshold, bool useMeanshiftGrouping) {
 	self->detectMultiScale(*img, *foundLocations,  hitThreshold, *winStride, *padding, scale, finalThreshold, useMeanshiftGrouping);
 }
-
 
 void cv_HOGDescriptor_setSVMDetector2(HOGDescriptor* self, vector_float* _svmdetector) {
 	self->setSVMDetector(*_svmdetector);
@@ -416,6 +344,14 @@ void cv_delete_CvDTreeParams(CvDTreeParams* self) {
 }
 
 void cv_delete_Feature2D(Feature2D* self) {
+    delete self;
+}
+
+void cv_delete_FileNode(FileNode* self) {
+    delete self;
+}
+
+void cv_delete_FileStorage(FileStorage* self) {
     delete self;
 }
 

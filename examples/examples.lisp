@@ -3107,6 +3107,376 @@ TODO(Reference example of function that uses TERM-CRITERIA)
 
 
 ========================================================================================================================================
+VEC
+========================================================================================================================================
+
+
+Note: The functions VEC-*, and MAKE-VEC-* are provided in this library. The VEC-* functions are 
+provided to match OpenCV's naming conventions, the MAKE-VEC* functions, to adhere to Common Lisp 
+naming conventions. Except for the difference in the names, all the VEC-* functions have the same 
+functionality as their MAKE-VEC* counterparts. I will be using the VEC-* versions in the examples 
+in this file because it makes them a easier to compare with OpenCV examples you find online, thus 
+making this library easier to learn.
+
+
+typedef Vec<uchar, 2> Vec2b;
+
+LISP-CV: (VEC-2B) => VEC-2B
+
+LISP-CV: (MAKE-VEC-2B) => VEC-2B
+
+LISP-CV: (VEC-2B (V0 :UCHAR) (V1 :UCHAR)) => VEC-2B
+
+LISP-CV: (MAKE-VEC-2B (V0 :UCHAR) (V1 :UCHAR)) => VEC-2B
+
+typedef Vec<uchar, 3> Vec3b;
+
+LISP-CV: (VEC-3B) => VEC-3B
+
+LISP-CV: (MAKE-VEC-3B) => VEC-3B
+
+LISP-CV: (VEC-3B (V0 :UCHAR) (V1 :UCHAR) (V2 :UCHAR)) => VEC-3B
+
+LISP-CV: (MAKE-VEC-3B (V0 :UCHAR) (V1 :UCHAR) (V2 :UCHAR)) => VEC-3B
+
+typedef Vec<uchar, 4> Vec4b;
+
+LISP-CV: (VEC-4B) => VEC-4B
+
+LISP-CV: (MAKE-VEC-4B) => VEC-4B
+
+LISP-CV: (VEC-4B (V0 :UCHAR) (V1 :UCHAR) (V2 :UCHAR) (V3 :UCHAR)) => VEC-4B
+
+LISP-CV: (MAKE-VEC-4B (V0 :UCHAR) (V1 :UCHAR) (V2 :UCHAR) (V3 :UCHAR)) => VEC-4B
+
+typedef Vec<double, 2> Vec2d;
+
+LISP-CV: (VEC-2D) => VEC-2D
+
+LISP-CV: (MAKE-VEC-2D) => VEC-2D
+
+LISP-CV: (VEC-2D (V0 :DOUBLE) (V1 :DOUBLE) (V2 :DOUBLE)) => VEC-2D
+
+LISP-CV: (MAKE-VEC-2D (V0 :DOUBLE) (V1 :DOUBLE) (V2 :DOUBLE)) => VEC-2D
+
+typedef Vec<double, 3> Vec3d;
+
+LISP-CV: (VEC-3D) => VEC-3D
+
+LISP-CV: (MAKE-VEC-3D) => VEC-3D
+
+LISP-CV: (VEC-3D (V0 :DOUBLE) (V1 :DOUBLE) (V2 :DOUBLE)) => VEC-3D
+
+LISP-CV: (MAKE-VEC-3D (V0 :DOUBLE) (V1 :DOUBLE) (V2 :DOUBLE)) => VEC-3D
+
+typedef Vec<double, 4> Vec4d;
+
+LISP-CV: (VEC-4D) => VEC-4D
+
+LISP-CV: (MAKE-VEC-4D) => VEC-4D
+
+LISP-CV: (VEC-4D (V0 :DOUBLE) (V1 :DOUBLE) (V2 :DOUBLE) (V3 :DOUBLE)) => VEC-4D
+
+LISP-CV: (MAKE-VEC-4D (V0 :DOUBLE) (V1 :DOUBLE) (V2 :DOUBLE) (V3 :DOUBLE)) => VEC-4D
+
+typedef Vec<double, 6> Vec6d;
+
+LISP-CV: (VEC-6D) => VEC-6D
+
+LISP-CV: (MAKE-VEC-6D) => VEC-6D
+
+LISP-CV: (VEC-6D (V0 :DOUBLE) (V1 :DOUBLE) (V2 :DOUBLE) (V3 :DOUBLE) (V4 :DOUBLE) (V5 :DOUBLE)) => VEC-6D
+
+LISP-CV: (MAKE-VEC-6D (V0 :DOUBLE) (V1 :DOUBLE) (V2 :DOUBLE) (V3 :DOUBLE) (V4 :DOUBLE) (V5 :DOUBLE)) => VEC-6D
+
+typedef Vec<float, 2> Vec2f;
+
+LISP-CV: (VEC-2F) => VEC-2F
+
+LISP-CV: (MAKE-VEC-2F) => VEC-2F
+
+LISP-CV: (VEC-2F (V0 :FLOAT) (V1 :FLOAT)) => VEC-2F
+
+LISP-CV: (MAKE-VEC-2F (V0 :FLOAT) (V1 :FLOAT)) => VEC-2F
+
+typedef Vec<float, 3> Vec3f;
+
+LISP-CV: (VEC-3F) => VEC-3F
+
+LISP-CV: (MAKE-VEC-3F) => VEC-3F
+
+LISP-CV: (VEC-3F (V0 :FLOAT) (V1 :FLOAT) (V2 :FLOAT)) => VEC-3F
+
+LISP-CV: (MAKE-VEC-3F (V0 :FLOAT) (V1 :FLOAT) (V2 :FLOAT)) => VEC-3F
+
+typedef Vec<float, 4> Vec4f;
+
+LISP-CV: (VEC-4F) => VEC-4F
+
+LISP-CV: (MAKE-VEC-4F) => VEC-4F
+
+LISP-CV: (VEC-4F (V0 :FLOAT) (V1 :FLOAT) (V2 :FLOAT) (V3 :FLOAT)) => VEC-4F
+
+LISP-CV: (MAKE-VEC-4F (V0 :FLOAT) (V1 :FLOAT) (V2 :FLOAT) (V3 :FLOAT)) => VEC-4F
+
+typedef Vec<float, 6> Vec6f;
+
+LISP-CV: (VEC-6F) => VEC-6F
+
+LISP-CV: (MAKE-VEC-6F) => VEC-6F
+
+LISP-CV: (VEC-6F (V0 :FLOAT) (V1 :FLOAT) (V2 :FLOAT) (V3 :FLOAT) (V4 :FLOAT) (V5 :FLOAT)) => VEC-6F
+
+LISP-CV: (MAKE-VEC-6F (V0 :FLOAT) (V1 :FLOAT) (V2 :FLOAT) (V3 :FLOAT) (V4 :FLOAT) (V5 :FLOAT)) => VEC-6F
+
+typedef Vec<int, 2> Vec2i;
+
+LISP-CV: (VEC-2I) => VEC-2I
+
+LISP-CV: (MAKE-VEC-2I) => VEC-2I
+
+LISP-CV: (VEC-2I (V0 :INT) (V1 :INT)) => VEC-2I
+
+LISP-CV: (MAKE-VEC-2I (V0 :INT) (V1 :INT)) => VEC-2I
+
+typedef Vec<int, 3> Vec3i;
+
+LISP-CV: (VEC-3I) => VEC-3I
+
+LISP-CV: (MAKE-VEC-3I) => VEC-3I
+
+LISP-CV: (VEC-3I (V0 :INT) (V1 :INT) (V2 :INT)) => VEC-3I
+
+LISP-CV: (MAKE-VEC-3I (V0 :INT) (V1 :INT) (V2 :INT)) => VEC-3I
+
+typedef Vec<int, 4> Vec4i;
+
+LISP-CV: (VEC-4I) => VEC-4I
+
+LISP-CV: (MAKE-VEC-4I) => VEC-4I
+
+LISP-CV: (VEC-4I (V0 :INT) (V1 :INT) (V2 :INT) (V3 :INT)) => VEC-4I
+
+LISP-CV: (MAKE-VEC-4I (V0 :INT) (V1 :INT) (V2 :INT) (V3 :INT)) => VEC-4I
+
+typedef Vec<int, 6> Vec6i;
+
+LISP-CV: (VEC-6I) => VEC-6I
+
+LISP-CV: (MAKE-VEC-6I) => VEC-6I
+
+LISP-CV: (VEC-6I (V0 :INT) (V1 :INT) (V2 :INT) (V3 :INT) (V4 :INT) (V5 :INT)) => VEC-6I
+
+LISP-CV: (MAKE-VEC-6I (V0 :INT) (V1 :INT) (V2 :INT) (V3 :INT) (V4 :INT) (V5 :INT)) => VEC-6I
+
+typedef Vec<int, 6> Vec6i;
+
+LISP-CV: (VEC-8I) => VEC-8I
+
+LISP-CV: (MAKE-VEC-8I) => VEC-8I
+
+LISP-CV: (VEC-8I (V0 :INT) (V1 :INT) (V2 :INT) (V3 :INT) (V4 :INT) (V5 :INT) (V6 :INT) (V7 :INT)) => VEC-8I
+
+LISP-CV: (MAKE-VEC-8I (V0 :INT) (V1 :INT) (V2 :INT) (V3 :INT) (V4 :INT) (V5 :INT) (V6 :INT) (V7 :INT)) => VEC-8I
+
+typedef Vec<short, 2> Vec2s;
+
+LISP-CV: (VEC-2S) => VEC-2S
+
+LISP-CV: (MAKE-VEC-2S) => VEC-2S
+
+LISP-CV: (VEC-2S (V0 :SHORT) (V1 :SHORT)) => VEC-2S
+
+LISP-CV: (MAKE-VEC-2S (V0 :SHORT) (V1 :SHORT)) => VEC-2S
+
+typedef Vec<short, 3> Vec3s;
+
+LISP-CV: (VEC-3S) => VEC-3S
+
+LISP-CV: (MAKE-VEC-3S) => VEC-3S
+
+LISP-CV: (VEC-3S (V0 :SHORT) (V1 :SHORT) (V2 :SHORT)) => VEC-3S
+
+LISP-CV: (MAKE-VEC-3S (V0 :SHORT) (V1 :SHORT) (V2 :SHORT)) => VEC-3S
+
+typedef Vec<short, 4> Vec4s;
+
+LISP-CV: (VEC-4S) => VEC-4S
+
+LISP-CV: (MAKE-VEC-4S) => VEC-4S
+
+LISP-CV: (VEC-4S (V0 :SHORT) (V1 :SHORT) (V2 :SHORT) (V3 :SHORT)) => VEC-4S
+
+LISP-CV: (MAKE-VEC-4S (V0 :SHORT) (V1 :SHORT) (V2 :SHORT) (V3 :SHORT)) => VEC-4S
+
+typedef Vec<uchar, 2> Vec2b;
+
+LISP-CV: (VEC-2W) => VEC-2W
+
+LISP-CV: (MAKE-VEC-2W) => VEC-2W
+
+LISP-CV: (VEC-2W (V0 :USHORT) (V1 :USHORT)) => VEC-2W
+
+LISP-CV: (MAKE-VEC-2W (V0 :USHORT) (V1 :USHORT)) => VEC-2W
+
+typedef Vec<uchar, 3> Vec3b;
+
+LISP-CV: (VEC-3W) => VEC-3W
+
+LISP-CV: (MAKE-VEC-3W) => VEC-3W
+
+LISP-CV: (VEC-3W (V0 :USHORT) (V1 :USHORT) (V2 :USHORT)) => VEC-3W
+
+LISP-CV: (MAKE-VEC-3W (V0 :USHORT) (V1 :USHORT) (V2 :USHORT)) => VEC-3W
+
+typedef Vec<uchar, 4> Vec4b;
+
+LISP-CV: (VEC-4W) => VEC-4W
+
+LISP-CV: (MAKE-VEC-4W) => VEC-4W
+
+LISP-CV: (VEC-4W (V0 :USHORT) (V1 :USHORT) (V2 :USHORT) (V3 :USHORT)) => VEC-4W
+
+LISP-CV: (MAKE-VEC-4W (V0 :USHORT) (V1 :USHORT) (V2 :USHORT) (V3 :USHORT)) => VEC-4W
+
+
+The Vec class is commonly used to describe pixel types of multi-channel arrays. 
+
+
+Example:
+
+
+(defun vec-example ()
+
+  ;Create an uninitialized VEC-* object and an 
+  ;initialized VEC-* object for each VEC-* type
+
+  (let ((vec-2b-0 (t:vec-2b))
+	(vec-2b-2 (t:vec-2b 1 2))
+	(vec-3b-0 (t:vec-3b))
+	(vec-3b-3 (t:vec-3b 1 2 3))
+	(vec-4b-0 (t:vec-4b))
+	(vec-4b-4 (t:vec-4b 1 2 3 4))
+	(vec-2d-0 (t:vec-2d))
+	(vec-2d-2 (t:vec-2d 1d0 2d0))
+	(vec-3d-0 (t:vec-3d))
+	(vec-3d-3 (t:vec-3d 1d0 2d0 3d0))
+	(vec-4d-0 (t:vec-4d))
+	(vec-4d-4 (t:vec-4d 1d0 2d0 3d0 4d0))
+	(vec-6d-0 (t:vec-6d))
+	(vec-6d-6 (t:vec-6d 1d0 2d0 3d0 4d0 5d0 6d0))
+	(vec-2f-0 (t:vec-2f))
+	(vec-2f-2 (t:vec-2f 1f0 2f0))
+	(vec-3f-0 (t:vec-3f))
+	(vec-3f-3 (t:vec-3f 1f0 2f0 3f0))
+	(vec-4f-0 (t:vec-4f))
+	(vec-4f-4 (t:vec-4f 1f0 2f0 3f0 4f0))
+	(vec-2i-0 (t:vec-2i))
+	(vec-2i-2 (t:vec-2i 1 2))
+	(vec-6f-0 (t:vec-6f))
+	(vec-6f-6 (t:vec-6f 1f0 2f0 3f0 4f0 5f0 6f0))
+	(vec-3i-0 (t:vec-3i))
+	(vec-3i-3 (t:vec-3i 1 2 3))
+	(vec-4i-0 (t:vec-4i))
+	(vec-4i-4 (t:vec-4i 1 2 3 4))
+	(vec-6i-0 (t:vec-6i))
+	(vec-6i-6 (t:vec-6i 1 2 3 4 5 6))
+	(vec-8i-0 (t:vec-8i))
+	(vec-8i-8 (t:vec-8i 1 2 3 4 5 6 7 8))
+	(vec-2s-0 (t:vec-2s))
+	(vec-2s-2 (t:vec-2s 1 2))
+	(vec-3s-0 (t:vec-3s))
+	(vec-3s-3 (t:vec-3s 1 2 3))
+	(vec-4s-0 (t:vec-4s))
+	(vec-4s-4 (t:vec-4s 1 2 3 4))
+	(vec-2w-0 (t:vec-2w))
+	(vec-2w-2 (t:vec-2w 1 2))
+	(vec-3w-0 (t:vec-3w))
+	(vec-3w-3 (t:vec-3w 1 2 3))
+	(vec-4w-0 (t:vec-4w))
+	(vec-4w-4 (t:vec-4w 1 2 3 4)))
+    ;Print the values of each VEC-* object
+    ;The '?' is a macro for CFFI::MEM-AREF
+    (format t "~%The return value of VEC-2B-0 is: ~a~%" vec-2b-0)
+    (format t "~%The elements of VEC-2B-2 are: (~a, ~a)~%" 
+	    (? vec-2b-2 :uchar) (? vec-2b-2 :uchar 1))
+    (format t "~%The return value of VEC-3B-0 is: ~a~%" vec-3b-0)
+    (format t "~%The elements of VEC-3B-3 are: (~a, ~a, ~a)~%" 
+	    (? vec-3b-3 :uchar) (? vec-3b-3 :uchar 1) (? vec-3b-3 :uchar 2))
+    (format t "~%The return value of VEC-4B-0 is: ~a" vec-4b-0)
+    (format t "~%~%The elements of VEC-4B-4 are: (~a, ~a, ~a, ~a)~%" 
+	    (? vec-4b-4 :uchar) (? vec-4b-4 :uchar 1)
+	    (? vec-4b-4 :uchar 2) (? vec-4b-4 :uchar 3))
+    (format t "~%The return value of VEC-2D-0 is: ~a~%" vec-2d-0)
+    (format t "~%The elements of VEC-2D-2 are: (~a, ~a)~%" 
+	    (? vec-2d-2 :double) (? vec-2d-2 :double 1))
+    (format t "~%The return value of VEC-3D-0 is: ~a~%" vec-3d-0)
+    (format t "~%The elements of VEC-3D-3 are: (~a, ~a, ~a)~%" 
+	    (? vec-3d-3 :double) (? vec-3d-3 :double 1) (? vec-3d-3 :double 2))
+    (format t "~%The return value of VEC-4D-0 is: ~a" vec-4d-0)
+    (format t "~%~%The elements of VEC-4D-4 are: (~a, ~a, ~a, ~a)~%" 
+	    (? vec-4d-4 :double) (? vec-4d-4 :double 1)
+	    (? vec-4d-4 :double 2) (? vec-4d-4 :double 3))
+    (format t "~%The return value of VEC-6d-0 is: ~a~%" vec-6d-0)
+    (format t "~%The elements of VEC-6D-6 are: (~a, ~a, ~a, ~a, ~a, ~a)~%" 
+	    (? vec-6d-6 :double) (? vec-6d-6 :double 1) (? vec-6d-6 :double 2) 
+	    (? vec-6d-6 :double 3)  (? vec-6d-6 :double 4) (? vec-6d-6 :double 5))
+    (format t "~%The return value of VEC-2F-0 is: ~a~%" vec-2f-0)
+    (format t "~%The elements of VEC-2F-2 are: (~a, ~a)~%"
+	    (? vec-2f-2 :float) (? vec-2f-2 :float 1))
+    (format t "~%The return value of VEC-3F-0 is: ~a~%" vec-3f-0)
+    (format t "~%The elements of VEC-3F-3 are: (~a, ~a, ~a)~%" 
+	    (? vec-3f-3 :float) (? vec-3f-3 :float 1) (? vec-3f-3 :float 2))
+    (format t "~%The return value of VEC-4F-0 is: ~a~%" vec-4f-0)
+    (format t "~%The elements of VEC-4F-4 are: (~a, ~a, ~a, ~a)~%" 
+	    (? vec-4f-4 :float) (? vec-4f-4 :float 1)
+	    (? vec-4f-4 :float 2) (? vec-4f-4 :float 3))
+    (format t "~%The return value of VEC-6F-0 is: ~a~%" vec-6f-0)
+    (format t "~%The elements of VEC-6F-6 are: (~a, ~a, ~a, ~a, ~a, ~a)~%" 
+	    (? vec-6f-6 :float) (? vec-6f-6 :float 1) (? vec-6f-6 :float 2) 
+	    (? vec-6f-6 :float 3) (? vec-6f-6 :float 4) (? vec-6f-6 :float 5))
+    (format t "~%The return value of VEC-2I-0 is: ~a~%" vec-2i-0)
+    (format t "~%The elements of VEC-2I-2 are: (~a, ~a)~%" 
+	    (? vec-2i-2 :int) (? vec-2i-2 :int 1))
+    (format t "~%The return value of VEC-3I-0 is: ~a~%" vec-3i-0)
+    (format t "~%The elements of VEC-3I-3 are: (~a, ~a, ~a)~%" 
+	    (? vec-3i-3 :int) (? vec-3i-3 :int 1) (? vec-3i-3 :int 2))
+    (format t "~%The return value of VEC-4I-0 is: ~a~%" vec-4i-0)
+    (format t "~%The elements of VEC-4I-4 are: (~a, ~a, ~a, ~a)~%" 
+	    (? vec-4i-4 :int) (? vec-4i-4 :int 1)
+	    (? vec-4i-4 :int 2) (? vec-4i-4 :int 3))
+    (format t "~%The return value of VEC-6I-0 is: ~a~%" vec-6i-0)
+    (format t "~%The elements of VEC-6I-6 are: (~a, ~a, ~a, ~a, ~a, ~a)~%" 
+	    (? vec-6i-6 :int) (? vec-6i-6 :int 1) (? vec-6i-6 :int 2) 
+	    (? vec-6i-6 :int 3)  (? vec-6i-6 :int 4) (? vec-6i-6 :int 5))
+    (format t "~%The return value of VEC-8I-0 is: ~a~%" vec-8i-0)
+    (format t "~%The elements of VEC-8I-8 are: (~a, ~a, ~a, ~a, ~a, ~a, ~a, ~a)~%" 
+	    (? vec-8i-8 :int) (? vec-8i-8 :int 1) (? vec-8i-8 :int 2) 
+	    (? vec-8i-8 :int 3) (? vec-8i-8 :int 4) (? vec-8i-8 :int 5)
+	    (? vec-8i-8 :int 6) (? vec-8i-8 :int 7))
+    (format t "~%The return value of VEC-2S-0 is: ~a~%" vec-2s-0)
+    (format t "~%The elements of VEC-2S-2 are: (~a, ~a)~%" 
+	    (? vec-2s-2 :short) (? vec-2s-2 :short 1))
+    (format t "~%The return value of VEC-3S-0 is: ~a~%" vec-3s-0)
+    (format t "~%The elements of VEC-3S-3 are: (~a, ~a, ~a)~%" 
+	    (? vec-3s-3 :short) (? vec-3s-3 :short 1) (? vec-3s-3 :short 2))
+    (format t "~%The return value of VEC-4S-0 is: ~a~%" vec-4s-0)
+    (format t "~%The elements of VEC-4S-4 are: (~a, ~a, ~a, ~a)~%" 
+	    (? vec-4s-4 :short) (? vec-4s-4 :short 1)
+	    (? vec-4s-4 :short 2) (? vec-4s-4 :short 3))
+    (format t "~%The return value of VEC-2W-0 is: ~a~%" vec-2w-0)
+    (format t "~%The elements of VEC-2W-2 are: (~a, ~a)~%" 
+	    (? vec-2w-2 :ushort) (? vec-2w-2 :ushort 1))
+    (format t "~%The return value of VEC-3W-0 is: ~a~%" vec-3w-0)
+    (format t "~%The elements of VEC-3W-3 are: (~a, ~a, ~a)~%" 
+	    (? vec-3w-3 :ushort) (? vec-3w-3 :ushort 1) (? vec-3w-3 :ushort 2))
+    (format t "~%The return value of VEC-4W-0 is: ~a~%" vec-4w-0)
+    (format t "~%The elements of VEC-4W-4 are: (~a, ~a, ~a, ~a)~%~%" 
+	    (? vec-4w-4 :ushort) (? vec-4w-4 :ushort 1)
+	    (? vec-4w-4 :ushort 2) (? vec-4w-4 :ushort 3))))
+
+
+========================================================================================================================================
 CORE - OPERATIONS ON ARRAYS
 ========================================================================================================================================
 
@@ -6002,8 +6372,6 @@ CORE - DRAWING FUNCTIONS
 ========================================================================================================================================
 
 
-
-
 CLIP-LINE
 
 Clips the line against the image rectangle.
@@ -6664,11 +7032,209 @@ CV> (CIRCLE IMAGE POINT RADIUS (T:RGB 255 0 0) +FILLED+ +AA+ 0)
 
 
 ========================================================================================================================================
+CORE - XML/YAML PERSISTENCE:
+========================================================================================================================================
+
+========================================================================================================================================
+FILE-STORAGE-WRITE
+========================================================================================================================================
+
+Writes an object or number to file storage.
+
+
+Note: The name FILE-STORAGE-WRITE is used in the documentation to refer to these *WRITE methods. 
+That name is for classification purposes only and is not a real function or method name. All of 
+these bindings along with bindings for OpenCv "write" members are designed to be called with the 
+overloaded Lisp-CV methods, *WRITE. The methods are named *WRITE instead of WRITE because WRITE 
+is the name of a Common Lisp function.
+
+
+C++: void write( FileStorage& fs, const String& name, double value );
+
+LISP-CV: (*WRITE (FS FILE-STORAGE) (NAME :STRING) (VALUE :DOUBLE)) => :VOID
+
+C++: void write( FileStorage& fs, const String& name, float value );
+
+LISP-CV: (*WRITE (FS FILE-STORAGE) (NAME :STRING) (VALUE :FLOAT)) => :VOID
+
+C++: void write( FileStorage& fs, const String& name, int value );
+
+LISP-CV: (*WRITE (FS FILE-STORAGE) (NAME :STRING) (VALUE :INT)) => :VOID
+
+C++: void write( FileStorage& fs, const String& name, const String& value );
+
+LISP-CV: (*WRITE (FS FILE-STORAGE) (NAME :STRING) (VALUE STRING)) => :VOID
+
+C++: void write( FileStorage& fs, const String& name, const Mat& value );
+
+LISP-CV: (*WRITE (FS FILE-STORAGE) (NAME :STRING) (VALUE MAT)) => :VOID
+
+C++: void write( FileStorage& fs, const String& name, const std::vector<KeyPoint>& value);
+
+LISP-CV: (*WRITE (FS FILE-STORAGE) (NAME :STRING) (VALUE VECTOR-KEY-POINT)) => :VOID
+
+
+    Parameters:	
+
+        FS - A FILE-STORAGE object
+
+        NAME - Name of the written object.
+  
+        VALUE - The object or number to be written.
+
+
+The methods write an object or a number to file storage.
+
+Example:
+
+(defun file-node-write-example (filename save-directory) 
+
+    ;Write a double float to a YML file
+    (let ((double-float 10.0d0))
+      (with-file-storage ((fs (file-storage 
+			       (cat save-directory "double-float.yml")  
+			       +file-storage-write+)))
+	(*write fs "double-float" double-float)
+	(release fs)))
+
+    ;Write a single float to a YML file
+    (let ((single-float 20.0d0))
+      (with-file-storage ((fs (file-storage 
+			       (cat save-directory "single-float.yml")  
+			       +file-storage-write+)))
+	(*write fs "single-float" single-float)
+	(release fs)))
+
+    ;Write an integer to a YML file
+    (let ((integer 30.0d0))
+      (with-file-storage ((fs (file-storage 
+			       (cat save-directory "integer.yml")  
+			       +file-storage-write+)))
+	(*write fs "integer" integer)
+	(release fs)))
+
+    ;Write a string to a YML file
+    (let ((string "LISP-CV ROCKS!!!"))
+      (with-file-storage ((fs (file-storage 
+			       (cat save-directory "string.yml")  
+			       +file-storage-write+)))
+	(*write fs "string" string)
+	(release fs)))
+
+    ;Write a matrix to a YML file
+    (with-mat ((matrix (mat-eye 10 10 +64fc3+)))
+      (with-file-storage ((fs (file-storage 
+			       (cat save-directory "matrix.yml")  
+			       +file-storage-write+)))
+	(*write fs "matrix" matrix)
+	(release fs)))
+
+    ;Write a vector of keypoints to a YML file
+    (with-named-window ("FILE-NODE-WRITE Example" +window-normal+)
+      (move-window "FILE-NODE-WRITE Example" 759 175)
+      ;Read in image
+      (with-mat ((image (imread filename +load-image-color+)))
+	(if (empty image) 
+	    (return-from file-node-write-example 
+	      (format t "Image was not loaded")))
+        ;Create BRISK feature detector
+	(with-feature-2d ((detector (brisk)))
+          ;Create vector to hold the keypoints
+	  (with-vector-key-point ((key-points (vector-key-point)))
+	    ;Detect the keypoints using BRISK
+	    (detect detector image key-points)
+            ;Create FILE-STORAGE object
+	    (with-file-storage ((fs (file-storage 
+				     (cat save-directory "keypoints.yml" ) 
+				     +file-storage-write+)))
+              ;Write the keypoints to a YML file
+	      (*write fs "keypoints" key-points)
+              ;Release FILE-STORAGE object
+	      (release fs)
+	      (imshow "FILE-NODE-WRITE Example" image)
+	      (loop
+		 (let ((c (wait-key 33)))
+		   (when (= c 27)
+		     (return))))))))))
+
+
+========================================================================================================================================
+FILE-STORAGE
+========================================================================================================================================
+
+The constructors.
+
+C++: FileStorage::FileStorage()
+
+LISP-CV: (FILE-STORAGE) => FILE-STORAGE
+
+C++: FileStorage::FileStorage(const String& source, int flags, const String& encoding=String())
+
+LISP-CV: (FILE-STORAGE (SOURCE :STRING) (FLAGS :INT) (ENCODING :STRING)) => FILE-STORAGE
+
+    Parameters:	
+
+
+        SOURCE - Name of the file to open or the text string to read the data from. Extension of the 
+                 file (.xml or .yml/.yaml) determines its format (XML or YAML respectively). Also you 
+                 can append .gz to work with compressed files, for example myHugeMatrix.xml.gz. If both 
+                 +FILE-STORAGE-WRITE+ and +FILE-STORAGE-MEMORY+ flags are specified, source is used just 
+                 to specify the output file format (e.g. mydata.xml, .yml etc.).
+
+        FLAGS -
+
+        Mode of operation. Possible values are:
+
+            +FILE-STORAGE-READ+ Open the file for reading.
+
+            +FILE-STORAGE-WRITE+ Open the file for writing.
+
+            +FILE-STORAGE-APPEND+ Open the file for appending.
+
+            +FILE-STORAGE-MEMORY+ Read data from source or write data to the internal buffer (which 
+                                  is returned by the FILE-STORAGE class RELEASE method)
+
+        ENCODING - Encoding of the file. Note that UTF-16 XML encoding is not supported currently 
+                   and you should use 8-bit encoding instead of it.
+
+
+The full constructor opens the file. Alternatively you can use the default constructor and then call 
+the FILE-STORAGE class *OPEN method.
+
+
+Example:
+
+See FILE-NODE-WRITE-EXAMPLE
+
+========================================================================================================================================
+FILE-STORAGE-RELEASE
+========================================================================================================================================
+
+Note: The name FILE-STORAGE-RELEASE is used in the documentation to refer to the binding for the 
+"release" member of the OpenCV FileStorage class. That name is for classification purposes only. 
+This binding along with other bindings for OpenCv "release" members are designed to be called 
+with the overloaded Lisp-CV RELEASE methods.
+
+Closes the file and releases all the memory buffers.
+
+C++: void FileStorage::release()
+
+LISP-CV: (RELEASE (SELF FILE-STORAGE)) => :VOID
+
+Call this method after all I/O operations with the storage are finished.
+
+
+Example:
+
+See FILE-NODE-READ-EXAMPLE in this file
+
+========================================================================================================================================
 CORE - UTILITY AND SYSTEM FUNCTIONS AND MACROS
 ========================================================================================================================================
 
-
+========================================================================================================================================
 CHECK-HARDWARE-SUPPORT
+========================================================================================================================================
 
 Returns true if the specified feature is supported by the host hardware.
 
@@ -6725,8 +7291,9 @@ code.
 	    hardware-max-feature)))
 
 
-
+========================================================================================================================================
 CUBE-ROOT
+========================================================================================================================================
 
 Computes the cube root of an argument.
 
@@ -6747,8 +7314,9 @@ data.
 	  (cube-root float-val)))
 
 
-
+========================================================================================================================================
 FAST-ATAN2
+========================================================================================================================================
 
 Calculates the angle of a 2D vector in degrees.
 
@@ -6778,8 +7346,9 @@ in degrees and varies from 0 to 360 degrees. The accuracy is about 0.3 degrees.
 	    (fast-atan2 float-y float-x))))
 
 
-
+========================================================================================================================================
 GET-TICK-COUNT
+========================================================================================================================================
 
 Returns the number of ticks.
 
@@ -6822,9 +7391,9 @@ See also: (GET-TICK-FREQUENCY)
     (format t "~a CPU ticks occurred while ruuning MAT 1000 times ~%"  
 	    time-calc)))
 
-
+========================================================================================================================================
 GET-TICK-FREQUENCY
-
+========================================================================================================================================
 
 Returns the number of ticks per second.
 
@@ -6866,8 +7435,9 @@ tion time in seconds:
 	    time-calc)))
 
 
-
+========================================================================================================================================
 *SQRT
+========================================================================================================================================
 
 Calculates a square root of array elements.
 
@@ -6923,9 +7493,9 @@ See also:
 IMGPROC - IMAGE FILTERING
 ========================================================================================================================================
 
-
-
+========================================================================================================================================
 BILATERAL-FILTER
+========================================================================================================================================
 
 Applies the bilateral filter to an image.
 
@@ -6933,6 +7503,7 @@ C++: void bilateralFilter(InputArray src, OutputArray dst, int d, double sigmaCo
 
 LISP-CV (BILATERAL-FILTER (SRC MAT) (DEST MAT) (D :INT) (SIGMA-COLOR :DOUBLE) (SIGMA-SPACE :DOUBLE) &OPTIONAL
         ((BORDER-TYPE :INT) +BORDER-DEFAULT+)) => :VOID
+
 
     Parameters:	
 
@@ -6951,6 +7522,7 @@ LISP-CV (BILATERAL-FILTER (SRC MAT) (DEST MAT) (D :INT) (SIGMA-COLOR :DOUBLE) (S
                       farther pixels will influence each other as long as their colors are close enough 
                       (see SIGMA-COLOR). When (> d 0) , it specifies the neighborhood size regardless of 
                       SIGMA-SPACE . Otherwise, D is proportional to SIGMA-SPACE .
+
 
 The function applies bilateral filtering to the input image, as described in:
 
@@ -6973,8 +7545,9 @@ Example:
 See BLUR-EXAMPLE in this file.
 
 
-
+========================================================================================================================================
 BLUR
+========================================================================================================================================
 
 Blurs an image using the normalized box filter.
 
@@ -7110,9 +7683,9 @@ Example:
 	 (when (>= c 0)
 	   (return))))))
 
-
-
+========================================================================================================================================
 COPY-MAKE-BORDER
+========================================================================================================================================
 
 Forms a border around an image.
 
@@ -7193,8 +7766,9 @@ See also:
 		 (return)))))))))
 
 
-
+========================================================================================================================================
 DILATE
+========================================================================================================================================
 
 Dilates an image by using a specific structuring element.
 
@@ -7243,7 +7817,9 @@ See also:
 (ERODE), (MORPHOLOGY-EX), (CREATE-MORPHOLOGY-FILTER), (GET-STRUCTURING-ELEMENT)
 
 
+========================================================================================================================================
 Example:
+========================================================================================================================================
 
 
 ;; Global variables
@@ -7306,8 +7882,9 @@ Example:
 	   (return))))))
 
 
-
+========================================================================================================================================
 ERODE
+========================================================================================================================================
 
 Erodes an image by using a specific structuring element.
 
@@ -7418,8 +7995,9 @@ Example:
 	   (return))))))
 
 
-
+========================================================================================================================================
 FILTER-2D
+========================================================================================================================================
 
 Convolves an image with the kernel.
 
@@ -7512,8 +8090,9 @@ See also:
 			 (return)))))))))))))
 
 
-
+========================================================================================================================================
 GAUSSIAN-BLUR
+========================================================================================================================================
 
 Blurs an image using a Gaussian filter.
 
@@ -7558,15 +8137,17 @@ Example:
 
 See BLUR-EXAMPLE in this file.
 
-
-
+========================================================================================================================================
 GET-STRUCTURING-ELEMENT
+========================================================================================================================================
 
 Returns a structuring element of the specified size and shape for morphological operations.
+
 
 C++: Mat getStructuringElement(int shape, Size ksize, Point anchor=Point(-1,-1))
 
 LISP-CV: (GET-STRUCTURING-ELEMENT (SHAPE :INT) (KSIZE SIZE) &OPTIONAL ((KERNEL POINT) (POINT -1 -1))) => MAT
+
 
     Parameters:	
 
@@ -7579,14 +8160,13 @@ LISP-CV: (GET-STRUCTURING-ELEMENT (SHAPE :INT) (KSIZE SIZE) &OPTIONAL ((KERNEL P
 
             +MORPH-CROSS+ - A cross-shaped structuring element:
 
-
         KSIZE - Size of the structuring element.
-
 
         ANCHOR - Anchor position within the element. The default value (-1 -1) means that the anchor 
                  is at the center. Note that only the shape of a cross-shaped element depends on the 
                  anchor position. In other cases the anchor just regulates how much the result of the 
                  morphological operation is shifted.
+
 
 The function constructs and returns the structuring element that can be further passed to (CREATE-MORPHOLOGY-FILTER), 
 (ERODE), (DILATE) or (MORPHOLOGY-EX) . But you can also construct an arbitrary binary mask yourself 
@@ -7677,8 +8257,9 @@ and use it as the structuring element.
 	     (return)))))))
 
 
-
+========================================================================================================================================
 LAPLACIAN
+========================================================================================================================================
 
 Calculates the Laplacian of an image.
 
@@ -7748,9 +8329,9 @@ See also:
 	       (return))))))))
 
 
-
+========================================================================================================================================
 MEDIAN-BLUR
-
+========================================================================================================================================
 
 Blurs an image using the median filter.
 
@@ -7783,8 +8364,9 @@ Example:
 See BLUR-EXAMPLE in this file.
 
 
-
+========================================================================================================================================
 MORPHOLOGY-EX
+========================================================================================================================================
 
 Performs advanced morphological transformations.
 
@@ -7839,6 +8421,8 @@ http://docs.opencv.org/trunk/modules/imgproc/doc/filtering.html?highlight=morpho
 for a description and formulae.
 
 
+Example:
+
 
 (defun morphology-ex-example (filename)
 
@@ -7885,8 +8469,9 @@ for a description and formulae.
 			 (return)))))))))))))
 
 
-
+========================================================================================================================================
 PYR-DOWN
+========================================================================================================================================
 
 Blurs an image and downsamples it.
 
@@ -7964,8 +8549,9 @@ the source image with the kernel, then, it downsamples the image by rejecting ev
   (main filename))
 
 
-
+========================================================================================================================================
 PYR-UP
+========================================================================================================================================
 
 Upsamples an image and then blurs it.
 
@@ -8042,8 +8628,9 @@ zero rows and columns and then convolves the result with the same kernel as in (
   (main filename))
 
 
-
+========================================================================================================================================
 SCHARR
+========================================================================================================================================
 
 Calculates the first x- or y- image derivative.
 
@@ -8167,8 +8754,9 @@ See also:
 		       (return))))))))))))
 
 
-
+========================================================================================================================================
 SOBEL
+========================================================================================================================================
 
 Calculates the first, second, third, or mixed image derivatives using an extended Sobel operator.
 
@@ -8307,6 +8895,7 @@ Example 2:
 ========================================================================================================================================
 IMGPROC - GEOMETRIC IMAGE TRANSFORMATIONS
 ========================================================================================================================================
+
 
 ========================================================================================================================================
 GET-AFFINE-TRANSFORM
@@ -8794,9 +9383,9 @@ LISP-CV: (INVERT-AFFINE-TRANSFORM (M MAT) (I-M MAT)) => :VOID
 
     Parameters:	
 
-        M – Original affine transformation.
+        M - Original affine transformation.
 
-        I-M – Output reverse affine transformation.
+        I-M - Output reverse affine transformation.
 
 
 The function computes an inverse affine transformation represented by 2x3 matrix M:
@@ -9280,8 +9869,9 @@ See also:
 
 
 
-
+========================================================================================================================================
 CVT-COLOR
+========================================================================================================================================
 
 Converts an image from one color space to another.
 
@@ -9490,8 +10080,9 @@ pattern is 50% green, 25% red and 25% blue, hence is also called RGBG,[1][2] GRG
 		       (return))))))))))))
 
 
-
+========================================================================================================================================
 DISTANCE-TRANSFORM
+========================================================================================================================================
 
 Calculates the distance to the closest zero pixel for each pixel of the source image.
 
@@ -9616,8 +10207,9 @@ algorithm currently,  i.e. (EQ MASK-SIZE +DIST-MASK-PRECISE+) is not supported y
 		   (return))))))))))
 
 
-
+========================================================================================================================================
 THRESHOLD
+========================================================================================================================================
 
 Applies a fixed-level threshold to each array element.
 
@@ -9717,7 +10309,9 @@ IMGPROC - HISTOGRAMS
 ========================================================================================================================================
 
 
+========================================================================================================================================
 EQUALIZE-HIST
+========================================================================================================================================
 
 
 Equalizes the histogram of a grayscale image.
@@ -9790,8 +10384,9 @@ http://docs.opencv.org/modules/imgproc/doc/histograms.html?highlight=equalizeh#e
 IMGPROC - FEATURE DETECTION
 ========================================================================================================================================
 
-
+========================================================================================================================================
 CANNY
+========================================================================================================================================
 
 Finds edges in an image using the [Canny86] algorithm.
 
@@ -11956,14 +12551,13 @@ FEATURE-DETECTOR-CREATE
 
 Creates a feature detector by its name.
 
-Note: The function FEATURE-DETECTOR-CREATE and the method CREATE, are provided in this library. 
-Both, the function and the method, have the same functionality and can be used interchangeably.
-I use the method in the examples in this file but since other functions also have a companion 
-defmethod named CREATE I named the example for FEATURE-DETECTOR-CREATE with the function name.
+Note: The name FEATURE-DETECTOR-CREATE is used in the documentation to refer to the binding for the 
+"create" member of the OpenCV FeatureDetector class. That name is for classification purposes only.
+This binding along with other bindings for OpenCv "create" members are designed to be called with the 
+overloaded Lisp-CV CREATE methods.
 
 C++: Ptr<FeatureDetector> FeatureDetector::create(const string& detectorType)
 
-LISP-CV: (FEATURE-DETECTOR-CREATE (SELF FEATURE-2D) (DETECTOR-TYPE :STRING)) => FEATURE-2D 
 
 LISP-CV: (CREATE (SELF FEATURE-2D) (DETECTOR-TYPE :STRING)) => FEATURE-2D 
 
@@ -11998,6 +12592,7 @@ Also a combined format is supported: feature detector adapter name:
                                      feature detector name: (see above), for example: "GRIDFAST", "PYRAMIDSTAR".
 
 
+Example:
 
 (defun feature-detector-create-example (filename-1 filename-2) 
 
@@ -12061,14 +12656,12 @@ FEATURE-DETECTOR-DETECT
 
 Detects keypoints in an image.
 
-Note: The function FEATURE-DETECTOR-DETECT and the method DETECT, are provided in this library. 
-Both, the function and the method, have the same functionality and can be used interchangeably.
-I use the method in the examples in this file but since other functions also have a companion 
-defmethod named DETECT I named the example for FEATURE-DETECTOR-DETECT with the function name.
+Note: The name FEATURE-DETECTOR-DETECT is used in the documentation to refer to the binding for the 
+"detect" member of the OpenCV FeatureDetector class. That name is for classification purposes only.
+This binding along with other bindings for OpenCv "detect" members are designed to be called with the 
+overloaded Lisp-CV DETECT methods.
 
 C++: void FeatureDetector::detect(InputArray image, vector<KeyPoint>& keypoints, InputArray mask=noArray() ) const
-
-LISP-CV: (FEATURE-DETECTOR-DETECT (SELF FEATURE-2D) (IMAGE MAT) (KEYPOINTS KEY-POINT) &OPTIONAL ((MASK MAT) (MAT) GIVEN-MASK)) => :VOID
 
 LISP-CV: (DETECT (SELF FEATURE-2D) (IMAGE MAT) (KEYPOINTS KEY-POINT) &OPTIONAL ((MASK MAT) (MAT) GIVEN-MASK)) => :VOID
 
@@ -12083,6 +12676,8 @@ LISP-CV: (DETECT (SELF FEATURE-2D) (IMAGE MAT) (KEYPOINTS KEY-POINT) &OPTIONAL (
         MASK - Mask specifying where to look for keypoints (optional). It must be a 8-bit integer 
                matrix with non-zero values in the region of interest.
 
+
+Example:
 
 
 (defun feature-detector-detect-example (&optional 
@@ -12175,20 +12770,18 @@ LISP-CV: (DETECT (SELF FEATURE-2D) (IMAGE MAT) (KEYPOINTS KEY-POINT) &OPTIONAL (
 
 ========================================================================================================================================
 FEATURES2D - COMMON INTERFACES OF DESCRIPTOR EXTRACTORS
-========================================================================================================================================
+====================f====================================================================================================================
 
 DESCRIPTOR-EXTRACTOR-COMPUTE
 
 Computes the descriptors for a set of keypoints detected in an image
 
-Note: The function DESCRIPTOR-EXTRACTOR-COMPUTE and the method COMPUTE, are provided in this library. 
-Both, the function and the method, have the same functionality and can be used interchangeably. I use 
-the method in the examples in this file, but, since other functions have a companion defmethod named 
-COMPUTE, I named the example for DESCRIPTOR-EXTRACTOR-COMPUTE with the function name.
+Note: The name DESCRIPTOR-EXTRACTOR-COMPUTE is used in the documentation to refer to the binding for 
+the "compute" member of the OpenCV DescriptorExtractor class. That name is for classification purposes 
+only. This binding along with other bindings for OpenCv "compute" members are designed to be called with 
+the overloaded Lisp-CV COMPUTE methods.
 
 C++: void DescriptorExtractor::compute(InputArray image, vector<KeyPoint>& keypoints, OutputArray descriptors) const
-
-LISP-CV: (DESCRIPTOR-EXTRACTOR-COMPUTE (SELF FEATURE-2D) (IMAGE MAT) (KEYPOINTS VECTOR-KEY-POINT) (DESCRIPTORS MAT)) => FEATURE-2D
 
 LISP-CV: (COMPUTE (SELF FEATURE-2D) (IMAGE MAT) (KEYPOINTS VECTOR-KEY-POINT) (DESCRIPTORS MAT)) => FEATURE-2D
 
@@ -12212,9 +12805,9 @@ See the FEATURE-DETECTOR-CREATE-EXAMPLE in this file.
 FEATURES2D - DRAWING FUNCTION OF KEYPOINTS AND MATCHES
 ========================================================================================================================================
 
-
-
+========================================================================================================================================
 DRAW-MATCHES
+========================================================================================================================================
 
 Draws the found matches of keypoints from two images.
 
@@ -12421,16 +13014,13 @@ DESCRIPTOR-MATCHER-MATCH
 
 Finds the best match for each descriptor from a query set.
 
-Note: The function DESCRIPTOR-MATCHER-MATCH and the method MATCH, are provided in this library. 
-Both, the function and the method, have the same functionality and can be used interchangeably. 
-I use the method in the examples in this file, but, since other functions also have a companion 
-defmethod named MATCH, I named the example for DESCRIPTOR-MATCHER-MATCH with the function name.
+Note: The name DESCRIPTOR-MATCHER-MATCH is used in the documentation to refer to the binding for the 
+"match" member of the OpenCV DescriptorMatcher class. That name is for classification purposes only.
+This binding along with other bindings for OpenCv "match" members are designed to be called with the 
+overloaded Lisp-CV MATCH methods.
 
 C++: void DescriptorMatcher::match(InputArray queryDescriptors, InputArray trainDescriptors, vector<DMatch>& matches, 
      InputArray mask=noArray() ) const
-
-LISP-CV: (DESCRIPTOR-MATCHER-MATCH (SELF FEATURE-2D) (QUERY-DESCRIPTORS MAT) (TRAIN-DESCRIPTORS MAT) 
-         (MATCHES VECTOR-DMATCH) (MASK MAT)) => :VOID
 
 LISP-CV: (MATCH (SELF FEATURE-2D) (QUERY-DESCRIPTORS MAT) (TRAIN-DESCRIPTORS MAT) 
          (MATCHES VECTOR-DMATCH) (MASK MAT)) => :VOID
@@ -12450,7 +13040,7 @@ LISP-CV: (MATCH (SELF FEATURE-2D) (QUERY-DESCRIPTORS MAT) (TRAIN-DESCRIPTORS MAT
         MASK - Mask specifying permissible matches between an input query and train matrices of descriptors.
 
 
-In this function the train descriptors are passed as an input argument. An optional mask can be passed 
+In this method the train descriptors are passed as an input argument. An optional mask can be passed 
 to specify which query and training descriptors can be matched. Namely, (QUERY-DESCRIPTORS I) can be 
 matched with (TRAIN-DESCRIPTORS J) only if (AT MASK I J :UCHAR) is non-zero.
 
@@ -15344,48 +15934,48 @@ functionality as MAKE-SCALAR and MAKE-SCALAR-ALL(respectively). I use the SCALAR
 functions in the examples in this file because it makes them easier to compare with OpenCV examples 
 you find online, thus making this library easier to learn.
 
-C++:  Scalar_();
+C++:  Scalar::Scalar();
 
 LISP-CV:  (SCALAR) => SCALAR
 
 LISP-CV:  (MAKE-SCALAR) => SCALAR
 
-C++: Scalar_(_Tp v0, _Tp v1, _Tp v2, _Tp v3)
+C++: Scalar::Scalar(double v0, double v1, double v2, double v3)
 
-LISP-CV:  (SCALAR ((VAL0 :DOUBLE) &OPTIONAL ((VAL1 :DOUBLE) 0) ((VAL2 :DOUBLE) 0) ((VAL3 :DOUBLE) 0))) => SCALAR
+LISP-CV:  (SCALAR ((V0 :DOUBLE) &OPTIONAL ((V1 :DOUBLE) 0) ((V2 :DOUBLE) 0) ((V3 :DOUBLE) 0))) => SCALAR
 
-LISP-CV:  (MAKE-SCALAR ((VAL0 :DOUBLE) &OPTIONAL ((VAL1 :DOUBLE) 0) ((VAL2 :DOUBLE) 0) ((VAL3 :DOUBLE) 0))) => SCALAR
+LISP-CV:  (MAKE-SCALAR ((V0 :DOUBLE) &OPTIONAL ((V1 :DOUBLE) 0) ((V2 :DOUBLE) 0) ((V3 :DOUBLE) 0))) => SCALAR
 
-C++: Scalar_<_Tp>::all(_Tp v0)
+C++: Scalar::Scalar::all(double v0)
 
-LISP-CV:  (SCALAR-ALL (VAL0123 :DOUBLE)) => SCALAR
+LISP-CV:  (SCALAR-ALL (V0 :DOUBLE)) => SCALAR
 
-LISP-CV:  (MAKE-SCALAR-ALL (VAL0123 :DOUBLE)) => SCALAR
+LISP-CV:  (MAKE-SCALAR-ALL (V0 :DOUBLE)) => SCALAR
 
 
     Parameters:	
 
-        VAl0 - First scalar element - Must exist.
+        V0 - First scalar element or value of all scalar elements if evaluating (SCALAR-ALL V0).
 
-        VAl1 - Second scalar element - Can be empty.
+        V1 - Second scalar element.
        
-        VAl2 - Third scalar element - Can be empty.
+        V2 - Third scalar element.
     
-        VAl3 - Fourth scalar element - Can be empty.
+        V3 - Fourth scalar element.
 
-        VAL0123 - Value of all scalar elements.
 
 
 The functions SCALAR and MAKE-SCALAR are SCALAR constructors. They return a pointer to an up to 4 
-element scalar. Only VAL0 is required, the rest are optional. Both the functions SCALAR-ALL and 
-MAKE-SCALAR-ALL return a pointer to a 4 element scalar with all elements having the same value.
-
+element scalar. Both the functions SCALAR-ALL and MAKE-SCALAR-ALL return a pointer to a 4 element 
+scalar with all elements having the same value.
 
 
 (defun scalar-example ()
 
-  (with-scalar ((scalar-1 (scalar 0 255 0))
+  (with-scalar ((un-init-scalar (scalar))
+                (scalar-1 (scalar 0 255 0))
 		(scalar-2 (scalar-all 255)))
+    (format t "~%UN-INIT-SCALAR = ~a~%~%" un-init-scalar)
     (format t "~%SCALAR-1 = (~a, ~a, ~a)~%~%" 
 	    (? scalar-1 :double 0)
 	    (? scalar-1 :double 1)
@@ -15395,7 +15985,6 @@ MAKE-SCALAR-ALL return a pointer to a 4 element scalar with all elements having 
 	    (? scalar-2 :double 1)
 	    (? scalar-2 :double 2)
 	    (? scalar-2 :double 3))))
-
 
 
 MAT-TYPE
@@ -15431,13 +16020,16 @@ Note: This example uses TG finalizers for memory management
 
 
 
+========================================================================================================================================
 CIRCLE
+========================================================================================================================================
 
 Draws a circle.
 
 C++: void circle(Mat& img, Point center, int radius, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
 
-LISP-CV: (CIRCLE (IMG MAT) (CENTER POINT) (RADIUS :INT) (COLOR SCALAR) &OPTIONAL ((THICKNESS :INT) 1) ((LINE-TYPE :INT) 8) ((SHIFT :INT) 0))
+LISP-CV: (CIRCLE (IMG MAT) (CENTER POINT) (RADIUS :INT) (COLOR SCALAR) &OPTIONAL ((THICKNESS :INT) 1) 
+                ((LINE-TYPE :INT) 8) ((SHIFT :INT) 0)) => :VOID
 
     Parameters:	
 
@@ -15449,38 +16041,18 @@ LISP-CV: (CIRCLE (IMG MAT) (CENTER POINT) (RADIUS :INT) (COLOR SCALAR) &OPTIONAL
 
         COLOR - Circle color.
 
-        THICKNESS - Thickness of the circle outline, if positive. Negative thickness means that a F-
-                    illed circle is to be drawn.
+        THICKNESS - Thickness of the circle outline, if positive. Negative thickness means that a 
+                    Filled circle is to be drawn.
 
         LINE-TYPE - Type of the circle boundary. See the (LINE) description.
 
         SHIFT - Number of fractional bits in the coordinates of the center and in the radius value.
 
+
 The function circle draws a simple or filled circle with a given center and radius.
 
-CIRCLE-EXAMPLE:
 
-(defparameter x 40)
-(defparameter y 40)
-(defparameter point 0)
-(defparameter the-right-wall 600)
-(defparameter the-left-wall 40)
-(defparameter the-ceiling 40)
-(defparameter the-floor 440)
-(defparameter rate 10)
-(defparameter right-wall-switch 0)
-(defparameter left-wall-switch 0)
-(defparameter ceiling-switch 0)
-(defparameter floor-switch 0)
-
-(defun report ()
-  (format t "x = ~a~%" x)
-  (format t "y = ~a~%" y)
-  (format t "right-wall-switch = ~a~%" right-wall-switch)
-  (format t "left-wall-switch = ~a~%" left-wall-switch)
-  (format t "ceiling-switch = ~a~%" ceiling-switch)
-  (format t "floor-switch = ~a~%" floor-switch))
-
+Example:
 
 
 (defparameter x 40)
@@ -15505,52 +16077,55 @@ CIRCLE-EXAMPLE:
   (format t "floor-switch = ~a~%" floor-switch))
 
 
-(defun circle-example (&optional (camera-index *camera-index*))
+(defun circle-example (&optional (cam *camera-index*))
 
   "This example uses the function CIRCLE to create a little 
    red ball. Then it uses a bit of logic to make the ball b-
    ounce around the room."
 
-  (with-capture (cap (video-capture camera-index))
-    (let* ((window-name "CICRLE Example")
-	   (color (scalar 0 0 255)))
+  (with-captured-camera (cap cam :width 640 :height 480)
+    (let* ((window-name "CICRLE Example"))
       (if (not (cap-is-open cap)) 
 	  (return-from circle-example 
 	    (format t "Cannot open the video camera")))
-      (format t "~%Frame Size : ~ax~a~%~%" 
-	      (cap-get cap +cap-prop-frame-width+)
-	      (cap-get cap +cap-prop-frame-height+))
-      (named-window window-name +window-normal+)
-      (move-window window-name 759 175)
-      (do* ((frame 0))
-	   ((plusp (wait-key *millis-per-frame*)) 
-	    (format t "Key is pressed by user"))
-	(setf frame (mat))
-	(cap-read cap frame)
-	(setf point (point x y))
-        (circle frame point 40 color +filled+ +aa+ 0)
-	(imshow window-name frame)
-	(if (= x the-right-wall) (progn 
-				   (format t "right wall has been touched~%") 
-				   (setf right-wall-switch 1)))    
-	(if (= x the-left-wall) (progn
-				  (format t "left wall has been touched~%") 
-				  (setf left-wall-switch 1)))	
-	(if (= y the-floor) (progn 
-			      (format t "floor has been touched~%") 
-			      (setf floor-switch 1))) 
-	(if (= y the-ceiling) (progn 
-				(format t"ceiling has been touched~%") 
-				(setf ceiling-switch 1))) 
-	(if (and (< x the-right-wall) (= right-wall-switch 0)) (incf x rate) (decf x rate))
-	(if (and (< y the-floor) (= floor-switch 0)) (incf y rate) (decf y rate))
-	(if (< x (+ 40 rate)) (setf right-wall-switch 0))
-	(if (< y (+ 40 rate)) (setf floor-switch 0))
-	(report))
-      (destroy-window window-name))))
+      (with-named-window (window-name +window-normal+)
+	(move-window window-name 759 175)
+	(with-scalar ((color (scalar 0 0 255)))
+	  (loop
+	     (with-mat ((frame (mat)))
+	       (cap-read cap frame)
+	       (with-point ((point (point x y)))
+		 (circle frame point 40 color +filled+ +aa+ 0)
+		 (imshow window-name frame)
+		 (if (= x the-right-wall) 
+		     (progn 
+		       (format t "right wall has been touched~%") 
+		       (setf right-wall-switch 1)))    
+		 (if (= x the-left-wall) 
+		     (progn
+		       (format t "left wall has been touched~%") 
+		       (setf left-wall-switch 1)))	
+		 (if (= y the-floor) 
+		     (progn 
+		       (format t "floor has been touched~%") 
+		       (setf floor-switch 1))) 
+		 (if (= y the-ceiling) 
+		     (progn 
+		       (format t"ceiling has been touched~%") 
+		       (setf ceiling-switch 1))) 
+		 (if (and (< x the-right-wall) (= right-wall-switch 0)) (incf x rate) (decf x rate))
+		 (if (and (< y the-floor) (= floor-switch 0)) (incf y rate) (decf y rate))
+		 (if (< x (+ 40 rate)) (setf right-wall-switch 0))
+		 (if (< y (+ 40 rate)) (setf floor-switch 0))
+		 (report)))
+	     (let ((c (wait-key 33)))
+	       (when (= c 27)
+		 (return)))))))))
 
 
+========================================================================================================================================
 MAT-ZEROS
+========================================================================================================================================
 
 Returns a zero array of the specified size and type.
 
@@ -15603,7 +16178,9 @@ wise, the existing matrix A is filled with zeros.
     (destroy-window window-name)))
 
 
+========================================================================================================================================
 MAT-ONES
+========================================================================================================================================
 
 Returns an array of all 1’s of the specified size and type.
 
@@ -16730,6 +17307,7 @@ Example:
 
 (defparameter n (/ 1 1))
 
+
 (defun update-swank-example (filename)
 
   "You can update this program as it runs! Just run 
@@ -16738,7 +17316,10 @@ Example:
    to the REPL, even though its not active, you can 
    use (SETF N (/ 1 <NEW VALUE>)) to update N which 
    will change the strobe effect. After you running 
-   SETF once you will get the REPL back"
+   SETF once you will get the REPL back
+
+   Note: If the strobe effect does not change when 
+   you update N, try using a smaller picture."
 
   (let ((window-name "UPDATE-SWANK-EXAMPLE")
 	(x 0))
