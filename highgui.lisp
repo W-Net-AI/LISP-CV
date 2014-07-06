@@ -141,13 +141,6 @@
   (%wait-key delay))
 
 
-(defmacro with-named-window ((winname &optional (flags +window-autosize+)) &body body)
-	  `(unwind-protect (progn (named-window ,winname ,flags)
-				  ,@body)
-				  (destroy-window ,winname)))
-
-
-
 ;;; Reading and Writing Images and Video
 
 
@@ -303,41 +296,6 @@
   "Writes the next video frame"
   (self video-writer)
   (image mat))
-
-
-(defmacro with-capture ((capture-var capture) &body body)
-  "Ensures CAP-RELEASE gets called on captures."
-  `(let ((,capture-var ,capture))
-     (unwind-protect
-	  (progn ,@body)
-       (cap-release ,capture-var)
-       (del-vid-cap ,capture-var))))
-
-
-(defmacro with-captured-camera ((capture-var dev-index &key width height) &body body)
-  "Ensures CAP-RELEASE gets called on captures 
-   and sets capture width/height in function"
-  `(let ((,capture-var (video-capture ,dev-index)))
-     (when ,width
-       (cap-set ,capture-var +cap-prop-frame-width+ ,width))
-     (when ,height
-       (cap-set ,capture-var +cap-prop-frame-height+ ,height))
-     (unwind-protect (progn ,@body)
-       (cap-release ,capture-var)
-       (del-vid-cap ,capture-var))))
-
-
-(defmacro with-captured-file ((capture-var file-path &key width height) &body body)
-  "Ensures CAP-RELEASE gets called on captures 
-   and sets capture width/height in function"
-  `(let ((,capture-var (video-capture ,file-path)))
-     (when ,width
-       (cap-set ,capture-var +cap-prop-frame-width+ ,width))
-     (when ,height
-       (cap-set ,capture-var +cap-prop-frame-height+ ,height))
-     (unwind-protect (progn ,@body)
-       (cap-release ,capture-var)
-       (del-vid-cap ,capture-var))))
 
 
 ;;; Qt New Functions

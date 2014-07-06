@@ -104,7 +104,6 @@
    #:del-d-tree-params
    #:del-file-node
    #:del-file-storage
-   #:del-feature-2d
    #:del-hog-descriptor
    #:del-k-nearest
    #:del-key-point
@@ -187,18 +186,22 @@
 
 ;; WITH-MACROS
 
+
+   #:with-capture
+   #:with-captured-camera
+   #:with-captured-file
    #:with-cascade-classifier
    #:with-dmatch
    #:with-d-tree
    #:with-d-tree-params
    #:with-file-node
    #:with-file-storage
-   #:with-feature-2d
    #:with-hog-descriptor
    #:with-key-point
    #:with-k-nearest
    #:with-mat
    #:with-mat-expr
+   #:with-named-window
    #:with-normal-bayes-classifier
    #:with-object
    #:with-point
@@ -278,12 +281,13 @@
 
    #:ann-mlp
    #:ann-mlp-train-params
+   #:bf-matcher
+   #:brisk
    #:cascade-classifier
    #:dmatch
    #:d-tree
    #:d-tree-node
    #:d-tree-params
-   #:feature-2d
    #:file-node
    #:file-storage
    #:hog-descriptor
@@ -309,6 +313,7 @@
    #:*string
    #:svm
    #:svm-params
+   #:surf
    #:term-criteria
    #:trackbar-callback
    #:vec-2b
@@ -650,10 +655,11 @@
    #:dot
    #:height
    #:match
+   #:*open
    #:release
    #:size
    #:width
-   #:write
+   #:*write
    #:x
    #:y
    #:z
@@ -1401,7 +1407,6 @@
    #:named-window
    #:start-window-thread
    #:wait-key
-   #:with-named-window
 
 
 ;; highgui - Reading and Writing Images and Video
@@ -1452,9 +1457,7 @@
    #:video-writer
    #:video-writer-is-open
    #:video-writer-write
-   #:with-capture
-   #:with-captured-camera
-   #:with-captured-file
+
 
 ;; highgui - Qt New Functions
 
@@ -1483,15 +1486,24 @@
 
    #:brisk
    #:make-brisk
+   #:feature-2d-create
 
 ;; features2d - Common Interfaces of Feature Detectors
 
+   #:feature-detector-create
+   #:feature-detector-detect
+
 ;; features2d - Common Interfaces of Descriptor Extractors
+
+   #:descriptor-extractor-compute
+   #:descriptor-extractor-create
 
 ;; features2d - Common Interfaces of Descriptor Matchers
 
    #:bf-matcher
    #:make-bf-matcher
+   #:descriptor-matcher-create
+   #:descriptor-matcher-match
 
 ;;; features2d - Drawing Function of Keypoints and Matches
 

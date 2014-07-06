@@ -7087,7 +7087,7 @@ The methods write an object or a number to file storage.
 
 Example:
 
-(defun file-node-write-example (filename save-directory) 
+(defun file-storage-write-example (filename save-directory) 
 
     ;Write a double float to a YML file
     (let ((double-float 10.0d0))
@@ -7098,7 +7098,7 @@ Example:
 	(release fs)))
 
     ;Write a single float to a YML file
-    (let ((single-float 20.0d0))
+    (let ((single-float 20.0f0))
       (with-file-storage ((fs (file-storage 
 			       (cat save-directory "single-float.yml")  
 			       +file-storage-write+)))
@@ -7106,7 +7106,7 @@ Example:
 	(release fs)))
 
     ;Write an integer to a YML file
-    (let ((integer 30.0d0))
+    (let ((integer 30))
       (with-file-storage ((fs (file-storage 
 			       (cat save-directory "integer.yml")  
 			       +file-storage-write+)))
@@ -7130,15 +7130,15 @@ Example:
 	(release fs)))
 
     ;Write a vector of keypoints to a YML file
-    (with-named-window ("FILE-NODE-WRITE Example" +window-normal+)
-      (move-window "FILE-NODE-WRITE Example" 759 175)
+    (with-named-window ("FILE-STORAGE-WRITE Example" +window-normal+)
+      (move-window "FILE-STORAGE-WRITE Example" 759 175)
       ;Read in image
       (with-mat ((image (imread filename +load-image-color+)))
 	(if (empty image) 
-	    (return-from file-node-write-example 
+	    (return-from file-storage-write-example 
 	      (format t "Image was not loaded")))
         ;Create BRISK feature detector
-	(with-feature-2d ((detector (brisk)))
+	(with-brisk ((detector (brisk)))
           ;Create vector to hold the keypoints
 	  (with-vector-key-point ((key-points (vector-key-point)))
 	    ;Detect the keypoints using BRISK
@@ -7151,7 +7151,7 @@ Example:
 	      (*write fs "keypoints" key-points)
               ;Release FILE-STORAGE object
 	      (release fs)
-	      (imshow "FILE-NODE-WRITE Example" image)
+	      (imshow "FILE-STORAGE-WRITE Example" image)
 	      (loop
 		 (let ((c (wait-key 33)))
 		   (when (= c 27)
@@ -12358,12 +12358,9 @@ The function SET-WINDOW-PROPERTY enables changing properties of a window.
     (del-mat image)
     (destroy-window window-name)))
 
-
-
 ========================================================================================================================================
 FEATURES2D - FEATURE DETECTION AND DESCRIPTION
 ========================================================================================================================================
-
 
 ========================================================================================================================================
 BRISK
@@ -12378,13 +12375,9 @@ easier to compare with OpenCV examples you find online, thus making this library
 
 C++: BRISK::BRISK(int thresh=30, int octaves=3, float patternScale=1.0f)
 
-LISP-CV: (BRISK &OPTIONAL ((THRESH :INT) 30) ((OCTAVES :INT) 3) ((PATTERN-SCALE :FLOAT) 1.0F0) => FEATURE-2D
+LISP-CV: (BRISK &OPTIONAL ((THRESH :INT) 30) ((OCTAVES :INT) 3) ((PATTERN-SCALE :FLOAT) 1.0F0) => BRISK
 
-LISP-CV: (MAKE-BRISK &OPTIONAL ((THRESH :INT) 30) ((OCTAVES :INT) 3) ((PATTERN-SCALE :FLOAT) 1.0F0) => FEATURE-2D
-
-
-Note: In this library, to make all the FEATURES2D functions work together nicely, I had to make 
-      the three functions BF-MATCHER, BRISK and SURF the same type, FEATURE-2D. 
+LISP-CV: (MAKE-BRISK &OPTIONAL ((THRESH :INT) 30) ((OCTAVES :INT) 3) ((PATTERN-SCALE :FLOAT) 1.0F0) => BRISK
 
 
     Parameters:	
@@ -12395,10 +12388,13 @@ Note: In this library, to make all the FEATURES2D functions work together nicely
 
         PATTERN-SCALE - apply this scale to the pattern used for sampling the neighbourhood of a keypoint.
 
+
 BRISK is a object implementing the BRISK keypoint detector and descriptor extractor, described in [LCS11]:
 
 http://docs.opencv.org/modules/features2d/doc/feature_detection_and_description.html?highlight=brisk#lcs11
 
+
+Example:
 
 
 (defun brisk-example (filename-1 filename-2)
@@ -12514,20 +12510,20 @@ http://docs.opencv.org/modules/features2d/doc/feature_detection_and_description.
       (setf (aref all-matches-arr i) (gc:mat))
       ;; find matches, between the two images, 12 times,
       ;; each using a different set of BRISK parameters
-      (create (aref brisk-arr i) "BRISK")
+      (create :feature-detector (aref brisk-arr i) "BRISK")
       ;; detect keypoints in the image GRAY-A
       (detect (aref brisk-arr i) gray-a (aref keypoints-a-arr i))
       ;; Compute the descriptors for a set of keypoints detected in GRAY-A
-      (compute (aref brisk-arr i) gray-a (aref keypoints-a-arr i) 
-				  (aref descriptors-a-arr i))
+      (compute :feature-2d (aref brisk-arr i) gray-a (aref keypoints-a-arr i) 
+	       (aref descriptors-a-arr i))
       ;; detect keypoints in the image GRAY-B
       (detect (aref brisk-arr i) gray-b (aref keypoints-b-arr i))
       ;; compute the descriptors for a set of keypoints detected in GRAY-B
-      (compute (aref brisk-arr i) gray-b (aref keypoints-b-arr i) 
-				  (aref descriptors-b-arr i))
+      (compute :feature-2d (aref brisk-arr i) gray-b (aref keypoints-b-arr i) 
+	       (aref descriptors-b-arr i))
       ;; find the best match for each descriptor
       (match (aref matcher-arr i) (aref descriptors-a-arr i) 
-				(aref descriptors-b-arr i) (aref matches-arr i))
+	     (aref descriptors-b-arr i) (aref matches-arr i))
       ;; draw the found matches
       (draw-matches gray-a (aref keypoints-a-arr i) gray-b (aref keypoints-b-arr i) 
 		    (aref matches-arr i) (aref all-matches-arr i) 
@@ -12535,36 +12531,48 @@ http://docs.opencv.org/modules/features2d/doc/feature_detection_and_description.
 		    +draw-rich-keypoints+)
       ;; show the 12 different matches in 12 windows
       (imshow (aref window-name-arr i) (aref all-matches-arr i))
-      (del-feature-2d (aref brisk-arr i)))
+      (del-brisk (aref brisk-arr i)))
     ;; after 'esc' key is pressed destroy all 12 windows
     (loop while (not (= (wait-key 0) 27)))
     (dotimes (i 12)
       (destroy-window (aref window-name-arr i)))))
 
-
 ========================================================================================================================================
 FEATURES2D - COMMON INTERFACES OF FEATURE DETECTORS
 ========================================================================================================================================
 
-
+========================================================================================================================================
 FEATURE-DETECTOR-CREATE
+========================================================================================================================================
 
 Creates a feature detector by its name.
 
+
 Note: The name FEATURE-DETECTOR-CREATE is used in the documentation to refer to the binding for the 
-"create" member of the OpenCV FeatureDetector class. That name is for classification purposes only.
-This binding along with other bindings for OpenCv "create" members are designed to be called with the 
-overloaded Lisp-CV CREATE methods.
+"create" member of the OpenCV FeatureDetector class because it is more descriptive and it is easier 
+to search for in this file. The CREATE method may also be used to call this binding.
+
 
 C++: Ptr<FeatureDetector> FeatureDetector::create(const string& detectorType)
 
+LISP-CV: (CREATE (TYPE SYMBOL) (SELF BF-MATCHER) (DETECTOR-TYPE :STRING)) => BF-MATCHER
 
-LISP-CV: (CREATE (SELF FEATURE-2D) (DETECTOR-TYPE :STRING)) => FEATURE-2D 
+LISP-CV: (CREATE (TYPE SYMBOL) (SELF BRISK) (DETECTOR-TYPE :STRING)) => BRISK
+
+LISP-CV: (CREATE (TYPE SYMBOL) (SELF SURF) (DETECTOR-TYPE :STRING)) => SURF
+
+LISP-CV: (FEATURE-DETECTOR-CREATE (SELF BF-MATCHER) (DETECTOR-TYPE :STRING)) => BF-MATCHER
+
+LISP-CV: (FEATURE-DETECTOR-CREATE (SELF BRISK) (DETECTOR-TYPE :STRING)) => BRISK
+
+LISP-CV: (FEATURE-DETECTOR-CREATE (SELF SURF) (DETECTOR-TYPE :STRING)) => SURF
 
 
     Parameters:	
 
-        SELF - A FEATURE-2D object e.g. BRISK
+        TYPE - A symbol. Must be specified as :FEATURE-DETECTOR.
+ 
+        SELF - A BF-MATCHER, BRISK or SURF object.
 
         DETECTOR-TYPE - Feature detector type:
 
@@ -12572,19 +12580,29 @@ LISP-CV: (CREATE (SELF FEATURE-2D) (DETECTOR-TYPE :STRING)) => FEATURE-2D
 The following detector types are supported:
 
 
-    "FAST" - FAST-FEATURE-DETECTOR
-    "STAR" - STAR-FEATURE-DETECTOR
-    "SIFT" - SIFT (nonfree module)
-    "SURF" - SURF (nonfree module)
-    "ORB" - ORB
-    "BRISK" - BRISK
-    "MSER" - MSER
-    "GFTT" - GOOD-FEATURES-TO-TRACK-DETECTOR
-    "HARRIS" - GOOD-FEATURES-TO-TRACK-DETECTOR with Harris detector enabled
-    "Dense" - DENSE-FEATURE-DETECTOR
-    "SimpleBlob" - SIMPLE-BLOB-DETECTOR
-
-
+       "FAST" - FAST-FEATURE-DETECTOR
+   
+       "STAR" - STAR-FEATURE-DETECTOR
+   
+       "SIFT" - SIFT (nonfree module)
+   
+       "SURF" - SURF (nonfree module)
+   
+       "ORB" - ORB
+   
+       "BRISK" - BRISK
+   
+       "MSER" - MSER
+   
+       "GFTT" - GOOD-FEATURES-TO-TRACK-DETECTOR
+   
+       "HARRIS" - GOOD-FEATURES-TO-TRACK-DETECTOR with Harris detector enabled
+   
+       "Dense" - DENSE-FEATURE-DETECTOR
+   
+       "SimpleBlob" - SIMPLE-BLOB-DETECTOR
+   
+  
 Also a combined format is supported: feature detector adapter name:
 
            ("GRID" - GRID-ADAPTED-FEATURE-DETECTOR, "PYRAMID" - PYRAMID-ADAPTED-FEATURE-DETECTOR) + 
@@ -12593,6 +12611,7 @@ Also a combined format is supported: feature detector adapter name:
 
 
 Example:
+
 
 (defun feature-detector-create-example (filename-1 filename-2) 
 
@@ -12618,56 +12637,70 @@ Example:
 	    (format t "Both images were not loaded")))
       (with-vector-key-point ((keypoints-a (vector-key-point))
 			      (keypoints-b (vector-key-point)))
-	;; declare a variable BRISKD of the type FEATURE-2D
-	(with-feature-2d ((briskd (brisk thresh octaves pattern-scale))
-			  ;; declare matcher
-			  (matcher (bf-matcher)))
-	  (with-vector-dmatch ((matches (vector-dmatch)))
-	    ;; create a feature detector
-	    (create briskd "STAR")
-	    ;; detect keypoints in the image GRAY-A
-	    (detect briskd gray-a keypoints-a)
-	    ;; Compute the descriptors for a set of keypoints detected in GRAY-A
-	    (compute briskd gray-a keypoints-a descriptors-a)
-	    ;; detect keypoints in the image GRAY-B
-	    (detect briskd gray-b keypoints-b)
-	    ;; Compute the descriptors for a set of keypoints detected in GRAY-B
-	    (compute briskd gray-b keypoints-b descriptors-b)
-	    ;; find the best match for each descriptor
-	    (match matcher descriptors-a descriptors-b matches)
-	    (with-named-window (window-name +window-normal+)
-	      (move-window window-name 759 175)
-	      (with-scalar ((scalar (scalar-all -1)))
-		;; draw the found matches
-		(with-vector-char ((matches-mask (gc:make-vector-char)))
-		  (draw-matches gray-a keypoints-a gray-b keypoints-b matches all-matches 
-				scalar scalar matches-mask
-				+not-draw-single-points+)
-		  ;; show the matches in a window 
-		  (imshow window-name all-matches)
-		  (loop 
-		     (let ((c (wait-key 33)))
-		       (when (= c 27)
-			 (return)))))))))))))
+	;; declare BRISK keypoint detector/descriptor extractor
+	(with-brisk ((briskd (brisk thresh octaves pattern-scale)))
+	  ;; declare matcher
+	  (with-bf-matcher ((matcher (bf-matcher)))
+	    ;; create vector of DMATCH objects to hold the matches
+	    (with-vector-dmatch ((matches (vector-dmatch)))
+	      ;; create a feature detector
+	      (create :feature-detector briskd "STAR")
+	      ;; detect keypoints in the image GRAY-A
+	      (detect briskd gray-a keypoints-a)
+	      ;; Compute the descriptors for a set of keypoints detected in GRAY-A
+	      (compute :feature-2d briskd gray-a keypoints-a descriptors-a)
+	      ;; detect keypoints in the image GRAY-B
+	      (detect briskd gray-b keypoints-b)
+	      ;; Compute the descriptors for a set of keypoints detected in GRAY-B
+	      (compute :feature-2d  briskd gray-b keypoints-b descriptors-b)
+	      ;; find the best match for each descriptor
+	      (match matcher descriptors-a descriptors-b matches)
+	      (with-named-window (window-name +window-normal+)
+		(move-window window-name 759 175)
+		(with-scalar ((scalar (scalar-all -1)))
+		  ;; draw the found matches
+		  (with-vector-char ((matches-mask (gc:make-vector-char)))
+		    (draw-matches gray-a keypoints-a gray-b keypoints-b matches all-matches 
+				  scalar scalar matches-mask
+				  +not-draw-single-points+)
+		    ;; show the matches in a window 
+		    (imshow window-name all-matches)
+		    (loop 
+		       (let ((c (wait-key 33)))
+			 (when (= c 27)
+			   (return))))))))))))))
 
 
-
+========================================================================================================================================
 FEATURE-DETECTOR-DETECT
+========================================================================================================================================
 
 Detects keypoints in an image.
 
+
 Note: The name FEATURE-DETECTOR-DETECT is used in the documentation to refer to the binding for the 
-"detect" member of the OpenCV FeatureDetector class. That name is for classification purposes only.
-This binding along with other bindings for OpenCv "detect" members are designed to be called with the 
-overloaded Lisp-CV DETECT methods.
+"detect" member of the OpenCV FeatureDetector class because it is more descriptive and it is easier 
+to search for in this file. The DETECT method may also be used to call this binding.
+
 
 C++: void FeatureDetector::detect(InputArray image, vector<KeyPoint>& keypoints, InputArray mask=noArray() ) const
 
-LISP-CV: (DETECT (SELF FEATURE-2D) (IMAGE MAT) (KEYPOINTS KEY-POINT) &OPTIONAL ((MASK MAT) (MAT) GIVEN-MASK)) => :VOID
+LISP-CV: (DETECT (SELF BF-MATCHER) (IMAGE MAT) (KEYPOINTS KEY-POINT) &OPTIONAL ((MASK MAT) (MAT) GIVEN-MASK)) => :VOID
+
+LISP-CV: (DETECT (SELF BRISK) (IMAGE MAT) (KEYPOINTS KEY-POINT) &OPTIONAL ((MASK MAT) (MAT) GIVEN-MASK)) => :VOID
+
+LISP-CV: (DETECT (SELF SURF) (IMAGE MAT) (KEYPOINTS KEY-POINT) &OPTIONAL ((MASK MAT) (MAT) GIVEN-MASK)) => :VOID
+
+LISP-CV: (FEATURE-DETECTOR-DETECT (SELF BF-MATCHER) (IMAGE MAT) (KEYPOINTS KEY-POINT) &OPTIONAL ((MASK MAT) (MAT) GIVEN-MASK)) => :VOID
+
+LISP-CV: (FEATURE-DETECTOR-DETECT (SELF BRISK) (IMAGE MAT) (KEYPOINTS KEY-POINT) &OPTIONAL ((MASK MAT) (MAT) GIVEN-MASK)) => :VOID
+
+LISP-CV: (FEATURE-DETECTOR-DETECT (SELF SURF) (IMAGE MAT) (KEYPOINTS KEY-POINT) &OPTIONAL ((MASK MAT) (MAT) GIVEN-MASK)) => :VOID
+
 
     Parameters:	
 
-        SELF - A FEATURE-2D object e.g. SURF, BRISK etc.
+        SELF - A BF-MATCHER, BRISK or SURF object.
 
         IMAGE - An image.
 
@@ -12681,9 +12714,9 @@ Example:
 
 
 (defun feature-detector-detect-example (&optional 
-			 (cam *camera-index*) 
-			 (width *default-width*)
-			 (height *default-height*))
+					  (cam *camera-index*) 
+					  (width *default-width*)
+					  (height *default-height*))
 
   (with-captured-camera (cap cam :width width :height height)
     ;;Initialize the template location, dimension and 
@@ -12717,7 +12750,7 @@ Example:
 	  (create-trackbar "TEMPLATE-HEIGHT" window-name template-height height) 
           (create-trackbar "TEMPLATE-WIDTH" window-name template-width width)
           ;;Trackbar to set the hessian keypoint detector threshold
-	  (create-trackbar "MIN-HESSIAN" window-name min-hessian 100000) 
+	  (create-trackbar "MIN-HESSIAN" window-name min-hessian 30000) 
 	  (loop ;;Were using the camera feed as the image here and a
 	     ;;region of interest of the feed as the template
 	     (with-mat ((frame (mat)))
@@ -12746,17 +12779,16 @@ Example:
                  ;;region of interest will be the template image.
 		 (with-mat ((template (roi frame roi)))
 		   (cvt-color template template +bgr2gray+)
-		   (with-feature-2d ((detector (surf (coerce (? min-hessian :int) 
-							     'double-float)))
-                                     (extractor (gc:surf)))
+		   (with-surf ((detector (surf (coerce (? min-hessian :int) 'double-float)))
+			       (extractor (gc:surf)))
 		     ;;-- Step 1: Detect keypoints in the
                      ;;-- image and template using DETECT
 		     (detect detector template keypoints-1)
 		     (detect detector frame keypoints-2)
 		     ;;-- Step 2: Calculate descriptors(feature vectors) 
                      ;;-- using the keypoints detected in the last step
-		     (compute extractor template keypoints-1 descriptors-1)
-		     (compute extractor frame keypoints-2 descriptors-2)
+		     (compute :feature-2d extractor template keypoints-1 descriptors-1)
+		     (compute :feature-2d extractor frame keypoints-2 descriptors-2)
 		     ;;-- Step 3: Match descriptor vectors with a brute force matcher
 		     (match matcher descriptors-1 descriptors-2 matches)
 		     ;;-- Draw matches
@@ -12770,22 +12802,40 @@ Example:
 
 ========================================================================================================================================
 FEATURES2D - COMMON INTERFACES OF DESCRIPTOR EXTRACTORS
-====================f====================================================================================================================
+========================================================================================================================================
 
+========================================================================================================================================
 DESCRIPTOR-EXTRACTOR-COMPUTE
+========================================================================================================================================
 
 Computes the descriptors for a set of keypoints detected in an image
 
-Note: The name DESCRIPTOR-EXTRACTOR-COMPUTE is used in the documentation to refer to the binding for 
-the "compute" member of the OpenCV DescriptorExtractor class. That name is for classification purposes 
-only. This binding along with other bindings for OpenCv "compute" members are designed to be called with 
-the overloaded Lisp-CV COMPUTE methods.
+
+Note: The name DESCRIPTOR-EXTRACTOR-COMPUTE is used in the documentation to refer to the binding for the 
+"compute" member of the OpenCV DescriptorExtractor class because it is more descriptive and it is easier 
+to search for in this file. The COMPUTE method may also be used to call this binding.
+
 
 C++: void DescriptorExtractor::compute(InputArray image, vector<KeyPoint>& keypoints, OutputArray descriptors) const
 
-LISP-CV: (COMPUTE (SELF FEATURE-2D) (IMAGE MAT) (KEYPOINTS VECTOR-KEY-POINT) (DESCRIPTORS MAT)) => FEATURE-2D
+LISP-CV: (COMPUTE (TYPE SYMBOL) (SELF BF-MATCHER) (IMAGE MAT) (KEYPOINTS VECTOR-KEY-POINT) (DESCRIPTORS MAT)) => BF-MATCHER
+
+LISP-CV: (COMPUTE (TYPE SYMBOL) (SELF BRISK) (IMAGE MAT) (KEYPOINTS VECTOR-KEY-POINT) (DESCRIPTORS MAT)) => BRISK
+
+LISP-CV: (COMPUTE (TYPE SYMBOL) (SELF SURF) (IMAGE MAT) (KEYPOINTS VECTOR-KEY-POINT) (DESCRIPTORS MAT)) => SURF
+
+LISP-CV: (DESCRIPTOR-EXTRACTOR-COMPUTE (SELF BF-MATCHER) (IMAGE MAT) (KEYPOINTS VECTOR-KEY-POINT) (DESCRIPTORS MAT)) => BF-MATCHER
+
+LISP-CV: (DESCRIPTOR-EXTRACTOR-COMPUTE (SELF BRISK) (IMAGE MAT) (KEYPOINTS VECTOR-KEY-POINT) (DESCRIPTORS MAT)) => BRISK
+
+LISP-CV: (DESCRIPTOR-EXTRACTOR-COMPUTE (SELF SURF) (IMAGE MAT) (KEYPOINTS VECTOR-KEY-POINT) (DESCRIPTORS MAT)) => SURF
+
 
     Parameters:	
+
+        TYPE - A symbol. Must be specified as :DESCRIPTOR-EXTRACTOR.
+
+        SELF - A BF-MATCHER, BRISK or SURF object.
 
         IMAGE - Image.
 
@@ -12796,10 +12846,10 @@ LISP-CV: (COMPUTE (SELF FEATURE-2D) (IMAGE MAT) (KEYPOINTS VECTOR-KEY-POINT) (DE
         DESCRIPTORS - Computed descriptors. 
 
 
+
 Example:
 
 See the FEATURE-DETECTOR-CREATE-EXAMPLE in this file.
-
 
 ========================================================================================================================================
 FEATURES2D - DRAWING FUNCTION OF KEYPOINTS AND MATCHES
@@ -12867,6 +12917,8 @@ two keypoints (circles). The FLAGS parameters are defined as follows:
                                     e and orientation wilL be drawn.
 
 
+Example:
+
 
 (defun draw-matches-example (filename-1 filename-2) 
 
@@ -12901,71 +12953,69 @@ two keypoints (circles). The FLAGS parameters are defined as follows:
 	    (move-window window-name-3 485 444)
 	    (move-window window-name-4 894 444)
 	    ;; declare feature detector
-	    (with-feature-2d ((briskd (brisk thresh octaves pattern-scale))
-			      ;; declare matcher
-			      (matcher (bf-matcher)))
-	      ;; the object you want to track 
-	      (with-mat ((object (imread filename-1 +load-image-grayscale+))
-			 ;; the image the object is a part of
-			 (image (imread filename-2 +load-image-grayscale+))
-			 ;; matrices used to hold the descriptors
-			 (descriptors-a (mat))
-			 (descriptors-b (mat))) 
-		;; vectors used to hold the keypoints
-		(with-vector-key-point ((keypoints-a (vector-key-point))
-					(keypoints-b (vector-key-point)))
-		  (with-vector-dmatch ((matches (vector-dmatch)))
+	    (with-brisk ((briskd (brisk thresh octaves pattern-scale)))
+	      ;; declare matcher
+	      (with-bf-matcher ((matcher (bf-matcher)))
+		;; the object you want to track 
+		(with-mat ((object (imread filename-1 +load-image-grayscale+))
+			   ;; the image the object is a part of
+			   (image (imread filename-2 +load-image-grayscale+))
+			   ;; matrices used to hold the descriptors
+			   (descriptors-a (mat))
+			   (descriptors-b (mat))) 
+		  ;; vectors used to hold the keypoints
+		  (with-vector-key-point ((keypoints-a (vector-key-point))
+					  (keypoints-b (vector-key-point)))
+		    (with-vector-dmatch ((matches (vector-dmatch)))
 
-		    (if (empty (or object image)) 
-			(return-from draw-matches-example 
-			  (format t "Both images were not loaded")))
+		      (if (empty (or object image)) 
+			  (return-from draw-matches-example 
+			    (format t "Both images were not loaded")))
 
-		    ;; create a feature detector
-		    (create briskd "SimpleBlob")
-		    ;; detect keypoints in OBJECT
-		    (detect briskd object keypoints-a)
-		    ;; Compute the descriptors for a set of keypoints detected in object
-		    (compute briskd object keypoints-a descriptors-a)
-		    ;; detect keypoints in IMAGE
-		    (detect briskd image keypoints-b)
-		    ;; Compute the descriptors for a set of keypoints detected in IMAGE
-		    (compute briskd image keypoints-b descriptors-b)
-		    ;; find the best match for each descriptor
-		    (match matcher descriptors-a descriptors-b matches)
-		    ;; draw the found matches and show in a window 
-                    ;; four times, each with different parameters
-		    ;; output matrix
-		    (with-mat ((all-matches (mat)))
-		      (draw-matches object keypoints-a image keypoints-b matches all-matches 
-				    (gc:scalar-all -1) (gc:scalar-all -1) (gc:make-vector-char) 
-				    +default+)
-		      (imshow window-name-1 all-matches))
-		    (with-mat ((all-matches (mat)))
-		      (draw-matches object keypoints-a image keypoints-b matches all-matches 
-				    (gc:scalar 0 0 0) (gc:scalar 255 255 255) (gc:make-vector-char) 
-				    +draw-rich-keypoints+)
-		      (imshow window-name-2 all-matches))
-		    (with-mat ((all-matches (mat)))
-		      (draw-matches object keypoints-a image keypoints-b matches all-matches 
-				    (gc:scalar 0 0 255) (gc:scalar 255 255 2555) (gc:make-vector-char) 
-				    +not-draw-single-points+)
-		      (imshow window-name-3 all-matches))
-		    (with-mat ((all-matches (mat)))
-		      (draw-matches object keypoints-a image keypoints-b matches all-matches 
-				    (gc:scalar-all 255) (gc:scalar-all -1) (gc:make-vector-char) 
-				    +draw-rich-keypoints+)
-		      (imshow window-name-4 all-matches))
-		    (loop
-		       (let ((c (wait-key 33)))
-			 (when (= c 27)
-			   (return))))))))))))))
-
+		      ;; create a feature detector
+		      (create :feature-detector briskd "SimpleBlob")
+		      ;; detect keypoints in OBJECT
+		      (detect briskd object keypoints-a)
+		      ;; Compute the descriptors for a set of keypoints detected in object
+		      (compute :feature-2d briskd object keypoints-a descriptors-a)
+		      ;; detect keypoints in IMAGE
+		      (detect briskd image keypoints-b)
+		      ;; Compute the descriptors for a set of keypoints detected in IMAGE
+		      (compute :feature-2d briskd image keypoints-b descriptors-b)
+		      ;; find the best match for each descriptor
+		      (match matcher descriptors-a descriptors-b matches)
+		      ;; draw the found matches and show in a window 
+		      ;; four times, each with different parameters
+		      ;; output matrix
+		      (with-mat ((all-matches (mat)))
+			(draw-matches object keypoints-a image keypoints-b matches all-matches 
+				      (gc:scalar-all -1) (gc:scalar-all -1) (gc:make-vector-char) 
+				      +default+)
+			(imshow window-name-1 all-matches))
+		      (with-mat ((all-matches (mat)))
+			(draw-matches object keypoints-a image keypoints-b matches all-matches 
+				      (gc:scalar 0 0 0) (gc:scalar 255 255 255) (gc:make-vector-char) 
+				      +draw-rich-keypoints+)
+			(imshow window-name-2 all-matches))
+		      (with-mat ((all-matches (mat)))
+			(draw-matches object keypoints-a image keypoints-b matches all-matches 
+				      (gc:scalar 0 0 255) (gc:scalar 255 255 2555) (gc:make-vector-char) 
+				      +not-draw-single-points+)
+			(imshow window-name-3 all-matches))
+		      (with-mat ((all-matches (mat)))
+			(draw-matches object keypoints-a image keypoints-b matches all-matches 
+				      (gc:scalar-all 255) (gc:scalar-all -1) (gc:make-vector-char) 
+				      +draw-rich-keypoints+)
+			(imshow window-name-4 all-matches))
+		      (loop
+			 (let ((c (wait-key 33)))
+			   (when (= c 27)
+			     (return)))))))))))))))
 
 
 ========================================================================================================================================
 FEATURES2D - COMMON INTERFACES OF DESCRIPTOR MATCHERS
 ========================================================================================================================================
-
 
 ========================================================================================================================================
 BF-MATCHER
@@ -12980,12 +13030,10 @@ easier to compare with OpenCV examples you find online, thus making this library
 
 C++: BFMatcher::BFMatcher(int normType=NORM_L2, bool crossCheck=false )
 
-LISP-CV:  (BF-MATCHER &OPTIONAL ((NORM-TYPE :INT) +NORM-L2+) ((CROSS-CHECK :BOOLEAN) NIL)) => FEATURE-2D
+LISP-CV:  (BF-MATCHER &OPTIONAL ((NORM-TYPE :INT) +NORM-L2+) ((CROSS-CHECK :BOOLEAN) NIL)) => BF-MATCHER
 
-LISP-CV:  (MAKE-BF-MATCHER &OPTIONAL ((NORM-TYPE :INT) +NORM-L2+) ((CROSS-CHECK :BOOLEAN) NIL)) => FEATURE-2D
+LISP-CV:  (MAKE-BF-MATCHER &OPTIONAL ((NORM-TYPE :INT) +NORM-L2+) ((CROSS-CHECK :BOOLEAN) NIL)) => BF-MATCHER
 
-Note: In this library, to make all the FEATURES2D functions work together nicely, I had to make 
-      the three functions BF-MATCHER, BRISK and SURF the same type, FEATURE-2D. 
 
     Parameters:	
 
@@ -13007,27 +13055,43 @@ Example:
 
 See BRISK-EXAMPLE in this file.
 
-
 ========================================================================================================================================
 DESCRIPTOR-MATCHER-MATCH
 ========================================================================================================================================
 
 Finds the best match for each descriptor from a query set.
 
+
 Note: The name DESCRIPTOR-MATCHER-MATCH is used in the documentation to refer to the binding for the 
-"match" member of the OpenCV DescriptorMatcher class. That name is for classification purposes only.
-This binding along with other bindings for OpenCv "match" members are designed to be called with the 
-overloaded Lisp-CV MATCH methods.
+"match" member of the OpenCV DescriptorMatcher class because it is more descriptive and it is easier 
+to search for in this file. The MATCH method may also be used to call this binding.
+
 
 C++: void DescriptorMatcher::match(InputArray queryDescriptors, InputArray trainDescriptors, vector<DMatch>& matches, 
      InputArray mask=noArray() ) const
 
-LISP-CV: (MATCH (SELF FEATURE-2D) (QUERY-DESCRIPTORS MAT) (TRAIN-DESCRIPTORS MAT) 
-         (MATCHES VECTOR-DMATCH) (MASK MAT)) => :VOID
+LISP-CV: (MATCH (SELF BF-MATCHER) (QUERY-DESCRIPTORS MAT) (TRAIN-DESCRIPTORS MAT) (MATCHES VECTOR-DMATCH) &OPTIONAL
+                (MASK MAT)) => :VOID
+
+LISP-CV: (MATCH (SELF BRISK) (QUERY-DESCRIPTORS MAT) (TRAIN-DESCRIPTORS MAT) (MATCHES VECTOR-DMATCH) &OPTIONAL
+                (MASK MAT)) => :VOID
+
+LISP-CV: (MATCH (SELF SURF) (QUERY-DESCRIPTORS MAT) (TRAIN-DESCRIPTORS MAT) (MATCHES VECTOR-DMATCH) &OPTIONAL
+                (MASK MAT)) => :VOID
+
+LISP-CV: (DESCRIPTOR-MATCHER-MATCH (SELF BF-MATCHER) (QUERY-DESCRIPTORS MAT) (TRAIN-DESCRIPTORS MAT) (MATCHES VECTOR-DMATCH) &OPTIONAL
+                                   (MASK MAT)) => :VOID
+
+LISP-CV: (DESCRIPTOR-MATCHER-MATCH (SELF BRISK) (QUERY-DESCRIPTORS MAT) (TRAIN-DESCRIPTORS MAT) (MATCHES VECTOR-DMATCH) &OPTIONAL
+                                   (MASK MAT)) => :VOID
+
+LISP-CV: (DESCRIPTOR-MATCHER-MATCH (SELF SURF) (QUERY-DESCRIPTORS MAT) (TRAIN-DESCRIPTORS MAT) (MATCHES VECTOR-DMATCH) &OPTIONAL
+                                   (MASK MAT)) => :VOID
+
 
     Parameters:	
 
-        SELF - A FEATURE-2D object e.g. BF-MATCHER
+        SELF - A BF-MATCHER. BRISK or SURF object,
 
         QUERY-DESCRIPTORS - Query set of descriptors.
 
@@ -13040,6 +13104,7 @@ LISP-CV: (MATCH (SELF FEATURE-2D) (QUERY-DESCRIPTORS MAT) (TRAIN-DESCRIPTORS MAT
         MASK - Mask specifying permissible matches between an input query and train matrices of descriptors.
 
 
+
 In this method the train descriptors are passed as an input argument. An optional mask can be passed 
 to specify which query and training descriptors can be matched. Namely, (QUERY-DESCRIPTORS I) can be 
 matched with (TRAIN-DESCRIPTORS J) only if (AT MASK I J :UCHAR) is non-zero.
@@ -13049,11 +13114,9 @@ Example:
 
 See BRISK-EXAMPLE
 
-
 ========================================================================================================================================
 OBJDETECT - CASCADE CLASSIFICATION
 ========================================================================================================================================
-
 
 ========================================================================================================================================
 CASCADE-CLASSIFIER
@@ -15689,12 +15752,9 @@ LISP-CV: (STYLIZATION (SRC MAT) (DEST MAT) &OPTIONAL ((SIGMA-S :FLOAT) 60F0) ((S
 	       (destroy-all-windows)
 	       (return)))))))
 
-
-
 ========================================================================================================================================
 NON-FREE - FEATURE DETECTION AND DESCRIPTION
 ========================================================================================================================================
-
 
 ========================================================================================================================================
 SURF
@@ -15708,23 +15768,19 @@ are the same function. I use the SURF function in the examples in this file beca
 them easier to compare with OpenCV examples you find online, thus making this library easier to 
 learn.
 
+
 C++: SURF::SURF()
 
-LISP-CV: (SURF) => FEATURE-2D
+LISP-CV: (SURF) => SURF
 
-LISP-CV: (MAKE-SURF) => FEATURE-2D
+LISP-CV: (MAKE-SURF) => SURF
 
 C++: SURF::SURF(double hessianThreshold, int nOctaves=4, int nOctaveLayers=2, bool extended=true, bool upright=false )
 
-LISP-CV: (SURF (HESSIAN-THRESHOLD :DOUBLE) &OPTIONAL ((N-OCTAVES :INT) 4) 
-              ((EXTENDED :BOOLEAN) T) ((UPRIGHT :BOOLEAN) NIL)) => FEATURE-2D
+LISP-CV: (SURF (HESSIAN-THRESHOLD :DOUBLE) &OPTIONAL ((N-OCTAVES :INT) 4) ((EXTENDED :BOOLEAN) T) ((UPRIGHT :BOOLEAN) NIL)) => SURF
 
-LISP-CV: (MAKE-SURF (HESSIAN-THRESHOLD :DOUBLE) &OPTIONAL ((N-OCTAVES :INT) 4) 
-                   ((EXTENDED :BOOLEAN) T) ((UPRIGHT :BOOLEAN) NIL)) => FEATURE-2D
-
-
-Note: In this library, to make all the FEATURES2D functions work together nicely, I had to make 
-      the three functions BF-MATCHER, BRISK and SURF the same type, FEATURE-2D. 
+LISP-CV: (MAKE-SURF (HESSIAN-THRESHOLD :DOUBLE) &OPTIONAL ((N-OCTAVES :INT) 4) ((EXTENDED :BOOLEAN) T) ((UPRIGHT :BOOLEAN) NIL)) 
+          => SURF
 
 
     Parameters:	
@@ -15741,6 +15797,8 @@ Note: In this library, to make all the FEATURES2D functions work together nicely
         UPRIGHT - Up-right or rotated features flag (t - do not compute orientation of features; 
                   nil - compute orientation).
 
+
+Example:
 
 
 (defun surf-example (filename-1 filename-2) 
@@ -15774,8 +15832,8 @@ Note: In this library, to make all the FEATURES2D functions work together nicely
       (detect detector img-1 keypoints-1)
       (detect detector img-2 keypoints-2)
       ;;-- Step 2: Calculate descriptors (feature vectors)
-      (compute extractor img-1 keypoints-1 descriptors-1)
-      (compute extractor img-2 keypoints-2 descriptors-2)
+      (compute :feature-2d extractor img-1 keypoints-1 descriptors-1)
+      (compute :feature-2d extractor img-2 keypoints-2 descriptors-2)
       ;-- Step 3: Matching descriptor vectors with a brute force matcher
       (match matcher descriptors-1 descriptors-2 matches)
       ;;-- Draw matches
@@ -15786,7 +15844,6 @@ Note: In this library, to make all the FEATURES2D functions work together nicely
 	 (let ((c (wait-key 33)))
 	   (when (= c 27)
 	     (return)))))))
-
 
 
 ========================================================================================================================================
@@ -17027,6 +17084,10 @@ LISP-CV: (DEL-ANN-MLP (SELF ANN-MLP)) => :VOID
 
 LISP-CV: (DEL-ANN-MLP-TRAIN-PARAMS (SELF ANN-MLP-TRAIN-PARAMS)) => :VOID
 
+LISP-CV: (DEL-BF-MATCHER (SELF BF-MATCHER)) => :VOID
+
+LISP-CV: (DEL-BRISK (SELF BRISK)) => :VOID
+
 LISP-CV: (DEL-CASC-CLASS (SELF CASCADE-CLASSIFIER)) => :VOID
 
 LISP-CV: (DEL-D-TREE (SELF D-TREE)) => :VOID
@@ -17034,8 +17095,6 @@ LISP-CV: (DEL-D-TREE (SELF D-TREE)) => :VOID
 LISP-CV: (DEL-D-TREE-PARAMS (SELF D-TREE-PARAMS)) => :VOID
 
 LISP-CV: (DEL-DMATCH (SELF DMATCH)) => :VOID
-
-LISP-CV: (DEL-FEATURE-2D (SELF FEATURE-2D)) => :VOID
 
 LISP-CV: (DEL-HOG-DESCRIPTOR (SELF HOG-DESCRIPTOR)) => :VOID
 
@@ -17076,6 +17135,8 @@ LISP-CV: (DEL-SIZE (SELF SIZE)) => :VOID
 LISP-CV: (DEL-SIZE-2F (SELF SIZE-2F)) => :VOID
 
 LISP-CV: (DEL-STD-STRING (SELF *STRING)) => :VOID
+
+LISP-CV: (DEL-SURF (SELF SURF)) => :VOID
 
 LISP-CV: (DEL-TERM-CRIT (SELF TERM-CRITERIA)) => :VOID
 

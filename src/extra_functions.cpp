@@ -130,9 +130,9 @@ ADD_READ_FUNC_IMPL_1(m, Mat);
 
 ADD_READ_FUNC_IMPL_2(vkp, vector_KeyPoint);
 
-//FileNode* cv_FileNode_assignVal(FileStorage* fs) {
+//FileNode* cv_FileNode_assignVal(FileStorage* fs, String* nodename) {
 //    FileNode* fn = new FileNode;
-//    *fn = *fs;
+//    *fn = *fs[*nodename];
 //    return fn;
 //}
 
@@ -327,6 +327,14 @@ void cv_delete_CvANN_MLP_TrainParams(CvANN_MLP_TrainParams* self) {
     delete self;
 }
 
+void cv_delete_BFMatcher(BFMatcher* self) {
+    delete self;
+}
+
+void cv_delete_BRISK(BRISK* self) {
+    delete self;
+}
+
 void cv_delete_CascadeClassifier(CascadeClassifier* self) {
      delete self;
 }
@@ -340,10 +348,6 @@ void cv_delete_CvDTree(CvDTree* self) {
 }
 
 void cv_delete_CvDTreeParams(CvDTreeParams* self) {
-    delete self;
-}
-
-void cv_delete_Feature2D(Feature2D* self) {
     delete self;
 }
 
@@ -421,6 +425,10 @@ void cv_delete_Size(Size* self) {
 
 void cv_delete_Size2f(Size2f* self) {
      delete self;
+}
+
+void cv_delete_SURF(SURF* self) {
+    delete self;
 }
 
 void cv_delete_TermCriteria(TermCriteria* self) {

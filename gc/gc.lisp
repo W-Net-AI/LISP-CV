@@ -2001,7 +2001,7 @@
 
 ;; BFMatcher::BFMatcher(int normType=NORM_L2, bool crossCheck=false )
 ;; BFMatcher* cv_create_BFMatcher(int normType, bool crossCheck) 
-(defcfun ("cv_create_BFMatcher" %bf-matcher) (cv::feature-2d :garbage-collect t)
+(defcfun ("cv_create_BFMatcher" %bf-matcher) (cv::bf-matcher :garbage-collect t)
 	 (norm-type :int)
 	 (cross-check :boolean))
 
@@ -2018,7 +2018,7 @@
 
 ;; BRISK::BRISK(int thresh=30, int octaves=3, float patternScale=1.0f)
 ;; BRISK* cv_create_BRISK(int thresh, int octaves, float patternScale)
-(defcfun ("cv_create_BRISK" %brisk) (cv::feature-2d :garbage-collect t)
+(defcfun ("cv_create_BRISK" %brisk) (cv::brisk :garbage-collect t)
 	 (thresh :int)
 	 (octaves :int)
 	 (pattern-scale :float))
@@ -2255,12 +2255,12 @@
 
 ;; SURF::SURF()
 ;; SURF* cv_create_SURF() 
-(defcfun ("cv_create_SURF" surf-0) (cv::feature-2d :garbage-collect t))
+(defcfun ("cv_create_SURF" surf-0) (cv::surf :garbage-collect t))
 
 
 ;; SURF::SURF(double hessianThreshold, int nOctaves=4, int nOctaveLayers=2, bool extended=true, bool upright=false )
 ;; SURF* cv_create_SURF5(double hessianThreshold, int nOctaves, int nOctaveLayers, bool extended, bool upright)
-(defcfun ("cv_create_SURF5" surf-5) (cv::feature-2d :garbage-collect t)
+(defcfun ("cv_create_SURF5" surf-5) (cv::surf :garbage-collect t)
 	 (hessian-threshold :double)
 	 (n-octaves :int)
 	 (n-octave-layers :int)

@@ -29,6 +29,20 @@
 
 
 ;; void operator delete  ( void* ptr )
+;; void cv_delete_BFMatcher(BFMatcher* self)
+(defcfun ("cv_delete_BFMatcher" del-bf-matcher) :void
+  "Calls delete on a BF-MATCHER object."
+  (self bf-matcher))
+
+
+;; void operator delete  ( void* ptr )
+;; void cv_delete_BRISK(BRISK* self)
+(defcfun ("cv_delete_BRISK" del-brisk) :void
+  "Calls delete on a BRISK object."
+  (self brisk))
+
+
+;; void operator delete  ( void* ptr )
 ;; void cv_delete_CascadeClassifier(CascadeClassifier* ptr) 
 (defcfun ("cv_delete_CascadeClassifier" del-casc-class) :void
   "Calls delete on a CASCADE-CLASSIFIER object."
@@ -54,13 +68,6 @@
 (defcfun ("cv_delete_CvDTreeParams" del-d-tree-params) :void
   "Calls delete on a D-TREE-PARAMS object."
   (self d-tree-params))
-
-
-;; void operator delete  ( void* ptr )
-;; void cv_delete_Feature2D(Feature2D* self)
-(defcfun ("cv_delete_Feature2D" del-feature-2d) :void
-  "Calls delete on a FEATURE-2D object."
-  (self feature-2d))
 
 
 ;; void operator delete  ( void* ptr )
@@ -215,6 +222,13 @@
 (defcfun ("cv_delete_std_string" del-std-string) :void
   "Calls delete on a *STRING object."
   (self *string))
+
+
+;; void operator delete  ( void* ptr )
+;; void cv_delete_SURF(SURF* self)
+(defcfun ("cv_delete_SURF" del-surf) :void
+  "Calls delete on a SURF object."
+  (self surf))
 
 
 ;; void operator delete  ( void* ptr )

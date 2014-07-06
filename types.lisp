@@ -2073,29 +2073,81 @@
 ;; FEATURES2D
 
 
-;; FEATURE-2D
+;; BF-MATCHER
 
 
-(define-foreign-type feature-2d ()
+
+(define-foreign-type bf-matcher ()
   ((garbage-collect  :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
-  (:simple-parser feature-2d))
+  (:simple-parser bf-matcher))
 
 
-(defclass cv-feature-2d ()
+(defclass cv-bf-matcher ()
   ((c-pointer :reader c-pointer :initarg :c-pointer)))
 
 
-(defmethod translate-to-foreign ((lisp-value cv-feature-2d) (c-type feature-2d))
+(defmethod translate-to-foreign ((lisp-value cv-bf-matcher) (c-type bf-matcher))
   (values  (c-pointer lisp-value) lisp-value))
 
 
-(defmethod translate-from-foreign (c-pointer (c-type feature-2d))
-  (let ((feature-2d (make-instance 'cv-feature-2d :c-pointer c-pointer)))
+(defmethod translate-from-foreign (c-pointer (c-type bf-matcher))
+  (let ((bf-matcher (make-instance 'cv-bf-matcher :c-pointer c-pointer)))
     (when (garbage-collect c-type)
-      (tg:finalize feature-2d (lambda () (del-feature-2d c-pointer))))
-    feature-2d))
+      (tg:finalize bf-matcher (lambda () (del-bf-matcher c-pointer))))
+    bf-matcher))
+
+
+
+;; BRISK
+
+
+(define-foreign-type brisk ()
+  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+                     :garbage-collect))
+  (:actual-type :pointer)
+  (:simple-parser brisk))
+
+
+(defclass cv-brisk ()
+  ((c-pointer :reader c-pointer :initarg :c-pointer)))
+
+
+(defmethod translate-to-foreign ((lisp-value cv-brisk) (c-type brisk))
+  (values  (c-pointer lisp-value) lisp-value))
+
+
+(defmethod translate-from-foreign (c-pointer (c-type brisk))
+  (let ((brisk (make-instance 'cv-brisk :c-pointer c-pointer)))
+    (when (garbage-collect c-type)
+      (tg:finalize brisk (lambda () (del-brisk c-pointer))))
+    brisk))
+
+
+; SURF
+
+
+(define-foreign-type surf ()
+  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+                     :garbage-collect))
+  (:actual-type :pointer)
+  (:simple-parser surf))
+
+
+(defclass cv-surf ()
+  ((c-pointer :reader c-pointer :initarg :c-pointer)))
+
+
+(defmethod translate-to-foreign ((lisp-value cv-surf) (c-type surf))
+  (values  (c-pointer lisp-value) lisp-value))
+
+
+(defmethod translate-from-foreign (c-pointer (c-type surf))
+  (let ((surf (make-instance 'cv-surf :c-pointer c-pointer)))
+    (when (garbage-collect c-type)
+      (tg:finalize surf (lambda () (del-surf c-pointer))))
+    surf))
 
 
 

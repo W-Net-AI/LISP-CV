@@ -97,10 +97,10 @@
 (defgeneric clone (self)
   (:documentation "Used for all class bindings with a CLONE member."))
 
-(defgeneric compute (self &rest args)
+(defgeneric compute (type self &rest args)
   (:documentation "Used for all class bindings with a COMPUTE member."))
 
-(defgeneric create (self &rest args)
+(defgeneric create (type self &rest args)
   (:documentation "Used for all class bindings with a CREATE member."))
 
 (defgeneric detect (self &rest args)
@@ -112,8 +112,11 @@
 (defgeneric height (self)
   (:documentation "Used for all class bindings with an HEIGHT member."))
 
-(defgeneric match (arg &rest args)
+(defgeneric match (self &rest args)
   (:documentation "Used for all class bindings with a MATCH member."))
+
+(defgeneric *open (self &rest args)
+  (:documentation "Used for all class bindings with a OPEN member."))
 
 (defgeneric release (self)
   (:documentation "Used for all class bindings with a RELEASE member."))
@@ -1286,7 +1289,8 @@
 	 (v0 :double)
 	 (v1 :double)
 	 (v2 :double)
-	 (v3 :double))
+	 (v3 :double))(defmethod angle ((self cv-key-point))
+  (mem-aref (c-pointer self) :float 3))
 
 
 (defun scalar (&optional (v1 0d0) (v2 0d0) (v3 0d0) (v4 0d0))
@@ -1747,7 +1751,8 @@
   "VEC-3F constructor"
   (cond ((null v0)
 	 (vec-3f-0))
-	(v0
+	(v0(defmethod angle ((self cv-key-point))
+  (mem-aref (c-pointer self) :float 3))
 	 (vec-3f-3 v0 v1 v2))
 	(t nil)))
 
@@ -2895,7 +2900,7 @@
 
 ;; void write( FileStorage& fs, const String& name, double value )
 ;; void cv_FileNode_write_number_##(FileStorage* fs, String* name, tn value)
-(defcfun ("cv_FileNode_write_number_d" file-node-write-double) :void
+(defcfun ("cv_FileNode_write_number_d" file-storage-write-double) :void
   (fs file-storage)
   (name *string)
   (value :double))
@@ -2903,7 +2908,7 @@
 
 ;; void write( FileStorage& fs, const String& name, float value )
 ;; void cv_FileNode_write_number_##(FileStorage* fs, String* name, tn value)
-(defcfun ("cv_FileNode_write_number_f" file-node-write-float) :void
+(defcfun ("cv_FileNode_write_number_f" file-storage-write-float) :void
   (fs file-storage)
   (name *string)
   (value :float))
@@ -2911,7 +2916,7 @@
 
 ;; void write( FileStorage& fs, const String& name, int value )
 ;; void cv_FileNode_write_number_##(FileStorage* fs, String* name, tn value)
-(defcfun ("cv_FileNode_write_number_i" file-node-write-int) :void
+(defcfun ("cv_FileNode_write_number_i" file-storage-write-int) :void
   (fs file-storage)
   (name *string)
   (value :int))
@@ -2919,7 +2924,7 @@
 
 ;; void write( FileStorage& fs, const String& name, const std::vector<KeyPoint>& value)
 ;; void cv_FileNode_write_pointer_##(FileStorage* fs, String* name, tn* value)
-(defcfun ("cv_FileNode_write_pointer_m" file-node-write-mat) :void
+(defcfun ("cv_FileNode_write_pointer_m" file-storage-write-mat) :void
   (fs file-storage)
   (name *string)
   (value mat))
@@ -2927,7 +2932,7 @@
 
 ;; void write( FileStorage& fs, const String& name, const String& value )
 ;; void cv_FileNode_write_pointer_##(FileStorage* fs, String* name, tn* value)
-(defcfun ("cv_FileNode_write_pointer_s" file-node-write-string) :void
+(defcfun ("cv_FileNode_write_pointer_s" file-storage-write-string) :void
   (fs file-storage)
   (name *string)
   (value *string))
@@ -2935,7 +2940,7 @@
 
 ;; void write( FileStorage& fs, const String& name, const std::vector<KeyPoint>& value)
 ;; void cv_FileNode_write_pointer_##(FileStorage* fs, String* name, tn* value)
-(defcfun ("cv_FileNode_write_pointer_vkp" file-node-write-key-point) :void
+(defcfun ("cv_FileNode_write_pointer_vkp" file-storage-write-key-point) :void
   (fs file-storage)
   (name *string)
   (value vector-key-point))
@@ -2977,6 +2982,16 @@
 	(args
 	 (apply #'file-storage-3 args))
 	(t nil)))
+
+
+(defun file-storage-open (self &optional filename flags (encoding (%string) given-encoding))
+       (let ((return (%file-storage-open self (%c-string-to-string filename (length filename)) 
+					 flags 
+					 (if given-encoding 
+					     (%c-string-to-string encoding (length encoding)) 
+					     encoding))))
+	 (if given-encoding nil (del-std-string encoding))
+	 return))
 
 
 ;; void FileStorage::release()
@@ -3109,6 +3124,10 @@
   (mem-aref (c-pointer self) :float 1))
 
 
+(defmethod *open ((self cv-file-storage) &rest args)
+  (apply #'file-storage-open self args))
+
+
 (defmethod release ((self cv-file-storage))
   (file-storage-release self))
 
@@ -3162,25 +3181,25 @@
 
 (defmethod *write ((fs cv-file-storage) (name string) (value float))
   (if (typep value 'double-float)
-      (file-node-write-double fs (%c-string-to-string name (length name)) value)
-      (file-node-write-float fs (%c-string-to-string name (length name)) value)))
+      (file-storage-write-double fs (%c-string-to-string name (length name)) value)
+      (file-storage-write-float fs (%c-string-to-string name (length name)) value)))
 
 
 (defmethod *write ((fs cv-file-storage) (name string) (value integer))
-  (file-node-write-int fs (%c-string-to-string name (length name)) value))
+  (file-storage-write-int fs (%c-string-to-string name (length name)) value))
 
 
 (defmethod *write ((fs cv-file-storage) (name string) (value cv-mat))
-  (file-node-write-mat fs (%c-string-to-string name (length name)) value))
+  (file-storage-write-mat fs (%c-string-to-string name (length name)) value))
 
 
 (defmethod *write ((fs cv-file-storage) (name string) (value string))
-  (file-node-write-string fs (%c-string-to-string name (length name)) 
+  (file-storage-write-string fs (%c-string-to-string name (length name)) 
 		       (%c-string-to-string value (length value))))
 
 
 (defmethod *write ((fs cv-file-storage) (name string) (value std-vector-key-point))
-  (file-node-write-key-point fs (%c-string-to-string name (length name)) value))
+  (file-storage-write-key-point fs (%c-string-to-string name (length name)) value))
 
 
 (defmethod x ((self cv-key-point))

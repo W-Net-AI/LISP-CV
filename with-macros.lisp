@@ -25,6 +25,59 @@
        (values))))
 
 
+(defmacro with-bf-matcher (bind &body body)
+  "Ensures DEL-BF-MATCHER gets called when a
+   BF-MATCHER object goes out of scope."
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-bf-matcher %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
+
+
+(defmacro with-brisk (bind &body body)
+  "Ensures DEL-BRISK gets called when a
+   BRISK object goes out of scope."
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-brisk %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
+
+
+(defmacro with-capture ((capture-var capture) &body body)
+  "Ensures CAP-RELEASE gets called on captures."
+  `(let ((,capture-var ,capture))
+     (unwind-protect
+	  (progn ,@body)
+       (cap-release ,capture-var)
+       (del-vid-cap ,capture-var))))
+
+
+(defmacro with-captured-camera ((capture-var dev-index &key width height) &body body)
+  "Ensures CAP-RELEASE gets called on captures 
+   and sets capture width/height in function"
+  `(let ((,capture-var (video-capture ,dev-index)))
+     (when ,width
+       (cap-set ,capture-var +cap-prop-frame-width+ ,width))
+     (when ,height
+       (cap-set ,capture-var +cap-prop-frame-height+ ,height))
+     (unwind-protect (progn ,@body)
+       (cap-release ,capture-var)
+       (del-vid-cap ,capture-var))))
+
+
+(defmacro with-captured-file ((capture-var file-path &key width height) &body body)
+  "Ensures CAP-RELEASE gets called on captures 
+   and sets capture width/height in function"
+  `(let ((,capture-var (video-capture ,file-path)))
+     (when ,width
+       (cap-set ,capture-var +cap-prop-frame-width+ ,width))
+     (when ,height
+       (cap-set ,capture-var +cap-prop-frame-height+ ,height))
+     (unwind-protect (progn ,@body)
+       (cap-release ,capture-var)
+       (del-vid-cap ,capture-var))))
+
+
 (defmacro with-cascade-classifier (bind &body body)
   "Ensures DEL-CASC-CLASS gets called when a
    CASCADE-CLASSIFIER object goes out of scope."
@@ -58,15 +111,6 @@
   `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
      (unwind-protect (progn ,@body)
        (mapcar #!(del-d-tree-params %1) ,(cons 'list (mapcar #!(car %1) bind)))
-       (values))))
-
-
-(defmacro with-feature-2d (bind &body body)
-  "Ensures DEL-FEATURE-2D gets called when 
-   a FEATURE-2D object goes out of scope."
-  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
-     (unwind-protect (progn ,@body)
-       (mapcar #!(del-feature-2d %1) ,(cons 'list (mapcar #!(car %1) bind)))
        (values))))
 
 
@@ -131,6 +175,12 @@
      (unwind-protect (progn ,@body)
        (mapcar #!(del-mat-expr %1) ,(cons 'list (mapcar #!(car %1) bind)))
        (values))))
+
+
+(defmacro with-named-window ((winname &optional (flags +window-autosize+)) &body body)
+	  `(unwind-protect (progn (named-window ,winname ,flags)
+				  ,@body)
+				  (destroy-window ,winname)))
 
 
 (defmacro with-normal-bayes-classifier (bind &body body)
@@ -273,6 +323,15 @@
   `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
      (unwind-protect (progn ,@body)
        (mapcar #!(del-std-string %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
+
+
+(defmacro with-surf (bind &body body)
+  "Ensures DEL-SURF gets called when 
+   a SURF object goes out of scope."
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-surf %1) ,(cons 'list (mapcar #!(car %1) bind)))
        (values))))
 
 
