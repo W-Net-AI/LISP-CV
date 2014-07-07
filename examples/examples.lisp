@@ -6648,7 +6648,7 @@ Calculates the width and height of a text string.
 
 C++: Size getTextSize(const string& text, int fontFace, double fontScale, int thickness, int* baseLine)
 
-LISP-CV:  (GET-TEXT-SIZE (TEXT *STRING) (FONT-FACE :INT) (FONT-SCALE :DOUBLE) (THICKNESS :INT) (BASE-LINE :POINTER)) 
+LISP-CV:  (GET-TEXT-SIZE (TEXT :STRING) (FONT-FACE :INT) (FONT-SCALE :DOUBLE) (THICKNESS :INT) (BASE-LINE :POINTER)) 
            => SIZE
 
 
@@ -6807,7 +6807,7 @@ Draws a text string.
 C++: void putText(Mat& img, const string& text, Point org, int fontFace, double fontScale, Scalar color, int thickness=1, 
      int lineType=8, bool bottomLeftOrigin=false )
 
-LISP-CV: (PUT-TEXT (IMG MAT) (TEXT *STRING) (ORG POINT) (FONT-FACE :INT) (FONT-SCALE :DOUBLE)  
+LISP-CV: (PUT-TEXT (IMG MAT) (TEXT :STRING) (ORG POINT) (FONT-FACE :INT) (FONT-SCALE :DOUBLE)  
              (COLOR SCALAR) &OPTIONAL (THICKNESS :INT) (LINE-TYPE :INT) (BOTTOM-LEFT-ORIGN :BOOLEAN)) => :VOID
  
     Parameters:	
@@ -7036,42 +7036,195 @@ CORE - XML/YAML PERSISTENCE:
 ========================================================================================================================================
 
 ========================================================================================================================================
+FILE-STORAGE
+========================================================================================================================================
+
+The constructors.
+
+Note: Both FILE-STORAGE and MAKE-FILE-STORAGE are provided in this library. The first, to match OpenCV's 
+naming conventions, the second, to adhere to Common Lisp naming conventions. Except for the name, they are 
+the same function. I use the FILE-STORAGE function in the examples in this file because it will make them 
+easier to compare with OpenCV examples you find online, thus making this library easier to learn.
+
+C++: FileStorage::FileStorage()
+
+LISP-CV: (FILE-STORAGE) => FILE-STORAGE
+
+LISP-CV: (MAKE-FILE-STORAGE) => FILE-STORAGE
+
+C++: FileStorage::FileStorage(const String& source, int flags, const String& encoding=String())
+
+LISP-CV: (FILE-STORAGE (SOURCE :STRING) (FLAGS :INT) (ENCODING :STRING)) => FILE-STORAGE
+
+LISP-CV: (MAKE-FILE-STORAGE (SOURCE :STRING) (FLAGS :INT) (ENCODING :STRING)) => FILE-STORAGE
+
+    Parameters:	
+
+
+        SOURCE - Name of the file to open or the text string to read the data from. Extension of the 
+                 file (.xml or .yml/.yaml) determines its format (XML or YAML respectively). Also you 
+                 can append .gz to work with compressed files, for example myHugeMatrix.xml.gz. If both 
+                 +FILE-STORAGE-WRITE+ and +FILE-STORAGE-MEMORY+ flags are specified, source is used just 
+                 to specify the output file format (e.g. mydata.xml, .yml etc.).
+
+        FLAGS -
+
+        Mode of operation. Possible values are:
+
+            +FILE-STORAGE-READ+ Open the file for reading.
+
+            +FILE-STORAGE-WRITE+ Open the file for writing.
+
+            +FILE-STORAGE-APPEND+ Open the file for appending.
+
+            +FILE-STORAGE-MEMORY+ Read data from source or write data to the internal buffer (which 
+                                  is returned by the FILE-STORAGE class RELEASE method)
+
+        ENCODING - Encoding of the file. Note that UTF-16 XML encoding is not supported currently 
+                   and you should use 8-bit encoding instead of it.
+
+
+The full constructor opens the file. Alternatively you can use the default constructor and then call 
+the FILE-STORAGE class *OPEN method.
+
+
+Example:
+
+See FILE-STORAGE-WRITE-EXAMPLE
+
+========================================================================================================================================
+FILE-STORAGE-OPEN
+========================================================================================================================================
+
+Opens a file.
+
+Note: The name FILE-STORAGE-OPEN is used in the documentation to refer to the binding for the 
+"open" member of the OpenCV FileStorage class because it is more descriptive and it is easier 
+to search for in this file. The *OPEN method may also be used to call this binding. 
+
+Note: The name *OPEN is used for the method because OPEN is the name of a Common Lisp function. 
+
+
+C++: bool FileStorage::open(const String& filename, int flags, const String& encoding=String())
+
+LISP-CV: (*OPEN) (SELF FILE-STORAGE) (FILENAME :STRING) (FLAGS :INT) (ENCODING :STRING)) => :BOOLEAN
+
+LISP-CV: (FILE-STORAGE-OPEN) (SELF FILE-STORAGE) (FILENAME :STRING) (FLAGS :INT) (ENCODING :STRING)) => :BOOLEAN
+
+
+    Parameters:	
+
+        FILENAME - Name of the file to open or the text string to read the data from. Extension of 
+                   the file (.xml or .yml/.yaml) determines its format (XML or YAML respectively). 
+                   Also you can append .gz to work with compressed files, e.g. myHugeMatrix.xml.gz. 
+                   If both the +FILE-STORAGE-WRITE+ and +FILE-STORAGE-MEMORY+ flags are specified, 
+                   source is used just to specify the output file format (e.g. mydata.xml/.yml...).
+
+        FLAGS - Mode of operation. See FILE-STORAGE constructor for more details.
+
+        ENCODING - Encoding of the file. Note that UTF-16 XML encoding is not supported currently 
+                   and you should use 8-bit encoding instead of it.
+
+See description of parameters in the FILE-STORAGE constructor. This function calls (FILE-STORAGE-RELEASE) 
+before opening the file.
+
+
+Example:
+
+;;Not functioning perfectly
+(defun file-storage-open-example (save-directory) 
+
+  (let ((filename (cat save-directory "matrix.yml")))
+    ;Create 3 matrices
+    (with-mat ((matrix-1 (mat-ones 10 10 +64f+))
+	       (matrix-2 (mat-zeros 10 10 +64f+))
+	       (matrix-3 (mat-eye 10 10 +64f+)))
+					;Create a FILE-STORAGE object
+      (with-file-storage ((fs (file-storage)))
+					;Open the file for writing
+	(if (*open fs filename +file-storage-write+)
+	    (format t "~%File open...~%") nil)
+					;Write the 3 matrices to the file
+	(*write fs "matrix 1" matrix-1)
+	(*write fs "matrix 2" matrix-2)
+	(*write fs "matrix 3" matrix-3) 
+	(format t "~%Wrote matrices to ~a~%~%" filename)
+	(release fs)))))
+
+
+========================================================================================================================================
+FILE-STORAGE-RELEASE
+========================================================================================================================================
+
+Note: The name FILE-STORAGE-RELEASE is used in the documentation to refer to the binding for the 
+"release" member of the OpenCV FileStorage class because it is more descriptive and it is easier 
+to search for in this file. The RELEASE method may also be used to call this binding. 
+
+
+Closes the file and releases all the memory buffers.
+
+C++: void FileStorage::release()
+
+LISP-CV: (RELEASE (SELF FILE-STORAGE)) => :VOID
+
+LISP-CV: (FILE-STORAGE-RELEASE (SELF FILE-STORAGE)) => :VOID
+
+Call this method after all I/O operations with the storage are finished.
+
+
+Example:
+
+See FILE-STORAGE-OPEN-EXAMPLE in this file
+
+========================================================================================================================================
 FILE-STORAGE-WRITE
 ========================================================================================================================================
 
 Writes an object or number to file storage.
 
 
-Note: The name FILE-STORAGE-WRITE is used in the documentation to refer to these *WRITE methods. 
-That name is for classification purposes only and is not a real function or method name. All of 
-these bindings along with bindings for OpenCv "write" members are designed to be called with the 
-overloaded Lisp-CV methods, *WRITE. The methods are named *WRITE instead of WRITE because WRITE 
-is the name of a Common Lisp function.
+Note: The name FILE-STORAGE-WRITE is used in the documentation to refer to the binding for the 
+"write" member of the OpenCV FileStorage class because it is more descriptive and it is easier 
+to search for in this file. The *WRITE method may also be used to call this binding. 
+
+Note: The name *WRITE is used for the method because WRITE is the name of a Common Lisp function.
 
 
-C++: void write( FileStorage& fs, const String& name, double value );
+C++: void write( FileStorage& fs, const String& name, double value )
 
 LISP-CV: (*WRITE (FS FILE-STORAGE) (NAME :STRING) (VALUE :DOUBLE)) => :VOID
 
-C++: void write( FileStorage& fs, const String& name, float value );
+LISP-CV: (FILE-STORAGE-WRITE (FS FILE-STORAGE) (NAME :STRING) (VALUE :DOUBLE)) => :VOID
+
+C++: void write( FileStorage& fs, const String& name, float value )
 
 LISP-CV: (*WRITE (FS FILE-STORAGE) (NAME :STRING) (VALUE :FLOAT)) => :VOID
 
-C++: void write( FileStorage& fs, const String& name, int value );
+LISP-CV: (FILE-STORAGE-WRITE (FS FILE-STORAGE) (NAME :STRING) (VALUE :FLOAT)) => :VOID
+
+C++: void write( FileStorage& fs, const String& name, int value )
 
 LISP-CV: (*WRITE (FS FILE-STORAGE) (NAME :STRING) (VALUE :INT)) => :VOID
 
-C++: void write( FileStorage& fs, const String& name, const String& value );
+LISP-CV: (FILE-STORAGE-WRITE (FS FILE-STORAGE) (NAME :STRING) (VALUE :INT)) => :VOID
+
+C++: void write( FileStorage& fs, const String& name, const String& value )
 
 LISP-CV: (*WRITE (FS FILE-STORAGE) (NAME :STRING) (VALUE STRING)) => :VOID
 
-C++: void write( FileStorage& fs, const String& name, const Mat& value );
+LISP-CV: (FILE-STORAGE-WRITE (FS FILE-STORAGE) (NAME :STRING) (VALUE STRING)) => :VOID
+
+C++: void write( FileStorage& fs, const String& name, const Mat& value )
 
 LISP-CV: (*WRITE (FS FILE-STORAGE) (NAME :STRING) (VALUE MAT)) => :VOID
 
-C++: void write( FileStorage& fs, const String& name, const std::vector<KeyPoint>& value);
+LISP-CV: (FILE-STORAGE-WRITE (FS FILE-STORAGE) (NAME :STRING) (VALUE MAT)) => :VOID
+
+C++: void write( FileStorage& fs, const String& name, const std::vector<KeyPoint>& value)
 
 LISP-CV: (*WRITE (FS FILE-STORAGE) (NAME :STRING) (VALUE VECTOR-KEY-POINT)) => :VOID
+
+LISP-CV: (FILE-STORAGE-WRITE (FS FILE-STORAGE) (NAME :STRING) (VALUE VECTOR-KEY-POINT)) => :VOID
 
 
     Parameters:	
@@ -7084,6 +7237,7 @@ LISP-CV: (*WRITE (FS FILE-STORAGE) (NAME :STRING) (VALUE VECTOR-KEY-POINT)) => :
 
 
 The methods write an object or a number to file storage.
+
 
 Example:
 
@@ -7156,77 +7310,6 @@ Example:
 		 (let ((c (wait-key 33)))
 		   (when (= c 27)
 		     (return))))))))))
-
-
-========================================================================================================================================
-FILE-STORAGE
-========================================================================================================================================
-
-The constructors.
-
-C++: FileStorage::FileStorage()
-
-LISP-CV: (FILE-STORAGE) => FILE-STORAGE
-
-C++: FileStorage::FileStorage(const String& source, int flags, const String& encoding=String())
-
-LISP-CV: (FILE-STORAGE (SOURCE :STRING) (FLAGS :INT) (ENCODING :STRING)) => FILE-STORAGE
-
-    Parameters:	
-
-
-        SOURCE - Name of the file to open or the text string to read the data from. Extension of the 
-                 file (.xml or .yml/.yaml) determines its format (XML or YAML respectively). Also you 
-                 can append .gz to work with compressed files, for example myHugeMatrix.xml.gz. If both 
-                 +FILE-STORAGE-WRITE+ and +FILE-STORAGE-MEMORY+ flags are specified, source is used just 
-                 to specify the output file format (e.g. mydata.xml, .yml etc.).
-
-        FLAGS -
-
-        Mode of operation. Possible values are:
-
-            +FILE-STORAGE-READ+ Open the file for reading.
-
-            +FILE-STORAGE-WRITE+ Open the file for writing.
-
-            +FILE-STORAGE-APPEND+ Open the file for appending.
-
-            +FILE-STORAGE-MEMORY+ Read data from source or write data to the internal buffer (which 
-                                  is returned by the FILE-STORAGE class RELEASE method)
-
-        ENCODING - Encoding of the file. Note that UTF-16 XML encoding is not supported currently 
-                   and you should use 8-bit encoding instead of it.
-
-
-The full constructor opens the file. Alternatively you can use the default constructor and then call 
-the FILE-STORAGE class *OPEN method.
-
-
-Example:
-
-See FILE-NODE-WRITE-EXAMPLE
-
-========================================================================================================================================
-FILE-STORAGE-RELEASE
-========================================================================================================================================
-
-Note: The name FILE-STORAGE-RELEASE is used in the documentation to refer to the binding for the 
-"release" member of the OpenCV FileStorage class. That name is for classification purposes only. 
-This binding along with other bindings for OpenCv "release" members are designed to be called 
-with the overloaded Lisp-CV RELEASE methods.
-
-Closes the file and releases all the memory buffers.
-
-C++: void FileStorage::release()
-
-LISP-CV: (RELEASE (SELF FILE-STORAGE)) => :VOID
-
-Call this method after all I/O operations with the storage are finished.
-
-
-Example:
-
-See FILE-NODE-READ-EXAMPLE in this file
 
 ========================================================================================================================================
 CORE - UTILITY AND SYSTEM FUNCTIONS AND MACROS
@@ -10813,15 +10896,634 @@ Example 2:
 				    (return)))))))))))))))))))
 
 
+========================================================================================================================================
+HIGHGUI - USER INTERFACE
+========================================================================================================================================
+
+CREATE-TRACKBAR
+
+Creates a trackbar and attaches it to the specified window.
+
+C++: int createTrackbar(const string& trackbarname, const string& winname, int* value, int count, TrackbarCallback onChange=0, 
+                        void* userdata=0)
+
+LISP-CV:  (CREATE-TRACKBAR (TRACKBARNAME :STRING) (WINNAME :STRING) (VALUE :POINTER) (COUNT :INT) &OPTIONAL 
+                          ((ON-CHANGE TRACKBAR-CALLBACK) (NULL-POINTER)) ((USERDATA :POINTER) (NULL-POINTER))) => :INT
+
+    
+    Parameters:	
+
+        TRACKBARNAME - Name of the created trackbar
+
+        WINNAME - Name of the window that will be used as a parent of the created trackbar.
+
+        VALUE - Optional pointer to an integer variable whose value reflects the position of the slider. 
+                Upon creation, the slider position is defined by this variable.
+
+        COUNT - Maximal position of the slider. The minimal position is always 0.
+
+        ON-CHANGE - Pointer to the function to be called every time the slider changes position. This 
+                    function should be prototyped as in the below example, where the first parameter 
+                    is the trackbar position and the second parameter is the user data (see the next 
+                    parameter). If the callback is the NULL pointer, no callbacks are called, but only 
+                    value is updated.
+
+        USERDATA - User data that is passed as is to the callback. It can be used to handle trackbar 
+                   events without using global variables.
+
+
+The function CREATE-TRACKBAR creates a trackbar (a slider or range control) with the specified name
+and range, assigns a variable value to be a position synchronized with the trackbar and specifies the 
+callback function onChange to be called on the trackbar position change. The created trackbar is displayed 
+in the specified window winname.
+
+Note: (Qt Backend Only) WINNAME can be empty (or NIL) if the trackbar should be attached to the control panel.
+
+
+Example:
+
+
+;; a callback function called by the CREATE-TRACKBAR
+;; ON-CHANGE parameter...a HELLO-WORLD function.
+
+(defcallback hello-world-brightness :void ((pos :int) (ptr :pointer))
+  (format t "Hello World!~%~%~a~a~%~%" (mem-aref ptr :string 0) pos))
+
+;; another HELLO-WORLD callback function
+(defcallback hello-world-contrast :void ((pos :int) (ptr :pointer))
+  (format t "Hello World!~%~%~a~a~%~%" (mem-aref ptr :string 0) pos))
+
+
+(defun create-trackbar-example (filename)
+  (let ((window-name "Adjust brightness and contrast by moving the sliders.")
+	(brightness 0)
+	(contrast 0))
+    (with-named-window (window-name +window-autosize+)
+      (move-window window-name 759 175)
+      ;; allocate two :int pointers that trackbar can adjust
+      (with-object ((slider-1-value (alloc :int '(50)))
+		    (slider-2-value (alloc :int '(50)))
+		    ;; data to be passed to HELLO-WORLD-BRIGHTNESS callback function
+		    (userdata-1 (alloc :string "Brightness =  "))
+		    ;; data to be passed to HELLO-WORLD-CONTRAST callback function
+		    (userdata-2 (alloc :string "Contrast = ")))
+	(loop
+	   ;; read in image supplied by filename parameter
+	   (with-mat ((src (imread filename 1)))
+	     (if (empty src) 
+		 (return-from create-trackbar-example
+		   (format t "Image not loaded")))
+	     ;; Clone the source image to dest
+	     (with-mat  ((dest (clone src)))
+	       ;; create Trackbar with name, 'Brightness'
+	       (create-trackbar "Brightness" window-name slider-1-value 100
+				;; pointer to a callback function to be called every 
+				;; time the trackbar slider changes position 
+				(callback hello-world-brightness) 
+				;; user data that is passed to 
+				;; the callback function           
+				userdata-1)
+	       ;; create trackbar with name, 'Contrast'
+	       (create-trackbar  "Contrast" window-name slider-2-value 100
+				 ;; again,a callback function pointer 
+				 (callback hello-world-contrast) 
+				 ;; user data
+				 userdata-2)
+	       ;; when the top trackbar is moved, adjust brightness variable
+	       (setf brightness (- (mem-ref slider-1-value :int) 50))
+	       ;; when the bottom Trackbar is moved, adjust contrast variable
+	       (setf contrast (/ (mem-ref slider-2-value :int) 50))
+	       ;; apply brightness and contrast settings to the destination image
+	       (convert-to src dest -1 (coerce contrast 'double-float)  
+			   (coerce brightness 'double-float))
+	       ;; show adjusted image in a window
+	       (imshow window-name dest)
+	       (let ((c (wait-key 33)))
+		 (when (= c 27)
+		   (return))))))))))
+
+
+
+DESTROY-WINDOW
+
+
+Destroys a window.
+
+
+C++: void destroyWindow(const string& winname)
+
+LISP-CV: (DESTROY-WINDOW (WINNAME :STRING)) => :VOID
+
+    Parameters:	WINNAME - Name of the window to be destroyed.
+
+The function DESTROY-WINDOW destroys the window with the given name.
+
+
+(defun destroy-window-example ()
+
+  "Creates a window. Window will be closed 
+   by DESTROY-WINDOW when it is active and
+   any key is pressed."
+
+  (let* ((window-name "DESTROY-WINDOW Example"))
+    (named-window window-name +window-normal+)
+    (loop while (not (= (wait-key 0) 27)))
+    (destroy-window window-name)))
+
+
+
+DESTROY-ALL-WINDOWS
+
+Destroys all of the HighGUI windows.
+
+C++: void destroyAllWindows()
+
+LISP-CV: (DESTROY-ALL-WINDOWS) => :VOID
+
+
+The function DESTROY-ALL-WINDOWS destroys all of the opened HighGUI windows.
+
+
+(defun destroy-all-windows-example ()
+
+  "In this example we create
+ 12 windows and DESTROY THEM!!!"
+
+  (let* ((window-name-arr 
+	  (make-array 12 :initial-contents 
+
+		      (list
+		       "WINDOW 1 - DESTROY-ALL-WINDOWS Example"
+		       "WINDOW 2 - DESTROY-ALL-WINDOWS Example"
+		       "WINDOW 3 - DESTROY-ALL-WINDOWS Example"
+		       "WINDOW 4 - DESTROY-ALL-WINDOWS Example"
+		       "WINDOW 5 - DESTROY-ALL-WINDOWS Example"
+		       "WINDOW 6 - DESTROY-ALL-WINDOWS Example"
+		       "WINDOW 7 - DESTROY-ALL-WINDOWS Example"
+		       "WINDOW 8 - DESTROY-ALL-WINDOWS Example"
+		       "WINDOW 9 - DESTROY-ALL-WINDOWS Example"
+		       "WINDOW 10 - DESTROY-ALL-WINDOWS Example"
+		       "WINDOW 11 - DESTROY-ALL-WINDOWS Example"
+		       "WINDOW 12 - DESTROY-ALL-WINDOWS Example"))))
+
+    ;; Create 12 windows to DESTROY!!!
+    (dotimes (i 12)
+      (named-window (aref window-name-arr i) +window-normal+))
+    ;; Move the windows to specific coordinates.
+    (move-window (aref window-name-arr 0) 88 0)
+    (move-window (aref window-name-arr 1) 538 0)
+    (move-window (aref window-name-arr 2) 988 0)
+    (move-window (aref window-name-arr 3) 1438 0)
+    (move-window (aref window-name-arr 4) 88 368)
+    (move-window (aref window-name-arr 5) 538 368)
+    (move-window (aref window-name-arr 6) 988 368)
+    (move-window (aref window-name-arr 7) 1438 368)
+    (move-window (aref window-name-arr 8) 88 708)
+    (move-window (aref window-name-arr 9) 538 708)
+    (move-window (aref window-name-arr 10) 988 708)
+    (move-window (aref window-name-arr 11) 1438 708)
+    ;; When you press the escape key, you will...
+    ;; DESTROY 12 WINDOWS!!!
+    (loop while (not (= (wait-key 0) 27)))
+    (destroy-all-windows)))
+    
+
+GET-TRACKBAR-POS
+
+Returns the trackbar position.
+
+C++: int getTrackbarPos(const String& trackbarname, const String& winname)
+
+LISP-CV: (GET-TRACKBAR-POS (TRACKBARNAME :STRING) (WINNAME :STRING)) => :INT
+
+
+    Parameters:	
+
+        TRACKBARNAME - Name of the trackbar.
+        
+        WINNAME - Name of the window that is the parent of the trackbar.
+        
+
+The function returns the current position of the specified trackbar.
+
+
+(defun get-trackbar-pos-example (filename)
+  (let ((window-name "See trackbars curre")
+	(text 0)
+	(pos 0)
+        (scale 0.70d0)
+	(thickness 1))
+    ;Read in image 
+    (with-mat ((img (imread filename 1)))
+      (if (empty img) 
+	  (return-from get-trackbar-pos-example
+	    (format t "Image not loaded")))
+      (with-named-window (window-name +window-autosize+)
+	(move-window window-name (cols img) 0)
+	(with-point ((org (point 0 25)))
+	  (with-scalar ((color (scalar 255 255 255)))
+	    (with-object ((unused-val (alloc :int 0)))
+	      (loop
+		 (with-mat ((clone (clone img)))
+		   (create-trackbar "Position" window-name unused-val 100)
+		   ;Get trackbar position and 
+		   ;print it to window
+		   (setf pos (get-trackbar-pos "Position" window-name))
+		   (setf text (concatenate 'string "Current trackbar position: " 
+					   (write-to-string pos)))
+		   (put-text clone text org +font-hershey-triplex+
+			     scale  color thickness +aa+)
+		   (imshow window-name clone))
+		 (let ((c (wait-key 33)))
+		   (when (= c 27)
+		     (return)))))))))))
+
+    
+========================================================================================================================================
+IMSHOW
+========================================================================================================================================
+
+Displays an image in the specified window.
+
+C++: void imshow(const string& winname, InputArray mat)
+
+LISP-CV: (IMSHOW (WINNAME :STRING) (MAT MAT)) => :void
+
+    Parameters:	
+
+        WINNAME - Name of the window.
+
+        MAT - Image to be shown.
+
+
+The function IMSHOW displays an image in the specified window. If the window was created with the 
++WINDOW-AUTOSIZE+ flag, the image is shown with its original size. Otherwise, the image is scaled 
+to fit the window. The function may scale the image, depending on its depth:
+
+        If the image is 8-bit unsigned, it is displayed as is.
+
+        If the image is 16-bit unsigned or 32-bit integer, the pixels are divided by 256. That is, 
+        the value range [0,255*256] is mapped to [0,255].
+
+        If the image is 32-bit floating-point, the pixel values are multiplied by 255. That is, the
+        value range [0,1] is mapped to [0,255].
+
+
+
+(defun imshow-example (filename)
+
+  "Opens the image FILENAME and shows it 
+   in a window with IMSHOW."
+
+  (with-mat ((image (imread filename 1)))
+    (if (empty image) 
+	(return-from imshow-example 
+	  (format t "Image not loaded")))
+    (let ((window-name "IMSHOW Example"))
+      (with-named-window (window-name +window-normal+)
+	(move-window window-name 759 175)
+	(imshow window-name image)
+	(loop
+	   (let ((c (wait-key 33)))
+	     (when (= c 27)
+	       (return))))))))
+
+
+
+========================================================================================================================================
+MOVE-WINDOW
+========================================================================================================================================
+
+Moves window to the specified position
+
+C++: void moveWindow(const string& winname, int x, int y)
+
+LISP-CV: (MOVE-WINDOW (WINNAME :STRING) (X :INT) (Y :INT)) => VOID
+
+
+    Parameters:	
+
+        WINNAME - Window name
+
+        X - The new x-coordinate of the window
+
+        Y - The new y-coordinate of the window
+
+
+(defun move-window-example ()
+
+  "Creates a window then uses MOVE-WINDOW 
+   to move the window to (x, y) position 
+   (720, 175)."
+
+  (let* ((window-name "MOVE-WINDOW Example")))
+    (named-window window-name +window-normal+)
+    (move-window window-name 759 175)
+    (loop while (not (= (wait-key 0) 27)))
+    (destroy-window window-name))
+
+
+========================================================================================================================================
+NAMED-WINDOW
+========================================================================================================================================
+
+
+Creates a window.
+
+
+C++: void namedWindow(const string& winname, int flags=WINDOW_AUTOSIZE)
+
+LISP-CV: (NAMED-WINDOW (WINNAME :STRING) &OPTIONAL ((FLAGS :INT) +WINDOW-AUTOSIZE+)) => :VOID
+
+
+    Parameters:	
+
+        NAME - Name of the window in the window caption that may be used as a window identifier.
+
+        FLAGS -
+
+        Flags of the window. The supported flags are:
+
+            +WINDOW-NORMAL+ If this is set, the user can resize the window (no constraint).
+
+            +WINDOW-AUTOSIZE+ If this is set, the window size is automatically adjusted to fit the 
+                              displayed image (see (IMSHOW) ), and you cannot change the window size 
+                              manually.
+
+            +WINDOW-OPENGL+ If this is set, the window will be created with OpenGL support.
+
+
+The function NAMED-WINDOW creates a window that can be used as a placeholder for images and trackbars. 
+Created windows are referred to by their names.
+
+If a window with the same name already exists, the function does nothing.
+
+You can call (DESTROY-WINDOW) or (DESTROY-ALL-WINDOWS) to close the window and de-allocate any associated 
+memory usage. For a simple program, you do not really have to call these functions because all the resources 
+and windows of the application are closed automatically by the operating system upon exit.
+
+
+Note:
+
+Qt backend supports additional flags:
+
+        +WINDOW-NORMAL+ or +WINDOW-AUTOSIZE+: +WINDOW-NORMAL+ enables you to resize the window, whereas 
+        +WINDOW-AUTOSIZE adjusts automatically the window size to fit the displayed image (see (IMSHOW) ), 
+        and you cannot change the window size manually.
+
+        +WINDOW-FREERATIO+ or +WINDOW-KEEPRATIO+: +WINDOW-FREERATIO+ adjusts the image with no respect to 
+        its ratio, whereas +WINDOW-KEEPRATIO keeps the image ratio. 
+        
+        +GUI-NORMAL+ or +GUI-EXPANDED+: +GUI-NORMAL+ is the old way to draw the window without statusbar 
+        and toolbar, whereas +GUI-EXPANDED+ is a new enhanced GUI.
+
+By default, (= FLAGS (LOGIOR +WINDOW-AUTOSIZE+  +WINDOW-KEEPRATIO+  +GUI-EXPANDED+))
+
+
+
+(defun named-window-example ()
+
+  "Creates a named window with NAMED-WINDOW. Window 
+   will close when it is selected and any key is pr-
+   essed."
+
+  (let* ((window-name "NAMED-WINDOW Example"))
+    (named-window window-name +window-normal+)
+    (loop while (not (= (wait-key 0) 27)))
+    (destroy-window window-name)))
+
+
+
+
+SET-MOUSE-CALLBACK
+
+
+Sets mouse handler for the specified window
+
+
+C++: void setMouseCallback(const string& winname, MouseCallback onMouse, void* userdata=0 )
+
+LISP-CV: (SET-MOUSE-CALLBACK (WINNAME :STRING) (ON-MOUSE MOUSE-CALLBACK) (USERDATA :VOID)) => :VOID
+
+
+    Parameters:	
+
+        WINNAME - Window name
+
+        ONMOUSE - Mouse callback. See example below for how to use the callback.
+
+        USERDATA - The optional parameter passed to the callback.
+
+
+
+(defcallback call-back-func :void ((event :int)(x :int)(y :int)
+                                   (flags :int)(userdata :pointer))
+  ;; This callback function is called by the SET-MOUSE CALLBACK function
+  ;; in the example below. The mouse handler created by SET-MOUSE CALLBACK
+  ;; captures movements made by the mouse along with 3 different keypresses.
+  ;; They are then processed in this function.
+
+  (format t "Recieved ~a~%~%" (mem-aref userdata :string))
+
+  (if (= event +event-mousemove+)
+      (format t "Mouse move over the window (~a, ~a)~%~%" x y))
+  (if (= event +event-lbuttondown+)
+      (format t "Left button of the mouse down (~a, ~a)~%~%" x y))
+  (if (= event +event-rbuttondown+)
+      (format t "Right button of the mouse down (~a, ~a)~%~%" x y))
+  (if (= event +event-mbuttondown+)
+      (format t "Middle button of the mouse down (~a, ~a)~%~%" x y))
+  (if (= event +event-lbuttonup+)
+      (format t "Left button of the mouse up (~a, ~a)~%~%" x y))
+  (if (= event +event-rbuttonup+)
+      (format t "Right button of the mouse up (~a, ~a)~%~%" x y))
+  (if (= event +event-mbuttonup+)
+      (format t "Middle button of the mouse up (~a, ~a)~%~%" x y))
+  (if (= event +event-lbuttondblclk+)
+      (format t "Left button double-click flag triggered (~a, ~a)~%~%" x y))
+  (if (= event +event-rbuttondblclk+)
+      (format t "Right button double-click flag triggered (~a, ~a)~%~%" x y))
+  (if (= event +event-mbuttondblclk+)
+      (format t "Middle button double-click flag triggered (~a, ~a)~%~%" x y))
+  (if (= flags (+ +event-flag-ctrlkey+ +event-flag-lbutton+))
+      (format t "Left mouse button is clicked while pressing CTRL key (~a, ~a)~%~%" x y))
+  (if (= flags (+ +event-flag-shiftkey+ +event-flag-rbutton+))
+      (format t "Right mouse button is clicked while pressing SHIFT key (~a, ~a)~%~%" x y))
+  (if (= flags (+ +event-flag-altkey+ +event-mousemove+))
+      (format t "Mouse is moved over the window while pressing ALT key  (~a, ~a)~%~%" x y )))
+
+
+(defun set-mouse-callback-example (filename)
+  ;; load image
+  (let ((src (imread filename 1))
+	(window-name "SET-MOUSE-CALLBACK Example")
+	;; Declare a userdata parameter 
+	(userdata (alloc :string "USERDATA output")))
+    (if (empty src) 
+	(return-from set-mouse-callback-example
+	  (format t "Image not loaded")))
+    (named-window window-name 1)
+    (move-window window-name 759 175)
+    ;; Set mouse handler for the window, which passes a constant 
+    ;; stream of mouse and mouse button positional data to the f-
+    ;; unction above.  Also passes the contents of USERDATA to t-
+    ;; he above function CALL-BACK-FUNC.
+    (set-mouse-callback window-name (callback call-back-func) userdata)
+    (imshow window-name src)
+    (loop while (not (= (wait-key 0) 27)))
+    (destroy-window window-name)
+    (del-mat src)
+    (free userdata)))
+
+
+
+SET-TRACKBAR-POS
+
+Sets the trackbar position.
+
+C++: void setTrackbarPos(const String& trackbarname, const String& winname, int pos)
+
+LISP-CV: (SET-TRACKBAR-POS (TRACKBARNAME :STRING) (WINNAME :STRING) (POS :INT)) => :VOID
+
+
+    Parameters:	
+
+        TRACKBARNAME - Name of the trackbar.
+        
+        WINNAME - Name of the window that is the parent of trackbar.
+        
+        POS - New position.
+        
+
+The function sets the position of the specified trackbar in the specified window.
+
+
+(defun set-trackbar-pos-example (filename)
+  (let ((window-name "SET-TRACKBAR-POS Example")
+	(text 0)
+        (pos 0)
+        (scale 0.70d0)
+	(thickness 1))
+    ;Read in image
+    (with-mat ((img (imread filename 1)))
+      (if (empty img) 
+	  (return-from set-trackbar-pos-example
+	    (format t "Image not loaded")))
+      (with-named-window (window-name +window-autosize+)
+	(move-window window-name (cols img) 0)
+	(with-point ((org (point 0 25)))
+	  (with-scalar ((color (scalar 255 255 255)))
+	    (with-object ((unused-val (alloc :int 0)))
+	      (loop
+		 (with-mat ((clone (clone img)))
+		   ;Create primary trackbar
+		   (create-trackbar "Primary" window-name unused-val 100)
+		   ;Set primary trackbar position to POS
+		   (setf pos (get-trackbar-pos "Primary" window-name))
+		   ;Print primary trackbar position on window
+		   (setf text (concatenate 'string "Primary trackbar position: " 
+					   (write-to-string pos)))
+		   (put-text clone text org +font-hershey-triplex+
+			     scale  color thickness +aa+)
+		   ;Create 4 slave trackbars
+		   (create-trackbar "Slave 1" window-name unused-val 100)
+		   (create-trackbar "Slave 2" window-name unused-val 100)
+		   (create-trackbar "Slave 3" window-name unused-val 100)
+		   (create-trackbar "Slave 4" window-name unused-val 100)
+		   ;Set slave trackbars position to POS
+		   (set-trackbar-pos "Slave 1" window-name pos)
+		   (set-trackbar-pos "Slave 2" window-name pos)
+		   (set-trackbar-pos "Slave 3" window-name pos)
+		   (set-trackbar-pos "Slave 4" window-name pos)
+		   (imshow window-name clone))
+		 (let ((c (wait-key 33)))
+		   (when (= c 27)
+		     (return)))))))))))
+
+
+
+========================================================================================================================================
+START-WINDOW-THREAD
+========================================================================================================================================
+
+
+Creates a separate thread that will manage window events.
+
+
+C++: int startWindowThread()
+
+LISP-CV: (START-WINDOW-THREAD) => :INT
+
+
+(defun start-window-thread-example ()
+
+  (let* ((window-name "START-WINDOW-THREAD Example"))
+    ;Start the window thread
+    (start-window-thread)
+    ;Open a window
+    (named-window window-name +window-normal+)
+    ;Wait until a key gets pressed inside the window
+    (loop while (not (= (wait-key 0) 27)))
+    ;Close the window
+    (destroy-window window-name)))
+
+
+
+========================================================================================================================================
+WAIT-KEY
+========================================================================================================================================
+
+
+Waits for a pressed key.
+
+
+C++: int waitKey(int delay=0)
+
+LISP-CV: (WAIT-KEY &OPTIONAL ((DELAY :INT) 0)) => :INT
+
+
+    Parameters:	DELAY - Delay in milliseconds. 0 is the special value that means “forever”.
+
+
+The function WAIT-KEY waits for a key event infinitely when (<= DELAY 0), for DELAY milliseconds when 
+it is positive. Since the OS has a minimum time between switching threads, the function will not wait 
+exactly delay ms, it will wait at least delay ms, depending on what else is running on your computer 
+at that time. It returns the code of the pressed key or -1 if no key was pressed before the specified 
+time had elapsed.
+
+Note:
+
+This function is the only method in HighGUI that can fetch and handle events, so it needs to be called 
+periodically for normal event processing unless HighGUI is used within an environment that takes care 
+of event processing.
+
+Note:
+
+The function only works if there is at least one HighGUI window created and the window is active. If 
+there are several HighGUI windows, any of them can be active.
+
+
+(defun wait-key-example ()
+
+  "After window is created with NAMED-WINDOW 
+   and moved with MOVE-WINDOW this function 
+   waits until a keypress(ESC) is detected w-
+   ith the function WAIT-KEY until it runs t-
+   he function DESTROY-WINDOW. Note: window 
+   must be active before the key press will 
+   be detected."
+
+  (let* ((window-name "WAIT-KEY Example"))
+    (named-window window-name +window-normal+)
+    (move-window window-name 759 175)
+    (loop while (not (= (wait-key 0) 27)))
+    (destroy-window window-name)))
 
 ========================================================================================================================================
 HIGHGUI - READING AND WRITING IMAGES AND VIDEO
 ========================================================================================================================================
 
-
-
 CAP-GET
-
 
 Returns the specified VIDEO-CAPTURE property
 
@@ -11106,7 +11808,7 @@ Loads an image from a file.
 
 C++: Mat imread(const string& filename, int flags=1)
 
-LISP-CV: (IMREAD (FILENAME *STRING) &OPTIONAL ((FLAGS :INT) +LOAD-IMAGE-COLOR+)) => MAT
+LISP-CV: (IMREAD (FILENAME :STRING) &OPTIONAL ((FLAGS :INT) +LOAD-IMAGE-COLOR+)) => MAT
 
 
     Parameters:	
@@ -11383,9 +12085,9 @@ LISP-CV: (MAKE-VIDEO-CAPTURE &OPTIONAL (SRC :INT)) => VIDEO-CAPTURE
 
 C++: VideoCapture::VideoCapture(const string& filename)
 
-LISP-CV: (VIDEO-CAPTURE &OPTIONAL (SRC *STRING)) => VIDEO-CAPTURE
+LISP-CV: (VIDEO-CAPTURE &OPTIONAL (SRC :STRING)) => VIDEO-CAPTURE
 
-LISP-CV: (MAKE-VIDEO-CAPTURE &OPTIONAL (SRC *STRING)) => VIDEO-CAPTURE
+LISP-CV: (MAKE-VIDEO-CAPTURE &OPTIONAL (SRC :STRING)) => VIDEO-CAPTURE
 
 
   Parameters:	
@@ -11504,8 +12206,6 @@ Parameters:
 
 
 
-
-
 WITH-CAPTURED-FILE
 
 
@@ -11546,648 +12246,19 @@ Parameters:
 	     (when (= c 27)
 	       (return))))))))
 
-
-
-========================================================================================================================================
-HIGHGUI - USER INTERFACE
-========================================================================================================================================
-
-
-
-CREATE-TRACKBAR
-
-Creates a trackbar and attaches it to the specified window.
-
-C++: int createTrackbar(const string& trackbarname, const string& winname, int* value, int count, TrackbarCallback onChange=0, 
-                        void* userdata=0)
-
-LISP-CV:  (CREATE-TRACKBAR (TRACKBARNAME *STRING) (WINNAME *STRING) (VALUE :POINTER) (COUNT :INT) &OPTIONAL 
-                          ((ON-CHANGE TRACKBAR-CALLBACK) (NULL-POINTER)) ((USERDATA :POINTER) (NULL-POINTER))) => :INT
-
-    
-    Parameters:	
-
-        TRACKBARNAME - Name of the created trackbar
-
-        WINNAME - Name of the window that will be used as a parent of the created trackbar.
-
-        VALUE - Optional pointer to an integer variable whose value reflects the position of the slider. 
-                Upon creation, the slider position is defined by this variable.
-
-        COUNT - Maximal position of the slider. The minimal position is always 0.
-
-        ON-CHANGE - Pointer to the function to be called every time the slider changes position. This 
-                    function should be prototyped as in the below example, where the first parameter 
-                    is the trackbar position and the second parameter is the user data (see the next 
-                    parameter). If the callback is the NULL pointer, no callbacks are called, but only 
-                    value is updated.
-
-        USERDATA - User data that is passed as is to the callback. It can be used to handle trackbar 
-                   events without using global variables.
-
-
-The function CREATE-TRACKBAR creates a trackbar (a slider or range control) with the specified name
-and range, assigns a variable value to be a position synchronized with the trackbar and specifies the 
-callback function onChange to be called on the trackbar position change. The created trackbar is displayed 
-in the specified window winname.
-
-Note: (Qt Backend Only) WINNAME can be empty (or NIL) if the trackbar should be attached to the control panel.
-
-
-Example:
-
-
-;; a callback function called by the CREATE-TRACKBAR
-;; ON-CHANGE parameter...a HELLO-WORLD function.
-
-(defcallback hello-world-brightness :void ((pos :int) (ptr :pointer))
-  (format t "Hello World!~%~%~a~a~%~%" (mem-aref ptr :string 0) pos))
-
-;; another HELLO-WORLD callback function
-(defcallback hello-world-contrast :void ((pos :int) (ptr :pointer))
-  (format t "Hello World!~%~%~a~a~%~%" (mem-aref ptr :string 0) pos))
-
-
-(defun create-trackbar-example (filename)
-  (let ((window-name "Adjust brightness and contrast by moving the sliders.")
-	(brightness 0)
-	(contrast 0))
-    (with-named-window (window-name +window-autosize+)
-      (move-window window-name 759 175)
-      ;; allocate two :int pointers that trackbar can adjust
-      (with-object ((slider-1-value (alloc :int '(50)))
-		    (slider-2-value (alloc :int '(50)))
-		    ;; data to be passed to HELLO-WORLD-BRIGHTNESS callback function
-		    (userdata-1 (alloc :string "Brightness =  "))
-		    ;; data to be passed to HELLO-WORLD-CONTRAST callback function
-		    (userdata-2 (alloc :string "Contrast = ")))
-	(loop
-	   ;; read in image supplied by filename parameter
-	   (with-mat ((src (imread filename 1)))
-	     (if (empty src) 
-		 (return-from create-trackbar-example
-		   (format t "Image not loaded")))
-	     ;; Clone the source image to dest
-	     (with-mat  ((dest (clone src)))
-	       ;; create Trackbar with name, 'Brightness'
-	       (create-trackbar "Brightness" window-name slider-1-value 100
-				;; pointer to a callback function to be called every 
-				;; time the trackbar slider changes position 
-				(callback hello-world-brightness) 
-				;; user data that is passed to 
-				;; the callback function           
-				userdata-1)
-	       ;; create trackbar with name, 'Contrast'
-	       (create-trackbar  "Contrast" window-name slider-2-value 100
-				 ;; again,a callback function pointer 
-				 (callback hello-world-contrast) 
-				 ;; user data
-				 userdata-2)
-	       ;; when the top trackbar is moved, adjust brightness variable
-	       (setf brightness (- (mem-ref slider-1-value :int) 50))
-	       ;; when the bottom Trackbar is moved, adjust contrast variable
-	       (setf contrast (/ (mem-ref slider-2-value :int) 50))
-	       ;; apply brightness and contrast settings to the destination image
-	       (convert-to src dest -1 (coerce contrast 'double-float)  
-			   (coerce brightness 'double-float))
-	       ;; show adjusted image in a window
-	       (imshow window-name dest)
-	       (let ((c (wait-key 33)))
-		 (when (= c 27)
-		   (return))))))))))
-
-
-
-DESTROY-WINDOW
-
-
-Destroys a window.
-
-
-C++: void destroyWindow(const string& winname)
-
-LISP-CV: (DESTROY-WINDOW (WINNAME *STRING)) => :VOID
-
-    Parameters:	WINNAME - Name of the window to be destroyed.
-
-The function DESTROY-WINDOW destroys the window with the given name.
-
-
-(defun destroy-window-example ()
-
-  "Creates a window. Window will be closed 
-   by DESTROY-WINDOW when it is active and
-   any key is pressed."
-
-  (let* ((window-name "DESTROY-WINDOW Example"))
-    (named-window window-name +window-normal+)
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name)))
-
-
-
-DESTROY-ALL-WINDOWS
-
-Destroys all of the HighGUI windows.
-
-C++: void destroyAllWindows()
-
-LISP-CV: (DESTROY-ALL-WINDOWS) => :VOID
-
-
-The function DESTROY-ALL-WINDOWS destroys all of the opened HighGUI windows.
-
-
-(defun destroy-all-windows-example ()
-
-  "In this example we create
- 12 windows and DESTROY THEM!!!"
-
-  (let* ((window-name-arr 
-	  (make-array 12 :initial-contents 
-
-		      (list
-		       "WINDOW 1 - DESTROY-ALL-WINDOWS Example"
-		       "WINDOW 2 - DESTROY-ALL-WINDOWS Example"
-		       "WINDOW 3 - DESTROY-ALL-WINDOWS Example"
-		       "WINDOW 4 - DESTROY-ALL-WINDOWS Example"
-		       "WINDOW 5 - DESTROY-ALL-WINDOWS Example"
-		       "WINDOW 6 - DESTROY-ALL-WINDOWS Example"
-		       "WINDOW 7 - DESTROY-ALL-WINDOWS Example"
-		       "WINDOW 8 - DESTROY-ALL-WINDOWS Example"
-		       "WINDOW 9 - DESTROY-ALL-WINDOWS Example"
-		       "WINDOW 10 - DESTROY-ALL-WINDOWS Example"
-		       "WINDOW 11 - DESTROY-ALL-WINDOWS Example"
-		       "WINDOW 12 - DESTROY-ALL-WINDOWS Example"))))
-
-    ;; Create 12 windows to DESTROY!!!
-    (dotimes (i 12)
-      (named-window (aref window-name-arr i) +window-normal+))
-    ;; Move the windows to specific coordinates.
-    (move-window (aref window-name-arr 0) 88 0)
-    (move-window (aref window-name-arr 1) 538 0)
-    (move-window (aref window-name-arr 2) 988 0)
-    (move-window (aref window-name-arr 3) 1438 0)
-    (move-window (aref window-name-arr 4) 88 368)
-    (move-window (aref window-name-arr 5) 538 368)
-    (move-window (aref window-name-arr 6) 988 368)
-    (move-window (aref window-name-arr 7) 1438 368)
-    (move-window (aref window-name-arr 8) 88 708)
-    (move-window (aref window-name-arr 9) 538 708)
-    (move-window (aref window-name-arr 10) 988 708)
-    (move-window (aref window-name-arr 11) 1438 708)
-    ;; When you press the escape key, you will...
-    ;; DESTROY 12 WINDOWS!!!
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-all-windows)))
-    
-
-GET-TRACKBAR-POS
-
-Returns the trackbar position.
-
-C++: int getTrackbarPos(const String& trackbarname, const String& winname)
-
-LISP-CV: (GET-TRACKBAR-POS (TRACKBARNAME *STRING) (WINNAME *STRING)) => :INT
-
-
-    Parameters:	
-
-        TRACKBARNAME - Name of the trackbar.
-        
-        WINNAME - Name of the window that is the parent of the trackbar.
-        
-
-The function returns the current position of the specified trackbar.
-
-
-(defun get-trackbar-pos-example (filename)
-  (let ((window-name "See trackbars curre")
-	(text 0)
-	(pos 0)
-        (scale 0.70d0)
-	(thickness 1))
-    ;Read in image 
-    (with-mat ((img (imread filename 1)))
-      (if (empty img) 
-	  (return-from get-trackbar-pos-example
-	    (format t "Image not loaded")))
-      (with-named-window (window-name +window-autosize+)
-	(move-window window-name (cols img) 0)
-	(with-point ((org (point 0 25)))
-	  (with-scalar ((color (scalar 255 255 255)))
-	    (with-object ((unused-val (alloc :int 0)))
-	      (loop
-		 (with-mat ((clone (clone img)))
-		   (create-trackbar "Position" window-name unused-val 100)
-		   ;Get trackbar position and 
-		   ;print it to window
-		   (setf pos (get-trackbar-pos "Position" window-name))
-		   (setf text (concatenate 'string "Current trackbar position: " 
-					   (write-to-string pos)))
-		   (put-text clone text org +font-hershey-triplex+
-			     scale  color thickness +aa+)
-		   (imshow window-name clone))
-		 (let ((c (wait-key 33)))
-		   (when (= c 27)
-		     (return)))))))))))
-
-    
-========================================================================================================================================
-IMSHOW
-========================================================================================================================================
-
-Displays an image in the specified window.
-
-C++: void imshow(const string& winname, InputArray mat)
-
-LISP-CV: (IMSHOW (WINNAME *STRING) (MAT MAT)) => :void
-
-    Parameters:	
-
-        WINNAME - Name of the window.
-
-        MAT - Image to be shown.
-
-
-The function IMSHOW displays an image in the specified window. If the window was created with the 
-+WINDOW-AUTOSIZE+ flag, the image is shown with its original size. Otherwise, the image is scaled 
-to fit the window. The function may scale the image, depending on its depth:
-
-        If the image is 8-bit unsigned, it is displayed as is.
-
-        If the image is 16-bit unsigned or 32-bit integer, the pixels are divided by 256. That is, 
-        the value range [0,255*256] is mapped to [0,255].
-
-        If the image is 32-bit floating-point, the pixel values are multiplied by 255. That is, the
-        value range [0,1] is mapped to [0,255].
-
-
-
-(defun imshow-example (filename)
-
-  "Opens the image FILENAME and shows it 
-   in a window with IMSHOW."
-
-  (with-mat ((image (imread filename 1)))
-    (if (empty image) 
-	(return-from imshow-example 
-	  (format t "Image not loaded")))
-    (let ((window-name "IMSHOW Example"))
-      (with-named-window (window-name +window-normal+)
-	(move-window window-name 759 175)
-	(imshow window-name image)
-	(loop
-	   (let ((c (wait-key 33)))
-	     (when (= c 27)
-	       (return))))))))
-
-
-
-========================================================================================================================================
-MOVE-WINDOW
-========================================================================================================================================
-
-Moves window to the specified position
-
-C++: void moveWindow(const string& winname, int x, int y)
-
-LISP-CV: (MOVE-WINDOW (WINNAME *STRING) (X :INT) (Y :INT)) => VOID
-
-
-    Parameters:	
-
-        WINNAME - Window name
-
-        X - The new x-coordinate of the window
-
-        Y - The new y-coordinate of the window
-
-
-(defun move-window-example ()
-
-  "Creates a window then uses MOVE-WINDOW 
-   to move the window to (x, y) position 
-   (720, 175)."
-
-  (let* ((window-name "MOVE-WINDOW Example")))
-    (named-window window-name +window-normal+)
-    (move-window window-name 759 175)
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name))
-
-
-========================================================================================================================================
-NAMED-WINDOW
-========================================================================================================================================
-
-
-Creates a window.
-
-
-C++: void namedWindow(const string& winname, int flags=WINDOW_AUTOSIZE)
-
-LISP-CV: (NAMED-WINDOW (WINNAME *STRING) &OPTIONAL ((FLAGS :INT) +WINDOW-AUTOSIZE+)) => :VOID
-
-
-    Parameters:	
-
-        NAME - Name of the window in the window caption that may be used as a window identifier.
-
-        FLAGS -
-
-        Flags of the window. The supported flags are:
-
-            +WINDOW-NORMAL+ If this is set, the user can resize the window (no constraint).
-
-            +WINDOW-AUTOSIZE+ If this is set, the window size is automatically adjusted to fit the 
-                              displayed image (see (IMSHOW) ), and you cannot change the window size 
-                              manually.
-
-            +WINDOW-OPENGL+ If this is set, the window will be created with OpenGL support.
-
-
-The function NAMED-WINDOW creates a window that can be used as a placeholder for images and trackbars. 
-Created windows are referred to by their names.
-
-If a window with the same name already exists, the function does nothing.
-
-You can call (DESTROY-WINDOW) or (DESTROY-ALL-WINDOWS) to close the window and de-allocate any associated 
-memory usage. For a simple program, you do not really have to call these functions because all the resources 
-and windows of the application are closed automatically by the operating system upon exit.
-
-
-Note:
-
-Qt backend supports additional flags:
-
-        +WINDOW-NORMAL+ or +WINDOW-AUTOSIZE+: +WINDOW-NORMAL+ enables you to resize the window, whereas 
-        +WINDOW-AUTOSIZE adjusts automatically the window size to fit the displayed image (see (IMSHOW) ), 
-        and you cannot change the window size manually.
-
-        +WINDOW-FREERATIO+ or +WINDOW-KEEPRATIO+: +WINDOW-FREERATIO+ adjusts the image with no respect to 
-        its ratio, whereas +WINDOW-KEEPRATIO keeps the image ratio. 
-        
-        +GUI-NORMAL+ or +GUI-EXPANDED+: +GUI-NORMAL+ is the old way to draw the window without statusbar 
-        and toolbar, whereas +GUI-EXPANDED+ is a new enhanced GUI.
-
-By default, (= FLAGS (LOGIOR +WINDOW-AUTOSIZE+  +WINDOW-KEEPRATIO+  +GUI-EXPANDED+))
-
-
-
-(defun named-window-example ()
-
-  "Creates a named window with NAMED-WINDOW. Window 
-   will close when it is selected and any key is pr-
-   essed."
-
-  (let* ((window-name "NAMED-WINDOW Example"))
-    (named-window window-name +window-normal+)
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name)))
-
-
-
-
-SET-MOUSE-CALLBACK
-
-
-Sets mouse handler for the specified window
-
-
-C++: void setMouseCallback(const string& winname, MouseCallback onMouse, void* userdata=0 )
-
-LISP-CV: (SET-MOUSE-CALLBACK (WINNAME *STRING) (ON-MOUSE MOUSE-CALLBACK) (USERDATA :VOID)) => :VOID
-
-
-    Parameters:	
-
-        WINNAME - Window name
-
-        ONMOUSE - Mouse callback. See example below for how to use the callback.
-
-        USERDATA - The optional parameter passed to the callback.
-
-
-
-(defcallback call-back-func :void ((event :int)(x :int)(y :int)
-                                   (flags :int)(userdata :pointer))
-  ;; This callback function is called by the SET-MOUSE CALLBACK function
-  ;; in the example below. The mouse handler created by SET-MOUSE CALLBACK
-  ;; captures movements made by the mouse along with 3 different keypresses.
-  ;; They are then processed in this function.
-
-  (format t "Recieved ~a~%~%" (mem-aref userdata :string))
-
-  (if (= event +event-mousemove+)
-      (format t "Mouse move over the window (~a, ~a)~%~%" x y))
-  (if (= event +event-lbuttondown+)
-      (format t "Left button of the mouse down (~a, ~a)~%~%" x y))
-  (if (= event +event-rbuttondown+)
-      (format t "Right button of the mouse down (~a, ~a)~%~%" x y))
-  (if (= event +event-mbuttondown+)
-      (format t "Middle button of the mouse down (~a, ~a)~%~%" x y))
-  (if (= event +event-lbuttonup+)
-      (format t "Left button of the mouse up (~a, ~a)~%~%" x y))
-  (if (= event +event-rbuttonup+)
-      (format t "Right button of the mouse up (~a, ~a)~%~%" x y))
-  (if (= event +event-mbuttonup+)
-      (format t "Middle button of the mouse up (~a, ~a)~%~%" x y))
-  (if (= event +event-lbuttondblclk+)
-      (format t "Left button double-click flag triggered (~a, ~a)~%~%" x y))
-  (if (= event +event-rbuttondblclk+)
-      (format t "Right button double-click flag triggered (~a, ~a)~%~%" x y))
-  (if (= event +event-mbuttondblclk+)
-      (format t "Middle button double-click flag triggered (~a, ~a)~%~%" x y))
-  (if (= flags (+ +event-flag-ctrlkey+ +event-flag-lbutton+))
-      (format t "Left mouse button is clicked while pressing CTRL key (~a, ~a)~%~%" x y))
-  (if (= flags (+ +event-flag-shiftkey+ +event-flag-rbutton+))
-      (format t "Right mouse button is clicked while pressing SHIFT key (~a, ~a)~%~%" x y))
-  (if (= flags (+ +event-flag-altkey+ +event-mousemove+))
-      (format t "Mouse is moved over the window while pressing ALT key  (~a, ~a)~%~%" x y )))
-
-
-(defun set-mouse-callback-example (filename)
-  ;; load image
-  (let ((src (imread filename 1))
-	(window-name "SET-MOUSE-CALLBACK Example")
-	;; Declare a userdata parameter 
-	(userdata (alloc :string "USERDATA output")))
-    (if (empty src) 
-	(return-from set-mouse-callback-example
-	  (format t "Image not loaded")))
-    (named-window window-name 1)
-    (move-window window-name 759 175)
-    ;; Set mouse handler for the window, which passes a constant 
-    ;; stream of mouse and mouse button positional data to the f-
-    ;; unction above.  Also passes the contents of USERDATA to t-
-    ;; he above function CALL-BACK-FUNC.
-    (set-mouse-callback window-name (callback call-back-func) userdata)
-    (imshow window-name src)
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name)
-    (del-mat src)
-    (free userdata)))
-
-
-
-SET-TRACKBAR-POS
-
-Sets the trackbar position.
-
-C++: void setTrackbarPos(const String& trackbarname, const String& winname, int pos)
-
-LISP-CV: (SET-TRACKBAR-POS (trackbarname *string) (winname *string) (pos :int)) => :VOID
-
-
-    Parameters:	
-
-        TRACKBARNAME - Name of the trackbar.
-        
-        WINNAME - Name of the window that is the parent of trackbar.
-        
-        POS - New position.
-        
-
-The function sets the position of the specified trackbar in the specified window.
-
-
-(defun set-trackbar-pos-example (filename)
-  (let ((window-name "SET-TRACKBAR-POS Example")
-	(text 0)
-        (pos 0)
-        (scale 0.70d0)
-	(thickness 1))
-    ;Read in image
-    (with-mat ((img (imread filename 1)))
-      (if (empty img) 
-	  (return-from set-trackbar-pos-example
-	    (format t "Image not loaded")))
-      (with-named-window (window-name +window-autosize+)
-	(move-window window-name (cols img) 0)
-	(with-point ((org (point 0 25)))
-	  (with-scalar ((color (scalar 255 255 255)))
-	    (with-object ((unused-val (alloc :int 0)))
-	      (loop
-		 (with-mat ((clone (clone img)))
-		   ;Create primary trackbar
-		   (create-trackbar "Primary" window-name unused-val 100)
-		   ;Set primary trackbar position to POS
-		   (setf pos (get-trackbar-pos "Primary" window-name))
-		   ;Print primary trackbar position on window
-		   (setf text (concatenate 'string "Primary trackbar position: " 
-					   (write-to-string pos)))
-		   (put-text clone text org +font-hershey-triplex+
-			     scale  color thickness +aa+)
-		   ;Create 4 slave trackbars
-		   (create-trackbar "Slave 1" window-name unused-val 100)
-		   (create-trackbar "Slave 2" window-name unused-val 100)
-		   (create-trackbar "Slave 3" window-name unused-val 100)
-		   (create-trackbar "Slave 4" window-name unused-val 100)
-		   ;Set slave trackbars position to POS
-		   (set-trackbar-pos "Slave 1" window-name pos)
-		   (set-trackbar-pos "Slave 2" window-name pos)
-		   (set-trackbar-pos "Slave 3" window-name pos)
-		   (set-trackbar-pos "Slave 4" window-name pos)
-		   (imshow window-name clone))
-		 (let ((c (wait-key 33)))
-		   (when (= c 27)
-		     (return)))))))))))
-
-
-
-========================================================================================================================================
-START-WINDOW-THREAD
-========================================================================================================================================
-
-
-Creates a separate thread that will manage window events.
-
-
-C++: int startWindowThread()
-
-LISP-CV: (START-WINDOW-THREAD) => :INT
-
-
-(defun start-window-thread-example ()
-
-  (let* ((window-name "START-WINDOW-THREAD Example"))
-    ;Start the window thread
-    (start-window-thread)
-    ;Open a window
-    (named-window window-name +window-normal+)
-    ;Wait until a key gets pressed inside the window
-    (loop while (not (= (wait-key 0) 27)))
-    ;Close the window
-    (destroy-window window-name)))
-
-
-
-========================================================================================================================================
-WAIT-KEY
-========================================================================================================================================
-
-
-Waits for a pressed key.
-
-
-C++: int waitKey(int delay=0)
-
-LISP-CV: (WAIT-KEY &OPTIONAL ((DELAY :INT) 0)) => :INT
-
-
-    Parameters:	DELAY - Delay in milliseconds. 0 is the special value that means “forever”.
-
-
-The function WAIT-KEY waits for a key event infinitely when (<= DELAY 0), for DELAY milliseconds when 
-it is positive. Since the OS has a minimum time between switching threads, the function will not wait 
-exactly delay ms, it will wait at least delay ms, depending on what else is running on your computer 
-at that time. It returns the code of the pressed key or -1 if no key was pressed before the specified 
-time had elapsed.
-
-Note:
-
-This function is the only method in HighGUI that can fetch and handle events, so it needs to be called 
-periodically for normal event processing unless HighGUI is used within an environment that takes care 
-of event processing.
-
-Note:
-
-The function only works if there is at least one HighGUI window created and the window is active. If 
-there are several HighGUI windows, any of them can be active.
-
-
-(defun wait-key-example ()
-
-  "After window is created with NAMED-WINDOW 
-   and moved with MOVE-WINDOW this function 
-   waits until a keypress(ESC) is detected w-
-   ith the function WAIT-KEY until it runs t-
-   he function DESTROY-WINDOW. Note: window 
-   must be active before the key press will 
-   be detected."
-
-  (let* ((window-name "WAIT-KEY Example"))
-    (named-window window-name +window-normal+)
-    (move-window window-name 759 175)
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name)))
-
-
-
 ========================================================================================================================================
 HIGHGUI - QT NEW FUNCTIONS
 ========================================================================================================================================
 
-
-
+========================================================================================================================================
 DISPLAY-OVERLAY
+========================================================================================================================================
 
 Displays a text on a window image as an overlay for a specified duration.
 
 C++: void displayOverlay(const String& winname, const String& text, int delayms=0 )
 
-LISP-CV: (DISPLAY-OVERLAY (WINNAME *STRING) (TEXT *STRING) &OPTIONAL ((DELAYMS :INT) 0)) => :VOID
+LISP-CV: (DISPLAY-OVERLAY (WINNAME :STRING) (TEXT :STRING) &OPTIONAL ((DELAYMS :INT) 0)) => :VOID
 
 
     Parameters:	
@@ -12225,82 +12296,83 @@ specified delay the original content of the window is restored.
 		   (return))))))))))
 
 
-
-
-
+========================================================================================================================================
 GET-WINDOW-PROPERTY
-
+========================================================================================================================================
 
 Provides parameters of a window.
 
-
 C++: double getWindowProperty(const string& winname, int prop_id)
 
-LISP-CV: (GET-WINDOW-PROPERTY (WINNAME (:pOINTER STRING*)) (PROP-ID) :INT) => :DOUBLE
+LISP-CV: (GET-WINDOW-PROPERTY (WINNAME :STRING) (PROP-ID) :INT) => :DOUBLE
 
 
-          Parameters:	
+    Parameters:	
 
-              WINNAME - Name of the window.
+        WINNAME - Name of the window.
 
-              PROP-ID -
+        PROP-ID -
 
-              Window property to retrieve. The following operation flags are available:
+           Window property to retrieve. The following operation flags are available:
 
 
-                     +WND-PROP-FULLSCREEN+ Change if the window is fullscreen (+WINDOW-NORMAL+ or 
-                                           +WINDOW-FULLSCREEN+).
+               +WND-PROP-FULLSCREEN+ Change if the window is fullscreen;
+  
+                             (+WINDOW-NORMAL+ or +WINDOW-FULLSCREEN+).
 
-                     +WND-PROP-AUTOSIZE+ Change if the window is resizable (+WINDOW-NORMAL+ or 
-                                         +WINDOW-AUTOSIZE+).
+               +WND-PROP-AUTOSIZE+ Change if the window is resizable;
 
-                     +WND-PROP-ASPECTRATIO+ Change if the aspect ratio of the image is preserved,
-                                            (+WINDOW-FREERATIO+ or +WINDOW-KEEPRATIO+).
+                             (+WINDOW-NORMAL+ or +WINDOW-AUTOSIZE+).
 
+                     +WND-PROP-ASPECTRATIO+ Change if the aspect ratio of the image is preserved;
+
+                             (+WINDOW-FREERATIO+ or +WINDOW-KEEPRATIO+).
 
 
 Note: See (SET-WINDOW-PROPERTY) to know the meaning of the returned values.
 
-
 The function GET-WINDOW-PROPERTY returns properties of a window.
 
 
+Example:
+
 (defun get-window-property-example (filename)
 
-  ;; Read in image
-  (let* ((image (imread filename 1))
-	 (window-name "GET-WINDOW-PROPERTY Example"))
-    (if (empty image) 
-	(return-from get-window-property-example 
-	  (format t "Image not loaded")))
-    ;; Create window
-    (named-window window-name +window-normal+)
-    ;; Set window to fullscreen
-    (set-window-property window-name +wnd-prop-fullscreen+ 
-			 +window-fullscreen+)
-    ;; If aspect ratio is not stretched, set to stretched
-    (if (equal 1.0d0 (get-window-property window-name +wnd-prop-fullscreen+)) 
-	(set-window-property window-name +wnd-prop-aspectratio+ 
-			     +window-freeratio+))
-    ;; Show image
-    (imshow window-name image)
-    (loop while (not (= (wait-key 0) 27)))
-    (del-mat image)
-    (destroy-window window-name)))
+  (let* ((window-name "GET-WINDOW-PROPERTY Example"))
+    ;;Read in image
+    (with-mat ((image (imread filename 1)))
+      (if (empty image) 
+	  (return-from get-window-property-example 
+	    (format t "Image not loaded")))
+      ;;Create window
+      (with-named-window (window-name +window-normal+)
+	;;Set window to fullscreen
+	(set-window-property window-name +wnd-prop-fullscreen+ 
+			     +window-fullscreen+)
+	;;If aspect ratio is not stretched, set to stretched
+	(if (equal 1.0d0 (get-window-property window-name +wnd-prop-fullscreen+)) 
+	    (set-window-property window-name +wnd-prop-aspectratio+ 
+				 +window-freeratio+))
+	;;Show image
+	(imshow window-name image)
+	(loop 
+	   (let ((c (wait-key 33)))
+	     (when (= c 27)
+	       (return))))))))
 
 
-
+========================================================================================================================================
 SET-WINDOW-PROPERTY
-
+========================================================================================================================================
 
 Changes parameters of a window dynamically.
 
 
 C++: void setWindowProperty(const string& winname, int prop_id, double prop_value)
 
-LISP-CV: (SET-WINDOW-PROPERTY (WINNAME *STRING) (PROP-ID :INT) (PROP-VALUE :DOUBLE)) => :VOID
+LISP-CV: (SET-WINDOW-PROPERTY (WINNAME :STRING) (PROP-ID :INT) (PROP-VALUE :DOUBLE)) => :VOID
 
-
+     
     Parameters:	
 
         WINNAME - Name of the window.
@@ -12310,14 +12382,17 @@ LISP-CV: (SET-WINDOW-PROPERTY (WINNAME *STRING) (PROP-ID :INT) (PROP-VALUE :DOUB
            Window property to edit. The following operation flags are available:
 
 
-               +WND-PROP-FULLSCREEN+ Change if the window is fullscreen (+WINDOW-NORMAL+ or 
-                                     +WINDOW-FULLSCREEN+).
+               +WND-PROP-FULLSCREEN+ Change if the window is fullscreen;
+                     
+                             (+WINDOW-NORMAL+ or +WINDOW-FULLSCREEN+).
 
-               +WND-PROP-AUTOSIZE+ Change if the window is resizable (+WINDOW-NORMAL+ or 
-                                   +WINDOW-AUTOSIZE+).
+               +WND-PROP-AUTOSIZE+ Change if the window is resizable;
+ 
+                             (+WINDOW-NORMAL+ or +WINDOW-AUTOSIZE+).
 
-               +WND-PROP-ASPECTRATIO+ Change if the aspect ratio of the image is preserved,
-                                      (+WINDOW-FREERATIO+ or +WINDOW-KEEPRATIO+).
+               +WND-PROP-ASPECTRATIO+ Change if the aspect ratio of the image is preserved;
+
+                             (+WINDOW-FREERATIO+ or +WINDOW-KEEPRATIO+).
 
         PROP-VALUE -
 
@@ -12332,31 +12407,34 @@ LISP-CV: (SET-WINDOW-PROPERTY (WINNAME *STRING) (PROP-ID :INT) (PROP-VALUE :DOUB
 
                +WINDOW-FREERATIO+ Make the window resizable without any ratio constraints.
 
-               +WINDOW-KEEPRATIO+ Make the window resizable, but preserve the proportions of the di-
-                                  splayed image.
-
+               +WINDOW-KEEPRATIO+ Make the window resizable, but preserve the proportions of the 
+                                  displayed image.
 
 
 The function SET-WINDOW-PROPERTY enables changing properties of a window.
 
 
+Example:
+
 (defun set-window-property-example (filename)
-  ;; Read in image
-  (let* ((image (imread filename 1))
-	 (window-name "SET-WINDOW-PROPERTY Example"))
-    (if (empty image) 
-	(return-from set-window-property-example 
-	  (format t "Image not loaded")))
-    ;; Create window
-    (named-window window-name +window-normal+)
-    ;; Set window to fullscreen
-    (set-window-property window-name +wnd-prop-fullscreen+ 
-			 +window-fullscreen+)
-    ;; Show image
-    (imshow window-name image)
-    (loop while (not (= (wait-key 0) 27)))
-    (del-mat image)
-    (destroy-window window-name)))
+
+  (let ((window-name "SET-WINDOW-PROPERTY Example"))
+    ;; Read in image
+    (with-mat ((image (imread filename 1)))
+      (if (empty image) 
+	  (return-from set-window-property-example 
+	    (format t "Image not loaded")))
+      ;; Create window
+      (with-named-window (window-name +window-normal+)
+	;; Set window to fullscreen
+	(set-window-property window-name +wnd-prop-fullscreen+ 
+			     +window-fullscreen+)
+	;; Show image
+	(imshow window-name image)
+	(loop
+	   (let ((c (wait-key 33)))
+	     (when (= c 27)
+	       (return))))))))
 
 ========================================================================================================================================
 FEATURES2D - FEATURE DETECTION AND DESCRIPTION
@@ -12677,7 +12755,6 @@ FEATURE-DETECTOR-DETECT
 
 Detects keypoints in an image.
 
-
 Note: The name FEATURE-DETECTOR-DETECT is used in the documentation to refer to the binding for the 
 "detect" member of the OpenCV FeatureDetector class because it is more descriptive and it is easier 
 to search for in this file. The DETECT method may also be used to call this binding.
@@ -12850,6 +12927,73 @@ LISP-CV: (DESCRIPTOR-EXTRACTOR-COMPUTE (SELF SURF) (IMAGE MAT) (KEYPOINTS VECTOR
 Example:
 
 See the FEATURE-DETECTOR-CREATE-EXAMPLE in this file.
+
+
+
+========================================================================================================================================
+DESCRIPTOR-EXTRACTOR-CREATE
+========================================================================================================================================
+
+Creates a descriptor extractor by name.
+
+
+Note: The name DESCRIPTOR-EXTRACTOR-CREATE is used in the documentation to refer to the binding for the 
+"create" member of the OpenCV DescriptorExtractor class because it is more descriptive and it is easier 
+to search for in this file. The CREATE method may also be used to call this binding.
+
+
+C++: Ptr<DescriptorExtractor> DescriptorExtractor::create(const String& descriptorExtractorType)
+
+LISP-CV: (CREATE) (TYPE SYMBOL) (SELF BF-MATCHER) (DESCRIPTOR-EXTRACTOR-TYPE :STRING)) => BF-MATCHER
+
+LISP-CV: (CREATE) (TYPE SYMBOL) (SELF BRISK) (DESCRIPTOR-EXTRACTOR-TYPE :STRING)) => BRISK
+
+LISP-CV: (CREATE) (TYPE SYMBOL) (SELF SURF) (DESCRIPTOR-EXTRACTOR-TYPE :STRING)) => SURF
+
+LISP-CV: (DESCRIPTOR-EXTRACTOR-CREATE) (SELF BF-MATCHER) (DESCRIPTOR-EXTRACTOR-TYPE :STRING)) => BF-MATCHER
+
+LISP-CV: (DESCRIPTOR-EXTRACTOR-CREATE) (SELF BRISK) (DESCRIPTOR-EXTRACTOR-TYPE :STRING)) => BRISK
+
+LISP-CV: (DESCRIPTOR-EXTRACTOR-CREATE) (SELF SURF) (DESCRIPTOR-EXTRACTOR-TYPE :STRING)) => SURF
+
+
+    Parameters:	    
+
+        TYPE - A symbol. Must be specified as :DESCRIPTOR-EXTRACTOR.
+
+        SELF - A BF-MATCHER, BRISK or SURF object.
+
+        DESCRIPTOR-EXTRACTOR-TYPE - Descriptor extractor type.
+
+
+The current implementation supports the following types of a descriptor extractor:
+
+
+        "SIFT" - SIFT
+
+        "SURF" - SURF
+
+        "BRIEF" - BriefDescriptorExtractor
+
+        "BRISK" - BRISK
+
+        "ORB" - ORB
+
+        "FREAK" - FREAK
+
+
+A combined format is also supported: descriptor extractor adapter name:
+ 
+        ("Opponent" - OpponentColorDescriptorExtractor) 
+
++ descriptor extractor name (see above), for example: "OpponentSIFT".
+
+
+Note: OpponentColorDescriptorExtractor is an internal OpenCV class that is called when you add the 
+"Opponent" prefix to one of the descriptor extractor types listed above. It is not implemented in 
+LISP-CV as a class or function.
+
+Example:(Coming soon)
 
 ========================================================================================================================================
 FEATURES2D - DRAWING FUNCTION OF KEYPOINTS AND MATCHES
@@ -13139,9 +13283,9 @@ LISP-CV: (CASCADE-CLASSIFIER) => CASCADE-CLASSIFIER
 
 LISP-CV: (MAKE-CASCADE-CLASSIFIER) => CASCADE-CLASSIFIER
 
-LISP-CV: (CASCADE-CLASSIFIER (FILENAME *STRING)) => CASCADE-CLASSIFIER
+LISP-CV: (CASCADE-CLASSIFIER (FILENAME :STRING)) => CASCADE-CLASSIFIER
 
-LISP-CV: (MAKE-CASCADE-CLASSIFIER (FILENAME *STRING)) => CASCADE-CLASSIFIER
+LISP-CV: (MAKE-CASCADE-CLASSIFIER (FILENAME :STRING)) => CASCADE-CLASSIFIER
 
 
     Parameters:	
@@ -13181,7 +13325,7 @@ Loads a classifier from a file.
 
 C++: bool CascadeClassifier::load(const string& filename)
 
-LISP-CV: (CASCADE-CLASSIFIER-LOAD (SELF CASCADE-CLASSIFIER) (FILENAME *STRING)) => :BOOLEAN
+LISP-CV: (CASCADE-CLASSIFIER-LOAD (SELF CASCADE-CLASSIFIER) (FILENAME :STRING)) => :BOOLEAN
 
 
     Parameters:	
@@ -16559,9 +16703,9 @@ LISP-CV: (MAKE-VIDEO-WRITER) => VIDEO-WRITER
 
 C++: VideoWriter::VideoWriter(const string& filename, int fourcc, double fps, Size frameSize, bool isColor=true)
 
-LISP-CV: (VIDEO-WRITER (FILENAME *STRING) (FOURCC :INT) (FPS :DOUBLE) (FRAME-SIZE SIZE) ((IS-COLOR :INT) T)) => VIDEO-WRITER
+LISP-CV: (VIDEO-WRITER (FILENAME :STRING) (FOURCC :INT) (FPS :DOUBLE) (FRAME-SIZE SIZE) ((IS-COLOR :INT) T)) => VIDEO-WRITER
 
-LISP-CV: (MAKE-VIDEO-WRITER (FILENAME *STRING) (FOURCC :INT) (FPS :DOUBLE) (FRAME-SIZE SIZE) ((IS-COLOR :INT) T)) => VIDEO-WRITER
+LISP-CV: (MAKE-VIDEO-WRITER (FILENAME :STRING) (FOURCC :INT) (FPS :DOUBLE) (FRAME-SIZE SIZE) ((IS-COLOR :INT) T)) => VIDEO-WRITER
 
 
     Parameters:	
@@ -17134,7 +17278,7 @@ LISP-CV: (DEL-SIZE (SELF SIZE)) => :VOID
 
 LISP-CV: (DEL-SIZE-2F (SELF SIZE-2F)) => :VOID
 
-LISP-CV: (DEL-STD-STRING (SELF *STRING)) => :VOID
+LISP-CV: (DEL-STD-STRING (SELF :STRING)) => :VOID
 
 LISP-CV: (DEL-SURF (SELF SURF)) => :VOID
 

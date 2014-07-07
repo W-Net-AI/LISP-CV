@@ -992,6 +992,9 @@
 
    #:file-storage
    #:make-file-storage
+   #:file-storage-open
+   #:file-storage-release
+   #:file-storage-write
 
 ;; core - Utility and System Functions and Macros
 

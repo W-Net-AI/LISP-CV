@@ -427,6 +427,11 @@
    #:make-rgb
    #:rgb
 
+;; core - XML/YAML Persistence
+
+   #:file-storage
+   #:make-file-storage
+
 ;; core - Utility and System Functions and Macros
 
 ;; imgproc - Image Filtering

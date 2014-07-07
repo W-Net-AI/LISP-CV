@@ -112,6 +112,9 @@
 (defgeneric height (self)
   (:documentation "Used for all class bindings with an HEIGHT member."))
 
+(defgeneric file-storage-write (fs name value)
+  (:documentation "Used for all FILE-STORAGE-WRITE methods."))
+
 (defgeneric match (self &rest args)
   (:documentation "Used for all class bindings with a MATCH member."))
 
@@ -1289,8 +1292,7 @@
 	 (v0 :double)
 	 (v1 :double)
 	 (v2 :double)
-	 (v3 :double))(defmethod angle ((self cv-key-point))
-  (mem-aref (c-pointer self) :float 3))
+	 (v3 :double))
 
 
 (defun scalar (&optional (v1 0d0) (v2 0d0) (v3 0d0) (v4 0d0))
@@ -1736,12 +1738,12 @@
 
 ;; typedef Vec<float, 3> Vec3f
 ;; Vec3##t * cv_create_0_Vec3##()
-(defcfun ("cv_create_0_Vec3f" vec-3f-0) (cv::vec-3f :garbage-collect t))
+(defcfun ("cv_create_0_Vec3f" vec-3f-0) vec-3f)
 
 
 ;; typedef Vec<float, 3> Vec3f
 ;; Vec3##t * cv_create_Vec3##(tn v0, tn v1, tn v2)
-(defcfun ("cv_create_Vec3f" vec-3f-3) (cv::vec-3f :garbage-collect t)
+(defcfun ("cv_create_Vec3f" vec-3f-3) vec-3f
   (v0 :float)
   (v1 :float)
   (v2 :float))
@@ -1751,8 +1753,7 @@
   "VEC-3F constructor"
   (cond ((null v0)
 	 (vec-3f-0))
-	(v0(defmethod angle ((self cv-key-point))
-  (mem-aref (c-pointer self) :float 3))
+	(v0
 	 (vec-3f-3 v0 v1 v2))
 	(t nil)))
 
@@ -2984,6 +2985,15 @@
 	(t nil)))
 
 
+;; bool FileStorage::open(const String& filename, int flags, const String& encoding=String())
+;; bool cv_FileStorage_open(FileStorage* self, String* filename, int flags, String* encoding)
+(defcfun ("cv_FileStorage_open" %file-storage-open) :boolean
+  (self file-storage)
+  (filename *string)
+  (flags :int)
+  (encoding *string))
+
+
 (defun file-storage-open (self &optional filename flags (encoding (%string) given-encoding))
        (let ((return (%file-storage-open self (%c-string-to-string filename (length filename)) 
 					 flags 
@@ -3052,11 +3062,6 @@
 ;;;DEFMETHOD's
 
 
-
-(defmethod angle ((self cv-key-point))
-  (mem-aref (c-pointer self) :float 3))
-
-
 (defmethod angle ((self cv-rotated-rect))
   "The rotation angle. When the angle is 0, 90, 180, 270 
     etc., the rectangle becomes an up-right rectangle."
@@ -3122,6 +3127,29 @@
 
 (defmethod height ((self cv-size-2f))
   (mem-aref (c-pointer self) :float 1))
+
+
+(defmethod file-storage-write ((fs cv-file-storage) (name string) (value float))
+  (if (typep value 'double-float)
+      (file-storage-write-double fs (%c-string-to-string name (length name)) value)
+      (file-storage-write-float fs (%c-string-to-string name (length name)) value)))
+
+
+(defmethod file-storage-write ((fs cv-file-storage) (name string) (value integer))
+  (file-storage-write-int fs (%c-string-to-string name (length name)) value))
+
+
+(defmethod file-storage-write ((fs cv-file-storage) (name string) (value cv-mat))
+  (file-storage-write-mat fs (%c-string-to-string name (length name)) value))
+
+
+(defmethod file-storage-write ((fs cv-file-storage) (name string) (value string))
+  (file-storage-write-string fs (%c-string-to-string name (length name)) 
+		       (%c-string-to-string value (length value))))
+
+
+(defmethod file-storage-write ((fs cv-file-storage) (name string) (value std-vector-key-point))
+  (file-storage-write-key-point fs (%c-string-to-string name (length name)) value))
 
 
 (defmethod *open ((self cv-file-storage) &rest args)

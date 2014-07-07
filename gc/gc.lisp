@@ -19,6 +19,11 @@
 ;; Interop - String*
 
 
+;; stdstring* create_std_string()
+  "Creates a *STRING object."
+(defcfun ("create_std_string" %string) (cv::*string :garbage-collect t))
+
+
 ;; string* std_cstringToString(char* s, size_t len) 
 (defcfun ("cstring_to_std_string" c-string-to-string) (cv::*string :garbage-collect t)
 	 "Converts C string to C++"
@@ -1832,6 +1837,47 @@
 (defmacro make-rgb (r g b)
 	  "BGR value constructor macro"
 	  `(scalar ,b ,g ,r))
+
+
+;;; CORE - XML/YAML Persistence
+
+
+;; FileStorage::FileStorage()
+;; FileStorage* cv_create_FileStorage()
+(defcfun ("cv_create_FileStorage" file-storage-0) (cv::file-storage :garbage-collect t))
+
+
+;; FileStorage::FileStorage(const String& source, int flags, const String& encoding=String())
+;; FileStorage* cv_create_FileStorage3(String* source, int flags, String* encoding)
+(defcfun ("cv_create_FileStorage3" %file-storage-3) (cv::file-storage :garbage-collect t) 
+  (source cv::*string)
+  (flags :int)
+  (encoding cv::*string))
+
+
+(defun file-storage-3 (&optional source flags (encoding (cv::%string) given-encoding))
+  (let ((return (%file-storage-3 (cv::%c-string-to-string source (length source)) flags 
+				 (if given-encoding 
+				     (cv::%c-string-to-string encoding (length encoding)) 
+				     encoding))))
+    (if given-encoding nil (cv::del-std-string encoding))
+    return))
+
+
+(defun file-storage (&rest args)
+  (cond ((null args)
+	 (file-storage-0))
+	(args
+	 (apply #'file-storage-3 args))
+	(t nil)))
+
+
+(defun make-file-storage (&rest args)
+  (cond ((null args)
+	 (file-storage-0))
+	(args
+	 (apply #'file-storage-3 args))
+	(t nil)))
 
 
 ;;; CORE - Utility and System Functions and Macros

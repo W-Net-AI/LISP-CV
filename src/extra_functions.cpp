@@ -71,13 +71,13 @@
 } \
 
 #define ADD_READ_FUNC_IMPL_0(t, tn) \
-    void cv_FileNode_read_number_##t(FileNode* node, tn name, tn default_value) { \
-        read(*node, name, default_value);\
+    void cv_FileNode_read_number_##t(FileNode* node, tn value, tn default_value) { \
+        read(*node, value, default_value);\
 } \
 
 #define ADD_READ_FUNC_IMPL_1(t, tn) \
-    void cv_FileNode_read_pointer_##t(FileNode* node, tn* name, tn* default_value) { \
-        read(*node, *name, *default_value);\
+    void cv_FileNode_read_pointer_##t(FileNode* node, tn* value, tn* default_value) { \
+        read(*node, *value, *default_value);\
 } \
 
 #define ADD_READ_FUNC_IMPL_2(t, tn) \
@@ -130,10 +130,15 @@ ADD_READ_FUNC_IMPL_1(m, Mat);
 
 ADD_READ_FUNC_IMPL_2(vkp, vector_KeyPoint);
 
-//FileNode* cv_FileNode_assignVal(FileStorage* fs, String* nodename) {
-//    FileNode* fn = new FileNode;
-//    *fn = *fs[*nodename];
-//    return fn;
+FileNode * cv_FileNode_assignVal(FileStorage * fs, string * nodename) {
+
+    return new cv::FileNode(fs->operator[](*nodename));
+
+}
+
+//FileStorage* cv_FileStorage_write_String(FileStorage* fs, char* value)
+//{ 
+//    return new FileStorage(*fs << char(*value));
 //}
 
 Scalar* cv_create_Scalar0()
