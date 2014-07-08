@@ -1942,6 +1942,23 @@
   (scale :double))
 
 
+;;; Motion Analysis and Object Tracking
+
+
+;; Point2d phaseCorrelate(InputArray src1, InputArray src2, InputArray window=noArray(), double* response=0)
+;; Point2d* cv_phaseCorrelate(Mat* src1, Mat* src2, Mat* window, double* response) 
+(defcfun ("cv_phaseCorrelate" %phase-correlate) (cv::point-2d :garbage-collect t)
+  (src-1 cv::mat)
+  (src-2 cv::mat)
+  (window cv::mat)
+  (response :pointer))
+
+
+(defun phase-correlate (src-1 src-2 &optional (window (mat) given-window) (response (null-pointer)))
+       (let ((return (%phase-correlate src-1 src-2 window response)))
+	 (if given-window nil (cv::del-mat window))
+	 return))
+
 
 ;;; HIGHGUI
 

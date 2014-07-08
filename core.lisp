@@ -63,7 +63,6 @@
   "Creates a *STRING object."
 (defcfun ("create_std_string" %string) *string)
 
-
 ;; Version for external use.
 
 ;; string* std_cstringToString(char* s, size_t len) 
@@ -269,14 +268,16 @@
 
 ;; void Mat::copyTo(OutputArray m) const
 ;; void cv_Mat_copyTo(Mat* self, Mat* m)
-(defcfun ("cv_Mat_copyTo" copy-to2) :void
+(defcfun ("cv_Mat_copyTo" copy-to-2) :void
+  "Copies the matrix to another one."
   (self mat)
   (m mat))
 
 
 ;; void Mat::copyTo(OutputArray m, InputArray mask) const
 ;; void cv_Mat_copyTo_masked(Mat* self, Mat* m, Mat* mask)
-(defcfun ("cv_Mat_copyTo_masked" copy-to3) :void
+(defcfun ("cv_Mat_copyTo_masked" copy-to-3) :void
+  "Copies the matrix to another one, masked."
   (self mat)
   (m mat)
   (mask mat))
@@ -284,8 +285,8 @@
 
 (defun copy-to (&optional mat m mask)
        (cond ((eq mask nil)
-	      (copy-to2 mat m))
-	      (t (copy-to3 mat m mask))))
+	      (copy-to-2 mat m))
+	      (t (copy-to-3 mat m mask))))
 
 
 ;; Mat Mat::cross(InputArray m) const
@@ -2841,17 +2842,17 @@
 ;; void cv_line(Mat* img, Point* pt1, Point* pt2, Scalar* color, int thickness, int lineType, int shift) 
 (defcfun ("cv_line" %line) :void
   (img mat)
-  (pt1 point)
-  (pt2 point)
+  (pt-1 point)
+  (pt-2 point)
   (color scalar)
   (thickness :int) 
   (line-type :int) 
   (shift :int))
 
 
-(defun line (img pt1 pt2 color &optional (thickness 1) (line-type 8) (shift 0))
+(defun line (img pt-1 pt-2 color &optional (thickness 1) (line-type 8) (shift 0))
        "Draws a line segment connecting two points."
-       (%line img pt1 pt2 color thickness line-type shift))
+       (%line img pt-1 pt-2 color thickness line-type shift))
 
 
 ;; void putText(Mat& img, const string& text, Point org, int fontFace, double fontScale, Scalar color, int thickness=1, int lineType=8, 
@@ -3252,7 +3253,7 @@
 (defmethod x ((self cv-point-3d))
   "Retrieves X coordinate of a POINT-3D object."
   (mem-aref (c-pointer self) :double))
-'
+
 
 (defmethod x ((self cv-point-3f))
   "Retrieves X coordinate of a POINT-3F object."
@@ -3303,6 +3304,7 @@
 
 
 (defmethod y ((self cv-rect))
+  "Retrieves Y coordinate of a RECT object."
   (mem-aref (c-pointer self) :int 1))
 
 

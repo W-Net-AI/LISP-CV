@@ -136,10 +136,10 @@ FileNode * cv_FileNode_assignVal(FileStorage * fs, string * nodename) {
 
 }
 
-//FileStorage* cv_FileStorage_write_String(FileStorage* fs, char* value)
-//{ 
-//    return new FileStorage(*fs << char(*value));
-//}
+FileStorage* cv_FileStorage_write_String(FileStorage* fs, String* value)
+{  
+  return new FileStorage(*fs << String(*value));
+}
 
 Scalar* cv_create_Scalar0()
 {

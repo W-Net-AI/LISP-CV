@@ -3666,7 +3666,7 @@ See also:
     (imshow window-name-1 image)
     ;Convert IMAGE to 1 channel
     (cvt-color image image +bgr2gray+)
-    ;Convert IMAGE to double floatwhen
+    ;Convert IMAGE to double float
     (convert-to image image +64f+)
     ;Find natural logarithm of each element of 
     ;IMAGE, just to see what it looks like
@@ -6729,7 +6729,7 @@ Draws a line segment connecting two points.
 
 C++: void line(Mat& img, Point pt1, Point pt2, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
 
-LISP-CV: (LINE (IMG MAT) (PT1 POINT) (PT2 POINT) (COLOR SCALAR) &OPTIONAL ((THICKNESS :INT) 1) ((LINE-TYPE :INT) 8) 
+LISP-CV: (LINE (IMG MAT) (PT-1 POINT) (PT-2 POINT) (COLOR SCALAR) &OPTIONAL ((THICKNESS :INT) 1) ((LINE-TYPE :INT) 8) 
          ((SHIFT :INT) 0)) => :VOID
 
     Parameters:	
@@ -7131,24 +7131,20 @@ before opening the file.
 
 Example:
 
-;;Not functioning perfectly
+
 (defun file-storage-open-example (save-directory) 
 
   (let ((filename (cat save-directory "matrix.yml")))
-    ;Create 3 matrices
-    (with-mat ((matrix-1 (mat-ones 10 10 +64f+))
-	       (matrix-2 (mat-zeros 10 10 +64f+))
-	       (matrix-3 (mat-eye 10 10 +64f+)))
-					;Create a FILE-STORAGE object
+    ;;Create a matrix
+    (with-mat ((matrix (mat-ones 10 10 +64f+)))
+      ;;Create a FILE-STORAGE object
       (with-file-storage ((fs (file-storage)))
-					;Open the file for writing
+	;;Open the file for writing
 	(if (*open fs filename +file-storage-write+)
 	    (format t "~%File open...~%") nil)
-					;Write the 3 matrices to the file
-	(*write fs "matrix 1" matrix-1)
-	(*write fs "matrix 2" matrix-2)
-	(*write fs "matrix 3" matrix-3) 
-	(format t "~%Wrote matrices to ~a~%~%" filename)
+	;;Write the matrix to the file
+	(*write fs "matrix" matrix)
+	(format t "~%Wrote matrix to ~a~%~%" filename)
 	(release fs)))))
 
 
@@ -10386,11 +10382,9 @@ See also:
 		       (when (= c 27)
 			 (return)))))))))))))
 
-
 ========================================================================================================================================
-IMGPROC - HISTOGRAMS
+IMGPROC - MOTION ANALYSIS AND OBJECT TRACKING
 ========================================================================================================================================
-
 
 ========================================================================================================================================
 EQUALIZE-HIST
@@ -10461,6 +10455,110 @@ http://docs.opencv.org/modules/imgproc/doc/histograms.html?highlight=equalizeh#e
 		     (when (= c 27)
 		       (return))))))))))))
 
+
+========================================================================================================================================
+IMGPROC - MOTION ANALYSIS AND OBJECT TRACKING
+========================================================================================================================================
+
+========================================================================================================================================
+PHASE-CORRELATE
+========================================================================================================================================
+
+The function is used to detect translational shifts that occur between two images. The operation takes 
+advantage of the Fourier shift theorem for detecting the translational shift in the frequency domain. It 
+can be used for fast image registration as well as motion estimation. For more information please see:
+
+http://en.wikipedia.org/wiki/Phase_correlation.
+
+Calculates the cross-power spectrum of two supplied source arrays. the arrays are padded if needed 
+with (GET-OPTIMAL-DFT-SIZE).
+
+C++: Point2d phaseCorrelate(InputArray src1, InputArray src2, InputArray window=noArray(), double* response=0)
+
+LISP-CV: (PHASE-CORRELATE (SRC-1 MAT) (SRC-2 MAT) ((WINDOW MAT) (MAT)) ((RESPONSE :POINTER) (NULL-POINTER))) => POINT-2D
+
+    Parameters:	
+
+        SRC-1 - Source floating point array (+32FC1+ or +64FC1+)
++
+        SRC-2 - Source floating point array (+32FC1+ or +64FC1+)
+
+        WINDOW - Floating point array with windowing coefficients to reduce edge effects (optional).
+
+        RESPONSE - Signal power within the 5x5 centroid around the peak, between 0 and 1 (optional).
+
+
+Return value: detected phase shift (sub-pixel) between the two arrays.
+
+
+See OpenCv documentation at this link:
+
+http://docs.opencv.org/trunk/modules/imgproc/doc/motion_analysis_and_object_tracking.html?highlight=phasec#phasecorrelate
+
+for further description and formulae.
+
+
+See also:
+
+(DFT), (GET-OPTIMAL-DFT-SIZE), (IDFT), (MUL-SPECTRUMS) (CREATE-HANNING-WINDOW)
+
+
+Example:
+
+
+(defun phase-correlate-example (&optional 
+				  (cam *camera-index*) 
+				  (width *default-width*)
+				  (height *default-height*))
+
+  "In this example PHASE-CORRELATE detects the motion of the camera not 
+   the subject. To see the effect of this this example you will need to 
+   pick up the camera and move it different directions and at different 
+   speeds. When a transitional shift between two camera frames is detec-
+   ted and certain criteria is met, a circle with a line inside indicat-
+   ing the direction of movement, will be drawn to the window."
+
+  (with-captured-camera (cap cam :width width :height height)
+    (if (not (cap-is-open cap)) 
+	(return-from phase-correlate-example 
+	  (format t "Cannot open the video camera")))      
+    (let ((window-name "Phase Shift - PHASE-CORRELATE Example"))
+      (with-named-window (window-name +window-autosize+)
+	(move-window window-name 639 115)
+	(with-mat ((frame (mat))
+		   (curr (mat))
+		   (prev (mat))
+		   (curr-64f (mat))
+		   (prev-64f (mat))
+		   (hann (mat)))
+
+	  (loop
+	     (let ((radius 0))
+	       (cap-read cap frame)
+	       (cvt-color frame curr +bgr2gray+)
+	       (if (empty prev) (progn (setf prev (t:clone curr)) 
+				       (create-hanning-window hann (size curr) +64f+)))
+	       (convert-to prev prev-64f +64f+)
+	       (convert-to curr curr-64f +64f+)
+	       (with-point-2d ((shift (phase-correlate prev-64f curr-64f hann)))
+		 (setf radius (coerce (sqrt (+ (* (x shift) (x shift)) 
+					       (* (y shift) (y shift)))) 'double-float))
+		 (if (> radius 5) (progn 
+
+				    ;;Draw a circle and line indicating the shift direction
+
+				    (with-point ((center (point (ash (cols curr) -1)  
+								(ash (rows curr) -1))))
+				      (with-point ((pt-2 (point (+ (x center) (floor (x shift))) 
+								(+ (y center) (floor (y shift))))))
+					(with-scalar ((scalar (scalar 0 255 0)))
+					  (circle frame center (floor radius) scalar 3 +aa+)
+					  (line frame center pt-2 scalar 3 +aa+)) nil))))
+		 (imshow window-name frame)
+		 (let ((key (wait-key 2)))
+		   (setf prev (t:clone curr))
+		   (when (= key 27)  ;Esc to exit...
+		     (return)))))))))))
 
 
 ========================================================================================================================================

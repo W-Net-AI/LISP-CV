@@ -91,7 +91,7 @@ ADD_READ_FUNC_HEADERS_1(m, Mat);
 ADD_WRITE_FUNC_HEADERS_2(vkp, vector_KeyPoint);
 void cv_FileNode_read_pointer_vkp (FileNode* fs, vector_KeyPoint* keypoints):
 FileNode * cv_FileNode_assignVal(FileStorage * fs, string * nodename);
-//FileStorage* cv_FileStorage_write_String(FileStorage* fs, char* value);
+FileStorage* cv_FileStorage_write_String(FileStorage* fs, String* value);
 Scalar* cv_create_Scalar0();
 Scalar* cv_create_Scalar4(double val0, double val1, double val2, double val3);
 CvDTreeParams* cv_create_CvDTreeParams();

@@ -454,6 +454,8 @@
 
 ;; imgproc - Motion Analysis and Object Tracking
 
+   #:phase-correlate
+
 ;; imgproc - Feature Detection
 
 ;; imgproc - Object Detection

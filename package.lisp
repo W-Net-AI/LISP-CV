@@ -1358,6 +1358,8 @@
 
 ;; imgproc - Motion Analysis and Object Tracking
 
+   #:phase-correlate
+
 ;; imgproc - Feature Detection
 
    #:+lsd-refine-none+

@@ -480,7 +480,31 @@
 
 ;;; Structural Analysis and Shape Descriptors
 
+
 ;;; Motion Analysis and Object Tracking
+
+
+;; void createHanningWindow(OutputArray dst, Size winSize, int type)
+;; void cv_createHanningWindow(Mat* dst, Size* winSize, int type)
+(defcfun ("cv_createHanningWindow" create-hanning-window) :void
+  (dst (mat))
+  (win-size size)
+  (type :int))
+
+
+;; Point2d phaseCorrelate(InputArray src1, InputArray src2, InputArray window=noArray(), double* response=0)
+;; Point2d* cv_phaseCorrelate(Mat* src1, Mat* src2, Mat* window, double* response) 
+(defcfun ("cv_phaseCorrelate" %phase-correlate) point-2d
+  (src-1 mat)
+  (src-2 mat)
+  (window mat)
+  (response :pointer))
+
+
+(defun phase-correlate (src-1 src-2 &optional (window (mat) given-window) (response (null-pointer)))
+       (let ((return (%phase-correlate src-1 src-2 window response)))
+	 (if given-window nil (del-mat window))
+	 return))
 
 
 ;;; Feature Detection

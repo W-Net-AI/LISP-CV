@@ -62,7 +62,7 @@
   "Calls delete on a D-TREE object."
   (self d-tree))
 
-
+;
 ;; void operator delete  ( void* ptr )
 ;; void cv_delete_CvDTreeParams(CvDTreeParam* self)
 (defcfun ("cv_delete_CvDTreeParams" del-d-tree-params) :void
