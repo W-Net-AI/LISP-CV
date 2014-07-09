@@ -330,7 +330,7 @@
 
 
 
-;;; DEFMETHODS
+;;; DEFMETHOD'S
 
 
 (defmethod compute ((type symbol) (self cv-bf-matcher) &rest args)

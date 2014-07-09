@@ -623,13 +623,13 @@
 
 ;; void operator delete  ( void* ptr )
 ;; void cv_delete_VideoCapture(VideoCapture* self)
-(defcfun ("cv_delete_VideoCapture" del-vid-cap) :void
+(defcfun ("cv_delete_VideoCapture" del-video-capture) :void
   "Calls delete on a VIDEO-CAPTURE object."
   (self video-capture))
 
 
 ;; void operator delete  ( void* ptr )
 ;; void delete_VideoWriter(VideoWriter* self)
-(defcfun ("cv_delete_VideoWriter" del-vid-writer) :void
+(defcfun ("cv_delete_VideoWriter" del-video-writer) :void
   "Calls delete on a VIDEO-WRITER object."
   (self video-writer))

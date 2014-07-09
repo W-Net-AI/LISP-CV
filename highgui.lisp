@@ -186,42 +186,43 @@
 
 ;; double VideoCapture::get(int propId)
 ;; double cv_VideoCapture_get(VideoCapture* self, int propId)
-(cffi:defcfun ("cv_VideoCapture_get" cap-get) :double
+(cffi:defcfun ("cv_VideoCapture_get" video-capture-get) :double
   "Returns the specified VideoCapture property."
   (self video-capture)
   (prop-id :int))
 
 
 ;; bool VideoCapture::isOpened()
-;; cv_VideoCapture_isOpened0
-(cffi:defcfun ("cv_VideoCapture_isOpened0" cap-is-open) :boolean
+;; bool cv_VideoCapture_isOpened0(VideoCapture* self)
+(cffi:defcfun ("cv_VideoCapture_isOpened0" video-capture-is-opened) :boolean
   "Returns true if video capturing has been initialized already."
   (self video-capture))
 
 
 ;; bool VideoCapture::read(Mat& image)
 ;; bool cv_VideoCapture_read(VideoCapture* self, Mat* image)
-(cffi:defcfun ("cv_VideoCapture_read" cap-read) :boolean
+(cffi:defcfun ("cv_VideoCapture_read" video-capture-read) :boolean
   "Grabs, decodes and returns the next video frame."
   (self video-capture)
   (image mat))
 
-
-(defcfun ("cv_VideoCapture_release0_0" cap-release) :void
+;; void VideoCapture::release()
+;; void cv_VideoCapture_release0_0(VideoCapture* self)
+(defcfun ("cv_VideoCapture_release0_0" video-capture-release) :void
   (self video-capture))
 
 
 ;; bool VideoCapture::set(int propId, double value
 ;; bool cv_VideoCapture_set(VideoCapture* self, int propId, double value)
-(cffi:defcfun ("cv_VideoCapture_set" %cap-set) :boolean
+(cffi:defcfun ("cv_VideoCapture_set" %video-capture-set) :boolean
   (self video-capture)
   (prop-id :int)
   (value :double))
 
 
-(defun cap-set (self prop-id value)
+(defun video-capture-set (self prop-id value)
        "Sets a property in the VideoCapture."
-       (%cap-set self prop-id (coerce value 'double-float)))
+       (%video-capture-set self prop-id (coerce value 'double-float)))
 
 
 ;; Mat imread(const string& filename, int flags=1)
@@ -286,7 +287,7 @@
 ;; bool VideoWriter::isOpened()
 ;; bool cv_VideoWriter_isOpened0_0(VideoWriter* self) 
 "Returns true if video writer has been successfully initialized."
-(defcfun ("cv_VideoWriter_isOpened0_0" video-writer-is-open) :boolean
+(defcfun ("cv_VideoWriter_isOpened0_0" video-writer-is-opened) :boolean
   (self video-writer))
 
 
@@ -335,4 +336,26 @@
 (defun set-window-property (winname prop-id prop-value)
        "Changes parameters of a window dynamically."
        (%set-window-property  (%c-string-to-string winname (length winname)) prop-id (coerce prop-value 'double-float)))
+
+
+
+;;; DEFMETHOD'S
+
+(defmethod *get ((self cv-video-capture) (value integer))
+	   (video-capture-get self value))
+
+(defmethod is-opened ((self cv-video-capture))
+	   (video-capture-is-opened self))
+
+(defmethod is-opened ((self cv-video-writer))
+	   (video-writer-is-opened self))
+
+(defmethod *read ((self cv-video-capture) (arg cv-mat))
+	   (video-capture-read self arg))
+
+(defmethod release ((self cv-video-capture))
+  (video-capture-release self))
+
+(defmethod *set ((self cv-video-capture) (value-1 integer) (value-2 real))
+	   (video-capture-set self value-1 (coerce value-2 'double-float)))
 

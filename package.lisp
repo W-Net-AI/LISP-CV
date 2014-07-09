@@ -3,6 +3,7 @@
 (defpackage :lisp-cv
   (:nicknames #:lisp-cv #:lcv #:cv)
   (:use #:cffi #:common-lisp #:swank #:trivial-garbage #:lisp-executable) 
+  (:shadow #:write)
   (:export 
 
 
@@ -180,14 +181,13 @@
    #:del-vector-vec-2w
    #:del-vector-vec-3w
    #:del-vector-vec-4w
-   #:del-vid-cap
+   #:del-video-capture
    #:del-vid-writer
 
 
 ;; WITH-MACROS
 
 
-   #:with-capture
    #:with-captured-camera
    #:with-captured-file
    #:with-cascade-classifier
@@ -653,10 +653,14 @@
    #:create
    #:detect
    #:dot
+   #:*get
    #:height
+   #:is-opened
    #:match
    #:*open
+   #:*read
    #:release
+   #:*set
    #:size
    #:width
    #:*write
@@ -1447,20 +1451,19 @@
    #:+load-image-anydepth+
    #:+load-image-anycolor+
 
-   #:cap-get
    #:cap-is-open
-   #:cap-read
-   #:cap-release
-   #:cap-set
- 
-
    #:imread
    #:imwrite
    #:make-video-capture
    #:make-video-writer
    #:video-capture
+   #:video-capture-get
+   #:video-capture-is-opened
+   #:video-capture-read
+   #:video-capture-release
+   #:video-capture-set
    #:video-writer
-   #:video-writer-is-open
+   #:video-writer-is-opened
    #:video-writer-write
 
 

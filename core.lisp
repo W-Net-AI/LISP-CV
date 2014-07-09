@@ -108,8 +108,14 @@
 (defgeneric dot (self other)
   (:documentation "Used for all class bindings with a DOT member"))
 
+(defgeneric *get (self value)
+  (:documentation "Used for all class bindings with a GET member"))
+
 (defgeneric height (self)
   (:documentation "Used for all class bindings with an HEIGHT member."))
+
+(defgeneric is-opened (self)
+  (:documentation "Used for all class bindings with an IS-OPENED member."))
 
 (defgeneric file-storage-write (fs name value)
   (:documentation "Used for all FILE-STORAGE-WRITE methods."))
@@ -120,8 +126,14 @@
 (defgeneric *open (self &rest args)
   (:documentation "Used for all class bindings with a OPEN member."))
 
+(defgeneric *read (self arg)
+  (:documentation "Used for all class bindings with an READ member."))
+
 (defgeneric release (self)
   (:documentation "Used for all class bindings with a RELEASE member."))
+
+(defgeneric *set (self value-1 value-2)
+  (:documentation "Used for all class bindings with an SET member."))
 
 (defgeneric size (arg &rest args)
   (:documentation "Used for all class bindings with a SIZE member."))
@@ -131,9 +143,6 @@
 
 (defgeneric *write (fs name value)
   (:documentation "Used for all class bindings with an WRITE member."))
-
-(defgeneric *read (fs value &optional default-value)
-  (:documentation "Used for all class bindings with an READ member."))
 
 (defgeneric x (self)
   (:documentation "Used for all class bindings with an X member."))
@@ -3060,7 +3069,7 @@
 
 
 
-;;;DEFMETHOD's
+;;;DEFMETHOD'S
 
 
 (defmethod angle ((self cv-rotated-rect))

@@ -26,18 +26,18 @@ an example that uses TG finalizers):
 			     (height *default-height*))
 
   (with-captured-camera (cap cam :width width :height height)
-    (if (not (cap-is-open cap)) 
+    (if (not (is-opened cap)) 
 	(return-from with-macro-example 
 	  (format t "Cannot open the video camera")))      
     (let ((window-name "WITH-MACRO Example"))
       (format t "~%Frame Size : ~ax~a~%~%" 
-	      (cap-get cap +cap-prop-frame-width+)
-	      (cap-get cap +cap-prop-frame-height+))
+	      (*get cap +cap-prop-frame-width+)
+	      (*get cap +cap-prop-frame-height+))
       (with-named-window (window-name +window-normal+)
 	(move-window window-name 759 175)
-	(loop
-	   (with-mat ((frame (mat)))
-	     (cap-read cap frame)
+	(with-mat ((frame (mat)))
+	  (loop
+	     (*read cap frame)
 	     (imshow window-name frame)
 	     (let ((c (wait-key 33)))
 	       (when (= c 27)
@@ -140,54 +140,53 @@ See also:
 
 
 (defun adjust-roi-example (&optional 
-			     (camera-index *camera-index*) 
+			     (cam *camera-index*) 
 			     (width *default-width*)
 			     (height *default-height*))
-  ;Set camera feed to CAP
-  (with-capture (cap (video-capture camera-index))
+  ;;Set camera feed to CAP and set its width and height
+  (with-captured-camera (cap cam :width width :height height)
     (let ((window-name-1 "Original FRAME - ADJUST-ROI Example")
 	  (window-name-2 "Region of interest - ADJUST-ROI Example")
 	  (window-name-3 "FRAME readjusted to original dimensions - ADJUST-ROI Example"))
-      (if (not (cap-is-open cap)) 
+      (if (not (is-opened cap)) 
 	  (return-from adjust-roi-example 
 	    (format t "Cannot open the video camera")))
-      ;Set width and height of CAP
-      (cap-set cap +cap-prop-frame-width+ width)
-      (cap-set cap +cap-prop-frame-height+ height)
+      ;;Print width and height of CAP
       (format t "~%Frame Size : ~ax~a~%~%" 
-	      (cap-get cap +cap-prop-frame-width+)
-	      (cap-get cap +cap-prop-frame-height+))
-      (named-window window-name-1 +window-normal+)
-      (named-window window-name-2 +window-normal+)
-      (named-window window-name-3 +window-normal+)
-      (move-window window-name-1 310 175)
-      (move-window window-name-2 760 175)
-      (move-window window-name-3 1210 175)
-      (do* ((frame 0)
-            ;Create rectangle RECT
-            (rect (rect (round (/ width 4)) 
-			(round (/ height 4))  
-			(round (/ width 2)) 
-			(round (/ height 2)))))
-	   ((plusp (wait-key *millis-per-frame*)) 
-	    (format t "Key is pressed by user"))
-        ;Set camera feed to FRAME
-	(setf frame (mat))
-	(cap-read cap frame)
-        ;Show original FRAME in window
-	(imshow window-name-1 frame)
-        ;Set FRAME region of interest to RECT, half 
-        ;the size of FRAME, positioned in the middle 
-        ;of FRAME
-	(setf frame (roi frame rect))
-        ;;Show adjusted FRAME in window
-	(imshow window-name-2 frame)
-        ;Readjust frame back to original dimensions
-	(adjust-roi frame 120 120 160 160)
-        ;Show readjusted FRAME in a window
-	(imshow window-name-3 frame))
-      (destroy-all-windows))))
+	      (*get cap +cap-prop-frame-width+)
+	      (*get cap +cap-prop-frame-height+))
+      (with-named-window (window-name-1 +window-normal+)
+	(with-named-window (window-name-2 +window-normal+)
+	  (with-named-window (window-name-3 +window-normal+)
+	    (move-window window-name-1 310 175)
+	    (move-window window-name-2 760 175)
+	    (move-window window-name-3 1210 175)
+	    (with-mat ((frame (mat)))
+	      ;;Create rectangle RECT
+	      (with-rect ((rect (rect (round (/ width 4)) 
+				      (round (/ height 4))  
+				      (round (/ width 2)) 
+				      (round (/ height 2)))))
+		(loop
 
+
+		   ;;Set camera feed to FRAME
+		   (*read cap frame)
+		   ;;Show original FRAME in window
+		   (imshow window-name-1 frame)
+		   ;;Set FRAME region of interest to RECT, half 
+		   ;;the size of FRAME, positioned in the middle 
+		   ;;of FRAME
+		   (with-mat ((frame (roi frame rect)))
+		     ;;Show adjusted FRAME in window
+		     (imshow window-name-2 frame)
+		     ;;Readjust frame back to original dimensions
+		     (with-mat ((adjusted-roi (adjust-roi frame 120 120 160 160)))
+		       ;;Show readjusted FRAME in a window
+		       (imshow window-name-3 frame)))	    
+		       (let ((c (wait-key 33)))
+			 (when (= c 27)
+			   (return))))))))))))
 
 ========================================================================================================================================
 ASSGN
@@ -548,6 +547,8 @@ When the operation mask is specified, and the (CREATE) call shown above realloca
 newly allocated matrix is initialized with all zeros before copying the data.
 
 
+Example 1:
+
 (defun copy-to-example-1 ()
   ;; initialize data for matrices
   (with-object ((data (alloc :int '(10 20 30 40))))
@@ -591,39 +592,42 @@ newly allocated matrix is initialized with all zeros before copying the data.
       (format t "~%"))))
 
 
+Example 2:
 
 (defun copy-to-example-2 (&optional (cam 0) 
 			    (width *default-width*)
 			    (height *default-height*))
 
   "In this COPY-TO example, we use the output of CANNY, 
-   a binary image, as the MASK parameter of COPY-TO."
+  a binary image, as the MASK parameter of COPY-TO."
 
-  (let ((window-name "COPY-TO Example 2"))
-    (with-named-window (window-name +window-normal+)
-      (set-window-property window-name +wnd-prop-fullscreen+ 
-			   +window-fullscreen+)
-      (set-window-property window-name +wnd-prop-aspectratio+ 
-			   +window-freeratio+)
-      (with-captured-camera (cap cam :width width :height height)
+  ;;Set cameraa feed to CAP. Set its, width/height to default
+  (with-captured-camera (cap cam :width width :height height)
+    (let ((window-name "COPY-TO Example 2"))
+      (with-named-window (window-name +window-normal+)
+	(set-window-property window-name +wnd-prop-fullscreen+ 
+			     +window-fullscreen+)
+	(set-window-property window-name +wnd-prop-aspectratio+ 
+			     +window-freeratio+)
 	(with-object ((threshold1 (alloc :int 0))
 		      (threshold2 (alloc :int 0)))
-	  (loop        ;;Create matrices to 
-	               ;;hold all the data
+	  ;;Adjusting the trackbars changes the THRESHOLD1 
+	  ;;and THRESHOLD2 parameters of the function CANNY
+	  (create-trackbar "THRESHOLD1" window-name threshold1 500)
+	  (create-trackbar "THRESHOLD2" window-name threshold2 500)
+	  (loop  
+	     ;;Create matrices to 
+	     ;;hold all the data
 	     (with-mat ((frame (mat))
 			(src (mat height width +8u+))
 			(dst (mat height width +8u+))
-                        ;;Create matrix filled with zeros(all black)
+			;;Create matrix filled with zeros(all black)
 			(black-mat (mat-zeros (rows frame) (cols frame) 0)))
                ;;Set the camera 
                ;;feed to FRAME
-	       (cap-read cap frame)
+	       (*read cap frame)
                ;;Convert FRAME to grayscale
 	       (cvt-color frame src +bgr2gray+)
-	       ;;Adjusting the trackbars changes the THRESHOLD1 
-               ;;and THRESHOLD2 parameters of the function CANNY
-	       (create-trackbar "THRESHOLD1" window-name threshold1 500)
-	       (create-trackbar "THRESHOLD2" window-name threshold2 500)
                ;;Set CANNY output to DST
 	       (canny src dst (coerce (? threshold1 :int) 'double-float) 
 		      (coerce (? threshold2 :int) 'double-float))
@@ -1410,46 +1414,47 @@ submatrix within the original matrix. The function LOCATE-ROI does exactly that.
 			     (cam *camera-index*) 
 			     (width *default-width*)
 			     (height *default-height*))
-  ;Set camera feed to CAP and set its width and height
+  ;;Set camera feed to CAP and set its width and height
   (with-captured-camera (cap cam :width width :height height)
     (let ((window-name-1 "Original FRAME - LOCATE-ROI Example")
 	  (window-name-2 "Submatrix - LOCATE-ROI Example"))
-      (if (not (cap-is-open cap)) 
+      (if (not (is-opened cap)) 
 	  (return-from locate-roi-example 
 	    (format t "Cannot open the video camera")))
       (format t "~%Frame Size : ~ax~a~%~%" 
-	      (cap-get cap +cap-prop-frame-width+)
-	      (cap-get cap +cap-prop-frame-height+))
+	      (*get cap +cap-prop-frame-width+)
+	      (*get cap +cap-prop-frame-height+))
       ;;Create windows and move to specified positions
       (with-named-window (window-name-1 +window-normal+)
 	(with-named-window (window-name-2 +window-normal+)
 	  (move-window window-name-1 514 175)
 	  (move-window window-name-2 966 175)
-	  ;Create rectangle RECT
-	  (with-rect ((rect (rect (round (/ width 4)) 
-				  (round (/ height 4))  
-				  (round (/ width 2)) 
-				  (round (/ height 2)))))
-            ;;Create variables to hold the size and location 
-            ;;information derived by LOCATE-ROI
-            (with-size ((roi-size (size 0 0)))
-	      (with-point ((roi-loc (point 0 0)))
-		(loop
-		   (with-mat ((frame (mat)))
-		     (cap-read cap frame)
-		     ;Show original FRAME in window
+	  (with-mat ((frame (mat)))
+	    ;;Create rectangle RECT
+	    (with-rect ((rect (rect (round (/ width 4)) 
+				    (round (/ height 4))  
+				    (round (/ width 2)) 
+				    (round (/ height 2)))))
+	      ;;Create variables to hold the size and location 
+	      ;;information derived by LOCATE-ROI
+	      (with-size ((roi-size (size 0 0)))
+		(with-point ((roi-loc (point 0 0)))
+		  (loop
+		     ;;Set camera feed to frame   
+		     (*read cap frame)
+		     ;;Show original FRAME in window
 		     (imshow window-name-1 frame)
-		     ;Extract submatrix(roi) from FRAME
+		     ;;Extract submatrix(roi) from FRAME
 		     (with-mat ((frame (roi frame rect)))
-		       ;Locate the position of the submatrix 
-		       ;inside FRAME we just extracted as well 
-		       ;as the size of its parent matrix which 
-		       ;is, in this case FRAME 
+		       ;;Locate the position of the submatrix 
+		       ;;inside FRAME we just extracted as well 
+		       ;;as the size of its parent matrix which 
+		       ;;is, in this case FRAME 
 		       (locate-roi frame roi-size roi-loc)
-		       ;Print location of submatrix
+		       ;;Print location of submatrix
 		       (format t "Location of FRAME region of interest (~a, ~a)~%~%" 
 			       (x roi-loc) (y roi-loc))
-		       ;Print size of parent matrix
+		       ;;Print size of parent matrix
 		       (format t "Size of FRAME (~a, ~a)~%~%" 
 			       (width roi-size) (height roi-size))
 		       ;;Show submatrix in window
@@ -3708,6 +3713,8 @@ See also:
 (*MIN), (COMPARE), (IN-RANGE), (MIN-MAX-LOC), Matrix Expressions(MAT-EXPR)
 
 
+Example:
+
 (defun *max-example (&optional (cam 0)
 		       (width *default-width*)
 		       (height *default-height*))
@@ -3719,76 +3726,75 @@ See also:
    rackbar changes the scalar value the ASSGN-VAL function us-
    es to decide what to set each element of MAT-3 to."
 
-  ;Create camera capture, CAP, set CAP to default width and height
+  ;;Create camera capture, CAP, set CAP to default width and height
   (with-captured-camera (cap cam :width width :height height)  
     (let* ((window-name-1 "MAT-3 after THRESHOLD - *MAX-Example")
 	   (window-name-2 "MAT-5 after ASSGN-VAL - *MAX-Example")
 	   (window-name-3 "MAT-4 after *MAX - *MAX-Example"))
-      ;Create two matrices: MAT-1 and MAT-2(used to show how *MAX works)
+      ;;Create two matrices: MAT-1 and MAT-2(used to show how *MAX works)
       (with-mat ((mat-1 (mat 3 3 +32s+ (alloc :int '(1 2 3 4 5 6 7 8 9))))
 		 (mat-2 (mat 3 3 +32s+ (alloc :int '(9 8 7 6 5 4 3 2 1))))
-		 ;Create destination matrix of same size and type: DEST
+		 ;;Create destination matrix of same size and type: DEST
 		 (dest (mat 3 3 +32s+))
-		;Create 3 matrices used to hold 
-		;data we use later in the example
+		 ;;Create 3 matrices used to hold 
+		 ;;data we use later in the example
 		 (mat-3 (mat height width +8u+))
 		 (mat-4 (mat height width +8u+))
 		 (mat-5 (mat height width +8u+))) 
-        ;Create windows and move to specified locations
+	;;Create windows and move to specified locations
 	(with-named-window (window-name-1 +window-normal+)
 	  (with-named-window (window-name-2 +window-normal+)
 	    (with-named-window (window-name-3 +window-normal+)
 	      (move-window window-name-1 310 175)
 	      (move-window window-name-2 760 175)
 	      (move-window window-name-3 1210 175)
-	      ;Print MAT-1
-	      (format t "MAT-1:~%~%")
+	      ;;Print MAT-1
+	      (format t "~%~%MAT-1:~%~%")
 	      (print-mat mat-1 :int)
 	      (format t "~%~%")
-	      ;Print MAT-2
+	      ;;Print MAT-2
 	      (format t "MAT-2:~%~%")
 	      (print-mat mat-2 :int)
 	      (format t "~%~%")
-	      ;Find per element maximum of 
-	      ;MAT-1 and MAT-2, set to DEST
+	      ;;Find per element maximum of 
+	      ;;MAT-1 and MAT-2, set to DEST
 	      (*max mat-1 mat-2 dest)
-	      ;Print DEST
+	      ;;Print DEST
 	      (format t "Per element maximum of MAT-1 and  MAT-2:~%~%")
 	      (print-mat dest :int)
 	      (format t "~%~%")
-	      ;Allocate :int pointer for trackbar to change
-	      (with-object ((val (alloc :int 67)))
-	        ;Create trackbar on middle window which changes 
-	        ;the scalar value ASSGN-VAL uses in loop
+	      ;;Allocate :int pointer for trackbar to change
+	      (with-object ((val (alloc :int 76)))
+		;;Create trackbar on middle window which changes 
+		;;the scalar value ASSGN-VAL uses in loop
 		(create-trackbar "Value of mat-3" window-name-2 val 255)
-		(loop
-		   ;Set camera feed to FRAME
-		   (with-mat ((frame (mat)))
-		     (cap-read cap frame)
-		     ;Convert FRAME to 1 channel 
-		     ;grayscale image, set to mat-1
-		     ;FRAME stays the same
+		(with-mat ((frame (mat)))
+		  (loop
+		     ;;Set camera feed to FRAME
+		     (*read cap frame)
+		     ;;Convert FRAME to 1 channel 
+		     ;;grayscale image, set to mat-1
+		     ;;FRAME stays the same
 		     (cvt-color frame mat-3 +bgr2gray+)
-		     ;Convert FRAME to 1 channel 
-		     ;grayscale image, set to MAT-4
-		     ;FRAME stays the same
+		     ;;Convert FRAME to 1 channel 
+		     ;;grayscale image, set to MAT-4
+		     ;;FRAME stays the same
 		     (cvt-color frame mat-4  +bgr2gray+)
-		     ;Apply a fixed-level threshold to 
-		     ;each array element of MAT-3
+		     ;;Apply a fixed-level threshold to 
+		     ;;each array element of MAT-3
 		     (threshold mat-3 mat-3 128d0 255d0 +thresh-binary-inv+)
-		     ;Assign each element of MAT-5 a scalar value
+		     ;;Assign each element of MAT-5 a scalar value
 		     (assgn-val mat-5 (scalar (mem-aref val :int)))
-		     ;Find the maximum of each element 
-		     ;of MAT-4 and MAT-5, set to MAT-4
+		     ;;Find the maximum of each element 
+		     ;;of MAT-4 and MAT-5, set to MAT-4
 		     (*max mat-4 mat-5 mat-4)
-		     ;Show MAT-3, MAT-5 and MAT-4 in windows
+		     ;;;Show MAT-3, MAT-5 and MAT-4 in windows
 		     (imshow window-name-1 mat-3)
 		     (imshow window-name-2 mat-5)
 		     (imshow window-name-3 mat-4)
 		     (let ((c (wait-key 33)))
 		       (when (= c 27)
 			 (return)))))))))))))
-
 
 ========================================================================================================================================
 *MIN
@@ -3822,6 +3828,7 @@ See also:
 (*MAX), (COMPARE), (IN-RANGE), (MIN-MAX-LOC), Matrix Expressions(MAT-EXPR)
 
 
+Example:
 
 (defun *min-example (&optional (cam 0)
 		       (width *default-width*)
@@ -3834,81 +3841,81 @@ See also:
    rackbar changes the scalar value the ASSGN-VAL function us-
    es to decide what to set each element of MAT-3 to."
 
-  ;Create video capture, CAP. Set CAP to default width and height
+  ;;Create video capture, CAP. Set CAP to default width and height
   (with-captured-camera (cap cam :width width :height height)   
-    ;Create two matrices: MAT-1 and MAT-2(used to show how *MIN works)
+    ;;Create two matrices: MAT-1 and MAT-2(used to show how *MIN works)
     (with-mat ((mat-1 (mat 3 3 +32s+ (alloc :int '(1 2 3 4 5 6 7 8 9))))
 	       (mat-2 (mat 3 3 +32s+ (alloc :int '(9 8 7 6 5 4 3 2 1))))
-	       ;Create destination matrix of same size and type, DEST
+	       ;;Create destination matrix of same size and type, DEST
 	       (dest (mat 3 3 +32s+))
-	       ;Create 3 matrices used to hold the
-	       ;data we use later in the example
+	       ;;Create 3 matrices used to hold the
+	       ;;data we use later in the example
 	       (mat-3 (mat height width +8u+))
 	       (mat-4 (mat height width +8u+))
 	       (mat-5 (mat height width +8u+)))
-      ;Allocate int pointer for trackbar to change
-      (with-object ((val (alloc :int '(128))))
-	(let ((window-name-1 "MAT-3 after THRESHOLD - *MIN-Example")
-	      (window-name-2 "MAT-5 after ASSGN-VAL - *MIN-Example")
-	      (window-name-3 "MAT-4 after *MIN - *MIN-Example")) 
-	  ;Create windows and move to specified locations
-	  (with-named-window (window-name-1 +window-normal+)
-	    (with-named-window (window-name-2 +window-normal+)
-	      (with-named-window (window-name-3 +window-normal+)
-		(move-window window-name-1 310 175)
-		(move-window window-name-2 760 175)
-		(move-window window-name-3 1210 175)
-		;Print MAT-1
+      (let ((window-name-1 "MAT-3 after THRESHOLD - *MIN-Example")
+	    (window-name-2 "MAT-5 after ASSGN-VAL - *MIN-Example")
+	    (window-name-3 "MAT-4 after *MIN - *MIN-Example")) 
+	;;Create windows and move to specified locations
+	(with-named-window (window-name-1 +window-normal+)
+	  (with-named-window (window-name-2 +window-normal+)
+	    (with-named-window (window-name-3 +window-normal+)
+	      (move-window window-name-1 310 175)
+	      (move-window window-name-2 760 175)
+	      (move-window window-name-3 1210 175)
+	      ;;Allocate int pointer for trackbar to change
+	      (with-object ((val (alloc :int '(128))))
+		;;Create a trackbar on the middle window which changes 
+		;;the scalar value the function ASSGN-VAL will use.
+		(create-trackbar "Value of mat-3" window-name-2 val 255)
+		;;Print MAT-1
 		(format t "~%MAT-1:~%~%")
 		(print-mat mat-1 :int)
 		(format t "~%~%")
-		;Print MAT-2
+		;;Print MAT-2
 		(format t "MAT-2:~%~%")
 		(print-mat mat-2 :int)
 		(format t "~%")
-		;Find per element minimum of 
-		;MAT-1 and MAT-2, set to DEST
+		;;Find per element minimum of 
+		;;MAT-1 and MAT-2, set to DEST
 		(*min mat-1 mat-2 dest)
-	     	;Print DEST
+	     	;;Print DEST
 		(format t "Per element minimum of MAT-1 and  MAT-2:~%~%")
 		(print-mat dest :int)
 		(format t "~%")
-		(loop
-		   ;Set camera feed to FRAME
-		   (with-mat ((frame (mat)))
-		     (cap-read cap frame)
-		     ;Convert FRAME to 1 channel grayscale 
-                     ;image, set to MAT-3. FRAME stays the 
-                     ;same
+		(with-mat ((frame (mat)))
+		  (loop
+		     ;;Set camera feed to FRAME
+		     (*read cap frame)
+		     ;;Convert FRAME to 1 channel grayscale 
+                     ;;image, set to MAT-3. FRAME stays the 
+                     ;;same
 		     (cvt-color frame mat-3 +bgr2gray+)
-		     ;Convert FRAME to 1 channel grayscale 
-                     ;image, set to MAT-4. FRAME stays the 
-                     ;same
+		     ;;Convert FRAME to 1 channel grayscale 
+                     ;;image, set to MAT-4. FRAME stays the 
+                     ;;same
 		     (cvt-color frame mat-4  +bgr2gray+)
-		     ;Apply a fixed-level threshold to 
-		     ;each array element of MAT-3
+		     ;;Apply a fixed-level threshold to 
+		     ;;each array element of MAT-3
 		     (threshold mat-3 mat-3 128d0 255d0 +thresh-binary-inv+)
-		     ;Create a trackbar on the middle window which changes 
-		     ;the scalar value ASSGN-VAL will use in the next step
-		     (create-trackbar "Value of mat-3" window-name-2 val 255)
+		     
+		     ;;Assign each element of MAT-5 a scalar value
 
-		     ;Assign each element of MAT-5 a scalar value
-
-		     ;Note: The 't:' prefix to SCALAR toggles its 
-		     ;finalizer to true. Also, '?' is a macro for 
-		     ;CFFI::MEM-AREF
+		     ;;Note: The 't:' prefix to SCALAR toggles its 
+		     ;;finalizer to true. Also, '?' is a macro for 
+		     ;;CFFI::MEM-AREF
 
 		     (assgn-val mat-5 (t:scalar (? val :int)))
-		     ;Find the minimum of each element 
-		     ;of MAT-4 AND MAT-5, set to MAT-4
+		     ;;Find the minimum of each element 
+		     ;;of MAT-4 AND MAT-5, set to MAT-4
 		     (*min mat-4 mat-5 mat-4)
-		     ;Show MAT-3, MAT-4 and MAT-5 in windows
+		     ;;Show MAT-3, MAT-4 and MAT-5 in windows
 		     (imshow window-name-1 mat-3)
 		     (imshow window-name-2 mat-5)
-		     (imshow window-name-3 mat-4)) 
-		   (let ((c (wait-key 33)))
-		     (when (= c 27)
-		       (return))))))))))))
+		     (imshow window-name-3 mat-4) 
+		     (let ((c (wait-key 33)))
+		       (when (= c 27)
+			 (return)))))))))))))
 
 
 ========================================================================================================================================
@@ -3988,10 +3995,13 @@ Note:
 Saturation is not applied when the arrays have the depth +32S+. You may even get a negative value i-
 n the case of overflow.
 
+
 See also:
 
 (ABS) 
 
+
+Example:
 
 (defun absdiff-example (&optional 
 			  (camera-index 
@@ -4004,28 +4014,26 @@ See also:
    nd outputs the result to a window...Makes for quite an i-
    nteresting effect."
 
-  (with-capture (cap (video-capture camera-index))
+  (with-captured-camera (cap camera-index :width width :height height)
     (let ((scalar (mat 1 1 +64f+ (scalar 128 128 128)))
 	  (window-name "ABSDIFF Example"))
-      (if (not (cap-is-open cap)) 
+      (if (not (is-opened cap)) 
 	  (return-from absdiff-example 
 	    (format t "Cannot open the video camera")))
-      (cap-set cap +cap-prop-frame-width+ width)
-      (cap-set cap +cap-prop-frame-height+ height)
-      (named-window window-name +window-normal+)
-      (move-window window-name 759 175)
-      (do* ((frame 0))
-	   ((plusp (wait-key *millis-per-frame*)) 
-	    (format t "Key is pressed by user"))
-	(setf frame (mat))
-	(cap-read cap frame)
-	(absdiff frame scalar frame)
-	(imshow window-name frame))
-      (destroy-window window-name))))
+      (with-named-window (window-name +window-normal+)
+	(move-window window-name 759 175)
+	(with-mat ((frame (mat)))
+	  (loop
+	     (*read cap frame)
+	     (absdiff frame scalar frame)
+	     (imshow window-name frame)
+	     (let ((c (wait-key 33)))
+	       (when (= c 27)
+		 (return)))))))))
 
-
-
+========================================================================================================================================
 ADD-WEIGHTED
+========================================================================================================================================
 
 Calculates the weighted sum of two arrays.
 
@@ -4572,13 +4580,14 @@ scaling, taking an absolute value, conversion to an unsigned 8-bit type. In case
 the function processes each channel independently. 
 
 
+Example:
 
 (defun convert-scale-abs-example (&optional (cam *camera-index*) 
 				    (width *default-width*)
 				    (height *default-height*))
 
   (with-captured-camera (cap cam :width width :height height)
-    (if (not (cap-is-open cap)) 
+    (if (not (is-opened cap)) 
 	(return-from convert-scale-abs-example 
 	  (format t "Cannot open the video camera")))  
     (let ((window-name "CONVERT-SCALE-ABS Example"))
@@ -4602,18 +4611,17 @@ the function processes each channel independently.
 	  ;;Print converted MAT
 	  (format t "~%~%Printing MAT after the conversion~%~%")
 	  (print-mat mat :uchar)
-          (format t "~%~%")
-	  (loop
-	     (with-mat ((frame (mat)))
-	       (cap-read cap frame)
+          (format t "~%")
+	  (with-mat ((frame (mat)))
+	    (loop
+	       (*read cap frame)
 	       ;;Run CONVERT-SCALE-ABS on the camera
                ;;output, just to see what happens
 	       (convert-scale-abs frame frame 2d0 5d0)
-	       (imshow window-name frame))
-	     (let ((c (wait-key 33)))
-	       (when (= c 27)
-		 (return)))))))))
-
+	       (imshow window-name frame)
+	       (let ((c (wait-key 33)))
+		 (when (= c 27)
+		   (return))))))))))
 
 
 DET
@@ -4799,10 +4807,13 @@ The example scenarios of using the function are the following:
 
         Reversing the order of point arrays ((> FLIP-CODE 0) OR (EQ FLIP-CODE 0)).
 
+
 See also:
 
 (TRANSPOSE) , (REPEAT) , (COMPLETE-SYMM)
 
+
+Example:
 
 (defun flip-example (&optional (cam *camera-index*))
 
@@ -4849,10 +4860,10 @@ See also:
 	;;MAT clones in the top windows
 	(dotimes (i 3)
 	  (imshow (aref window-name-arr i) (aref mat-clone-arr i)))
-	(loop
-           ;;Assign camera feed to FRAME
-	   (with-mat ((frame (mat)))
-	     (cap-read cap frame)
+	(with-mat ((frame (mat)))
+	  (loop
+	     ;;Assign camera feed to FRAME
+	     (*read cap frame)
 	     ;;Make 3 frame clones
 	     (dotimes (i 3)
 	       (setf (aref frame-clone-arr i) (gc:clone frame)))
@@ -4865,11 +4876,11 @@ See also:
 	       (imshow (aref window-name-arr (+ i 3)) (aref frame-clone-arr i)))
 	     ;;Clean up used memory
 	     (dotimes (i 3)
-	       (del-mat (aref frame-clone-arr i))))
-	   (let ((c (wait-key 33)))
-	     (when (= c 27)
-	       (destroy-all-windows)
-	       (return))))))))
+	       (del-mat (aref frame-clone-arr i)))
+	     (let ((c (wait-key 33)))
+	       (when (= c 27)
+		 (destroy-all-windows)
+		 (return)))))))))
 
 
 
@@ -4896,48 +4907,50 @@ LISP-CV: (IN-RANGE-S (SRC MAT) (LOWERB SCALAR) (UPPERB SCALAR) (DEST MAT)) => :V
 All the arrays must have the same type, except the destination, and the same size (or ROI size).
 
 
+Example:
+
 (defun in-range-s-example (&optional 
 			     (cam *camera-index*) 
 			     (width *default-width*)
 			     (height *default-height*))
 
-  ;; Set camera feed to CAP and set camera feed width/height
+  ;;Set camera feed to CAP and set camera feed width/height
   (with-captured-camera (cap cam :width width :height height)  
     (let ((window-name-1 "Original camera feed - IN-RANGE-S Example")
 	  (window-name-2 "Only red objects - IN-RANGE-S Example"))
-      (if (not (cap-is-open cap)) 
+      (if (not (is-opened cap)) 
 	  (return-from in-range-s-example 
 	    (format t "Cannot open the video camera")))
       (format t "~%Frame Size : ~ax~a~%~%" 
-	      (cap-get cap +cap-prop-frame-width+)
-	      (cap-get cap +cap-prop-frame-height+))
+	      (*get cap +cap-prop-frame-width+)
+	      (*get cap +cap-prop-frame-height+))
       (with-named-window (window-name-1 +window-normal+)
 	(with-named-window (window-name-2 +window-normal+)
 	  (move-window window-name-1 533 175)
 	  (move-window window-name-2 984 175)
-	  ;; Iterate through each frames of the video
-	  (loop
-	     ;; Set camera feed to FRAME
-	     (with-mat ((frame (mat)))
-	       (cap-read cap frame)
-	       (with-mat ((src (clone frame))
-			  (img-hsv (mat))
-			  (img-thresh (mat)))
+	  (with-mat ((frame (mat))
+                     (img-hsv (mat))
+		     (img-thresh (mat)))
+	    ;;Iterate through each frames of the video
+	    (loop
+	       ;;Set camera feed to FRAME
+	       (*read cap frame)
+	       (with-mat ((src (clone frame)))
 		 (with-scalar ((lower-hsv (scalar 170 160 60))
 			       (upper-hsv (scalar 180 2556 256)))
-		   ;; Smooth the original image using Gaussian kernel
+		   ;;Smooth the original image using Gaussian kernel
 		   (gaussian-blur src src (size 5 5) 0.0d0 0.0d0)
-		   ;; Change the color format from BGR to HSV
+		   ;;Change the color format from BGR to HSV
 		   (cvt-color src img-hsv +bgr2hsv+)
-		   ;; Threshold the HSV image and create a binary image
+		   ;;Threshold the HSV image and create a binary image
 		   (in-range-s img-hsv lower-hsv upper-hsv img-thresh)
-		   ;; Smooth the binary image using Gaussian kernel
+		   ;;Smooth the binary image using Gaussian kernel
 		   (gaussian-blur img-thresh img-thresh (size 5 5) 0.0d0 0.0d0)
 		   (imshow window-name-1 src)
-		   (imshow window-name-2 img-thresh)))
-	       (let ((c (wait-key 33)))
-		 (when (= c 27)
-		   (return))))))))))
+		   (imshow window-name-2 img-thresh))
+		 (let ((c (wait-key 33)))
+		   (when (= c 27)
+		     (return)))))))))))
 
 
 
@@ -4983,10 +4996,13 @@ Similarly to +DECOMP-LU+ , the method +DECOMP-CHOLESKY+ works only with non-sing
 that should also be symmetrical and positively defined. In this case, the function stores the inverted 
 matrix in DEST and returns non-zero. Otherwise, it returns 0.
 
+
 See also:
 
 (SOLVE), SVD
 
+
+Example:
 
 (defun invert-example (&optional 
 			 (cam *camera-index*) 
@@ -4994,7 +5010,7 @@ See also:
 			 (height *default-height*)) 
 
   (with-captured-camera (cap cam :width width :height height)
-    (if (not (cap-is-open cap)) 
+    (if (not (is-opened cap)) 
 	(return-from invert-example 
 	  (format t "Cannot open the video camera")))
     (let ((invert-return 0)
@@ -5044,9 +5060,9 @@ See also:
 	  (imshow (aref window-name-arr 0) mat)
 	  (imshow (aref window-name-arr 1) dest)
 	  (imshow (aref window-name-arr 2) identity-mat)
-	  (loop ;;Read in camera feed
-	     (with-mat ((frame (mat)))
-	       (cap-read cap frame)
+	  (with-mat ((frame (mat)))
+	    (loop ;;Read in camera feed
+	       (*read cap frame)
 	       ;;Make a clone of the camera feed, DEST
 	       (with-mat ((dest (clone frame))
 			  ;;Crop FRAME to make it a square matrix, set to ROI
@@ -5070,11 +5086,11 @@ See also:
                  ;;Note: Running MUL on a matrix this big makes the 
                  ;;example slow too.
 		 (with-mat ((identity-mat (>> (mul roi dest))))
-		 (imshow (aref window-name-arr 5) identity-mat))))
-	     (let ((c (wait-key 33)))
-	       (when (= c 27)
-		 (destroy-all-windows)
-		 (return)))))))))
+		   (imshow (aref window-name-arr 5) identity-mat)))
+	       (let ((c (wait-key 33)))
+		 (when (= c 27)
+		   (destroy-all-windows)
+		   (return))))))))))
 
 
 
@@ -5241,7 +5257,6 @@ See also:
 
 Example:
 
-
 (defun mean-example (&optional (cam *camera-index*) 
 		       (width *default-width*)
 		       (height *default-height*))
@@ -5267,10 +5282,10 @@ Example:
 	  (set-window-property window-name +wnd-prop-fullscreen+ 
 			       +window-fullscreen+)
 	  (move-window window-name 624 100)
-	  (loop
-	     (with-mat ((frame (mat)))
+	  (with-mat ((frame (mat)))
+	    (loop
 	       ;;Set FRAME to a frame of the camera feed
-	       (cap-read cap frame)
+	       (*read cap frame)
 	       ;;Print rectangle location/dimensions
 	       (format t "RECT-X: ~a~%~%" (mem-ref rect-x :int))
 	       (format t "RECT-Y: ~a~%~%" (mem-ref rect-y :int))
@@ -5313,23 +5328,23 @@ Example:
 						 (mem-ref rect-width :int)) 
 					      (+ (mem-ref rect-y :int) 
 						 (mem-ref rect-height :int)))))
-		 ;;Set region of interest of FRAME to the rectangle 
-		 ;;location/dimensions we specified
-		 (with-rect ((roi (rect (mem-ref rect-x :int) (mem-ref rect-y :int)
-					(mem-ref rect-width :int) (mem-ref rect-height :int))))
-		   ;;Set region of interest of FRAME to ROI. This region of 
-		   ;;interest is the where we find the mean of the pixels. 
-		   (with-mat ((frame (roi frame roi)))
-		   ;;Find mean of FRAME and set to 
-		   ;;COLOR parameter of RECTANGLE
-		  (with-scalar ((color (mean frame (mat))))
-		     ;;Create a rectangle the color of 
-		     ;;the mean of the pixels it covers
-		     (rectangle img point-1 point-2 color +filled+ 4 0)
-		 (imshow window-name img)))))))
-    	     (let ((c (wait-key 33)))
-	       (when (= c 27)
-		 (return)))))))))
+		   ;;Set region of interest of FRAME to the rectangle 
+		   ;;location/dimensions we specified
+		   (with-rect ((roi (rect (mem-ref rect-x :int) (mem-ref rect-y :int)
+					  (mem-ref rect-width :int) (mem-ref rect-height :int))))
+		     ;;Set region of interest of FRAME to ROI. This region of 
+		     ;;interest is the where we find the mean of the pixels. 
+		     (with-mat ((frame (roi frame roi)))
+		       ;;Find mean of FRAME and set to 
+		       ;;COLOR parameter of RECTANGLE
+		       (with-scalar ((color (mean frame (mat))))
+			 ;;Create a rectangle the color of 
+			 ;;the mean of the pixels it covers
+			 (rectangle img point-1 point-2 color +filled+ 4 0)
+			 (imshow window-name img))))))
+	       (let ((c (wait-key 33)))
+		 (when (= c 27)
+		   (return))))))))))
 
 
 MIN-MAX-LOC
@@ -5363,10 +5378,13 @@ The functions do not work with multi-channel arrays. If you need to find minimum
 all the channels, use (RESHAPE) first to reinterpret the array as single-channel. Or extract the particular 
 channel using either (EXTRACT-IMAGE-COI), or (MIX-CHANNELS), or (SPLIT).
 
+
 See also
 
 (MAX), (MIN), (COMPARE), (IN-RANGE), (EXTRACT-IMAGE-COI), (MIX-CHANNELS), (SPLIT), (RESHAPE)
 
+
+Example: 
 
 (defun min-max-loc-example (filename &optional (cam 0))
 
@@ -5379,19 +5397,19 @@ See also
    Probably good to be in a well lighted room."
 
   (with-captured-camera (cap cam :width 640 :height 480) 
-	  ;Create windows
+    ;;Create windows
     (let* ((window-name-1 "TPL - MIN-MAX-LOC Example")
 	   (window-name-2 "FRAME - MIN-MAX-LOC Example")
 	   (window-name-3 "MATCHES - MIN-MAX-LOC Example")
-	   ;Initialize size parameters 
-	   ;for the matches
+	   ;;Initialize size parameters 
+	   ;;for the matches
            (iwidth 0)
 	   (iheight 0))      
       ;;Create windows
       (with-named-window (window-name-1 +window-autosize+)
 	(with-named-window (window-name-2 +window-autosize+) 
 	  (with-named-window (window-name-3 +window-autosize+) 
-	    ;Move windows to specified locations     
+	    ;;Move windows to specified locations     
 	    (move-window window-name-1 325 0)
 	    (move-window window-name-2 325 260)
 	    (move-window window-name-3 969 260)
@@ -5399,39 +5417,36 @@ See also
 			 (maxloc (point)))
 	      (with-object ((minval (alloc :double 0d0))
 			    (maxval (alloc :double 0d0)))
-		;Set rectangle color
+		;;Set rectangle color
 		(with-scalar ((color (scalar 0 0 255)))
-                  ;Load template image
-		  (with-mat ((tpl (imread filename 1)))
+		  (with-mat ((frame (mat))
+			     ;;Load template image
+			     (tpl (imread filename 1)))
 		    (loop
-		       ;Set camera feed to FRAME
-		       (with-mat ((frame (mat)))
-			 (cap-read cap frame)
-			 (setf iwidth (+ (- (cols frame) (cols tpl)) 1))
-			 (setf iheight (+ (- (rows frame) (rows tpl)) 1))
-			 ;Create  matrix to hold all of the matches
-			 (with-mat ((matches (mat iheight iwidth +32f+)))
-			  ;Run MATCH-TEMPLATE on each frame of the camera 
-                          ;feed and run NORMALIZE on each match 
-			   (match-template frame tpl matches +tm-ccoeff-normed+)
-			   (normalize matches matches 0d0 1d0 +norm-minmax+)
-                           ;Run MIN-MAX-LOC to set point 
-                           ;coordinates for each match
-			   (min-max-loc matches minval maxval minloc maxloc)
-			   (rectangle frame (gc:point (x minloc) (y minloc)) 
-				      (gc:point (+ (x minloc) (cols tpl)) 
-					     (+ (y minloc) (rows tpl))) 
-				      color 10 0 0)
-			   ;Show image, template and matches in a window
-			   (imshow window-name-1 tpl)
-			   (imshow window-name-2 frame)
-			   (imshow window-name-3 matches)
-			   (let ((c (wait-key 33)))
-			     (when (= c 27)
-			       (return))))))))))))))))
-
-
-
+		       ;;Set camera feed to FRAME
+		       (*read cap frame)
+		       (setf iwidth (+ (- (cols frame) (cols tpl)) 1))
+		       (setf iheight (+ (- (rows frame) (rows tpl)) 1))
+		       ;;Create  matrix to hold all of the matches
+		       (with-mat ((matches (mat iheight iwidth +32f+)))
+			 ;;Run MATCH-TEMPLATE on each frame of the camera 
+			 ;;feed and run NORMALIZE on each match 
+			 (match-template frame tpl matches +tm-ccoeff-normed+)
+			 (normalize matches matches 0d0 1d0 +norm-minmax+)
+			 ;;Run MIN-MAX-LOC to set point 
+					;coordinates for each match
+			 (min-max-loc matches minval maxval minloc maxloc)
+			 (rectangle frame (gc:point (x minloc) (y minloc)) 
+				    (gc:point (+ (x minloc) (cols tpl)) 
+					      (+ (y minloc) (rows tpl))) 
+				    color 10 0 0)
+			 ;;Show image, template and matches in a window
+			 (imshow window-name-1 tpl)
+			 (imshow window-name-2 frame)
+			 (imshow window-name-3 matches)
+			 (let ((c (wait-key 33)))
+			   (when (= c 27)
+			     (return)))))))))))))))
 
 
 MUL-TRANSPOSED
@@ -5648,6 +5663,7 @@ LISP-CV: (NORM (SRC1 MAT) (SRC2 MAT) &OPTIONAL ((NORM-TYPE :INT) +NORM-L2+) ((MA
 
 The functions NORM calculate an absolute norm of SRC1 (when there is no SRC2):
 
+
 See OpenCV documentation:
 
 http://docs.opencv.org/trunk/modules/core/doc/operations_on_arrays.html?highlight=norm#norm
@@ -5655,28 +5671,34 @@ http://docs.opencv.org/trunk/modules/core/doc/operations_on_arrays.html?highligh
 for a description and formulae
 
 
+Example:
+
 (defun norm-example (filename &optional (cam 0))
 
-  "This example is an improvement on the way MIN-MAX-LOC tracks 
-   an object in the MIN-MAX-LOC example, in a couple ways. Firs
-   t, if you use the 'resized-checkerboard.png' in the Lisp-CV 
-   IMAGES directory, you'll notice the result of MIN-MAX-LOC is 
-   better defined in the MATCHES window as a result of NORM bei-
-   ng used instead of NORMALIZE. You'll still have to play with 
-   the distance you hold the object from the camera to get a go-
-   od track. However, you can improve the objects track if you 
-   adjusting the Brightness and Contrast sliders. Also, if you 
-   look at the MATCHES window while trying to get a track, you 
-   notice the visual clues will aid you toward that endeavor."
+  "This example is an improvement on how MIN-MAX-LOC tracks an 
+   object, in the MIN-MAX-LOC example, in a couple ways. First, 
+   you'll notice the result of MIN-MAX-LOC, as shown in the wi-
+   ndow 'MATCHES', is better defined as a result of NORM being 
+   used instead of NORMALIZE. You'll still have to adjust the 
+   distance you hold the object from the camera to get a good 
+   track, however you can improve the objects track by adjusti
+   ng the 'Brightness' and 'Contrast' trackbar sliders. Also, 
+   if you look at the MATCHES window while trying to get a tra-
+   ck, you notice the visual clues there help you to do that.
+
+   Note: Printing the 'checkerboard.png' image, in the LISP-CV 
+   images directory, to use for the object to track and using 
+   the 'resized-checkerboard.png', in the same directory, for 
+   the template image gives a good effect in this example."
 
   (with-captured-camera (cap cam :width 640 :height 480) 
-					;Create windows
+    ;;Create windows
     (let* ((window-name-1 "TEMPL - NORM Example")
 	   (window-name-2 "FRAME - NORM Example")
 	   (window-name-3 "Move Trackbars to change Brightness and Contrast - NORM Example")
 	   (window-name-4 "MATCHES - NORM Example")
-					;Initialize size parameters 
-					;for the matches
+	   ;;Initialize size parameters 
+	   ;;for the matches
            (iwidth 0)
 	   (iheight 0)
 	   (brightness 0)
@@ -5686,7 +5708,7 @@ for a description and formulae
 	(with-named-window (window-name-2 +window-autosize+) 
 	  (with-named-window (window-name-3 +window-autosize+) 
 	    (with-named-window (window-name-4 +window-autosize+) 
-	      ;Move windows to specified locations     
+	      ;;Move windows to specified locations     
 	      (move-window window-name-1 250 29)
 	      (move-window window-name-2 99 260)
 	      (move-window window-name-3 743 260)
@@ -5697,48 +5719,47 @@ for a description and formulae
 			      (maxval (alloc :double 0d0))
 			      (val1 (alloc :int 50))
 			      (val2 (alloc :int 50)))
-		  ;Set rectangle color
+		  ;;Set rectangle color
 		  (with-scalar ((color (scalar 0 0 255)))
-		    ;Load template image
-		    (with-mat ((templ (imread filename 1))
+		    ;;Load template image
+		    (with-mat ((frame (mat))
+			       (templ (imread filename 1))
 			       (dest (mat)))
 		      (create-trackbar "Brightness" window-name-3 val1 100)
 		      (create-trackbar  "Contrast" window-name-3 val2 100)
 		      (loop
-			 ;Set camera feed to FRAME
-			 (with-mat ((frame (mat)))
-			   (cap-read cap frame)
-			   ;Set brightness and contrast values 
-			   ;based on trackbar input
-			   (setf brightness (- (mem-ref val1 :int) 50))
-			   (setf contrast (/ (mem-ref val2 :int) 50))
-			   (copy-to frame dest)
-			   (convert-to frame dest -1 (coerce contrast 'double-float)  
-				       (coerce brightness 'double-float))
-			   (setf iwidth (+ (- (cols frame) (cols templ)) 1))
-			   (setf iheight (+ (- (rows frame) (rows templ)) 1))
-			   ;Create  matrix to hold all of the matches
-			   (with-mat ((matches (mat iheight iwidth +32f+)))
-			     ;Run MATCH-TEMPLATE on each frame of the camera 
-			     ;feed and run NORM on each match 
-			     (match-template dest templ matches +tm-ccoeff-normed+)
-			     (norm matches matches +norm-l2+)
-			     ;Run MIN-MAX-LOC to set point 
-			     ;coordinates for each match
-			     (min-max-loc matches minval maxval minloc maxloc)
-			     (rectangle frame (gc:point (x minloc) (y minloc)) 
-					(gc:point (+ (x minloc) (cols templ)) 
-						  (+ (y minloc) (rows templ))) 
-					color 10 0 0)
-			     ;Show image, template and matches and DEST in a window
-			     (imshow window-name-1 templ)
-			     (imshow window-name-2 frame)
-			     (imshow window-name-3 dest)
-			     (imshow window-name-4 matches)
-			     (let ((c (wait-key 33)))
-			       (when (= c 27)
-				 (return)))))))))))))))))
-
+			 ;;Set camera feed to FRAME
+			 (*read cap frame)
+			 ;;Set brightness and contrast values 
+			 ;;based on trackbar input
+			 (setf brightness (- (mem-ref val1 :int) 50))
+			 (setf contrast (/ (mem-ref val2 :int) 50))
+			 (copy-to frame dest)
+			 (convert-to frame dest -1 (coerce contrast 'double-float)  
+				     (coerce brightness 'double-float))
+			 (setf iwidth (+ (- (cols frame) (cols templ)) 1))
+			 (setf iheight (+ (- (rows frame) (rows templ)) 1))
+			 ;;Create a matrix to hold all of the matches
+			 (with-mat ((matches (mat iheight iwidth +32f+)))
+			   ;;Run MATCH-TEMPLATE on each frame of the camera 
+			   ;;feed and run NORM on each match 
+			   (match-template dest templ matches +tm-ccoeff-normed+)
+			   (norm matches matches +norm-l2+)
+			   ;;Run MIN-MAX-LOC to set point 
+			   ;;coordinates for each match
+			   (min-max-loc matches minval maxval minloc maxloc)
+			   (rectangle frame (gc:point (x minloc) (y minloc)) 
+				      (gc:point (+ (x minloc) (cols templ)) 
+						(+ (y minloc) (rows templ))) 
+				      color 10 0 0)
+			   ;;Show image, template and matches and DEST in a window
+			   (imshow window-name-1 templ)
+			   (imshow window-name-2 frame)
+			   (imshow window-name-3 dest)
+			   (imshow window-name-4 matches)
+			   (let ((c (wait-key 33)))
+			     (when (= c 27)
+			       (return))))))))))))))))
 
 
 NORMALIZE
@@ -6241,33 +6262,33 @@ http://docs.opencv.org/modules/core/doc/operations_on_arrays.html?highlight=log#
 
 for description and formulae.
 
+
 See also:
 
 (ADD), (ADD-WEIGHTED), (SCALE-ADD), (CONVERT-TO), Matrix Expressions(MAT-EXPR)
 
 
-(defun subtract-example (&optional (camera-index 0) 
+Example:
+
+(defun subtract-example (&optional (cam 0) 
 			   (width *default-width*)
 			   (height *default-height*))
 
-  (with-capture (cap (video-capture camera-index))
-    (let* ((window-name "Frame Subtract - SUBTRACT Example")
-	   (last-frame (mat height width +8uc3+))
-	   (dest (mat height width +8uc3+)))
-      (cap-set cap +cap-prop-frame-width+ width)
-      (cap-set cap +cap-prop-frame-height+ height)
-      (named-window window-name)
-      (move-window window-name 610 225)
-      (do* ((frame 0))
-	   ((plusp (wait-key *millis-per-frame*)) 
-	    (format t "Key is pressed by user"))
-	(setf frame (mat))
-	(cap-read cap frame)
-	(subtract frame last-frame dest)
-	(imshow window-name dest)
-	(copy-to frame last-frame))
-      (destroy-window window-name))))
-
+  (with-captured-camera (cap cam :width width :height height)
+    (let* ((window-name "Frame Subtract - SUBTRACT Example"))
+      (with-named-window (window-name +window-autosize+)
+	(move-window window-name 610 225)
+	(with-mat ((last-frame (mat height width +8uc3+))
+		   (dest (mat height width +8uc3+)))
+	  (loop
+	     (with-mat ((frame (mat)))
+	       (*read cap frame)
+	       (subtract frame last-frame dest)
+	       (imshow window-name dest)
+	       (copy-to frame last-frame)
+	       (let ((c (wait-key 33)))
+		 (when (= c 27)
+		   (return))))))))))
 
 
 SUM
@@ -7807,16 +7828,19 @@ xels on-fly), but what other more complex functions, including your own, may do 
 undary handling.
 
 
-Note
+Note:
 
 When the source image is a part (ROI) of a bigger image, the function will try to use the pixels outside 
 of the ROI to form a border. To disable this feature and always do extrapolation, as if src was not a ROI, 
 use (LOGIOR BORDER-TYPE +BORDER-ISOLATED+).
 
+
 See also:
 
 (BORDER-INTERPOLATE)
 
+
+Example:
 
 (defun copy-make-border-example (&optional (cam 0) 
 				   (width *default-width*)
@@ -7830,20 +7854,19 @@ See also:
            (border-height (+ (* 2  border) height)))
       (with-named-window (window-name +window-normal+)
 	(move-window window-name 759 175)
-	(loop
-	  ;Create a matrix big enough to accommodate 
-	  ;a 100 pixel border on all sides
-	   (with-mat ((rgb (mat border-height border-width +8uc3+))
-		      (frame (mat)))
-	     (cap-read cap frame)
-	     ;Make a border around FRAME
+	;;Create a matrix big enough to accommodate 
+	;;a one hundred pixel border on all sides
+	(with-mat ((rgb (mat border-height border-width +8uc3+))
+		   (frame (mat)))
+	  (loop
+	     (*read cap frame)
+	     ;;Make a border around FRAME
 	     (copy-make-border frame rgb border border border border  
 			       +border-replicate+ (scalar-all 75))
 	     (imshow window-name rgb)
 	     (let ((c (wait-key 33)))
 	       (when (= c 27)
 		 (return)))))))))
-
 
 ========================================================================================================================================
 DILATE
@@ -8384,29 +8407,31 @@ See also:
 (SOBEL), (SCHARR)
 
 
-(defun laplacian-example (&optional (cam *camera-index*))
+(defun laplacian-example (&optional 
+			    (cam *camera-index*) 
+			    (width *default-width*)
+			    (height *default-height*))
 
-  (with-captured-camera (cap cam :width 640 :height 480)
+  (with-captured-camera (cap cam :width width :height height)
     (let* ((window-name  "LAPLACIAN Example")) 
       (with-named-window (window-name +window-normal+)
 	(set-window-property window-name +wnd-prop-fullscreen+ 
 			     +window-fullscreen+)
 	(set-window-property window-name +wnd-prop-aspectratio+ 
 			     +window-freeratio+)
-	(loop
-	   (with-mat ((frame (mat)))
-	     (cap-read cap frame)
-	     (with-mat ((cvt (mat (rows frame) (cols frame) +8u+))
-			(src (mat (rows frame) (cols frame) +8u+))
-			(tmp (mat (rows frame) (cols frame) +8u+)))
-	       (cvt-color frame cvt +bgr2gray+)
-	       (imshow window-name (progn
-				     (laplacian cvt tmp +64f+ 3)
-				     (convert-scale-abs tmp src) src))))
-	   (let ((c (wait-key 33)))
-	     (when (= c 27)
-	       (return))))))))
-
+	(with-mat ((frame (mat))
+		   (cvt (mat height width +8u+))
+		   (src (mat height width +8u+))
+		   (tmp (mat height width +8u+)))
+	  (loop
+	     (*read cap frame)
+	     (cvt-color frame cvt +bgr2gray+)
+	     (imshow window-name (progn
+				   (laplacian cvt tmp +64f+ 3)
+				   (convert-scale-abs tmp src) src))
+	     (let ((c (wait-key 33)))
+	       (when (= c 27)
+		 (return)))))))))
 
 ========================================================================================================================================
 MEDIAN-BLUR
@@ -8756,6 +8781,8 @@ See also:
 (CART-TO-POLAR)
 
 
+Example:
+
 (defun scharr-example (&optional (cam 0))
 
   "In this example, we compare the code for the SOBEL function with the 
@@ -8766,7 +8793,7 @@ See also:
   (with-captured-camera (cap cam :width 640 :height 480)
     (let* ((window-name-1 "SOBEL - SCHARR Example")
 	   (window-name-2 "SCHARR - SCHARR Example")
-	   ;Declare variables 
+	   ;;Declare variables 
            (scale 1d0)
 	   (delta 0d0)
 	   (ddepth +16s+))
@@ -8774,64 +8801,63 @@ See also:
 	(with-named-window (window-name-2 +window-normal+)
 	  (move-window window-name-1 533 175)
 	  (move-window window-name-2 984 175)
-	  (loop
-	     ;Load camera feed
-	     (with-mat ((frame (mat)))
-	       (cap-read cap frame)
-	       ;Declare more variables 
-	       (with-size ((size (size 3 3)))
-		 (with-mat ((src-gray (mat))
-			    (grad (mat))
-			    (grad-x (mat))
-			    (grad-y (mat))
-			    (abs-grad-x (mat))
-			    (abs-grad-y (mat)))
+	  ;;Declare objects
+	  (with-size ((size (size 3 3)))
+	    (with-mat ((frame (mat))
+		       (src-gray (mat))
+		       (grad (mat))
+		       (grad-x (mat))
+		       (grad-y (mat))
+		       (abs-grad-x (mat))
+		       (abs-grad-y (mat)))
+	      (loop
+		 ;;Load camera feed
+		 (*read cap frame)
 
-		   ;SOBEL version:
-		   
-		   ;First, we apply a GAUSSIAN-BLUR to 
-		   ;our image to reduce the noise 
-		   (gaussian-blur frame frame  size 0d0 0d0)
-		   ;Now we convert camera feed to grayscale
-		   (cvt-color frame src-gray +bgr2gray+)
+		 ;;SOBEL version:
+		 
+		 ;;First, we apply a GAUSSIAN-BLUR to 
+		 ;;our image to reduce the noise 
+		 (gaussian-blur frame frame  size 0d0 0d0)
+		 ;;Now we convert camera feed to grayscale
+		 (cvt-color frame src-gray +bgr2gray+)
 
-		   ;Then, we calculate the “derivatives” 
-		   ;in x and y directions, using SOBEL
+		 ;;Then, we calculate the “derivatives” 
+		 ;;in x and y directions, using SOBEL
 
-		   ;Gradient x  
-		   (sobel src-gray grad-x ddepth 1 0 3 scale delta +border-default+)
-		   ;Gradient y
-		   (sobel src-gray grad-y ddepth 0 1 3 scale delta +border-default+)
-		   ;We convert our partial 
-		   ;results back to +8U+
-                   (convert-scale-abs grad-x abs-grad-x)
-		   (convert-scale-abs grad-y abs-grad-y)
-		   ;Add both directional gradients
-		   (add-weighted abs-grad-x 0.5d0 abs-grad-y 0.5d0 0d0 grad)
-		   ;Then, show SOBEL version in a window
-		   (imshow window-name-1 grad)
+		 ;;Gradient x  
+		 (sobel src-gray grad-x ddepth 1 0 3 scale delta +border-default+)
+		 ;;Gradient y
+		 (sobel src-gray grad-y ddepth 0 1 3 scale delta +border-default+)
+		 ;;We convert our partial 
+		 ;;results back to +8U+
+		 (convert-scale-abs grad-x abs-grad-x)
+		 (convert-scale-abs grad-y abs-grad-y)
+		 ;;Add both directional gradients
+		 (add-weighted abs-grad-x 0.5d0 abs-grad-y 0.5d0 0d0 grad)
+		 ;;Then, show SOBEL version in a window
+		 (imshow window-name-1 grad)
 
-	           ;SCHARR version:
+		 ;;SCHARR version:
 
-		   ;Apply a GAUSSIAN-BLUR
-		   (gaussian-blur frame frame  size 0d0 0d0)
-		   ;Convert camera feed to grayscale
-		   (cvt-color frame src-gray +bgr2gray+)
-		   ;Calculate the “derivatives" in the 
-		   ;x and y directions, using SCHARR
-		   (scharr src-gray grad-x ddepth 1 0 scale delta +border-default+)
-                   (scharr src-gray grad-y ddepth 0 1 scale delta +border-default+)
-		   ;Convert results back to +8U+      
-		   (convert-scale-abs grad-x abs-grad-x)
-		   (convert-scale-abs grad-y abs-grad-y)
-		   ;Add both directional gradients
-		   (add-weighted abs-grad-x 0.5d0 abs-grad-y 0.5d0 0d0 grad)
-		   ;Show SCHARR version in a window
-		   (imshow window-name-2 grad)
-		   (let ((c (wait-key 33)))
-		     (when (= c 27)
-		       (return))))))))))))
-
+		 ;;Apply a GAUSSIAN-BLUR
+		 (gaussian-blur frame frame  size 0d0 0d0)
+		 ;;Convert camera feed to grayscale
+		 (cvt-color frame src-gray +bgr2gray+)
+		 ;;Calculate the “derivatives" in the 
+		 ;;x and y directions, using SCHARR
+		 (scharr src-gray grad-x ddepth 1 0 scale delta +border-default+)
+		 (scharr src-gray grad-y ddepth 0 1 scale delta +border-default+)
+		 ;;Convert results back to +8U+      
+		 (convert-scale-abs grad-x abs-grad-x)
+		 (convert-scale-abs grad-y abs-grad-y)
+		 ;;Add both directional gradients
+		 (add-weighted abs-grad-x 0.5d0 abs-grad-y 0.5d0 0d0 grad)
+		 ;;Show SCHARR version in a window
+		 (imshow window-name-2 grad)
+		 (let ((c (wait-key 33)))
+		   (when (= c 27)
+		     (return)))))))))))
 
 ========================================================================================================================================
 SOBEL
@@ -8898,7 +8924,6 @@ See also:
 
 Example 1:
 
-
 (defun sobel-example-1 (&optional (cam *camera-index*))
 
   (with-captured-camera (cap cam :width 640 :height 480)
@@ -8910,44 +8935,46 @@ Example 1:
 	(set-window-property window-name +wnd-prop-aspectratio+ 
 			     +window-freeratio+)
 	(with-mat ((gray (mat))
-		   (sobelx (mat)))
+		   (sobelx (mat))
+                   (draw (mat))
+		   (frame (mat)))
 	  (with-object ((minval (alloc :double 0d0))
 			(maxval (alloc :double 0d0)))
-	    (with-mat ((draw (mat)))
-	      (loop
-		 (with-mat ((frame (mat)))
-		   (cap-read cap frame)
-		   ;Show original camera 
-		   ;output in a window
-		   (imshow window-name frame)
-		   ;Convert camera output, a 3 channel 
-		   ;matrix, to 1 channel matrix
-		   (cvt-color frame gray +bgr2gray+)
-		   ;Compute Sobel x derivative and set 
-		   ;to destination matrix SOBELX
-		   (sobel gray sobelx ddepth 0 1 -7))
-		 ;Find minimum and maximum intensities
-		 (min-max-loc sobelx minval maxval)
-		 (format t "MINVAL: ~a~%~%" (mem-aref minval :double 0))
-		 (format t "MAXVAL: ~a~%~%" (mem-aref maxval :double 0))
-		 ;+32F+ image needs to be converted to +8U+ type
-		 (convert-to sobelx draw +8u+ (/ 255d0 (- (? maxval :double) 
-							  (? minval :double))) 
-			     (* (* (? minval :double) -1.283)  
-				(/ 255.d0 (- (? maxval :double) 
-					     
-					     (? minval :double)))))
-		 (imshow window-name draw)
-		 (let ((c (wait-key 33)))
-		   (when (= c 27)
-		     (return)))))))))))
+	    (loop
+	       ;;Set camera to frame
+	       (*read cap frame)
+	       ;;Show original camera 
+	       ;;output in a window
+	       (imshow window-name frame)
+	       ;;Convert camera output, a 3 channel 
+	       ;;matrix, to 1 channel matrix
+	       (cvt-color frame gray +bgr2gray+)
+	       ;;Compute Sobel x derivative and set 
+	       ;;to destination matrix SOBELX
+	       (sobel gray sobelx ddepth 0 1 -7)
+	       ;;Find minimum and maximum intensities
+	       (min-max-loc sobelx minval maxval)
+	       ;;+32F+ image needs to be converted to +8U+ type
+	       (convert-to sobelx draw +8u+ (/ 255d0 (- (? maxval :double) 
+							(? minval :double))) 
+			   (* (* (? minval :double) -1.283)  
+			      (/ 255.d0 (- (? maxval :double) 
+					   
+					   (? minval :double)))))
+	       (imshow window-name draw)
+	       (let ((c (wait-key 33)))
+		 (when (= c 27)
+		   (return))))))))))
 
 
 
 Example 2:
 
 
-(defun sobel-example-2 (&optional (cam *camera-index*))
+(defun sobel-example-2 (&optional 
+			  (cam *camera-index*) 
+			  (width *default-width*)
+			  (height *default-height*))
 
   (with-captured-camera (cap cam :width 640 :height 480)
     (let* ((window-name  "SOBEL Example")) 
@@ -8956,19 +8983,19 @@ Example 2:
 			     +window-fullscreen+)
 	(set-window-property window-name +wnd-prop-aspectratio+ 
 			     +window-freeratio+)
-	(loop
-	   (with-mat ((frame (mat)))
-	     (cap-read cap frame)
-	     (with-mat ((cvt (mat (rows frame) (cols frame) +8u+))
-			(src (mat (rows frame) (cols frame) +8u+))
-			(tmp (mat (rows frame) (cols frame) +8u+)))
-	       (cvt-color frame cvt +bgr2gray+)
-	       (imshow window-name (progn
-				     (sobel cvt tmp +32f+ 0 1 -1)
-				     (convert-scale-abs tmp src) src))))
-	(let ((c (wait-key 33)))
-	  (when (= c 27)
-	    (return))))))))
+	(with-mat ((frame (mat))
+		   (cvt (mat height width +8u+))
+		   (src (mat height width +8u+))
+		   (tmp (mat height width +8u+)))
+	  (loop
+	     (*read cap frame)
+	     (cvt-color frame cvt +bgr2gray+)
+	     (imshow window-name (progn
+				   (sobel cvt tmp +32f+ 0 1 -1)
+				   (convert-scale-abs tmp src) src))
+	     (let ((c (wait-key 33)))
+	       (when (= c 27)
+		 (return)))))))))
 
 
 ========================================================================================================================================
@@ -9319,7 +9346,7 @@ Example:
 
   ;Create VIDEO-CAPTURE and set to default width and height,
   (with-captured-camera (cap cam :width width :height height)
-    (if (not (cap-is-open cap)) 
+    (if (not (is-opened cap)) 
 	(return-from get-perspective-transform-example 
 	  (format t "Cannot open the video camera")))
     ;Input Quadilateral or Image plane coordinates.
@@ -9396,7 +9423,7 @@ Example:
 	       (with-mat ((input (mat)) 
 			  (output (mat)))
 		 ;Set camera feed to INPUT.
-		 (cap-read cap input)
+		 (*read cap input)
 
 		 ;The 4 points that select quadilateral on the input, 
 		 ;from element 0x0 of INPUT-QUAD in clockwise order. 
@@ -9741,13 +9768,15 @@ See also:
 (WARP-AFFINE), (WARP-PERSPECTIVE), (REMAP)
 
 
+Example:
+
 (defun resize-example (&optional (cam *camera-index*) 
 			 (width 640)
 			 (height 480))
 
   "Uses RESIZE to enlarge the camera output and then shows
    both the resized FRAME(RESIZED) and the original FRAME 
-   a window."
+   in windows."
 
   (with-captured-camera (cap cam :width width :height height)    
     (let* ((window-name-1 "Original FRAME - RESIZE Example")
@@ -9756,16 +9785,16 @@ See also:
 	(with-named-window (window-name-2 +window-autosize+)
 	  (move-window window-name-1 0 0)
 	  (move-window window-name-2 700 175)
-	  (with-mat ((resized (mat (round (* height 2)) 
+	  (with-mat ((frame (mat))
+		     (resized (mat (round (* height 2)) 
 				   (round (* width 2)) 
 				   +8uc3+)))
 	    (loop
-	       (with-mat ((frame (mat)))
-		 (cap-read cap frame)
-		 (resize frame resized (size 1280 960) 0.0d0 
-			 0.0d0 +inter-lanczos4+)
-		 (imshow window-name-1 frame)
-		 (imshow window-name-2 resized))
+	       (*read cap frame)
+	       (resize frame resized (size 1280 960) 0.0d0 
+		       0.0d0 +inter-lanczos4+)
+	       (imshow window-name-1 frame)
+	       (imshow window-name-2 resized)
 	       (let ((c (wait-key 33)))
 		 (when (= c 27)
 		   (return))))))))))
@@ -10101,12 +10130,13 @@ belief, fall along a line in the CIELUV color space unless the mixtures are cons
                          +BAYERBG2RGB+, +BAYERGB2RGB+, +BAYERRG2RGB+, +BAYERGR2RGB+)***
 
 
- A Bayer filter mosaic is a color filter array (CFA) for arranging RGB color filters on a square gr-
+A Bayer filter mosaic is a color filter array (CFA) for arranging RGB color filters on a square gr-
 id of photosensors. Its particular arrangement of color filters is used in most single-chip digital 
 image sensors used in digital cameras, camcorders, and scanners to create a color image. The filter 
 pattern is 50% green, 25% red and 25% blue, hence is also called RGBG,[1][2] GRGB,[3] or RGGB.[4]
 
 
+Example:
 
 (defun cvt-color-example (&optional (camera *camera-index*) 
 			    (width 640)
@@ -10115,7 +10145,7 @@ pattern is 50% green, 25% red and 25% blue, hence is also called RGBG,[1][2] GRG
   "In this example, the function CVT-COLOR converts 
    the camera output to 4 different color spaces an-
    d shows the results in four windows. See the CVT-
-   COLOR documentation:
+   COLOR documentation in:
 
    LISP-CV-MASTER/EXAMPLES/EXAMPLES.LISP 
 
@@ -10126,12 +10156,12 @@ pattern is 50% green, 25% red and 25% blue, hence is also called RGBG,[1][2] GRG
 	  (window-name-2 "+BGR2XYZ+ - CVT-COLOR Example")
 	  (window-name-3 "+BGR2GRAY+ - CVT-COLOR Example")
 	  (window-name-4 "+BGR2HLS+ - CVT-COLOR Example"))
-      (if (not (cap-is-open cap)) 
+      (if (not (is-opened cap)) 
 	  (return-from cvt-color-example 
 	    (format t "Cannot open the video camera")))
       (format t "~%Frame Size : ~ax~a~%~%" 
-	      (cap-get cap +cap-prop-frame-width+)
-	      (cap-get cap +cap-prop-frame-height+))
+	      (*get cap +cap-prop-frame-width+)
+	      (*get cap +cap-prop-frame-height+))
       (with-named-window (window-name-1 +window-normal+)
 	(with-named-window (window-name-2 +window-normal+)
 	  (with-named-window (window-name-3 +window-normal+)
@@ -10140,9 +10170,9 @@ pattern is 50% green, 25% red and 25% blue, hence is also called RGBG,[1][2] GRG
 	      (move-window window-name-2 894 98)
 	      (move-window window-name-3 485 444)
 	      (move-window window-name-4 894 444)
-	      (loop
-		 (with-mat ((frame (mat)))
-		   (cap-read cap frame)
+	      (with-mat ((frame (mat)))
+		(loop
+		   (*read cap frame)
 		   (with-mat ((src1 (clone frame))
 			      (src2 (clone frame))
 			      (src3 (clone frame)))
@@ -10153,11 +10183,10 @@ pattern is 50% green, 25% red and 25% blue, hence is also called RGBG,[1][2] GRG
 		     (imshow window-name-1 frame)
 		     (imshow window-name-2 src1)
 		     (imshow window-name-3 src2)
-		     (imshow window-name-4  src3))
-		   (let ((c (wait-key 33)))
-		     (when (= c 27)
-		       (return))))))))))))
-
+		     (imshow window-name-4  src3)
+		     (let ((c (wait-key 33)))
+		       (when (= c 27)
+			 (return)))))))))))))
 
 ========================================================================================================================================
 DISTANCE-TRANSFORM
@@ -10239,6 +10268,7 @@ Voronoi diagram for a binary image. The second variant can use only the approxim
 algorithm currently,  i.e. (EQ MASK-SIZE +DIST-MASK-PRECISE+) is not supported yet.
 
 
+Example:
 
 (defun distance-transform-example (&optional (cam 0) 
 				     (width *default-width*)
@@ -10251,28 +10281,28 @@ algorithm currently,  i.e. (EQ MASK-SIZE +DIST-MASK-PRECISE+) is not supported y
    he trackbars to get a better idea of how these functions are working 
    together to create this effect."
 
-  (let ((window-name "DISTANCE-TRANSFORM Example"))
-    (with-named-window (window-name +window-normal+)
-      (set-window-property window-name +wnd-prop-fullscreen+ 
-			   +window-fullscreen+)
-      (set-window-property window-name +wnd-prop-aspectratio+ 
-			   +window-freeratio+)
-      (with-captured-camera (cap cam :width width :height height)
-	(with-mat ((src (mat height width +8u+))
-		   (dst (mat height width +8u+))
-		   (final (mat height width +32f+)))
-	  (with-object ((canny-1 (alloc :int 471))
-			(canny-2 (alloc :int 128))
-			(threshold (alloc :int +thresh-binary-inv+))
-			(dist-trans (alloc :int +dist-c+)))
-	    (loop
-	       (with-mat ((frame (mat)))
-		 (cap-read cap frame)
+  (with-captured-camera (cap cam :width width :height height)
+    (let ((window-name "DISTANCE-TRANSFORM Example"))
+      (with-named-window (window-name +window-normal+)
+	(set-window-property window-name +wnd-prop-fullscreen+ 
+			     +window-fullscreen+)
+	(set-window-property window-name +wnd-prop-aspectratio+ 
+			     +window-freeratio+)
+	(with-object ((canny-1 (alloc :int 471))
+		      (canny-2 (alloc :int 128))
+		      (threshold (alloc :int +thresh-binary-inv+))
+		      (dist-trans (alloc :int +dist-c+)))
+	  (create-trackbar "canny-1" window-name canny-1 500)
+	  (create-trackbar "canny-2" window-name canny-2 500)
+	  (create-trackbar "threshold" window-name threshold 4)
+	  (create-trackbar "dist-trans" window-name dist-trans 3)
+	  (with-mat ((src (mat height width +8u+))
+		     (dst (mat height width +8u+))
+		     (final (mat height width +32f+)))
+	    (with-mat ((frame (mat)))
+	      (loop
+		 (*read cap frame)
 		 (cvt-color frame src +bgr2gray+)
-		 (create-trackbar "canny-1" window-name canny-1 500)
-		 (create-trackbar "canny-2" window-name canny-2 500)
-		 (create-trackbar "threshold" window-name threshold 4)
-		 (create-trackbar "dist-trans" window-name dist-trans 3)
 		 (canny src dst (coerce (? canny-1 :int) 'double-float) 
 			(coerce (? canny-2 :int) 'double-float))
 		 (threshold dst dst 1d0 255d0 (? threshold :int))
@@ -10280,10 +10310,10 @@ algorithm currently,  i.e. (EQ MASK-SIZE +DIST-MASK-PRECISE+) is not supported y
 		     (set-trackbar-pos "dist-trans" window-name 1) nil)
 		 (distance-transform dst final (? dist-trans :int) 3)
 		 (normalize final final 0.0d0 1.0d0 +norm-minmax+)
-		 (imshow window-name final))
-	       (let ((c (wait-key 33)))
-		 (when (= c 27)
-		   (return))))))))))
+		 (imshow window-name final)
+		 (let ((c (wait-key 33)))
+		   (when (= c 27)
+		     (return)))))))))))
 
 
 ========================================================================================================================================
@@ -10333,10 +10363,13 @@ the function determines the optimal threshold value using the Otsu’s algorithm
 of the specified thresh . The function returns the computed threshold value. Currently, the Otsu’s 
 method is implemented only for 8-bit images. 
 
+
 See also:
 
 (ADAPTIVE-THRESHOLD), (FIND-CONTOURS), (COMPARE), (MIN), (MAX)
 
+
+Example:
 
 (defun threshold-example (&optional (cam 0) (width 640) (height 480))
 
@@ -10346,41 +10379,41 @@ See also:
     (let* ((window-name "Camera/Threshold"))
       (with-named-window (window-name +window-autosize+)
 	(move-window window-name 333 175)
-	(loop
-	   ;Set camera feed to FRAME
-	   (with-mat ((frame (mat)))
-	     (cap-read cap frame)
-	     (with-mat ((grayscale (mat height width +8u+))
-			(threshold (mat height width +8u+))
-			(threshold3 (mat height width +8uc3+))
-			;Create a double wide window to show the camera 
-			;output and a thresholded camera output in
-			(window (mat height (* width 2) +8uc3+)))
-	       ;Convert FRAME to a 1 channel grayscale 
-	       ;image and assign to GRAYSCALE
-	       (cvt-color frame grayscale +bgr2gray+)
-	       ;Apply a fixed-level threshold to 
-	       ;each array element of GRAYSCALE
-	       (threshold grayscale threshold 128d0 255d0 +thresh-binary+)
-	       ;Convert threshold back to a 3 channel 
-               ;BGR image and assign to THRESHOLD3
-	       (cvt-color threshold threshold3 +gray2bgr+)
-	       ;Set WINDOW roi to the left half
-	       (with-mat ((a (adjust-roi window 0 0 0 (* (cols threshold3) -1))))
-		 ;Copy original camera feed(FRAME) to WINDOW 
-		 (copy-to frame window)
-		 ;Set WINDOW roi to the right half
-		 (with-mat ((b (adjust-roi window 0 0 (* (cols frame) -1) 
-					   (cols threshold3))))
-		   ;Copy thresholded camera feed to WINDOW
-		   (copy-to threshold3 window)
-		   ;Restore original roi
-		   (with-mat ((c (adjust-roi window 0 0 (cols frame) 0)))
-		     ;Show WINDOW in a window
-		     (imshow window-name window)
-		     (let ((c (wait-key 33)))
-		       (when (= c 27)
-			 (return)))))))))))))
+	(with-mat ((frame (mat))
+		   (grayscale (mat height width +8u+))
+		   (threshold (mat height width +8u+))
+		   (threshold3 (mat height width +8uc3+))
+		   ;;Create a double wide window to show the camera 
+		   ;;output and a thresholded camera output in
+		   (window (mat height (* width 2) +8uc3+)))
+	  (loop
+	     ;;Set camera feed to FRAME
+	     (*read cap frame)
+	     ;;Convert FRAME to a 1 channel grayscale 
+	     ;;image and assign to GRAYSCALE
+	     (cvt-color frame grayscale +bgr2gray+)
+	     ;;Apply a fixed-level threshold to 
+	     ;;each array element of GRAYSCALE
+	     (threshold grayscale threshold 128d0 255d0 +thresh-binary+)
+	     ;;Convert threshold back to a 3 channel 
+	     ;;BGR image and assign to THRESHOLD3
+	     (cvt-color threshold threshold3 +gray2bgr+)
+	     ;;Set WINDOW roi to the left half
+	     (with-mat ((a (adjust-roi window 0 0 0 (* (cols threshold3) -1))))
+	       ;;Copy original camera feed(FRAME) to WINDOW 
+	       (copy-to frame window)
+	       ;;Set WINDOW roi to the right half
+	       (with-mat ((b (adjust-roi window 0 0 (* (cols frame) -1) 
+					 (cols threshold3))))
+		 ;;Copy thresholded camera feed to WINDOW
+		 (copy-to threshold3 window)
+		 ;;Restore original roi
+		 (with-mat ((c (adjust-roi window 0 0 (cols frame) 0)))
+		   ;;Show WINDOW in a window
+		   (imshow window-name window)
+		   (let ((c (wait-key 33)))
+		     (when (= c 27)
+		       (return))))))))))))
 
 ========================================================================================================================================
 IMGPROC - MOTION ANALYSIS AND OBJECT TRACKING
@@ -10413,47 +10446,48 @@ See OpenCV documentation for algorithm:
 http://docs.opencv.org/modules/imgproc/doc/histograms.html?highlight=equalizeh#equalizehist
 
 
+Example:
+
 (defun equalize-hist-example (&optional 
 				(camera-index *camera-index*) 
 				(width *default-width*)
 				(height *default-height*))
 
-  (with-capture (cap (video-capture camera-index))
+  (with-captured-camera (cap camera-index :height height :width width)
     (let* ((window-name-1 "Original FRAME - EQUALIZE-HIST Example")
            (window-name-2 "1 channel FRAME - EQUALIZE-HIST Example")
            (window-name-3 "Equalized FRAME - EQUALIZE-HIST Example"))
-      (if (not (cap-is-open cap)) 
+      (if (not (is-opene cap)) 
 	  (return-from equalize-hist-example 
 	    (format t "Cannot open the video camera")))
-      (cap-set cap +cap-prop-frame-width+ width)
-      (cap-set cap +cap-prop-frame-height+ height)
       (format t "~%Frame Size : ~ax~a~%~%" 
-	      (cap-get cap +cap-prop-frame-width+)
-	      (cap-get cap +cap-prop-frame-height+))
+	      (*get cap +cap-prop-frame-width+)
+	      (*get cap +cap-prop-frame-height+))
       (with-named-window (window-name-1 +window-autosize+)
 	(with-named-window (window-name-2 +window-autosize+)
 	  (with-named-window (window-name-3 +window-autosize+)
 	    (move-window window-name-1 184 175)
 	    (move-window window-name-2 634 175)
 	    (move-window window-name-3 1084 175)
-	    (loop
-	       (with-mat ((frame (mat)))
-		 (cap-read cap frame)
-		 (with-mat ((frame-gray (mat)))
-		   ;Show FRAME in a window
-		   (imshow window-name-1 frame)
-		   ;Convert FRAME to 1 channel 
-		   ;image, FRAME-GRAY
-		   (cvt-color frame frame-gray +bgr2gray+)
-		   ;Show FRAME-GRAY in a window
-		   (imshow window-name-2 frame-gray)
-		   ;Run EQUALIZE-HIST on FRAME-GRAY
-		   (equalize-hist frame-gray frame-gray)
-		   ;Show FRAME-GRAY in a window
-		   (imshow window-name-3 frame-gray)
-		   (let ((c (wait-key 33)))
-		     (when (= c 27)
-		       (return))))))))))))
+	    (with-mat ((frame (mat))
+		       (frame-gray (mat)))
+	      (loop
+		 ;;Set camera to frame
+		 (*read cap frame)
+		 ;;Show FRAME in a window
+		 (imshow window-name-1 frame)
+		 ;;Convert FRAME to 1 channel 
+		 ;;image, FRAME-GRAY
+		 (cvt-color frame frame-gray +bgr2gray+)
+		 ;;Show FRAME-GRAY in a window
+		 (imshow window-name-2 frame-gray)
+		 ;;Run EQUALIZE-HIST on FRAME-GRAY
+		 (equalize-hist frame-gray frame-gray)
+		 ;;Show FRAME-GRAY in a window
+		 (imshow window-name-3 frame-gray)
+		 (let ((c (wait-key 33)))
+		   (when (= c 27)
+		     (return)))))))))))
 
 
 ========================================================================================================================================
@@ -10505,7 +10539,6 @@ See also:
 
 Example:
 
-
 (defun phase-correlate-example (&optional 
 				  (cam *camera-index*) 
 				  (width *default-width*)
@@ -10519,7 +10552,7 @@ Example:
    ing the direction of movement, will be drawn to the window."
 
   (with-captured-camera (cap cam :width width :height height)
-    (if (not (cap-is-open cap)) 
+    (if (not (is-opened cap)) 
 	(return-from phase-correlate-example 
 	  (format t "Cannot open the video camera")))      
     (let ((window-name "Phase Shift - PHASE-CORRELATE Example"))
@@ -10531,27 +10564,26 @@ Example:
 		   (curr-64f (mat))
 		   (prev-64f (mat))
 		   (hann (mat)))
+	  (with-scalar ((scalar (scalar 0 255 0)))
 
-	  (loop
-	     (let ((radius 0))
-	       (cap-read cap frame)
-	       (cvt-color frame curr +bgr2gray+)
-	       (if (empty prev) (progn (setf prev (t:clone curr)) 
-				       (create-hanning-window hann (size curr) +64f+)))
-	       (convert-to prev prev-64f +64f+)
-	       (convert-to curr curr-64f +64f+)
-	       (with-point-2d ((shift (phase-correlate prev-64f curr-64f hann)))
-		 (setf radius (coerce (sqrt (+ (* (x shift) (x shift)) 
-					       (* (y shift) (y shift)))) 'double-float))
-		 (if (> radius 5) (progn 
+	    (loop
+	       (let ((radius 0))
+		 (*read cap frame)
+		 (cvt-color frame curr +bgr2gray+)
+		 (if (empty prev) (progn (setf prev (t:clone curr)) 
+					 (create-hanning-window hann (size curr) +64f+)))
+		 (convert-to prev prev-64f +64f+)
+		 (convert-to curr curr-64f +64f+)
+		 (with-point-2d ((shift (phase-correlate prev-64f curr-64f hann)))
+		   (setf radius (coerce (sqrt (+ (* (x shift) (x shift)) 
+						 (* (y shift) (y shift)))) 'double-float))
+		   (if (> radius 5) (progn 
 
-				    ;;Draw a circle and line indicating the shift direction
-
-				    (with-point ((center (point (ash (cols curr) -1)  
-								(ash (rows curr) -1))))
-				      (with-point ((pt-2 (point (+ (x center) (floor (x shift))) 
-								(+ (y center) (floor (y shift))))))
-					(with-scalar ((scalar (scalar 0 255 0)))
+				      ;;Draw a circle and line indicating the shift direction
+				      (with-point ((center (point (ash (cols curr) -1)  
+								  (ash (rows curr) -1))))
+					(with-point ((pt-2 (point (+ (x center) (floor (x shift))) 
+								  (+ (y center) (floor (y shift))))))
 					  (circle frame center (floor radius) scalar 3 +aa+)
 					  (line frame center pt-2 scalar 3 +aa+)) nil))))
 		 (imshow window-name frame)
@@ -10559,7 +10591,6 @@ Example:
 		   (setf prev (t:clone curr))
 		   (when (= key 27)  ;Esc to exit...
 		     (return)))))))))))
-
 
 ========================================================================================================================================
 IMGPROC - FEATURE DETECTION
@@ -10599,7 +10630,12 @@ largest value is used to find initial segments of strong edges.
 See: http://en.wikipedia.org/wiki/Canny_edge_detector
 
 
-(defun canny-example (&optional (cam *camera-index*))
+Example:
+
+(defun canny-example (&optional 
+			(cam *camera-index*) 
+			(width *default-width*)
+			(height *default-height*))
 
   (with-captured-camera (cap cam :width 640 :height 480)
     (let* ((window-name  "CANNY Example")
@@ -10610,49 +10646,48 @@ See: http://en.wikipedia.org/wiki/Canny_edge_detector
 			     +window-fullscreen+)
 	(set-window-property window-name +wnd-prop-aspectratio+ 
 			     +window-freeratio+)
-	;Allocate int pointers for trackbars to adjust
+	;;Allocate int pointers for trackbars to adjust
 	(with-object ((low-thresh (alloc :int 50)) 
 		      (high-thresh (alloc :int 60))
 		      (l2-gradient-switch (alloc :int 0)))
-	  (loop
-	     (with-mat ((frame (mat)))
-	       (cap-read cap frame)
-	       ;Clone FRAME
-	       (with-mat ((clone (clone frame))
-		          ;Create destination matrix 
-                          ;half the size of FRAME
-			  (out (mat (/ (cols frame) 2) 
-					  (/ (rows frame) 2) +8uc3+)))
-		 (create-trackbar "LOW-THRESH" window-name low-thresh 500)                         
-		 (create-trackbar "HIGH-THRESH" window-name high-thresh 500)
-		 (create-trackbar "L2-GRADIENT" window-name l2-gradient-switch 1)
+	  (create-trackbar "LOW-THRESH" window-name low-thresh 500)                         
+	  (create-trackbar "HIGH-THRESH" window-name high-thresh 500)
+	  (create-trackbar "L2-GRADIENT" window-name l2-gradient-switch 1)
+	  (with-mat ((frame (mat))
+		     ;;Create the destination matrix 
+		     ;;half the size of camera feed
+		     (out (mat (/ height 2) 
+			       (/ width 2) +8uc3+)))
+	    (loop
+               ;;Set camera feed to frame
+	       (*read cap frame)
+	       ;;Clone FRAME
+	       (with-mat ((clone (clone frame)))
 		 (if (eq (? l2-gradient-switch :int) 1) (setf l2-gradient t) 
 		     (setf l2-gradient nil))
-		 ;Convert CLONE to a 1 channel grayscale image.
+		 ;;Convert CLONE to a 1 channel grayscale image.
 		 (cvt-color clone clone +bgr2gray+)
-		 ;Blur and downsample CLONE
+		 ;;Blur and downsample CLONE
 		 (pyr-down clone out)
-		 ;Detect edges in camera feed. The LOW-THRESH, 
-		 ;HIGH-THRESH and L2-GRADIENT parameters can 
-		 ;be changed by sliding the trackbars
+		 ;;Detect edges in camera feed. The LOW-THRESH, 
+		 ;;HIGH-THRESH and L2-GRADIENT parameters can 
+		 ;;be changed by sliding the trackbars
 		 (canny out out (coerce (? low-thresh :int) 'double-float) 
 			(coerce (? high-thresh :int) 'double-float) 
 			aperture-size l2-gradient)
-		 ;Show result in window
-		 (imshow window-name out)))	     
-	     (let ((c (wait-key 33)))
-	       (when (= c 27)
-		 (return)))))))))
-
-
+		 ;;Show result in window
+		 (imshow window-name out))	     
+	       (let ((c (wait-key 33)))
+		 (when (= c 27)
+		   (return))))))))))
 
 ========================================================================================================================================
 IMGPROC - OBJECT DETECTION
 ========================================================================================================================================
 
-
-
+========================================================================================================================================
 MATCH-TEMPLATE:
+========================================================================================================================================
 
 Compares a template against overlapped image regions.
 
@@ -10692,39 +10727,37 @@ which is easier to analyze.
 
 Example 1:
 
-
-(defun match-template-example-1 (&optional (camera-index *camera-index*) 
+(defun match-template-example-1 (&optional (cam *camera-index*) 
 				   (width *default-width*)
 				   (height *default-height*))
 
-  "Here a template image extracted from a frame of the camera feed i-
-   s compared to that frame to find the area most similiar to the te-
-   mplate image in the camera feed. 
+  "Here a template image extracted from a frame of the camera feed is 
+   compared to that frame to find the area most similiar to the templ-
+   ate image in the camera feed. 
    
    The function: 
 
    (MATCH-TEMPLATE IMAGE TEMPL RESULT METHOD)
  
-   is used for the matching. The last parameter chooses the method o-
-   f template matching. We use all six methods, shown in six windows 
-   starting with square difference matching (SQDIFF).
+   is used for the matching. The last parameter chooses the method of 
+   template matching. We use all six methods, shown in six windows st-
+   arting with square difference matching (SQDIFF).
 
    Note the use of (NORMALIZE) in this code, which allows us to show 
    the results in a consistent way (recall that some of the matching 
-   methods can return negative-valued results. We use the +NORM-MIN-
-   MAX+ flag when normalizing; this tells the function to shift and 
-   scale the floating-point images so that all returned values are b-
-   etween 0 and 1.
+   methods can return negative-valued results. For this exammple, we 
+   use the +NORM-MIN-MAX+ flag when normalizing; this tells the funct-
+   ion to shift and scale the floating-point images so that all retur-
+   ned values are between 0 and 1.
 
-   Matches are indicated by dark areas in the left column of black 
-   and white images and by bright spots in the other two columns
-  
-   Position the rectangle in the top-leftmost window to select the 
-   template MATCH-TEMPLATE uses to find objects in camera feed by 
-   moving the trackbar sliders in the bottom-leftmost window"
+   Matches are indicated by dark areas in the left column of black an-
+   d white images and by bright spots in the other two columns. Posit-
+   ion the rectangle, in the top-left-most window, to select the temp-
+   late MATCH-TEMPLATE uses to find objects in camera feed by moving 
+   the trackbar sliders in the bottom-left-most window."
 
-  (with-capture (cap (video-capture camera-index))
-    ;Create array of window names
+  (with-captured-camera (cap cam :width width :height height)
+    ;;Create array of window names
     (let* ((window-name-arr (make-array 8 :initial-contents 
 					(list "SRC - MATCH-TEMPLATE-EXAMPLE-1"
 					      "FRAME - MATCH-TEMPLATE-EXAMPLE-1"
@@ -10734,18 +10767,16 @@ Example 1:
 					      "CCORR-NORMED - MATCH-TEMPLATE-EXAMPLE-1"
 					      "COEFF - MATCH-TEMPLATE-EXAMPLE-1"
 					      "COEFF-NORMED - MATCH-TEMPLATE-EXAMPLE-1")))
-	   ;Initialize size parameters 
-	   ;for the matches
+	   ;;Initialize size parameters 
+	   ;;for the matches
 	   (iwidth 0)
 	   (iheight 0)
 	   (arr (make-array '(6)))
            (n 10))      
-      (cap-set cap +cap-prop-frame-width+ width)
-      (cap-set cap +cap-prop-frame-width+ height)
       ;;Create array of windows
       (dotimes (i 8)
 	(named-window (aref window-name-arr i) +window-normal+))
-      ;Move windows to specified locations     
+      ;;Move windows to specified locations     
       (move-window (aref window-name-arr 0) 134 0)
       (move-window (aref window-name-arr 1) 134 400)
       (move-window (aref window-name-arr 2) 551 0)
@@ -10754,114 +10785,109 @@ Example 1:
       (move-window (aref window-name-arr 5) 968 400)
       (move-window (aref window-name-arr 6) 1385 0)
       (move-window (aref window-name-arr 7) 1385 400)
-      ;Allocate int pointers for the trackbars to 
-      ;adjust which will set the template image a-
-      ;nd the guiding rectangle location and boun-
-      ;daries
+      ;;Allocate int pointers for the trackbars to 
+      ;;adjust which will set the template image a-
+      ;;nd the guiding rectangle location and boun-
+      ;;daries
       (with-object ((rect-x (alloc :int '(0))))
 	(with-object ((rect-y (alloc :int '(0))))
 	  (with-object ((rect-width (alloc :int (list (round (/ width n))))))
 	    (with-object ((rect-height (alloc :int (list (round (/ height n))))))
-	     ;Create trackbars used to adjust template and rectangle position
+	      ;;Create trackbars used to adjust template and rectangle position
 	      (create-trackbar "RECT-X" (aref window-name-arr 1) rect-x width)
 	      (create-trackbar "RECT-Y" (aref window-name-arr 1) rect-y height)
-	      (create-trackbar "RECT-WIDTH" (aref window-name-arr 1) rect-width 
-			       width)
-	      (create-trackbar "RECT-HEIGHT" (aref window-name-arr 1) rect-height 
-			       height)
-	      ;Set rectangle color
-	      (with-scalar ((color (scalar 0 255 0)))
-		(loop
-		   ;Set camera feed to FRAME
-		   (with-mat ((frame (mat)))
-		     (cap-read cap frame)
-		     ;Print location and size of the 
-		     ;template used to do the matchi-
-		     ;ng and the rectangle
-		     (format t "RECT-X: ~a~%~%" (mem-ref rect-x :int))
-		     (format t "RECT-Y: ~a~%~%" (mem-ref rect-y :int))
-		     (format t "RECT-WIDTH: ~a~%~%" (mem-ref rect-width :int))
-		     (format t "RECT-HEIGHT: ~a~%~%" (mem-ref rect-height :int))
-		     ;Instantiate logic used to move the 
-		     ;template and the rectangle as one
-		     (if (< (mem-ref rect-x :int) (round (/ (mem-ref rect-width :int) 128))) 
-			 (setf (mem-ref rect-x :int) 1))
-		     (if (> (mem-ref rect-x :int) 
-			    (- (cols frame) (mem-ref rect-width :int))) 
-			 (setf (mem-ref rect-x :int) 
-			       (- (cols frame) (mem-ref rect-width :int))))
-		     (if (< (mem-ref rect-y :int) (round (/ (mem-ref rect-height :int) 128))) 
-			 (setf (mem-ref rect-y :int) 1))
-		     (if (> (mem-ref rect-y :int) 
-			    (- (rows frame) (mem-ref rect-height :int))) 
-			 (setf (mem-ref rect-y :int) 
-			       (- (rows frame) (mem-ref rect-height :int))))
-		     (if (< (mem-ref rect-width :int) 1) 
-			 (setf (mem-ref rect-width :int) 1))
-		     (if (< (mem-ref rect-height :int) 1) 
-			 (setf (mem-ref rect-height :int) 1))
-		     (with-mat ((img (mat)))
-		       (with-mat ((src (mat)))
-		         ;Create 2 clones of FRAME, IMG will be where the 
-			 ;rectangle is moved to choose the template. SRC 
-		         ;is MATCH-TEMPLATE IMAGE parameter. FRAME will b-
-		         ;e the template image 
-			 (copy-to frame img)
-			 (copy-to frame src)
-			 ;Set template position and location parameters
-			 (with-rect ((roi (rect (mem-ref rect-x :int)
-						(mem-ref rect-y :int)
-						(mem-ref rect-width :int)
-						(mem-ref rect-height :int))))
-			   ;Create template image from FRAME 
-			   ;to use in MATCH-TEMPLATE. Set to 
-			   ;FRAME
-			   (copy-to (roi frame roi) frame))
-			 ;Set rectangle location parameters
-			 (with-point ((point-1 (point (mem-ref rect-x :int) 
-						      (mem-ref rect-y :int)))
-				      (point-2 (point (+ (mem-ref rect-x :int) 
-							 (mem-ref rect-width :int)) 
-						      (+ (mem-ref rect-y :int) 
-							 (mem-ref rect-height :int))))) 
-			   ;Create rectangle on IMG at same 
-			   ;position as the template
-			   (rectangle img point-1 point-2 color 5 4 0)
-			   (imshow (aref window-name-arr 0) img))
-			 ;Set width and height of matrices 
-			 ;we will create in next step
-			 (setf iwidth (+ (- (cols src) (cols frame)) 1))
-			 (setf iheight (+ (- (rows src) (rows frame)) 1))
-			 ;Create an array of finalized matrices 
-                         ;to hold all of the matches. All of the
-                         ;functions with automatic GC are in the
-                         ;gc.lisp file and can be used by adding
-                         ;the 'gc' prefix to the function name.    
-			 (dotimes (i 6)
-			   (setf (aref arr i) (gc:mat iheight iwidth +32f+)))
-			 ;Run all versions of MATCH-TEMPLATE 
-			 ;and run NORMALIZE on each match 
-			 (dotimes (i 6)
-			   (match-template src frame (aref arr i) i)
-			   (normalize (aref arr i) (aref arr i) 1d0 0d0 +norm-minmax+)) 
-			 ;Show template(FRAME) in a window
-			 (imshow (aref window-name-arr 1) frame)
-			 ;Show matches
-			 (dotimes (i 6)
-			   (imshow (aref window-name-arr (+ i 2)) (aref arr i)))))
-		     ;Reset ROI
-		     (with-rect ((roi (rect 0 0 (cols frame) (rows frame))))
-		       (copy-to (roi frame roi) frame)))
-		   (let ((c (wait-key 33)))
-		     (when (= c 27)
-		       (destroy-all-windows)
-		       (return))))))))))))
+	      (create-trackbar "RECT-WIDTH" (aref window-name-arr 1) rect-width width)
+	      (create-trackbar "RECT-HEIGHT" (aref window-name-arr 1) rect-height height)
+	      (with-mat ((frame (mat)))
+		(with-rect ((roi (rect 0 0 (cols frame) (rows frame))))	      
+		  ;;Set rectangle color
+		  (with-scalar ((color (scalar 0 255 0)))
+		    (loop
+		       ;;Set camera feed to FRAME
+		       (*read cap frame)
+		       ;;Print location and size of the 
+		       ;;template used to do the matchi-
+		       ;;ng and the rectangle
+		       (format t "RECT-X: ~a~%~%" (mem-ref rect-x :int))
+		       (format t "RECT-Y: ~a~%~%" (mem-ref rect-y :int))
+		       (format t "RECT-WIDTH: ~a~%~%" (mem-ref rect-width :int))
+		       (format t "RECT-HEIGHT: ~a~%~%" (mem-ref rect-height :int))
+		       ;;Instantiate logic used to move the 
+		       ;;template and the rectangle as one
+		       (if (< (mem-ref rect-x :int) (round (/ (mem-ref rect-width :int) 128))) 
+			   (setf (mem-ref rect-x :int) 1))
+		       (if (> (mem-ref rect-x :int) 
+			      (- (cols frame) (mem-ref rect-width :int))) 
+			   (setf (mem-ref rect-x :int) 
+				 (- (cols frame) (mem-ref rect-width :int))))
+		       (if (< (mem-ref rect-y :int) (round (/ (mem-ref rect-height :int) 128))) 
+			   (setf (mem-ref rect-y :int) 1))
+		       (if (> (mem-ref rect-y :int) 
+			      (- (rows frame) (mem-ref rect-height :int))) 
+			   (setf (mem-ref rect-y :int) 
+				 (- (rows frame) (mem-ref rect-height :int))))
+		       (if (< (mem-ref rect-width :int) 1) 
+			   (setf (mem-ref rect-width :int) 1))
+		       (if (< (mem-ref rect-height :int) 1) 
+			   (setf (mem-ref rect-height :int) 1))
+		       ;;Create 2 clones of FRAME, IMG will be where the 
+		       ;;rectangle is moved to choose the template. SRC 
+		       ;;is MATCH-TEMPLATE IMAGE parameter. FRAME will b-
+		       ;;e the template image 
+		       (with-mat ((img (clone frame)))
+			 (with-mat ((src (clone frame)))
+			   ;;Set template position and location parameters
+			   (with-rect ((roi (rect (mem-ref rect-x :int)
+						  (mem-ref rect-y :int)
+						  (mem-ref rect-width :int)
+						  (mem-ref rect-height :int))))
+			     ;;Create template image from FRAME 
+			     ;;to use in MATCH-TEMPLATE. Set to 
+			     ;;FRAME
+			     (copy-to (roi frame roi) frame))
+			   ;;Set rectangle location parameters
+			   (with-point ((point-1 (point (mem-ref rect-x :int) 
+							(mem-ref rect-y :int)))
+					(point-2 (point (+ (mem-ref rect-x :int) 
+							   (mem-ref rect-width :int)) 
+							(+ (mem-ref rect-y :int) 
+							   (mem-ref rect-height :int))))) 
+			     ;;Create rectangle on IMG at same 
+			     ;;position as the template
+			     (rectangle img point-1 point-2 color 5 4 0)
+			     (imshow (aref window-name-arr 0) img))
+			   ;;Set width and height of matrices 
+			   ;;we will create in next step
+			   (setf iwidth (+ (- (cols src) (cols frame)) 1))
+			   (setf iheight (+ (- (rows src) (rows frame)) 1))
+			   ;;Create an array of finalized matrices 
+			   ;;to hold all of the matches. All of the
+			   ;;functions with automatic GC are in the
+			   ;;gc.lisp file and can be used by adding
+			   ;;the 'gc' prefix to the function name.    
+			   (dotimes (i 6)
+			     (setf (aref arr i) (gc:mat iheight iwidth +32f+)))
+			   ;;Run all versions of MATCH-TEMPLATE 
+			   ;;and run NORMALIZE on each match 
+			   (dotimes (i 6)
+			     (match-template src frame (aref arr i) i)
+			     (normalize (aref arr i) (aref arr i) 1d0 0d0 +norm-minmax+)) 
+			   ;;Show template(FRAME) in a window
+			   (imshow (aref window-name-arr 1) frame)
+			   ;;Show matches
+			   (dotimes (i 6)
+			     (imshow (aref window-name-arr (+ i 2)) (aref arr i)))))
+		       ;;Reset ROI
+		       (copy-to (roi frame roi) frame)
+		       (let ((c (wait-key 33)))
+			 (when (= c 27)
+			   (destroy-all-windows)
+			   (return))))))))))))))
 
 
 Example 2:
 
-
-(defun match-template-example-2 (&optional (camera-index *camera-index*) 
+(defun match-template-example-2 (&optional (cam *camera-index*) 
 				   (width *default-width*)
 				   (height *default-height*))
 
@@ -10877,122 +10903,116 @@ Example 2:
    The normal frame rate for videos is 0.033333333 second per frame. 
    This example should fill in any cracks left by the other one."
 
-  (with-capture (cap (video-capture camera-index))
-					;Create array of window names
+  (with-captured-camera (cap cam :width width :height height)
+    ;;Create array of window names
     (let* ((window-name-arr (make-array 3 :initial-contents 
 					(list "IMG - MATCH-TEMPLATE-EXAMPLE-2"
 					      "FRAME - MATCH-TEMPLATE-EXAMPLE-2"
 					      "SQDIFF - MATCH-TEMPLATE-EXAMPLE-2")))
-           ;Initialize size parameters 
-	   ;for the matches
+	   ;;Initialize size parameters 
+	   ;;for the matches
            (iwidth 0)
 	   (iheight 0)
            (n 10))      
-      (cap-set cap +cap-prop-frame-width+ width)
-      (cap-set cap +cap-prop-frame-width+ height)
       ;;Create windows
       (with-named-window ((aref window-name-arr 0) +window-normal+)
 	(with-named-window ((aref window-name-arr 1) +window-normal+)
 	  (with-named-window ((aref window-name-arr 2) +window-autosize+)   
-	    ;Move windows to specified locations     
+	    ;;Move windows to specified locations     
 	    (move-window (aref window-name-arr 0) 253 0)
 	    (move-window (aref window-name-arr 1) 253 400)
 	    (move-window (aref window-name-arr 2) 670 150)
-	    ;Allocate int pointers for the trackbars to 
-	    ;adjust which will set the template image a-
-	    ;nd the guiding rectangle location and boun-
-	    ;daries
+	    ;;Allocate int pointers for the trackbars to 
+	    ;;adjust which will set the template image a-
+	    ;;nd the guiding rectangle location and boun-
+	    ;;daries
 	    (with-object ((rect-x (alloc :int '(0))))
 	      (with-object ((rect-y (alloc :int '(0))))
 		(with-object ((rect-width (alloc :int (list (round (/ width n))))))
 		  (with-object ((rect-height (alloc :int (list (round (/ height n))))))
-		    ;Create trackbars used to adjust template and rectangle position
+		    ;;Create trackbars used to adjust template and rectangle position
 		    (create-trackbar "RECT-X" (aref window-name-arr 1) rect-x width)
 		    (create-trackbar "RECT-Y" (aref window-name-arr 1) rect-y height)
 		    (create-trackbar "RECT-WIDTH" (aref window-name-arr 1) rect-width 
 				     width)
 		    (create-trackbar "RECT-HEIGHT" (aref window-name-arr 1) rect-height 
 				     height)
-		    ;Set rectangle color
-		    (with-scalar ((color (scalar 0 255 0)))
-		      (loop
-			 ;Set camera feed to FRAME
-			 (with-mat ((frame (mat)))
-			   (cap-read cap frame)
-			  ;Print location and size of the 
-			  ;template used to do the matchi-
-			  ;ng and the rectangle
-			  (format t "RECT-X: ~a~%~%" (mem-ref rect-x :int))
-			  (format t "RECT-Y: ~a~%~%" (mem-ref rect-y :int))
-			  (format t "RECT-WIDTH: ~a~%~%" (mem-ref rect-width :int))
-			  (format t "RECT-HEIGHT: ~a~%~%" (mem-ref rect-height :int))
-			  ;Instantiate logic used to move the 
-			  ;template and the rectangle as one
-			  (if (< (mem-ref rect-x :int) (round (/ (mem-ref rect-width :int) 128))) 
-			      (setf (mem-ref rect-x :int) 1))
-			  (if (> (mem-ref rect-x :int) 
-				 (- (cols frame) (mem-ref rect-width :int))) 
-			      (setf (mem-ref rect-x :int) 
-				    (- (cols frame) (mem-ref rect-width :int))))
-			  (if (< (mem-ref rect-y :int) (round (/ (mem-ref rect-height :int) 128))) 
-			      (setf (mem-ref rect-y :int) 1))
-			  (if (> (mem-ref rect-y :int) 
-				 (- (rows frame) (mem-ref rect-height :int))) 
-			      (setf (mem-ref rect-y :int) 
-				    (- (rows frame) (mem-ref rect-height :int))))
-			  (if (< (mem-ref rect-width :int) 1) 
-			      (setf (mem-ref rect-width :int) 1))
-			  (if (< (mem-ref rect-height :int) 1) 
-			      (setf (mem-ref rect-height :int) 1))
-			  (with-mat ((img (mat)))
-			    (with-mat ((src (mat)))
-			      ;Create 2 copies of FRAME, IMG will be where the 
-			      ;rectangle is moved to choose the template. SRC 
-			      ;is MATCH-TEMPLATE IMAGE parameter. FRAME will b-
-			      ;e the template image 
-			      (copy-to frame img)
-			      (copy-to frame src)
-			      ;Set template position and location parameters
-			      (with-rect ((roi (rect (mem-ref rect-x :int)
-						     (mem-ref rect-y :int)
-						     (mem-ref rect-width :int)
-						     (mem-ref rect-height :int))))
-			       ;Create template image from FRAME 
-			       ;to use in MATCH-TEMPLATE. Set to 
-			       ;FRAME
-				(copy-to (roi frame roi) frame))
-			      ;Set rectangle location parameters
-			      (with-point ((point-1 (point (mem-ref rect-x :int) 
-							   (mem-ref rect-y :int)))
-					   (point-2 (point (+ (mem-ref rect-x :int) 
-							      (mem-ref rect-width :int)) 
-							   (+ (mem-ref rect-y :int) 
-							      (mem-ref rect-height :int))))) 
-				;Create rectangle on IMG at same 
-				;position as the template
-				(rectangle img point-1 point-2 color 5 4 0)
-				(imshow (aref window-name-arr 0) img))
-			      ;Set width and height of matrices 
-			      ;we will create in next step
-			      (setf iwidth (+ (- (cols src) (cols frame)) 1))
-			      (setf iheight (+ (- (rows src) (rows frame)) 1))
-			      ;Create  matrix to hold all of the matches
-			      (with-mat ((matches (mat iheight iwidth +32f+)))
-				;Run MATCH-TEMPLATE on each frame of the camera 
-                                ;feed and run NORMALIZE on each match 
-				(match-template src frame matches +tm-ccoeff-normed+)
-				(normalize matches matches 1d0 0d0 +norm-minmax+)
-			        ;Show template(FRAME) in a window
-				(imshow (aref window-name-arr 1) frame)
-				;Show matches
-				(imshow (aref window-name-arr 2) matches)
-			        ;Reset ROI
-				(with-rect ((roi (rect 0 0 (cols frame) (rows frame))))
-				  (copy-to (roi frame roi) frame))
-				(let ((c (wait-key 33)))
-				  (when (= c 27)
-				    (return)))))))))))))))))))
-
+		    (with-mat ((frame (mat)))
+		      (with-rect ((roi (rect 0 0 (cols frame) (rows frame))))
+			;;Set rectangle color
+			(with-scalar ((color (scalar 0 255 0)))
+			  (loop
+			     ;;Set camera feed to FRAME
+			     (*read cap frame)
+			     ;;Print location and size of the 
+			     ;;template used to do the matchi-
+			     ;;ng and the rectangle
+			     (format t "RECT-X: ~a~%~%" (mem-ref rect-x :int))
+			     (format t "RECT-Y: ~a~%~%" (mem-ref rect-y :int))
+			     (format t "RECT-WIDTH: ~a~%~%" (mem-ref rect-width :int))
+			     (format t "RECT-HEIGHT: ~a~%~%" (mem-ref rect-height :int))
+			     ;;Instantiate logic used to move the 
+			     ;;template and the rectangle as one
+			     (if (< (mem-ref rect-x :int) (round (/ (mem-ref rect-width :int) 128))) 
+				 (setf (mem-ref rect-x :int) 1))
+			     (if (> (mem-ref rect-x :int) 
+				    (- (cols frame) (mem-ref rect-width :int))) 
+				 (setf (mem-ref rect-x :int) 
+				       (- (cols frame) (mem-ref rect-width :int))))
+			     (if (< (mem-ref rect-y :int) (round (/ (mem-ref rect-height :int) 128))) 
+				 (setf (mem-ref rect-y :int) 1))
+			     (if (> (mem-ref rect-y :int) 
+				    (- (rows frame) (mem-ref rect-height :int))) 
+				 (setf (mem-ref rect-y :int) 
+				       (- (rows frame) (mem-ref rect-height :int))))
+			     (if (< (mem-ref rect-width :int) 1) 
+				 (setf (mem-ref rect-width :int) 1))
+			     (if (< (mem-ref rect-height :int) 1) 
+				 (setf (mem-ref rect-height :int) 1))
+			     ;;Create 2 copies of FRAME, IMG will be where the 
+			     ;;rectangle is moved to choose the template. SRC 
+			     ;;is MATCH-TEMPLATE IMAGE parameter. FRAME will b-
+			     ;;Set template position and location parameters
+			     (with-mat ((img (clone frame)))
+			       (with-mat ((src (clone frame)))
+				 (with-rect ((roi (rect (mem-ref rect-x :int)
+							(mem-ref rect-y :int)
+							(mem-ref rect-width :int)
+							(mem-ref rect-height :int))))
+				   ;;Create template image from FRAME 
+				   ;;to use in MATCH-TEMPLATE. Set to 
+				   ;;FRAME
+				   (copy-to (roi frame roi) frame))
+				 ;;Set rectangle location parameters
+				 (with-point ((point-1 (point (mem-ref rect-x :int) 
+							      (mem-ref rect-y :int)))
+					      (point-2 (point (+ (mem-ref rect-x :int) 
+								 (mem-ref rect-width :int)) 
+							      (+ (mem-ref rect-y :int) 
+								 (mem-ref rect-height :int))))) 
+				   ;;Create rectangle on IMG at same 
+				   ;;position as the template
+				   (rectangle img point-1 point-2 color 5 4 0)
+				   (imshow (aref window-name-arr 0) img))
+				 ;;Set width and height of matrices 
+				 ;;we will create in next step
+				 (setf iwidth (+ (- (cols src) (cols frame)) 1))
+				 (setf iheight (+ (- (rows src) (rows frame)) 1))
+				 ;;Create  matrix to hold all of the matches
+				 (with-mat ((matches (mat iheight iwidth +32f+)))
+				   ;;Run MATCH-TEMPLATE on each frame of the camera 
+				   ;;feed and run NORMALIZE on each match 
+				   (match-template src frame matches +tm-ccoeff-normed+)
+				   (normalize matches matches 1d0 0d0 +norm-minmax+)
+				   ;;Show template(FRAME) in a window
+				   (imshow (aref window-name-arr 1) frame)
+				   ;;Show matches
+				   (imshow (aref window-name-arr 2) matches)
+				   ;;Reset ROI
+				   (copy-to (roi frame roi) frame))
+				 (let ((c (wait-key 33)))
+				   (when (= c 27)
+				     (return)))))))))))))))))))
 
 ========================================================================================================================================
 HIGHGUI - USER INTERFACE
@@ -11621,14 +11641,25 @@ there are several HighGUI windows, any of them can be active.
 HIGHGUI - READING AND WRITING IMAGES AND VIDEO
 ========================================================================================================================================
 
-CAP-GET
+========================================================================================================================================
+VIDEO-CAPTURE-GET
+========================================================================================================================================
 
 Returns the specified VIDEO-CAPTURE property
 
 
+Note: The name VIDEO-CAPTURE-GET is used in the documentation to refer to the binding for the "get" 
+member of the OpenCV VideoCapture class because it is more descriptive and it is easier to search for 
+in this file. The *GET method may also be used to call this binding.
+
+Note: The name *GET is used for the method because GET is the name of a Common Lisp accessor.
+
+
 C++: double VideoCapture::get(int propId)
 
-LISP-CV: (CAP-GET (SELF VIDEO-CAPTURE) (PROP-ID :INT))
+LISP-CV: (*GET (SELF VIDEO-CAPTURE) (PROP-ID :INT))
+
+LISP-CV: (VIDEO-CAPTURE-GET (SELF VIDEO-CAPTURE) (PROP-ID :INT))
 
 
     Parameters:	SELF - The VIDEO-CAPTURE structure. 
@@ -11637,12 +11668,12 @@ LISP-CV: (CAP-GET (SELF VIDEO-CAPTURE) (PROP-ID :INT))
 
        Property identifier. It can be one of the following:
 
-            +CAP-PROP-POS-MSEC+ Current position of the video file in milliseconds or video capture tim-
-                                estamp.
+            +CAP-PROP-POS-MSEC+ Current position of the video file in milliseconds or video capture 
+                                time-stamp.
             +CAP-PROP-POS-FRAMES+ 0-based index of the frame to be decoded/captured next.
 
-            +CAP-PROP-POS-AVI-RATIO+ Relative position of the video file: 0 - start of the film, 1 - en-
-                                     d of the film.
+            +CAP-PROP-POS-AVI-RATIO+ Relative position of the video file: 0 - start of the film, 1 - 
+                                     end of the film.
             +CAP-PROP-FRAME-WIDTH+ Width of the frames in the video stream.
 
             +CAP-PROP-FRAME-HEIGHT+ Height of the frames in the video stream.
@@ -11680,46 +11711,112 @@ Note: When querying a property that is not supported by the backend used by the 
 value 0 is returned.
 
 
-(defun cap-get-example (&optional 
-                          (camera-index *camera-index*) 
-			  (width *default-width*)
-			  (height *default-height*))
+(defun video-capture-get-example (&optional 
+				    (cam *camera-index*) 
+				    (width *default-width*)
+				    (height *default-height*))
 
   "Gets the width and height of the camera capture 
-   with the function CAP-GET and prints it."
+   with the method *GET and prints it."
 
-  (with-capture (cap (video-capture camera-index))
-    (let ((window-name "CAP-GET Example"))
-      (if (not (cap-is-open cap)) 
-	  (return-from cap-get-example 
+  (with-captured-camera (cap cam :width width :height height)
+    (let ((window-name "VIDEO-CAPTURE-GET Example"))
+      (if (not (is-opened cap)) 
+	  (return-from video-capture-get-example
 	    (format t "Cannot open the video camera")))
-      (cap-set cap +cap-prop-frame-width+ width)
-      (cap-set cap +cap-prop-frame-height+ height)
+      (*set cap +cap-prop-frame-width+ width)
+      (*set cap +cap-prop-frame-height+ height)
       (format t "~%Frame Size : ~ax~a~%~%" 
-	      (cap-get cap +cap-prop-frame-width+)
-	      (cap-get cap +cap-prop-frame-height+))
-      (named-window window-name +window-normal+)
-      (move-window window-name 759 175)
-      (do* ((frame 0))
-	   ((plusp (wait-key *millis-per-frame*)) 
-	    (format t "Key is pressed by user"))
-	(setf frame (mat))
-	(cap-read cap frame)
-	(imshow window-name frame)
-        (del-mat frame))
-      (destroy-window window-name))))
+	      (*get cap +cap-prop-frame-width+)
+	      (*get cap +cap-prop-frame-height+))
+      (with-named-window (window-name +window-normal+)
+	(move-window window-name 759 175)
+	(with-mat ((frame (mat)))
+	  (loop
+	     (*read cap frame)
+	     (imshow window-name frame)
+	     (let ((c (wait-key 33)))
+	       (when (= c 27)
+		 (return)))))))))
 
 
 
-CAP-READ
+========================================================================================================================================
+VIDEO-CAPTURE-IS-OPENED
+========================================================================================================================================
 
+Returns true if video capturing has been initialized already.
+
+
+Note: The name VIDEO-CAPTURE-IS-OPENED is used in the documentation to refer to the binding for the 
+"isOpened" member of the OpenCV VideoCapture class because it is more descriptive and it is easier 
+to search for in this file. The IS-OPENED method may also be used to call this binding.
+
+
+C++: bool VideoCapture::isOpened()
+
+LISP-CV: (IS-OPENED (SELF VIDEO-CAPTURE)) => :BOOLEAN
+
+LISP-CV: (VIDEO-CAPTURE-IS-OPENED (SELF VIDEO-CAPTURE)) => :BOOLEAN
+
+
+Parameters:	
+
+         SELF - The VIDEO-CAPTURE structure.
+
+
+If previous call to VIDEO-CAPTURE constructor or VIDEO-CAPTURE-IS-OPENED succeeded, the function 
+or method returns true.
+
+
+Example: 
+
+(defun video-capture-is-opened-example (&optional (cam 0))
+
+  "If the previous call to VIDEO-CAPTURE constructor (e.g. 
+
+   (VIDEO-CAPTURE CAMERA-INDEX) 
+  
+   in the this example) or the method IS_OPENED succeeded, 
+   the method returns true. The boolean output of PRINC in 
+   the IF statement in this example reflects a good or bad 
+   capture. Output will likely be 'T' unless the camera is 
+   unplugged. Try unplugging your camera to test it out."
+
+  (with-video-capture ((cap (video-capture cam))) 
+    (let ((window-name "VIDEO-CAPTURE-IS-OPENED Example"))
+      (if (not (princ (is-opened cap))) 
+	  (return-from video-capture-is-opened-example
+	    (format t "~%Cannot open the video camera")))
+      (with-named-window (window-name +window-normal+)
+	(move-window window-name 759 175)
+	(with-mat ((frame (mat)))
+	  (loop
+	     (*read cap frame)
+	     (imshow window-name frame)
+     	     (let ((c (wait-key 33)))
+	       (when (= c 27)
+		 (return)))))))))
+
+========================================================================================================================================
+VIDEO-CAPTURE-READ
+========================================================================================================================================
 
 Grabs, decodes and returns the next video frame.
 
 
+Note: The name VIDEO-CAPTURE-READ is used in the documentation to refer to the binding for the "read" 
+member of the OpenCV VideoCapture class because it is more descriptive and it is easier to search for 
+in this file. The *READ method may also be used to call this binding.
+
+Note: The name *READ is used for the method because READ is the name of a Common Lisp function.
+
+
 C++: bool VideoCapture::read(Mat& image)
 
-LISP-CV: (CAP-READ (SELF VIDEO-CAPTURE) (IMAGE MAT))
+LISP-CV: (*READ (SELF VIDEO-CAPTURE) (IMAGE MAT)) => :BOOLEAN
+
+LISP-CV: (VIDEO-CAPTURE-READ (SELF VIDEO-CAPTURE) (IMAGE MAT)) => :BOOLEAN
 
 
     Parameters:	
@@ -11729,45 +11826,49 @@ LISP-CV: (CAP-READ (SELF VIDEO-CAPTURE) (IMAGE MAT))
          IMAGE - The returned frame.
 
 
-The methods/functions combine (CAP-GRAB) and (CAP-RETRIEVE) in one call. This is the most convenient 
-method for reading video files or capturing data from decode and return the just grabbed frame. If no 
-frames has been grabbed (camera has been disconnected, or there are no more frames in video file), the 
-methods return false and the functions return NULL pointer.
+The methods/functions combine (VIDEO-CAPTURE-GRAB) and (VIDEO-CAPTURE-RETRIEVE) in one call. This is 
+the most convenient method for reading video files or capturing data from decode and return the just 
+grabbed frame. If no frames have been grabbed (if camera has been disconnected, or there are no more 
+frames in video file), the methods return false and the functions return NULL pointer.
 
 
-(defun cap-read-example (&optional (camera-index 
-				    *camera-index*))
+(defun video-capture-read-example (&optional (camera-index 
+					      *camera-index*))
 
-  (with-capture (cap (video-capture camera-index))
-    (let ((window-name "CAP-READ Example"))
-      (if (not (cap-is-open cap)) 
-	  (return-from cap-read-example 
+  (with-video-capture ((cap (video-capture camera-index)))
+    (let ((window-name "VIDEO-CAPTURE-READ Example"))
+      (if (not (is-opened cap)) 
+	  (return-from video-capture-read-example
 	    (format t "Cannot open the video camera")))
-      (named-window window-name +window-normal+)
-      (move-window window-name 759 175)
-      (do* ((frame 0))
-	   ((plusp (wait-key *millis-per-frame*)) 
-	    (format t "Key is pressed by user"))
-	(setf frame (mat))
-	(cap-read cap frame)
-	(imshow window-name frame)
-        (del-mat frame))
-      (destroy-window window-name))))
+      (with-named-window (window-name +window-normal+)
+	(move-window window-name 759 175)
+	(with-mat ((frame (mat)))
+	  (loop
+	     (*read cap frame)
+	     (imshow window-name frame)
+	     (let ((c (wait-key 33)))
+	       (when (= c 27)
+		 (return)))))))))
 
-
-
-CAP-RELEASE
-
+========================================================================================================================================
+VIDEO-CAPTURE-RELEASE
+========================================================================================================================================
 
 Closes video file or capturing device.
+
+Note: The name VIDEO-CAPTURE-RELEASE is used in the documentation to refer to the binding for the 
+"release" member of the OpenCV VideoCapture class because it is more descriptive and it is easier 
+to search for in this file. The RELEASE method may also be used to call this binding.
 
 
 C++: void VideoCapture::release()
 
-LISP-CV: (CAP-RELEASE (SELF VIDEO-CAPTURE)) => :VOID
+LISP-CV: (RELEASE (SELF VIDEO-CAPTURE)) => :VOID
+
+LISP-CV: (VIDEO-CAPTURE-RELEASE (SELF VIDEO-CAPTURE)) => :VOID
 
 
-The methods are automatically called by subsequent (CAP-OPEN) and by VIDEO-CAPTURE destructor.
+The methods are automatically called by subsequent (VIDEO-CAPTURE-OPEN) and by VIDEO-CAPTURE destructor.
 
 
     Parameters:	
@@ -11775,51 +11876,47 @@ The methods are automatically called by subsequent (CAP-OPEN) and by VIDEO-CAPTU
          SELF - The VIDEO-CAPTURE structure.
 
 
-(defun cap-release-example (&optional 
-                              (camera-index 
-                               *camera-index*))
-
-  "In order: First the function CAPTURE-FROM-CAM allocates and 
-   initializes the structure for reading a video stream from t-
-   he camera. Next a window is created with NAMED-WINDOW. Then 
-   the camera stream is read with CAP-READ and then shown in t-
-   he window with IMSHOW. Then, once the user invokes the WAIT-
-   KEY function by pressing the Escape key while the window is 
-   active the DO loop is exited and CAP-RELEASE is called clos-
-   ing the structure used to read and show the video stream. 
-   Note: If you use the macro WITH-CAPTURE, CAP-RELEASErot will b-
-   e called automatically. See WITH-CAPTURE EXAMPLE for usage."
+(defun video-capture-release-example (&optional 
+					(camera-index 
+					 *camera-index*))
   
-  (let ((cap (video-capture camera-index))
-	(window-name "CAP-RELEASE Example"))
-    (if (not (cap-is-open cap)) 
-	(return-from cap-release-example 
-	  (format t "Cannot open the video camera")))
-    (named-window window-name +window-normal+)
-    (move-window window-name 759 175)
-    (do* ((frame 0))
-	 ((plusp (wait-key *millis-per-frame*)) 
-	  (format t "Key is pressed by user"))
-      (setf frame (mat))
-      (cap-read cap frame)
-      (imshow window-name frame))
-    (cap-release cap)
-    (destroy-window window-name)))
+  (with-video-capture ((cap (video-capture camera-index)))
+    (let ((window-name "VIDEO-CAPTURE-RELEASE Example"))
+      (if (not (is-opened cap)) 
+	  (return-from video-capture-release-example 
+	    (format t "Cannot open the video camera")))
+      (with-named-window (window-name +window-normal+)
+      (move-window window-name 759 175)
+      (with-mat ((frame (mat)))
+	(loop
+	   (*read cap frame)
+	   (imshow window-name frame)
+	   (let ((c (wait-key 33)))
+	     (when (= c 27)
+	       (release cap)
+	       (return)))))))))
 
-
-
-CAP-SET
-
+========================================================================================================================================
+VIDEO-CAPTURE-SET
+========================================================================================================================================
 
 Sets a property in the VIDEO-CAPTURE
+
+Note: The name VIDEO-CAPTURE-SET is used in the documentation to refer to the binding for the "set" 
+member of the OpenCV VideoCapture class because it is more descriptive and it is easier to search for 
+in this file. The *SET method may also be used to call this binding.
+
+Note: The name *SET is used for the method because SET is the name of a Common Lisp function.
 
 
 C++: bool VideoCapture::set(int propId, double value)
 
-LISP-CV: (CAP-SET (SELF VIDEO-CAPTURE) (PROP-ID :INT) (VALUE :DOUBLE)) => :BOOLEAN
+LISP-CV: (*SET (SELF VIDEO-CAPTURE) (PROP-ID :INT) (VALUE :DOUBLE)) => :BOOLEAN
+
+LISP-CV: (VIDEO-CAPTURE-SET (SELF VIDEO-CAPTURE) (PROP-ID :INT) (VALUE :DOUBLE)) => :BOOLEAN
 
 
-    Parameters:	SELF - The VIDEO-CAPTURE structure.
+    Parameters:	SELF - A VIDEO-CAPTURE object.
 
                 PROP-ID -
 
@@ -11868,37 +11965,37 @@ LISP-CV: (CAP-SET (SELF VIDEO-CAPTURE) (PROP-ID :INT) (VALUE :DOUBLE)) => :BOOLE
   
                  VALUE - Value of the property.
 
+   
+Example:
 
-             
-(defun cap-set-example (&optional 
-                          (camera-index 
-                           *camera-index*))
+(defun video-capture-set-example (&optional 
+				    (camera-index 
+				     *camera-index*))
 
-  "Changes the brightness level of the camera feed 
-   with the function CAP-SET and then prints the b-
-   rightness level."
+  "Changes the brightness level of the camera output 
+   ,with the method *SET, and then prints it."
 
-  (with-capture (cap (video-capture camera-index))
-    (let ((window-name "CAP-SET Example"))
-      (if (not (cap-is-open cap)) 
-	  (return-from cap-set-example 
+  (with-video-capture ((cap (video-capture camera-index)))
+    (let ((window-name "VIDEO-CAPTURE-SET Example"))
+      (if (not (is-opened cap)) 
+	  (return-from video-capture-set-example
 	    (format t "Cannot open the video camera")))
-(cap-set cap +cap-prop-brightness+ 0.7)
-      (format t "Brightness level: ~a~%~%" 
-	      (cap-get cap +cap-prop-brightness+))
-      (named-window window-name +window-normal+)
-      (move-window window-name 759 175)
-      (do* ((frame 0))
-	   ((plusp (wait-key *millis-per-frame*)) 
-	    (format t "Key is pressed by user"))
-	(setf frame (mat))
-	(cap-read cap frame)
-	(imshow window-name frame))
-      (destroy-window window-name))))
+      (*set cap +cap-prop-brightness+ 0.7)
+      (format t "~%Brightness level: ~a~%~%" 
+	      (*get cap +cap-prop-brightness+))
+      (with-named-window (window-name +window-normal+)
+	(move-window window-name 759 175)
+	(with-mat ((frame (mat)))
+	  (loop
+	     (*read cap frame)
+	     (imshow window-name frame)
+     	     (let ((c (wait-key 33)))
+	       (when (= c 27)
+		 (return)))))))))
 
-
-
+========================================================================================================================================
 IMREAD
+========================================================================================================================================
 
 
 Loads an image from a file.
@@ -12046,9 +12143,9 @@ Example using TG finalizers for memory management:
 	   (when (= c 27)
 	     (return)))))))
 
-
-
+========================================================================================================================================
 IMWRITE
+========================================================================================================================================
 
 Saves an image to a specified file.
 
@@ -12121,7 +12218,7 @@ have alpha set to 0, fully opaque pixels should have alpha set to 255/65535.
 Usage: (IMWRITE-EXAMPLE "/MY-PIC.JPG" "/HOME/USERS/OUT-FILE.JPG")
 
 
-;;Extract frames 
+;;Small program used to extract frames from the camera feed.
 
 
 (defun image-extractor (&optional 
@@ -12129,25 +12226,25 @@ Usage: (IMWRITE-EXAMPLE "/MY-PIC.JPG" "/HOME/USERS/OUT-FILE.JPG")
 			  (width *default-width*)
 			  (height *default-height*))
 
-   "Extracts frames from the camera feed and saves as 
+  "Extracts frames from the camera feed and saves as 
     .jpg files in the Lisp-CV Data Directory. This is 
     useful if you want to create large training sets 
     easily."
 
   (with-captured-camera (cap cam :width width :height height)
-    (if (not (cap-is-open cap)) 
+    (if (not (is-opened cap)) 
 	(return-from image-extractor 
 	  (format t "Cannot open the video camera")))      
     (let ((window-name "IMAGE-EXTRACTOR Example")
           (filename 0))
       (format t "~%Frame Size : ~ax~a~%~%" 
-	      (cap-get cap +cap-prop-frame-width+)
-	      (cap-get cap +cap-prop-frame-height+))
+	      (*get cap +cap-prop-frame-width+)
+	      (*get cap +cap-prop-frame-height+))
       (with-named-window (window-name +window-normal+)
 	(move-window window-name 759 175)
-	(loop
-	   (with-mat ((frame (mat)))
-	     (cap-read cap frame)
+	(with-mat ((frame (mat)))
+	  (loop
+	     (*read cap frame)
 	     (setf filename (cat *lisp-cv-data-dir* "img-" 
 				 (write-to-string *file-number*) ".jpg"))
 	     (incf *file-number*)
@@ -12158,8 +12255,9 @@ Usage: (IMWRITE-EXAMPLE "/MY-PIC.JPG" "/HOME/USERS/OUT-FILE.JPG")
 		 (return)))))))))
 
 
-
+========================================================================================================================================
 VIDEO-CAPTURE
+========================================================================================================================================
 
 VIDEO-CAPTURE constructors.
 
@@ -12203,6 +12301,8 @@ LISP-CV: (MAKE-VIDEO-CAPTURE &OPTIONAL (SRC :STRING)) => VIDEO-CAPTURE
 If no arguments are provided this function creates an uninitialized VIDEO-CAPTURE object.
         
 
+Example:
+
 (defun video-capture-example (filename &optional 
 					 (camera-index *camera-index*))
 
@@ -12216,72 +12316,32 @@ If no arguments are provided this function creates an uninitialized VIDEO-CAPTUR
 		       (file-capture (video-capture filename)))
     (let ((window-name-1 "Camera Feed - VIDEO-CAPTURE Example")
 	  (window-name-2 "Video file - VIDEO-CAPTURE Example"))
-      (if (not (cap-is-open camera-capture)) 
+      (if (not (is-opened camera-capture)) 
 	  (return-from video-capture-example 
 	    (format t "Cannot open the video camera")))
-      (if (not (cap-is-open file-capture)) 
+      (if (not (is-opened file-capture)) 
 	  (return-from video-capture-example 
 	    (format t "Cannot open the video file")))
       (with-named-window (window-name-1 +window-normal+)
 	(with-named-window (window-name-2 +window-normal+)
 	  (move-window window-name-1 533 175)
 	  (move-window window-name-2 984 175)
-	  (loop 
-	     (with-mat ((camera-frame (mat))
-			(video-frame (mat)))
-	       (cap-read camera-capture camera-frame)
+	  (with-mat ((camera-frame (mat))
+		     (video-frame (mat)))
+	    (loop 
+	       (*read camera-capture camera-frame)
 	       (imshow window-name-1 camera-frame)
-	       (cap-read file-capture video-frame)
-	       (imshow window-name-2 video-frame))
-	     (let ((c (wait-key 33)))
-	       (when (= c 27)
-		 (return)))))))))
-
-
-WITH-CAPTURE
-
-
-Ensures CAP-RELEASE and DEL-VID-CAP gets called automatically when capture goes out of scope.
-
-
-LISP-CV: (WITH-CAPTURE (CAPTURE-VAR CAP)) &BODY BODY)
-
-
-Parameters:	
-
-         CAPTURE-VAR - A variable representing the function used to open video file or a capturing 
-                       device. Similar to the variable in a LET statement.
-
-         CAP - The function used to open video file or a capturing device for video capturing, as in 
-               (video-capture (DEVICE :INT)). See WITH-CAPTURE example.
-    
-         BODY - The body of the code to be executed once the video file or capturing device is open.
-
-
-(defun with-capture-example (&optional 
-			       (cam 0))
-
-  (with-capture (cap (video-capture cam))
-    (let ((window-name "WITH-CAPTURE Example"))
-      (if (not (cap-is-open cap))
-	  (return-from with-capture-example 
-	    (format t "Cannot open the video camera")))
-      (with-named-window( window-name +window-normal+)
-	(move-window window-name 759 175)
-	(loop 
-	   (with-mat ((frame (mat)))
-	     (cap-read cap frame)
-	     (imshow window-name frame))
-	   (let ((c (wait-key 33)))
-	     (when (= c 27)
-	       (return))))))))
-
+	       (*read file-capture video-frame)
+	       (imshow window-name-2 video-frame)
+	       (let ((c (wait-key 33)))
+		 (when (= c 27)
+		   (return))))))))))
 
 
 WITH-CAPTURED-CAMERA
 
 
-Ensures CAP-RELEASE and DEL-VID-CAP gets called on captures. Also sets capture width/height in function.
+Ensures VIDEO-CAPTURE-RELEASE and DEL-VIDEO-CAPTURE gets called on captures. Also sets capture width/height in function.
 
 
 LISP-CV: (WITH-CAPTURED-CAMERA ((CAPTURE-VAR (DEV-INDEX :INT) &KEY (WIDTH :INT) (HEIGHT :INT)) &BODY BODY)) => VIDEO-CAPTURE
@@ -12307,7 +12367,7 @@ Parameters:
 WITH-CAPTURED-FILE
 
 
-Ensures CAP-RELEASE and DEL-VID-CAP gets called on captures. Also sets capture width/height in function.
+Ensures VIDEO-CAPTURE-RELEASE and DEL-VIDEO-CAPTURE gets called on captures. Also sets capture width/height in function.
 
 
 LISP-CV: (WITH-CAPTURED-FILE ((CAPTURE-VAR (FILE-PATH :INT) &KEY (WIDTH :INT) (HEIGHT :INT)) &BODY BODY))
@@ -12336,13 +12396,13 @@ Parameters:
       (with-captured-file (cap file-path 
 			       :width 640 
 			       :height 480)
-	(loop
-	   (with-mat ((frame (mat)))
-	     (cap-read cap frame)
-	     (imshow window-name frame))
-	   (let ((c (wait-key 33)))
-	     (when (= c 27)
-	       (return))))))))
+	(with-mat ((frame (mat)))
+	  (loop
+	     (*read cap frame)
+	     (imshow window-name frame)
+	     (let ((c (wait-key 33)))
+	       (when (= c 27)
+		 (return)))))))))
 
 ========================================================================================================================================
 HIGHGUI - QT NEW FUNCTIONS
@@ -12374,25 +12434,20 @@ of time delayms. The function does not modify the image, displayed in the window
 specified delay the original content of the window is restored.
 
 
-(defun display-overlay-example (filename &optional (cap 0))
+(defun display-overlay-example (&optional (cap 0))
 
-  (with-capture (cap (video-capture cap))
+  (with-video-capture ((cap (video-capture cap)))
     (let ((window-name "DISPLAY-OVERLAY Example"))
       (with-named-window (window-name +window-normal+)
 	(move-window window-name 759 175)
-	(with-mat ((image (imread filename 1)))
-	  (if (empty image) 
-	      (return-from display-overlay-example
-		(format t "Image not loaded")))
+	(with-mat ((frame (mat)))
 	  (loop
-	     (with-mat ((frame (mat)))
-	       (cap-read cap frame)
-	       (display-overlay window-name "This is a test" 1)
-	       (imshow window-name frame)
-	       (let ((c (wait-key 33)))
-		 (when (= c 27)
-		   (return))))))))))
-
+	     (*read cap frame)
+	     (display-overlay window-name "This is a test" 1)
+	     (imshow window-name frame)
+	     (let ((c (wait-key 33)))
+	       (when (= c 27)
+		 (return)))))))))
 
 ========================================================================================================================================
 GET-WINDOW-PROPERTY
@@ -12893,6 +12948,9 @@ Example:
 					  (width *default-width*)
 					  (height *default-height*))
 
+  "Note: The 'GC:' prefix to some of these functions 
+    signifies automatic garbage collection is enabled"
+
   (with-captured-camera (cap cam :width width :height height)
     ;;Initialize the template location, dimension and 
     ;;min-hessian variables for the trackbars to adjust
@@ -12926,10 +12984,10 @@ Example:
           (create-trackbar "TEMPLATE-WIDTH" window-name template-width width)
           ;;Trackbar to set the hessian keypoint detector threshold
 	  (create-trackbar "MIN-HESSIAN" window-name min-hessian 30000) 
-	  (loop ;;Were using the camera feed as the image here and a
-	     ;;region of interest of the feed as the template
-	     (with-mat ((frame (mat)))
-	       (cap-read cap frame)
+	  (with-mat ((frame (mat)))
+	    (loop ;;Were using the camera feed as the image here and a
+	       ;;region of interest of the feed as the template
+	       (*read cap frame)
 	       ;;Instantiate logic for the location/dimensions 
 	       ;;of the template based on the trackbar input
 	       (if (equal (? template-x :int) 0) 
@@ -12973,7 +13031,6 @@ Example:
 	       (let ((c (wait-key 33)))
 		 (when (= c 27)
 		   (return))))))))))
-
 
 ========================================================================================================================================
 FEATURES2D - COMMON INTERFACES OF DESCRIPTOR EXTRACTORS
@@ -13025,8 +13082,6 @@ LISP-CV: (DESCRIPTOR-EXTRACTOR-COMPUTE (SELF SURF) (IMAGE MAT) (KEYPOINTS VECTOR
 Example:
 
 See the FEATURE-DETECTOR-CREATE-EXAMPLE in this file.
-
-
 
 ========================================================================================================================================
 DESCRIPTOR-EXTRACTOR-CREATE
@@ -13521,13 +13576,11 @@ This function is parallelized with the TBB library.
 
 ;Global variables
 
-(defparameter face-cascade-name "<opencv-src-dir>/data/haarcascades/haarcascade_frontalface_alt.xml")
-
-;Create CASCADE-CLASSIFIER object
+;;Create CASCADE-CLASSIFIER object.
 (defparameter face-cascade (cascade-classifier))
-;Number of file to be saved
+;;Number of file to be saved.
 (defparameter filenumber 0)
-;Name of file to be saved 
+;;Name of file to be saved. 
 (defparameter filename 0) 
 (defparameter crop (mat))
 
@@ -13548,27 +13601,27 @@ This function is parallelized with the TBB library.
 		 (gray (mat)))
 	(cvt-color frame frame-gray +bgr2gray+)
 	(equalize-hist frame-gray frame-gray)
-	;Detect faces
+	;;Detect faces.
 	(with-size ((face-size (size 30 30)))
 	  (detect-multi-scale face-cascade frame-gray faces size-factor 
 			      num-buffers +cascade-do-canny-pruning+ face-size) 1)
-	;Convert VECTOR-RECT to a Lisp list for speed
+	;;Convert VECTOR-RECT to a Lisp list for speed.
 	(setf faces-list (vector-rect :to-lisp-list faces))
-	;Set Region of Interest...
+	;;Set Region of Interest...
 	(with-rect ((roi (rect)))
-	  ;Iterate through all current elements (detected faces)
+	  ;;Iterate through all current elements (detected faces).
 	  (dotimes (index-current (length faces-list))
-	    ;Get the area of current element (detected face)
-            ;AREA-CURRENT is area of current element
+	    ;;Get the area of current element (detected face)
+            ;;AREA-CURRENT is area of current element.
 	    (setf area-current (* (width (nth index-current faces-list))  ;AREA-CURRENT is area 
-   				  (height (nth index-current faces-list)))) ;of current element
-            ;INDEX-BIGGEST is index of the biggest element
+   				  (height (nth index-current faces-list)))) ;of current element.
+            ;;INDEX-BIGGEST is index of the biggest element.
 	    (setf roi (gc:clone (nth index-biggest faces-list))) 
 
-	    ;Get the area of biggest element, at the 
-            ;beginning it is same as current element
-        
-            ;AREA-BIGGEST is area of the biggest element
+	    ;;Get the area of biggest element, at the.
+            ;;beginning it is same as current element.
+	    
+            ;;AREA-BIGGEST is area of the biggest element.
 	    (setf area-biggest (* (width (nth index-biggest faces-list)) 
                                   (height (nth index-biggest faces-list)))) 
             (if (> area-current area-biggest)
@@ -13577,17 +13630,19 @@ This function is parallelized with the TBB library.
 		  (setf roi (gc:clone (nth index-biggest faces-list)))) nil)
 
 	    (setf crop (gc:roi frame roi))
-	    ;This will be needed later while saving images
+	    ;;This will be needed later while saving images.
 	    (resize crop res (size 128 128) 0d0 0d0 +inter-linear+)
-	    ;Convert cropped image to Grayscale
+	    ;;Convert cropped image to Grayscale.
 	    (cvt-color crop gray +bgr2gray+)
-	    ;Form a filename
-	    (setf filename (concatenate 'string "/home/users/Pictures/my-face/my-face-" 
+	    ;;Form a filename. It is suggested that you create a directory to 
+            ;;put the cropped images in because there will be a lot or them.
+	    (setf filename (concatenate 'string "/home/users/my-face/my-face-" 
 					(write-to-string filenumber) ".png"))
 	    (incf filenumber)
-
+            ;;Write cropped images to directory
+            ;;you specified in previous step.
 	    (imwrite filename gray)
-	    ;Display detected faces on main window - live stream from camera
+	    ;;Display detected faces on main window - live stream from camera.
 	    (with-point ((pt1 (point (x (nth index-current faces-list)) 
 				     (y (nth index-current faces-list))))
 			 (pt2 (point (+ (x (nth index-current faces-list)) 
@@ -13597,14 +13652,14 @@ This function is parallelized with the TBB library.
 	      (with-scalar ((color1 (scalar 0 255 0)))
 		(rectangle frame pt1 pt2 color1 2 8 0))))
 
-	(setf text (concatenate 'string "Crop area size: " 
-				(write-to-string (width roi)) "x" 
-				(write-to-string (height roi)) " Filename: " 
-				(write-to-string filename))))
-	(with-point ((org (point 30 30)))
+	  (setf text (concatenate 'string "Crop area size: " 
+				  (write-to-string (width roi)) "x" 
+				  (write-to-string (height roi)) " Filename: " 
+				  (write-to-string filename))))
+	(with-point ((org (point 2 30)))
 	  (with-scalar ((color2 (scalar 0 0 255)))	
 	    (put-text frame text org +font-hershey-complex-small+ 
-		      0.8d0 color2 1 +aa+)))))))
+		      0.66d0 color2 1 +aa+)))))))
 
 
 
@@ -13613,41 +13668,42 @@ This function is parallelized with the TBB library.
 				     (width *default-width*)
 				     (height *default-height*))
 
-  ;Setting width/height to 2 less than default width/height vastly
-  ;improves the speed of DETECT-MULTI-SCALE in this example
-  (with-captured-camera (cap cam :width (- width 2) :height (- height 2))
+  ;;Setting width/height to 2 less than default width/height vastly
+  ;;improves the speed of DETECT-MULTI-SCALE in this example.
+  (with-captured-camera (cap cam :width width :height height)
     (let ((window-name "Original - DETECT-MULTI-SCALE Example"))
-      ;Check if camera is opened
-      (if (not (cap-is-open cap)) 
+      ;;Check if camera is opened.
+      (if (not (is-opened cap)) 
 	  (return-from detect-multi-scale-example 
 	    (format t "Cannot open the video camera")))
-      ;Load the cascade
+      ;;Load the cascade.
       (if (not (cascade-classifier-load face-cascade face-cascade-name))
 	  (return-from detect-multi-scale-example 
 	    (format t "Error Loading")))
       (with-named-window (window-name +window-autosize+)
-	  (move-window window-name 0 300)
+	(move-window window-name 0 300)
+	(format t "~%Frame Size : ~ax~a~%~%" 
+		(*get cap +cap-prop-frame-width+)
+		(*get cap +cap-prop-frame-height+))
+	(with-mat ((frame (mat)))
 	  (loop
-             ;Read the video stream
-	     (with-mat ((frame (mat)))
-	       (cap-read cap frame)
-	       (if (not (empty frame)) 
-                   ;Apply the classifier to the frame
-		   (detect-and-display frame)
-		   (format t "No captured frame: Break!"))
-	       ;Show camera feed
-	       (imshow window-name frame)
-	       ;Show image
-	       (if (not (empty crop)) 
-		   (progn (imshow "Detected" crop)
-			  (setf crop (gc:mat)))
-		   (destroy-window "Detected"))
-	       (let ((c (wait-key 33)))
-		 (when (= c 27)
-		   (destroy-window "Detected")
-		   (return)))))))))
-
-
+             ;;Read the video stream.
+	     (*read cap frame)
+	     (if (not (empty frame)) 
+		 ;;Apply the classifier to the frame.
+		 (detect-and-display frame)
+		 (format t "No captured frame: Break!"))
+	     ;;Show camera feed.
+	     (imshow window-name frame)
+	     ;;Show image.
+	     (if (not (empty crop)) 
+		 (progn (imshow "Detected" crop)
+			(setf crop (gc:mat)))
+		 (destroy-window "Detected"))
+	     (let ((c (wait-key 33)))
+	       (when (= c 27)
+		 (destroy-window "Detected")
+		 (return)))))))))
 
 ========================================================================================================================================
 ML - NORMAL BAYES CLASSIFIER
@@ -16174,54 +16230,6 @@ http://docs.opencv.org/trunk/modules/contrib/doc/facerec/colormaps.html?highligh
 for the color scales for each of the available colormaps.
 
 
-
-
-CAP-IS-OPEN
-
-Returns true if video capturing has been initialized already.
-
-C++: bool VideoCapture::isOpened()
-
-LISP-CV: (CAP-IS-OPEN (SELF VIDEO-CAPTURE))
-
-Parameters:	
-
-         SELF - The VIDEO-CAPTURE structure.
-
-If the previous call to VIDEO-CAPTURE constructor or CAP-IS-OPEN succeeded, the method returns true.
-
-
-(defun cap-is-open-example (&optional 
-                              (camera-index 
-                               *camera-index*))
-
-  "If the previous call to VIDEO-CAPTURE constructor (i/e, 
-   (video-capture CAMERA-INDEX) in the below example) or the fu-
-   nction CAP-IS-OPEN succeeded, the method returns true. 
-   The boolean output of the PRINC function in the IF sta-
-   tement in this example reflects a good or bad capture. 
-   Output will likely be '1' or 'True' unless your camera 
-   is unplugged....Try unplugging your camera to test it 
-   out."
-
-  (with-capture (cap (video-capture camera-index)) 
-    (let ((window-name "CAP-IS-OPEN Example"))
-      (if (not (princ (cap-is-open cap))) 
-	  (return-from cap-is-open-example 
-	    (format t "Cannot open the video camera")))
-      (named-window window-name +window-normal+)
-      (move-window window-name 759 175)
-      (do* ((frame 0))
-	   ((plusp (wait-key *millis-per-frame*)) 
-	    (format t "~%~%Key is pressed by user"))
-	(setf frame (mat))
-	(cap-read cap frame)
-	(imshow window-name frame))
-      (cap-release cap)
-      (destroy-window window-name))))
-
-
-
 SCALAR
 
 SCALAR constructor.
@@ -16353,7 +16361,6 @@ The function circle draws a simple or filled circle with a given center and radi
 
 Example:
 
-
 (defparameter x 40)
 (defparameter y 40)
 (defparameter point 0)
@@ -16384,15 +16391,15 @@ Example:
 
   (with-captured-camera (cap cam :width 640 :height 480)
     (let* ((window-name "CICRLE Example"))
-      (if (not (cap-is-open cap)) 
+      (if (not (is-opened cap)) 
 	  (return-from circle-example 
 	    (format t "Cannot open the video camera")))
       (with-named-window (window-name +window-normal+)
 	(move-window window-name 759 175)
-	(with-scalar ((color (scalar 0 0 255)))
-	  (loop
-	     (with-mat ((frame (mat)))
-	       (cap-read cap frame)
+	(with-mat ((frame (mat)))
+	  (with-scalar ((color (scalar 0 0 255)))
+	    (loop
+	       (*read cap frame)
 	       (with-point ((point (point x y)))
 		 (circle frame point 40 color +filled+ +aa+ 0)
 		 (imshow window-name frame)
@@ -16416,11 +16423,10 @@ Example:
 		 (if (and (< y the-floor) (= floor-switch 0)) (incf y rate) (decf y rate))
 		 (if (< x (+ 40 rate)) (setf right-wall-switch 0))
 		 (if (< y (+ 40 rate)) (setf floor-switch 0))
-		 (report)))
-	     (let ((c (wait-key 33)))
-	       (when (= c 27)
-		 (return)))))))))
-
+		 (report))
+	       (let ((c (wait-key 33)))
+		 (when (= c 27)
+		   (return))))))))))
 
 ========================================================================================================================================
 MAT-ZEROS
@@ -16833,12 +16839,12 @@ FFMPEG or VFW is used; on MacOSX QTKit is used.
   (with-captured-camera (cap cam :width width :height height)
     (let* ((filename filename)
 	   (window-name "VIDEO-WRITER Example")
-	   (dheight (rational (cap-get cap +cap-prop-frame-height+)))
-	   (dwidth (rational (cap-get cap +cap-prop-frame-width+))))
-      ;; Initialize the VIDEO-WRITER object 
+	   (dheight (rational (*get cap +cap-prop-frame-height+)))
+	   (dwidth (rational (*get cap +cap-prop-frame-width+))))
+      ;;Initialize the VIDEO-WRITER object 
       (with-video-writer ((o-video-writer (make-video-writer filename 1196444237 ; todo
 							     20.0d0 (size width height) 1))) 
-	(if (not (cap-is-open cap))
+	(if (not (is-opened cap))
 	    (return-from video-writer-example 
 	      (format t "ERROR: Cannot open the video file")))
 	(if (not (video-writer-is-open o-video-writer)) 
@@ -16847,13 +16853,13 @@ FFMPEG or VFW is used; on MacOSX QTKit is used.
 	(format t "~%Frame Size : ~ax~a~%~%" dwidth dheight)     
 	(with-named-window (window-name +window-normal+)
 	  (move-window window-name 759 175)
-	  (loop
-	     (with-mat ((frame (mat)))	
-	       (cap-read cap frame)
+	  (with-mat ((frame (mat)))	
+	    (loop
+	       (*read cap frame)
 	       (if (not frame) 
 		   (return-from video-writer-example 
 		     (format t "ERROR: Cannot read video file")))
-	       ;; Write a frame into the file
+	       ;;Write a frame into the file
 	       (video-writer-write o-video-writer frame)
 	       (imshow window-name frame)
 	       (let ((c (wait-key 33)))
@@ -16861,31 +16867,35 @@ FFMPEG or VFW is used; on MacOSX QTKit is used.
 		   (return))))))))))
 
 
-
-VIDEO-WRITER-IS-OPEN
-
+========================================================================================================================================
+VIDEO-WRITER-IS-OPENED
+========================================================================================================================================
 
 Returns true if video writer has been successfully initialized.
 
+Note: The name VIDEO-WRITER-IS-OPENED is used in the documentation to refer to the binding for the 
+"isOpened" member of the OpenCV VideoWriter class because it is more descriptive and it is easier 
+to search for in this file. The IS-OPENED method may also be used to call this binding.
 
 C++: bool VideoWriter::isOpened()
+
+LISP-CV: (IS-OPENED (SELF VIDEO-WRITER)) :BOOLEAN
 
 LISP-CV: (VIDEO-WRITER-IS-OPEN (SELF VIDEO-WRITER)) :BOOLEAN
 
 
-(defun video-writer-is-open-example (filename &optional (camera-index *camera-index*))
-
-  (with-capture (cap (video-capture camera-index)) ; Open the video camera no. 0
-    (let* (; Initialize the VideoWriter object 
-	   (o-video-writer (video-writer filename 1196444237 ; todo
-					 20.0d0 (size 640 480) 1)))
+(defun video-writer-is-opened-example (filename &optional (camera-index *camera-index*))
+  ;;Open the video camera
+  (with-video-capture ((cap (video-capture camera-index))) 
+    ;;Initialize the VideoWriter object 
+    (with-video-writer ((o-video-writer (video-writer filename 1196444237 ; todo
+						      20.0d0 (size 640 480) 1)))
       (format t "~%If VIDEO-WRITER is open a T will be displayed, else NIL: ~a~%~%"
-	      (video-writer-is-open o-video-writer)))))
+	      (is-opened o-video-writer)))))
 
-
-
-VIDEO-WRITER-WRITE
-
+========================================================================================================================================
+VIDEO-WRITER-WRITE(under developement)
+========================================================================================================================================
 
 Writes the next video frame
 
@@ -16915,23 +16925,22 @@ e as has been specified when opening the video writer.
     (let* ((window-name "VIDEO-WRITER-WRITE Example")
 	   (o-video-writer (video-writer filename 1196444237 
 					 20.0d0 (size 640 480) 1)))
-      (if (not (cap-is-open cap)) 
+      (if (not (is-opened cap)) 
 	  (return-from video-writer-write-example 
 	    (format t "ERROR: Cannot open the video file")))
       (if (not (video-writer-is-open o-video-writer)) 
 	  (return-from video-writer-write-example 
 	    (format t "ERROR: Failed to write the video"))) 
-      (named-window window-name +window-normal+)
-      (move-window window-name 759 175)
-      (do* ((frame 0))
-	   ((plusp (wait-key *millis-per-frame*)) 
-	    (format t "~%~%Key is pressed by user~%~%"))
-	(setf frame (mat))
-	(cap-read cap frame) 
-	(video-writer-write o-video-writer frame) 
-	(imshow window-name frame))
-      (destroy-window window-name))))
-
+      (with-named-window (window-name +window-normal+)
+	(move-window window-name 759 175)
+	(with-mat ((frame (mat)))
+	  (loop
+	     (*read cap frame) 
+	     (video-writer-write o-video-writer frame) 
+	     (imshow window-name frame)
+	     (let ((c (wait-key 33)))
+	       (when (= c 27)
+		 (return)))))))))
 
 
 CLONE
@@ -17042,6 +17051,8 @@ taken into account by the function so the sub-array of ROI is actually extracted
 returns a pointer to the resultant sub-array header.
 
 
+Example:
+
 (defparameter x 100)
 (defparameter y 100)
 (defparameter region-of-interest 0)
@@ -17064,51 +17075,51 @@ returns a pointer to the resultant sub-array header.
   (format t "floor-switch = ~a~%" floor-switch))
 
 
-(defun roi-example (&optional (camera-index *camera-index*))
+(defun roi-example (&optional (cam *camera-index*) 
+		      (width *default-width*)
+		      (height *default-height*))
 
   "A slight variation on my circle-example. here I use a bit of 
    logic to make the camera region of interest bounce around th-
    room. Have a look through the code, I named the variables in 
    a way to make it easy to understand."
 
-  (with-capture (cap (video-capture camera-index))
+  (with-captured-camera (cap cam :width width :height height)
     (let* ((window-name "ROI Example"))
-      (if (not (cap-is-open cap)) 
+      (if (not (is-opened cap)) 
 	  (return-from roi-example 
 	    (format t "Cannot open the video camera")))
       (format t "~%Frame Size : ~ax~a~%~%" 
-	      (cap-get cap +cap-prop-frame-width+)
-	      (cap-get cap +cap-prop-frame-height+))
-      (named-window window-name +window-normal+)
-      (move-window window-name 759 175)
-      (do* ((frame 0))
-	   ((plusp (wait-key *millis-per-frame*)) 
-	    (format t "Key is pressed by user"))
-	(setf frame (mat))
-	(cap-read cap frame)
-	(setf region-of-interest (rect x y 40 40))
-        (setf frame (roi frame region-of-interest))
-	(imshow window-name frame)
-	(if (= x the-right-wall) (progn 
-				   (format t "right wall has been touc-hed~%") 
-				   (setf right-wall-switch 1)))    
-	(if (= x the-left-wall) (progn
-				  (format t "left wall has been touched~%") 
-				  (setf left-wall-switch 1)))	
-	(if (= y the-floor) (progn 
-			      (format t "floor has been touched~%") 
-			      (setf floor-switch 1))) 
-	(if (= y the-ceiling) (progn 
-				(format t "ceiling has been touched~%") 
-				(setf ceiling-switch 1))) 
-	(if (and (< x the-right-wall) (= right-wall-switch 0)) (incf x rate) (decf x rate))
-	(if (and (< y the-floor) (= floor-switch 0)) (incf y rate) (decf y rate))
-	(if (< x (+ 100 rate)) (setf right-wall-switch 0))
-	(if (< y (+ 100 rate)) (setf floor-switch 0))
-	(report))
-      (destroy-window window-name))))
-
-
+	      (*get cap +cap-prop-frame-width+)
+	      (*get cap +cap-prop-frame-height+))
+      (with-named-window (window-name +window-normal+)
+	(move-window window-name 759 175)
+	(with-mat ((frame (mat)))
+	  (loop
+	     (*read cap frame)
+	     (with-rect ((region-of-interest (rect x y 40 40)))
+	       (with-mat ((frame (roi frame region-of-interest)))
+		 (imshow window-name frame)
+		 (if (= x the-right-wall) (progn 
+					    (format t "right wall has been touc-hed~%") 
+					    (setf right-wall-switch 1)))    
+		 (if (= x the-left-wall) (progn
+					   (format t "left wall has been touched~%") 
+					   (setf left-wall-switch 1)))	
+		 (if (= y the-floor) (progn 
+				       (format t "floor has been touched~%") 
+				       (setf floor-switch 1))) 
+		 (if (= y the-ceiling) (progn 
+					 (format t "ceiling has been touched~%") 
+					 (setf ceiling-switch 1))) 
+		 (if (and (< x the-right-wall) (= right-wall-switch 0)) (incf x rate) (decf x rate))
+		 (if (and (< y the-floor) (= floor-switch 0)) (incf y rate) (decf y rate))
+		 (if (< x (+ 100 rate)) (setf right-wall-switch 0))
+		 (if (< y (+ 100 rate)) (setf floor-switch 0))
+		 (report)
+		 (let ((c (wait-key 33)))
+		   (when (= c 27)
+		     (return)))))))))))
 
 ========================================================================================================================================
 LISP-CV - MACROS AND EXTRA FUNCTIONS:
@@ -17490,9 +17501,9 @@ LISP-CV: (DEL-VECTOR-VEC-3W (SELF VECTOR-VEC-3W)) => :VOID
 
 LISP-CV: (DEL-VECTOR-VEC-4W (SELF VECTOR-VEC-4W)) => :VOID
 
-LISP-CV: (DEL-VID-CAP (SELF VIDEO-CAPTURE)) => :VOID
+LISP-CV: (DEL-VIDEO-CAPTURE (SELF VIDEO-CAPTURE)) => :VOID
 
-LISP-CV: (DEL-VID-WRITER (SELF VIDEO-WRITER)) => :VOID
+LISP-CV: (DEL-VIDEO-WRITER (SELF VIDEO-WRITER)) => :VOID
 
 
   Parameters:	

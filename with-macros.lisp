@@ -43,39 +43,30 @@
        (values))))
 
 
-(defmacro with-capture ((capture-var capture) &body body)
-  "Ensures CAP-RELEASE gets called on captures."
-  `(let ((,capture-var ,capture))
-     (unwind-protect
-	  (progn ,@body)
-       (cap-release ,capture-var)
-       (del-vid-cap ,capture-var))))
-
-
 (defmacro with-captured-camera ((capture-var dev-index &key width height) &body body)
-  "Ensures CAP-RELEASE gets called on captures 
+  "Ensures VIDEO-CAPTURE-RELEASE gets called on captures 
    and sets capture width/height in function"
   `(let ((,capture-var (video-capture ,dev-index)))
      (when ,width
-       (cap-set ,capture-var +cap-prop-frame-width+ ,width))
+       (video-capture-set ,capture-var +cap-prop-frame-width+ ,width))
      (when ,height
-       (cap-set ,capture-var +cap-prop-frame-height+ ,height))
+       (video-capture-set ,capture-var +cap-prop-frame-height+ ,height))
      (unwind-protect (progn ,@body)
-       (cap-release ,capture-var)
-       (del-vid-cap ,capture-var))))
+       (video-capture-release ,capture-var)
+       (del-video-capture ,capture-var))))
 
 
 (defmacro with-captured-file ((capture-var file-path &key width height) &body body)
-  "Ensures CAP-RELEASE gets called on captures 
+  "Ensures VIDEO-CAPTURE-RELEASE gets called on captures 
    and sets capture width/height in function"
   `(let ((,capture-var (video-capture ,file-path)))
      (when ,width
-       (cap-set ,capture-var +cap-prop-frame-width+ ,width))
+       (video-capture-set ,capture-var +cap-prop-frame-width+ ,width))
      (when ,height
-       (cap-set ,capture-var +cap-prop-frame-height+ ,height))
+       (video-capture-set ,capture-var +cap-prop-frame-height+ ,height))
      (unwind-protect (progn ,@body)
-       (cap-release ,capture-var)
-       (del-vid-cap ,capture-var))))
+       (video-capture-release ,capture-var)
+       (del-video-capture ,capture-var))))
 
 
 (defmacro with-cascade-classifier (bind &body body)
@@ -840,19 +831,19 @@
 
 
 (defmacro with-video-capture (bind &body body)
-  "Ensures DEL-VID-CAP gets called when 
+  "Ensures DEL-VIDEO-CAPTURE gets called when 
    a VIDEO-CAPTURE object goes out of scope."
   `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
      (unwind-protect (progn ,@body)
-       (mapcar #!(del-vid-cap %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (mapcar #!(del-video-capture %1) ,(cons 'list (mapcar #!(car %1) bind)))
        (values))))
 
 
 (defmacro with-video-writer (bind &body body)
-  "Ensures DEL-VID-WRITER gets called when 
+  "Ensures DEL-VIDEO-WRITER gets called when 
    a VIDEO-WRITER object goes out of scope."
   `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
      (unwind-protect (progn ,@body)
-       (mapcar #!(del-vid-writer %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (mapcar #!(del-video-writer %1) ,(cons 'list (mapcar #!(car %1) bind)))
        (values))))
 

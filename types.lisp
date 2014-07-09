@@ -2037,7 +2037,7 @@
 (defmethod translate-from-foreign (c-pointer (c-type video-capture))
   (let ((video-capture (make-instance 'cv-video-capture :c-pointer c-pointer)))
     (when (garbage-collect c-type)
-      (tg:finalize video-capture (lambda () (del-vid-cap c-pointer))))
+      (tg:finalize video-capture (lambda () (del-video-capture c-pointer))))
     video-capture))
 
 
@@ -2063,7 +2063,7 @@
 (defmethod translate-from-foreign (c-pointer (c-type video-writer))
   (let ((video-writer (make-instance 'cv-video-writer :c-pointer c-pointer)))
     (when (garbage-collect c-type)
-      (tg:finalize video-writer (lambda () (del-vid-writer c-pointer))))
+      (tg:finalize video-writer (lambda () (del-video-writer c-pointer))))
     video-writer))
 
 
