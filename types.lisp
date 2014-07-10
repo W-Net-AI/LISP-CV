@@ -9,6 +9,16 @@
 
 (in-package :lisp-cv)
 
+;;Shadowed CL functions are being 
+;;re-imported here for time being
+
+
+(defun max (&rest args)
+       (apply #'cl:max args))
+
+(defun read (&rest args)
+       (apply #'cl:read args))
+
 
 ;; NON GARBAGE COLLECTED TYPES
 

@@ -16,7 +16,7 @@
   :serial t
   :components ((:file "package") 
                (:file "lookup") 
-	           (:file "lisp-cv" :depends-on ("package"))
+	       (:file "lisp-cv" :depends-on ("package"))
                (:file "utils" :depends-on ("package" "lisp-cv"))
                (:file "constants" :depends-on ("package" "lisp-cv"))
                (:file "types" :depends-on ("package" "lisp-cv"))
@@ -25,8 +25,8 @@
                (:file "delete" :depends-on ("package" "lisp-cv" "types"))
                (:file "with-macros" :depends-on ("package" "lisp-cv" "delete" "types"))
                (:file "core" :depends-on ("package" "lisp-cv" "constants" "types"))
-	           (:file "imgproc" :depends-on ("package" "lisp-cv" "constants" "types" "core"))
-	           (:file "highgui" :depends-on ("package" "lisp-cv" "constants" "types" "core"))
+	       (:file "imgproc" :depends-on ("package" "lisp-cv" "constants" "types" "core"))
+	       (:file "highgui" :depends-on ("package" "lisp-cv" "constants" "types" "core"))
                (:file "calib3d" :depends-on ("package" "lisp-cv" "constants" "types" "core"))
                (:file "objdetect" :depends-on ("package" "lisp-cv" "constants" "types" "core"))
                (:file "ml" :depends-on ("package" "lisp-cv" "constants" "types" "core" "structs"))
@@ -35,4 +35,8 @@
                (:file "nonfree" :depends-on ("package" "lisp-cv" "constants" "types" "core"))
                (:file "contrib" :depends-on ("package" "lisp-cv" "constants" "types" "core"))
                (:file "macros" :depends-on ("package" "lisp-cv" "constants" "types" "delete" "with-macros" "vector" "core" 
-                                            "imgproc" "highgui" "calib3d" "objdetect" "features2d" "nonfree" "contrib" "utils" "structs"))))
+                                            "imgproc" "highgui" "calib3d" "objdetect" "features2d" "nonfree" "contrib" "utils" 
+                                            "structs" "ml" "photo"))
+               (:file "methods" :depends-on ("package" "lisp-cv" "constants" "types" "delete" "with-macros" 
+                                             "vector" "core" "imgproc" "highgui" "calib3d" "objdetect" 
+                                             "features2d" "nonfree" "contrib" "utils" "structs" "ml" "photo"))))

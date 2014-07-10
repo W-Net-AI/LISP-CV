@@ -3,7 +3,7 @@
 (defpackage :lisp-cv
   (:nicknames #:lisp-cv #:lcv #:cv)
   (:use #:cffi #:common-lisp #:swank #:trivial-garbage #:lisp-executable) 
-  (:shadow #:write)
+  (:shadow #:abs #:exp #:get #:log #:min #:max #:open #:read #:set #:sqrt #:write)
   (:export 
 
 
@@ -643,7 +643,7 @@
    #:vec-vec-4w-to-lisp-vec
 
 
-;; DEFMETHODS
+;; DEFGENERIC
 
    #:angle
    #:bounding-rect
@@ -657,16 +657,26 @@
    #:height
    #:is-opened
    #:match
-   #:*open
-   #:*read
    #:release
-   #:*set
    #:size
    #:width
-   #:*write
    #:x
    #:y
    #:z
+
+;;; Functions and methods used to 
+;;; re-import shadowed symbols.
+
+   #:abs
+   #:exp
+   #:log
+   #:max
+   #:min
+   #:open
+   #:read 
+   #:set
+   #:sqrt
+   #:write
 
 ;; core - Basic Structures
    
@@ -850,6 +860,7 @@
    #:tl
    #:term-criteria
    #:total
+   #:*trace
    #:train-idx
    #:vec-2b
    #:vec-3b
@@ -921,12 +932,6 @@
    #:+covar-rows+ 
    #:+covar-cols+ 
 
-   #:*abs
-   #:*exp
-   #:*log
-   #:*max
-   #:*min
-   #:*trace
    #:abs-diff
    #:add-weighted
    #:bitwise-and
@@ -963,7 +968,6 @@
    #:uniform
 
 ;; core - Drawing Functions
-
 
    #:+aa+
    #:+font-hershey-simplex+
@@ -1644,3 +1648,4 @@
 
    #:apply-color-map
 ))
+

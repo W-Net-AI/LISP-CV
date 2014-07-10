@@ -1749,13 +1749,18 @@
 
 ;; MatExpr abs(const Mat& m)
 ;; MatExpr* cv_abs(Mat* m)
-(defcfun ("cv_abs" *abs) (cv::mat-expr :garbage-collect t)
+(defcfun ("cv_abs" %abs) (cv::mat-expr :garbage-collect t)
 	 (m cv::mat))
+
+
+(defmethod abs ((self cv::cv-mat))
+  "Calculates an absolute value of each matrix element."
+  (%abs self))
 
 
 ;; Scalar trace(InputArray mtx)
 ;; Scalar* cv_trace(Mat* mtx)
-(defcfun ("cv_trace" *trace) (cv::scalar :garbage-collect t)
+(defcfun ("cv_trace" %trace) (cv::scalar :garbage-collect t)
   "Returns the trace of a matrix."
   (mtx cv::mat))
 

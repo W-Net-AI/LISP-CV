@@ -50,7 +50,6 @@
 			    (swank::handle-requests connection t)))))
 
 
-
 ;; C-Interop - String*
 
 
@@ -79,79 +78,6 @@
   "Converts C string to C++"
   (s :string)
   (len :unsigned-int))
-
-
-;;; DEFGENERIC (*defgeneric functions are placed here so the whole library can use them*)
-
-
-(defgeneric angle (self)
-  (:documentation "Used for all class bindings with an ANGLE member."))
-
-(defgeneric bounding-rect (self)
-  (:documentation "Used for all class bindings with an ANGLE member."))
-
-(defgeneric center (self)
-  (:documentation "Used for all class bindings with an CENTER member."))
-
-(defgeneric clone (self)
-  (:documentation "Used for all class bindings with a CLONE member."))
-
-(defgeneric compute (type self &rest args)
-  (:documentation "Used for all class bindings with a COMPUTE member."))
-
-(defgeneric create (type self &rest args)
-  (:documentation "Used for all class bindings with a CREATE member."))
-
-(defgeneric detect (self &rest args)
-  (:documentation "Used for all class bindings with a DETECT member."))
-
-(defgeneric dot (self other)
-  (:documentation "Used for all class bindings with a DOT member"))
-
-(defgeneric *get (self value)
-  (:documentation "Used for all class bindings with a GET member"))
-
-(defgeneric height (self)
-  (:documentation "Used for all class bindings with an HEIGHT member."))
-
-(defgeneric is-opened (self)
-  (:documentation "Used for all class bindings with an IS-OPENED member."))
-
-(defgeneric file-storage-write (fs name value)
-  (:documentation "Used for all FILE-STORAGE-WRITE methods."))
-
-(defgeneric match (self &rest args)
-  (:documentation "Used for all class bindings with a MATCH member."))
-
-(defgeneric *open (self &rest args)
-  (:documentation "Used for all class bindings with a OPEN member."))
-
-(defgeneric *read (self arg)
-  (:documentation "Used for all class bindings with an READ member."))
-
-(defgeneric release (self)
-  (:documentation "Used for all class bindings with a RELEASE member."))
-
-(defgeneric *set (self value-1 value-2)
-  (:documentation "Used for all class bindings with an SET member."))
-
-(defgeneric size (arg &rest args)
-  (:documentation "Used for all class bindings with a SIZE member."))
-
-(defgeneric width (self)
-  (:documentation "Used for all class bindings with an WIDTH member."))
-
-(defgeneric *write (fs name value)
-  (:documentation "Used for all class bindings with an WRITE member."))
-
-(defgeneric x (self)
-  (:documentation "Used for all class bindings with an X member."))
-
-(defgeneric y (self)
-  (:documentation "Used for all class bindings with an Y member."))
-
-(defgeneric z (self)
-  (:documentation "Used for all class bindings with an Z member."))
 
 
 ;;; Basic Structures
@@ -2203,13 +2129,14 @@
 
 ;; MatExpr abs(const Mat& m)
 ;; MatExpr* cv_abs(Mat* m)
-(defcfun ("cv_abs" *abs) mat-expr
+(defcfun ("cv_abs" %abs) mat-expr
+  "Calculates an absolute value of each matrix element."
   (m mat))
 
 
 ;; void exp(InputArray src, OutputArray dst)
 ;; void cv_exp(Mat* src, Mat* dst)
-(defcfun ("cv_exp" *exp) :void
+(defcfun ("cv_exp" %exp) :void
   "Calculates the exponent of every array element."
   (src mat)
   (dest mat))
@@ -2217,7 +2144,7 @@
 
 ;; void log(InputArray src, OutputArray dst)
 ;; void cv_log(Mat* src, Mat* dst)
-(defcfun ("cv_log" *log) :int
+(defcfun ("cv_log" %log) :int
   "Calculates the natural logarithm of every array element."
   (src mat)
   (dest mat))
@@ -2225,7 +2152,7 @@
 
 ;; void max(InputArray src1, InputArray src2, OutputArray dst)
 ;; void cv_max(Mat* src1, Mat* src2, Mat* dst)
-(defcfun ("cv_max" *max) :void 
+(defcfun ("cv_max" %max) :void 
 	 "Calculates per-element maximum of two arrays."
 	 (src1 mat)
 	 (src2 mat)
@@ -2234,7 +2161,7 @@
 
 ;; void min(InputArray src1, InputArray src2, OutputArray dst)
 ;; void cv_min(Mat* src1, Mat* src2, Mat* dst)
-(defcfun ("cv_min" *min) :void 
+(defcfun ("cv_min" %min) :void 
 	 "Calculates per-element minimum of two arrays."
 	 (src1 mat)
 	 (src2 mat)
@@ -2667,6 +2594,14 @@
 	      (t nil)))
 
 
+;; void sqrt(InputArray src, OutputArray dst)
+;; void cv_sqrt(Mat* src, Mat* dst)
+(defcfun ("cv_sqrt" %sqrt) :void
+  "Calculates a square root of array elements."
+  (src mat)
+  (dest mat))
+
+
 ;; void scaleAdd(InputArray src1, double alpha, InputArray src2, OutputArray dst)
 ;; void cv_scaleAdd(Mat* src1, double alpha, Mat* src2, Mat* dst)
 (defcfun ("cv_scaleAdd" scale-add) :void 
@@ -2908,55 +2843,6 @@
 ;;; XML/YAML Persistence
 
 
-
-;; void write( FileStorage& fs, const String& name, double value )
-;; void cv_FileNode_write_number_##(FileStorage* fs, String* name, tn value)
-(defcfun ("cv_FileNode_write_number_d" file-storage-write-double) :void
-  (fs file-storage)
-  (name *string)
-  (value :double))
-
-
-;; void write( FileStorage& fs, const String& name, float value )
-;; void cv_FileNode_write_number_##(FileStorage* fs, String* name, tn value)
-(defcfun ("cv_FileNode_write_number_f" file-storage-write-float) :void
-  (fs file-storage)
-  (name *string)
-  (value :float))
-
-
-;; void write( FileStorage& fs, const String& name, int value )
-;; void cv_FileNode_write_number_##(FileStorage* fs, String* name, tn value)
-(defcfun ("cv_FileNode_write_number_i" file-storage-write-int) :void
-  (fs file-storage)
-  (name *string)
-  (value :int))
-
-
-;; void write( FileStorage& fs, const String& name, const std::vector<KeyPoint>& value)
-;; void cv_FileNode_write_pointer_##(FileStorage* fs, String* name, tn* value)
-(defcfun ("cv_FileNode_write_pointer_m" file-storage-write-mat) :void
-  (fs file-storage)
-  (name *string)
-  (value mat))
-
-
-;; void write( FileStorage& fs, const String& name, const String& value )
-;; void cv_FileNode_write_pointer_##(FileStorage* fs, String* name, tn* value)
-(defcfun ("cv_FileNode_write_pointer_s" file-storage-write-string) :void
-  (fs file-storage)
-  (name *string)
-  (value *string))
-
-
-;; void write( FileStorage& fs, const String& name, const std::vector<KeyPoint>& value)
-;; void cv_FileNode_write_pointer_##(FileStorage* fs, String* name, tn* value)
-(defcfun ("cv_FileNode_write_pointer_vkp" file-storage-write-key-point) :void
-  (fs file-storage)
-  (name *string)
-  (value vector-key-point))
-
-
 ;; FileStorage::FileStorage()
 ;; FileStorage* cv_create_FileStorage()
 (defcfun ("cv_create_FileStorage" file-storage-0) file-storage)
@@ -3021,6 +2907,55 @@
 
 
 
+;; void write( FileStorage& fs, const String& name, double value )
+;; void cv_FileNode_write_number_##(FileStorage* fs, String* name, tn value)
+(defcfun ("cv_FileNode_write_number_d" file-storage-write-double) :void
+  (fs file-storage)
+  (name *string)
+  (value :double))
+
+
+;; void write( FileStorage& fs, const String& name, float value )
+;; void cv_FileNode_write_number_##(FileStorage* fs, String* name, tn value)
+(defcfun ("cv_FileNode_write_number_f" file-storage-write-float) :void
+  (fs file-storage)
+  (name *string)
+  (value :float))
+
+
+;; void write( FileStorage& fs, const String& name, int value )
+;; void cv_FileNode_write_number_##(FileStorage* fs, String* name, tn value)
+(defcfun ("cv_FileNode_write_number_i" file-storage-write-int) :void
+  (fs file-storage)
+  (name *string)
+  (value :int))
+
+
+;; void write( FileStorage& fs, const String& name, const std::vector<KeyPoint>& value)
+;; void cv_FileNode_write_pointer_##(FileStorage* fs, String* name, tn* value)
+(defcfun ("cv_FileNode_write_pointer_vkp" file-storage-write-vector-key-point) :void
+  (fs file-storage)
+  (name *string)
+  (value vector-key-point))
+
+
+;; void write( FileStorage& fs, const String& name, const std::vector<KeyPoint>& value)
+;; void cv_FileNode_write_pointer_##(FileStorage* fs, String* name, tn* value)
+(defcfun ("cv_FileNode_write_pointer_m" file-storage-write-mat) :void
+  (fs file-storage)
+  (name *string)
+  (value mat))
+
+
+;; void write( FileStorage& fs, const String& name, const String& value )
+;; void cv_FileNode_write_pointer_##(FileStorage* fs, String* name, tn* value)
+(defcfun ("cv_FileNode_write_pointer_s" file-storage-write-string) :void
+  (fs file-storage)
+  (name *string)
+  (value *string))
+
+
+
 ;;; Utility and System Functions and Macros
 
 
@@ -3059,275 +2994,4 @@
   "Returns the number of ticks per second.")
 
 
-;; void sqrt(InputArray src, OutputArray dst)
-;; void cv_sqrt(Mat* src, Mat* dst)
-(defcfun ("cv_sqrt" *sqrt) :void
-  "Calculates a square root of array elements."
-  (src mat)
-  (dest mat))
-
-
-
-
-;;;DEFMETHOD'S
-
-
-(defmethod angle ((self cv-rotated-rect))
-  "The rotation angle. When the angle is 0, 90, 180, 270 
-    etc., the rectangle becomes an up-right rectangle."
-  (rotated-rect-angle self))
-
-
-(defmethod bounding-rect ((self cv-rotated-rect))
-  "Returns the minimal up-right rectangle 
-   containing the rotated rectangle."
-  (rotated-rect-bounding-rect self))
-
-
-(defmethod center ((self cv-rotated-rect))
-  "The rectangle mass center."
-  (rotated-rect-center self))
-
-
-(defmethod clone ((self cv-mat))
-  "Creates a full copy of the array and the underlying data."
-  (mat-clone self))
-
-
-(defmethod clone ((self cv-rect))
-  "Creates a full copy of a RECT object"
-  (rect-clone self))
-
-
-(defmethod dot ((self cv-mat) (other cv-mat))
-  (mat-dot self other))
-
-
-(defmethod dot ((self cv-point) (other cv-point))
-  (dot-2i self other))
-
-
-(defmethod dot ((self cv-point-2d) (other cv-point-2d))
-  (dot-2d self other))
-
-
-(defmethod dot ((self cv-point-2f) (other cv-point-2f))
-  (dot-2f self other))
-
-
-(defmethod dot ((self cv-point-3d) (other cv-point-3d))
-  (dot-3d self other))
-
-
-(defmethod dot ((self cv-point-3f) (other cv-point-3f))
-  (dot-3f self other))
-
-
-(defmethod dot ((self cv-point-3i) (other cv-point-3i))
-  (dot-3i self other))
-
-
-(defmethod height ((self cv-rect))
-  (mem-aref (c-pointer self) :int 2))
-
-
-(defmethod height ((self cv-size))
-  (mem-aref (c-pointer self) :int 1))
-
-
-(defmethod height ((self cv-size-2f))
-  (mem-aref (c-pointer self) :float 1))
-
-
-(defmethod file-storage-write ((fs cv-file-storage) (name string) (value float))
-  (if (typep value 'double-float)
-      (file-storage-write-double fs (%c-string-to-string name (length name)) value)
-      (file-storage-write-float fs (%c-string-to-string name (length name)) value)))
-
-
-(defmethod file-storage-write ((fs cv-file-storage) (name string) (value integer))
-  (file-storage-write-int fs (%c-string-to-string name (length name)) value))
-
-
-(defmethod file-storage-write ((fs cv-file-storage) (name string) (value cv-mat))
-  (file-storage-write-mat fs (%c-string-to-string name (length name)) value))
-
-
-(defmethod file-storage-write ((fs cv-file-storage) (name string) (value string))
-  (file-storage-write-string fs (%c-string-to-string name (length name)) 
-		       (%c-string-to-string value (length value))))
-
-
-(defmethod file-storage-write ((fs cv-file-storage) (name string) (value std-vector-key-point))
-  (file-storage-write-key-point fs (%c-string-to-string name (length name)) value))
-
-
-(defmethod *open ((self cv-file-storage) &rest args)
-  (apply #'file-storage-open self args))
-
-
-(defmethod release ((self cv-file-storage))
-  (file-storage-release self))
-
-
-(defmethod size ((arg cv-key-point) &rest args)
-  args
-  (mem-aref (c-pointer arg) :float 2))
-
-
-(defmethod size ((arg cv-mat) &rest args)
-  args
-  (mat-size arg))
-
-
-(defmethod size ((arg cv-range) &rest args)
-  args
-  (range-size arg))
-
-
-(defmethod size ((arg cv-rect) &rest args)
-  args
-  (rect-size arg))
-
-
-(defmethod size ((arg cv-rotated-rect) &rest args)
-  "Width and height of the rectangle."
-  args
-  (rotated-rect-size arg))
-
-
-(defmethod size ((arg null) &rest args)
-  args
-  (if (eq arg nil) (size-0) nil))
-
-
-(defmethod size ((arg real) &rest args)
-  (size-2 (coerce arg 'double-float) (coerce (or (first args) 0) 'double-float)))
-
-
-(defmethod width ((self cv-rect))
-  (mem-aref (c-pointer self) :int 3))
-
-
-(defmethod width ((self cv-size))
-  (mem-aref (c-pointer self) :int))
-
-
-(defmethod width ((self cv-size-2f))
-  (mem-aref (c-pointer self) :float))
-
-
-(defmethod *write ((fs cv-file-storage) (name string) (value float))
-  (if (typep value 'double-float)
-      (file-storage-write-double fs (%c-string-to-string name (length name)) value)
-      (file-storage-write-float fs (%c-string-to-string name (length name)) value)))
-
-
-(defmethod *write ((fs cv-file-storage) (name string) (value integer))
-  (file-storage-write-int fs (%c-string-to-string name (length name)) value))
-
-
-(defmethod *write ((fs cv-file-storage) (name string) (value cv-mat))
-  (file-storage-write-mat fs (%c-string-to-string name (length name)) value))
-
-
-(defmethod *write ((fs cv-file-storage) (name string) (value string))
-  (file-storage-write-string fs (%c-string-to-string name (length name)) 
-		       (%c-string-to-string value (length value))))
-
-
-(defmethod *write ((fs cv-file-storage) (name string) (value std-vector-key-point))
-  (file-storage-write-key-point fs (%c-string-to-string name (length name)) value))
-
-
-(defmethod x ((self cv-key-point))
-  (mem-aref (c-pointer self) :float))
-
-
-(defmethod x ((self cv-point))
- "Retrieves X coordinate of a POINT object."
-  (mem-aref (c-pointer self) :int))
-
-
-(defmethod x ((self cv-point-2d))
-  "Retrieves X coordinate of a POINT-2D object."
-  (mem-aref (c-pointer self) :double))
-
-
-(defmethod x ((self cv-point-2f))
-  "Retrieves X coordinate of a POINT-2F object."
-  (mem-aref (c-pointer self) :float))
-
-
-(defmethod x ((self cv-point-3d))
-  "Retrieves X coordinate of a POINT-3D object."
-  (mem-aref (c-pointer self) :double))
-
-
-(defmethod x ((self cv-point-3f))
-  "Retrieves X coordinate of a POINT-3F object."
-  (mem-aref (c-pointer self) :float))
-
-
-(defmethod x ((self cv-point-3i))
-  "Retrieves X coordinate of a POINT-3I object."
-  (mem-aref (c-pointer self) :int))
-
-
-(defmethod x ((self cv-rect))
-  (mem-aref (c-pointer self) :int))
-
-
-(defmethod y ((self cv-key-point))
-  (mem-aref (c-pointer self) :float 1))
-
-
-(defmethod y ((self cv-point))
-  "Retrieves Y coordinate of a POINT object."
-  (mem-aref (c-pointer self) :int 1))
-
-
-(defmethod y ((self cv-point-2d))
-  "Retrieves Y coordinate of a POINT-2D object."
-  (mem-aref (c-pointer self) :double 1))
-
-
-(defmethod y ((self cv-point-2f))
-  "Retrieves Y coordinate of a POINT-2F object."
-  (mem-aref (c-pointer self) :float 1))
-
-
-(defmethod y ((self cv-point-3d))
-  "Retrieves Y coordinate of a POINT-3D object."
-  (mem-aref (c-pointer self) :double 1))
-
-
-(defmethod y ((self cv-point-3f))
-  "Retrieves Y coordinate of a POINT-3F object."
-  (mem-aref (c-pointer self) :float 1))
-
-
-(defmethod y ((self cv-point-3i))
-  "Retrieves Y coordinate of a POINT-3I object."
-  (mem-aref (c-pointer self) :int 1))
-
-
-(defmethod y ((self cv-rect))
-  "Retrieves Y coordinate of a RECT object."
-  (mem-aref (c-pointer self) :int 1))
-
-
-(defmethod z ((self cv-point-3d))
-  "Retrieves Z coordinate of a POINT-3D object."
-  (mem-aref (c-pointer self) :double 2))
-
-
-(defmethod z ((self cv-point-3f))
-  "Retrieves Z coordinate of a POINT-3F object."
-  (mem-aref (c-pointer self) :float 2))
-
-
-(defmethod z ((self cv-point-3i))
-  "Retrieves Z coordinate of a POINT-3I object."
-  (mem-aref (c-pointer self) :int 2))
 

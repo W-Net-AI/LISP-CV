@@ -2,8 +2,8 @@
 
 (defpackage :gc
   (:nicknames #:gc #:t)
-  (:use #:cffi #:common-lisp #:swank #:trivial-garbage #:lisp-executable ;#:lisp-cv
-) 
+  (:use #:cffi #:common-lisp #:swank #:trivial-garbage #:lisp-executable) 
+  (:shadow #:abs)
   (:export 
 
 ;; Macros
@@ -283,6 +283,10 @@
    #:vec-vec-4w-to-lisp-list
    #:vec-vec-4w-to-lisp-vec
 
+;;; Functions and methods used to 
+;;; re-import shadowed symbols.
+
+   #:abs
 
 ;; core - Basic Structures
 
@@ -384,6 +388,7 @@
    #:sub
    #:term-criteria
    #:tl
+   #:*trace
    #:vec-2b
    #:vec-3b
    #:vec-4b
@@ -412,8 +417,6 @@
 
 ;; core - Operations on Arrays
 
-   #:*abs
-   #:*trace
    #:inv
    #:mean
    #:make-rng

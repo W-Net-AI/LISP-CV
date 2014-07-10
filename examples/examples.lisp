@@ -37,7 +37,7 @@ an example that uses TG finalizers):
 	(move-window window-name 759 175)
 	(with-mat ((frame (mat)))
 	  (loop
-	     (*read cap frame)
+	     (read cap frame)
 	     (imshow window-name frame)
 	     (let ((c (wait-key 33)))
 	       (when (= c 27)
@@ -171,7 +171,7 @@ See also:
 
 
 		   ;;Set camera feed to FRAME
-		   (*read cap frame)
+		   (read cap frame)
 		   ;;Show original FRAME in window
 		   (imshow window-name-1 frame)
 		   ;;Set FRAME region of interest to RECT, half 
@@ -625,7 +625,7 @@ Example 2:
 			(black-mat (mat-zeros (rows frame) (cols frame) 0)))
                ;;Set the camera 
                ;;feed to FRAME
-	       (*read cap frame)
+	       (read cap frame)
                ;;Convert FRAME to grayscale
 	       (cvt-color frame src +bgr2gray+)
                ;;Set CANNY output to DST
@@ -1441,7 +1441,7 @@ submatrix within the original matrix. The function LOCATE-ROI does exactly that.
 		(with-point ((roi-loc (point 0 0)))
 		  (loop
 		     ;;Set camera feed to frame   
-		     (*read cap frame)
+		     (read cap frame)
 		     ;;Show original FRAME in window
 		     (imshow window-name-1 frame)
 		     ;;Extract submatrix(roi) from FRAME
@@ -3486,31 +3486,33 @@ CORE - OPERATIONS ON ARRAYS
 ========================================================================================================================================
 
 ========================================================================================================================================
-*ABS
+ABS
 ========================================================================================================================================
 
 Calculates an absolute value of each matrix element.
 
+Note: The LISP-CV function ABS overloads the Common Lisp function ABS so both functions can use the 
+same name. THe LISP-CV function ABS provides the the same functionality as the Common Lisp function 
+ABS and the OpenCV C++ ABS function. To use the Common Lisp function ABS directly, while you are in 
+the LISP-CV package, you need to evaluate CL:ABS.
+
 C++: MatExpr abs(const Mat& m)
 
-LISP-CV: (*ABS (M MAT)) => MAT-EXPR
+LISP-CV: (ABS (M MAT)) => MAT-EXPR
 
     Parameters:	
 
         M - matrix.
 
-*ABS is a meta-function that is expanded to one of (ABS-DIFF) or (CONVERT-SCALE-ABS) forms:
+ABS is a meta-function that is expanded to one of (ABS-DIFF) or (CONVERT-SCALE-ABS) forms:
 
-        (DEFPARAMETER C (*ABS (>> (SUB A B)))) is equivalent to (ABSDIFF A B C)
+        (DEFPARAMETER C (ABS (>> (SUB A B)))) is equivalent to (ABSDIFF A B C)
 
-        (DEFPARAMETER C (*ABS A)) is equivalent to (ABSDIFF A (SCALAR-ALL 0) C)
+        (DEFPARAMETER C (ABS A)) is equivalent to (ABSDIFF A (SCALAR-ALL 0) C)
 
 
 The output matrix has the same size and the same type as the input one except for the last case, 
 where C is (EQ DEPTH +8U+). 
-
-
-Note: This function is named *ABS instead of ABS because, ABS is the name of a Common Lisp function.
 
 
 See also:
@@ -3518,32 +3520,36 @@ See also:
 Matrix Expressions(MAT-EXPR), (ABS-DIFF), (CONVERT-SCALE-ABS)
 
 
-(defun *abs-example ()
+(defun abs-example ()
 
   ;;Allocate data and create a 2x2 matrix.
   (with-object ((data (alloc :float '(4f0 -7f0 2f0 -3f0))))
     (with-mat ((mat (mat 2 2 +32f+ data)))
       ;;Print MAT.
-      (format t "~%MAT = ~%~%")
+      (format t "~%MAT:~%~%")
       (print-mat mat :float)
       ;;Find absolute value of all MAT elements.
-      (with-mat-expr ((abs-val (*abs mat)))
+      (with-mat-expr ((abs-val (abs mat)))
 	(with-mat ((forced-abs-val (>> abs-val)))
 	  ;;Print MAT's absolute value.
-          (format t "~%The absolute of MAT = ~%~%")
+          (format t "~%The absolute value of all MAT elements:~%~%")
 	  (print-mat forced-abs-val :float)
 	  (format t "~%"))))))
 
-
 ========================================================================================================================================
-*EXP
+EXP
 ========================================================================================================================================
 
 Calculates the exponent of every array element.
 
+Note: The LISP-CV function EXP overloads the Common Lisp function EXP so both functions can use the 
+same name. THe LISP-CV function EXP provides the the same functionality as the Common Lisp function 
+EXP and the OpenCV 'exp' function. To use the Common Lisp function EXP directly, while you are in the 
+LISP-CV package, you need to evaluate CL:EXP.
+
 C++: void exp(InputArray src, OutputArray dst)
 
-LISP-CV: (*EXP (SRC MAT) (DEST MAT)) => :VOID
+LISP-CV: (EXP (SRC MAT) (DEST MAT)) => :VOID
 
 
     Parameters:	
@@ -3553,7 +3559,7 @@ LISP-CV: (*EXP (SRC MAT) (DEST MAT)) => :VOID
         DEST - Output array of the same size and type as SRC.
 
 
-The function *EXP calculates the exponent of every element of the input array:
+The function EXP calculates the exponent of every element of the input array:
 
 See OpenCV documentation:
 
@@ -3562,15 +3568,13 @@ http://docs.opencv.org/modules/core/doc/operations_on_arrays.html?highlight=log#
 for a description and formula.
 
 
-Note: This function is named *EXP instead of EXP because, EXP is the name of a Common Lisp function.
-
 See also:
 
-(*LOG) , (CART-TO-POLAR) , (POLAR-TO-CART) , (PHASE) , (POW) , (*SQRT) , (MAGNITUDE)
+(LOG) , (CART-TO-POLAR) , (POLAR-TO-CART) , (PHASE) , (POW) , (SQRT) , (MAGNITUDE)
 
 
 
-(defun *exp-example ()
+(defun exp-example ()
   ;Create double float matrix data
   (with-object ((data (alloc :double '(1d0 2d0 3d0 4d0 5d0 
 				       6d0 7d0 8d0 9d0))))
@@ -3582,7 +3586,7 @@ See also:
       ;Calculate exponent of each element of 
       ;MAT, using MAT as destination matrix
       (format t "~%Calculate exponent of each element of MAT: ~%~%")
-      (*exp mat mat)
+      (exp mat mat)
       (format t "MAT: ~%~%")
       ;Print MAT
       (print-mat mat :double)
@@ -3590,7 +3594,7 @@ See also:
       ;matrix element of MAT, virtually reve-
       ;rts MAT to it's original state
       (format t "~%Calculate natural logarithm or each element of MAT: ~%~%")
-      (*log mat mat)
+      (log mat mat)
       (format t "MAT: ~%~%")
       ;Print MAT
       (print-mat mat :double)
@@ -3598,14 +3602,19 @@ See also:
 
 
 ========================================================================================================================================
-*LOG
+LOG
 ========================================================================================================================================
 
 Calculates the natural logarithm of every array element.
 
+Note: The LISP-CV function LOG overloads the Common Lisp function LOG so both functions can use the 
+same name. THe LISP-CV function LOG provides the the same functionality as the Common Lisp function 
+LOG and the OpenCV 'log' function. To use the Common Lisp function LOG directly, while you are in the 
+LISP-CV package, you need to evaluate CL:LOG.
+
 C++: void log(InputArray src, OutputArray dst)
 
-LISP-CV: (*LOG (SRC MAT) (DEST MAT)) => :VOID
+LISP-CV: (LOG (SRC MAT) (DEST MAT)) => :VOID
 
 
     Parameters:	
@@ -3615,8 +3624,9 @@ LISP-CV: (*LOG (SRC MAT) (DEST MAT)) => :VOID
         DST - Output array of the same size and type as SRC.
 
 
-The function *LOG calculates the natural logarithm of the absolute value of every element of the input 
-array:
+The function LOG calculates the natural logarithm of the absolute value of every element of the 
+input array:
+
 
 See OpenCV documentation:
 
@@ -3625,72 +3635,46 @@ http://docs.opencv.org/modules/core/doc/operations_on_arrays.html?highlight=log#
 for a description and formula.
 
 
-Note: This function is named *LOG instead of LOG because, LOG is the name of a Common Lisp function.
-
-
 See also:
 
-(*EXP), (CART-TO-POLAR), (POLAR-TO-CART), (PHASE), (POW), (*SQRT), (MAGNITUDE)
+(EXP), (CART-TO-POLAR), (POLAR-TO-CART), (PHASE), (POW), (SQRT), (MAGNITUDE)
 
 
-(defun *log-example (filename)
+Example:
 
-	 ;Create double float matrix data
-  (let* ((data (alloc :double '(1d0 2d0 3d0 4d0 5d0 
-                               6d0 7d0 8d0 9d0)))
-         ;Create double float matrix
-	 (mat (mat 3 3 +64f+ data))
-	 (window-name-1 "Original Image - *LOG Example")
-	 (window-name-2 "Natural logarithm of image - *LOG Example")
-         (image (imread filename 1)))
-    (named-window window-name-1 +window-normal+)
-    (named-window window-name-2 +window-normal+)
-    (move-window window-name-1 533 175)
-    (move-window window-name-2 984 175)
-    (format t "MAT = ~%~%")
-    ;Print MAT
-    (dotimes (i (rows mat))
-      (dotimes (j (cols mat))
-	(format t "~a" (at mat i j :double))
-	(princ #\Space))
-      (princ #\Newline))
-    ;Calculate natural logarithm of each element 
-    ;of MAT, using MAT as destination matrix
-    (format t "~%Calculate natural logarithm: ~%~%")
-    (*log mat mat)
-    (format t "MAT = ~%~%")
-    ;Print MAT
-    (dotimes (i (rows mat))
-      (dotimes (j (cols mat))
-	(format t "~a" (at mat i j :double))
-	(princ #\Space))
-      (princ #\Newline))
-    (free data)
-    (format t "~%")
-    ;Show original IMAGE in window
-    (imshow window-name-1 image)
-    ;Convert IMAGE to 1 channel
-    (cvt-color image image +bgr2gray+)
-    ;Convert IMAGE to double float
-    (convert-to image image +64f+)
-    ;Find natural logarithm of each element of 
-    ;IMAGE, just to see what it looks like
-    (*log image image)
-    ;Show IMAGE
-    (imshow window-name-2 image)
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-all-windows)))
+(defun log-example ()
+
+  ;;Create double float matrix data
+  (with-object ((data (alloc :double '(1d0 2d0 3d0 4d0 5d0 
+				       6d0 7d0 8d0 9d0))))
+    (with-mat ((mat (mat 3 3 +64f+ data)))
+      (format t "~%MAT = ~%~%")
+      ;;Print MAT
+      (print-mat mat :double)
+      ;;Calculate natural logarithm of each element 
+      ;;of MAT, using MAT as destination matrix
+      (format t "~%Calculate natural logarithm: ~%~%")
+      (log mat mat)
+      (format t "MAT = ~%~%")
+      ;;Print MAT
+      (print-mat mat :double)
+      (format t "~%"))))
 
 
 ========================================================================================================================================
-*MAX
+MAX
 ========================================================================================================================================
 
 Calculates per-element maximum of two arrays.
 
+Note: The LISP-CV function MAX overloads the Common Lisp function MAX so both functions can use the 
+same name. THe LISP-CV function MAX provides the the same functionality as the Common Lisp function 
+MAX and the OpenCV 'max' function. To use the Common Lisp function MAX directly, while in the LISP-CV 
+package, you need to evaluate CL:MAX.
+
 C++: void max(InputArray src1, InputArray src2, OutputArray dst)
 
-LISP-CV: (*MAX (SRC1 MAT) (SRC2 MAT) (DEST MAT)) => :VOID    (loop while (not (= (wait-key 0) 27)))
+LISP-CV: (MAX (SRC1 MAT) (SRC2 MAT) (DEST MAT)) => :VOID    (loop while (not (= (wait-key 0) 27)))
 
 
     Parameters:	
@@ -3702,20 +3686,18 @@ LISP-CV: (*MAX (SRC1 MAT) (SRC2 MAT) (DEST MAT)) => :VOID    (loop while (not (=
         DEST - Output array of the same size and type as SRC1.
 
 
-The function *MAX calculates the per-element maximum of two arrays. When the input array is multi-channel, 
+The function MAX calculates the per-element maximum of two arrays. When the input array is multi-channel, 
 each channel is compared with value independently.
-
-Note: This function is named *MAX instead of MAX because, MAX is the name of a Common Lisp function.
 
 
 See also:
 
-(*MIN), (COMPARE), (IN-RANGE), (MIN-MAX-LOC), Matrix Expressions(MAT-EXPR)
+(MIN), (COMPARE), (IN-RANGE), (MIN-MAX-LOC), Matrix Expressions(MAT-EXPR)
 
 
 Example:
 
-(defun *max-example (&optional (cam 0)
+(defun max-example (&optional (cam 0)
 		       (width *default-width*)
 		       (height *default-height*))
 
@@ -3728,10 +3710,10 @@ Example:
 
   ;;Create camera capture, CAP, set CAP to default width and height
   (with-captured-camera (cap cam :width width :height height)  
-    (let* ((window-name-1 "MAT-3 after THRESHOLD - *MAX-Example")
-	   (window-name-2 "MAT-5 after ASSGN-VAL - *MAX-Example")
-	   (window-name-3 "MAT-4 after *MAX - *MAX-Example"))
-      ;;Create two matrices: MAT-1 and MAT-2(used to show how *MAX works)
+    (let* ((window-name-1 "MAT-3 after THRESHOLD - MAX-Example")
+	   (window-name-2 "MAT-5 after ASSGN-VAL - MAX-Example")
+	   (window-name-3 "MAT-4 after MAX - MAX-Example"))
+      ;;Create two matrices: MAT-1 and MAT-2(used to show how MAX works)
       (with-mat ((mat-1 (mat 3 3 +32s+ (alloc :int '(1 2 3 4 5 6 7 8 9))))
 		 (mat-2 (mat 3 3 +32s+ (alloc :int '(9 8 7 6 5 4 3 2 1))))
 		 ;;Create destination matrix of same size and type: DEST
@@ -3758,7 +3740,7 @@ Example:
 	      (format t "~%~%")
 	      ;;Find per element maximum of 
 	      ;;MAT-1 and MAT-2, set to DEST
-	      (*max mat-1 mat-2 dest)
+	      (max mat-1 mat-2 dest)
 	      ;;Print DEST
 	      (format t "Per element maximum of MAT-1 and  MAT-2:~%~%")
 	      (print-mat dest :int)
@@ -3771,7 +3753,7 @@ Example:
 		(with-mat ((frame (mat)))
 		  (loop
 		     ;;Set camera feed to FRAME
-		     (*read cap frame)
+		     (read cap frame)
 		     ;;Convert FRAME to 1 channel 
 		     ;;grayscale image, set to mat-1
 		     ;;FRAME stays the same
@@ -3787,7 +3769,7 @@ Example:
 		     (assgn-val mat-5 (scalar (mem-aref val :int)))
 		     ;;Find the maximum of each element 
 		     ;;of MAT-4 and MAT-5, set to MAT-4
-		     (*max mat-4 mat-5 mat-4)
+		     (max mat-4 mat-5 mat-4)
 		     ;;;Show MAT-3, MAT-5 and MAT-4 in windows
 		     (imshow window-name-1 mat-3)
 		     (imshow window-name-2 mat-5)
@@ -3797,14 +3779,19 @@ Example:
 			 (return)))))))))))))
 
 ========================================================================================================================================
-*MIN
+MIN
 ========================================================================================================================================
 
 Calculates per-element minimum of two arrays.
 
+Note: The LISP-CV function MIN overloads the Common Lisp function MIN so both functions can use the 
+same name. THe LISP-CV function MIN provides the the same functionality as the Common Lisp function 
+MIN and the OpenCV 'min' function. To use the Common Lisp function MIN directly, while in the LISP-CV 
+package, you need to evaluate CL:MIN.
+
 C++: void min(InputArray src1, InputArray src2, OutputArray dst)
 
-LISP-CV: (*MIN (SRC1 MAT) (SRC2 MAT) (DEST MAT)) => :VOID
+LISP-CV: (MIN (SRC1 MAT) (SRC2 MAT) (DEST MAT)) => :VOID
 
 
     Parameters:	
@@ -3816,21 +3803,18 @@ LISP-CV: (*MIN (SRC1 MAT) (SRC2 MAT) (DEST MAT)) => :VOID
         DEST - Output array of the same size and type as SRC1.
 
 
-The function *MIN calculates the per-element minimum of two arrays. When the input array is multi-
+The function MIN calculates the per-element minimum of two arrays. When the input array is multi-
 channel, each channel is compared with value independently.
-
-
-Note: This function is named *MIN instead of MIN because, MIN is the name of a Common Lisp function.
 
 
 See also:
 
-(*MAX), (COMPARE), (IN-RANGE), (MIN-MAX-LOC), Matrix Expressions(MAT-EXPR)
+(MAX), (COMPARE), (IN-RANGE), (MIN-MAX-LOC), Matrix Expressions(MAT-EXPR)
 
 
 Example:
 
-(defun *min-example (&optional (cam 0)
+(defun min-example (&optional (cam 0)
 		       (width *default-width*)
 		       (height *default-height*))
 
@@ -3843,7 +3827,7 @@ Example:
 
   ;;Create video capture, CAP. Set CAP to default width and height
   (with-captured-camera (cap cam :width width :height height)   
-    ;;Create two matrices: MAT-1 and MAT-2(used to show how *MIN works)
+    ;;Create two matrices: MAT-1 and MAT-2(used to show how MIN works)
     (with-mat ((mat-1 (mat 3 3 +32s+ (alloc :int '(1 2 3 4 5 6 7 8 9))))
 	       (mat-2 (mat 3 3 +32s+ (alloc :int '(9 8 7 6 5 4 3 2 1))))
 	       ;;Create destination matrix of same size and type, DEST
@@ -3853,9 +3837,9 @@ Example:
 	       (mat-3 (mat height width +8u+))
 	       (mat-4 (mat height width +8u+))
 	       (mat-5 (mat height width +8u+)))
-      (let ((window-name-1 "MAT-3 after THRESHOLD - *MIN-Example")
-	    (window-name-2 "MAT-5 after ASSGN-VAL - *MIN-Example")
-	    (window-name-3 "MAT-4 after *MIN - *MIN-Example")) 
+      (let ((window-name-1 "MAT-3 after THRESHOLD - MIN-Example")
+	    (window-name-2 "MAT-5 after ASSGN-VAL - MIN-Example")
+	    (window-name-3 "MAT-4 after MIN - MIN-Example")) 
 	;;Create windows and move to specified locations
 	(with-named-window (window-name-1 +window-normal+)
 	  (with-named-window (window-name-2 +window-normal+)
@@ -3878,7 +3862,7 @@ Example:
 		(format t "~%")
 		;;Find per element minimum of 
 		;;MAT-1 and MAT-2, set to DEST
-		(*min mat-1 mat-2 dest)
+		(min mat-1 mat-2 dest)
 	     	;;Print DEST
 		(format t "Per element minimum of MAT-1 and  MAT-2:~%~%")
 		(print-mat dest :int)
@@ -3886,7 +3870,7 @@ Example:
 		(with-mat ((frame (mat)))
 		  (loop
 		     ;;Set camera feed to FRAME
-		     (*read cap frame)
+		     (read cap frame)
 		     ;;Convert FRAME to 1 channel grayscale 
                      ;;image, set to MAT-3. FRAME stays the 
                      ;;same
@@ -3908,7 +3892,7 @@ Example:
 		     (assgn-val mat-5 (t:scalar (? val :int)))
 		     ;;Find the minimum of each element 
 		     ;;of MAT-4 AND MAT-5, set to MAT-4
-		     (*min mat-4 mat-5 mat-4)
+		     (min mat-4 mat-5 mat-4)
 		     ;;Show MAT-3, MAT-4 and MAT-5 in windows
 		     (imshow window-name-1 mat-3)
 		     (imshow window-name-2 mat-5)
@@ -3936,11 +3920,11 @@ LISP-CV: (*TRACE (MTX MAT)) => SCALAR
 The function *TRACE returns the sum of the diagonal elements of the matrix MTX.
 
 
-See OpenCV Documentation at this link...
+See OpenCV Documentation at this link:
 
 http://docs.opencv.org/trunk/modules/core/doc/operations_on_arrays.html?highlight=trace#trace
 
-...for the formula.
+for the formula.
 
 
 Note: This function is named *TRACE instead of TRACE because, TRACE is the name of a Common Lisp macro.
@@ -4024,7 +4008,7 @@ Example:
 	(move-window window-name 759 175)
 	(with-mat ((frame (mat)))
 	  (loop
-	     (*read cap frame)
+	     (read cap frame)
 	     (absdiff frame scalar frame)
 	     (imshow window-name frame)
 	     (let ((c (wait-key 33)))
@@ -4614,7 +4598,7 @@ Example:
           (format t "~%")
 	  (with-mat ((frame (mat)))
 	    (loop
-	       (*read cap frame)
+	       (read cap frame)
 	       ;;Run CONVERT-SCALE-ABS on the camera
                ;;output, just to see what happens
 	       (convert-scale-abs frame frame 2d0 5d0)
@@ -4863,7 +4847,7 @@ Example:
 	(with-mat ((frame (mat)))
 	  (loop
 	     ;;Assign camera feed to FRAME
-	     (*read cap frame)
+	     (read cap frame)
 	     ;;Make 3 frame clones
 	     (dotimes (i 3)
 	       (setf (aref frame-clone-arr i) (gc:clone frame)))
@@ -4934,7 +4918,7 @@ Example:
 	    ;;Iterate through each frames of the video
 	    (loop
 	       ;;Set camera feed to FRAME
-	       (*read cap frame)
+	       (read cap frame)
 	       (with-mat ((src (clone frame)))
 		 (with-scalar ((lower-hsv (scalar 170 160 60))
 			       (upper-hsv (scalar 180 2556 256)))
@@ -5062,7 +5046,7 @@ Example:
 	  (imshow (aref window-name-arr 2) identity-mat)
 	  (with-mat ((frame (mat)))
 	    (loop ;;Read in camera feed
-	       (*read cap frame)
+	       (read cap frame)
 	       ;;Make a clone of the camera feed, DEST
 	       (with-mat ((dest (clone frame))
 			  ;;Crop FRAME to make it a square matrix, set to ROI
@@ -5285,7 +5269,7 @@ Example:
 	  (with-mat ((frame (mat)))
 	    (loop
 	       ;;Set FRAME to a frame of the camera feed
-	       (*read cap frame)
+	       (read cap frame)
 	       ;;Print rectangle location/dimensions
 	       (format t "RECT-X: ~a~%~%" (mem-ref rect-x :int))
 	       (format t "RECT-Y: ~a~%~%" (mem-ref rect-y :int))
@@ -5424,7 +5408,7 @@ Example:
 			     (tpl (imread filename 1)))
 		    (loop
 		       ;;Set camera feed to FRAME
-		       (*read cap frame)
+		       (read cap frame)
 		       (setf iwidth (+ (- (cols frame) (cols tpl)) 1))
 		       (setf iheight (+ (- (rows frame) (rows tpl)) 1))
 		       ;;Create  matrix to hold all of the matches
@@ -5729,7 +5713,7 @@ Example:
 		      (create-trackbar  "Contrast" window-name-3 val2 100)
 		      (loop
 			 ;;Set camera feed to FRAME
-			 (*read cap frame)
+			 (read cap frame)
 			 ;;Set brightness and contrast values 
 			 ;;based on trackbar input
 			 (setf brightness (- (mem-ref val1 :int) 50))
@@ -5964,7 +5948,7 @@ for description and formula.
 
 See also:
 
-(*SQRT), (*EXP), (*LOG), (CART-TO-POLAR), (POLAR-TO-CART)
+(SQRT), (EXP), (LOG), (CART-TO-POLAR), (POLAR-TO-CART)
 
 
 
@@ -6282,7 +6266,7 @@ Example:
 		   (dest (mat height width +8uc3+)))
 	  (loop
 	     (with-mat ((frame (mat)))
-	       (*read cap frame)
+	       (read cap frame)
 	       (subtract frame last-frame dest)
 	       (imshow window-name dest)
 	       (copy-to frame last-frame)
@@ -7106,7 +7090,7 @@ LISP-CV: (MAKE-FILE-STORAGE (SOURCE :STRING) (FLAGS :INT) (ENCODING :STRING)) =>
 
 
 The full constructor opens the file. Alternatively you can use the default constructor and then call 
-the FILE-STORAGE class *OPEN method.
+the FILE-STORAGE class OPEN method.
 
 
 Example:
@@ -7121,14 +7105,17 @@ Opens a file.
 
 Note: The name FILE-STORAGE-OPEN is used in the documentation to refer to the binding for the 
 "open" member of the OpenCV FileStorage class because it is more descriptive and it is easier 
-to search for in this file. The *OPEN method may also be used to call this binding. 
+to search for in this file. The OPEN function may also be used to call this binding. 
 
-Note: The name *OPEN is used for the method because OPEN is the name of a Common Lisp function. 
+Note: The LISP-CV function OPEN overloads the Common Lisp function OPEN so both functions can use the 
+same name. THe LISP-CV function OPEN provides the the same functionality as the Common Lisp function 
+OPEN and the 'open' members of OpenCV's classes. To use the Common Lisp function OPEN directly, while 
+you are in the LISP-CV package, you need to evaluate CL:OPEN.
 
 
 C++: bool FileStorage::open(const String& filename, int flags, const String& encoding=String())
 
-LISP-CV: (*OPEN) (SELF FILE-STORAGE) (FILENAME :STRING) (FLAGS :INT) (ENCODING :STRING)) => :BOOLEAN
+LISP-CV: (OPEN) (SELF FILE-STORAGE) (FILENAME :STRING) (FLAGS :INT) (ENCODING :STRING)) => :BOOLEAN
 
 LISP-CV: (FILE-STORAGE-OPEN) (SELF FILE-STORAGE) (FILENAME :STRING) (FLAGS :INT) (ENCODING :STRING)) => :BOOLEAN
 
@@ -7152,22 +7139,20 @@ before opening the file.
 
 Example:
 
-
 (defun file-storage-open-example (save-directory) 
 
   (let ((filename (cat save-directory "matrix.yml")))
     ;;Create a matrix
-    (with-mat ((matrix (mat-ones 10 10 +64f+)))
+    (with-mat ((matrix (mat-ones 5 5 +64f+)))
       ;;Create a FILE-STORAGE object
       (with-file-storage ((fs (file-storage)))
 	;;Open the file for writing
-	(if (*open fs filename +file-storage-write+)
+	(if (open fs filename +file-storage-write+)
 	    (format t "~%File open...~%") nil)
 	;;Write the matrix to the file
-	(*write fs "matrix" matrix)
+	(write fs "matrix" matrix)
 	(format t "~%Wrote matrix to ~a~%~%" filename)
 	(release fs)))))
-
 
 ========================================================================================================================================
 FILE-STORAGE-RELEASE
@@ -7202,44 +7187,42 @@ Writes an object or number to file storage.
 
 Note: The name FILE-STORAGE-WRITE is used in the documentation to refer to the binding for the 
 "write" member of the OpenCV FileStorage class because it is more descriptive and it is easier 
-to search for in this file. The *WRITE method may also be used to call this binding. 
-
-Note: The name *WRITE is used for the method because WRITE is the name of a Common Lisp function.
+to search for in this file. The WRITE methods may also be used to call this binding. 
 
 
 C++: void write( FileStorage& fs, const String& name, double value )
 
-LISP-CV: (*WRITE (FS FILE-STORAGE) (NAME :STRING) (VALUE :DOUBLE)) => :VOID
+LISP-CV: (WRITE (FS FILE-STORAGE) (NAME :STRING) (VALUE :DOUBLE)) => :VOID
 
 LISP-CV: (FILE-STORAGE-WRITE (FS FILE-STORAGE) (NAME :STRING) (VALUE :DOUBLE)) => :VOID
 
 C++: void write( FileStorage& fs, const String& name, float value )
 
-LISP-CV: (*WRITE (FS FILE-STORAGE) (NAME :STRING) (VALUE :FLOAT)) => :VOID
+LISP-CV: (WRITE (FS FILE-STORAGE) (NAME :STRING) (VALUE :FLOAT)) => :VOID
 
 LISP-CV: (FILE-STORAGE-WRITE (FS FILE-STORAGE) (NAME :STRING) (VALUE :FLOAT)) => :VOID
 
 C++: void write( FileStorage& fs, const String& name, int value )
 
-LISP-CV: (*WRITE (FS FILE-STORAGE) (NAME :STRING) (VALUE :INT)) => :VOID
+LISP-CV: (WRITE (FS FILE-STORAGE) (NAME :STRING) (VALUE :INT)) => :VOID
 
 LISP-CV: (FILE-STORAGE-WRITE (FS FILE-STORAGE) (NAME :STRING) (VALUE :INT)) => :VOID
 
 C++: void write( FileStorage& fs, const String& name, const String& value )
 
-LISP-CV: (*WRITE (FS FILE-STORAGE) (NAME :STRING) (VALUE STRING)) => :VOID
+LISP-CV: (WRITE (FS FILE-STORAGE) (NAME :STRING) (VALUE STRING)) => :VOID
 
 LISP-CV: (FILE-STORAGE-WRITE (FS FILE-STORAGE) (NAME :STRING) (VALUE STRING)) => :VOID
 
 C++: void write( FileStorage& fs, const String& name, const Mat& value )
 
-LISP-CV: (*WRITE (FS FILE-STORAGE) (NAME :STRING) (VALUE MAT)) => :VOID
+LISP-CV: (WRITE (FS FILE-STORAGE) (NAME :STRING) (VALUE MAT)) => :VOID
 
 LISP-CV: (FILE-STORAGE-WRITE (FS FILE-STORAGE) (NAME :STRING) (VALUE MAT)) => :VOID
 
 C++: void write( FileStorage& fs, const String& name, const std::vector<KeyPoint>& value)
 
-LISP-CV: (*WRITE (FS FILE-STORAGE) (NAME :STRING) (VALUE VECTOR-KEY-POINT)) => :VOID
+LISP-CV: (WRITE (FS FILE-STORAGE) (NAME :STRING) (VALUE VECTOR-KEY-POINT)) => :VOID
 
 LISP-CV: (FILE-STORAGE-WRITE (FS FILE-STORAGE) (NAME :STRING) (VALUE VECTOR-KEY-POINT)) => :VOID
 
@@ -7260,73 +7243,74 @@ Example:
 
 (defun file-storage-write-example (filename save-directory) 
 
-    ;Write a double float to a YML file
-    (let ((double-float 10.0d0))
-      (with-file-storage ((fs (file-storage 
-			       (cat save-directory "double-float.yml")  
-			       +file-storage-write+)))
-	(*write fs "double-float" double-float)
-	(release fs)))
+  ;;Write a double float to a YML file
+  (let ((double-float 1.0d0))
+    (with-file-storage ((fs (file-storage 
+			     (cat save-directory "double-float.yml")  
+			     +file-storage-write+)))
+      (write fs "double-float" double-float)
 
-    ;Write a single float to a YML file
-    (let ((single-float 20.0f0))
-      (with-file-storage ((fs (file-storage 
-			       (cat save-directory "single-float.yml")  
-			       +file-storage-write+)))
-	(*write fs "single-float" single-float)
-	(release fs)))
+      (release fs)))
 
-    ;Write an integer to a YML file
-    (let ((integer 30))
-      (with-file-storage ((fs (file-storage 
-			       (cat save-directory "integer.yml")  
-			       +file-storage-write+)))
-	(*write fs "integer" integer)
-	(release fs)))
+  ;;Write a single float to a YML file
+  (let ((single-float 2.0f0))
+    (with-file-storage ((fs (file-storage 
+			     (cat save-directory "single-float.yml")  
+			     +file-storage-write+)))
+      (write fs "single-float" single-float)
+      (release fs)))
 
-    ;Write a string to a YML file
-    (let ((string "LISP-CV ROCKS!!!"))
-      (with-file-storage ((fs (file-storage 
-			       (cat save-directory "string.yml")  
-			       +file-storage-write+)))
-	(*write fs "string" string)
-	(release fs)))
+  ;;Write an integer to a YML file
+  (let ((integer 3))
+    (with-file-storage ((fs (file-storage 
+			     (cat save-directory "integer.yml")  
+			     +file-storage-write+)))
+      (write fs "integer" integer)
+      (release fs)))
 
-    ;Write a matrix to a YML file
-    (with-mat ((matrix (mat-eye 10 10 +64fc3+)))
-      (with-file-storage ((fs (file-storage 
-			       (cat save-directory "matrix.yml")  
-			       +file-storage-write+)))
-	(*write fs "matrix" matrix)
-	(release fs)))
+  ;;Write a string to a YML file
+  (let ((string "LISP-CV ROCKS!!!"))
+    (with-file-storage ((fs (file-storage 
+			     (cat save-directory "string.yml")  
+			     +file-storage-write+)))
+      (write fs "string" string)
+      (release fs)))
 
-    ;Write a vector of keypoints to a YML file
-    (with-named-window ("FILE-STORAGE-WRITE Example" +window-normal+)
-      (move-window "FILE-STORAGE-WRITE Example" 759 175)
-      ;Read in image
-      (with-mat ((image (imread filename +load-image-color+)))
-	(if (empty image) 
-	    (return-from file-storage-write-example 
-	      (format t "Image was not loaded")))
-        ;Create BRISK feature detector
-	(with-brisk ((detector (brisk)))
-          ;Create vector to hold the keypoints
-	  (with-vector-key-point ((key-points (vector-key-point)))
-	    ;Detect the keypoints using BRISK
-	    (detect detector image key-points)
-            ;Create FILE-STORAGE object
-	    (with-file-storage ((fs (file-storage 
-				     (cat save-directory "keypoints.yml" ) 
-				     +file-storage-write+)))
-              ;Write the keypoints to a YML file
-	      (*write fs "keypoints" key-points)
-              ;Release FILE-STORAGE object
-	      (release fs)
-	      (imshow "FILE-STORAGE-WRITE Example" image)
-	      (loop
-		 (let ((c (wait-key 33)))
-		   (when (= c 27)
-		     (return))))))))))
+  ;;Write a matrix to a YML file
+  (with-mat ((matrix (mat-eye 10 10 +64fc3+)))
+    (with-file-storage ((fs (file-storage 
+			     (cat save-directory "matrix.yml")  
+			     +file-storage-write+)))
+      (write fs "matrix" matrix)
+      (release fs)))
+
+  ;;Write a vector of keypoints to a YML file
+  (with-named-window ("FILE-STORAGE-WRITE Example" +window-normal+)
+    (move-window "FILE-STORAGE-WRITE Example" 759 175)
+    ;;Read in image
+    (with-mat ((image (imread filename +load-image-color+)))
+      (if (empty image) 
+	  (return-from file-storage-write-example 
+	    (format t "Image was not loaded")))
+      ;;Create BRISK feature detector
+      (with-brisk ((detector (brisk)))
+	;;Create vector to hold the keypoints
+	(with-vector-key-point ((key-points (vector-key-point)))
+	  ;;Detect the keypoints using BRISK
+	  (detect detector image key-points)
+	  ;;Create FILE-STORAGE object
+	  (with-file-storage ((fs (file-storage 
+				   (cat save-directory "keypoints.yml" ) 
+				   +file-storage-write+)))
+	    ;;Write the keypoints to a YML file
+	    (write fs "keypoints" key-points)
+	    ;;Release FILE-STORAGE object
+	    (release fs)
+	    (imshow "FILE-STORAGE-WRITE Example" image)
+	    (loop
+	       (let ((c (wait-key 33)))
+		 (when (= c 27)
+		   (return))))))))))
 
 ========================================================================================================================================
 CORE - UTILITY AND SYSTEM FUNCTIONS AND MACROS
@@ -7536,10 +7520,15 @@ tion time in seconds:
 
 
 ========================================================================================================================================
-*SQRT
+SQRT
 ========================================================================================================================================
 
 Calculates a square root of array elements.
+
+Note: The LISP-CV SQRT methods overload the Common Lisp function SQRT so both can use the same name. 
+THe LISP-CV SQRT methods provide the the same functionality as the Common Lisp function SQRT and the 
+OpenCV 'sqrt' function. To use the Common Lisp function SQRT directly, while you are in the LISP-CV 
+package, you need to evaluate CL:SQRT.
 
 C++: void sqrt(InputArray src, OutputArray dst)
 
@@ -7552,42 +7541,32 @@ LISP-CV: (SQRT (SRC MAT) (DEST MAT)) => :VOID
         DEST - Output array of the same size and type as SRC.
 
 
-The functions *SQRT calculate a square root of each input array element. In case of multi-channel 
+The functions SQRT calculate a square root of each input array element. In case of multi-channel 
 arrays, each channel is processed independently. The accuracy is approximately the same as of the 
 Common Lisp function SQRT.
 
-Note: This function is named *SQRT instead of SQRT because, SQRT is the name of a Common Lisp function.
 
 See also:
 
 (POW), (MAGNITUDE)
 
 
-(defun *sqrt-example ()
+(defun sqrt-example ()
 
   "Computes the square root of 
-   each element of matrix M"
+   each element of matrix M."
 
-  (let* ((data (alloc :float '(53.0f0 62.0f0 85.0f0 64.0f0 23.0f0 
-			       97.0f0 52.0f0 16.0f0 12.0f0)))
-	 (m (mat 3 3 +32f+ data))
-         (dest (mat 3 3 +32f+)))
-    (format t "M = ~%~%")
-    (dotimes (i (rows m))
-      (dotimes (j (cols m))
-	(format t "~a" (at m i j :float))
-	(princ #\Space))
-      (princ #\Newline))
-    (format t "~%~%")
-    (*sqrt m dest)
-    (format t "DEST = ~%~%")
-    (dotimes (i 3)
-      (dotimes (j 3)
-	(format t "~a" (at dest i j :float))
-	(princ #\Space))
-      (princ #\Newline))
-    (free data)))
-
+  (with-object ((data (alloc :float '(53.0f0 62.0f0 85.0f0 64.0f0 23.0f0 
+				      97.0f0 52.0f0 16.0f0 12.0f0))))
+    (with-mat ((m (mat 3 3 +32f+ data))
+	       (dest (mat 3 3 +32f+)))
+      (format t "~%M = ~%~%")
+      (print-mat m :float)
+      (format t "~%~%")
+      ($ (sqrt m dest))
+      (format t "DEST = ~%~%")
+      (print-mat dest :float)
+      (format t "~%"))))
 
 ========================================================================================================================================
 IMGPROC - IMAGE FILTERING
@@ -7859,7 +7838,7 @@ Example:
 	(with-mat ((rgb (mat border-height border-width +8uc3+))
 		   (frame (mat)))
 	  (loop
-	     (*read cap frame)
+	     (read cap frame)
 	     ;;Make a border around FRAME
 	     (copy-make-border frame rgb border border border border  
 			       +border-replicate+ (scalar-all 75))
@@ -8424,7 +8403,7 @@ See also:
 		   (src (mat height width +8u+))
 		   (tmp (mat height width +8u+)))
 	  (loop
-	     (*read cap frame)
+	     (read cap frame)
 	     (cvt-color frame cvt +bgr2gray+)
 	     (imshow window-name (progn
 				   (laplacian cvt tmp +64f+ 3)
@@ -8812,7 +8791,7 @@ Example:
 		       (abs-grad-y (mat)))
 	      (loop
 		 ;;Load camera feed
-		 (*read cap frame)
+		 (read cap frame)
 
 		 ;;SOBEL version:
 		 
@@ -8942,7 +8921,7 @@ Example 1:
 			(maxval (alloc :double 0d0)))
 	    (loop
 	       ;;Set camera to frame
-	       (*read cap frame)
+	       (read cap frame)
 	       ;;Show original camera 
 	       ;;output in a window
 	       (imshow window-name frame)
@@ -8988,7 +8967,7 @@ Example 2:
 		   (src (mat height width +8u+))
 		   (tmp (mat height width +8u+)))
 	  (loop
-	     (*read cap frame)
+	     (read cap frame)
 	     (cvt-color frame cvt +bgr2gray+)
 	     (imshow window-name (progn
 				   (sobel cvt tmp +32f+ 0 1 -1)
@@ -9423,7 +9402,7 @@ Example:
 	       (with-mat ((input (mat)) 
 			  (output (mat)))
 		 ;Set camera feed to INPUT.
-		 (*read cap input)
+		 (read cap input)
 
 		 ;The 4 points that select quadilateral on the input, 
 		 ;from element 0x0 of INPUT-QUAD in clockwise order. 
@@ -9790,7 +9769,7 @@ Example:
 				   (round (* width 2)) 
 				   +8uc3+)))
 	    (loop
-	       (*read cap frame)
+	       (read cap frame)
 	       (resize frame resized (size 1280 960) 0.0d0 
 		       0.0d0 +inter-lanczos4+)
 	       (imshow window-name-1 frame)
@@ -10172,7 +10151,7 @@ Example:
 	      (move-window window-name-4 894 444)
 	      (with-mat ((frame (mat)))
 		(loop
-		   (*read cap frame)
+		   (read cap frame)
 		   (with-mat ((src1 (clone frame))
 			      (src2 (clone frame))
 			      (src3 (clone frame)))
@@ -10301,7 +10280,7 @@ Example:
 		     (final (mat height width +32f+)))
 	    (with-mat ((frame (mat)))
 	      (loop
-		 (*read cap frame)
+		 (read cap frame)
 		 (cvt-color frame src +bgr2gray+)
 		 (canny src dst (coerce (? canny-1 :int) 'double-float) 
 			(coerce (? canny-2 :int) 'double-float))
@@ -10388,7 +10367,7 @@ Example:
 		   (window (mat height (* width 2) +8uc3+)))
 	  (loop
 	     ;;Set camera feed to FRAME
-	     (*read cap frame)
+	     (read cap frame)
 	     ;;Convert FRAME to a 1 channel grayscale 
 	     ;;image and assign to GRAYSCALE
 	     (cvt-color frame grayscale +bgr2gray+)
@@ -10473,7 +10452,7 @@ Example:
 		       (frame-gray (mat)))
 	      (loop
 		 ;;Set camera to frame
-		 (*read cap frame)
+		 (read cap frame)
 		 ;;Show FRAME in a window
 		 (imshow window-name-1 frame)
 		 ;;Convert FRAME to 1 channel 
@@ -10568,7 +10547,7 @@ Example:
 
 	    (loop
 	       (let ((radius 0))
-		 (*read cap frame)
+		 (read cap frame)
 		 (cvt-color frame curr +bgr2gray+)
 		 (if (empty prev) (progn (setf prev (t:clone curr)) 
 					 (create-hanning-window hann (size curr) +64f+)))
@@ -10660,7 +10639,7 @@ Example:
 			       (/ width 2) +8uc3+)))
 	    (loop
                ;;Set camera feed to frame
-	       (*read cap frame)
+	       (read cap frame)
 	       ;;Clone FRAME
 	       (with-mat ((clone (clone frame)))
 		 (if (eq (? l2-gradient-switch :int) 1) (setf l2-gradient t) 
@@ -10804,7 +10783,7 @@ Example 1:
 		  (with-scalar ((color (scalar 0 255 0)))
 		    (loop
 		       ;;Set camera feed to FRAME
-		       (*read cap frame)
+		       (read cap frame)
 		       ;;Print location and size of the 
 		       ;;template used to do the matchi-
 		       ;;ng and the rectangle
@@ -10943,7 +10922,7 @@ Example 2:
 			(with-scalar ((color (scalar 0 255 0)))
 			  (loop
 			     ;;Set camera feed to FRAME
-			     (*read cap frame)
+			     (read cap frame)
 			     ;;Print location and size of the 
 			     ;;template used to do the matchi-
 			     ;;ng and the rectangle
@@ -11724,8 +11703,8 @@ value 0 is returned.
       (if (not (is-opened cap)) 
 	  (return-from video-capture-get-example
 	    (format t "Cannot open the video camera")))
-      (*set cap +cap-prop-frame-width+ width)
-      (*set cap +cap-prop-frame-height+ height)
+      (set cap +cap-prop-frame-width+ width)
+      (set cap +cap-prop-frame-height+ height)
       (format t "~%Frame Size : ~ax~a~%~%" 
 	      (*get cap +cap-prop-frame-width+)
 	      (*get cap +cap-prop-frame-height+))
@@ -11733,12 +11712,11 @@ value 0 is returned.
 	(move-window window-name 759 175)
 	(with-mat ((frame (mat)))
 	  (loop
-	     (*read cap frame)
+	     (read cap frame)
 	     (imshow window-name frame)
 	     (let ((c (wait-key 33)))
 	       (when (= c 27)
 		 (return)))))))))
-
 
 
 ========================================================================================================================================
@@ -11792,7 +11770,7 @@ Example:
 	(move-window window-name 759 175)
 	(with-mat ((frame (mat)))
 	  (loop
-	     (*read cap frame)
+	     (read cap frame)
 	     (imshow window-name frame)
      	     (let ((c (wait-key 33)))
 	       (when (= c 27)
@@ -11807,14 +11785,17 @@ Grabs, decodes and returns the next video frame.
 
 Note: The name VIDEO-CAPTURE-READ is used in the documentation to refer to the binding for the "read" 
 member of the OpenCV VideoCapture class because it is more descriptive and it is easier to search for 
-in this file. The *READ method may also be used to call this binding.
+in this file. The READ function may also be used to call this binding.
 
-Note: The name *READ is used for the method because READ is the name of a Common Lisp function.
+Note: The LISP-CV function READ overloads the Common Lisp function READ so both functions can use the 
+same name. THe LISP-CV function READ provides the the same functionality as the Common Lisp function 
+READ and the 'read' members of OpenCV's classes. To use the Common Lisp function READ directly, while 
+you are in the LISP-CV package, you need to evaluate CL:READ.
 
 
 C++: bool VideoCapture::read(Mat& image)
 
-LISP-CV: (*READ (SELF VIDEO-CAPTURE) (IMAGE MAT)) => :BOOLEAN
+LISP-CV: (READ (SELF VIDEO-CAPTURE) (IMAGE MAT)) => :BOOLEAN
 
 LISP-CV: (VIDEO-CAPTURE-READ (SELF VIDEO-CAPTURE) (IMAGE MAT)) => :BOOLEAN
 
@@ -11844,7 +11825,7 @@ frames in video file), the methods return false and the functions return NULL po
 	(move-window window-name 759 175)
 	(with-mat ((frame (mat)))
 	  (loop
-	     (*read cap frame)
+	     (read cap frame)
 	     (imshow window-name frame)
 	     (let ((c (wait-key 33)))
 	       (when (= c 27)
@@ -11889,7 +11870,7 @@ The methods are automatically called by subsequent (VIDEO-CAPTURE-OPEN) and by V
       (move-window window-name 759 175)
       (with-mat ((frame (mat)))
 	(loop
-	   (*read cap frame)
+	   (read cap frame)
 	   (imshow window-name frame)
 	   (let ((c (wait-key 33)))
 	     (when (= c 27)
@@ -11904,14 +11885,17 @@ Sets a property in the VIDEO-CAPTURE
 
 Note: The name VIDEO-CAPTURE-SET is used in the documentation to refer to the binding for the "set" 
 member of the OpenCV VideoCapture class because it is more descriptive and it is easier to search for 
-in this file. The *SET method may also be used to call this binding.
+in this file. The SET method may also be used to call this binding.
 
-Note: The name *SET is used for the method because SET is the name of a Common Lisp function.
+Note: The LISP-CV function SET overloads the Common Lisp function SET so both functions can use the 
+same name. THe LISP-CV function SET provides the the same functionality as the Common Lisp function 
+SET and the 'set' members of OpenCV's classes. To use the Common Lisp function SET directly, while 
+you are in the LISP-CV package, you need to evaluate CL:SET.
 
 
 C++: bool VideoCapture::set(int propId, double value)
 
-LISP-CV: (*SET (SELF VIDEO-CAPTURE) (PROP-ID :INT) (VALUE :DOUBLE)) => :BOOLEAN
+LISP-CV: (SET (SELF VIDEO-CAPTURE) (PROP-ID :INT) (VALUE :DOUBLE)) => :BOOLEAN
 
 LISP-CV: (VIDEO-CAPTURE-SET (SELF VIDEO-CAPTURE) (PROP-ID :INT) (VALUE :DOUBLE)) => :BOOLEAN
 
@@ -11973,21 +11957,21 @@ Example:
 				     *camera-index*))
 
   "Changes the brightness level of the camera output 
-   ,with the method *SET, and then prints it."
+   ,with the method SET, and then prints it."
 
   (with-video-capture ((cap (video-capture camera-index)))
     (let ((window-name "VIDEO-CAPTURE-SET Example"))
       (if (not (is-opened cap)) 
 	  (return-from video-capture-set-example
 	    (format t "Cannot open the video camera")))
-      (*set cap +cap-prop-brightness+ 0.7)
+      (set cap +cap-prop-brightness+ 0.7)
       (format t "~%Brightness level: ~a~%~%" 
 	      (*get cap +cap-prop-brightness+))
       (with-named-window (window-name +window-normal+)
 	(move-window window-name 759 175)
 	(with-mat ((frame (mat)))
 	  (loop
-	     (*read cap frame)
+	     (read cap frame)
 	     (imshow window-name frame)
      	     (let ((c (wait-key 33)))
 	       (when (= c 27)
@@ -12244,7 +12228,7 @@ Usage: (IMWRITE-EXAMPLE "/MY-PIC.JPG" "/HOME/USERS/OUT-FILE.JPG")
 	(move-window window-name 759 175)
 	(with-mat ((frame (mat)))
 	  (loop
-	     (*read cap frame)
+	     (read cap frame)
 	     (setf filename (cat *lisp-cv-data-dir* "img-" 
 				 (write-to-string *file-number*) ".jpg"))
 	     (incf *file-number*)
@@ -12329,9 +12313,9 @@ Example:
 	  (with-mat ((camera-frame (mat))
 		     (video-frame (mat)))
 	    (loop 
-	       (*read camera-capture camera-frame)
+	       (read camera-capture camera-frame)
 	       (imshow window-name-1 camera-frame)
-	       (*read file-capture video-frame)
+	       (read file-capture video-frame)
 	       (imshow window-name-2 video-frame)
 	       (let ((c (wait-key 33)))
 		 (when (= c 27)
@@ -12398,7 +12382,7 @@ Parameters:
 			       :height 480)
 	(with-mat ((frame (mat)))
 	  (loop
-	     (*read cap frame)
+	     (read cap frame)
 	     (imshow window-name frame)
 	     (let ((c (wait-key 33)))
 	       (when (= c 27)
@@ -12442,7 +12426,7 @@ specified delay the original content of the window is restored.
 	(move-window window-name 759 175)
 	(with-mat ((frame (mat)))
 	  (loop
-	     (*read cap frame)
+	     (read cap frame)
 	     (display-overlay window-name "This is a test" 1)
 	     (imshow window-name frame)
 	     (let ((c (wait-key 33)))
@@ -12987,7 +12971,7 @@ Example:
 	  (with-mat ((frame (mat)))
 	    (loop ;;Were using the camera feed as the image here and a
 	       ;;region of interest of the feed as the template
-	       (*read cap frame)
+	       (read cap frame)
 	       ;;Instantiate logic for the location/dimensions 
 	       ;;of the template based on the trackbar input
 	       (if (equal (? template-x :int) 0) 
@@ -13688,7 +13672,7 @@ This function is parallelized with the TBB library.
 	(with-mat ((frame (mat)))
 	  (loop
              ;;Read the video stream.
-	     (*read cap frame)
+	     (read cap frame)
 	     (if (not (empty frame)) 
 		 ;;Apply the classifier to the frame.
 		 (detect-and-display frame)
@@ -16399,7 +16383,7 @@ Example:
 	(with-mat ((frame (mat)))
 	  (with-scalar ((color (scalar 0 0 255)))
 	    (loop
-	       (*read cap frame)
+	       (read cap frame)
 	       (with-point ((point (point x y)))
 		 (circle frame point 40 color +filled+ +aa+ 0)
 		 (imshow window-name frame)
@@ -16847,7 +16831,7 @@ FFMPEG or VFW is used; on MacOSX QTKit is used.
 	(if (not (is-opened cap))
 	    (return-from video-writer-example 
 	      (format t "ERROR: Cannot open the video file")))
-	(if (not (video-writer-is-open o-video-writer)) 
+	(if (not (video-writer-is-opened o-video-writer)) 
 	    (return-from video-writer-example 
 	      (format t "ERROR: Failed to write the video"))) 
 	(format t "~%Frame Size : ~ax~a~%~%" dwidth dheight)     
@@ -16855,17 +16839,16 @@ FFMPEG or VFW is used; on MacOSX QTKit is used.
 	  (move-window window-name 759 175)
 	  (with-mat ((frame (mat)))	
 	    (loop
-	       (*read cap frame)
+	       (read cap frame)
 	       (if (not frame) 
 		   (return-from video-writer-example 
 		     (format t "ERROR: Cannot read video file")))
 	       ;;Write a frame into the file
-	       (video-writer-write o-video-writer frame)
+	       (write o-video-writer frame)
 	       (imshow window-name frame)
 	       (let ((c (wait-key 33)))
 		 (when (= c 27)
 		   (return))))))))))
-
 
 ========================================================================================================================================
 VIDEO-WRITER-IS-OPENED
@@ -16881,7 +16864,7 @@ C++: bool VideoWriter::isOpened()
 
 LISP-CV: (IS-OPENED (SELF VIDEO-WRITER)) :BOOLEAN
 
-LISP-CV: (VIDEO-WRITER-IS-OPEN (SELF VIDEO-WRITER)) :BOOLEAN
+LISP-CV: (VIDEO-WRITER-IS-OPENED (SELF VIDEO-WRITER)) :BOOLEAN
 
 
 (defun video-writer-is-opened-example (filename &optional (camera-index *camera-index*))
@@ -16894,13 +16877,23 @@ LISP-CV: (VIDEO-WRITER-IS-OPEN (SELF VIDEO-WRITER)) :BOOLEAN
 	      (is-opened o-video-writer)))))
 
 ========================================================================================================================================
-VIDEO-WRITER-WRITE(under developement)
+VIDEO-WRITER-WRITE
 ========================================================================================================================================
 
 Writes the next video frame
 
+Note: The name VIDEO-WRITER-WRITE is used in the documentation to refer to the binding for the 
+"write" member of the OpenCV VideoWriter class because it is more descriptive and it is easier 
+to search for in this file. The WRITE method may also be used to call this binding.
 
-C++: VideoWriter& VideoWriter::operator<<(const Mat& image)
+Note: The LISP-CV function WRITE overloads the Common Lisp function WRITE so both functions can use the 
+same name. THe LISP-CV function WRITE provides the the same functionality as the Common Lisp function 
+WRITE and the 'write' members of OpenCV's classes. To use the Common Lisp function WRITE directly, while 
+you are in the LISP-CV package, you need to evaluate CL:WRITE.
+
+C++: void VideoWriter::write(const Mat& image)
+
+LISP-CV: (WRITE (SELF VIDEO-WRITER) (IMAGE MAT)) => VIDEO-WRITER
 
 LISP-CV: (VIDEO-WRITER-WRITE (SELF VIDEO-WRITER) (IMAGE MAT)) => VIDEO-WRITER
 
@@ -16911,32 +16904,31 @@ LISP-CV: (VIDEO-WRITER-WRITE (SELF VIDEO-WRITER) (IMAGE MAT)) => VIDEO-WRITER
         IMAGE - The written frame
 
 
-The function VIDEO-WRITER-WRITE writes the specified image to video file. It must have the same siz-
-e as has been specified when opening the video writer.
+The function VIDEO-WRITER-WRITE writes the specified image to video file. It must have the same size 
+as has been specified when opening the video writer.
 
 
-(defun video-writer-write-example (filename &optional 
-					      (camera-index *camera-index*))
+(defun video-writer-write-example (filename &optional (cam 0))
 
   "Saves the camera feed to a video file. The save 
    location is specified by the FILENAME parameter."
 
-  (with-capture (cap (video-capture camera-index)) 
+  (with-video-capture ((cap (video-capture cam))) 
     (let* ((window-name "VIDEO-WRITER-WRITE Example")
 	   (o-video-writer (video-writer filename 1196444237 
 					 20.0d0 (size 640 480) 1)))
       (if (not (is-opened cap)) 
 	  (return-from video-writer-write-example 
 	    (format t "ERROR: Cannot open the video file")))
-      (if (not (video-writer-is-open o-video-writer)) 
+      (if (not (is-opened o-video-writer)) 
 	  (return-from video-writer-write-example 
 	    (format t "ERROR: Failed to write the video"))) 
       (with-named-window (window-name +window-normal+)
 	(move-window window-name 759 175)
 	(with-mat ((frame (mat)))
 	  (loop
-	     (*read cap frame) 
-	     (video-writer-write o-video-writer frame) 
+	     (read cap frame) 
+	     (write o-video-writer frame) 
 	     (imshow window-name frame)
 	     (let ((c (wait-key 33)))
 	       (when (= c 27)
@@ -17096,7 +17088,7 @@ Example:
 	(move-window window-name 759 175)
 	(with-mat ((frame (mat)))
 	  (loop
-	     (*read cap frame)
+	     (read cap frame)
 	     (with-rect ((region-of-interest (rect x y 40 40)))
 	       (with-mat ((frame (roi frame region-of-interest)))
 		 (imshow window-name frame)

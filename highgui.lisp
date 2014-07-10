@@ -338,24 +338,3 @@
        (%set-window-property  (%c-string-to-string winname (length winname)) prop-id (coerce prop-value 'double-float)))
 
 
-
-;;; DEFMETHOD'S
-
-(defmethod *get ((self cv-video-capture) (value integer))
-	   (video-capture-get self value))
-
-(defmethod is-opened ((self cv-video-capture))
-	   (video-capture-is-opened self))
-
-(defmethod is-opened ((self cv-video-writer))
-	   (video-writer-is-opened self))
-
-(defmethod *read ((self cv-video-capture) (arg cv-mat))
-	   (video-capture-read self arg))
-
-(defmethod release ((self cv-video-capture))
-  (video-capture-release self))
-
-(defmethod *set ((self cv-video-capture) (value-1 integer) (value-2 real))
-	   (video-capture-set self value-1 (coerce value-2 'double-float)))
-
