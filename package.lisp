@@ -1,4 +1,4 @@
-;;; -*- mode: lisp; indent-tabs: nil -*-
+;;;; -*- mode: lisp; indent-tabs: nil -*-
 
 (defpackage :lisp-cv
   (:nicknames #:lisp-cv #:lcv #:cv)
