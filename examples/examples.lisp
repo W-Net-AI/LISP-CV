@@ -12525,7 +12525,6 @@ Example:
 		 (return)))))))))
 
 
-
 ========================================================================================================================================
 WITH-CAPTURED-CAMERA
 ========================================================================================================================================
@@ -12562,7 +12561,7 @@ Example:
     (with-named-window (window-name +window-normal+)
       (move-window window-name 759 175)
       (with-captured-camera (cap cam :width 640 
-				 :height 480)
+				     :height 480)
 	(if (not (is-opened cap)) 
 	    (return-from with-captured-camera-example 
 	      (format t "~%Cannot open the video camera~%~%")))
