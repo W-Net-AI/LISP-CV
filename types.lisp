@@ -2187,7 +2187,7 @@
 (defmethod translate-from-foreign (c-pointer (c-type cascade-classifier))
   (let ((cascade-classifier (make-instance 'cv-cascade-classifier :c-pointer c-pointer)))
     (when (garbage-collect c-type)
-      (tg:finalize cascade-classifier (lambda () (del-casc-class c-pointer))))
+      (tg:finalize cascade-classifier (lambda () (del-cascade-classifier c-pointer))))
     cascade-classifier))
 
 

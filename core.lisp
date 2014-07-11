@@ -2982,6 +2982,11 @@
 	 (y :float))
 
 
+;; int getNumberOfCPUs()
+;; cv_getNumberOfCPUs()
+(defcfun ("cv_getNumberOfCPUs" get-number-of-cpu-s) :int)
+
+
 ;; int64 getTickCount()
 ;; int64 cv_getTickCount()
 (defcfun ("cv_getTickCount" get-tick-count)  :int64

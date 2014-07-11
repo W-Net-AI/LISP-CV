@@ -44,7 +44,7 @@
 
 ;; void operator delete  ( void* ptr )
 ;; void cv_delete_CascadeClassifier(CascadeClassifier* ptr) 
-(defcfun ("cv_delete_CascadeClassifier" del-casc-class) :void
+(defcfun ("cv_delete_CascadeClassifier" del-cascade-classifier) :void
   "Calls delete on a CASCADE-CLASSIFIER object."
   (self cascade-classifier))
 

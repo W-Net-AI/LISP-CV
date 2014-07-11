@@ -175,13 +175,13 @@
 
 
 (defun make-video-capture (&optional src)
-       (cond ((eq src nil)
-	      (video-capture-0))
-	      ((numberp src)
-	       (video-capture-dev src))
-	       ((stringp src) 
-		(video-capture-file (%c-string-to-string src (length src))))
-		(t nil)))
+  (cond ((eq src nil)
+	 (video-capture-0))
+	((numberp src)
+	 (video-capture-dev src))
+	((stringp src) 
+	 (video-capture-file (%c-string-to-string src (length src))))
+	(t nil)))
 
 
 ;; double VideoCapture::get(int propId)
@@ -190,6 +190,18 @@
   "Returns the specified VideoCapture property."
   (self video-capture)
   (prop-id :int))
+
+
+;; bool VideoCapture::grab()
+;; bool cv_VideoCapture_grab(VideoCapture* self) 
+(defcfun ("cv_VideoCapture_grab" video-capture-grab) :boolean
+  (self video-capture))
+
+
+;; bool VideoCapture::grab()
+;; bool cv_VideoCapture_grab(VideoCapture* self) 
+(defcfun ("cv_VideoCapture_grab" grab) :boolean
+  (self video-capture))
 
 
 ;; bool VideoCapture::isOpened()
@@ -206,10 +218,27 @@
   (self video-capture)
   (image mat))
 
+
 ;; void VideoCapture::release()
 ;; void cv_VideoCapture_release0_0(VideoCapture* self)
 (defcfun ("cv_VideoCapture_release0_0" video-capture-release) :void
   (self video-capture))
+
+
+;; bool VideoCapture::retrieve(OutputArray image, int flag=0 
+;; bool cv_VideoCapture_retrieve(VideoCapture* self, Mat* image, int flag)
+(defcfun ("cv_VideoCapture_retrieve" %video-capture-retrieve) :boolean
+  (self video-capture)
+  (image mat)
+  (flag :int))
+
+
+(defun video-capture-retrieve (self image &optional (flag 0))
+  (%video-capture-retrieve self image flag))
+
+
+(defun retrieve (self image &optional (flag 0))
+  (%video-capture-retrieve self image flag))
 
 
 ;; bool VideoCapture::set(int propId, double value
@@ -260,28 +289,40 @@
 ;; VideoWriter* cv_create_VideoWriter5(String* filename, int fourcc, double fps, Size* frameSize, bool isColor)
 (defcfun ("cv_create_VideoWriter5" video-writer-5) video-writer
 	 (filename *string)
-	 (fourcc :int)
+	 (four-cc :int)
 	 (fps :double)
 	 (frame-size size)
 	 (is-color :boolean))
 
 
-(defun video-writer (&optional filename fourcc fps frame-size (is-color t))
+(defun video-writer (&optional filename four-cc fps frame-size (is-color t))
        "VIDEO-WRITER constructor"  
        (cond ((eq filename nil)
 	      (video-writer-0))
 	      (filename
-	       (video-writer-5 (%c-string-to-string filename (length filename)) fourcc fps frame-size is-color))
+	       (video-writer-5 (%c-string-to-string filename (length filename)) four-cc fps frame-size is-color))
 	       (t nil)))
 
 
-(defun make-video-writer (&optional filename fourcc fps frame-size (is-color t))
+(defun make-video-writer (&optional filename four-cc fps frame-size (is-color t))
        "VIDEO-WRITER constructor"  
        (cond ((eq filename nil)
 	      (video-writer-0))
 	      (filename
-	       (video-writer-5 (%c-string-to-string filename (length filename)) fourcc fps frame-size is-color))
+	       (video-writer-5 (%c-string-to-string filename (length filename)) four-cc fps frame-size is-color))
 	       (t nil)))
+
+
+;; int CV_FOURCC(char c1, char c2, char c3, char c4)
+(defcfun ("CV_FOURCC" %four-cc) :int
+  (c1 :char)
+  (c2 :char)
+  (c3 :char)
+  (c4 :char))
+
+
+(defun four-cc (c1 c2 c3 c4)
+(%four-cc (char-code c1) (char-code c2) (char-code c3) (char-code c4)))
 
 
 ;; bool VideoWriter::isOpened()

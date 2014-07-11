@@ -85,6 +85,8 @@ void cv_FileNode_read_pointer_##t(FileNode* node, vector_KeyPoint* keypoints) { 
     read(*node, *keypoints);\
 } \
 
+#define CV_FOURCC_MACRO(c1, c2, c3, c4) (((c1) & 255) + (((c2) & 255) << 8) + (((c3) & 255) << 16) + (((c4) & 255) << 24)) 
+
 extern "C" {
 
 ADD_VEC_FUNC_IMPL_0_0(b);
@@ -129,6 +131,11 @@ ADD_READ_FUNC_IMPL_1(s, String);
 ADD_READ_FUNC_IMPL_1(m, Mat);
 
 ADD_READ_FUNC_IMPL_2(vkp, vector_KeyPoint);
+
+int CV_FOURCC(char c1, char c2, char c3, char c4)
+{
+    return CV_FOURCC_MACRO(c1, c2, c3, c4); 
+}
 
 FileNode * cv_FileNode_assignVal(FileStorage * fs, string * nodename) {
 

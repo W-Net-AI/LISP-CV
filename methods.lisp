@@ -627,7 +627,7 @@
 	 (apply #'cl:set args))
 	((typep (first args) 'cv-video-capture) 
 	 (video-capture-set (first args) (second args) (coerce (or (third args) 0d0) 'double-float)))))
-
+;
 
 (defun write (&rest args)
 

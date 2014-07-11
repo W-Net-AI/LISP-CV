@@ -1,12 +1,24 @@
-;;;; -*- mode: lisp; indent-tabs: nil -*-
-;;;; examples.lisp
-;;;; Documentation and Examples(In process). For now, if you want to know if a Lisp binding exists 
-;;;; for a specified OpenCV C++ function search this file for the OpenCV C++ function name to find 
-;;;; its Lisp name, documentation and an example program. All examples written inside a DEFUN are 
-;;;; named by the Lisp function name followed by "-EXAMPLE", e.g. MAT-EXAMPLE for the function MAT, 
-;;;; to make finding them easier in this file. If an example is not written inside a DEFUN, e.g. if 
-;;;; the MAT example was not written inside a DEFUN, the title MAT-EXAMPLE, would still be typed above 
-;;;; it to make locating the example in this file easier. Note: Implementing this is still in process.
+========================================================================================================================================
+========================================================================================================================================
+========================================================================================================================================
+========================================================================================================================================
+========================================================================================================================================
+========================================================================================================================================
+========================================================================================================================================
+========================================================================================================================================
+========================================================================================================================================
+========================================================================================================================================
+========================================================================================================================================
+
+EXAMPLES.LISP
+
+Documentation and Examples(In process). For now, if you want to know if a Lisp binding exists 
+for a specified OpenCV C++ function search this file for the OpenCV C++ function name to find 
+its Lisp name, documentation and an example program. All examples written inside a DEFUN are 
+named by the Lisp function name followed by "-EXAMPLE", e.g. MAT-EXAMPLE for the function MAT, 
+to make finding them easier in this file. If an example is not written inside a DEFUN, e.g. if 
+the MAT example was not written inside a DEFUN, the title MAT-EXAMPLE, would still be typed above 
+it to make locating the example in this file easier. Note: Implementing this is still in process.
 
 
 There are 3 major types of memory management, manual, with-* macros and Trivial Garbage finalizers
@@ -42,7 +54,6 @@ an example that uses TG finalizers):
 	     (let ((c (wait-key 33)))
 	       (when (= c 27)
 		 (return)))))))))
-
 
 ========================================================================================================================================
 CORE - BASIC STRUCTURES:
@@ -432,6 +443,60 @@ This function returns the number of matrix channels.
 	       (when (= c 27)
 		 (return)))))))))
 
+
+========================================================================================================================================
+CLONE
+========================================================================================================================================
+
+Creates a full copy of a matrix and the underlying data or a full copy of a RECT object. 
+
+C++: Mat Mat::clone() const
+
+LISP-CV: (CLONE (SELF MAT)) => MAT
+
+C: Rect* cv_Rect_clone(Rect* self) 
+
+LISP-CV: (CLONE (SELF RECT)) => RECT
+
+
+    Parameters:	
+
+        SELF - Pointer to a matrix or a rectangle.
+
+MAT:
+
+This method creates a full copy of array. The original (*STEP), is not taken into account. So, 
+the array copy is a continuous array occupying (* (TOTAL) (ELEM-SIZE)) bytes.
+
+Note (*STEP) is a binding for the OpenCV Mat class 'step[]' member.
+
+RECT:
+
+This method creates a full copy of a RECT object. It is a convenience function for creating a clone 
+of a RECT object created in C and bound in Lisp.
+
+Note: See RECT-EXAMPLE in this file for an example that uses this CLONE method on a RECT object.
+
+
+(defun clone-example ()
+
+  ;Create data
+  (with-object ((m1-data (alloc :float '(53.0f0 62.0f0 85.0f0 64.0f0 23.0f0 
+					 97.0f0 52.0f0 16.0f0 12.0f0))))
+    ;Create matrix M1 and fill it with data
+    (with-mat ((m1 (mat 3 3 +32f+ m1-data))
+	       ;Create a clone of matrix M1
+	       (m2 (clone m1)))
+      (format t "~%M2 = ~%~%")
+      ;Print the elements of natrix M2 in a loop
+      (dotimes (i (rows m2))
+	(dotimes (j (cols m2))
+	  ;AT retrieves elements of M2, FORMAT 
+	  ;prints the elements to the screen 
+	  (format t "~a" (at m2 i j :float))
+	  (princ #\Space))
+	(princ #\Newline))
+      (format t "~%"))))
 
 ========================================================================================================================================
 COL-RANGE
@@ -4095,8 +4160,9 @@ See also:
 		 (return)))))))))
 
 
-
+========================================================================================================================================
 BITWISE-AND
+========================================================================================================================================
 
 Calculates the per-element bit-wise conjunction of two arrays.
 
@@ -4155,8 +4221,9 @@ independently.
     (destroy-all-windows)))
 
 
-
+========================================================================================================================================
 BITWISE-NOT
+========================================================================================================================================
 
 Inverts every bit of an array.
 
@@ -4218,8 +4285,9 @@ In case of multi-channel arrays, each channel is processed independently.
     (destroy-all-windows)))
 
 
-
+========================================================================================================================================
 BITWISE-OR
+========================================================================================================================================
 
 Calculates the per-element bit-wise disjunction of two arrays.
 
@@ -4278,8 +4346,9 @@ independently.
     (destroy-all-windows)))
 
 
-
+========================================================================================================================================
 BITWISE-XOR
+========================================================================================================================================
 
 Calculates the per-element bit-wise “exclusive or” operation on two arrays.
 
@@ -4337,10 +4406,9 @@ arrays, each channel is processed independently.
     (destroy-all-windows)))
 
 
-
-
+========================================================================================================================================
 CALC-COVAR-MATRIX
-
+========================================================================================================================================
 
 Calculates the covariance matrix of a set of vectors.
 
@@ -4395,13 +4463,13 @@ See also:
 PCA, (MUL-TRANSPOSED), (MAHALANOBIS)
 
 
-CALC-COVAR-MATRIX-EXAMPLE:
+Example:
 
 See MAHALANOBIS-EXAMPLE in this file.
 
-
-
+========================================================================================================================================
 CHECK-RANGE
+========================================================================================================================================
 
 Checks every element of an input array for invalid values.
 
@@ -4430,8 +4498,7 @@ first outlier is stored in POS (when: (NOT (EQ POS (NULL-POINTER))) ). Then, the
 (when: (EQ QUIET T) ) or throw an exception.
 
 
-CHECK-RANGE-EXAMPLE
-
+Example:
 
 Create a matrix filled with integers between 1 and 10
 
@@ -4462,9 +4529,9 @@ CV> (CHECK-RANGE A T (GC:POINT) 0.5D0 9.5D0)
 
 T
 
-
-
+========================================================================================================================================
 COMPLETE-SYMM
+========================================================================================================================================
 
 
 Copies the lower or the upper half of a square matrix to another half.
@@ -4539,9 +4606,9 @@ See also:
       (print-mat mat2 :float)
       (format t "~%")))))
 
-
-
+========================================================================================================================================
 CONVERT-SCALE-ABS
+========================================================================================================================================
 
 Scales, calculates absolute values, and converts the result to 8-bit.
 
@@ -4607,8 +4674,9 @@ Example:
 		 (when (= c 27)
 		   (return))))))))))
 
-
+========================================================================================================================================
 DET
+========================================================================================================================================
 
 Returns the determinant of a square floating-point matrix.
 
@@ -4684,12 +4752,11 @@ See also:
       (format t "~%"))))
 
 
-
+========================================================================================================================================
 DIVIDE
-
+========================================================================================================================================
 
 Performs per-element division of two arrays or a scalar by an array.
-
 
 C++: void divide(InputArray src1, InputArray src2, OutputArray dst, double scale=1, int dtype=-1)
 
@@ -4756,8 +4823,9 @@ See also:
       (print-mat result :float)
       (format t "~%"))))
 
-
+========================================================================================================================================
 FLIP
+========================================================================================================================================
 
 Flips a 2D array around vertical, horizontal, or both axes.
 
@@ -4866,9 +4934,9 @@ Example:
 		 (destroy-all-windows)
 		 (return)))))))))
 
-
-
+========================================================================================================================================
 IN-RANGE-S
+========================================================================================================================================
 
 Checks if array elements lie between the elements of two other arrays.
 
@@ -4936,9 +5004,9 @@ Example:
 		   (when (= c 27)
 		     (return)))))))))))
 
-
-
+========================================================================================================================================
 INVERT
+========================================================================================================================================
 
 Finds the inverse or pseudo-inverse of a matrix.
 
@@ -5076,9 +5144,9 @@ Example:
 		   (destroy-all-windows)
 		   (return))))))))))
 
-
-
+========================================================================================================================================
 MAGNITUDE
+========================================================================================================================================
 
 Calculates the magnitude of 2D vectors.
 
@@ -5123,9 +5191,9 @@ See also:
     (print-mat magnitude :float)
     (format t "~%")))
 
-
-
+========================================================================================================================================
 MAHALANOBIS
+========================================================================================================================================
 
 Calculates the Mahalanobis distance between two vectors.
 
@@ -5207,9 +5275,9 @@ the (INVERT) function (preferably using the +DECOMP-SVD+ method, as the most acc
       ;For Mahalanobis Distance:
       (format t "~a~%~%"(mahalanobis p1 p2 invcovar)))))
 
-
-
+========================================================================================================================================
 MEAN
+========================================================================================================================================
 
 Calculates an average (mean) of array elements.
 
@@ -5330,8 +5398,9 @@ Example:
 		 (when (= c 27)
 		   (return))))))))))
 
-
+========================================================================================================================================
 MIN-MAX-LOC
+========================================================================================================================================
 
 Finds the global minimum and maximum in an array.
 
@@ -5432,8 +5501,9 @@ Example:
 			   (when (= c 27)
 			     (return)))))))))))))))
 
-
+========================================================================================================================================
 MUL-TRANSPOSED
+========================================================================================================================================
 
 
 Calculates the product of a matrix and its transposition.
@@ -5478,11 +5548,10 @@ http://docs.opencv.org/trunk/modules/core/doc/operations_on_arrays.html?highligh
 
 for further description and formulae.
 
-Note: The output of MUL-TRANSPOSED into the matrix supplied by the DEST param is so strong that DEST cannot be overwritten by calling 
+
 See also:
 
 (CALC-COVAR-MATRIX), (GEMM), (REPEAT), (REDUCE)
-
 
 
 MUL-TRANSPOSE-EXAMPLE:
@@ -5545,10 +5614,9 @@ CV> (PRINT-MAT A :FLOAT)
 
 NIL
 
-
-
-
+========================================================================================================================================
 MULTIPLY
+========================================================================================================================================
 
 Calculates the per-element scaled product of two arrays.
 
@@ -5620,9 +5688,9 @@ See also:
       (print-mat dest3 :double)
       (format t "~%"))))
 
-
-
+========================================================================================================================================
 NORM
+========================================================================================================================================
 
 Calculates an absolute array norm, an absolute difference norm, or a relative difference norm.
 
@@ -5745,8 +5813,9 @@ Example:
 			     (when (= c 27)
 			       (return))))))))))))))))
 
-
+========================================================================================================================================
 NORMALIZE
+========================================================================================================================================
 
 Normalizes the norm or value range of an array.
 
@@ -5782,17 +5851,19 @@ http://docs.opencv.org/modules/core/doc/operations_on_arrays.html?highlight=norm
 
 for a description and formulae.
 
+
 See also:
 
 (NORM), (CONVER-TO)
+
 
 Example:
 
 See MATCH-TEMPLATE-EXAMPLE for example usage of NORMALIZE.
 
-
-
+========================================================================================================================================
 PHASE
+========================================================================================================================================
 
 Calculates the rotation angle of 2D vectors.
 
@@ -5818,7 +5889,7 @@ See OpenCV documentation at this link for further description and a formula:
 http://docs.opencv.org/trunk/modules/core/doc/operations_on_arrays.html?highlight=phase#phase
 
 
-
+Example:
 
 (defun random-color (rng &optional (icolor 0))
   (setf icolor rng)
@@ -5918,10 +5989,9 @@ http://docs.opencv.org/trunk/modules/core/doc/operations_on_arrays.html?highligh
 		   (when (= c 27)
 		     (return)))))))))))
 
-
-
-
+========================================================================================================================================
 POW
+========================================================================================================================================
 
 Raises every array element to a power.
 
@@ -5950,10 +6020,9 @@ See also:
 
 (SQRT), (EXP), (LOG), (CART-TO-POLAR), (POLAR-TO-CART)
 
-
-
-
+========================================================================================================================================
 RANDU
+========================================================================================================================================
 
 Generates a single uniformly-distributed random number or an array of random numbers.
 
@@ -6001,12 +6070,9 @@ See also:
     (princ #\Space)
     (free data)))
 
-
-
-
-
+========================================================================================================================================
 REPEAT
-
+========================================================================================================================================
 
 Fills the output array with repeated copies of the input array.
 
@@ -6040,8 +6106,7 @@ See also:
 (REDUCE), Matrix Expressions(MAT-EXPR)
 
 
-REPEAT-EXAMPLE:
-
+Example:
 
 Create a 2x2 matrix. (The GC: prefix indicates automatic Garbage Collection is activated.)
 
@@ -6087,9 +6152,9 @@ CV> (PRINT-MAT b :INT)
 
 NIL
 
-
-
+========================================================================================================================================
 RNG
+========================================================================================================================================
 
 The constructors
 
@@ -6141,8 +6206,9 @@ CV> (UNIFORM RNG 0F0 10F0)
 3.1438508
 
 
-
+========================================================================================================================================
 SCALE-ADD
+========================================================================================================================================
 
 Calculates the sum of a scaled array and another array.
 
@@ -6214,9 +6280,9 @@ See also:
     (free alpha-val)
     (destroy-all-windows)))
 
-
-
+========================================================================================================================================
 SUBTRACT
+========================================================================================================================================
 
 Calculates the per-element difference between two arrays or array and a scalar.
 
@@ -6274,8 +6340,9 @@ Example:
 		 (when (= c 27)
 		   (return))))))))))
 
-
+========================================================================================================================================
 SUM
+========================================================================================================================================
 
 Calculates the sum of array elements.
 
@@ -6324,9 +6391,9 @@ See also:
       (princ #\Newline))
     (format t "~%")))
 
-
-
+========================================================================================================================================
 UNIFORM
+========================================================================================================================================
 
 Returns the next random number sampled from the uniform distribution.
 
@@ -6376,8 +6443,9 @@ There is a nuance illustrated by the following example:
 CORE - DRAWING FUNCTIONS
 ========================================================================================================================================
 
-
+========================================================================================================================================
 CLIP-LINE
+========================================================================================================================================
 
 Clips the line against the image rectangle.
 
@@ -6470,9 +6538,9 @@ Example:
 	       (when (= c 27)
 		 (return)))))))))
 
-
-
+========================================================================================================================================
 BGR
+========================================================================================================================================
 
 A macro for SCALAR organized as BGR(BLUE, GREEN, RED) color values.
 
@@ -6505,9 +6573,9 @@ enabled in the RGB macro, (EQ FINALIZER T).
 
 CV> (CIRCLE IMAGE POINT RADIUS (T:BRG 255 0 0) +FILLED+ +AA+ 0)
 
-
-
+========================================================================================================================================
 ELLIPSE
+========================================================================================================================================
 
 Draws a simple or thick elliptic arc or fills an ellipse sector.
 
@@ -6559,8 +6627,6 @@ ellipse, not an arc, pass (EQ START-ANGLE 0) and (END-ANGLE 360).
 
 Example 1:
 
-
-
 (defun random-color (rng &optional (icolor 0))
   (setf icolor rng)
   (return-from random-color (scalar (uniform rng 0 255) 
@@ -6600,9 +6666,7 @@ Example 1:
 		   (return))))))))))
 
 
-
 Example 2:
-
 
 (defun random-color (rng &optional (icolor 0))
   (setf icolor rng)
@@ -6643,9 +6707,9 @@ Example 2:
 		   (when (= c 27)
 		     (return)))))))))))
 
-
-
+========================================================================================================================================
 GET-TEXT-SIZE
+========================================================================================================================================
 
 
 Calculates the width and height of a text string.
@@ -6726,9 +6790,9 @@ That is, the following code renders some text, the tight box surrounding it, and
 		       (when (= c 27)
 			 (return)))))))))))))
 
-
-
+========================================================================================================================================
 LINE
+========================================================================================================================================
 
 Draws a line segment connecting two points.
 
@@ -6803,9 +6867,9 @@ and BGR -> (BGR B G R).
       (imshow window-name mat))
     (destroy-window window-name)))
 
-
-
+========================================================================================================================================
 PUT-TEXT
+========================================================================================================================================
 
 Draws a text string.
 
@@ -6910,13 +6974,11 @@ Example:
       (imshow window-name mat))
     (destroy-window window-name)))
 
-
-
+========================================================================================================================================
 RECTANGLE
-
+========================================================================================================================================
 
 Draws a simple, thick, or filled up-right rectangle.
-
 
 C++: void rectangle(Mat& img, Point pt1, Point pt2, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
 
@@ -6955,7 +7017,6 @@ re PT1 and PT2.
 
 
 Example:
-
 
 (defun random-color (rng &optional (icolor 0))
   (setf icolor rng)
@@ -7001,8 +7062,9 @@ Example:
 		 (when (= c 27)
 		   (return))))))))))
 
-
+========================================================================================================================================
 RGB
+========================================================================================================================================
 
 A macro for SCALAR organized as RGB(RED, GREEN, BLUE) color values.
 
@@ -7429,6 +7491,25 @@ in degrees and varies from 0 to 360 degrees. The accuracy is about 0.3 degrees.
     (format t "Angle of vector - float = ~a~%~%" 
 	    (fast-atan2 float-y float-x))))
 
+========================================================================================================================================
+GET-NUMBER-OF-CPU-S
+========================================================================================================================================
+
+Returns the number of logical CPUs available for the process.
+
+
+C++: int getNumberOfCPUs()
+
+LISP-CV: (GET-NUMBER-OF-CPU-S) => :INT
+
+
+Example:
+
+(defun get-number-of-cpu-s-example ()
+
+  (format t "~%The number of CPU's = ~a~%~%" 
+
+	  (get-number-of-cpu-s)))
 
 ========================================================================================================================================
 GET-TICK-COUNT
@@ -10395,7 +10476,7 @@ Example:
 		       (return))))))))))))
 
 ========================================================================================================================================
-IMGPROC - MOTION ANALYSIS AND OBJECT TRACKING
+IMGPROC - HISTOGRAMS
 ========================================================================================================================================
 
 ========================================================================================================================================
@@ -10472,6 +10553,45 @@ Example:
 ========================================================================================================================================
 IMGPROC - MOTION ANALYSIS AND OBJECT TRACKING
 ========================================================================================================================================
+
+========================================================================================================================================
+CREATE-HANNING-WINDOW
+========================================================================================================================================
+
+This function computes a Hanning window coefficients in two dimensions. 
+
+See: http://en.wikipedia.org/wiki/Hann_function and: 
+
+http://en.wikipedia.org/wiki/Window_function for more information.
+
+C++: void createHanningWindow(OutputArray dst, Size winSize, int type)
+
+LISP-CV: (CREATE-HANNING-WINDOW (DEST MAT) (WIN-SIZE SIZE) (TYPE :INT)) => :VOID
+
+
+    Parameters:	
+
+        DEST - Destination array to place Hann coefficients in.
+
+        WIN-SIZE - The window size specifications.
+
+        TYPE - Created array type.
+
+
+An example is shown below:
+
+
+;;Create hanning window with
+;;size 100x100 and type +32F+
+
+(with-mat ((hann (mat)))
+  (with-size ((win-size (size 0 0)))
+    (create-Hanning-Window hann win-size +32F+)))
+
+
+See also:
+
+(PHASE-CORRELATE) (PHASE-CORRELATE-EXAMPLE)
 
 ========================================================================================================================================
 PHASE-CORRELATE
@@ -10997,7 +11117,9 @@ Example 2:
 HIGHGUI - USER INTERFACE
 ========================================================================================================================================
 
+========================================================================================================================================
 CREATE-TRACKBAR
+========================================================================================================================================
 
 Creates a trackbar and attaches it to the specified window.
 
@@ -11100,9 +11222,9 @@ Example:
 		   (return))))))))))
 
 
-
+========================================================================================================================================
 DESTROY-WINDOW
-
+========================================================================================================================================
 
 Destroys a window.
 
@@ -11111,10 +11233,14 @@ C++: void destroyWindow(const string& winname)
 
 LISP-CV: (DESTROY-WINDOW (WINNAME :STRING)) => :VOID
 
+
     Parameters:	WINNAME - Name of the window to be destroyed.
+
 
 The function DESTROY-WINDOW destroys the window with the given name.
 
+
+Example:
 
 (defun destroy-window-example ()
 
@@ -11127,9 +11253,9 @@ The function DESTROY-WINDOW destroys the window with the given name.
     (loop while (not (= (wait-key 0) 27)))
     (destroy-window window-name)))
 
-
-
+========================================================================================================================================
 DESTROY-ALL-WINDOWS
+========================================================================================================================================
 
 Destroys all of the HighGUI windows.
 
@@ -11184,8 +11310,9 @@ The function DESTROY-ALL-WINDOWS destroys all of the opened HighGUI windows.
     (loop while (not (= (wait-key 0) 27)))
     (destroy-all-windows)))
     
-
+========================================================================================================================================
 GET-TRACKBAR-POS
+========================================================================================================================================
 
 Returns the trackbar position.
 
@@ -11285,8 +11412,6 @@ to fit the window. The function may scale the image, depending on its depth:
 	     (when (= c 27)
 	       (return))))))))
 
-
-
 ========================================================================================================================================
 MOVE-WINDOW
 ========================================================================================================================================
@@ -11319,11 +11444,9 @@ LISP-CV: (MOVE-WINDOW (WINNAME :STRING) (X :INT) (Y :INT)) => VOID
     (loop while (not (= (wait-key 0) 27)))
     (destroy-window window-name))
 
-
 ========================================================================================================================================
 NAMED-WINDOW
 ========================================================================================================================================
-
 
 Creates a window.
 
@@ -11389,11 +11512,9 @@ By default, (= FLAGS (LOGIOR +WINDOW-AUTOSIZE+  +WINDOW-KEEPRATIO+  +GUI-EXPANDE
     (loop while (not (= (wait-key 0) 27)))
     (destroy-window window-name)))
 
-
-
-
+========================================================================================================================================
 SET-MOUSE-CALLBACK
-
+========================================================================================================================================
 
 Sets mouse handler for the specified window
 
@@ -11472,9 +11593,9 @@ LISP-CV: (SET-MOUSE-CALLBACK (WINNAME :STRING) (ON-MOUSE MOUSE-CALLBACK) (USERDA
     (del-mat src)
     (free userdata)))
 
-
-
+========================================================================================================================================
 SET-TRACKBAR-POS
+========================================================================================================================================
 
 Sets the trackbar position.
 
@@ -11537,8 +11658,6 @@ The function sets the position of the specified trackbar in the specified window
 		   (when (= c 27)
 		     (return)))))))))))
 
-
-
 ========================================================================================================================================
 START-WINDOW-THREAD
 ========================================================================================================================================
@@ -11564,12 +11683,9 @@ LISP-CV: (START-WINDOW-THREAD) => :INT
     ;Close the window
     (destroy-window window-name)))
 
-
-
 ========================================================================================================================================
 WAIT-KEY
 ========================================================================================================================================
-
 
 Waits for a pressed key.
 
@@ -11621,6 +11737,351 @@ HIGHGUI - READING AND WRITING IMAGES AND VIDEO
 ========================================================================================================================================
 
 ========================================================================================================================================
+IMREAD
+========================================================================================================================================
+
+Loads an image from a file.
+
+C++: Mat imread(const string& filename, int flags=1)
+
+LISP-CV: (IMREAD (FILENAME :STRING) &OPTIONAL ((FLAGS :INT) +LOAD-IMAGE-COLOR+)) => MAT
+
+
+    Parameters:	
+
+        FILENAME - Name of file to be loaded.
+
+        FLAGS -
+
+        Flags specifying the color type of a loaded image:
+
+            +LOAD-IMAGE-ANYDEPTH+ - If set, return 16-bit/32-bit image when the input has
+                                    the corresponding depth, otherwise convert it to 8-bit.
+
+            +LOAD-IMAGE-COLOR+ - If set, always convert image to the color one.
+
+            +LOAD-IMAGE-GRAYSCALE+ - If set, always convert image to the grayscale one.
+
+
+         For example:
+
+            (> FLAGS 0) Return a 3-channel color image.
+
+                Note:
+
+                In the current implementation the alpha channel, if any, is stripped from
+                the output image. Use negative value if you need the alpha channel.
+
+            (= FLAGS 0) Return a grayscale image.
+
+            (< FLAGS 0) Return the loaded image as is (with alpha channel).
+
+
+The function IMREAD loads an image from the specified file and returns it. If the image cannot be 
+read (because of missing file, improper permissions, unsupported or invalid format), the function 
+returns an empty matrix e.g. (EQ (NULL-POINTER-P (DATA MATRIX)) T). Currently, the following file 
+formats are supported:
+
+        Windows bitmaps - *.bmp, *.dib (always supported)
+
+        JPEG files - *.jpeg, *.jpg, *.jpe (see the Notes section)
+
+        JPEG 2000 files - *.jp2 (see the Notes section)
+
+        Portable Network Graphics - *.png (see the Notes section)
+
+        Portable image format - *.pbm, *.pgm, *.ppm (always supported)
+
+        Sun rasters - *.sr, *.ras (always supported)
+
+        TIFF files - *.tiff, *.tif (see the Notes section)
+
+Note:
+
+    The function determines the type of an image by the content, not by the file extension.
+
+    On Microsoft Windows* OS and MacOSX*, the codecs shipped with an LISP-CV image (libjpeg
+    , libpng, libtiff, and libjasper) are used by default. So, LISP-CV can always read JPEG-
+    s, PNGs, and TIFFs. On MacOSX, there is also an option to use native MacOSX image readers. But 
+    beware that currently these native image loaders give images with different pixel values becaus-
+    e of the color management embedded into MacOSX. 
+
+    On Linux*, BSD flavors and other Unix-like open-source operating systems, LISP-CV looks
+    for codecs supplied with an OS image. Install the relevant packages (do not forget the developm-
+    ent files, for example, “libjpeg-dev”, in Debian* and Ubuntu*) to get the codec support or turn 
+    on the OPENCV_BUILD_3RDPARTY_LIBS flag in CMake.
+
+Note:
+
+In the case of color images, the decoded images will have the channels stored in B G R order.
+
+
+Examples:
+
+
+Example using manual memory management:
+
+(defun imread-example-1 (filename)
+
+  "Open the image FILENAME with IMREAD 
+   and show it in a window. This examp-
+   le uses manual memory management"
+
+  (let* ((image (imread filename 1))
+	 (window-name "IMREAD Example 1"))
+    (if (empty image) 
+	(return-from imread-example-1 
+	  (format t "Image not loaded")))
+    (with-named-window (window-name +window-normal+)
+      (move-window window-name 759 175)
+      (imshow window-name image)
+      (loop
+	 (let ((c (wait-key 33)))
+	   (when (= c 27)
+	     (del-mat image)
+	     (return)))))))
+
+
+Example using a WITH-* macrs for memory/window managemant:
+
+(defun imread-example-2 (filename)
+
+  "Open the image FILENAME with IMREAD 
+   and show it in a window. This examp-
+   le uses a with-* macro for memory m-
+   anagement."
+
+  (let ((window-name "IMREAD Example 2"))
+    (with-named-window (window-name +window-normal+)
+      (move-window window-name 759 175)
+      (with-mat ((image (imread filename 1)))
+	(if (empty image) 
+	    (return-from imread-example-2 
+	      (format t "Image not loaded")))
+	(imshow window-name image)
+	(loop
+	   (let ((c (wait-key 33)))
+	     (when (= c 27)
+	       (return))))))))
+
+
+Example using TG finalizers for memory management:
+
+(defun imread-example-3 (filename)
+
+  "Open the image FILENAME with IMREAD 
+   and show it in a window. This examp-
+   le uses a TG finalizer for memory m-
+   anagement"
+
+  (let* ((image (gc:imread filename 1))
+	 (window-name "IMREAD Example 3"))
+    (if (empty image) 
+	(return-from imread-example-3 
+	  (format t "Image not loaded")))
+    (with-named-window (window-name +window-normal+)
+      (move-window window-name 759 175)
+      (imshow window-name image)
+      (loop
+	 (let ((c (wait-key 33)))
+	   (when (= c 27)
+	     (return)))))))
+
+========================================================================================================================================
+IMWRITE
+========================================================================================================================================
+
+Saves an image to a specified file.
+
+C++: bool imwrite(const string& filename, InputArray img, const vector<int>& params=vector<int>() )
+
+LISP-CV: (IMWRITE (FILENAME :STRING) (IMG MAT) ((PARAMS VECTOR-INT) (VECTOR-INT))) => :BOOLEAN
+
+    Parameters:	
+
+        FILENAME - Name of the file.
+
+        IMAGE - Image to be saved.
+
+        PARAMS -
+
+        Format-specific save parameters encoded as pairs PARAM-ID-1, PARAM-VALUE-1, PARAM-ID-2, 
+        PARAM-VALUE-2, ... . The following parameters are currently supported:
+
+            For JPEG, it can be a quality (+IMWRITE-JPEG-QUALITY+) from 0 to 100 (the higher is the 
+            better). Default value is 95.
+
+            For PNG, it can be the compression level (+IMWRITE-PNG-COMPRESSION+) from 0 to 9. A higher 
+            value means a smaller size and longer compression time. Default value is 3.
+
+            For PPM, PGM, or PBM, it can be a binary format flag (+IMWRITE-PXM-BINARY+ ), 0 or 1. 
+            Default value is 1.
+
+The function IMWRITE saves the image to the specified file. The image format is chosen based on the 
+filename extension (see (IMREAD) for the list of extensions). Only 8-bit (or 16-bit unsigned (+16U+) 
+in case of PNG, JPEG 2000, and TIFF) single-channel or 3-channel (with ‘BGR’ channel order) images 
+can be saved using this function. If the format, depth or channel order is different, use (CONVERT-TO), 
+and (CVT-COLOR) to convert it before saving. Or, use the universal XML I/O functions to save the image 
+to XML or YAML format.
+
+It is possible to store PNG images with an alpha channel using this function. To do this, create 8-bit 
+(or 16-bit) 4-channel image BGRA, where the alpha channel goes last. Fully transparent pixels should 
+have alpha set to 0, fully opaque pixels should have alpha set to 255/65535. 
+
+
+Examples:
+
+Default example:
+
+Usage: (IMWRITE-EXAMPLE "/MY-PIC.JPG" "/HOME/USERS/OUT-FILE.JPG")
+
+(defun imwrite-example (filename out-file)
+  
+  (let* ((window-name-1 "Original image - IMWRITE Example")
+         (window-name-2 "Flipped image - IMWRITE Example"))
+    ;;Read in image
+    (with-mat ((image (imread filename 1)))
+      (if (empty image) 
+	  (return-from imwrite-example 
+	    (format t "Image not loaded")))
+      (with-named-window (window-name-1 +window-normal+)
+	(with-named-window (window-name-2 +window-normal+)
+	  (move-window window-name-1 533 175)
+	  (move-window window-name-2 984 175)
+	  ;;Show original IMAGE in window
+	  (imshow window-name-1 image)
+	  ;;Flip IMAGE around the x-axis
+	  (flip image image -1)
+	  ;;Show flipped image in window
+	  (imshow window-name-2 image)
+	  ;;Write flipped image to filename specified 
+	  ;;by the OUT-FILE parameter 
+	  (imwrite out-file image 
+		   (vector-int 
+		    (list +imwrite-jpeg-quality+ 99)))
+	  (loop 
+    	     (let ((c (wait-key 33)))
+	       (when (= c 27)
+		 (return)))))))))
+
+
+Small example program used to extract frames from the camera feed:
+
+
+(defun image-extractor (&optional 
+			  (cam *camera-index*) 
+			  (width *default-width*)
+			  (height *default-height*))
+
+  "Extracts frames from the camera feed and saves as 
+    .jpg files in the Lisp-CV Data Directory. This is 
+    useful if you want to create large training sets 
+    easily."
+
+  (with-captured-camera (cap cam :width width :height height)
+    (if (not (is-opened cap)) 
+	(return-from image-extractor 
+	  (format t "Cannot open the video camera")))      
+    (let ((window-name "IMAGE-EXTRACTOR Example")
+          (filename 0))
+      (format t "~%Frame Size : ~ax~a~%~%" 
+	      (*get cap +cap-prop-frame-width+)
+	      (*get cap +cap-prop-frame-height+))
+      (with-named-window (window-name +window-normal+)
+	(move-window window-name 759 175)
+	(with-mat ((frame (mat)))
+	  (loop
+	     (read cap frame)
+	     (setf filename (cat *lisp-cv-data-dir* "img-" 
+				 (write-to-string *file-number*) ".jpg"))
+	     (incf *file-number*)
+	     (imwrite filename frame)
+	     (imshow window-name frame)
+	     (let ((c (wait-key 33)))
+	       (when (= c 27)
+		 (return)))))))))
+
+========================================================================================================================================
+VIDEO-CAPTURE
+========================================================================================================================================
+
+VIDEO-CAPTURE constructors.
+
+Note: Both VIDEO-CAPTURE and MAKE-VIDEO-CAPTURE are provided in this library. The first, to match 
+OpenCV's naming conventions, the second, to adhere to Common Lisp naming conventions. Except for 
+the name, they are the same function. I use the VIDEO-CAPTURE function in the examples in this file 
+because it will make them easier to compare with OpenCV examples you find online, thus making this 
+library easier to learn.
+
+C++: VideoCapture::VideoCapture()
+
+LISP-CV: (VIDEO-CAPTURE) => VIDEO-CAPTURE
+
+LISP-CV: (MAKE-VIDEO-CAPTURE) => VIDEO-CAPTURE
+
+C++: VideoCapture::VideoCapture(int device)
+
+LISP-CV: (VIDEO-CAPTURE &OPTIONAL (SRC :INT)) => VIDEO-CAPTURE
+
+LISP-CV: (MAKE-VIDEO-CAPTURE &OPTIONAL (SRC :INT)) => VIDEO-CAPTURE
+
+C++: VideoCapture::VideoCapture(const string& filename)
+
+LISP-CV: (VIDEO-CAPTURE &OPTIONAL (SRC :STRING)) => VIDEO-CAPTURE
+
+LISP-CV: (MAKE-VIDEO-CAPTURE &OPTIONAL (SRC :STRING)) => VIDEO-CAPTURE
+
+
+  Parameters:	
+
+        SRC - A device: ID of the opened video capturing device (i.e. a camera index). If there is 
+                        a single camera connected, just pass 0.     
+
+              A file name: Name of the opened video file (eg. video.avi) or image sequence (eg. 
+                           img_%02d.jpg, which will read samples like img_00.jpg, img_01.jpg, 
+                           img_02.jpg, ...)
+
+  
+If no arguments are provided this function creates an uninitialized VIDEO-CAPTURE object.
+        
+
+Example:
+
+(defun video-capture-example (filename &optional 
+					 (camera-index *camera-index*))
+
+  "This example use the function VIDEO-CAPTURE to open a video 
+   capturing device, supplied by the *CAMERA-INDEX* parameter. 
+   The setf-able *CAMERA-INDEX* parameter defaults to 0. Then 
+   the function VIDEO-CAPTURE is used to open a video file sup-
+   plied by the parameter FILENAME."
+  
+  (with-video-capture ((camera-capture (video-capture camera-index))
+		       (file-capture (video-capture filename)))
+    (let ((window-name-1 "Camera Feed - VIDEO-CAPTURE Example")
+	  (window-name-2 "Video file - VIDEO-CAPTURE Example"))
+      (if (not (is-opened camera-capture)) 
+	  (return-from video-capture-example 
+	    (format t "Cannot open the video camera")))
+      (if (not (is-opened file-capture)) 
+	  (return-from video-capture-example 
+	    (format t "Cannot open the video file")))
+      (with-named-window (window-name-1 +window-normal+)
+	(with-named-window (window-name-2 +window-normal+)
+	  (move-window window-name-1 533 175)
+	  (move-window window-name-2 984 175)
+	  (with-mat ((camera-frame (mat))
+		     (video-frame (mat)))
+	    (loop 
+	       (read camera-capture camera-frame)
+	       (imshow window-name-1 camera-frame)
+	       (read file-capture video-frame)
+	       (imshow window-name-2 video-frame)
+	       (let ((c (wait-key 33)))
+		 (when (= c 27)
+		   (return))))))))))
+
+========================================================================================================================================
 VIDEO-CAPTURE-GET
 ========================================================================================================================================
 
@@ -11659,7 +12120,7 @@ LISP-CV: (VIDEO-CAPTURE-GET (SELF VIDEO-CAPTURE) (PROP-ID :INT))
 
             +CAP-PROP-FPS+ Frame rate.
 
-            +CAP-PROP-FOURCC+ 4-character code of codec.
+            +CAP-PROP-FOUR-CC+ 4-character code of codec.
 
             +CAP-PROP-FRAME-COUNT+ Number of frames in the video file.
 
@@ -11718,6 +12179,45 @@ value 0 is returned.
 	       (when (= c 27)
 		 (return)))))))))
 
+
+
+========================================================================================================================================
+VIDEO-CAPTURE-GRAB
+========================================================================================================================================
+
+Grabs the next frame from video file or capturing device.
+
+Note: The name VIDEO-CAPTURE-GRAB is used in the documentation to refer to the binding for the "grab"
+member of the OpenCV VideoCapture class because it is more descriptive and it is easier to search for 
+in this file. The GRAB function may also be used to call this binding.
+
+
+C++: bool VideoCapture::grab()
+
+LISP-CV: (GRAB (SELF VIDEO-CAPTURE)) => :BOOLEAN
+
+LISP-CV: (VIDEO-CAPTURE-GRAB (SELF VIDEO-CAPTURE)) => :BOOLEAN
+
+
+The functions grab the next frame from video file or camera and return true (non-zero) in the case 
+of success.
+
+The primary use of the function is in multi-camera environments, especially when the cameras do not 
+have hardware synchronization. That is, you call (VIDEO-CAPTURE-GRAB) for each camera and after that 
+call the slower method (VIDEO-CAPTURE-RETRIEVE) to decode and get frame from each camera. This way the 
+overhead on demosaicing or motion jpeg decompression etc. is eliminated and the retrieved frames from 
+different cameras will be closer in time.
+
+Also, when a connected camera is multi-head (e.g., a stereo camera or a Kinect device), the correct way 
+of retrieving data from it is to call "VIDEO-CAPTURE-GRAB" first and then call (VIDEO-CAPTURE-RETRIEVE) 
+one or more times with different values of the channel parameter. See:
+
+https://github.com/Itseez/opencv/tree/master/samples/cpp/openni_capture.cpp
+
+
+Example:
+
+See VIDEO-CAPTURE-RETRIEVE-EXAMPLE in this file.
 
 ========================================================================================================================================
 VIDEO-CAPTURE-IS-OPENED
@@ -11877,6 +12377,53 @@ The methods are automatically called by subsequent (VIDEO-CAPTURE-OPEN) and by V
 	       (release cap)
 	       (return)))))))))
 
+
+========================================================================================================================================
+VIDEO-CAPTURE-RETRIEVE
+========================================================================================================================================
+
+Decodes and returns the grabbed video frame.
+
+Note: The name VIDEO-CAPTURE-RETRIEVE is used in the documentation to refer to the binding for the 
+"retrieve" member of the OpenCV VideoCapture class because it is more descriptive and it is easier 
+to search for in this file. The RETRIEVE function may also be used to call this binding.
+
+
+C++: bool VideoCapture::retrieve(OutputArray image, int flag=0 )
+
+LISP-CV: (RETRIEVE (SELF VIDEO-CAPTURE) (IMAGE MAT) &OPTIONAL ((FLAGS :INT) 0)) => :BOOLEAN
+
+LISP-CV: (VIDEO-CAPTURE-RETRIEVE (SELF VIDEO-CAPTURE) (IMAGE MAT) &OPTIONAL ((FLAGS :INT) 0)) => :BOOLEAN
+
+
+The methods/functions decode and return the just grabbed frame. If no frames has been grabbed, e.g. 
+camera has been disconnected, or there are no more frames in video file, the methods return false and 
+the functions return NULL pointer.
+
+
+Example:
+
+
+(defun video-capture-retrieve-example (&optional (camera-index 
+						  *camera-index*))
+
+  (with-video-capture ((cap (video-capture camera-index)))
+    (let ((window-name "VIDEO-CAPTURE-RETRIEVE Example"))
+      (if (not (is-opened cap)) 
+	  (return-from video-capture-retrieve-example
+	    (format t "Cannot open the video camera")))
+      (with-named-window (window-name +window-normal+)
+	(move-window window-name 759 175)
+	(with-mat ((frame (mat)))
+	  (loop
+	     (grab cap)
+	     (retrieve cap frame)
+	     (read cap frame)
+	     (imshow window-name frame)
+	     (let ((c (wait-key 33)))
+	       (when (= c 27)
+		 (return)))))))))
+
 ========================================================================================================================================
 VIDEO-CAPTURE-SET
 ========================================================================================================================================
@@ -11920,7 +12467,7 @@ LISP-CV: (VIDEO-CAPTURE-SET (SELF VIDEO-CAPTURE) (PROP-ID :INT) (VALUE :DOUBLE))
 
             +CAP-PROP-FPS+ Frame rate.
 
-            +CAP-PROP-FOURCC+ 4-character code of codec.
+            +CAP-PROP-FOUR-CC+ 4-character code of codec.
 
             +CAP-PROP-FRAME-COUNT+ Number of frames in the video file.
 
@@ -11977,353 +12524,11 @@ Example:
 	       (when (= c 27)
 		 (return)))))))))
 
-========================================================================================================================================
-IMREAD
-========================================================================================================================================
-
-
-Loads an image from a file.
-
-
-C++: Mat imread(const string& filename, int flags=1)
-
-LISP-CV: (IMREAD (FILENAME :STRING) &OPTIONAL ((FLAGS :INT) +LOAD-IMAGE-COLOR+)) => MAT
-
-
-    Parameters:	
-
-        FILENAME - Name of file to be loaded.
-
-        FLAGS -
-
-        Flags specifying the color type of a loaded image:
-
-            +LOAD-IMAGE-ANYDEPTH+ - If set, return 16-bit/32-bit image when the input has the corresponding 
-                                    depth, otherwise convert it to 8-bit.
-
-            +LOAD-IMAGE-COLOR+ - If set, always convert image to the color one
-
-            +LOAD-IMAGE-GRAYSCALE+ - If set, always convert image to the grayscale one
-
-            >0 Return a 3-channel color image.
-
-                Note
-
-                In the current implementation the alpha channel, if any, is stripped from the output 
-                image. Use negative value if you need the alpha channel.
-
-            =0 Return a grayscale image.
-
-            <0 Return the loaded image as is (with alpha channel).
-
-
-The function IMREAD loads an image from the specified file and returns it. If the image cannot be r-
-ead (because of missing file, improper permissions, unsupported or invalid format), the function re-
-turns an empty matrix ( Mat::data==NULL )todo. Currently, the following file formats are supported:
-
-        Windows bitmaps - *.bmp, *.dib (always supported)
-
-        JPEG files - *.jpeg, *.jpg, *.jpe (see the Notes section)
-
-        JPEG 2000 files - *.jp2 (see the Notes section)
-
-        Portable Network Graphics - *.png (see the Notes section)
-
-        Portable image format - *.pbm, *.pgm, *.ppm (always supported)
-
-        Sun rasters - *.sr, *.ras (always supported)
-
-        TIFF files - *.tiff, *.tif (see the Notes section)
-
-Note:
-
-    The function determines the type of an image by the content, not by the file extension.
-
-    On Microsoft Windows* OS and MacOSX*, the codecs shipped with an LISP-CV image (libjpeg
-    , libpng, libtiff, and libjasper) are used by default. So, LISP-CV can always read JPEG-
-    s, PNGs, and TIFFs. On MacOSX, there is also an option to use native MacOSX image readers. But 
-    beware that currently these native image loaders give images with different pixel values becaus-
-    e of the color management embedded into MacOSX. 
-
-    On Linux*, BSD flavors and other Unix-like open-source operating systems, LISP-CV looks
-    for codecs supplied with an OS image. Install the relevant packages (do not forget the developm-
-    ent files, for example, “libjpeg-dev”, in Debian* and Ubuntu*) to get the codec support or turn 
-    on the OPENCV_BUILD_3RDPARTY_LIBS flag in CMake.
-
-Note
-
-In the case of color images, the decoded images will have the channels stored in B G R order.
-
-
-Example using manual memory management:
-
-
-(defun imread-example-1 (filename)
-
-  "Open the image FILENAME with IMREAD 
-   and show it in a window. This examp-
-   le uses manual memory management"
-
-  (let* ((image (imread filename 1))
-	 (window-name "IMREAD Example 1"))
-    (if (empty image) 
-	(return-from imread-example-1 
-	  (format t "Image not loaded")))
-    (with-named-window (window-name +window-normal+)
-      (move-window window-name 759 175)
-      (imshow window-name image)
-      (loop
-	 (let ((c (wait-key 33)))
-	   (when (= c 27)
-	     (del-mat image)
-	     (return)))))))
-
-
-Example using a WITH-* macrs for memory/window managemant:
-
-
-(defun imread-example-2 (filename)
-
-  "Open the image FILENAME with IMREAD 
-   and show it in a window. This examp-
-   le uses a with-* macro for memory m-
-   anagement."
-
-  (let ((window-name "IMREAD Example 2"))
-    (with-named-window (window-name +window-normal+)
-      (move-window window-name 759 175)
-      (with-mat ((image (imread filename 1)))
-	(if (empty image) 
-	    (return-from imread-example-2 
-	      (format t "Image not loaded")))
-	(imshow window-name image)
-	(loop
-	   (let ((c (wait-key 33)))
-	     (when (= c 27)
-	       (return))))))))
-
-
-
-Example using TG finalizers for memory management:
-
-
-(defun imread-example-3 (filename)
-
-  "Open the image FILENAME with IMREAD 
-   and show it in a window. This examp-
-   le uses a TG finalizer for memory m-
-   anagement"
-
-  (let* ((image (gc:imread filename 1))
-	 (window-name "IMREAD Example 3"))
-    (if (empty image) 
-	(return-from imread-example-3 
-	  (format t "Image not loaded")))
-    (with-named-window (window-name +window-normal+)
-      (move-window window-name 759 175)
-      (imshow window-name image)
-      (loop
-	 (let ((c (wait-key 33)))
-	   (when (= c 27)
-	     (return)))))))
-
-========================================================================================================================================
-IMWRITE
-========================================================================================================================================
-
-Saves an image to a specified file.
-
-C++: bool imwrite(const string& filename, InputArray img, const vector<int>& params=vector<int>() )
-
-LISP-CV: (IMWRITE (FILENAME :STRING) (IMG MAT) ((PARAMS VECTOR-INT) (VECTOR-INT))) => :BOOLEAN
-
-    Parameters:	
-
-        FILENAME - Name of the file.
-
-        IMAGE - Image to be saved.
-
-        PARAMS -
-
-        Format-specific save parameters encoded as pairs PARAM-ID-1, PARAM-VALUE-1, PARAM-ID-2, 
-        PARAM-VALUE-2, ... . The following parameters are currently supported:
-
-            For JPEG, it can be a quality (+IMWRITE-JPEG-QUALITY+) from 0 to 100 (the higher is the 
-            better). Default value is 95.
-
-            For PNG, it can be the compression level (+IMWRITE-PNG-COMPRESSION+) from 0 to 9. A higher 
-            value means a smaller size and longer compression time. Default value is 3.
-
-            For PPM, PGM, or PBM, it can be a binary format flag (+IMWRITE-PXM-BINARY+ ), 0 or 1. 
-            Default value is 1.
-
-The function IMWRITE saves the image to the specified file. The image format is chosen based on the 
-filename extension (see (IMREAD) for the list of extensions). Only 8-bit (or 16-bit unsigned (+16U+) 
-in case of PNG, JPEG 2000, and TIFF) single-channel or 3-channel (with ‘BGR’ channel order) images 
-can be saved using this function. If the format, depth or channel order is different, use (CONVERT-TO), 
-and (CVT-COLOR) to convert it before saving. Or, use the universal XML I/O functions to save the image 
-to XML or YAML format.
-
-It is possible to store PNG images with an alpha channel using this function. To do this, create 8-bit 
-(or 16-bit) 4-channel image BGRA, where the alpha channel goes last. Fully transparent pixels should 
-have alpha set to 0, fully opaque pixels should have alpha set to 255/65535. 
-
-
-(defun imwrite-example (filename out-file)
-  
-  (let* ((window-name-1 "Original image - IMWRITE Example")
-         (window-name-2 "Flipped image - IMWRITE Example"))
-    ;;Read in image
-    (with-mat ((image (imread filename 1)))
-      (if (empty image) 
-	  (return-from imwrite-example 
-	    (format t "Image not loaded")))
-      (with-named-window (window-name-1 +window-normal+)
-	(with-named-window (window-name-2 +window-normal+)
-	  (move-window window-name-1 533 175)
-	  (move-window window-name-2 984 175)
-	  ;;Show original IMAGE in window
-	  (imshow window-name-1 image)
-	  ;;Flip IMAGE around the x-axis
-	  (flip image image -1)
-	  ;;Show flipped image in window
-	  (imshow window-name-2 image)
-	  ;;Write flipped image to filename specified 
-	  ;;by the OUT-FILE parameter 
-	  (imwrite out-file image 
-		   (vector-int 
-		    (list +imwrite-jpeg-quality+ 99)))
-	  (loop 
-    	     (let ((c (wait-key 33)))
-	       (when (= c 27)
-		 (return)))))))))
-
-
-Usage: (IMWRITE-EXAMPLE "/MY-PIC.JPG" "/HOME/USERS/OUT-FILE.JPG")
-
-
-;;Small program used to extract frames from the camera feed.
-
-
-(defun image-extractor (&optional 
-			  (cam *camera-index*) 
-			  (width *default-width*)
-			  (height *default-height*))
-
-  "Extracts frames from the camera feed and saves as 
-    .jpg files in the Lisp-CV Data Directory. This is 
-    useful if you want to create large training sets 
-    easily."
-
-  (with-captured-camera (cap cam :width width :height height)
-    (if (not (is-opened cap)) 
-	(return-from image-extractor 
-	  (format t "Cannot open the video camera")))      
-    (let ((window-name "IMAGE-EXTRACTOR Example")
-          (filename 0))
-      (format t "~%Frame Size : ~ax~a~%~%" 
-	      (*get cap +cap-prop-frame-width+)
-	      (*get cap +cap-prop-frame-height+))
-      (with-named-window (window-name +window-normal+)
-	(move-window window-name 759 175)
-	(with-mat ((frame (mat)))
-	  (loop
-	     (read cap frame)
-	     (setf filename (cat *lisp-cv-data-dir* "img-" 
-				 (write-to-string *file-number*) ".jpg"))
-	     (incf *file-number*)
-	     (imwrite filename frame)
-	     (imshow window-name frame)
-	     (let ((c (wait-key 33)))
-	       (when (= c 27)
-		 (return)))))))))
 
 
 ========================================================================================================================================
-VIDEO-CAPTURE
-========================================================================================================================================
-
-VIDEO-CAPTURE constructors.
-
-Note: Both VIDEO-CAPTURE and MAKE-VIDEO-CAPTURE are provided in this library. The first, to match 
-OpenCV's naming conventions, the second, to adhere to Common Lisp naming conventions. Except for 
-the name, they are the same function. I use the VIDEO-CAPTURE function in the examples in this file 
-because it will make them easier to compare with OpenCV examples you find online, thus making this 
-library easier to learn.
-
-C++: VideoCapture::VideoCapture()
-
-LISP-CV: (VIDEO-CAPTURE) => VIDEO-CAPTURE
-
-LISP-CV: (MAKE-VIDEO-CAPTURE) => VIDEO-CAPTURE
-
-C++: VideoCapture::VideoCapture(int device)
-
-LISP-CV: (VIDEO-CAPTURE &OPTIONAL (SRC :INT)) => VIDEO-CAPTURE
-
-LISP-CV: (MAKE-VIDEO-CAPTURE &OPTIONAL (SRC :INT)) => VIDEO-CAPTURE
-
-C++: VideoCapture::VideoCapture(const string& filename)
-
-LISP-CV: (VIDEO-CAPTURE &OPTIONAL (SRC :STRING)) => VIDEO-CAPTURE
-
-LISP-CV: (MAKE-VIDEO-CAPTURE &OPTIONAL (SRC :STRING)) => VIDEO-CAPTURE
-
-
-  Parameters:	
-
-        SRC - 
-
-             A device: ID of the opened video capturing device (i.e. a camera index). If there is 
-                       a single camera connected, just pass 0.     
-
-             A file name: Name of the opened video file (eg. video.avi) or image sequence (eg. 
-                          img_%02d.jpg, which will read samples like img_00.jpg, img_01.jpg, 
-                          img_02.jpg, ...)
-
-  
-If no arguments are provided this function creates an uninitialized VIDEO-CAPTURE object.
-        
-
-Example:
-
-(defun video-capture-example (filename &optional 
-					 (camera-index *camera-index*))
-
-  "This example use the function VIDEO-CAPTURE to open a video 
-   capturing device, supplied by the *CAMERA-INDEX* parameter. 
-   The setf-able *CAMERA-INDEX* parameter defaults to 0. Then 
-   the function VIDEO-CAPTURE is used to open a video file sup-
-   plied by the parameter FILENAME."
-  
-  (with-video-capture ((camera-capture (video-capture camera-index))
-		       (file-capture (video-capture filename)))
-    (let ((window-name-1 "Camera Feed - VIDEO-CAPTURE Example")
-	  (window-name-2 "Video file - VIDEO-CAPTURE Example"))
-      (if (not (is-opened camera-capture)) 
-	  (return-from video-capture-example 
-	    (format t "Cannot open the video camera")))
-      (if (not (is-opened file-capture)) 
-	  (return-from video-capture-example 
-	    (format t "Cannot open the video file")))
-      (with-named-window (window-name-1 +window-normal+)
-	(with-named-window (window-name-2 +window-normal+)
-	  (move-window window-name-1 533 175)
-	  (move-window window-name-2 984 175)
-	  (with-mat ((camera-frame (mat))
-		     (video-frame (mat)))
-	    (loop 
-	       (read camera-capture camera-frame)
-	       (imshow window-name-1 camera-frame)
-	       (read file-capture video-frame)
-	       (imshow window-name-2 video-frame)
-	       (let ((c (wait-key 33)))
-		 (when (= c 27)
-		   (return))))))))))
-
-
 WITH-CAPTURED-CAMERA
-
+========================================================================================================================================
 
 Ensures VIDEO-CAPTURE-RELEASE and DEL-VIDEO-CAPTURE gets called on captures. Also sets capture width/height in function.
 
@@ -12346,13 +12551,34 @@ Parameters:
          BODY - The body of the code to be executed once the video file or capturing device is open.
 
 
+Example:
 
+(defun with-captured-camera-example ()
 
+  (format t "~%Please enter in the device id of your camera: ")
+
+  (let ((window-name "WITH-CAPTURED-FILE Example")
+	(cam (read)))
+    (with-named-window (window-name +window-normal+)
+      (move-window window-name 759 175)
+      (with-captured-camera (cap cam :width 640 
+				 :height 480)
+	(if (not (is-opened cap)) 
+	    (return-from with-captured-camera-example 
+	      (format t "~%Cannot open the video camera~%~%")))
+	(with-mat ((frame (mat)))
+	  (loop
+	     (read cap frame)
+	     (imshow window-name frame)
+	     (let ((c (wait-key 33)))
+	       (when (= c 27)
+		 (return)))))))))
+
+========================================================================================================================================
 WITH-CAPTURED-FILE
-
+========================================================================================================================================
 
 Ensures VIDEO-CAPTURE-RELEASE and DEL-VIDEO-CAPTURE gets called on captures. Also sets capture width/height in function.
-
 
 LISP-CV: (WITH-CAPTURED-FILE ((CAPTURE-VAR (FILE-PATH :INT) &KEY (WIDTH :INT) (HEIGHT :INT)) &BODY BODY))
 
@@ -12362,8 +12588,8 @@ Parameters:
          CAPTURE-VAR - A variable representing the function used to open video file or a capturing 
                        device. Similar to the variable in a LET statement.
 
-         FILENAME - Name of the opened video file (eg. video.avi) or image sequence (eg. img-%02d.jpg, 
-                    which will read samples like img-00.jpg, img-01.jpg, img-02.jpg,...)
+         FILE-PATH - Name of the opened video file (eg. video.avi) or image sequence (eg. img-%02d.jpg, 
+                     which will read samples like img-00.jpg, img-01.jpg, img-02.jpg,...)
 
          WIDTH - Width of the frames in the video stream.
 
@@ -12372,8 +12598,10 @@ Parameters:
          BODY - The body of the code to be executed once the video file or capturing device is open.
 
 
+Example:
 
 (defun with-captured-file-example (file-path)
+
   (let ((window-name "WITH-CAPTURED-FILE Example"))
     (with-named-window (window-name +window-normal+)
       (move-window window-name 759 175)
@@ -12742,7 +12970,7 @@ Example:
       ;; draw the found matches
       (draw-matches gray-a (aref keypoints-a-arr i) gray-b (aref keypoints-b-arr i) 
 		    (aref matches-arr i) (aref all-matches-arr i) 
-		    (gc:scalar-all -1) (gc:scalar-all -1) (gc:make-vector-char) 
+		    (gc:scalar-all -1) (gc:scalar-all -1) (gc:vector-char) 
 		    +draw-rich-keypoints+)
       ;; show the 12 different matches in 12 windows
       (imshow (aref window-name-arr i) (aref all-matches-arr i))
@@ -12874,7 +13102,7 @@ Example:
 		(move-window window-name 759 175)
 		(with-scalar ((scalar (scalar-all -1)))
 		  ;; draw the found matches
-		  (with-vector-char ((matches-mask (gc:make-vector-char)))
+		  (with-vector-char ((matches-mask (gc:vector-char)))
 		    (draw-matches gray-a keypoints-a gray-b keypoints-b matches all-matches 
 				  scalar scalar matches-mask
 				  +not-draw-single-points+)
@@ -12884,7 +13112,6 @@ Example:
 		       (let ((c (wait-key 33)))
 			 (when (= c 27)
 			   (return))))))))))))))
-
 
 ========================================================================================================================================
 FEATURE-DETECTOR-DETECT
@@ -13151,7 +13378,7 @@ C++: void drawMatches(const Mat& img1, const vector<KeyPoint>& keypoints1, const
 
 LISP-CV: (DRAW-MATCHES (IMG1 MAT) (KEYPOINTS1 KEYPOINT) (IMG2 MAT) (KEYPOINTS2 KEYPOINT) (MATCHES1TO2 VECTOR-DMATCH) 
                        (OUT-IMG MAT) (MATCH-COLOR SCALAR) (SINGLE-POINT-COLOR SCALAR) &OPTIONAL ((MATCHES-MASK VECTOR-CHAR) 
-                       (MAKE-VECTOR-CHAR)) ((FLAGS :INT) +DEFAULT+)) => :VOID
+                       (VECTOR-CHAR)) ((FLAGS :INT) +DEFAULT+)) => :VOID
 
 
     Parameters:	
@@ -13270,22 +13497,22 @@ Example:
 		      ;; output matrix
 		      (with-mat ((all-matches (mat)))
 			(draw-matches object keypoints-a image keypoints-b matches all-matches 
-				      (gc:scalar-all -1) (gc:scalar-all -1) (gc:make-vector-char) 
+				      (gc:scalar-all -1) (gc:scalar-all -1) (gc:vector-char) 
 				      +default+)
 			(imshow window-name-1 all-matches))
 		      (with-mat ((all-matches (mat)))
 			(draw-matches object keypoints-a image keypoints-b matches all-matches 
-				      (gc:scalar 0 0 0) (gc:scalar 255 255 255) (gc:make-vector-char) 
+				      (gc:scalar 0 0 0) (gc:scalar 255 255 255) (gc:vector-char) 
 				      +draw-rich-keypoints+)
 			(imshow window-name-2 all-matches))
 		      (with-mat ((all-matches (mat)))
 			(draw-matches object keypoints-a image keypoints-b matches all-matches 
-				      (gc:scalar 0 0 255) (gc:scalar 255 255 2555) (gc:make-vector-char) 
+				      (gc:scalar 0 0 255) (gc:scalar 255 255 2555) (gc:vector-char) 
 				      +not-draw-single-points+)
 			(imshow window-name-3 all-matches))
 		      (with-mat ((all-matches (mat)))
 			(draw-matches object keypoints-a image keypoints-b matches all-matches 
-				      (gc:scalar-all 255) (gc:scalar-all -1) (gc:make-vector-char) 
+				      (gc:scalar-all 255) (gc:scalar-all -1) (gc:vector-char) 
 				      +draw-rich-keypoints+)
 			(imshow window-name-4 all-matches))
 		      (loop
@@ -13403,7 +13630,6 @@ OBJDETECT - CASCADE CLASSIFICATION
 CASCADE-CLASSIFIER
 ========================================================================================================================================
 
-
 Creates a CASCADE-CLASSIFIER object or loads a classifier from a file.
 
 Note: Both CASCADE-CLASSIFIER and MAKE-CASCADE-CLASSIFIER are provided in this library. The first, 
@@ -13434,7 +13660,6 @@ LISP-CV: (MAKE-CASCADE-CLASSIFIER (FILENAME :STRING)) => CASCADE-CLASSIFIER
 
 Example:
 
-
 Create an uninitialized CASCADE-CLASSIFIER object
 
 CV> (DEFPARAMETER FACE-CASCADE (CASCADE-CLASSIFIER))
@@ -13451,8 +13676,6 @@ FACE-CASCADE-NAME
 CV> (DEFPARAMETER FACE-CASCADE (CASCADE-CLASSIFIER FACE-CASCADE-NAME))
 
 FACE-CASCADE
-
-
 
 ========================================================================================================================================
 CASCADE-CLASSIFIER-LOAD
@@ -13490,11 +13713,9 @@ CV> (CASCADE-CLASSIFIER-LOAD FACE-CASCADE FACE-CASCADE-NAME)  ;Load the Classifi
 T <--- Operation successful
 
 
-
 ========================================================================================================================================
 DETECT-MULTI-SCALE
 ========================================================================================================================================
-
 
 Detects objects of different sizes in the input image. The detected objects are returned as a list of rectangles.
 
@@ -13560,6 +13781,8 @@ This function is parallelized with the TBB library.
 
 ;Global variables
 
+;;Load file
+(defparameter face-cascade-name "<opencv-src-dir>/data/haarcascades/haarcascade_frontalface_default.xml")
 ;;Create CASCADE-CLASSIFIER object.
 (defparameter face-cascade (cascade-classifier))
 ;;Number of file to be saved.
@@ -13693,9 +13916,9 @@ This function is parallelized with the TBB library.
 ML - NORMAL BAYES CLASSIFIER
 ========================================================================================================================================
 
-
-
+========================================================================================================================================
 NORMAL-BAYES-CLASSIFIER
+========================================================================================================================================
 
 Default and training constructors.
 
@@ -13992,9 +14215,9 @@ Example:
 		   (when (= c 27)
 		     (return)))))))))))
 
-
-
+========================================================================================================================================
 NORMAL-BAYES-CLASSIFIER-PREDICT
+========================================================================================================================================
 
 Predicts the response for sample(s).
 
@@ -14015,15 +14238,13 @@ Example:
 
 See NORMAL-BAYES-CLASSIFIER-EXAMPLE in this file.
 
-
-
 ========================================================================================================================================
 ML - K-NEAREST NEIGHBORS
 ========================================================================================================================================
 
-
-
+========================================================================================================================================
 K-NEAREST
+========================================================================================================================================
 
 Default and training constructors.
 
@@ -14341,10 +14562,9 @@ Example:
 		     (when (= c 27)
 		       (return))))))))))))
 
-
-
-
+========================================================================================================================================
 K-NEAREST-FIND-NEAREST
+========================================================================================================================================
 
 Finds the neighbors and predicts responses for input vectors.
 
@@ -14392,12 +14612,9 @@ Example:
 
 See the K-NEAREST-EXAMPLE in this library
 
-
-
 ========================================================================================================================================
 ML - DECISION TREES
 ========================================================================================================================================
-
 
 ========================================================================================================================================
 D-TREE
@@ -14746,7 +14963,6 @@ Example:
 		       (when (= c 27)
 			 (return)))))))))))))
 
-
 ========================================================================================================================================
 D-TREE-PARAMS
 ========================================================================================================================================
@@ -14845,9 +15061,9 @@ Example:
 
 See D-TREE-EXAMPLE in this file.
 
-
-
+========================================================================================================================================
 D-TREE-PREDICT
+========================================================================================================================================
 
 Returns the leaf node of a decision tree corresponding to the input vector.
 
@@ -14885,9 +15101,9 @@ Example:
 
 See D-TREE-EXAMPLE in this file.
 
-
-
+========================================================================================================================================
 D-TREE-TRAIN
+========================================================================================================================================
 
 Trains a decision tree.
 
@@ -14911,12 +15127,9 @@ Example:
 
 See D-TREE-EXAMPLE in this file.
 
-
-
 ========================================================================================================================================
 ML - NEURAL NETWORKS
 ========================================================================================================================================
-
 
 ========================================================================================================================================
 ANN-MLP
@@ -15126,9 +15339,9 @@ Example:
 		 (when (= c 27)
 		   (return))))))))))
 
-
-
+========================================================================================================================================
 ANN-MLP-CREATE
+========================================================================================================================================
 
 Constructs MLP with the specified topology.
 
@@ -15168,9 +15381,9 @@ Example:
 
 See ANN-MLP-EXAMPLE in this file.
 
-
-
+========================================================================================================================================
 ANN-MLP-PREDICT
+========================================================================================================================================
 
 Predicts responses for input samples.
 
@@ -15199,10 +15412,9 @@ Example:
 
 See ANN-MLP-EXAMPLE in this file.
 
-
-
-
+========================================================================================================================================
 ANN-MLP-TRAIN
+========================================================================================================================================
 
 Trains/updates MLP.
 
@@ -15259,7 +15471,6 @@ the range [-1,1], instead of [0,1], for optimal results.
 Example:
 
 See ANN-MLP-EXAMPLE in this file.
-
 
 ========================================================================================================================================
 ANN-MLP-TRAIN-PARAMS
@@ -15344,23 +15555,20 @@ Example:
 
 See ANN-MLP-EXAMPLE in this file.
 
-
-
 ========================================================================================================================================
 PHOTO - INPAINTING
 ========================================================================================================================================
 
-
-
+========================================================================================================================================
 IN-PAINT
-
+========================================================================================================================================
 
 Restores the selected region in an image using the region neighborhood.
 
-
 C++: void inpaint(InputArray src, InputArray inpaintMask, OutputArray dst, double inpaintRadius, int flags)
 
-LISP-CV:
+LISP-CV: (IN-PAINT (SRC MAT) (IN-PAINT-MASK MAT) (DEST MAT) (IN-PAINT-RADIUS :DOUBLE) (FLAGS :INT)) => :VOID
+
 
     Parameters:	
 
@@ -15381,6 +15589,7 @@ LISP-CV:
             +INPAINT-NS+ Navier-Stokes based method [Navier01]
 
             +INPAINT-TELEA+ Method by Alexandru Telea [Telea04].
+
 
 The function reconstructs the selected image area from the pixel near the area boundary. The function 
 may be used to remove dust and scratches from a scanned photo, or to remove undesirable objects from 
@@ -15465,15 +15674,13 @@ Example:
 	       (when (= c 27)
 		 (return)))))))))
 
-
-
 ========================================================================================================================================
 PHOTO - DECOLORIZATION
 ========================================================================================================================================
 
-
-
+========================================================================================================================================
 DECOLOR
+========================================================================================================================================
 
 Transforms a color image to a grayscale image. It is a basic tool in digital printing, stylized 
 black-and-white photograph rendering, and in many single channel image processing applications.
@@ -15519,23 +15726,21 @@ This function is to be applied on color images.
 		 (when (= c 27)
 		   (return))))))))))
 
-
-
 ========================================================================================================================================
 PHOTO - SEAMLESS CLONING
 ========================================================================================================================================
 
-
-
+========================================================================================================================================
 COLOR-CHANGE
+========================================================================================================================================
 
 Given an original color image, two differently colored versions of this image can be mixed seamlessly.
+
 
 C++: void colorChange(InputArray src, InputArray mask, OutputArray dst, float red_mul=1.0f, float green_mul=1.0f, float blue_mul=1.0f)
 
 LISP-CV: (COLOR-CHANGE (SRC MAT) (MASK MAT) (DEST MAT) &OPTIONAL ((RED-MUL :FLOAT) 1.0F0) ((GREEN-MUL :FLOAT) 1.0F0) 
                       ((BLUE-MUL :FLOAT) 1.0F0)) => :VOID
-
 
     Parameters:	
 
@@ -15554,6 +15759,8 @@ LISP-CV: (COLOR-CHANGE (SRC MAT) (MASK MAT) (DEST MAT) &OPTIONAL ((RED-MUL :FLOA
 
 Multiplication factor is between 0.5f0 to 2.5f0.
 
+
+Example:
 
 (defparameter *cloning-dir*
   (cat *lisp-cv-src-dir* "images/cloning"))
@@ -15588,9 +15795,9 @@ Multiplication factor is between 0.5f0 to 2.5f0.
 		 (when (= c 27)
 		   (return))))))))))
 
-
-
+========================================================================================================================================
 ILLUMINATION-CHANGE
+========================================================================================================================================
 
 Applying an appropriate non-linear transformation to the gradient field inside the selection and 
 then integrating back with a Poisson solver, modifies locally the apparent illumination of an 
@@ -15650,9 +15857,9 @@ This is useful to highlight under-exposed foreground objects or to reduce specul
 		 (when (= c 27)
 		   (return))))))))))
 
-
-
+========================================================================================================================================
 SEAMLESS-CLONE
+========================================================================================================================================
 
 Image editing tasks concern either global changes (color/intensity corrections, filters, deformations) 
 or local changes concerned to a selection. Here we are interested in achieving local changes, ones that 
@@ -15690,6 +15897,7 @@ LISP-CV:  (SEAMLESS-CLONING (SRC MAT) (DEST MAT) (MASK MAT) (P POINT) (BLEND MAT
 
             +FEATURE-EXCHANGE+ Feature exchange allows the user to replace easily certain
                 features of one object by alternative features.
+
 
 Example 1:
 
@@ -15739,7 +15947,6 @@ Example 1:
 
 Example 2:
 
-
 (defparameter *cloning-dir*
   (cat *lisp-cv-src-dir* "images/cloning"))
 
@@ -15783,10 +15990,9 @@ Example 2:
 		     (when (= c 27)
 		       (return))))))))))))
 
-
-
-
+========================================================================================================================================
 TEXTURE-FLATTENING
+========================================================================================================================================
 
 By retaining only the gradients at edge locations, before integrating with the Poisson solver, one 
 washes out the texture of the selected region, giving its contents a flat aspect. Here Canny Edge 
@@ -15853,16 +16059,13 @@ color of the destination image.
 		 (when (= c 27)
 		   (return))))))))))
 
-
-
 ========================================================================================================================================
 PHOTO - NON-PHOTOREALISTIC RENDERING
 ========================================================================================================================================
 
-
-
+========================================================================================================================================
 DETAIL-ENHANCE
-
+========================================================================================================================================
 
 This filter enhances the details of a particular image.
 
@@ -15887,10 +16090,9 @@ Example:
 
 See STYLIZATION-EXAMPLE in this file.
 
-
-
+========================================================================================================================================
 EDGE-PRESERVING-FILTER
-
+========================================================================================================================================
 
 Filtering is the fundamental operation in image and video processing. Edge-preserving smoothing filters 
 are used in many different applications.
@@ -15923,12 +16125,12 @@ Example:
 
 See STYLIZATION-EXAMPLE in this file.
 
-
-
+========================================================================================================================================
 PENCIL-SKETCH
+========================================================================================================================================
 
+Pencil-like non-photorealistic line drawing.
 
-Pencil-like non-photorealistic line drawing
 
 C++: void pencilSketch(InputArray src, OutputArray dst1, OutputArray dst2, float sigma_s=60, float sigma_r=0.07f, 
                        float shade_factor=0.02f)
@@ -15955,13 +16157,14 @@ Example:
 
 See STYLIZATION-EXAMPLE in this file.
 
-
-
+========================================================================================================================================
 STYLIZATION
+========================================================================================================================================
 
 Stylization aims to produce digital imagery with a wide variety of effects not focused on photorealism.
 Edge-aware filters are ideal for stylization, as they can abstract regions of low contrast while preserving, 
 or enhancing, high-contrast features.
+
 
 C++: void stylization(InputArray src, OutputArray dst, float sigma_s=60, float sigma_r=0.45f)
 
@@ -15978,6 +16181,7 @@ LISP-CV: (STYLIZATION (SRC MAT) (DEST MAT) &OPTIONAL ((SIGMA-S :FLOAT) 60F0) ((S
         SIGMA-R - Range between 0 to 1.
 
 
+Example:
 
 (defun stylization-example (filename)
 
@@ -16106,7 +16310,7 @@ Example:
 	 (img-matches (gc:mat))
 	 (window-name "Image Matches - SURF Example"))
     (if (empty (or img-1 img-2)) 
-	(return-from surf-example 
+	(returhttp://www.fourcc.org/codecs.phpn-from surf-example 
 	  (format t "Both images were not loaded")))
     (with-named-window (window-name +window-normal+)
       (move-window window-name 759 175)
@@ -16132,9 +16336,9 @@ Example:
 CONTRIB - COLORMAPS IN OPENCV
 ========================================================================================================================================
 
-
-
+========================================================================================================================================
 APPLY-COLOR-MAP
+========================================================================================================================================
 
 Applies a GNU Octave/MATLAB equivalent colormap on a given image.
 
@@ -16213,8 +16417,9 @@ http://docs.opencv.org/trunk/modules/contrib/doc/facerec/colormaps.html?highligh
 
 for the color scales for each of the available colormaps.
 
-
+========================================================================================================================================
 SCALAR
+========================================================================================================================================
 
 SCALAR constructor.
 
@@ -16277,8 +16482,9 @@ scalar with all elements having the same value.
 	    (? scalar-2 :double 2)
 	    (? scalar-2 :double 3))))
 
-
+========================================================================================================================================
 MAT-TYPE
+========================================================================================================================================
 
 Returns the type of a matrix element.
 
@@ -16308,8 +16514,6 @@ Note: This example uses TG finalizers for memory management
 	    (mat-type mat-one))
     (format t "~%MAT-TWO type is ~a(+64f+). It is a Double Precision Floating Point Matrix.~%~%" 
 	    (mat-type mat-two))))
-
-
 
 ========================================================================================================================================
 CIRCLE
@@ -16466,7 +16670,6 @@ wise, the existing matrix A is filled with zeros.
     (loop while (not (= (wait-key 0) 27)))
     (destroy-window window-name)))
 
-
 ========================================================================================================================================
 MAT-ONES
 ========================================================================================================================================
@@ -16511,9 +16714,9 @@ remembers the scale factor (3 in this case) and uses it when actually invoking t
     (loop while (not (= (wait-key 0) 27)))
     (destroy-window window-name)))
 
-
-
+========================================================================================================================================
 MAT-EYE
+========================================================================================================================================
 
 Returns an identity matrix of the specified size and type.
 
@@ -16583,22 +16786,20 @@ to (MAT-ONES), you can use a scale operation to create a scaled identity matrix 
     (loop while (not (= (wait-key 0) 27)))
     (destroy-all-windows)))
 
-
-
-
+========================================================================================================================================
 MAT-EXPR-T
+========================================================================================================================================
 
 Transposes a matrix.
-
 
 C++: MatExpr Mat::t() const
 
 LISP-CV: (MAT-EXPR-T (SELF MAT)) => MAT-EXPR
 
+The method performs matrix transposition by means of matrix expressions. It does not perform the 
+actual transposition but returns a temporary matrix transposition object that can be further used 
+as a part of more complex matrix expressions or can be assigned to a matrix.
 
-The method performs matrix transposition by means of matrix expressions. It does not perform the ac-
-tual transposition but returns a temporary matrix transposition object that can be further used as 
-a part of more complex matrix expressions or can be assigned to a matrix.
 
   Parameters:	
 
@@ -16623,9 +16824,9 @@ CV> (PRINT-MAT (>> (MAT-EXPR-T A)) :UCHAR) ;coerce the return value, back to MAT
 3 6 9 
 NIL
 
-
-
+========================================================================================================================================
 FORCE
+========================================================================================================================================
 
 Coverts a MAT-EXPR to MAT
 
@@ -16668,9 +16869,9 @@ shorthand version of the FORCE function supplied for ease of use.
 
 (>>-example)
 
-
-         
+========================================================================================================================================         
 DIAG
+========================================================================================================================================
 
 Extracts a diagonal from a matrix, or creates a diagonal matrix.
 
@@ -16718,9 +16919,9 @@ single-column matrix. Similarly to (ROW) and (COL) , this is an O(1) operation.
       (princ #\Newline))
     (free data)))
 
-
-
+========================================================================================================================================
 SUB
+========================================================================================================================================
 
 Subtracts matrix M1 from matrix M2
 
@@ -16772,9 +16973,9 @@ to type MAT with the function (FORCE), (or the shorthand version (>>)) to use in
     (free m1-data)
     (free m2-data)))
 
-
-
+========================================================================================================================================
 VIDEO-WRITER
+========================================================================================================================================
 
 VIDEO-WRITER constructors
 
@@ -16791,18 +16992,18 @@ LISP-CV: (MAKE-VIDEO-WRITER) => VIDEO-WRITER
 
 C++: VideoWriter::VideoWriter(const string& filename, int fourcc, double fps, Size frameSize, bool isColor=true)
 
-LISP-CV: (VIDEO-WRITER (FILENAME :STRING) (FOURCC :INT) (FPS :DOUBLE) (FRAME-SIZE SIZE) ((IS-COLOR :INT) T)) => VIDEO-WRITER
+LISP-CV: (VIDEO-WRITER (FILENAME :STRING) (FOUR-CC :INT) (FPS :DOUBLE) (FRAME-SIZE SIZE) ((IS-COLOR :INT) T)) => VIDEO-WRITER
 
-LISP-CV: (MAKE-VIDEO-WRITER (FILENAME :STRING) (FOURCC :INT) (FPS :DOUBLE) (FRAME-SIZE SIZE) ((IS-COLOR :INT) T)) => VIDEO-WRITER
+LISP-CV: (MAKE-VIDEO-WRITER (FILENAME :STRING) (FOUR-CC :INT) (FPS :DOUBLE) (FRAME-SIZE SIZE) ((IS-COLOR :INT) T)) => VIDEO-WRITER
 
 
     Parameters:	
 
         FILENAME - Name of the output video file.
 
-        FOURCC - 4-character code of codec used to compress the frames. For example, CV_FOURCC('P','I','M,'1') 
-                 is a MPEG-1 codec, CV_FOURCC('M','J','P','G') is a motion-jpeg codec etc. List of codes can be 
-                 obtained at Video Codecs by FOURCC page.(todo)
+        FOUR-CC - 4-character code of codec used to compress the frames. For example, (FOUR-CC #\P #\I #\M #\1) 
+                  is a MPEG-1 codec, (FOUR-CC #\M #\J #\P #\G)  is a motion-jpeg codec etc. List of codes can be 
+                  obtained at: http://www.fourcc.org/codecs.php
 
         FPS - Framerate of the created video stream.
 
@@ -16825,30 +17026,32 @@ FFMPEG or VFW is used; on MacOSX QTKit is used.
 	   (window-name "VIDEO-WRITER Example")
 	   (dheight (rational (*get cap +cap-prop-frame-height+)))
 	   (dwidth (rational (*get cap +cap-prop-frame-width+))))
-      ;;Initialize the VIDEO-WRITER object 
-      (with-video-writer ((o-video-writer (make-video-writer filename 1196444237 ; todo
-							     20.0d0 (size width height) 1))) 
-	(if (not (is-opened cap))
-	    (return-from video-writer-example 
-	      (format t "ERROR: Cannot open the video file")))
-	(if (not (video-writer-is-opened o-video-writer)) 
-	    (return-from video-writer-example 
-	      (format t "ERROR: Failed to write the video"))) 
-	(format t "~%Frame Size : ~ax~a~%~%" dwidth dheight)     
-	(with-named-window (window-name +window-normal+)
-	  (move-window window-name 759 175)
-	  (with-mat ((frame (mat)))	
-	    (loop
-	       (read cap frame)
-	       (if (not frame) 
-		   (return-from video-writer-example 
-		     (format t "ERROR: Cannot read video file")))
-	       ;;Write a frame into the file
-	       (write o-video-writer frame)
-	       (imshow window-name frame)
-	       (let ((c (wait-key 33)))
-		 (when (= c 27)
-		   (return))))))))))
+      (with-size ((frame-size (size width height)))
+	;;Initialize the VIDEO-WRITER object 
+	(with-video-writer ((o-video-writer (video-writer filename 
+							  (four-cc #\D #\I #\V #\X)
+							  20.0d0 frame-size 1))) 
+	  (if (not (is-opened cap))
+	      (return-from video-writer-example 
+		(format t "ERROR: Cannot open the video file")))
+	  (if (not (video-writer-is-opened o-video-writer)) 
+	      (return-from video-writer-example 
+		(format t "ERROR: Failed to write the video"))) 
+	  (format t "~%Frame Size : ~ax~a~%~%" dwidth dheight)     
+	  (with-named-window (window-name +window-normal+)
+	    (move-window window-name 759 175)
+	    (with-mat ((frame (mat)))	
+	      (loop
+		 (read cap frame)
+		 (if (not frame) 
+		     (return-from video-writer-example 
+		       (format t "ERROR: Cannot read video file")))
+		 ;;Write a frame into the file
+		 (write o-video-writer frame)
+		 (imshow window-name frame)
+		 (let ((c (wait-key 33)))
+		   (when (= c 27)
+		     (return)))))))))))
 
 ========================================================================================================================================
 VIDEO-WRITER-IS-OPENED
@@ -16914,81 +17117,31 @@ as has been specified when opening the video writer.
    location is specified by the FILENAME parameter."
 
   (with-video-capture ((cap (video-capture cam))) 
-    (let* ((window-name "VIDEO-WRITER-WRITE Example")
-	   (o-video-writer (video-writer filename 1196444237 
-					 20.0d0 (size 640 480) 1)))
-      (if (not (is-opened cap)) 
-	  (return-from video-writer-write-example 
-	    (format t "ERROR: Cannot open the video file")))
-      (if (not (is-opened o-video-writer)) 
-	  (return-from video-writer-write-example 
-	    (format t "ERROR: Failed to write the video"))) 
-      (with-named-window (window-name +window-normal+)
-	(move-window window-name 759 175)
-	(with-mat ((frame (mat)))
-	  (loop
-	     (read cap frame) 
-	     (write o-video-writer frame) 
-	     (imshow window-name frame)
-	     (let ((c (wait-key 33)))
-	       (when (= c 27)
-		 (return)))))))))
+    (let* ((window-name "VIDEO-WRITER-WRITE Example"))
+      (with-size ((frame-size (size 640 480)))
+	(with-video-writer ((o-video-writer (video-writer filename 
+							  (four-cc #\D #\I #\V #\X)
+							  20.0d0 frame-size 1)))
+	  (if (not (is-opened cap)) 
+	      (return-from video-writer-write-example 
+		(format t "ERROR: Cannot open the video file")))
+	  (if (not (is-opened o-video-writer)) 
+	      (return-from video-writer-write-example 
+		(format t "ERROR: Failed to write the video"))) 
+	  (with-named-window (window-name +window-normal+)
+	    (move-window window-name 759 175)
+	    (with-mat ((frame (mat)))
+	      (loop
+		 (read cap frame) 
+		 (write o-video-writer frame) 
+		 (imshow window-name frame)
+		 (let ((c (wait-key 33)))
+		   (when (= c 27)
+		     (return)))))))))))
 
-
-CLONE
-
-Creates a full copy of a matrix and the underlying data or a full copy of a RECT object. 
-
-C++: Mat Mat::clone() const
-
-LISP-CV: (CLONE (SELF MAT)) => MAT
-
-C: Rect* cv_Rect_clone(Rect* self) 
-
-LISP-CV: (CLONE (SELF RECT)) => RECT
-
-
-    Parameters:	
-
-        SELF - Pointer to a matrix or a rectangle.
-
-MAT:
-
-This method creates a full copy of array. The original (*STEP), is not taken into account. So, 
-the array copy is a continuous array occupying (* (TOTAL) (ELEM-SIZE)) bytes.
-
-Note (*STEP) is a binding for the OpenCV Mat class 'step[]' member.
-
-RECT:
-
-This method creates a full copy of a RECT object. It is a convenience function for creating a clone 
-of a RECT object created in C and bound in Lisp.
-
-Note: See RECT-EXAMPLE in this file for an example that uses this CLONE method on a RECT object.
-
-
-(defun clone-example ()
-
-  ;Create data
-  (with-object ((m1-data (alloc :float '(53.0f0 62.0f0 85.0f0 64.0f0 23.0f0 
-					 97.0f0 52.0f0 16.0f0 12.0f0))))
-    ;Create matrix M1 and fill it with data
-    (with-mat ((m1 (mat 3 3 +32f+ m1-data))
-	       ;Create a clone of matrix M1
-	       (m2 (clone m1)))
-      (format t "~%M2 = ~%~%")
-      ;Print the elements of natrix M2 in a loop
-      (dotimes (i (rows m2))
-	(dotimes (j (cols m2))
-	  ;AT retrieves elements of M2, FORMAT 
-	  ;prints the elements to the screen 
-	  (format t "~a" (at m2 i j :float))
-	  (princ #\Space))
-	(princ #\Newline))
-      (format t "~%"))))
-
-
+========================================================================================================================================
 TOTAL
+========================================================================================================================================
 
 Returns the total number of array elements.
 
@@ -17020,8 +17173,9 @@ e).
      (format t "Total mumber of elements in MAT2 = ~a" total2)
      (free data)))
 
-
+========================================================================================================================================
 ROI
+========================================================================================================================================
 
 Returns matrix header corresponding to the rectangular sub-array of an input matrix.
 
@@ -17117,15 +17271,16 @@ Example:
 LISP-CV - MACROS AND EXTRA FUNCTIONS:
 ========================================================================================================================================
 
+========================================================================================================================================
+$ 
+========================================================================================================================================
 
-
-$ (Macro for CL::TIME macro)
-
+Macro for the CL::TIME macro.
 
 Time how long a function takes to complete n iterations.
 
-
 LISP-CV: ($ FORM &optional (COUNT-FORM 1000000) ) => RESULT
+
 
     Parameters:	
 
@@ -17143,7 +17298,6 @@ complete n iterations, because all you have to do is go back one in the REPL his
 
 Example:
 
-
 (defun $-example ()
   ($ (sleep 1) 5))
 
@@ -17158,11 +17312,11 @@ Evaluation took:
   33,008 bytes consed
   
 NIL
+========================================================================================================================================
+? 
+========================================================================================================================================
 
-
-
-
-? (Macro for CFFI::MEM-AREF)
+Macro for CFFI::MEM-AREF.
 
 
 CFFI: mem-aref ptr type &optional (index 0)
@@ -17208,11 +17362,11 @@ LCV> (? A :STRING)
 
 "12545"
 
+========================================================================================================================================
+ALLOC 
+========================================================================================================================================
 
-
-
-ALLOC (Macro for CFFI::FOREIGN-ALLOC)
-
+Macro for CFFI::FOREIGN-ALLOC.
 
 CFFI: - foreign-alloc type &key initial-element initial-contents (count 1) null-terminated-p ⇒ pointer
 
@@ -17253,7 +17407,6 @@ CV> (MEM-AREF B :INT 1)
 CV> (MEM-AREF B :INT 2)
 
 3
-
 
 ========================================================================================================================================
 CONTINUABLE
@@ -17333,7 +17486,7 @@ LISP-CV: (DEL-BF-MATCHER (SELF BF-MATCHER)) => :VOID
 
 LISP-CV: (DEL-BRISK (SELF BRISK)) => :VOID
 
-LISP-CV: (DEL-CASC-CLASS (SELF CASCADE-CLASSIFIER)) => :VOID
+LISP-CV: (DEL-CASCADE-CLASSIFIER (SELF CASCADE-CLASSIFIER)) => :VOID
 
 LISP-CV: (DEL-D-TREE (SELF D-TREE)) => :VOID
 
@@ -17580,14 +17733,11 @@ CV> (MEM-REF A :INT)
 
 0
 
-
 ========================================================================================================================================
 UPDATE-SWANK
 ========================================================================================================================================
 
-
 Grabs SWANK connection and tells it to handle requests. 
-
 
 LISP-CV: (UPDATE-SWANK)
 
@@ -17609,7 +17759,6 @@ Function included for reference:
 
 
 Example:
-
 
 (defparameter n (/ 1 1))
 
@@ -17643,7 +17792,6 @@ Example:
 	   (let ((c (wait-key 33)))
 	     (when (= c 27)
 	       (return))))))))
-
 
 ========================================================================================================================================
 VECTOR-*
@@ -17690,8 +17838,7 @@ VECTOR-VEC-4I <===> vector<Vec4i>
 ==============================
 
 
-Examples:
-
+Examples(vector-example):
 
 Vectors with numbers as elements, VECTOR-CHAR, VECTOR-DOUBLE, VECTOR-FLOAT, VECTOR-INT and VECTOR-UCHAR operate as 
 follows:(I use VECTOR-FLOAT as an example of the 5 aforementioned vector types). 
@@ -17976,6 +18123,13 @@ CV> (IMG-IDX (VECTOR-DMATCH A 0))
 CV> (DISTANCE (VECTOR-DMATCH A 0))
 
 3.0
-
 ========================================================================================================================================
-
+========================================================================================================================================
+========================================================================================================================================
+========================================================================================================================================
+========================================================================================================================================
+========================================================================================================================================
+========================================================================================================================================
+========================================================================================================================================
+========================================================================================================================================
+========================================================================================================================================

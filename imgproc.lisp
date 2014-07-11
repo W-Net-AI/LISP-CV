@@ -487,7 +487,7 @@
 ;; void createHanningWindow(OutputArray dst, Size winSize, int type)
 ;; void cv_createHanningWindow(Mat* dst, Size* winSize, int type)
 (defcfun ("cv_createHanningWindow" create-hanning-window) :void
-  (dst (mat))
+  (dest mat)
   (win-size size)
   (type :int))
 

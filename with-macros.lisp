@@ -70,11 +70,11 @@
 
 
 (defmacro with-cascade-classifier (bind &body body)
-  "Ensures DEL-CASC-CLASS gets called when a
-   CASCADE-CLASSIFIER object goes out of scope."
+  "Ensures DEL-CASCADE-CLASSIFIER gets called when
+   a CASCADE-CLASSIFIER object goes out of scope."
   `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
      (unwind-protect (progn ,@body)
-       (mapcar #!(del-casc-class %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (mapcar #!(del-cascade-classifier %1) ,(cons 'list (mapcar #!(car %1) bind)))
        (values))))
 
 

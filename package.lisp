@@ -54,6 +54,7 @@
    #:?
    #:alloc
    #:d
+   #:f
    #:free
    #:print-mat
    #:size-of
@@ -99,7 +100,7 @@
    #:del
    #:del-ann-mlp
    #:del-ann-mlp-train-params
-   #:del-casc-class
+   #:del-cascade-classifier
    #:del-dmatch
    #:del-d-tree
    #:del-d-tree-params
@@ -664,8 +665,8 @@
    #:y
    #:z
 
-;;; Functions and methods used to 
-;;; re-import shadowed symbols.
+;;; Other generic functions and defuns 
+;;; used to re-import shadowed symbols.
 
    #:abs
    #:exp
@@ -717,7 +718,7 @@
    #:<<
    #:>>
    #:add
-   #:adjust-roi
+   #:adjust-roiadd all pathnames in a directory to a list lisp
    #:area
    #:area-2f
    #:br
@@ -1073,6 +1074,7 @@
    #:check-hardware-support
    #:cube-root
    #:fast-atan2
+   #:get-number-of-cpu-s
    #:get-tick-count
    #:get-tick-frequency
 
@@ -1456,17 +1458,23 @@
    #:+load-image-anycolor+
 
    #:cap-is-open
+   #:four-cc
+   #:grab
    #:imread
    #:imwrite
    #:make-video-capture
    #:make-video-writer
+   #:retrieve
    #:video-capture
    #:video-capture-get
+   #:video-capture-grab
    #:video-capture-is-opened
    #:video-capture-read
    #:video-capture-release
+   #:video-capture-retrieve
    #:video-capture-set
    #:video-writer
+   #:video-writer-four-cc
    #:video-writer-is-opened
    #:video-writer-write
 
@@ -1498,6 +1506,7 @@
 
    #:brisk
    #:make-brisk
+   #:feature-2d-compute
    #:feature-2d-create
 
 ;; features2d - Common Interfaces of Feature Detectors
