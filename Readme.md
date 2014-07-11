@@ -142,27 +142,24 @@ Let's do some tests just to be sure:
 
 ```
 (defun imread-example-2 (filename)
-
-  "Open image with IMREAD and show it in a 
-   window. This example uses with-* macros 
-   for memory management"
-
+  "Open the image FILENAME with IMREAD and show it in a window. This example uses with-*
+macros for memory management"
   (let ((window-name "IMREAD Example 2"))
     (with-named-window (window-name +window-normal+)
       (move-window window-name 759 175)
       (with-mat ((image (imread filename 1)))
         (if (empty image)
-	    (return-from imread-example-2 
-	      (format t "Image not loaded")))
+          (return-from imread-example-2 (format t "Image not loaded")))
         (imshow window-name image)
         (loop
-	   (let ((c (wait-key 33)))
-	     (when (= c 27)
-	       (return))))))))
+          (let ((c (wait-key 33)))
+            (when (= c 27)
+              (return))))))))
 
 (imread-example-2  <path-to-any-image>)
 
 ```
+
 
 If all went as planned, you should see your picture in a window.
 
@@ -242,4 +239,5 @@ with Lisp-CV)*
 *If you would like to add some other unspecified addition to the library*
 
 *Comments*
+
 
