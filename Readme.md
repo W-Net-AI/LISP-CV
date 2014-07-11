@@ -129,7 +129,7 @@ Then install resulting so-files using your distro's recommended way to install c
 Now you can start your Lisp and load LISP-CV:
 ```
 (asdf:load-system :lisp-cv)
-```
+
 (asdf:load-system :gc)
 ```
 
