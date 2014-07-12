@@ -89,6 +89,7 @@ ADD_READ_FUNC_HEADERS_0(d, double);
 ADD_READ_FUNC_HEADERS_1(s, String);
 ADD_READ_FUNC_HEADERS_1(m, Mat);
 int CV_FOURCC(char c1, char c2, char c3, char c4);
+void cv_groupRectangles_3(vector_Rect* rectList, int groupThreshold, double eps);
 void cv_FileNode_read_pointer_vkp (FileNode* fs, vector_KeyPoint* keypoints):
 FileNode * cv_FileNode_assignVal(FileStorage * fs, string * nodename);
 FileStorage* cv_FileStorage_write_String(FileStorage* fs, String* value);

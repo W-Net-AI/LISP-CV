@@ -12,6 +12,11 @@
 ;;Shadowed CL functions are being 
 ;;re-imported here for time being
 
+(defgeneric length (self)
+  (:documentation "Used to call the bindings for the C++ vector class 'size' member and CL:LENGTH."))
+
+(defmethod length ((self sequence))
+  (cl:length self))
 
 (defun max (&rest args)
        (apply #'cl:max args))

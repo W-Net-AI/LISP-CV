@@ -1013,7 +1013,7 @@ DOT
 ========================================================================================================================================
 
 Note: This is a overloaded method that computes the dot product of elements in both MAT and POINT-* 
-objects. THe documentation is revealed pertaining to both.
+objects. The documentation is revealed pertaining to both.
 
 
 MAT
@@ -3557,7 +3557,7 @@ ABS
 Calculates an absolute value of each matrix element.
 
 Note: The LISP-CV function ABS overloads the Common Lisp function ABS so both functions can use the 
-same name. THe LISP-CV function ABS provides the the same functionality as the Common Lisp function 
+same name. The LISP-CV function ABS provides the the same functionality as the Common Lisp function 
 ABS and the OpenCV C++ ABS function. To use the Common Lisp function ABS directly, while you are in 
 the LISP-CV package, you need to evaluate CL:ABS.
 
@@ -3608,7 +3608,7 @@ EXP
 Calculates the exponent of every array element.
 
 Note: The LISP-CV function EXP overloads the Common Lisp function EXP so both functions can use the 
-same name. THe LISP-CV function EXP provides the the same functionality as the Common Lisp function 
+same name. The LISP-CV function EXP provides the the same functionality as the Common Lisp function 
 EXP and the OpenCV 'exp' function. To use the Common Lisp function EXP directly, while you are in the 
 LISP-CV package, you need to evaluate CL:EXP.
 
@@ -3673,7 +3673,7 @@ LOG
 Calculates the natural logarithm of every array element.
 
 Note: The LISP-CV function LOG overloads the Common Lisp function LOG so both functions can use the 
-same name. THe LISP-CV function LOG provides the the same functionality as the Common Lisp function 
+same name. The LISP-CV function LOG provides the the same functionality as the Common Lisp function 
 LOG and the OpenCV 'log' function. To use the Common Lisp function LOG directly, while you are in the 
 LISP-CV package, you need to evaluate CL:LOG.
 
@@ -3733,7 +3733,7 @@ MAX
 Calculates per-element maximum of two arrays.
 
 Note: The LISP-CV function MAX overloads the Common Lisp function MAX so both functions can use the 
-same name. THe LISP-CV function MAX provides the the same functionality as the Common Lisp function 
+same name. The LISP-CV function MAX provides the the same functionality as the Common Lisp function 
 MAX and the OpenCV 'max' function. To use the Common Lisp function MAX directly, while in the LISP-CV 
 package, you need to evaluate CL:MAX.
 
@@ -3850,7 +3850,7 @@ MIN
 Calculates per-element minimum of two arrays.
 
 Note: The LISP-CV function MIN overloads the Common Lisp function MIN so both functions can use the 
-same name. THe LISP-CV function MIN provides the the same functionality as the Common Lisp function 
+same name. The LISP-CV function MIN provides the the same functionality as the Common Lisp function 
 MIN and the OpenCV 'min' function. To use the Common Lisp function MIN directly, while in the LISP-CV 
 package, you need to evaluate CL:MIN.
 
@@ -6992,9 +6992,9 @@ LISP-CV: (RECTANGLE (IMG MAT) (PT1 POINT) (PT2 POINT) (COLOR SCALAR) &OPTIONAL (
 
               IMG - Image.
 
-              PT1 - First point of the line segment.
+              PT1 - Vertex of the rectangle.
 
-              PT2 - Second point of the line segment.
+              PT2 - Vertex of the rectangle opposite to pt1 .
 
               COLOR - Rectangle color or brightness (grayscale image).
 
@@ -7170,7 +7170,7 @@ Note: The name FILE-STORAGE-OPEN is used in the documentation to refer to the bi
 to search for in this file. The OPEN function may also be used to call this binding. 
 
 Note: The LISP-CV function OPEN overloads the Common Lisp function OPEN so both functions can use the 
-same name. THe LISP-CV function OPEN provides the the same functionality as the Common Lisp function 
+same name. The LISP-CV function OPEN provides the the same functionality as the Common Lisp function 
 OPEN and the 'open' members of OpenCV's classes. To use the Common Lisp function OPEN directly, while 
 you are in the LISP-CV package, you need to evaluate CL:OPEN.
 
@@ -7607,7 +7607,7 @@ SQRT
 Calculates a square root of array elements.
 
 Note: The LISP-CV SQRT methods overload the Common Lisp function SQRT so both can use the same name. 
-THe LISP-CV SQRT methods provide the the same functionality as the Common Lisp function SQRT and the 
+The LISP-CV SQRT methods provide the the same functionality as the Common Lisp function SQRT and the 
 OpenCV 'sqrt' function. To use the Common Lisp function SQRT directly, while you are in the LISP-CV 
 package, you need to evaluate CL:SQRT.
 
@@ -12288,7 +12288,7 @@ member of the OpenCV VideoCapture class because it is more descriptive and it is
 in this file. The READ function may also be used to call this binding.
 
 Note: The LISP-CV function READ overloads the Common Lisp function READ so both functions can use the 
-same name. THe LISP-CV function READ provides the the same functionality as the Common Lisp function 
+same name. The LISP-CV function READ provides the the same functionality as the Common Lisp function 
 READ and the 'read' members of OpenCV's classes. To use the Common Lisp function READ directly, while 
 you are in the LISP-CV package, you need to evaluate CL:READ.
 
@@ -12435,7 +12435,7 @@ member of the OpenCV VideoCapture class because it is more descriptive and it is
 in this file. The SET method may also be used to call this binding.
 
 Note: The LISP-CV function SET overloads the Common Lisp function SET so both functions can use the 
-same name. THe LISP-CV function SET provides the the same functionality as the Common Lisp function 
+same name. The LISP-CV function SET provides the the same functionality as the Common Lisp function 
 SET and the 'set' members of OpenCV's classes. To use the Common Lisp function SET directly, while 
 you are in the LISP-CV package, you need to evaluate CL:SET.
 
@@ -17089,7 +17089,7 @@ Note: The name VIDEO-WRITER-WRITE is used in the documentation to refer to the b
 to search for in this file. The WRITE method may also be used to call this binding.
 
 Note: The LISP-CV function WRITE overloads the Common Lisp function WRITE so both functions can use the 
-same name. THe LISP-CV function WRITE provides the the same functionality as the Common Lisp function 
+same name. The LISP-CV function WRITE provides the the same functionality as the Common Lisp function 
 WRITE and the 'write' members of OpenCV's classes. To use the Common Lisp function WRITE directly, while 
 you are in the LISP-CV package, you need to evaluate CL:WRITE.
 
@@ -17833,16 +17833,39 @@ VECTOR-RECT <===> vector<Rect>
 =============================     
 VECTOR-UCHAR <===> vector<uchar>
 ==============================    
+VECTOR-VEC-2D <===> vector<Vec2d>
+==============================
+VECTOR-VEC-3D <===> vector<Vec3d>
+==============================
+VECTOR-VEC-4D <===> vector<Vec4d>
+==============================
+VECTOR-VEC-6D <===> vector<Vec6d>
+==============================
+VECTOR-VEC-2F <===> vector<Vec2f>
+==============================
+VECTOR-VEC-3F <===> vector<Vec3f>
+==============================
+VECTOR-VEC-4F <===> vector<Vec4f>
+==============================
+VECTOR-VEC-6F <===> vector<Vec6f>
+==============================
+VECTOR-VEC-2I <===> vector<Vec2i>
+==============================
+VECTOR-VEC-3I <===> vector<Vec3i>
+==============================
 VECTOR-VEC-4I <===> vector<Vec4i>
 ==============================
-
+VECTOR-VEC-6I <===> vector<Vec6i>
+==============================
+VECTOR-VEC-8I <===> vector<Vec8i>
+==============================
 
 Examples(vector-example):
 
-Vectors with numbers as elements, VECTOR-CHAR, VECTOR-DOUBLE, VECTOR-FLOAT, VECTOR-INT and VECTOR-UCHAR operate as 
-follows:(I use VECTOR-FLOAT as an example of the 5 aforementioned vector types). 
+Vectors with numbers as elements include, VECTOR-CHAR, VECTOR-DOUBLE, VECTOR-FLOAT, VECTOR-INT and 
+VECTOR-UCHAR. The preceding vectors operate as follows:(Using VECTOR-FLOAT as the example of the 5.) 
 
-The idea behind the vector macros in Lisp-CV is you use them primarily to pass data to and from the 
+The idea behind the vector functions in Lisp-CV is you use them primarily to pass data to and from the 
 underlying OpenCV code only. The reason being, due to the nature of wrapping the C++ vector class in 
 Lisp, some of the C++ speed is lost. Since Lisp vectors are extremely fast, the best workaround is to 
 use Lisp's own vector and list processing functions to fill in the gaps. The functions are designed so 
@@ -17924,11 +17947,11 @@ CV> (VECTOR-FLOAT :TO-LISP-VEC B)
 and then complete any necessary operations on the data.
 
 
-The ability to retrieve the length of a C++ vector is built into the Lisp-CV vector functions, it is 
-quite fast as well. You just evaluate as follows(using variable B from above):
+The ability to get the length of a vector is provided by this librarys overloaded LENGTH methods 
+You just evaluate as follows(using variable B from above):
 
 
-CV> (VECTOR-FLOAT :LENGTH B)
+CV> (LENGTH B)
 
 3  <--- Vector B length
 
@@ -17948,7 +17971,6 @@ If you would like to created an initialized C++ vector to pass to a function, yo
 the below:
 
 
-
 CV> (VECTOR-FLOAT '(1f0 2f0 3f0)) 
 
 
@@ -17959,7 +17981,6 @@ CV> (VECTOR-FLOAT (VECTOR 1f0 2f0 3f0))
 
 
 #<STD-VECTOR-FLOAT {100352FEA3}> <--- Output is a CLOS object pointing to an initialized vector<float>.
-
 
 
 Again these functions are a little bit slow for extremely large operations. However, if you assign 
@@ -18071,13 +18092,18 @@ CV> (VECTOR-POINT :TO-LISP-VEC A)
 #(#<CV-POINT {1006C49DA3}> #<CV-POINT {1006C49E03}>)  <--- Lisp vector
 
 
-And also retrieve the length of the vector:
+And, again, you can also retrieve the length of the vector using its LENGTH method:
 
 
-(VECTOR-POINT :LENGTH A)
+(LENGTH A)
 
 2  <--- Vector A length
 
+
+Note: The Common Lisp function LENGTH is overloaded in this libray so it can retrieve the length of 
+a C++ vector as well. This overloading causes CL:LENGTH to take close to a 0.027 sceond per million 
+iteration speed decrease. If you would like to use the Common Lisp function LENGTH directly, while 
+you're in the LISP-CV package, you need to evaluate CL:lENGTH.
 
 
 Note: For VECTOR-DMATCH. When accessing the numerical content of of the objects in a VECTOR-DMATCH, 
@@ -18096,13 +18122,13 @@ CV> (VECTOR-DMATCH A 0 1 :INT)
 
 2
 
-If a VECTOR-DMATCH contains a 3 element DMATCH, the value you entered 
-as the 3rd parameter will be accessible at the 4th index because on a
-3 element DMATCH the 3rd parameter contains the value of the OpenCV C++ 
-DMatch class distance member and that member is the fourth member in the 
-OpenCV DMatch class. If you access the value at the 3rd index you will be 
-retrieving the value of the OpenCv DMatch class imgIdx(IMG-IDX in Lisp-CV) 
-member which is of int type and has a default value of -1, e.g:
+
+If a VECTOR-DMATCH contains a 3 element DMATCH, the value you entered as the 3rd parameter will be 
+accessible at the 4th index. The reason being, on a 3 element DMATCH the 3rd parameter contains the 
+value of the OpenCV C++ DMatch class 'distance' member and that member is the fourth member in the 
+OpenCV DMatch class. If you access the value at the 3rd index, you will be retrieving the value of 
+the OpenCv DMatch class imgIdx(IMG-IDX in Lisp-CV) member, which is of int type, and has a default 
+value of -1. e.g:
 
 
 CV> (VECTOR-DMATCH A 0 2 :INT) <== IMG-IDX 
@@ -18122,6 +18148,7 @@ CV> (IMG-IDX (VECTOR-DMATCH A 0))
 CV> (DISTANCE (VECTOR-DMATCH A 0))
 
 3.0
+
 ========================================================================================================================================
 ========================================================================================================================================
 ========================================================================================================================================

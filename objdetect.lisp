@@ -145,3 +145,14 @@
 	 (t nil)))
 
 
+;; void groupRectangles(vector<Rect>& rectList, int groupThreshold, double eps=0.2)
+;; void cv_groupRectangles_3(vector_Rect* rectList, int groupThreshold, double eps)
+(defcfun ("cv_groupRectangles_3" %group-rectangles) :void
+  (rect-list vector-rect)
+  (group-threshold :int)
+  (eps :double))
+
+
+(defun group-rectangles (rect-list group-threshold &optional (eps 0.2d0))
+  (%group-rectangles rect-list group-threshold eps))
+

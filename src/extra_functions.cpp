@@ -137,6 +137,10 @@ int CV_FOURCC(char c1, char c2, char c3, char c4)
     return CV_FOURCC_MACRO(c1, c2, c3, c4); 
 }
 
+void cv_groupRectangles_3(vector_Rect* rectList, int groupThreshold, double eps) {
+	cv::groupRectangles(*rectList, groupThreshold, eps);
+}
+
 FileNode * cv_FileNode_assignVal(FileStorage * fs, string * nodename) {
 
     return new cv::FileNode(fs->operator[](*nodename));

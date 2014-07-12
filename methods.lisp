@@ -296,18 +296,6 @@
   (dot-3i self other))
 
 
-(defmethod height ((self cv-rect))
-  (mem-aref (c-pointer self) :int 2))
-
-
-(defmethod height ((self cv-size))
-  (mem-aref (c-pointer self) :int 1))
-
-
-(defmethod height ((self cv-size-2f))
-  (mem-aref (c-pointer self) :float 1))
-
-
 (defmethod feature-2d-compute ((self cv-bf-matcher) image keypoints descriptors)
   "Computes the descriptors for a set of keypoints detected in an image."
   (feature-2d-compute-bf-matcher self image keypoints descriptors))
@@ -388,6 +376,18 @@
   (file-storage-write-vector-key-point fs (%c-string-to-string name (length name)) value))
 
 
+(defmethod height ((self cv-rect))
+  (mem-aref (c-pointer self) :int 2))
+
+
+(defmethod height ((self cv-size))
+  (mem-aref (c-pointer self) :int 1))
+
+
+(defmethod height ((self cv-size-2f))
+  (mem-aref (c-pointer self) :float 1))
+
+
 (defmethod is-opened ((self cv-video-capture))
 	   (video-capture-is-opened self))
 
@@ -397,6 +397,102 @@
 
 (defmethod *get ((self cv-video-capture) (value integer))
 	   (video-capture-get self value))
+
+
+(defmethod length ((self std-vector-char))
+  (vec-char-length self))
+
+
+(defmethod length ((self std-vector-dmatch))
+  (vec-dmatch-length self))
+
+
+(defmethod length ((self std-vector-double))
+  (vec-double-length self))
+
+
+(defmethod length ((self std-vector-float))
+  (vec-float-length self))
+
+
+(defmethod length ((self std-vector-int))
+  (vec-int-length self))
+
+
+(defmethod length ((self std-vector-key-point))
+  (vec-key-point-length self))
+
+
+(defmethod length ((self std-vector-mat))
+  (vec-mat-length self))
+
+
+(defmethod length ((self std-vector-point))
+  (vec-point-length self))
+
+
+(defmethod length ((self std-vector-point-2f))
+  (vec-point-2f-length self))
+
+
+(defmethod length ((self std-vector-rect))
+  (vec-rect-length self))
+
+
+(defmethod length ((self std-vector-uchar))
+  (vec-uchar-length self))
+
+
+(defmethod length ((self std-vector-vec-2d))
+  (vec-vec-2d-length self))
+
+
+(defmethod length ((self std-vector-vec-3d))
+  (vec-vec-3d-length self))
+
+
+(defmethod length ((self std-vector-vec-4d))
+  (vec-vec-4d-length self))
+
+
+(defmethod length ((self std-vector-vec-6d))
+  (vec-vec-6d-length self))
+
+
+(defmethod length ((self std-vector-vec-2f))
+  (vec-vec-2f-length self))
+
+
+(defmethod length ((self std-vector-vec-3f))
+  (vec-vec-3f-length self))
+
+
+(defmethod length ((self std-vector-vec-4f)) 
+  (vec-vec-4f-length self))
+
+
+(defmethod length ((self std-vector-vec-6f))
+  (vec-vec-6f-length self))
+
+
+(defmethod length ((self std-vector-vec-2i))
+  (vec-vec-2i-length self))
+
+
+(defmethod length ((self std-vector-vec-3i))
+  (vec-vec-3i-length self))
+
+
+(defmethod length ((self std-vector-vec-4i))
+  (vec-vec-4i-length self))
+
+
+(defmethod length ((self std-vector-vec-6i))
+  (vec-vec-6i-length self))
+
+
+(defmethod length ((self std-vector-vec-8i))
+  (vec-vec-8i-length self))
 
 
 (defmethod match ((self cv-bf-matcher) &rest args)
@@ -627,7 +723,7 @@
 	 (apply #'cl:set args))
 	((typep (first args) 'cv-video-capture) 
 	 (video-capture-set (first args) (second args) (coerce (or (third args) 0d0) 'double-float)))))
-;
+
 
 (defun write (&rest args)
 
