@@ -132,7 +132,7 @@ ADD_READ_FUNC_IMPL_1(m, Mat);
 
 ADD_READ_FUNC_IMPL_2(vkp, vector_KeyPoint);
 
-Mat* cv_imdecode_2(vector_uchar* buf, int flags) {
+Mat* cv_imdecode(vector_uchar* buf, int flags) {
 	return new Mat(cv::imdecode(*buf, flags));
 }
 

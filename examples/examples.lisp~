@@ -14177,9 +14177,9 @@ The constructors follow conventions of (STAT-MODEL). See (STAT-MODEL-TRAIN) for 
 
 Example:
 
+
 ;; Note: This example is similar to, but is a more advanced 
-;; and informative version of the ANN-MLP-EAXMPLE in this f-
-;; ile.
+;; and informative version of the ANN-MLP-EAXMPLE in this file.
 
 ;; Download the PDF at this link for more details.
 
@@ -14313,8 +14313,7 @@ Example:
     (setf (at layers 2 0 :int) (? *layer-2* :int))
     (setf (at layers 3 0 :int) (? *layer-3* :int))
     (with-ann-mlp ((mlp (ann-mlp)))
-      (with-term-criteria ((criteria (term-criteria (logior +term-criteria-max-iter+ 
-							    +term-criteria-eps+) 
+      (with-term-criteria ((criteria (term-criteria (logior +term-criteria-max-iter+ +term-criteria-eps+) 
 						    100 0.00001d0)))
 	(with-ann-mlp-train-params ((params (ann-mlp-train-params criteria 
 								  +ann-mlp-train-params-backprop+ 
@@ -14659,8 +14658,7 @@ Example:
     (setf (at layers 2 0 :int) (? *layer-2* :int))
     (setf (at layers 3 0 :int) (? *layer-3* :int))
     (with-ann-mlp ((mlp (ann-mlp)))
-      (with-term-criteria ((criteria (term-criteria (logior +term-criteria-max-iter+ 
-							    +term-criteria-eps+) 
+      (with-term-criteria ((criteria (term-criteria (logior +term-criteria-max-iter+ +term-criteria-eps+) 
 						    100 0.00001d0)))
 	(with-ann-mlp-train-params ((params (ann-mlp-train-params criteria 
 								  +ann-mlp-train-params-backprop+ 
@@ -15056,8 +15054,7 @@ Example:
     (setf (at layers 2 0 :int) (? *layer-2* :int))
     (setf (at layers 3 0 :int) (? *layer-3* :int))
     (with-ann-mlp ((mlp (ann-mlp)))
-      (with-term-criteria ((criteria (term-criteria (logior +term-criteria-max-iter+ 
-							    +term-criteria-eps+) 
+      (with-term-criteria ((criteria (term-criteria (logior +term-criteria-max-iter+ +term-criteria-eps+) 
 						    100 0.00001d0)))
 	(with-ann-mlp-train-params ((params (ann-mlp-train-params criteria 
 								  +ann-mlp-train-params-backprop+ 
@@ -15463,8 +15460,7 @@ Example:
     (setf (at layers 2 0 :int) 15)
     (setf (at layers 3 0 :int) 1)
     (with-ann-mlp ((mlp (ann-mlp)))
-      (with-term-criteria ((criteria (term-criteria (logior +term-criteria-max-iter+ 
-							    +term-criteria-eps+) 
+      (with-term-criteria ((criteria (term-criteria (logior +term-criteria-max-iter+ +term-criteria-eps+) 
 						    100 0.00001d0)))
 	(with-ann-mlp-train-params ((params (ann-mlp-train-params criteria 
 								  +ann-mlp-train-params-backprop+ 
