@@ -3672,7 +3672,7 @@ Example:
 
 
 ========================================================================================================================================
-#CORE - OPERATIONS ON ARRAYS
+#CORE - #OPERATIONS ON ARRAYS
 ========================================================================================================================================
 
 ========================================================================================================================================
@@ -6565,7 +6565,7 @@ There is a nuance illustrated by the following example:
 
 
 ========================================================================================================================================
-#CORE - DRAWING FUNCTIONS
+#CORE - #DRAWING FUNCTIONS
 ========================================================================================================================================
 
 ========================================================================================================================================
@@ -7224,7 +7224,7 @@ CV> (CIRCLE IMAGE POINT RADIUS (T:RGB 255 0 0) +FILLED+ +AA+ 0)
 
 
 ========================================================================================================================================
-#CORE - XML/YAML PERSISTENCE:
+#CORE - #XML/YAML PERSISTENCE:
 ========================================================================================================================================
 
 ========================================================================================================================================
@@ -7500,7 +7500,7 @@ Example:
 		   (return))))))))))
 
 ========================================================================================================================================
-#CORE - UTILITY AND SYSTEM FUNCTIONS AND MACROS
+#CORE - #UTILITY AND SYSTEM FUNCTIONS AND MACROS
 ========================================================================================================================================
 
 ========================================================================================================================================
@@ -7775,7 +7775,7 @@ See also:
       (format t "~%"))))
 
 ========================================================================================================================================
-#IMGPROC - IMAGE FILTERING
+#IMGPROC - #IMAGE FILTERING
 ========================================================================================================================================
 
 ========================================================================================================================================
@@ -9184,7 +9184,7 @@ Example 2:
 
 
 ========================================================================================================================================
-#IMGPROC - GEOMETRIC IMAGE TRANSFORMATIONS
+#IMGPROC - #GEOMETRIC IMAGE TRANSFORMATIONS
 ========================================================================================================================================
 
 
@@ -9889,7 +9889,7 @@ Resizes an image.
 C++: void resize(InputArray src, OutputArray dst, Size dsize, double fx=0, double fy=0, int interpolation=INTER_LINEAR )
 
 LISP-CV: (RESIZE (SRC MAT) (DEST MAT) (DSIZE SIZE) &OPTIONAL ((FX :DOUBLE) 0D0) ((FY :DOUBLE) 0D0) 
-         ((INTERPOLATION :INT) +INTER-LINEAR+)) => :VOID
+        ((INTERPOLATION :INT) +INTER-LINEAR+)) => :VOID
 
 
     Parameters:	
@@ -9897,7 +9897,7 @@ LISP-CV: (RESIZE (SRC MAT) (DEST MAT) (DSIZE SIZE) &OPTIONAL ((FX :DOUBLE) 0D0) 
         SRC - Input image.
 
         DEST - Output image; it has the size DSIZE (when it is non-zero) or the size computed from 
-              (SIZE SRC), FX, and FY; the type of DEST is the same as of SRC.
+               (SIZE SRC), FX, and FY; the type of DEST is the same as of SRC.
 
         DSIZE - Output image size.
 
@@ -10105,7 +10105,7 @@ See also:
 
 
 ========================================================================================================================================
-#IMGPROC - MISCELLANEOUS IMAGE TRANSFORMATIONS:
+#IMGPROC - #MISCELLANEOUS IMAGE TRANSFORMATIONS:
 ========================================================================================================================================
 
 
@@ -10601,7 +10601,7 @@ Example:
 		       (return))))))))))))
 
 ========================================================================================================================================
-#IMGPROC - HISTOGRAMS
+#IMGPROC - #HISTOGRAMS
 ========================================================================================================================================
 
 ========================================================================================================================================
@@ -10676,7 +10676,7 @@ Example:
 
 
 ========================================================================================================================================
-#IMGPROC - MOTION ANALYSIS AND OBJECT TRACKING
+#IMGPROC - #MOTION ANALYSIS AND OBJECT TRACKING
 ========================================================================================================================================
 
 ========================================================================================================================================
@@ -10817,7 +10817,7 @@ Example:
 		     (return)))))))))))
 
 ========================================================================================================================================
-#IMGPROC - FEATURE DETECTION
+#IMGPROC - #FEATURE DETECTION
 ========================================================================================================================================
 
 ========================================================================================================================================
@@ -10906,7 +10906,7 @@ Example:
 		   (return))))))))))
 
 ========================================================================================================================================
-#IMGPROC - OBJECT DETECTION
+#IMGPROC - #OBJECT DETECTION
 ========================================================================================================================================
 
 ========================================================================================================================================
@@ -11239,7 +11239,7 @@ Example 2:
 				     (return)))))))))))))))))))
 
 ========================================================================================================================================
-#HIGHGUI - USER INTERFACE
+#HIGHGUI - #USER INTERFACE
 ========================================================================================================================================
 
 ========================================================================================================================================
@@ -11858,8 +11858,80 @@ there are several HighGUI windows, any of them can be active.
     (destroy-window window-name)))
 
 ========================================================================================================================================
-#HIGHGUI - READING AND WRITING IMAGES AND VIDEO
+#HIGHGUI - #READING AND WRITING IMAGES AND VIDEO
 ========================================================================================================================================
+
+========================================================================================================================================
+#IMDECODE
+========================================================================================================================================
+
+Reads an image from a buffer in memory.
+
+C++: Mat imdecode(InputArray buf, int flags)
+
+LISP-CV: (IMDECODE (BUF VECTOR-UCHAR) (FLAGS :INT)) => MAT
+
+
+    Parameters:	
+
+        BUF - Input array or vector of bytes.
+
+        FLAGS - The same flags as in (IMREAD).
+
+
+The function reads an image from the specified buffer in the memory. If the buffer is too short or 
+contains invalid data, the empty matrix/image is returned.
+
+See (IMREAD) for the list of supported formats and flags description.
+
+Note: In the case of color images, the decoded images will have the channels stored in B G R order.
+
+
+Example:
+
+(defun imdecode-example (&optional 
+			   (cam *camera-index*) 
+			   (width *default-width*)
+			   (height *default-height*))
+
+  "In a loop, a frame of the camera feed is encoded with IMENCODE and 
+   then decoded with IMDECODE and shown in a window. You can move the 
+   trackbar to choose the flag specifying decoded image's color type ."
+
+  (with-captured-camera (cap cam :width width :height height)
+    (if (not (is-opened cap)) 
+	(return-from imdecode-example 
+	  (format t "Cannot open the video camera")))      
+    (let ((window-name "IMDECODE Example")
+          (text 0)
+          (scale 0.785d0)
+          (thickness 1)
+          (line-type 8))
+      (with-named-window (window-name +window-autosize+)
+	(move-window window-name 640 175)
+	(with-object ((color-type (alloc :int 1)))
+	  (create-trackbar "Color Type" window-name color-type 2)
+	  (with-mat ((frame (mat)))
+	    (with-vector-uchar ((buf (vector-uchar)))
+	      (with-vector-int ((params (vector-int (list +imwrite-jpeg-quality+ 100))))
+		(with-point ((org (point 7 35)))
+		  (with-scalar ((blue (bgr 255 0 0)))
+		    (loop
+		       (read cap frame)
+		       (imencode ".jpg" frame buf params)
+		       (cond ((eq (? color-type :int) 0)
+			      (setf text (cat "Current Color Type is: " "+LOAD-IMAGE-GRAYSCALE")))
+			     ((eq (? color-type :int) 1)
+			      (setf text (cat "Current Color Type is: " "+LOAD-IMAGE-COLOR")))
+			     ((eq (? color-type :int) 2)
+			      (setf text (cat "Current Color Type is: " "+LOAD-IMAGE-ANYDEPTH"))))
+		       (with-mat ((decoded-image (imdecode buf (? color-type :int))))
+			 (put-text decoded-image text org +font-hershey-duplex+ scale 
+				   blue thickness line-type)
+			 (imshow window-name decoded-image))
+		       (let ((c (wait-key 33)))
+			 (when (= c 27)
+			   (return))))))))))))))
 
 ========================================================================================================================================
 #IMENCODE
@@ -11887,87 +11959,130 @@ See (IMWRITE) for the list of supported formats and flags description.
 
 Example:
 
-(defun imencode-example (output-folder &optional 
-					 (cam *camera-index*) 
-					 (width *default-width*)
-					 (height *default-height*))
+;;Functions in a separate thread will access 
+;;these variables so they need to be global.
+(defparameter window-name 0)
+(defparameter output-file-path 0)
+(defparameter vector-of-params 0)
+(defparameter frame 0)
+(defparameter text-1 0)
+(defparameter text-2 0)
+(defparameter timer (alloc :int 0))
+
+(defun imencode-example (output-folder filename &optional 
+						  (cam *camera-index*) 
+						  (width *default-width*)
+						  (height *default-height*))
 
   "This example allows you to capture images from the camera feed and 
    save them to a directory. Moving the 'J/W/PN/PX' Trackbar allows you 
    to choose between any one of the following four file types to save your 
    image as, JPG, WEBP, PNG, and PGM. Once you have chosen the file type for 
-   your image, move one of the four top-most trackbars to set the quality of 
-   the image. You can toggle the bottom trackbar to turn off the text before 
-   you save your image. Tap the 'w' key to write your image to disk."
+   your image, you can move one of the four trackbars that are underneath the 
+   'J/W/PN/PX' trackbar to set the quality/compression level of the image. You 
+   can toggle the bottom trackbar to disable the text before writing your image. 
+   Tap the 'w' key to write your image to disk. Slide the 'Timer' trackbar from 
+   0 to 15 if you would like to change the time(seconds) the program waits before 
+   capturing an image."
 
   (with-captured-camera (cap cam :width width :height height)
     (if (not (is-opened cap)) 
 	(return-from imencode-example 
 	  (format t "Cannot open the video camera")))      
-    (let ((window-name "IMENCODE Example")
-          (output-file-path 0)
-          (params 0)
+    (let ((params 0)
           (ext 0)
-          (text 0)
           (scale 1.15d0)
           (thickness 1)
-          (line-type 8))
+          (line-type 8)
+	  (n nil))
+      (setf window-name "IMENCODE Example")
       (with-named-window (window-name +window-autosize+)
 	(move-window window-name 640 175)
+        ;;Create values the trackbars can adjust.
 	(with-object ((jpeg-qual (alloc :int 95))
 		      (webp-qual (alloc :int 100))
 		      (png-comp (alloc :int 3))
 		      (pxm-binary (alloc :int 1))
 		      (mode (alloc :int 0))
                       (toggle-text (alloc :int 1)))
+	  (create-trackbar "J/W/PN/PX" window-name mode 3)
 	  (create-trackbar "JPG Qual." window-name jpeg-qual 99)
 	  (create-trackbar "WEBP Qual." window-name webp-qual 99)
 	  (create-trackbar "PNG Comp." window-name png-comp 8)
 	  (create-trackbar "PXM bin." window-name pxm-binary 1)
-	  (create-trackbar "J/W/PN/PX" window-name mode 3)
 	  (create-trackbar "Togg, Text" window-name toggle-text 1)
-	  (with-mat ((frame (mat)))
-	    (with-point ((org (point 7 35)))
-	      (with-scalar ((green (rgb 0 255 0)))
-		(loop
-		   (read cap frame)
-		   (with-vector-uchar ((buf (vector-uchar)))
-		     (cond ((eq (? mode :int) 0)
-			    (setf params (vector-int (list +imwrite-jpeg-quality+ 
-							   (? jpeg-qual :int))))
-			    (setf ext ".jpg"))
-			   ((eq (? mode :int) 1)
-			    (setf params (vector-int (list +imwrite-webp-quality+ 
-							   (? webp-qual :int))))
-			    (setf ext ".webp"))
-			   ((eq (? mode :int) 2)
-			    (setf params (vector-int (list +imwrite-png-compression+ 
-							   (? png-comp :int))))
-			    (setf ext ".png"))
-			   ((eq (? mode :int) 3)
-			    (setf params (vector-int (list +imwrite-pxm-binary+ 
-							   (? pxm-binary :int))))
-			    (setf ext ".pgm")))
-		     (imencode ext frame buf params)
-		     (setf text (cat "Size of Compressed Image: " (write-to-string (length buf))))
-		     (if (eq (? toggle-text :int) 1) 
-			 (put-text frame text org +font-hershey-script-simplex+ scale 
-				   green thickness line-type)))
+          (create-trackbar "Timer" window-name timer 15)
+	  (setf frame (mat))
+          ;;Create origin parameter for PUT-TEXT.
+	  (with-point ((org (point 7 35)))
+            ;;Create color parameter for PUT-TEXT.
+	    (with-scalar ((green (rgb 0 255 0)))
+	      (loop
+		 (read cap frame)
+                 ;;Create buffer to hold the encoded image.
+		 (with-vector-uchar ((buf (vector-uchar)))
+		   
+                   ;;Create the format parameters for IMENCODE 
+                   ;;and IMWRITE(based on top tackbar position).
+		   (cond ((eq (? mode :int) 0)
+			  (setf params (list +imwrite-jpeg-quality+ 
+					     (? jpeg-qual :int)))
+			  (setf ext ".jpg"))
+			 ((eq (? mode :int) 1)
+			  (setf params (list +imwrite-webp-quality+ 
+					     (? webp-qual :int)))
+			  (setf ext ".webp"))
+			 ((eq (? mode :int) 2)
+			  (setf params (list +imwrite-png-compression+ 
+					     (? png-comp :int)))
+			  (setf ext ".png"))
+			 ((eq (? mode :int) 3)
+			  (setf params (list +imwrite-pxm-binary+ 
+					     (? pxm-binary :int)))
+			  (setf ext ".pgm")))
+                   ;;Push the format parameters into a vector.
+		   (setf vector-of-params (vector-int params))
+                   ;;Encode a frame of the camera feed into BUF.
+		   (imencode ext frame buf vector-of-params)
+                   ;;Create text string for PUT-TEXT.
+		   (setf text-1 (cat "Size of Compressed Image: " 
+				     (write-to-string (length buf)))) ;Find length of 
+		   (if (eq (? toggle-text :int) 1)                    ;encoded image
+                       ;;Print size of BUF to screen.
+		       (put-text frame text-1 org +font-hershey-script-simplex+ scale 
+				 green thickness line-type))
+                   ;;If 'Esc' is pressed, 
+                   ;;then, exit program.
 		   (let ((c (wait-key 33)))
 		     (if (eq c 27)
-			 (return-from imencode-example (format t "~%Break!~%")))
-		     (if (eq c 119) (progn
-				      (setf output-file-path (cat output-folder "my-pic-" 
-								  (write-to-string 
-								   *file-number*) ext))
-				      (incf *file-number*)
-				      (imwrite output-file-path frame params)
-				      (setf text (cat "Wrote " (write-to-string 
-								output-file-path)))
-				      (display-overlay window-name text 2500))))
-		   (imshow window-name frame)
-		     (when nil
-		       (return)))))))))))
+			 (return-from imencode-example 
+			   (progn (format t "~%Break!~%") 
+				  (del-mat frame) 
+				  (del-vector-int vector-of-params) 
+				  (free timer) (setf *file-number* 0))))
+		     ;;If 'w' is pressed, 
+		     ;;then, write image.
+		     (if (eq c 119) 
+			 (progn
+			   (setf text-2 (cat "Waiting"))
+			   (display-overlay window-name text-2 (* (? timer :int) 1000))
+			   (setf output-file-path (cat output-folder filename 
+						       (write-to-string 
+							*file-number*) ext))
+			   (incf *file-number*)
+                           ;;Create separate thread so SLEEP 
+                           ;;function won't pause the program.
+			   (setf n (bt:make-thread (lambda ()  
+						     (sleep (? timer :int))
+						     (imwrite output-file-path 
+							      frame vector-of-params)
+						     (setf text-1 (cat "Wrote " 
+								       (write-to-string 
+									output-file-path)))
+						     (display-overlay window-name text-1 2500))))))))
+		 (imshow window-name frame)
+		 (when nil
+		   (return))))))))))
 
 ========================================================================================================================================
 #IMREAD
@@ -12757,6 +12872,171 @@ Example:
 	       (when (= c 27)
 		 (return)))))))))
 
+========================================================================================================================================
+VIDEO-WRITER
+========================================================================================================================================
+
+VIDEO-WRITER constructors
+
+Note: Both VIDEO-WRITER and MAKE-VIDEO-WRITER are provided in this library. The first, to match OpenCV's 
+naming conventions, the second, to adhere to Common Lisp naming conventions. Except for the name, they are 
+the same function. I use the VIDEO-WRITER function in the examples in this file because it will make them 
+easier to compare with OpenCV examples you find online, thus making this library easier to learn.
+
+C++: VideoWriter::VideoWriter()
+
+LISP-CV: (VIDEO-WRITER) => VIDEO-WRITER
+
+LISP-CV: (MAKE-VIDEO-WRITER) => VIDEO-WRITER
+
+C++: VideoWriter::VideoWriter(const string& filename, int fourcc, double fps, Size frameSize, bool isColor=true)
+
+LISP-CV: (VIDEO-WRITER (FILENAME :STRING) (FOUR-CC :INT) (FPS :DOUBLE) (FRAME-SIZE SIZE) ((IS-COLOR :INT) T)) => VIDEO-WRITER
+
+LISP-CV: (MAKE-VIDEO-WRITER (FILENAME :STRING) (FOUR-CC :INT) (FPS :DOUBLE) (FRAME-SIZE SIZE) ((IS-COLOR :INT) T)) => VIDEO-WRITER
+
+
+    Parameters:	
+
+        FILENAME - Name of the output video file.
+
+        FOUR-CC - 4-character code of codec used to compress the frames. For example, (FOUR-CC #\P #\I #\M #\1) 
+                  is a MPEG-1 codec, (FOUR-CC #\M #\J #\P #\G)  is a motion-jpeg codec etc. List of codes can be 
+                  obtained at: http://www.fourcc.org/codecs.php
+
+        FPS - Framerate of the created video stream.
+
+        FRAME-SIZE - Size of the video frames.
+
+        IS-COLOR - If it is not zero, the encoder will expect and encode color frames, otherwise it 
+                   will work with grayscale frames (the flag is currently supported on Windows only)
+
+
+The constructors/functions initialize video writers. On Linux FFMPEG is used to write videos; on Windows 
+FFMPEG or VFW is used; on MacOSX QTKit is used.
+
+
+(defun video-writer-example (filename &optional	
+					(cam 0) 
+					(width *default-width*)
+					(height *default-height*))
+  (with-captured-camera (cap cam :width width :height height)
+    (let* ((filename filename)
+	   (window-name "VIDEO-WRITER Example")
+	   (dheight (rational (*get cap +cap-prop-frame-height+)))
+	   (dwidth (rational (*get cap +cap-prop-frame-width+))))
+      (with-size ((frame-size (size width height)))
+	;;Initialize the VIDEO-WRITER object 
+	(with-video-writer ((o-video-writer (video-writer filename 
+							  (four-cc #\D #\I #\V #\X)
+							  20.0d0 frame-size 1))) 
+	  (if (not (is-opened cap))
+	      (return-from video-writer-example 
+		(format t "ERROR: Cannot open the video file")))
+	  (if (not (video-writer-is-opened o-video-writer)) 
+	      (return-from video-writer-example 
+		(format t "ERROR: Failed to write the video"))) 
+	  (format t "~%Frame Size : ~ax~a~%~%" dwidth dheight)     
+	  (with-named-window (window-name +window-normal+)
+	    (move-window window-name 759 175)
+	    (with-mat ((frame (mat)))	
+	      (loop
+		 (read cap frame)
+		 (if (not frame) 
+		     (return-from video-writer-example 
+		       (format t "ERROR: Cannot read video file")))
+		 ;;Write a frame into the file
+		 (write o-video-writer frame)
+		 (imshow window-name frame)
+		 (let ((c (wait-key 33)))
+		   (when (= c 27)
+		     (return)))))))))))
+
+========================================================================================================================================
+VIDEO-WRITER-IS-OPENED
+========================================================================================================================================
+
+Returns true if video writer has been successfully initialized.
+
+Note: The name VIDEO-WRITER-IS-OPENED is used in the documentation to refer to the binding for the 
+"isOpened" member of the OpenCV VideoWriter class because it is more descriptive and it is easier 
+to search for in this file. The IS-OPENED method may also be used to call this binding.
+
+C++: bool VideoWriter::isOpened()
+
+LISP-CV: (IS-OPENED (SELF VIDEO-WRITER)) :BOOLEAN
+
+LISP-CV: (VIDEO-WRITER-IS-OPENED (SELF VIDEO-WRITER)) :BOOLEAN
+
+
+(defun video-writer-is-opened-example (filename &optional (camera-index *camera-index*))
+  ;;Open the video camera
+  (with-video-capture ((cap (video-capture camera-index))) 
+    ;;Initialize the VideoWriter object 
+    (with-video-writer ((o-video-writer (video-writer filename 1196444237 ; todo
+						      20.0d0 (size 640 480) 1)))
+      (format t "~%If VIDEO-WRITER is open a T will be displayed, else NIL: ~a~%~%"
+	      (is-opened o-video-writer)))))
+
+========================================================================================================================================
+VIDEO-WRITER-WRITE
+========================================================================================================================================
+
+Writes the next video frame
+
+Note: The name VIDEO-WRITER-WRITE is used in the documentation to refer to the binding for the 
+"write" member of the OpenCV VideoWriter class because it is more descriptive and it is easier 
+to search for in this file. The WRITE method may also be used to call this binding.
+
+Note: The LISP-CV function WRITE overloads the Common Lisp function WRITE so both functions can use the 
+same name. The LISP-CV function WRITE provides the the same functionality as the Common Lisp function 
+WRITE and the 'write' members of OpenCV's classes. To use the Common Lisp function WRITE directly, while 
+you are in the LISP-CV package, you need to evaluate CL:WRITE.
+
+C++: void VideoWriter::write(const Mat& image)
+
+LISP-CV: (WRITE (SELF VIDEO-WRITER) (IMAGE MAT)) => VIDEO-WRITER
+
+LISP-CV: (VIDEO-WRITER-WRITE (SELF VIDEO-WRITER) (IMAGE MAT)) => VIDEO-WRITER
+
+    Parameters:	
+
+        SELF - Pointer to VIDEO-WRITER
+
+        IMAGE - The written frame
+
+
+The function VIDEO-WRITER-WRITE writes the specified image to video file. It must have the same size 
+as has been specified when opening the video writer.
+
+
+(defun video-writer-write-example (filename &optional (cam 0))
+
+  "Saves the camera feed to a video file. The save 
+   location is specified by the FILENAME parameter."
+
+  (with-video-capture ((cap (video-capture cam))) 
+    (let* ((window-name "VIDEO-WRITER-WRITE Example"))
+      (with-size ((frame-size (size 640 480)))
+	(with-video-writer ((o-video-writer (video-writer filename 
+							  (four-cc #\D #\I #\V #\X)
+							  20.0d0 frame-size 1)))
+	  (if (not (is-opened cap)) 
+	      (return-from video-writer-write-example 
+		(format t "ERROR: Cannot open the video file")))
+	  (if (not (is-opened o-video-writer)) 
+	      (return-from video-writer-write-example 
+		(format t "ERROR: Failed to write the video"))) 
+	  (with-named-window (window-name +window-normal+)
+	    (move-window window-name 759 175)
+	    (with-mat ((frame (mat)))
+	      (loop
+		 (read cap frame) 
+		 (write o-video-writer frame) 
+		 (imshow window-name frame)
+		 (let ((c (wait-key 33)))
+		   (when (= c 27)
+		     (return)))))))))))
 
 ========================================================================================================================================
 #WITH-CAPTURED-CAMERA
@@ -12849,7 +13129,7 @@ Example:
 		 (return)))))))))
 
 ========================================================================================================================================
-#HIGHGUI - QT NEW FUNCTIONS
+#HIGHGUI - #QT NEW FUNCTIONS
 ========================================================================================================================================
 
 ========================================================================================================================================
@@ -13034,7 +13314,7 @@ Example:
 	       (return))))))))
 
 ========================================================================================================================================
-#FEATURES2D - FEATURE DETECTION AND DESCRIPTION
+#FEATURES2D - #FEATURE DETECTION AND DESCRIPTION
 ========================================================================================================================================
 
 ========================================================================================================================================
@@ -13213,7 +13493,7 @@ Example:
       (destroy-window (aref window-name-arr i)))))
 
 ========================================================================================================================================
-#FEATURES2D - COMMON INTERFACES OF FEATURE DETECTORS
+#FEATURES2D - #COMMON INTERFACES OF FEATURE DETECTORS
 ========================================================================================================================================
 
 ========================================================================================================================================
@@ -13476,7 +13756,7 @@ Example:
 		   (return))))))))))
 
 ========================================================================================================================================
-#FEATURES2D - COMMON INTERFACES OF DESCRIPTOR EXTRACTORS
+#FEATURES2D - #COMMON INTERFACES OF DESCRIPTOR EXTRACTORS
 ========================================================================================================================================
 
 ========================================================================================================================================
@@ -13592,7 +13872,7 @@ LISP-CV as a class or function.
 Example:(Coming soon)
 
 ========================================================================================================================================
-#FEATURES2D - DRAWING FUNCTION OF KEYPOINTS AND MATCHES
+#FEATURES2D - #DRAWING FUNCTION OF KEYPOINTS AND MATCHES
 ========================================================================================================================================
 
 ========================================================================================================================================
@@ -13754,7 +14034,7 @@ Example:
 
 
 ========================================================================================================================================
-#FEATURES2D - COMMON INTERFACES OF DESCRIPTOR MATCHERS
+#FEATURES2D - #COMMON INTERFACES OF DESCRIPTOR MATCHERS
 ========================================================================================================================================
 
 ========================================================================================================================================
@@ -13855,7 +14135,7 @@ Example:
 See BRISK-EXAMPLE
 
 ========================================================================================================================================
-#OBJDETECT - CASCADE CLASSIFICATION
+#OBJDETECT - #CASCADE CLASSIFICATION
 ========================================================================================================================================
 
 ========================================================================================================================================
@@ -14145,7 +14425,7 @@ This function is parallelized with the TBB library.
 		 (return)))))))))
 
 ========================================================================================================================================
-#ML - NORMAL BAYES CLASSIFIER
+#ML - #NORMAL BAYES CLASSIFIER
 ========================================================================================================================================
 
 ========================================================================================================================================
@@ -14472,7 +14752,7 @@ Example:
 See NORMAL-BAYES-CLASSIFIER-EXAMPLE in this file.
 
 ========================================================================================================================================
-#ML - K-NEAREST NEIGHBORS
+#ML - #K-NEAREST NEIGHBORS
 ========================================================================================================================================
 
 ========================================================================================================================================
@@ -14847,7 +15127,7 @@ Example:
 See the K-NEAREST-EXAMPLE in this library
 
 ========================================================================================================================================
-#ML - DECISION TREES
+#ML - #DECISION TREES
 ========================================================================================================================================
 
 ========================================================================================================================================
@@ -15363,7 +15643,7 @@ Example:
 See D-TREE-EXAMPLE in this file.
 
 ========================================================================================================================================
-#ML - NEURAL NETWORKS
+#ML - #NEURAL NETWORKS
 ========================================================================================================================================
 
 ========================================================================================================================================
@@ -15792,7 +16072,7 @@ Example:
 See ANN-MLP-EXAMPLE in this file.
 
 ========================================================================================================================================
-#PHOTO - INPAINTING
+#PHOTO - #INPAINTING
 ========================================================================================================================================
 
 ========================================================================================================================================
@@ -15911,7 +16191,7 @@ Example:
 	       (return))))))))
 
 ========================================================================================================================================
-#PHOTO - DECOLORIZATION
+#PHOTO - #DECOLORIZATION
 ========================================================================================================================================
 
 ========================================================================================================================================
@@ -15963,7 +16243,7 @@ This function is to be applied on color images.
 		   (return))))))))))
 
 ========================================================================================================================================
-#PHOTO - SEAMLESS CLONING
+#PHOTO - #SEAMLESS CLONING
 ========================================================================================================================================
 
 ========================================================================================================================================
@@ -16296,7 +16576,7 @@ color of the destination image.
 		   (return))))))))))
 
 ========================================================================================================================================
-#PHOTO - NON-PHOTOREALISTIC RENDERING
+#PHOTO - #NON-PHOTOREALISTIC RENDERING
 ========================================================================================================================================
 
 ========================================================================================================================================
@@ -16475,7 +16755,7 @@ Example:
 	       (return)))))))
 
 ========================================================================================================================================
-#NON-FREE - FEATURE DETECTION AND DESCRIPTION
+#NONFREE - #FEATURE DETECTION AND DESCRIPTION
 ========================================================================================================================================
 
 ========================================================================================================================================
@@ -16569,7 +16849,7 @@ Example:
 
 
 ========================================================================================================================================
-#CONTRIB - COLORMAPS IN OPENCV
+#CONTRIB - #COLORMAPS IN OPENCV
 ========================================================================================================================================
 
 ========================================================================================================================================
@@ -17208,172 +17488,6 @@ to type MAT with the function (FORCE), (or the shorthand version (>>)) to use in
       (princ #\Newline))
     (free m1-data)
     (free m2-data)))
-
-========================================================================================================================================
-VIDEO-WRITER
-========================================================================================================================================
-
-VIDEO-WRITER constructors
-
-Note: Both VIDEO-WRITER and MAKE-VIDEO-WRITER are provided in this library. The first, to match OpenCV's 
-naming conventions, the second, to adhere to Common Lisp naming conventions. Except for the name, they are 
-the same function. I use the VIDEO-WRITER function in the examples in this file because it will make them 
-easier to compare with OpenCV examples you find online, thus making this library easier to learn.
-
-C++: VideoWriter::VideoWriter()
-
-LISP-CV: (VIDEO-WRITER) => VIDEO-WRITER
-
-LISP-CV: (MAKE-VIDEO-WRITER) => VIDEO-WRITER
-
-C++: VideoWriter::VideoWriter(const string& filename, int fourcc, double fps, Size frameSize, bool isColor=true)
-
-LISP-CV: (VIDEO-WRITER (FILENAME :STRING) (FOUR-CC :INT) (FPS :DOUBLE) (FRAME-SIZE SIZE) ((IS-COLOR :INT) T)) => VIDEO-WRITER
-
-LISP-CV: (MAKE-VIDEO-WRITER (FILENAME :STRING) (FOUR-CC :INT) (FPS :DOUBLE) (FRAME-SIZE SIZE) ((IS-COLOR :INT) T)) => VIDEO-WRITER
-
-
-    Parameters:	
-
-        FILENAME - Name of the output video file.
-
-        FOUR-CC - 4-character code of codec used to compress the frames. For example, (FOUR-CC #\P #\I #\M #\1) 
-                  is a MPEG-1 codec, (FOUR-CC #\M #\J #\P #\G)  is a motion-jpeg codec etc. List of codes can be 
-                  obtained at: http://www.fourcc.org/codecs.php
-
-        FPS - Framerate of the created video stream.
-
-        FRAME-SIZE - Size of the video frames.
-
-        IS-COLOR - If it is not zero, the encoder will expect and encode color frames, otherwise it 
-                   will work with grayscale frames (the flag is currently supported on Windows only)
-
-
-The constructors/functions initialize video writers. On Linux FFMPEG is used to write videos; on Windows 
-FFMPEG or VFW is used; on MacOSX QTKit is used.
-
-
-(defun video-writer-example (filename &optional	
-					(cam 0) 
-					(width *default-width*)
-					(height *default-height*))
-  (with-captured-camera (cap cam :width width :height height)
-    (let* ((filename filename)
-	   (window-name "VIDEO-WRITER Example")
-	   (dheight (rational (*get cap +cap-prop-frame-height+)))
-	   (dwidth (rational (*get cap +cap-prop-frame-width+))))
-      (with-size ((frame-size (size width height)))
-	;;Initialize the VIDEO-WRITER object 
-	(with-video-writer ((o-video-writer (video-writer filename 
-							  (four-cc #\D #\I #\V #\X)
-							  20.0d0 frame-size 1))) 
-	  (if (not (is-opened cap))
-	      (return-from video-writer-example 
-		(format t "ERROR: Cannot open the video file")))
-	  (if (not (video-writer-is-opened o-video-writer)) 
-	      (return-from video-writer-example 
-		(format t "ERROR: Failed to write the video"))) 
-	  (format t "~%Frame Size : ~ax~a~%~%" dwidth dheight)     
-	  (with-named-window (window-name +window-normal+)
-	    (move-window window-name 759 175)
-	    (with-mat ((frame (mat)))	
-	      (loop
-		 (read cap frame)
-		 (if (not frame) 
-		     (return-from video-writer-example 
-		       (format t "ERROR: Cannot read video file")))
-		 ;;Write a frame into the file
-		 (write o-video-writer frame)
-		 (imshow window-name frame)
-		 (let ((c (wait-key 33)))
-		   (when (= c 27)
-		     (return)))))))))))
-
-========================================================================================================================================
-VIDEO-WRITER-IS-OPENED
-========================================================================================================================================
-
-Returns true if video writer has been successfully initialized.
-
-Note: The name VIDEO-WRITER-IS-OPENED is used in the documentation to refer to the binding for the 
-"isOpened" member of the OpenCV VideoWriter class because it is more descriptive and it is easier 
-to search for in this file. The IS-OPENED method may also be used to call this binding.
-
-C++: bool VideoWriter::isOpened()
-
-LISP-CV: (IS-OPENED (SELF VIDEO-WRITER)) :BOOLEAN
-
-LISP-CV: (VIDEO-WRITER-IS-OPENED (SELF VIDEO-WRITER)) :BOOLEAN
-
-
-(defun video-writer-is-opened-example (filename &optional (camera-index *camera-index*))
-  ;;Open the video camera
-  (with-video-capture ((cap (video-capture camera-index))) 
-    ;;Initialize the VideoWriter object 
-    (with-video-writer ((o-video-writer (video-writer filename 1196444237 ; todo
-						      20.0d0 (size 640 480) 1)))
-      (format t "~%If VIDEO-WRITER is open a T will be displayed, else NIL: ~a~%~%"
-	      (is-opened o-video-writer)))))
-
-========================================================================================================================================
-VIDEO-WRITER-WRITE
-========================================================================================================================================
-
-Writes the next video frame
-
-Note: The name VIDEO-WRITER-WRITE is used in the documentation to refer to the binding for the 
-"write" member of the OpenCV VideoWriter class because it is more descriptive and it is easier 
-to search for in this file. The WRITE method may also be used to call this binding.
-
-Note: The LISP-CV function WRITE overloads the Common Lisp function WRITE so both functions can use the 
-same name. The LISP-CV function WRITE provides the the same functionality as the Common Lisp function 
-WRITE and the 'write' members of OpenCV's classes. To use the Common Lisp function WRITE directly, while 
-you are in the LISP-CV package, you need to evaluate CL:WRITE.
-
-C++: void VideoWriter::write(const Mat& image)
-
-LISP-CV: (WRITE (SELF VIDEO-WRITER) (IMAGE MAT)) => VIDEO-WRITER
-
-LISP-CV: (VIDEO-WRITER-WRITE (SELF VIDEO-WRITER) (IMAGE MAT)) => VIDEO-WRITER
-
-    Parameters:	
-
-        SELF - Pointer to VIDEO-WRITER
-
-        IMAGE - The written frame
-
-
-The function VIDEO-WRITER-WRITE writes the specified image to video file. It must have the same size 
-as has been specified when opening the video writer.
-
-
-(defun video-writer-write-example (filename &optional (cam 0))
-
-  "Saves the camera feed to a video file. The save 
-   location is specified by the FILENAME parameter."
-
-  (with-video-capture ((cap (video-capture cam))) 
-    (let* ((window-name "VIDEO-WRITER-WRITE Example"))
-      (with-size ((frame-size (size 640 480)))
-	(with-video-writer ((o-video-writer (video-writer filename 
-							  (four-cc #\D #\I #\V #\X)
-							  20.0d0 frame-size 1)))
-	  (if (not (is-opened cap)) 
-	      (return-from video-writer-write-example 
-		(format t "ERROR: Cannot open the video file")))
-	  (if (not (is-opened o-video-writer)) 
-	      (return-from video-writer-write-example 
-		(format t "ERROR: Failed to write the video"))) 
-	  (with-named-window (window-name +window-normal+)
-	    (move-window window-name 759 175)
-	    (with-mat ((frame (mat)))
-	      (loop
-		 (read cap frame) 
-		 (write o-video-writer frame) 
-		 (imshow window-name frame)
-		 (let ((c (wait-key 33)))
-		   (when (= c 27)
-		     (return)))))))))))
 
 ========================================================================================================================================
 #LISP-CV - MACROS AND EXTRA FUNCTIONS:

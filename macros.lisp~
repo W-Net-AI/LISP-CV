@@ -13,7 +13,7 @@
 
 
 ;; FORMAT macro (to make debugging easier)
-(defmacro lout (&optional (val "test"))
+(defmacro f (&optional (val "test"))
   `(if ,val
        (format t "~%~a~%~%" ,val) nil))
 
