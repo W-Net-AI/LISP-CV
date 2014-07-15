@@ -504,6 +504,10 @@
    #:cascade-classifier-load
    #:make-cascade-classifier
 
+;;; ml - LISP-CV specific
+
+   #:make-training-data-matrix
+
 ;;; ml - Normal Bayes Classifier
 
    #:make-normal-bayes-classifier

@@ -2,7 +2,7 @@
 
 (defpackage :lisp-cv
   (:nicknames #:lisp-cv #:lcv #:cv)
-  (:use #:cffi #:common-lisp #:swank #:trivial-garbage #:lisp-executable) 
+  (:use #:cffi #:common-lisp #:swank #:trivial-garbage #:lisp-executable #:bordeaux-threads) 
   (:shadow #:abs #:exp #:get #:length #:log #:min #:max #:open #:read #:set #:sqrt #:write)
   (:export 
 
@@ -1465,6 +1465,10 @@
    #:+var-categorical+
    #:+col-sample+
    #:+row-sample+
+
+;;; ml - LISP-CV specific
+
+;;; make-training-data-matrix
 
 ;;; ml - Normal Bayes Classifier
 

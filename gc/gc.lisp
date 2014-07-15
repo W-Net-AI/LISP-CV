@@ -8,12 +8,11 @@
 
 ;;; DEFGENERIC (*defgeneric functions are placed here so the whole file can use them*)
 
+(defgeneric clone (self)
+  (:documentation "Used for all bindings with a clone member."))
 
 (defgeneric size (arg &rest args)
   (:documentation "Used for all bindings with a size member."))
-
-(defgeneric clone (self)
-  (:documentation "Used for all bindings with a clone member."))
 
 
 ;; Interop - String*
@@ -2155,6 +2154,137 @@
 
 
 ;;; ML
+
+
+;;; ML - ;;; LISP-CV specific
+
+
+(defun make-training-data-matrix (&key directory dsize test)
+
+  "Creates training data to give to Machine Learning functions.
+   First, converts all of the images in the directory you have 
+   specified to single float. Then, resizes them, to the size 
+   you specified, with the DSIZE parameter. Finally, reshapes 
+   the images to 1D and adds the now 1D images, one image per 
+   row, to the TRAINING-DATA matrix.
+  
+   Note: All of the images in the directory you specify must 
+   be square and width/height values of DSIZE must be equal."
+
+  (let* ((window-name "TRAINING-DATA")
+	 (file-list (uiop:directory-files directory))
+	 (img-list (list))
+         ;;Extra list for GC
+         (end-list (list))
+	 (pathname-list (list))
+         (img-height (round (cv::size-height dsize)))
+         (img-width (round (cv::size-width dsize)))
+	 (img-area (* img-height img-width))
+	 (num-of-files 1016)
+         ;;Create matrix to hold the training data
+	 (training-data (mat-typed num-of-files img-area cv::+32fc1+))
+         (pass-fail 0)
+	 (i 0))
+
+    (cv::with-named-window (window-name cv::+window-autosize+)
+
+      (if (not (= img-height img-width)) 
+	  (return-from make-training-data-matrix 
+	    (error" :DSIZE width and height must be equal"))) 
+
+      (check-type test boolean)    
+
+      ;;Create a list of pathnames to
+      ;;read with the IMREAD function.
+      (dotimes (i num-of-files)
+	(push (cv::full-pathname (nth i file-list)) pathname-list))
+
+      ;;Make a list of all images in 
+      ;;the directory you specified.
+      (dotimes (i num-of-files)
+	(let ((path (cv::c-string-to-string (nth i pathname-list) (length (nth i pathname-list)))))
+	  (push  (cv::%imread path 0) img-list)
+	  (cv::del-std-string path)))
+
+      ;;Convert all images in 
+      ;;list to single float.
+      (dotimes (i num-of-files)
+	(cv::%convert-to (nth i img-list) (nth i img-list) cv::+32fc1+ 1.0d0 0.0d0))
+
+      ;;Resize all of the images and 
+      ;;convert them to 1D matrices.
+      (dotimes (i num-of-files)
+	(cv::%resize (nth i img-list) (nth i img-list) dsize 0d0 0d0 cv::+inter-linear+)
+	(push (cv::reshape-rows (nth i img-list) 0 1) end-list))
+
+      ;;Fill TRAINING-DATA with all of the 
+      ;;1D matrices. One matrix per row.
+      (dotimes (i num-of-files)
+	(dotimes (k img-area)
+	  (setf (mem-aref (cv::%ptr training-data i) :float k) (mem-aref (%ptr (nth i end-list) 0) :float k))))
+
+      ;;Garbage collect IMG-LIST
+      (dotimes (i num-of-files)
+	(cv::del-mat (nth i img-list)))
+
+      (if test (progn
+
+;;;Test to make sure all of the 
+;;;images are in TRAINING-DATA.   
+
+		 ;;Reset IMG-LIST so 
+		 ;;it can be reused.
+		 (setf img-list (list))    
+		 
+		 ;;Fill IMG-LIST with matrices.
+		 (dotimes (i num-of-files)
+		   (push (cv::mat-typed 1 img-area 0) img-list))
+
+		 ;;Convert all matrices in 
+		 ;;IMG-LIST to single float.
+		 (dotimes (i num-of-files)
+		   (cv::%convert-to (nth i img-list) (nth i img-list) cv::+32fc1+ 1.0d0 0.0d0))
+
+		 ;;Fill each matrix in IMG-LIST with 
+		 ;;a separate row from TRAINING-DATA.
+		 (dotimes (i num-of-files)
+		   (dotimes (k img-area)
+		     (setf (mem-aref (%ptr (nth i img-list) 0) :float k) (mem-aref (%ptr training-data i) :float k))))
+
+		 ;;If test fails..Break!
+		 (dotimes (i num-of-files)
+		   (dotimes (k img-area)
+		     (if (eq (mem-aref (%ptr (nth i end-list) 0) :float k) 
+			     (mem-aref (%ptr training-data i) :float k))
+			 (setf pass-fail 1)
+			 (setf pass-fail 0))))
+
+		 ;;Garbage collect END-LIST
+		 (dotimes (i num-of-files)
+		   (cv::del-mat (nth i end-list)))
+
+		 (if (eq pass-fail 0)	
+		     (return-from make-training-data-matrix 
+		       (format t "Test failed...Break!"))
+		     (format t "Test passed...Proceed!"))
+
+		 (loop
+		    ;;Show the images in IMG-LIST in a window 
+		    ;;for an additional visual verification.
+		    (let ((reshaped-images (cv::reshape-rows (nth i img-list) 
+							     0 img-height)))
+		      (cv::imshow window-name reshaped-images)
+		      (cv::del-mat reshaped-images))
+
+		    (if (< i 1015) (incf i))
+		    (sleep .001)
+		    (let ((c (cv::wait-key 1)))
+		      (when (or (= c 27) (= i 1015))
+
+			(return-from make-training-data-matrix 
+			  training-data))))) 
+	  training-data))))
+
 
 
 ;;; ML - Normal Bayes Classifier

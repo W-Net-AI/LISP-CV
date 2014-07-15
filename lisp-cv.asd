@@ -30,7 +30,7 @@
 	       (:file "highgui" :depends-on ("package" "lisp-cv" "constants" "types" "core"))
                (:file "calib3d" :depends-on ("package" "lisp-cv" "constants" "types" "core"))
                (:file "objdetect" :depends-on ("package" "lisp-cv" "constants" "types" "core"))
-               (:file "ml" :depends-on ("package" "lisp-cv" "constants" "types" "core" "structs"))
+               (:file "ml" :depends-on ("package" "lisp-cv" "constants" "types" "core" "structs" "imgproc"))
                (:file "photo" :depends-on ("package" "lisp-cv" "constants" "types" "core"))
                (:file "features2d" :depends-on ("package" "lisp-cv" "constants" "types" "core"))
                (:file "nonfree" :depends-on ("package" "lisp-cv" "constants" "types" "core"))

@@ -14425,6 +14425,55 @@ This function is parallelized with the TBB library.
 		 (return)))))))))
 
 ========================================================================================================================================
+#ML - #LISP-CV SPECIFIC FUNCTIONS
+========================================================================================================================================
+
+========================================================================================================================================
+#ML - #MAKE-TRAINING-DATA-MATRIX
+========================================================================================================================================
+
+Constructs single-float training data matrix.
+
+C++: Specific to LISP-CV
+
+LISP-CV: (MAKE-TRAINING-DATA-MATRIX &KEY (DIRECTORY :STRING) (DSIZE :INT) (TEST :BOOLEAN)) => MAT
+
+
+    Parameters:
+
+        DIRECTORY - Directory of square images: (AND (EQ (ROWS IMG) (COLS IMG))).
+
+        DSIZE - The new rows and cols value each image in DIRECTORY is resized to before being added 
+                into the output training data matrix. (WIDTH DSIZE) and (HEIGHT DSIZE) must be equal. 
+                The bigger the DSIZE value, the longer this function takes to run, This function was 
+                tested with input images sized 128x128 and a DSIZE argument of (SIZE 50 50). Running 
+                times went from 2 seconds, without tests enabled, to up to 16 seconds with the tests 
+                enabled. 
+
+        TEST - Boolean value, toggles internal, and external visual tests on or off.
+
+
+To train specific Machine Learning functions in this library on a set of images, first you have to 
+construct the training matrix. This function creates that matrix. The training matrix is specified 
+as follows: each row of the matrix corresponds to one image, and each element in that row corresponds 
+to one feature of the class, in this case, the color of the pixel at a certain point. The pathname 
+given to this function must be a directory containing square images of the same size/type. First, this 
+function converts all of the images in the specified directory to single float, then, resizes them, to 
+the size specified, with the DSIZE parameter. Finally, it reshapes the images to 1D and adds them, one 
+image per row, to the output training data matrix. Internal tests are run on the matrix if (EQ TEST T). 
+Running these tests makes the function take significantly longer. An external visual cue is provided that 
+consists of images being reconstituted from the output training matrix and shown sequentially in a window. 
+This can aid you in spotting any anomalies in the output. The internal tests are sufficient but this gives 
+visual confirmation and makes the function alot more fun to use.
+
+Note: The output matrix must be garbage collected, You can use manual MM(DEL-MAT function), a with-* 
+macro (the WITH-MAT macro) or you can enable automatic finalization by adding a GC: or T: prefix to 
+the functions name.
+
+
+Example:(Coming soon)  
+
+========================================================================================================================================
 #ML - #NORMAL BAYES CLASSIFIER
 ========================================================================================================================================
 
