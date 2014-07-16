@@ -375,10 +375,6 @@ void cv_delete_CvMat(CvMat* self) {
     delete self;
 }
 
-void cv_delete_CvTermCriteria(CvTermCriteria* self) {
-    delete self;
-}
-
 void cv_delete_DMatch(DMatch* self) {
     delete self;
 }

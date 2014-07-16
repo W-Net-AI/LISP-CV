@@ -60,7 +60,7 @@
 ;; void cv_delete_CvTermCriteria(CvTermCriteria* self) 
 (defcfun ("cv_delete_CvTermCriteria" del-cv-term-criteria) :void
   "Calls delete on a CV-TERM-CRITERIA object."
-  (self term-criteria-struct))
+  (self mat-struct))
 
 
 ;; void operator delete  ( void* ptr )
