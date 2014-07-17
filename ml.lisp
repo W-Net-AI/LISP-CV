@@ -21,7 +21,7 @@
    Note: All of the images in the directory you specify must 
    be square and width/height values of DSIZE must be equal."
 
-  (let* ((window-name "TRAINING-DATA")
+  (let* ((window-name "Testing...")
 	 (file-list (uiop:directory-files directory))
 	 (img-list (list))
          ;;Extra list for GC
@@ -36,123 +36,130 @@
          (pass-fail 0)
 	 (i 0))
 
-    (with-named-window (window-name +window-autosize+)
+    (check-type test boolean)      
+    
+    (cond ((not (eq img-height img-width)) 
+	   (error "the width and height of DSIZE must be equal."))
+	  ((not file-list)
+	   (error "invalid directory name or directory is empty."))
+	  ((not (uiop:directory-pathname-p directory))
+	   (error "error opening ~a:~%No such file or directory." 
+		  (cat "#P" (write-to-string directory)))))
 
-      (check-type test boolean)      
-      
-      (cond ((not (eq img-height img-width)) 
-	     (error "the width and height of DSIZE must be equal."))
-	    ((not file-list)
-	     (error "invalid directory name or directory is empty."))
-	    ((not (uiop:directory-pathname-p directory))
-	     (error "error opening ~a: No such file or directory." 
-		    (cat "#P" (write-to-string directory)))))
+    (dotimes (i num-of-files)
+      (if (uiop:directory-pathname-p (nth i file-list))
+	  (error "the pathname entered includes a directory.") nil))
 
-      (dotimes (i num-of-files)
-	(if (uiop:directory-pathname-p (nth i file-list))
-	    (error "the pathname entered includes a directory.") nil))
+    ;;Create a list of pathnames to
+    ;;read with the IMREAD function.
+    (dotimes (i num-of-files)
+      (push (full-pathname (nth i file-list)) pathname-list))
 
-      ;;Create a list of pathnames to
-      ;;read with the IMREAD function.
-      (dotimes (i num-of-files)
-	(push (full-pathname (nth i file-list)) pathname-list))
+    ;;Make a list of all images in 
+    ;;the directory you specified.
+    (format t "~%Loading images in...~%~% ~a...~%~%" directory)
+    (dotimes (i num-of-files)
+      (let ((path (c-string-to-string (nth i pathname-list) 
+				      (length (nth i pathname-list)))))
+	(if (is-continuous (%imread path 0)) 
+	    (push (%imread path 0) img-list)
+	    (error "Image is not continuous."))
+	(del-std-string path)))
 
-      ;;Make a list of all images in 
-      ;;the directory you specified.
-      (dotimes (i num-of-files)
-	(let ((path (c-string-to-string (nth i pathname-list) 
-					(length (nth i pathname-list)))))
-	  (if (is-continuous (%imread path 0)) 
-	      (push (%imread path 0) img-list)
-	      (error "Image is not continuous."))
-	  (del-std-string path)))
+    ;;Convert all the images in 
+    ;;IMG-LIST to single float.
+    (dotimes (i num-of-files)
+      (%convert-to (nth i img-list) (nth i img-list) +32fc1+ 1.0d0 0.0d0))
 
-      ;;Convert all the images in 
-      ;;IMG-LIST to single float.
-      (dotimes (i num-of-files)
-	(%convert-to (nth i img-list) (nth i img-list) +32fc1+ 1.0d0 0.0d0))
+    ;;Resize all of the images and 
+    ;;convert them to 1D matrices.
+    (dotimes (i num-of-files)
+      (%resize (nth i img-list) (nth i img-list) dsize 0d0 0d0 +inter-linear+)
+      (push (reshape-rows (nth i img-list) 0 1) end-list))
 
-      ;;Resize all of the images and 
-      ;;convert them to 1D matrices.
-      (dotimes (i num-of-files)
-	(%resize (nth i img-list) (nth i img-list) dsize 0d0 0d0 +inter-linear+)
-	(push (reshape-rows (nth i img-list) 0 1) end-list))
+    (setf end-list (reverse end-list))
+    
+    (format t "Adding images to training matrix...")
+    ;;Fill TRAINING-DATA with all of the 
+    ;;1D matrices. One matrix per row.
+    (dotimes (i num-of-files)
+      (dotimes (k img-area)
+	(setf (mem-aref (%ptr training-data i) :float k) 
+	      (mem-aref (%ptr (nth i end-list) 0) :float k))))
 
-      ;;Fill TRAINING-DATA with all of the 
-      ;;1D matrices. One matrix per row.
-      (dotimes (i num-of-files)
-	(dotimes (k img-area)
-	  (setf (mem-aref (%ptr training-data i) :float k) 
-		(mem-aref (%ptr (nth i end-list) 0) :float k))))
+    ;;Garbage collect IMG-LIST
+    (dotimes (i num-of-files)
+      (del-mat (nth i img-list)))
 
-      ;;Garbage collect IMG-LIST
-      (dotimes (i num-of-files)
-	(del-mat (nth i img-list)))
+    
 
-      (if test (progn
+    (if test (progn
+
+	       (format t "~%~%Testing...this may take a few seconds...")
 
 ;;;Test to make sure all of the 
 ;;;images are in TRAINING-DATA.   
 
-		 ;;Reset IMG-LIST so 
-		 ;;it can be reused.
-		 (setf img-list (list))    
-		 
-		 ;;Fill IMG-LIST with matrices.
-		 (dotimes (i num-of-files)
-		   (push (mat-typed 1 img-area 0) img-list))
+	       ;;Reset IMG-LIST so 
+	       ;;it can be reused.
+	       (setf img-list (list))    
+	       
+	       ;;Fill IMG-LIST with matrices.
+	       (dotimes (i num-of-files)
+		 (push (mat-typed 1 img-area 0) img-list))
 
-		 ;;Convert all matrices in 
-		 ;;IMG-LIST to single float.
-		 (dotimes (i num-of-files)
-		   (%convert-to (nth i img-list) (nth i img-list) +32fc1+ 1.0d0 0.0d0))
+	       ;;Convert all matrices in 
+	       ;;IMG-LIST to single float.
+	       (dotimes (i num-of-files)
+		 (%convert-to (nth i img-list) (nth i img-list) +32fc1+ 1.0d0 0.0d0))
 
-		 ;;Fill each matrix in IMG-LIST with 
-		 ;;a separate row from TRAINING-DATA.
-		 (dotimes (i num-of-files)
-		   (dotimes (k img-area)
-		     (setf (mem-aref (%ptr (nth i img-list) 0) :float k) 
-			   (mem-aref (%ptr training-data i) :float k))))
+	       ;;Fill each matrix in IMG-LIST with 
+	       ;;a separate row from TRAINING-DATA.
+	       (dotimes (i num-of-files)
+		 (dotimes (k img-area)
+		   (setf (mem-aref (%ptr (nth i img-list) 0) :float k) 
+			 (mem-aref (%ptr training-data i) :float k))))
 
-		 ;;If test fails..Break!
-		 (dotimes (i num-of-files)
-		   (dotimes (k img-area)
-		     (if (eq (mem-aref (%ptr (nth i end-list) 0) :float k) 
-			     (mem-aref (%ptr training-data i) :float k))
-			 (setf pass-fail 1)
-			 (setf pass-fail 0))))
+	       ;;If test fails..Break!
+	       (dotimes (i num-of-files)
+		 (dotimes (k img-area)
+		   (if (eq (mem-aref (%ptr (nth i end-list) 0) :float k) 
+			   (mem-aref (%ptr training-data i) :float k))
+		       (setf pass-fail 1)
+		       (setf pass-fail 0))))
 
-		 ;;Garbage collect END-LIST
-		 (dotimes (i num-of-files)
-		   (del-mat (nth i end-list)))
+	       ;;Garbage collect END-LIST
+	       (dotimes (i num-of-files)
+		 (del-mat (nth i end-list)))
 
-		 (if (eq pass-fail 0)	
-		     (return-from make-training-matrix 
-		       (format t "Test failed...Break!"))
-		     (format t "Test passed...Proceed!"))
+	       (if (eq pass-fail 0)	
+		   (return-from make-training-matrix 
+		     (format t "~%~%Test failed...Break!~%~%"))
+		   (format t "~%~%Test passed...Proceed!~%~%"))
 
-		 ;;Convert all the images in 
-		 ;;IMG-LIST to single float.
-		 (dotimes (i num-of-files)
-		   (%convert-to (nth i img-list) (nth i img-list) +8uc1+ 1.0d0 0.0d0))
+	       ;;Convert all the images in 
+	       ;;IMG-LIST to single float.
+	       (dotimes (i num-of-files)
+		 (%convert-to (nth i img-list) (nth i img-list) +8uc1+ 1.0d0 0.0d0))
 
-		 (loop
-		    ;;Show the images in IMG-LIST in a window 
-		    ;;for an additional visual verification.
+	       (loop
+		  ;;Show the images in IMG-LIST in a window 
+		  ;;for an additional visual verification.
 
-		    (let ((reshaped-images (reshape-rows (nth i img-list) 
-							 0 img-height)))
-		      (imshow window-name reshaped-images)
-		      (del-mat reshaped-images))
+		  (let ((reshaped-images (reshape-rows (nth i img-list) 
+						       0 img-height)))
+		    (imshow window-name reshaped-images)
+		    (del-mat reshaped-images))
 
-		    (if (< i (- num-of-files 1)) (incf i))
-		    (sleep .001)
-		    (let ((c (wait-key 1)))
-		      (when (or (= c 27) (= i (- num-of-files 1)))
+		  (if (< i (- num-of-files 1)) (incf i))
+		  (sleep .001)
+		  (let ((c (wait-key 1)))
+		    (when (or (= c 27) (= i (- num-of-files 1)))
 
-			(return-from make-training-matrix 
-			  training-data))))) 
-	  training-data))))
+		      (return-from make-training-matrix 
+			(progn (destroy-window window-name) training-data)))))) 
+	(progn (format t "~%~%Done!...no tests were performed on the training matrix.~%~%")
+	       training-data))))
 
 
 
@@ -173,7 +180,7 @@
   (var-idx mat)
   (sample-idx mat))
 
-(defun normal-bayes-classifier (&optional train-data responses  (var-idx (%mat) given-var-idx) (sample-idx (%mat) given-sample-idx))
+(defun normal-bayes-classifier (&optional train-data responses (var-idx (%mat) given-var-idx) (sample-idx (%mat) given-sample-idx))
   (let ((return (if train-data
 		    (normal-bayes-classifier-4 train-data responses  var-idx sample-idx)
 		    (normal-bayes-classifier-0))))
@@ -204,6 +211,7 @@
 
 
 ;;; K-nearest Neighbors
+
 
 
 ;; CvKNearest::CvKNearest()
@@ -244,6 +252,159 @@
 (defun k-nearest-find-nearest (self samples k &optional (results (null-pointer)) (neighbor-responses (null-pointer)) 
                               (dists (null-pointer)))
   (%k-nearest-find-nearest self samples k results neighbor-responses dists))
+
+
+
+;;; Support Vector Machines
+
+
+
+(defun gamma (self)
+  (if (typep self 'cv-svm-params)
+      (mem-ref (c-pointer self) :double 8)))
+
+
+(defun (setf gamma) (val self)
+  (if (typep self 'cv-svm-params)
+      (setf (mem-ref (c-pointer self) :double 8) val)))
+
+
+(defun kernel-type (self)
+  (if (typep self 'cv-svm-params)
+      (mem-ref (c-pointer self) :int 4)))
+
+
+(defun (setf kernel-type) (val self)
+  (if (typep self 'cv-svm-params)
+      (setf (mem-ref (c-pointer self) :int 4) val)))
+
+
+;; CvSVM::CvSVM()
+;; CvSVM* cv_create_CvSVM() 
+(defcfun ("cv_create_CvSVM" svm-0) svm)
+
+
+;; CvSVM::CvSVM(const Mat& trainData, const Mat& responses, const Mat& varIdx=Mat(), const Mat& sampleIdx=Mat(), 
+;; CvSVMParams params=CvSVMParams() )
+;; CvSVM* cv_create_CvSVM5(Mat* trainData, Mat* responses, Mat* varIdx, Mat* sampleIdx, CvSVMParams* params)
+(defcfun ("cv_create_CvSVM5" svm-5) svm
+  (train-data mat)
+  (responses mat)
+  (var-idx mat)
+  (sample-idx mat)
+  (params svm-params))
+
+
+(defun svm (&optional train-data responses (var-idx (%mat) given-var-idx) (sample-idx (%mat) given-sample-idx)
+	      (params (svm-params-0) given-params))
+  (let ((return (if train-data 
+		    (svm-5 train-data responses var-idx sample-idx params)
+		    (svm-0))))
+    (if given-var-idx nil (del-mat var-idx))
+    (if given-sample-idx nil (del-mat sample-idx))
+    (if given-params nil (del-svm-params params))
+    return))
+
+
+(defun make-svm (&optional train-data responses (var-idx (%mat) given-var-idx) (sample-idx (%mat) given-sample-idx)
+	      (params (svm-params-0) given-params))
+  (let ((return (if train-data 
+		    (svm-5 train-data responses var-idx sample-idx params)
+		    (svm-0))))
+    (if given-var-idx nil (del-mat var-idx))
+    (if given-sample-idx nil (del-mat sample-idx))
+    (if given-params nil (del-svm-params params))
+    return))
+
+
+;; CvSVMParams::CvSVMParams()
+;; CvSVMParams* cv_create_CvSVMParams() 
+(defcfun ("cv_create_CvSVMParams" svm-params-0) svm-params)
+
+
+;;  CvSVMParams::CvSVMParams(int svm_type, int kernel_type, double degree, double gamma, double coef0, double Cvalue, double nu, double p, CvMat* class_weights, CvTermCriteria term_crit)
+;; CvSVMParams* cv_create_CvSVMParams10(int svm_type, int kernel_type, double degree, double gamma, double coef0, double Cvalue, double nu, double p, CvMat* class_weights, CvTermCriteria term_crit)
+(defcfun ("cv_create_CvSVMParams10" svm-params-10) svm-params
+  (svm-type :int)
+  (kernel-type :int)
+  (degree :double)
+  (gamma :double)
+  (coef-0 :double)
+  (c-value :double)
+  (nu :double)
+  (p :double)
+  (class-weights mat-struct)
+  (term-crit term-criteria-struct))
+
+
+(defun svm-params (&optional svm-type kernel-type degree gamma coef-0 c-value nu p class-weights term-crit)
+  (cond ((null svm-type)
+	 (svm-params-0))
+	(svm-type
+	 (svm-params-10 svm-type kernel-type degree gamma coef-0 c-value nu p class-weights term-crit))
+	(t nil)))
+
+
+(defun make-svm-params (&optional svm-type kernel-type degree gamma coef-0 c-value nu p class-weights term-crit)
+  (cond ((null svm-type)
+	 (svm-params-0))
+	(svm-type
+	 (svm-params-10 svm-type kernel-type degree gamma coef-0 c-value nu p class-weights term-crit))
+	(t nil)))
+
+
+;; float CvSVM::predict( const cv::Mat& sample, bool returnDFVal=false ) const
+;; float cv_CvSVM_predict2(CvSVM* self, Mat* sample, bool returnDFVal) 
+(defcfun ("cv_CvSVM_predict2" svm-predict-2) :float
+  (self svm)
+  (sample mat)
+  (return-df-val :boolean))
+
+
+;; void CvSVM::predict( cv::InputArray samples, cv::OutputArray results ) const
+;; void cv_CvSVM_predict2_0(CvSVM* self, Mat* samples, Mat* results) 
+(defcfun ("cv_CvSVM_predict2_0" svm-predict-2-0) :float
+  (self svm)
+  (samples mat)
+  (results mat))
+
+
+(defun svm-predict (self arg1 &optional arg2)
+  (cond ((typep arg2 'cv-mat)
+	 (svm-predict-2-0 self arg1 arg2))
+	((typep arg2 'boolean)
+	 (svm-predict-2 self arg1 arg2))))
+
+
+;; bool CvSVM::train(const Mat& trainData, const Mat& responses, const Mat& varIdx=Mat(), const Mat& sampleIdx=Mat(), 
+;;                   CvSVMParams params=CvSVMParams() )
+;; bool cv_CvSVM_train5(CvSVM* self, Mat* trainData, Mat* responses, Mat* varIdx, Mat* sampleIdx, CvSVMParams* params)
+(defcfun ("cv_CvSVM_train5" %svm-train) :boolean
+  (self svm)
+  (train-data mat)
+  (responses mat)
+  (var-idx mat)
+  (sample-idx mat)
+  (params svm-params))
+
+
+(defun svm-train (self train-data responses &optional (var-idx (%mat) given-var-idx) (sample-idx (%mat) given-sample-idx)
+					      (params (svm-params-0) given-params))
+  (let ((return (%svm-train self train-data responses var-idx sample-idx params)))
+    (if given-var-idx nil (del-mat var-idx))
+    (if given-sample-idx nil (del-mat sample-idx))
+    (if given-params nil (del-svm-params params))
+    return))
+
+
+(defun svm-type (self)
+  (if (typep self 'cv-svm-params)
+      (mem-ref (c-pointer self) :int)))
+
+
+(defun (setf svm-type) (val self)
+  (if (typep self 'cv-svm-params)
+      (setf (mem-ref (c-pointer self) :int) val)))
 
 
 ;;; Decision Trees

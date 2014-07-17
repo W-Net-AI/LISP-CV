@@ -77,17 +77,29 @@
 (defgeneric open (self &rest args)
   (:documentation "Used for all class bindings with a OPEN member."))
 
+(defgeneric predict (self &rest args)
+  (:documentation "Used for all class bindings with a PREDICT member."))
+
 (defgeneric *read (self arg)
   (:documentation "Used for all class bindings with an READ member."))
 
 (defgeneric release (self)
   (:documentation "Used for all class bindings with a RELEASE member."))
 
+(defgeneric save (self &rest args)
+  (:documentation "Used for all class bindings with a SAVE member."))
+
 (defgeneric sqrt (arg &rest args)
   (:documentation "Used for all class bindings with a SIZE member."))
 
 (defgeneric size (arg &rest args)
   (:documentation "Used for all class bindings with a SIZE member."))
+
+(defgeneric stat-model-save (self &rest args)
+  (:documentation "Used for all STAT-MODEL-SAVE methods."))
+
+(defgeneric train (self &rest args)
+  (:documentation "Used for all class bindings with a TRAIN member."))
 
 (defgeneric width (self)
   (:documentation "Used for all class bindings with an WIDTH member."))
@@ -376,6 +388,10 @@
   (file-storage-write-vector-key-point fs (%c-string-to-string name (length name)) value))
 
 
+(defmethod *get ((self cv-video-capture) (value integer))
+	   (video-capture-get self value))
+
+
 (defmethod height ((self cv-rect))
   (mem-aref (c-pointer self) :int 2))
 
@@ -393,10 +409,6 @@
 
 (defmethod is-opened ((self cv-video-writer))
 	   (video-writer-is-opened self))
-
-
-(defmethod *get ((self cv-video-capture) (value integer))
-	   (video-capture-get self value))
 
 
 (defmethod length ((self std-vector-char))
@@ -518,6 +530,10 @@
   (apply #'cl::open self args))
 
 
+(defmethod predict ((self cv-svm) &rest args)
+  (apply #'svm-predict self args))
+
+
 (defmethod release ((self cv-file-storage))
   (file-storage-release self))
 
@@ -568,6 +584,10 @@
 
 (defmethod size ((arg real) &rest args)
   (size-2 (coerce arg 'double-float) (coerce (or (first args) 0) 'double-float)))
+
+
+(defmethod train ((self cv-svm) &rest args)
+  (apply #'svm-train self args))
 
 
 (defmethod width ((self cv-rect))

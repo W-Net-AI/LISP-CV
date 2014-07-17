@@ -18,6 +18,12 @@
 (defmethod length ((self sequence))
   (cl:length self))
 
+(defgeneric load (self &rest args)
+  (:documentation "Used for all class bindings with a LOAD member."))
+
+(defmethod load (self &rest args)
+  (apply #'cl::load self args))
+
 (defun max (&rest args)
        (apply #'cl:max args))
 
@@ -952,7 +958,7 @@
 
 
 (defmethod translate-from-foreign (c-pointer (c-type mat-struct))
-  (let ((matrix  (make-instance 'cv-cv-mat :c-pointer c-pointer)))
+  (let ((matrix (make-instance 'cv-cv-mat :c-pointer c-pointer)))
     (when (garbage-collect c-type)
       (tg:finalize matrix (lambda () (del-cv-mat c-pointer))))
     matrix))
@@ -2431,7 +2437,33 @@
     normal-bayes-classifier))
 
 
+
 ;; SVM
+
+(define-foreign-type svm ()
+  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+                     :garbage-collect))
+  (:actual-type :pointer)
+  (:simple-parser svm))
+
+
+(defclass cv-svm ()
+  ((c-pointer :reader c-pointer :initarg :c-pointer)))
+
+
+(defmethod translate-to-foreign ((lisp-value cv-svm) (c-type svm))
+  (values  (c-pointer lisp-value) lisp-value))
+
+
+(defmethod translate-from-foreign (c-pointer (c-type svm))
+  (let ((svm  (make-instance 'cv-svm :c-pointer c-pointer)))
+    (when (garbage-collect c-type)
+      (tg:finalize svm (lambda () (del-svm c-pointer))))
+    svm))
+
+
+
+;; SVM-PARAMS
 
 (define-foreign-type svm-params ()
   ((garbage-collect  :reader garbage-collect :initform nil :initarg 

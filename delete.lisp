@@ -246,6 +246,13 @@
 
 
 ;; void operator delete  ( void* ptr )
+;; void cv_delete_CvSVM(CvSVM* self)
+(defcfun ("cv_delete_CvSVM" del-svm) :void
+  "Calls delete on a SVM object."
+  (self svm))
+
+
+;; void operator delete  ( void* ptr )
 ;; void cv_delete_CvSVMParams(CvSVMParams* self)
 (defcfun ("cv_delete_CvSVMParams" del-svm-params) :void
   "Calls delete on a SVM-PARAMS object."

@@ -7,7 +7,7 @@
 (in-package :lisp-cv)
 
 
-;; D-TREE-NODE 
+;;; D-TREE-NODE 
 
 
 (cffi:defcstruct d-tree-node
@@ -37,6 +37,21 @@
 	(set_num_valid :pointer))
 
 
+;;; SVM-PARAMS
+
+;(cffi:defcstruct svm-params
+;
+	;(svm-type :int)
+;	(kernel-type :int)
+	;(degree :double)
+;	(gamma :double)
+	;(coef0 :double)
+;	(c :double)
+	;(nu :double)
+;	(p :double)
+	;(class-weights :pointer)
+;	(term-crit :pointer))
+;
 
 ;; KEY-POINT1
 ;; try (:actual-type (:pointer (:struct key-point)))

@@ -300,7 +300,7 @@
 		(dmatch-4 (first args) (second args) (third args) (fourth args)))
 		(t nil)))
 
-
+;
 (defun make-dmatch (&rest args)
   "DMatch constructor"
        (cond ((eq (first args) nil)
@@ -389,7 +389,7 @@
   (class-id :int))
 
 
-(defun key-point (&optional x y size (angle -1) (response 0) (octave 0) (class-id -1))
+(defun key-point (&optional x y size (angle -1f0) (response 0f0) (octave 0) (class-id -1))
        (cond ((eq x nil)
 	      (key-point-0))
 	      (x
@@ -397,7 +397,7 @@
 	       (t nil)))
 
 
-(defun make-key-point (&optional x y size (angle -1) (response 0) (octave 0) (class-id -1))
+(defun make-key-point (&optional x y size (angle -1f0) (response 0f0) (octave 0) (class-id -1))
        (cond ((eq x nil)
 	      (key-point-0))
 	      (x

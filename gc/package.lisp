@@ -520,6 +520,13 @@
    #:k-nearest-find-nearest
    #:make-k-nearest
 
+;;; ml - Support Vector Machines 
+
+   #:make-svm
+   #:make-svm-params
+   #:svm
+   #:svm-params
+
 ;;; ml - Decision Trees
 
    #:d-tree

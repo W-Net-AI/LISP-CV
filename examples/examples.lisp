@@ -14472,8 +14472,119 @@ Note: The output matrix must be garbage collected, You can use manual MM(DEL-MAT
 macro (the WITH-MAT macro) or you can enable automatic finalization by adding a GC: or T: prefix to 
 the functions name.
 
-Example:(Coming soon)  
 
+Example:
+
+
+(defun make-labels-matrix (&key training-matrix)
+
+  (let ((labels (mat (rows training-matrix) 1 +32fc1+)))
+    (dotimes (i (rows labels))
+      (setf (at labels i 0 :float) (+ i 1f0)))
+    labels))
+
+
+(defun make-training-matrix-example (training-image-directory test-image)
+
+  "This example performs OCR using Support Vector Machines. It is a basic, 
+   but powerful, example of the right way to create a training matrix filled 
+   with images to give to LISP-CV's SVM train method. The name, SVM, for Support 
+   Vector Machines, is the name bindings for the OpenCV class CvSVM are referred to
+   by in this library.
+  
+   Note: It is reccommended, to get the full effect of this example, that you un-tar 
+   the english-font.tar.gz file in the:
+   
+    <LISP-CV-SRC-DIR>/IMAGES/OCR-TRAINING-DATA/
+   
+   folder and pick a folder inside the resultant: 
+   
+   <LISP-CV-SRC-DIR>/IMAGES/OCR-TRAINING-DATA/ENGLISH/FONT/
+   
+   folder to use as the :DIRECTORY argument, to the function we will use to 
+   create our OCR training data matrix in this example, the LISP-CV specific, 
+   MAKE-TRAINING-MATRIX function. Each folder, inside the FONT folder, contains 
+   a total of 1016 images of a specific number, upper-case letter or a lower-case 
+   letter. And those images will be used to tell the SVM what a variety of a specific 
+   letter or number looks like, so when you add a single image from the folder you gave 
+   to the MAKE-TRAINING-MATRIX function, as the TEST-IMAGE parameter to this example, the 
+   SVM PREDICT method will be able to predict what image, out of 1016 images in the folder, 
+   that it was.  Remember, when you give a pathname to the MAKE-TRAINING-MATRIX function, 
+   to include a trailing backslash."
+  
+;;; Let's get started!
+
+  ;; First, we set the size parameter, that each 
+  ;; of the 1016 images in the selected folder, 
+  ;; will be resized to. If you used the images
+  ;; that I suggested in the intro to this examp-
+  ;; le, for best results, you should leave the 
+  ;; DSIZE parameter as is.
+  (with-size ((dsize (size 128 128)))
+    ;; Here we create the training matrix using the MAKE-TRAINING-MATRIX function.
+    ;; This functions adds all of the images in the TRAINING-IMAGE-DIRECTORY into 
+    ;; TRAINING-MAT, as 1D images, one image per row.
+    (with-mat ((training-mat (make-training-matrix :directory training-image-directory
+						   :dsize dsize :test t))
+               ;; Here we make a labels matrix with the MAKE-LABELS-MATRIX function
+               ;; above, that we will later give to the SVM TRAIN method. A labels 
+               ;; matrix is specified as a 1D matrix, where each element in the 1D 
+               ;; matrix corresponds to each row(an image) in the 2D matrix. e.g.
+               ;; since there are 1016 images in TRAINING-MAT, the labels matrix w-
+               ;; ill have 1016 rows, each row having one element, a number, from 
+               ;; 1 to 1016. So in this example if image 1 is in the first row of 
+               ;; TRAINING-MAT, then the first row of LABELS-MAT will have a 1.0d0
+               ;; (double float) in it, and so on. 
+	       (labels-mat (make-labels-matrix :training-matrix training-mat))
+               ;; Load the test image.
+	       (image (imread test-image +load-image-grayscale+)))
+
+      ;; Convert TEST-IMAGE to single-float.
+      (convert-to image image +32fc1+)
+      
+      ;; Resize TEST-IMAGE to match the size of 
+      ;; the images in TRAINING-MAT. Not needed 
+      ;; but performed anyways in case you want 
+      ;; to change the DSIZE parameter. 
+      (resize image image dsize)
+
+      ;; Create SVM-PARAMS object 
+      ;; and set its parameters.
+      (with-svm-params ((params (svm-params)))
+
+	(setf (svm-type params) +svm-c-svc+)
+	(setf (kernel-type params) +svm-poly+)
+	(setf (gamma params) 3d0)
+
+	;; Create an SVM object.
+	(with-svm ((svm (svm)))
+	  ;; Train SVM based on the data entered.
+	  (with-mat ((mat (mat)))
+	    (format t "~%~%Training the SVM...this may take a few seconds...")
+	    (train svm training-mat labels-mat mat mat params))
+	  (format t "~%~%Training Complete!!!")
+	  ;; Convert TEST-IMAGE to 1D matrix
+	  (with-mat ((1d-image (reshape image 0 1)))
+	    
+	    ;; Predict which, of the 1016 images in the
+	    ;; TRAINING-IMAGE-DIRECTORY, you specified 
+	    ;; as TEST-IMAGE.
+	    (format t "~%~%Prediction!..you entered image number ~a as TEST-IMAGE.~%~%" 
+		    (round (predict svm 1d-image)))
+
+	    ;; Create a window to show TEST-IMAGE in.
+	    (let ((window-name "TEST-IMAGE - MAKE-TRAINING-MATRIX-EXAMPLE"))
+	      (with-named-window (window-name +window-normal+)
+		(move-window window-name 759 175)
+
+		;; Show TEST-IMAGE in a window
+		(imshow window-name image)
+
+		(loop
+		   (let ((c (wait-key 33)))
+		     (when (= c 27)
+		       (return))))))))))))
+ 
 ========================================================================================================================================
 #ML - #NORMAL BAYES CLASSIFIER
 ========================================================================================================================================

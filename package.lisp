@@ -3,7 +3,7 @@
 (defpackage :lisp-cv
   (:nicknames #:lisp-cv #:lcv #:cv)
   (:use #:cffi #:common-lisp #:swank #:trivial-garbage #:lisp-executable #:bordeaux-threads) 
-  (:shadow #:abs #:exp #:get #:length #:log #:min #:max #:open #:read #:set #:sqrt #:write)
+  (:shadow #:abs #:exp #:get #:length #:load #:log #:min #:max #:open #:read #:set #:sqrt #:write)
   (:export 
 
 
@@ -126,6 +126,8 @@
    #:del-size
    #:del-size-2f
    #:del-std-string
+   #:del-svm
+   #:del-svm-params
    #:del-term-crit
    #:del-vec-2b
    #:del-vec-3b
@@ -216,6 +218,8 @@
    #:with-scalar
    #:with-size
    #:with-size-2f
+   #:with-svm
+   #:with-svm-params
    #:with-term-criteria
    #:with-vec-2b
    #:with-vec-3b
@@ -295,6 +299,7 @@
    #:make-mat
    #:mat
    #:mat-expr
+   #:mat-struct
    #:mouse-callback
    #:normal-bayes-classifier
    #:point
@@ -315,6 +320,7 @@
    #:svm-params
    #:surf
    #:term-criteria
+   #:term-criteria-struct
    #:trackbar-callback
    #:vec-2b
    #:vec-3b
@@ -670,8 +676,10 @@
    #:is-opened
    #:length
    #:match
+   #:predict
    #:release
    #:size
+   #:train
    #:width
    #:x
    #:y
@@ -809,6 +817,7 @@
    #:make-vec-2w
    #:make-vec-3w
    #:make-vec-4w
+   #:%mat
    #:mat
    #:mat-data
    #:mat-expr-t
@@ -1614,6 +1623,17 @@
    #:+svm-params-nu+ 
    #:+svm-params-coef+ 
    #:+svm-params-degree+ 
+
+   #:gamma
+   #:kernel-type
+   #:make-svm
+   #:make-svm-params
+   #:svm
+   #:svm-params-0
+   #:svm-params
+   #:svm-predict
+   #:svm-train
+   #:svm-type
 
 ;;; ml - Decision Trees
 

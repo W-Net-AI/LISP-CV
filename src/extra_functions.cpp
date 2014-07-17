@@ -136,8 +136,8 @@ CvMat* cv_create_CvMat() {
     return new CvMat();
 }
 
-CvTermCriteria* cv_create_CvTermCriteria() {
-    return new CvTermCriteria();
+CvTermCriteria* cv_create_CvTermCriteria(int type, int max_iter, double epsilon) {
+    return new CvTermCriteria(type, max_iter, epsilon);
 }
 
 Mat* cv_imdecode_2(vector_uchar* buf, int flags) {
