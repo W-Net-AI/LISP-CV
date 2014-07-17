@@ -300,7 +300,7 @@
 		(dmatch-4 (first args) (second args) (third args) (fourth args)))
 		(t nil)))
 
-;
+
 (defun make-dmatch (&rest args)
   "DMatch constructor"
        (cond ((eq (first args) nil)
