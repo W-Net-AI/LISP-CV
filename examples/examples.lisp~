@@ -4359,8 +4359,8 @@ independently.
   "Calculates the per-element bit-wise conjunction of two 
    images.
 
-   Note: You are encouraged to use the black-and-white.png 
-   and the white-and-black.png in the LISP-CV images direc-
+   Note: You are encouraged to use the Black and White.png 
+   and the White and Black.png in the LISP-CV images direc-
    tory to get the full effect of this example."
 
   (let* ((image-1 (imread filename-1 1))
@@ -4416,7 +4416,7 @@ In case of multi-channel arrays, each channel is processed independently.
 
   "Inverts every bit of IMAGE-1 and IMAGE-2.
 
-   Note: You are encouraged to use the black-and-white.png 
+   Note: You are encouraged to use the Black and White.png 
    in the LISP-CV images directory and an image of your ow-
    n choosing to get the full effect of this example."
 
@@ -4484,8 +4484,8 @@ independently.
   "Calculates the per-element bit-wise disjunction of two 
    images.
 
-   Note: You are encouraged to use the black-and-white.png 
-   and the white-and-black.png in the LISP-CV images direc-
+   Note: You are encouraged to use the Black and White.png 
+   and the White and Black.png in the LISP-CV images direc-
    tory to get the full effect of this example."
 
   (let* ((image-1 (imread filename-1 1))
@@ -4544,8 +4544,8 @@ arrays, each channel is processed independently.
   "Calculates the per-element bit-wise “exclusive or” oper-
    ation of two images.
 
-   Note: You are encouraged to use the black-and-white.png 
-   and the white-and-black.png in the LISP-CV images direc-
+   Note: You are encouraged to use the Black and White.png 
+   and the White and Black.png in the LISP-CV images direc-
    tory to get the full effect of this example."
 
   (let* ((image-1 (imread filename-1 1))
@@ -6409,7 +6409,7 @@ See also:
    he trackabar changes the scalar value used to scal-
    e IMAGE-1. 
 
-   Using the bear-drawing.jpg and bear-painting.jpg i-
+   Using the Bear Drawing.jpg and Bear Painting.jpg i-
    n the LISP-CV images directory for IMAGE-1 and IMA-
    GE-2 respectively will give a nice effect in this 
    example."
