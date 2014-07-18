@@ -50,10 +50,7 @@
 			    (swank::handle-requests connection t)))))
 
 
-;; C-Interop - String*
-
-
-;; Regular version 
+;; C-Interop - *String
 
 
 ;; %STRING is for internal use.
@@ -61,6 +58,7 @@
 ;; stdstring* create_std_string()
   "Creates a *STRING object."
 (defcfun ("create_std_string" %string) *string)
+
 
 ;; Version for external use.
 
@@ -78,6 +76,20 @@
   "Converts C string to C++"
   (s :string)
   (len :unsigned-int))
+
+
+;;; MAT
+
+;; CvMat* cv_Mat_to_CvMat(Mat* self)
+(defcfun ("cv_Mat_to_CvMat" mat-to-cv-mat) mat-struct
+  (type mat))
+
+
+;;; TERM-CRITERIA 
+
+;; CvTermCriteria cv_TermCriteria_to_CvTermCriteria(TermCriteria* self)
+(defcfun ("cv_TermCriteria_to_CvTermCriteria" term-crit-to-cv-term-crit) term-criteria-struct
+  (term-criteria term-criteria))
 
 
 ;;; Basic Structures

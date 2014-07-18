@@ -3002,9 +3002,6 @@ The function WIDTH-2F Finds the width of a SIZE-2F object.
 
 The function HEIGHT-2F Finds the height of a SIZE-2F object.
 
-
-
-
 ========================================================================================================================================
 #SIZE-ASSGN-TO
 ========================================================================================================================================
@@ -3231,6 +3228,49 @@ CV> (STEP1 M)
 
 21
 
+========================================================================================================================================
+#SUB
+========================================================================================================================================
+
+Subtracts matrix M2 from matrix M1
+
+C++: MatExpr - operator
+
+LISP-CV: (SUB (M1 MAT) (M2 MAT)) => MAT-EXPR
+
+
+    Parameters:	
+
+        M1 - A matrix.
+
+        M2 - A matrix.
+
+
+The function SUB subtracts the elements of matrix M2 from the elements of matrix M1 in order. Both 
+matrices must be the same size.  You may need to coerce the result of SUB, the return value, back 
+to type MAT with the function (FORCE), (or the shorthand version (>>)) to use in other functions. 
+
+
+(defun sub-example ()
+
+  "Matrix M2 is subtracted from matrix M1 with the 
+   function SUB. Matrix M1, matrix M2 and the resu-
+   lt(RESULT) are then printed."
+
+  (with-object ((m1-data (alloc :uint '(53 62 85 64 23 97 52 16 12)))
+		(m2-data (alloc :uint '(64 22 64 15 11 17 42 16 88))))
+    (with-mat ((m1 (mat 3 3 +32s+ m1-data))
+	       (m2 (mat 3 3 +32s+ m2-data)))
+      (with-mat-expr ((result (sub m1 m2)))
+	(format t "~%M1:~%~%")
+	(print-mat m1 :int)
+	(format t "~%M2:~%~%")
+	(print-mat m2 :int )
+	(format t "~%RESULT:~%~%")
+        ;; The ':t' prefix enables automatic 
+        ;; finalization in the (>>) function
+	(print-mat (t:>> result) :int)
+	(format t "~%~%")))))
 
 ========================================================================================================================================
 #TERM-CRITERIA
@@ -3302,7 +3342,7 @@ The method returns the number of array elements (a number of pixels if the array
 	(format t "~%Total mumber of elements in MAT-2 = ~a~%~%" total-2)))))
 
 ========================================================================================================================================
-VEC
+#VEC-*
 ========================================================================================================================================
 
 
@@ -12350,7 +12390,7 @@ Small example program used to extract frames from the camera feed:
 		 (return)))))))))
 
 ========================================================================================================================================
-VIDEO-CAPTURE
+#VIDEO-CAPTURE
 ========================================================================================================================================
 
 VIDEO-CAPTURE constructors.
@@ -12430,7 +12470,7 @@ Example:
 		   (return))))))))))
 
 ========================================================================================================================================
-VIDEO-CAPTURE-GET
+#VIDEO-CAPTURE-GET
 ========================================================================================================================================
 
 Returns the specified VIDEO-CAPTURE property
@@ -12530,7 +12570,7 @@ value 0 is returned.
 
 
 ========================================================================================================================================
-VIDEO-CAPTURE-GRAB
+#VIDEO-CAPTURE-GRAB
 ========================================================================================================================================
 
 Grabs the next frame from video file or capturing device.
@@ -12568,7 +12608,7 @@ Example:
 See VIDEO-CAPTURE-RETRIEVE-EXAMPLE in this file.
 
 ========================================================================================================================================
-VIDEO-CAPTURE-IS-OPENED
+#VIDEO-CAPTURE-IS-OPENED
 ========================================================================================================================================
 
 Returns true if video capturing has been initialized already.
@@ -12625,7 +12665,7 @@ Example:
 		 (return)))))))))
 
 ========================================================================================================================================
-VIDEO-CAPTURE-READ
+#VIDEO-CAPTURE-READ
 ========================================================================================================================================
 
 Grabs, decodes and returns the next video frame.
@@ -12680,7 +12720,7 @@ frames in video file), the methods return false and the functions return NULL po
 		 (return)))))))))
 
 ========================================================================================================================================
-VIDEO-CAPTURE-RELEASE
+#VIDEO-CAPTURE-RELEASE
 ========================================================================================================================================
 
 Closes video file or capturing device.
@@ -12727,7 +12767,7 @@ The methods are automatically called by subsequent (VIDEO-CAPTURE-OPEN) and by V
 
 
 ========================================================================================================================================
-VIDEO-CAPTURE-RETRIEVE
+#VIDEO-CAPTURE-RETRIEVE
 ========================================================================================================================================
 
 Decodes and returns the grabbed video frame.
@@ -12773,7 +12813,7 @@ Example:
 		 (return)))))))))
 
 ========================================================================================================================================
-VIDEO-CAPTURE-SET
+#VIDEO-CAPTURE-SET
 ========================================================================================================================================
 
 Sets a property in the VIDEO-CAPTURE
@@ -12873,7 +12913,7 @@ Example:
 		 (return)))))))))
 
 ========================================================================================================================================
-VIDEO-WRITER
+#VIDEO-WRITER
 ========================================================================================================================================
 
 VIDEO-WRITER constructors
@@ -12953,7 +12993,7 @@ FFMPEG or VFW is used; on MacOSX QTKit is used.
 		     (return)))))))))))
 
 ========================================================================================================================================
-VIDEO-WRITER-IS-OPENED
+#VIDEO-WRITER-IS-OPENED
 ========================================================================================================================================
 
 Returns true if video writer has been successfully initialized.
@@ -12979,7 +13019,7 @@ LISP-CV: (VIDEO-WRITER-IS-OPENED (SELF VIDEO-WRITER)) :BOOLEAN
 	      (is-opened o-video-writer)))))
 
 ========================================================================================================================================
-VIDEO-WRITER-WRITE
+#VIDEO-WRITER-WRITE
 ========================================================================================================================================
 
 Writes the next video frame
@@ -14436,12 +14476,16 @@ Constructs single-float training data matrix.
 
 C++: Specific to LISP-CV
 
-LISP-CV: (MAKE-TRAINING-MATRIX &KEY (DIRECTORY :STRING) (DSIZE :INT) (TEST :BOOLEAN)) => MAT
+LISP-CV: (MAKE-TRAINING-MATRIX &KEY (DIRECTORY :STRING) (DIRECTORY-CONTENTS KEYWORD) (DSIZE :INT) (TEST :BOOLEAN)) => MAT
 
 
     Parameters:
 
         DIRECTORY - Directory of square images: (AND (EQ (ROWS IMG) (COLS IMG))).
+
+        DIRECTORY-CONTENTS - Keyword flag, either :DIRECTORIES or :FILES, specifying whether or not 
+                             the provided DIRECTORY argument(a pathname) contains only files or only 
+                             directories(must be one or the other).
 
         DSIZE - The new rows and cols value each image in DIRECTORY is resized to before being added 
                 into the output training data matrix. (WIDTH DSIZE) and (HEIGHT DSIZE) must be equal. 
@@ -14475,14 +14519,12 @@ the functions name.
 
 Example:
 
-
 (defun make-labels-matrix (&key training-matrix)
 
   (let ((labels (mat (rows training-matrix) 1 +32fc1+)))
     (dotimes (i (rows labels))
       (setf (at labels i 0 :float) (+ i 1f0)))
     labels))
-
 
 (defun make-training-matrix-example (training-image-directory test-image)
 
@@ -14492,18 +14534,18 @@ Example:
    Vector Machines, is the name bindings for the OpenCV class CvSVM are referred to
    by in this library.
   
-   Note: It is reccommended, to get the full effect of this example, that you un-tar 
-   the english-font.tar.gz file in the:
+   Note: It is reccommended, to get the full effect of this example, you download 
+   the link in the:
    
     <LISP-CV-SRC-DIR>/IMAGES/OCR-TRAINING-DATA/
    
-   folder and pick a folder inside the resultant: 
+   folder, un-tar it, and pick a folder inside the resultant: 
    
-   <LISP-CV-SRC-DIR>/IMAGES/OCR-TRAINING-DATA/ENGLISH/FONT/
+   /English/Fnt/
    
    folder to use as the :DIRECTORY argument, to the function we will use to 
    create our OCR training data matrix in this example, the LISP-CV specific, 
-   MAKE-TRAINING-MATRIX function. Each folder, inside the FONT folder, contains 
+   MAKE-TRAINING-MATRIX function. Each folder, inside the Fnt folder, contains 
    a total of 1016 images of a specific number, upper-case letter or a lower-case 
    letter. And those images will be used to tell the SVM what a variety of a specific 
    letter or number looks like, so when you add a single image from the folder you gave 
@@ -14525,18 +14567,18 @@ Example:
     ;; This functions adds all of the images in the TRAINING-IMAGE-DIRECTORY into 
     ;; TRAINING-MAT, as 1D images, one image per row.
     (with-mat ((training-mat (make-training-matrix :directory training-image-directory
-						   :dsize dsize :test t))
-               ;; Here we make a labels matrix with the MAKE-LABELS-MATRIX function
-               ;; above, that we will later give to the SVM TRAIN method. A labels 
-               ;; matrix is specified as a 1D matrix, where each element in the 1D 
-               ;; matrix corresponds to each row(an image) in the 2D matrix. e.g.
-               ;; since there are 1016 images in TRAINING-MAT, the labels matrix w-
-               ;; ill have 1016 rows, each row having one element, a number, from 
-               ;; 1 to 1016. So in this example if image 1 is in the first row of 
-               ;; TRAINING-MAT, then the first row of LABELS-MAT will have a 1.0d0
-               ;; (double float) in it, and so on. 
+						   :directory-contents :files :dsize dsize :test t))
+	       ;; Here we make a labels matrix with the MAKE-LABELS-MATRIX function
+	       ;; above, that we will later give to the SVM TRAIN method. A labels 
+	       ;; matrix is specified as a 1D matrix, where each element in the 1D 
+	       ;; matrix corresponds to each row(an image) in the 2D matrix. e.g.
+	       ;; since there are 1016 images in TRAINING-MAT, the labels matrix w-
+	       ;; ill have 1016 rows, each row having one element, a number, from 
+	       ;; 1 to 1016. So in this example if image 1 is in the first row of 
+	       ;; TRAINING-MAT, then the first row of LABELS-MAT will have a 1.0d0
+	       ;; (double float) in it, and so on. 
 	       (labels-mat (make-labels-matrix :training-matrix training-mat))
-               ;; Load the test image.
+	       ;; Load the test image.
 	       (image (imread test-image +load-image-grayscale+)))
 
       ;; Convert TEST-IMAGE to single-float.
@@ -14551,7 +14593,7 @@ Example:
       ;; Create SVM-PARAMS object 
       ;; and set its parameters.
       (with-svm-params ((params (svm-params)))
-
+	(setf (degree params) 1d0)
 	(setf (svm-type params) +svm-c-svc+)
 	(setf (kernel-type params) +svm-poly+)
 	(setf (gamma params) 3d0)
@@ -14560,7 +14602,7 @@ Example:
 	(with-svm ((svm (svm)))
 	  ;; Train SVM based on the data entered.
 	  (with-mat ((mat (mat)))
-	    (format t "~%~%Training the SVM...this may take a few seconds...")
+	    (format t "Training the SVM...this may take a few seconds...")
 	    (train svm training-mat labels-mat mat mat params))
 	  (format t "~%~%Training Complete!!!")
 	  ;; Convert TEST-IMAGE to 1D matrix
@@ -14569,7 +14611,7 @@ Example:
 	    ;; Predict which, of the 1016 images in the
 	    ;; TRAINING-IMAGE-DIRECTORY, you specified 
 	    ;; as TEST-IMAGE.
-	    (format t "~%~%Prediction!..you entered image number ~a as TEST-IMAGE.~%~%" 
+	    (format t "~%~%Prediction..you entered image number ~a as TEST-IMAGE.~%~%" 
 		    (round (predict svm 1d-image)))
 
 	    ;; Create a window to show TEST-IMAGE in.
@@ -17597,60 +17639,6 @@ single-column matrix. Similarly to (ROW) and (COL) , this is an O(1) operation.
     (free data)))
 
 ========================================================================================================================================
-#SUB
-========================================================================================================================================
-
-Subtracts matrix M1 from matrix M2
-
-C++: MatExpr - operator
-
-LISP-CV: (SUB (M1 MAT) (M2 MAT)) => MAT-EXPR
-
-
-    Parameters:	
-
-        M1 - A matrix.
-
-        M2 - A matrix.
-
-
-The function SUB subtracts the elements of matrix M2 from the elements of matrix M1 in order. Both 
-matrices must be the same size.  You may need to coerce the result of SUB, the return value, back 
-to type MAT with the function (FORCE), (or the shorthand version (>>)) to use in other functions. 
-
-
-(defun sub-example ()
-
-  "Matrix M2 is subtracted from matrix M1 with the 
-   function SUB. Matrix M1, matrix M2 and the resu-
-   lt(RESULT) are then printed."
-
-  (let* ((m1-data (alloc :uint '(53 62 85 64 23 97 52 16 12)))
-	 (m2-data (alloc :uint '(64 22 64 15 11 17 42 16 88)))
-	 (m1 (mat 3 3 +32s+ m1-data))
-         (m2 (mat 3 3 +32s+ m2-data))
-         (result (sub m1 m2)))
-    (dotimes (i (rows m1))
-      (dotimes (j (cols m1))
-	(format t "~a" (at m1 i j :int))
-	(princ #\Space))
-      (princ #\Newline))
-    (format t "~%~%")imread-ex
-    (dotimes (i (rows m2))
-      (dotimes (j (cols m2))
-	(format t "~a" (at m2 i j :int))
-	(princ #\Space))
-      (princ #\Newline))
-    (format t "~%~%")
-    (dotimes (i 3)
-      (dotimes (j 3)
-	       (format t "~a" (at (>> result) i j :int))
-	       (princ #\Space))
-      (princ #\Newline))
-    (free m1-data)
-    (free m2-data)))
-
-========================================================================================================================================
 #LISP-CV - MACROS AND EXTRA FUNCTIONS:
 ========================================================================================================================================
 
@@ -18177,7 +18165,7 @@ Example:
 	       (return))))))))
 
 ========================================================================================================================================
-VECTOR-*
+#VECTOR-*
 ========================================================================================================================================
 
 Bindings for the C++ VECTOR class.

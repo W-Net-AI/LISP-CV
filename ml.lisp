@@ -9,7 +9,7 @@
 ;;; LISP-CV specific
 
 
-(defun make-training-matrix (&key directory dsize test)
+(defun make-training-matrix (&key directory directory-contents dsize test)
 
   "Creates training data to give to Machine Learning functions.
    First, converts all of the images in the directory you have 
@@ -22,76 +22,94 @@
    be square and width/height values of DSIZE must be equal."
 
   (let* ((window-name "Testing...")
-	 (file-list (uiop:directory-files directory))
+	 (directory-or-file-list (uiop:directory-files directory))
+	 (file-list-of-lists (list))
+	 (temp-list 0)
+	 (pathname-list (list))
 	 (img-list (list))
          ;;Extra list for GC
          (end-list (list))
-	 (pathname-list (list))
          (img-height (round (size-height dsize)))
          (img-width (round (size-width dsize)))
 	 (img-area (* img-height img-width))
-	 (num-of-files (length file-list))
+	 (num-of-files 0)
          ;;Create matrix to hold the training data
-	 (training-data (mat num-of-files img-area +32fc1+))
+	 (training-data 0)
          (pass-fail 0)
 	 (i 0))
 
+    ;; Error checking section
     (check-type test boolean)      
     
     (cond ((not (eq img-height img-width)) 
 	   (error "the width and height of DSIZE must be equal."))
-	  ((not file-list)
+	  ((not directory-or-file-list)
 	   (error "invalid directory name or directory is empty."))
 	  ((not (uiop:directory-pathname-p directory))
-	   (error "error opening ~a:~%No such file or directory." 
+	   (error "error opening ~a:~%No such file or directory.~%Note: supplied pathnames must include a trailing backslash." 
 		  (cat "#P" (write-to-string directory)))))
 
-    (dotimes (i num-of-files)
-      (if (uiop:directory-pathname-p (nth i file-list))
-	  (error "the pathname entered includes a directory.") nil))
+    ;;Load all pathnames correctly, whether or not, 
+    ;;a directory path was supplied to the function
+    (cond  ((eq directory-contents :directories)
 
-    ;;Create a list of pathnames to
-    ;;read with the IMREAD function.
-    (dotimes (i num-of-files)
-      (push (full-pathname (nth i file-list)) pathname-list))
+	    (dotimes (i (length directory-or-file-list))
+	      (if (uiop:directory-pathname-p (nth i directory-or-file-list)) nil
+		  (error "If :DIRECTORIES flag is specified, supplied path may only include directories."))) 
+
+	    (dotimes (i (length directory-or-file-list))
+	      (push 
+	       (uiop:directory-files (full-pathname (nth i directory-or-file-list))) 
+	       file-list-of-lists))
+
+	    (dotimes (i (length file-list-of-lists))
+	      (setf temp-list  (reverse (nth i file-list-of-lists)))
+
+	      (dotimes (j (length temp-list))
+		(push (full-pathname (nth j temp-list)) pathname-list)))
+
+	    (setf num-of-files (length pathname-list))
+	    (setf training-data (mat-typed num-of-files img-area +32fc1+)))
+
+	   ((eq directory-contents :files)
+
+	    (dotimes (i (length directory-or-file-list))
+	      (if (uiop:file-pathname-p (nth i directory-or-file-list)) nil
+		  (error "If :FILES flag is specified, supplied path may only include files."))) 
+
+	    ;;Create a list of pathnames to
+	    ;;read with the IMREAD function.
+	    (dotimes (i (length directory-or-file-list))
+	      (push (full-pathname (nth i directory-or-file-list)) pathname-list))
+
+	    (setf num-of-files (length pathname-list))
+	    (setf training-data (mat-typed num-of-files img-area +32fc1+))))
+
 
     ;;Make a list of all images in 
     ;;the directory you specified.
-    (format t "~%Loading images in...~%~% ~a...~%~%" directory)
+    (format t "~%Loading images in...~%~%'~a'...~%~%" directory)
     (dotimes (i num-of-files)
-      (let ((path (c-string-to-string (nth i pathname-list) 
-				      (length (nth i pathname-list)))))
-	(if (is-continuous (%imread path 0)) 
-	    (push (%imread path 0) img-list)
-	    (error "Image is not continuous."))
-	(del-std-string path)))
+      (push  (imread (nth i pathname-list) +load-image-grayscale+) end-list))
 
     ;;Convert all the images in 
     ;;IMG-LIST to single float.
-    (dotimes (i num-of-files)
-      (%convert-to (nth i img-list) (nth i img-list) +32fc1+ 1.0d0 0.0d0))
+    (dotimes (n num-of-files)
+      (convert-to (nth n end-list) (nth n end-list) +32fc1+))
 
-    ;;Resize all of the images and 
-    ;;convert them to 1D matrices.
-    (dotimes (i num-of-files)
-      (%resize (nth i img-list) (nth i img-list) dsize 0d0 0d0 +inter-linear+)
-      (push (reshape-rows (nth i img-list) 0 1) end-list))
+    ;;Resize all of the images
+    (dotimes (n num-of-files)
+      (resize (nth n end-list) (nth n end-list)  dsize))
 
     (setf end-list (reverse end-list))
     
-    (format t "Adding images to training matrix...")
     ;;Fill TRAINING-DATA with all of the 
     ;;1D matrices. One matrix per row.
-    (dotimes (i num-of-files)
-      (dotimes (k img-area)
-	(setf (mem-aref (%ptr training-data i) :float k) 
-	      (mem-aref (%ptr (nth i end-list) 0) :float k))))
-
-    ;;Garbage collect IMG-LIST
-    (dotimes (i num-of-files)
-      (del-mat (nth i img-list)))
-
-    
+    (format t "Adding images to training matrix...")
+    (dotimes (k num-of-files)
+      (dotimes (i img-height)
+	(dotimes (j img-width)
+	  (setf (at training-data k (+ (* i img-height) j) :float) (at (nth k end-list) i j :float)))))
 
     (if test (progn
 
@@ -106,12 +124,7 @@
 	       
 	       ;;Fill IMG-LIST with matrices.
 	       (dotimes (i num-of-files)
-		 (push (mat-typed 1 img-area 0) img-list))
-
-	       ;;Convert all matrices in 
-	       ;;IMG-LIST to single float.
-	       (dotimes (i num-of-files)
-		 (%convert-to (nth i img-list) (nth i img-list) +32fc1+ 1.0d0 0.0d0))
+		 (push (mat-typed 1 img-area +32fc1+) img-list))
 
 	       ;;Fill each matrix in IMG-LIST with 
 	       ;;a separate row from TRAINING-DATA.
@@ -138,7 +151,7 @@
 		   (format t "~%~%Test passed...Proceed!~%~%"))
 
 	       ;;Convert all the images in 
-	       ;;IMG-LIST to single float.
+	       ;;IMG-LIST to unsigned char.
 	       (dotimes (i num-of-files)
 		 (%convert-to (nth i img-list) (nth i img-list) +8uc1+ 1.0d0 0.0d0))
 
@@ -155,9 +168,13 @@
 		  (sleep .001)
 		  (let ((c (wait-key 1)))
 		    (when (or (= c 27) (= i (- num-of-files 1)))
-
+		      ;;Garbage collect IMG-LIST
+		      (dotimes (i num-of-files)
+			(del-mat (nth i img-list)))
 		      (return-from make-training-matrix 
-			(progn (destroy-window window-name) training-data)))))) 
+			(progn 
+			  (destroy-window window-name)
+			  training-data)))))) 
 	(progn (format t "~%~%Done!...no tests were performed on the training matrix.~%~%")
 	       training-data))))
 
@@ -258,15 +275,54 @@
 ;;; Support Vector Machines
 
 
+(defun c-value (self)
+  (if (typep self 'cv-svm-params)
+      (mem-ref (c-pointer self) :double 32)))
 
-(defun gamma (self)
+
+(defun (setf c-value) (val self)
+  (if (typep self 'cv-svm-params)
+      (setf (mem-ref (c-pointer self) :double 32) val)))
+
+
+(defun class-weights (self)
+  (if (typep self 'cv-svm-params)
+      (mem-ref (c-pointer self) 'mat-struct 56)))
+
+
+(defun (setf class-weights) (val self)
+  (if (typep self 'cv-svm-params)
+      (setf (mem-ref (c-pointer self) 'mat-struct 56) val)))
+
+
+(defun coef-0 (self)
+  (if (typep self 'cv-svm-params)
+      (mem-ref (c-pointer self) :double 24)))
+
+
+(defun (setf coef-0) (val self)
+  (if (typep self 'cv-svm-params)
+      (setf (mem-ref (c-pointer self) :double 24) val)))
+
+
+(defun degree (self)
   (if (typep self 'cv-svm-params)
       (mem-ref (c-pointer self) :double 8)))
 
 
-(defun (setf gamma) (val self)
+(defun (setf degree) (val self)
   (if (typep self 'cv-svm-params)
       (setf (mem-ref (c-pointer self) :double 8) val)))
+
+
+(defun gamma (self)
+  (if (typep self 'cv-svm-params)
+      (mem-ref (c-pointer self) :double 16)))
+
+
+(defun (setf gamma) (val self)
+  (if (typep self 'cv-svm-params)
+      (setf (mem-ref (c-pointer self) :double 16) val)))
 
 
 (defun kernel-type (self)
@@ -277,6 +333,26 @@
 (defun (setf kernel-type) (val self)
   (if (typep self 'cv-svm-params)
       (setf (mem-ref (c-pointer self) :int 4) val)))
+
+
+(defun nu (self)
+  (if (typep self 'cv-svm-params)
+      (mem-ref (c-pointer self) :double 40)))
+
+
+(defun (setf nu) (val self)
+  (if (typep self 'cv-svm-params)
+      (setf (mem-ref (c-pointer self) :double 40) val)))
+
+
+(defun p (self)
+  (if (typep self 'cv-svm-params)
+      (mem-ref (c-pointer self) :double 48)))
+
+
+(defun (setf p) (val self)
+  (if (typep self 'cv-svm-params)
+      (setf (mem-ref (c-pointer self) :double 48) val)))
 
 
 ;; CvSVM::CvSVM()
@@ -405,6 +481,16 @@
 (defun (setf svm-type) (val self)
   (if (typep self 'cv-svm-params)
       (setf (mem-ref (c-pointer self) :int) val)))
+
+
+(defun term-crit (self)
+  (if (typep self 'cv-svm-params)
+      (mem-ref (c-pointer self) 'term-criteria-struct 64)))
+
+
+(defun (setf term-crit) (val self)
+  (if (typep self 'cv-svm-params)
+      (setf (mem-ref (c-pointer self) 'term-criteria-struct 64) val)))
 
 
 ;;; Decision Trees

@@ -87,13 +87,13 @@
        (values))))
 
 
-;(defmacro with-cv-term-criteria (bind &body body)
-;  "Ensures DEL-CV-TERM-CRITERIA gets called when
-;   a CV-TERM-CRITERIA object goes out of scope."
-;  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
-;     (unwind-protect (progn ,@body)
-;       (mapcar #!(del-cv-term-criteria %1) ,(cons 'list (mapcar #!(car %1) bind)))
-;       (values))))
+(defmacro with-cv-term-criteria (bind &body body)
+  "Ensures DEL-CV-TERM-CRITERIA gets called when
+   a CV-TERM-CRITERIA object goes out of scope."
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-cv-term-criteria %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
 
 
 (defmacro with-dmatch (bind &body body)

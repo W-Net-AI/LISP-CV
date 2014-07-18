@@ -2159,7 +2159,7 @@
 ;;; ML - LISP-CV specific
 
 
-(defun make-training-matrix (&key directory dsize test)
+(defun make-training-matrix (&key directory directory-contents dsize test)
 
   "Creates training data to give to Machine Learning functions.
    First, converts all of the images in the directory you have 
@@ -2172,77 +2172,94 @@
    be square and width/height values of DSIZE must be equal."
 
   (let* ((window-name "Testing...")
-	 (file-list (uiop:directory-files directory))
+	 (directory-or-file-list (uiop:directory-files directory))
+	 (file-list-of-lists (list))
+	 (temp-list 0)
+	 (pathname-list (list))
 	 (img-list (list))
          ;;Extra list for GC
          (end-list (list))
-	 (pathname-list (list))
          (img-height (round (cv:size-height dsize)))
          (img-width (round (cv:size-width dsize)))
 	 (img-area (* img-height img-width))
-	 (num-of-files (cv:length file-list))
+	 (num-of-files 0)
          ;;Create matrix to hold the training data
-	 (training-data (mat num-of-files img-area cv:+32fc1+))
+	 (training-data 0)
          (pass-fail 0)
 	 (i 0))
 
-
+    ;; Error checking section
     (check-type test boolean)      
     
     (cond ((not (eq img-height img-width)) 
 	   (error "the width and height of DSIZE must be equal."))
-	  ((not file-list)
+	  ((not directory-or-file-list)
 	   (error "invalid directory name or directory is empty."))
 	  ((not (uiop:directory-pathname-p directory))
-	   (error "error opening ~a:~%No such file or directory." 
+	   (error "error opening ~a:~%No such file or directory.~%Note: supplied pathnames must include a trailing backslash." 
 		  (cv:cat "#P" (write-to-string directory)))))
 
-    (dotimes (i num-of-files)
-      (if (uiop:directory-pathname-p (nth i file-list))
-	  (error "the pathname entered includes a directory.") nil))
+    ;;Load all pathnames correctly, whether or not, 
+    ;;a directory path was supplied to the function
+    (cond  ((eq directory-contents :directories)
 
-    ;;Create a list of pathnames to
-    ;;read with the IMREAD function.
-    (dotimes (i num-of-files)
-      (push (cv:full-pathname (nth i file-list)) pathname-list))
+	    (dotimes (i (cv:length directory-or-file-list))
+	      (if (uiop:directory-pathname-p (nth i directory-or-file-list)) nil
+		  (error "If :DIRECTORIES flag is specified, supplied path may only include directories."))) 
+
+	    (dotimes (i (cv:length directory-or-file-list))
+	      (push 
+	       (uiop:directory-files (cv:full-pathname (nth i directory-or-file-list))) 
+	       file-list-of-lists))
+
+	    (dotimes (i (cv:length file-list-of-lists))
+	      (setf temp-list  (reverse (nth i file-list-of-lists)))
+
+	      (dotimes (j (cv:length temp-list))
+		(push (cv:full-pathname (nth j temp-list)) pathname-list)))
+
+	    (setf num-of-files (length pathname-list))
+	    (setf training-data (mat-typed num-of-files img-area cv:+32fc1+)))
+
+	   ((eq directory-contents :files)
+
+	    (dotimes (i (cv:length directory-or-file-list))
+	      (if (uiop:file-pathname-p (nth i directory-or-file-list)) nil
+		  (error "If :FILES flag is specified, supplied path may only include files."))) 
+
+	    ;;Create a list of pathnames to
+	    ;;read with the IMREAD function.
+	    (dotimes (i (length directory-or-file-list))
+	      (push (cv:full-pathname (nth i directory-or-file-list)) pathname-list))
+
+	    (setf num-of-files (cv:length pathname-list))
+	    (setf training-data (mat-typed num-of-files img-area cv:+32fc1+))))
+
 
     ;;Make a list of all images in 
     ;;the directory you specified.
-    (format t "~%Loading images in...~%~% ~a...~%~%" directory)
+    (format t "~%Loading images in...~%~%'~a'...~%~%" directory)
     (dotimes (i num-of-files)
-      (let ((path (cv:c-string-to-string (nth i pathname-list) 
-				      (cv:length (nth i pathname-list)))))
-	(if (cv:is-continuous (cv:%imread path 0)) 
-	    (push (cv:%imread path 0) img-list)
-	    (error "Image is not continuous."))
-	(cv:del-std-string path)))
+      (push  (cv:imread (nth i pathname-list) cv:+load-image-grayscale+) end-list))
 
     ;;Convert all the images in 
     ;;IMG-LIST to single float.
-    (dotimes (i num-of-files)
-      (cv:%convert-to (nth i img-list) (nth i img-list) cv:+32fc1+ 1.0d0 0.0d0))
+    (dotimes (n num-of-files)
+      (cv:convert-to (nth n end-list) (nth n end-list) cv:+32fc1+))
 
-    ;;Resize all of the images and 
-    ;;convert them to 1D matrices.
-    (dotimes (i num-of-files)
-      (cv:%resize (nth i img-list) (nth i img-list) dsize 0d0 0d0 cv:+inter-linear+)
-      (push (cv:reshape-rows (nth i img-list) 0 1) end-list))
+    ;;Resize all of the images
+    (dotimes (n num-of-files)
+      (cv:resize (nth n end-list) (nth n end-list)  dsize))
 
     (setf end-list (reverse end-list))
     
-    (format t "Adding images to training matrix...")
     ;;Fill TRAINING-DATA with all of the 
     ;;1D matrices. One matrix per row.
-    (dotimes (i num-of-files)
-      (dotimes (k img-area)
-	(setf (mem-aref (cv:%ptr training-data i) :float k) 
-	      (mem-aref (cv:%ptr (nth i end-list) 0) :float k))))
-
-    ;;Garbage collect IMG-LIST
-    (dotimes (i num-of-files)
-      (cv:del-mat (nth i img-list)))
-
-    
+    (format t "Adding images to training matrix...")
+    (dotimes (k num-of-files)
+      (dotimes (i img-height)
+	(dotimes (j img-width)
+	  (setf (cv:at training-data k (+ (* i img-height) j) :float) (cv:at (nth k end-list) i j :float)))))
 
     (if test (progn
 
@@ -2257,19 +2274,14 @@
 	       
 	       ;;Fill IMG-LIST with matrices.
 	       (dotimes (i num-of-files)
-		 (push (cv:mat-typed 1 img-area 0) img-list))
-
-	       ;;Convert all matrices in 
-	       ;;IMG-LIST to single float.
-	       (dotimes (i num-of-files)
-		 (cv:%convert-to (nth i img-list) (nth i img-list) cv:+32fc1+ 1.0d0 0.0d0))
+		 (push (cv:mat-typed 1 img-area cv:+32fc1+) img-list))
 
 	       ;;Fill each matrix in IMG-LIST with 
 	       ;;a separate row from TRAINING-DATA.
 	       (dotimes (i num-of-files)
 		 (dotimes (k img-area)
-		   (setf (mem-aref (cv:%ptr (nth i img-list) 0) :float k) 
-			 (mem-aref (cv:%ptr training-data i) :float k))))
+		   (setf (mem-aref (%ptr (nth i img-list) 0) :float k) 
+			 (mem-aref (%ptr training-data i) :float k))))
 
 	       ;;If test fails..Break!
 	       (dotimes (i num-of-files)
@@ -2289,7 +2301,7 @@
 		   (format t "~%~%Test passed...Proceed!~%~%"))
 
 	       ;;Convert all the images in 
-	       ;;IMG-LIST to single float.
+	       ;;IMG-LIST to unsigned char.
 	       (dotimes (i num-of-files)
 		 (cv:%convert-to (nth i img-list) (nth i img-list) cv:+8uc1+ 1.0d0 0.0d0))
 
@@ -2306,9 +2318,13 @@
 		  (sleep .001)
 		  (let ((c (cv:wait-key 1)))
 		    (when (or (= c 27) (= i (- num-of-files 1)))
-
+		      ;;Garbage collect IMG-LIST
+		      (dotimes (i num-of-files)
+			(cv:del-mat (nth i img-list)))
 		      (return-from make-training-matrix 
-			(progn (cv:destroy-window window-name) training-data)))))) 
+			(progn 
+			  (cv:destroy-window window-name)
+			  training-data)))))) 
 	(progn (format t "~%~%Done!...no tests were performed on the training matrix.~%~%")
 	       training-data))))
 

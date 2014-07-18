@@ -741,6 +741,7 @@
    #:adjust-roiadd all pathnames in a directory to a list lisp
    #:area
    #:area-2f
+   #:at
    #:br
    #:channels
    #:class-id
@@ -1439,6 +1440,7 @@
    #:convert-image
    #:create-trackbar
    #:destroy-all-windows
+   #:%destroy-window
    #:destroy-window
    #:get-trackbar-pos
    #:imshow

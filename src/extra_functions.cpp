@@ -132,12 +132,20 @@ ADD_READ_FUNC_IMPL_1(m, Mat);
 
 ADD_READ_FUNC_IMPL_2(vkp, vector_KeyPoint);
 
-CvMat* cv_create_CvMat() {
-    return new CvMat();
+const float* cv_CvSVM_get_support_vector(SVM* self, int i) {
+    return self->get_support_vector(i);
 }
 
-CvTermCriteria* cv_create_CvTermCriteria(int type, int max_iter, double epsilon) {
-    return new CvTermCriteria(type, max_iter, epsilon);
+CvMat* cv_Mat_to_CvMat(Mat* self) {
+
+    CvMat m = *self;
+    return new CvMat(m);
+}
+
+CvTermCriteria* cv_TermCriteria_to_CvTermCriteria(TermCriteria* self) {
+
+    CvTermCriteria t = *self;
+    return new CvTermCriteria(t);
 }
 
 Mat* cv_imdecode_2(vector_uchar* buf, int flags) {
@@ -372,10 +380,6 @@ void cv_delete_CvANN_MLP_TrainParams(CvANN_MLP_TrainParams* self) {
 }
 
 void cv_delete_CvMat(CvMat* self) {
-    delete self;
-}
-
-void cv_delete_CvTermCriteria(CvTermCriteria* self) {
     delete self;
 }
 
