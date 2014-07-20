@@ -39,7 +39,7 @@
 
 ;;; CV-TERM-CRITERIA
 
-(cffi:defcstruct term-criteria-struct
+(cffi:defcstruct cv-term-criteria
 
 	(type :int)
 	(max-iter :int)

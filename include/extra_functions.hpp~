@@ -90,7 +90,7 @@ ADD_READ_FUNC_HEADERS_1(s, String);
 ADD_READ_FUNC_HEADERS_1(m, Mat);
 const float* cv_CvSVM_get_support_vector(SVM* self, int i);
 CvMat* cv_Mat_to_CvMat(Mat* self);
-CvTermCriteria cv_TermCriteria_to_CvTermCriteria(TermCriteria* self);
+CvTermCriteria* cv_TermCriteria_to_CvTermCriteria(TermCriteria* self);
 Mat* cv_imdecode_2(vector_uchar* buf, int flags);
 bool cv_imencode_2(const char* ext, Mat* img, vector_uchar* buf, vector_int* params);
 int CV_FOURCC(char c1, char c2, char c3, char c4);

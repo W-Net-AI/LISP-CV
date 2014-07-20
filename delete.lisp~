@@ -57,6 +57,13 @@
 
 
 ;; void operator delete  ( void* ptr )
+;; void cv_delete_CvTermCriteria(CvTermCriteria* self) 
+(defcfun ("cv_delete_CvTermCriteria" del-cv-term-criteria) :void
+  "Calls delete on a CV-TERM-CRITERIA object."
+  (self term-criteria-struct))
+
+
+;; void operator delete  ( void* ptr )
 ;; void cv_delete_DMatch(DMatch* self)
 (defcfun ("cv_delete_DMatch" del-dmatch) :void
   "Calls delete on a DMATCH object."
