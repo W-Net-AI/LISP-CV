@@ -32,8 +32,8 @@
 (defgeneric create (type self &rest args)
   (:documentation "Used for all class bindings with a CREATE member."))
 
-;(defgeneric data (self)
-;  (:documentation "Used for all class bindings with a DATA member."))
+(defgeneric data (self)
+  (:documentation "Used for all class bindings with a DATA member."))
 
 (defgeneric detect (self &rest args)
   (:documentation "Used for all class bindings with a DETECT member."))

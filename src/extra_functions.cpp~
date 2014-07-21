@@ -17,6 +17,7 @@
 */
 #include <opencv2/c/excluded_functions.hpp>
 
+typedef vector<int> vector_int;
 
 #define ADD_VEC_FUNC_IMPL_0_0(t) \
     Vec2##t * cv_create_0_Vec2##t() { \

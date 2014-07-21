@@ -998,7 +998,7 @@
 (defcfun ("cv_Point3i_getZ" point-3i-z) :int
   "Retrieves Z coordinate of a POINT-3I object."
   (self point-3i))
-;
+
 
 (defun make-spacer ()
   (let ((s (make-adjustable-string "")))
