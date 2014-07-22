@@ -4000,69 +4000,71 @@ Example:
 	   (window-name-2 "MAT-5 after ASSGN-VAL - MAX-Example")
 	   (window-name-3 "MAT-4 after MAX - MAX-Example"))
       ;;Create two matrices: MAT-1 and MAT-2(used to show how MAX works)
-      (with-mat ((mat-1 (mat 3 3 +32s+ (alloc :int '(1 2 3 4 5 6 7 8 9))))
-		 (mat-2 (mat 3 3 +32s+ (alloc :int '(9 8 7 6 5 4 3 2 1))))
-		 ;;Create destination matrix of same size and type: DEST
-		 (dest (mat 3 3 +32s+))
-		 ;;Create 3 matrices used to hold 
-		 ;;data we use later in the example
-		 (mat-3 (mat height width +8u+))
-		 (mat-4 (mat height width +8u+))
-		 (mat-5 (mat height width +8u+))) 
-	;;Create windows and move to specified locations
-	(with-named-window (window-name-1 +window-normal+)
-	  (with-named-window (window-name-2 +window-normal+)
-	    (with-named-window (window-name-3 +window-normal+)
-	      (move-window window-name-1 310 175)
-	      (move-window window-name-2 760 175)
-	      (move-window window-name-3 1210 175)
-	      ;;Print MAT-1
-	      (format t "~%~%MAT-1:~%~%")
-	      (print-mat mat-1)
-	      (format t "~%~%")
-	      ;;Print MAT-2
-	      (format t "MAT-2:~%~%")
-	      (print-mat mat-2)
-	      (format t "~%~%")
-	      ;;Find per element maximum of 
-	      ;;MAT-1 and MAT-2, set to DEST
-	      (max mat-1 mat-2 dest)
-	      ;;Print DEST
-	      (format t "Per element maximum of MAT-1 and  MAT-2:~%~%")
-	      (print-mat dest)
-	      (format t "~%~%")
-	      ;;Allocate :int pointer for trackbar to change
-	      (with-object ((val (alloc :int 76)))
-		;;Create trackbar on middle window which changes 
-		;;the scalar value ASSGN-VAL uses in loop
-		(create-trackbar "Value of mat-3" window-name-2 val 255)
-		(with-mat ((frame (mat)))
-		  (loop
-		     ;;Set camera feed to FRAME
-		     (read cap frame)
-		     ;;Convert FRAME to 1 channel 
-		     ;;grayscale image, set to mat-1
-		     ;;FRAME stays the same
-		     (cvt-color frame mat-3 +bgr2gray+)
-		     ;;Convert FRAME to 1 channel 
-		     ;;grayscale image, set to MAT-4
-		     ;;FRAME stays the same
-		     (cvt-color frame mat-4  +bgr2gray+)
-		     ;;Apply a fixed-level threshold to 
-		     ;;each array element of MAT-3
-		     (threshold mat-3 mat-3 128d0 255d0 +thresh-binary-inv+)
-		     ;;Assign each element of MAT-5 a scalar value
-		     (assgn-val mat-5 (scalar (mem-aref val :int)))
-		     ;;Find the maximum of each element 
-		     ;;of MAT-4 and MAT-5, set to MAT-4
-		     (max mat-4 mat-5 mat-4)
-		     ;;Show MAT-3, MAT-5 and MAT-4 in windows
-		     (imshow window-name-1 mat-3)
-		     (imshow window-name-2 mat-5)
-		     (imshow window-name-3 mat-4)
-		     (let ((c (wait-key 33)))
-		       (when (= c 27)
-			 (return)))))))))))))
+      (with-object ((data-1 (alloc :int '(1 2 3 4 5 6 7 8 9)))
+		    (data-2 (alloc :int '(9 8 7 6 5 4 3 2 1))))
+	(with-mat ((mat-1 (mat 3 3 +32s+ data-1))
+		   (mat-2 (mat 3 3 +32s+ data-2))
+		   ;;Create destination matrix of same size and type: DEST
+		   (dest (mat 3 3 +32s+))
+		   ;;Create 3 matrices used to hold 
+		   ;;data we use later in the example
+		   (mat-3 (mat height width +8u+))
+		   (mat-4 (mat height width +8u+))
+		   (mat-5 (mat height width +8u+))) 
+	  ;;Create windows and move to specified locations
+	  (with-named-window (window-name-1 +window-normal+)
+	    (with-named-window (window-name-2 +window-normal+)
+	      (with-named-window (window-name-3 +window-normal+)
+		(move-window window-name-1 310 175)
+		(move-window window-name-2 760 175)
+		(move-window window-name-3 1210 175)
+		;;Print MAT-1
+		(format t "~%~%MAT-1:~%~%")
+		(print-mat mat-1)
+		(format t "~%~%")
+		;;Print MAT-2
+		(format t "MAT-2:~%~%")
+		(print-mat mat-2)
+		(format t "~%~%")
+		;;Find per element maximum of 
+		;;MAT-1 and MAT-2, set to DEST
+		(max mat-1 mat-2 dest)
+		;;Print DEST
+		(format t "Per element maximum of MAT-1 and  MAT-2:~%~%")
+		(print-mat dest)
+		(format t "~%~%")
+		;;Allocate :int pointer for trackbar to change
+		(with-object ((val (alloc :int 76)))
+		  ;;Create trackbar on middle window which changes 
+		  ;;the scalar value ASSGN-VAL uses in loop
+		  (create-trackbar "Value of mat-3" window-name-2 val 255)
+		  (with-mat ((frame (mat)))
+		    (loop
+		       ;;Set camera feed to FRAME
+		       (read cap frame)
+		       ;;Convert FRAME to 1 channel 
+		       ;;grayscale image, set to mat-1
+		       ;;FRAME stays the same
+		       (cvt-color frame mat-3 +bgr2gray+)
+		       ;;Convert FRAME to 1 channel 
+		       ;;grayscale image, set to MAT-4
+		       ;;FRAME stays the same
+		       (cvt-color frame mat-4  +bgr2gray+)
+		       ;;Apply a fixed-level threshold to 
+		       ;;each array element of MAT-3
+		       (threshold mat-3 mat-3 128d0 255d0 +thresh-binary-inv+)
+		       ;;Assign each element of MAT-5 a scalar value
+		       (assgn-val mat-5 (scalar (mem-aref val :int)))
+		       ;;Find the maximum of each element 
+		       ;;of MAT-4 and MAT-5, set to MAT-4
+		       (max mat-4 mat-5 mat-4)
+		       ;;Show MAT-3, MAT-5 and MAT-4 in windows
+		       (imshow window-name-1 mat-3)
+		       (imshow window-name-2 mat-5)
+		       (imshow window-name-3 mat-4)
+		       (let ((c (wait-key 33)))
+			 (when (= c 27)
+			   (return))))))))))))))
 
 ========================================================================================================================================
 #MIN
