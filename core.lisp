@@ -1,7 +1,7 @@
 ;;;; -*- mode: lisp; indent-tabs: nil -*-
 ;;;; core.lisp
 ;;;; OpenCV bindings
-;;;; The Core Functionality
+;;;; The Core Functionality.
 
 
 (in-package :lisp-cv)
