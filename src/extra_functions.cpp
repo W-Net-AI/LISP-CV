@@ -132,6 +132,14 @@ ADD_READ_FUNC_IMPL_1(m, Mat);
 
 ADD_READ_FUNC_IMPL_2(vkp, vector_KeyPoint);
 
+Vec3b* cv_Mat_at_Vec3b0(Mat* self, int i, int j) {
+  return &self->at<Vec3b>(i, j);
+}
+
+uchar &cv_Mat_at_uchar1(Mat* self, int i, int j) {
+  return self->at<uchar>(i, j);
+}
+
 const float* cv_CvSVM_get_support_vector(SVM* self, int i) {
     return self->get_support_vector(i);
 }

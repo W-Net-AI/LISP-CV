@@ -19,19 +19,23 @@
 
 (defvar *millis-per-frame* (round (/ 1000 *frames-per-second*)))
 
-(defparameter *personalize-print-mat* "#MAT")
+(defparameter *personalize-print-2d-mat* "#2M")
+
+(defparameter *personalize-print-3d-mat* "#3M")
    
-(defparameter *personalize-print-point* "#POINT")
+(defparameter *personalize-print-point* "#2P")
 
-(defparameter *personalize-print-point-2d* "#POINT-2D")
+(defparameter *personalize-print-point-2d* "#2P")
 
-(defparameter *personalize-print-point-2f* "#POINT-2F")
+(defparameter *personalize-print-point-2f* "#2P")
 
-(defparameter *personalize-print-point-3d* "#POINT-3D")
+(defparameter *personalize-print-point-3d* "#3P")
 
-(defparameter *personalize-print-point-3f* "#POINT-3F")
+(defparameter *personalize-print-point-3f* "#3P")
 
-(defparameter *personalize-print-point-3i* "#POINT-2I")
+(defparameter *personalize-print-point-3i* "#3P")
+
+(defparameter *personalize-print-scalar* "#SCALAR")
 
 
 ;; Change default parameters
@@ -96,11 +100,11 @@
   (len :unsigned-int))
 
 
-;;; CV-MAT
+;;; C-Interop - CV-MAT
 
 ;; CvMat* cv_Mat_to_CvMat(Mat* self)
 (defcfun ("cv_Mat_to_CvMat" mat-to-cv-mat) mat-struct
-  (type mat))
+  (self mat))
 
 
 ;; C-Interop - CV-TERM-CRITERIA 
@@ -108,6 +112,15 @@
 ;; CvTermCriteria cv_TermCriteria_to_CvTermCriteria(TermCriteria* self)
 (defcfun ("cv_TermCriteria_to_CvTermCriteria" term-crit-to-cv-term-crit) (:pointer (:struct term-criteria-struct))
   (term-criteria term-criteria))
+
+
+;; C-Interop - MEM-AREF macro with C-POINTER reader.
+
+(defun resolve-pointer (ptr)
+  (if (pointerp ptr) ptr (c-pointer ptr)))
+
+(defmacro @ (ptr type &optional (index 0))
+  `(mem-aref (resolve-pointer ,ptr) ,type ,index))
 
 
 ;;; Basic Structures
@@ -170,6 +183,114 @@
 (defcfun ("cv_Size2f_area" area-2f) :float
   "Gets the area of a SIZE-2F construct"
   (self size-2f))
+
+
+(defun arr-to-mat (arr)
+
+  (let* ((array-dimensions (array-dimensions arr))
+	 (x (car array-dimensions))
+	 (y (cadr array-dimensions))
+	 (z (caddr array-dimensions))
+         (channels (if z z 1))
+	 (area (* x y))
+         (mat 0)
+	 (ptr 0)
+         (cffi-type  
+	  (typecase arr
+	    ((simple-array t) :uchar)
+	    ((simple-array (unsigned-byte 8)) :uchar)
+	    ((simple-array (signed-byte 8)) :char)
+	    ((simple-array (unsigned-byte 16)) :ushort)
+	    ((simple-array (signed-byte 16)) :short)
+	    ((simple-array (signed-byte 32)) :int)
+	    ((simple-array single-float) :float)
+	    ((simple-array double-float) :double))))
+
+    (case cffi-type
+
+      (:uchar 
+       (case channels (1
+		       (setf mat (mat-typed x y +8uc1+)))
+	     ((2 3 4)
+	      (setf mat (mat-typed x y (case channels 
+					 (2 #.+8uc2+)
+					 (3 #.+8uc3+)
+					 (4 #.+8uc4+))))))
+       (setf ptr (%ptr mat 0))
+       (dotimes (n (* area channels))
+	 (setf (mem-aref ptr :uchar n) (row-major-aref arr n)))mat)
+
+      (:char 
+       (case channels (1
+		       (setf mat (mat-typed x y +8sc1+)))
+	     ((2 3 4)
+	      (setf mat (mat-typed x y (case channels 
+					 (2 #.+8sc2+)
+					 (3 #.+8sc3+)
+					 (4 #.+8sc4+))))))
+       (setf ptr (%ptr mat 0))
+       (dotimes (n (* area channels))
+	 (setf (mem-aref ptr :char n) (row-major-aref arr n)))mat)
+
+      (:ushort 
+       (case channels (1
+		       (setf mat (mat-typed x y +16uc1+)))
+	     ((2 3 4)
+	      (setf mat (mat-typed x y (case channels 
+					 (2 #.+16uc2+)
+					 (3 #.+16uc3+)
+					 (4 #.+16uc4+))))))
+       (setf ptr (%ptr mat 0))
+       (dotimes (n (* area channels))
+	 (setf (mem-aref ptr :ushort n) (row-major-aref arr n)))mat)
+
+      (:short 
+       (case channels (1
+		       (setf mat (mat-typed x y +16sc1+)))
+	     ((2 3 4)
+	      (setf mat (mat-typed x y (case channels 
+					 (2 #.+16sc2+)
+					 (3 #.+16sc3+)
+					 (4 #.+16sc4+))))))
+       (setf ptr (%ptr mat 0))
+       (dotimes (n (* area channels))
+	 (setf (mem-aref ptr :short n) (row-major-aref arr n)))mat)
+
+      (:int 
+       (case channels (1
+		       (setf mat (mat-typed x y +32sc1+)))
+	     ((2 3 4)
+	      (setf mat (mat-typed x y (case channels 
+					 (2 #.+32sc2+)
+					 (3 #.+32sc3+)
+					 (4 #.+32sc4+))))))
+       (setf ptr (%ptr mat 0))
+       (dotimes (n (* area channels))
+	 (setf (mem-aref ptr :int n) (row-major-aref arr n)))mat)
+
+      (:float 
+       (case channels (1
+		       (setf mat (mat-typed x y +32fc1+)))
+	     ((2 3 4)
+	      (setf mat (mat-typed x y (case channels 
+					 (2 #.+32fc2+)
+					 (3 #.+32fc3+)
+					 (4 #.+32fc4+))))))
+       (setf ptr (%ptr mat 0))
+       (dotimes (n (* area channels))
+	 (setf (mem-aref ptr :float n) (row-major-aref arr n)))mat)
+
+      (:double 
+       (case channels (1
+		       (setf mat (mat-typed x y +64fc1+)))
+	     ((2 3 4)
+	      (setf mat (mat-typed x y (case channels 
+					 (2 #.+64fc2+)
+					 (3 #.+64fc3+)
+					 (4 #.+64fc4+))))))
+       (setf ptr (%ptr mat 0))
+       (dotimes (n (* area channels))
+	 (setf (mem-aref ptr :double n) (row-major-aref arr n)))mat))))
 
 
 ;; Mat* cv_Mat_assign(Mat* self, Mat* m) 
@@ -472,13 +593,6 @@
 	 (data :pointer))
 
 
-(let ((previous nil))
-     (defun make-mat-data (rows cols type &rest args)
-	    (unless (equal (second args) (car previous))
-		    (setf previous (cons (second args) (foreign-alloc (first args) 
-								      :initial-contents (second args)))))
-								      (mat-data rows cols type (cdr previous))))
-
 ;; double Mat::dot(InputArray m) const
 ;; double cv_Mat_dot(Mat* self, Mat* m)
 (defcfun ("cv_Mat_dot" mat-dot) :double
@@ -555,15 +669,15 @@
 
 ;; Mat::Mat(const Mat& m, const Range& rowRange, const Range& colRange=Range::all() )
 ;; Mat* cv_Mat_get_Range(Mat* self, Range* rowRange, Range* colRange)
-(defcfun ("cv_Mat_with_Range" mat-range) mat
+(defcfun ("cv_Mat_with_Range" %mat-range) mat
   "MAT constructor with Range parameters."
   (self mat)
   (row-range range)
   (col-range range))
 
 
-(defun make-mat-range (self row-range &optional (col-range (range-all) given-col-range))
-  (let ((return (mat-range self row-range col-range)))
+(defun mat-range (self row-range &optional (col-range (range-all) given-col-range))
+  (let ((return (%mat-range self row-range col-range)))
     (if given-col-range nil (del-range col-range))
     return))
 
@@ -577,156 +691,124 @@
 
 (let ((previous nil))
 
-  (defun  mat-to-2d-arr (mat)
+  (defun  mat-to-arr (mat)
 
     (unless (equal mat (car previous))
       (setf previous (cons mat (mat-info mat))))
 
-    (let* ((input (data mat))
-	   (mat-info (cdr previous))
-	   (mat-rows (first mat-info))
-	   (mat-cols (second mat-info))
-	   (cffi-type (fourth mat-info))
-	   (channels (fifth mat-info))
-	   (mat-step1 (sixth mat-info))
-	   (arr 0))
+  (if (empty mat) 
+      (return-from mat-to-arr 
+	(format t "Matrix is empty.")))
 
-      (case cffi-type 
+  (let* ((mat-info (cdr previous))
+	 (mat-rows (first mat-info))
+	 (mat-cols (second mat-info))
+         (mat-type (third mat-info))
+	 (mat-area (* mat-rows mat-cols))
+	 (channels (fifth mat-info))
+         (arr 0)
+	 (ptr (ptr mat 0))
+         (cffi-type (case mat-type  
 
-	(:uchar 
+		      (#.+8uc1+ :uchar) 
+		      (#.+8sc1+ :char)
+		      (#.+16uc1+ :ushort)
+		      (#.+16sc1+ :short)
+		      (#.+32sc1+ :int)
+		      (#.+32fc1+ :float)
+		      (#.+64fc1+ :double)
+		      (#.+8uc2+  :uchar)
+		      (#.+8sc2+  :char)
+		      (#.+16uc2+ :ushort)
+		      (#.+16sc2+ :short)
+		      (#.+32sc2+ :int)
+		      (#.+32fc2+ :float)
+		      (#.+64fc2+ :double)
+		      (#.+8uc3+  :uchar)
+		      (#.+8sc3+  :char)
+		      (#.+16uc3+ :ushort)
+		      (#.+16sc3+ :short)
+		      (#.+32sc3+ :int)
+		      (#.+32fc3+ :float)
+		      (#.+64fc3+ :double)
+		      (#.+8uc4+  :uchar)
+		      (#.+8sc4+  :char)
+		      (#.+16uc4+ :ushort)
+		      (#.+16sc4+ :short)
+		      (#.+32sc4+ :int)
+		      (#.+32fc4+ :float)
+		      (#.+64fc4+ :double))))
+    (case cffi-type
 
-	 (case channels (1 
+      (:uchar 
 
-			 (setf arr (make-array (list mat-rows mat-cols)  :element-type '(unsigned-byte 8)))
+       (setf arr (if (= channels 1) 
+		     (make-array (list mat-rows mat-cols) 
+				 :element-type '(unsigned-byte 8)) 
+		     (make-array (list mat-rows mat-cols channels) 
+				 :element-type '(unsigned-byte 8))))
+       (dotimes (n (* mat-area channels))
+	 (setf (row-major-aref arr n) (mem-aref ptr :uchar n)))arr)
 
-			 (dotimes (i mat-rows)
-			   (dotimes (j mat-cols)		
+      (:char 
 
-			     (setf (aref arr i j) (mem-aref input :uchar (+ (* mat-step1 i) (* channels j)))))))
-	       ((2 3 4)
+       (setf arr (if (= channels 1) 
+		     (make-array (list mat-rows mat-cols) 
+				 :element-type '(signed-byte 8)) 
+		     (make-array (list mat-rows mat-cols channels) 
+				 :element-type '(signed-byte 8))))
+       (dotimes (n (* mat-area channels))
+	 (setf (row-major-aref arr n) (mem-aref ptr :char n)))arr)
 
-		(setf arr (make-array (list mat-rows mat-cols channels) :element-type '(unsigned-byte 8)))
+      (:ushort 
 
-		(dotimes (i mat-rows)
-		  (dotimes (j mat-cols)		
-		    (dotimes (k channels)
+       (setf arr (if (= channels 1) 
+		     (make-array (list mat-rows mat-cols) 
+				 :element-type '(unsigned-byte 16)) 
+		     (make-array (list mat-rows mat-cols channels) 
+				 :element-type '(unsigned-byte 16))))
+       (dotimes (n (* mat-area channels))
+	 (setf (row-major-aref arr n) (mem-aref ptr :ushort n)))arr)
 
-		      (setf (aref arr i j k) (mem-aref input :uchar (+ (+ (* mat-step1 i) (* channels j)) k)))))))))
-	(:char 
+      (:short 
 
-	 (case channels (1 
+       (setf arr (if (= channels 1) 
+		     (make-array (list mat-rows mat-cols) 
+				 :element-type '(signed-byte 16)) 
+		     (make-array (list mat-rows mat-cols channels) 
+				 :element-type '(signed-byte 16))))
+       (dotimes (n (* mat-area channels))
+	 (setf (row-major-aref arr n) (mem-aref ptr :short n)))arr)
 
-			 (setf arr (make-array (list mat-rows mat-cols) :element-type '(signed-byte 8)))
+      (:int 
 
-			 (dotimes (i mat-rows)
-			   (dotimes (j mat-cols)		
+       (setf arr (if (= channels 1) 
+		     (make-array (list mat-rows mat-cols) 
+				 :element-type '(signed-byte 32)) 
+		     (make-array (list mat-rows mat-cols channels) 
+				 :element-type '(signed-byte 32))))
+       (dotimes (n (* mat-area channels))
+	 (setf (row-major-aref arr n) (mem-aref ptr :int n)))arr)
 
-			     (setf (aref arr i j) (mem-aref input :char (+ (* mat-step1 i) (* channels j)))))))
-	       ((2 3 4)
+      (:float 
 
-		(setf arr (make-array (list mat-rows mat-cols channels) :element-type '(signed-byte 8) ))
+       (setf arr (if (= channels 1) 
+		     (make-array (list mat-rows mat-cols) 
+				 :element-type 'single-float) 
+		     (make-array (list mat-rows mat-cols channels) 
+				 :element-type 'single-float)))
+       (dotimes (n (* mat-area channels))
+	 (setf (row-major-aref arr n) (mem-aref ptr :float n)))arr)
 
-		(dotimes (i mat-rows)
-		  (dotimes (j mat-cols)		
-		    (dotimes (k channels)
+      (:double 
 
-		      (setf (aref arr i j k) (mem-aref input :char (+ (+ (* mat-step1 i) (* channels j)) k)))))))))
-	(:ushort 
-
-	 (case channels (1 
-
-			 (setf arr (make-array (list mat-rows mat-cols) :element-type '(unsigned-byte 16)))
-
-			 (dotimes (i mat-rows)
-			   (dotimes (j mat-cols)		
-
-			     (setf (aref arr i j) (mem-aref input :ushort (+ (* mat-step1 i) (* channels j)))))))
-	       ((2 3 4)
-
-		(setf arr (make-array (list mat-rows mat-cols channels) :element-type '(unsigned-byte 16)))
-
-		(dotimes (i mat-rows)
-		  (dotimes (j mat-cols)		
-		    (dotimes (k channels)
-
-		      (setf (aref arr i j k) (mem-aref input :ushort (+ (+ (* mat-step1 i) (* channels j)) k)))))))))
-	(:short
-
-	 (case channels (1 
-
-			 (setf arr (make-array (list mat-rows mat-cols) :element-type '(signed-byte 16)))
-
-			 (dotimes (i mat-rows)
-			   (dotimes (j mat-cols)		
-
-			     (setf (aref arr i j) (mem-aref input :short (+ (* mat-step1 i) (* channels j)))))))
-	       ((2 3 4)
-
-		(setf arr (make-array (list mat-rows mat-cols channels) :element-type '(signed-byte 16)))
-
-		(dotimes (i mat-rows)
-		  (dotimes (j mat-cols)		
-		    (dotimes (k channels)
-
-		      (setf (aref arr i j k) (mem-aref input :short (+ (+ (* mat-step1 i) (* channels j)) k)))))))))
-	(:int
-
-	 (case channels (1 
-
-			 (setf arr (make-array (list mat-rows mat-cols) :element-type '(signed-byte 32)))
-
-			 (dotimes (i mat-rows)
-			   (dotimes (j mat-cols)		
-
-			     (setf (aref arr i j) (mem-aref input :int (+ (* mat-step1 i) (* channels j)))))))
-	       ((2 3 4)
-
-		(setf arr (make-array (list mat-rows mat-cols channels) :element-type '(signed-byte 32)))
-
-		(dotimes (i mat-rows)
-		  (dotimes (j mat-cols)		
-		    (dotimes (k channels)
-
-		      (setf (aref arr i j k) (mem-aref input :int (+ (+ (* mat-step1 i) (* channels j)) k)))))))))
-	(:float 
-
-	 (case channels (1 
-
-			 (setf arr (make-array (list mat-rows mat-cols) :element-type 'single-float))
-
-			 (dotimes (i mat-rows)
-			   (dotimes (j mat-cols)		
-
-			     (setf (aref arr i j) (mem-aref input :float (+ (* mat-step1 i) (* channels j)))))))
-	       ((2 3 4)
-
-		(setf arr (make-array (list mat-rows mat-cols channels) :element-type 'single-float))
-
-		(dotimes (i mat-rows)
-		  (dotimes (j mat-cols)		
-		    (dotimes (k channels)
-
-		      (setf (aref arr i j k) (mem-aref input :float (+ (+ (* mat-step1 i) (* channels j)) k)))))))))
-	(:double 
-
-	 (case channels (1 
-
-			 (setf arr (make-array (list mat-rows mat-cols) :element-type 'double-float))
-
-			 (dotimes (i mat-rows)
-			   (dotimes (j mat-cols)		
-
-			     (setf (aref arr i j) (mem-aref input :double (+ (* mat-step1 i) (* channels j)))))))
-	       ((2 3 4)
-
-		(setf arr (make-array (list mat-rows mat-cols channels) :element-type 'double-float))
-
-		(dotimes (i mat-rows)
-		  (dotimes (j mat-cols)		
-		    (dotimes (k channels)
-
-		      (setf (aref arr i j k) (mem-aref input :double (+ (+ (* mat-step1 i) (* channels j)) k))))))))))
-      arr)))
+       (setf arr (if (= channels 1) 
+		     (make-array (list mat-rows mat-cols) 
+				 :element-type 'double-float) 
+		     (make-array (list mat-rows mat-cols channels) 
+				 :element-type 'double-float)))
+       (dotimes (n (* mat-area channels))
+	 (setf (row-major-aref arr n) (mem-aref ptr :double n)))arr)))))
 
 
 (defun mat-type-to-cffi (mat)
@@ -759,11 +841,10 @@
 		      (#.+16sc4+ ':short)
 		      (#.+32sc4+ ':int)
 		      (#.+32fc4+ ':float)
-		      (#.+64fc4+ ':double)))
-	 (channels (channels mat))) 
-    (multiple-value-bind (mat-type cffi-type channels) 
-	(values mat-type cffi-type channels) 
-      (list mat-type cffi-type channels))))
+		      (#.+64fc4+ ':double)))) 
+    (multiple-value-bind (mat-type cffi-type) 
+	(values mat-type cffi-type) 
+      (list mat-type cffi-type))))
 
 
 ;; int Mat::type() const
@@ -781,32 +862,21 @@
   (type :int))
 
 
-;; Mat::Mat(int rows, int cols, int type)
-;; Mat* cv_create_Mat_typed(int rows, int cols, int type)
-(defcfun ("cv_create_Mat_typed" make-mat-typed) mat
-  "MAT constructor with a row, column and type parameter."
-  (rows :int)
-  (cols :int)
-  (type :int))
-
-
 ;; Mat::Mat(int rows, int cols, int type, const Scalar& s)
 ;; Mat* cv_create_Mat_with_value(int rows, int cols, int type, Scalar* s)
-(defcfun ("cv_create_Mat_with_value" mat-value) mat
+(defcfun ("cv_create_Mat_with_value" %mat-value) mat
 	 (rows :int)
 	 (cols :int)
 	 (type :int)
 	 (s scalar))
 
 
-(let ((previous nil))
-     (defun make-mat-value (rows cols type s)
-	    (unless (equal s (car previous))
-		    (setf previous (cons s (scalar (if (first s) (first s) 0) 
-						   (if (second s) (second s) 0) 
-						   (if (third s) (third s) 0) 
-						   (if (fourth s) (fourth s) 0)))))
-						   (mat-value rows cols type (cdr previous))))
+(defun mat-value (rows cols type values)
+  (let* ((scalar (apply #'scalar values))					 
+	(ret (%mat-value rows cols type scalar)))
+    (del-scalar scalar)
+ret))
+
 
 ;;; MAT
 
@@ -817,23 +887,30 @@
   
   (cond ((eq (first args) nil) (%mat))
 
+	((and (eq (second args) nil) 
+	      (typep (first args) 'cv-mat))
+	 (mat-to-arr (first args)))
+
+	((and (eq (second args) nil) 
+	      (typep (first args) 'simple-array))
+
+	 (arr-to-mat (first args)))
+
 	((typep (second args) 'cv-range)
-	 (apply #'make-mat-range args))
+	 (apply #'mat-range args))
 	
-	((and (eq (fourth args) nil) (first args)) 
+	((and (eq (fourth args) nil) (first args))
 	 (apply #'mat-typed args))
 	
 	((typep (fourth args) 'cv-scalar)
-	 (apply #'mat-value args))
+	 (apply #'%mat-value args))
 	
 	((listp (fourth args))
-	 (apply #'make-mat-value args))
+	 (apply #'mat-value args))
 	
 	((pointerp (fourth args))
+
 	 (apply #'mat-data args))
-	
-	((listp (fifth args))
-	 (apply #'make-mat-data args))
 	
 	(t nil)))
 
@@ -844,23 +921,30 @@
   
   (cond ((eq (first args) nil) (%mat))
 
+	((and (eq (second args) nil) 
+	      (typep (first args) 'cv-mat))
+	 (mat-to-arr (first args)))
+
+	((and (eq (second args) nil) 
+	      (typep (first args) 'simple-array))
+
+	 (arr-to-mat (first args)))
+
 	((typep (second args) 'cv-range)
-	 (apply #'make-mat-range args))
+	 (apply #'mat-range args))
 	
-	((and (eq (fourth args) nil) (first args)) 
+	((and (eq (fourth args) nil) (first args))
 	 (apply #'mat-typed args))
 	
 	((typep (fourth args) 'cv-scalar)
-	 (apply #'mat-value args))
+	 (apply #'%mat-value args))
 	
 	((listp (fourth args))
-	 (apply #'make-mat-value args))
+	 (apply #'mat-value args))
 	
 	((pointerp (fourth args))
+
 	 (apply #'mat-data args))
-	
-	((listp (fifth args))
-	 (apply #'make-mat-data args))
 	
 	(t nil)))
 
@@ -1189,236 +1273,36 @@
   (self point-3i))
 
 
-(defun make-spacer ()
-  (let ((s (make-adjustable-string "")))
-    (dotimes (n (+ (length *personalize-print-mat*) 1)) 
-      (vector-push-extend #\Space s))
-    s))
+(defun print-2d-arr-as-mat (arr &optional (*standard-output* *standard-output*))
+
+	 (format t *personalize-print-2d-mat*)
+	 (format t  "(")
+	 (print-elements (i 0 (array-dimension arr 0)) ("(" (format nil ")~%    (") ")")
+	   (print-elements (j 0 (array-dimension arr 1)) ("" " " "")
+	     (prin1 (aref arr i j))))
+	 (format t ")~%"))
 
 
-(defun print-mat (mat &key to-file)
-  
-  (let* ((mat-info (mat-info mat))
-	 (mat-rows (first mat-info))
-	 (mat-cols (second mat-info))
-	 (type (fourth mat-info))
-	 (channels (fifth mat-info))
-	 (mat-step1 (sixth mat-info))
-	 (mat-area (* mat-rows mat-cols))
-	 (b 0)
-	 (g 0)
-	 (r 0)
-	 (a 0)
-	 (x 0)
-	 (spacer (make-spacer))
-	 (input (data mat)))
+(defun print-3d-arr-as-mat (arr &optional (*standard-output* *standard-output*))
 
-    (if (empty mat) 
-	(return-from print-mat 
-	  (format t "Empty matrix~%")))
-
-    (cond (to-file
-	   (let ((*print-case* :downcase))
-	     (with-open-file (str (cat *lisp-cv-src-dir* 
-				       "/data/" 
-				       (write-to-string to-file))
-				  :direction :output
-				  :if-exists :supersede
-				  :if-does-not-exist :create)
-	       (format str *personalize-print-mat*)
-	       (format str "(")
-	       (dotimes (i mat-rows)
-		 (format str "(")
-		 (dotimes (j mat-cols)
-
-		   (ecase type 
-
-		     (:uchar
-
-		      (setf b (mem-aref input :uchar
-					(+ (* mat-step1 i) (* channels j) )))
-		      (setf g (mem-aref input :uchar
-					(+ (+ (* mat-step1 i) (* channels j) ) 1)))
-		      (setf r (mem-aref input :uchar
-					(+ (+ (* mat-step1 i) (* channels j) ) 2)))
-		      (setf a (mem-aref input :uchar
-					(+ (+ (* mat-step1 i) (* channels j) ) 3))))
-		     (:char
-
-		      (setf b (mem-aref input :char
-					(+ (* mat-step1 i) (* channels j) )))
-		      (setf g (mem-aref input :char
-					(+ (+ (* mat-step1 i) (* channels j) ) 1)))
-		      (setf r (mem-aref input :char
-					(+ (+ (* mat-step1 i) (* channels j) ) 2)))
-		      (setf a (mem-aref input :char
-					(+ (+ (* mat-step1 i) (* channels j) ) 3))))
-		     (:ushort
-
-		      (setf b (mem-aref input :ushort
-					(+ (* mat-step1 i) (* channels j) )))
-		      (setf g (mem-aref input :ushort
-					(+ (+ (* mat-step1 i) (* channels j) ) 1)))
-		      (setf r (mem-aref input :ushort
-					(+ (+ (* mat-step1 i) (* channels j) ) 2)))
-		      (setf a (mem-aref input :ushort
-					(+ (+ (* mat-step1 i) (* channels j) ) 3))))
-		     (:short
-
-		      (setf b (mem-aref input :short
-					(+ (* mat-step1 i) (* channels j) )))
-		      (setf g (mem-aref input :short
-					(+ (+ (* mat-step1 i) (* channels j) ) 1)))
-		      (setf r (mem-aref input :short
-					(+ (+ (* mat-step1 i) (* channels j) ) 2)))
-		      (setf a (mem-aref input :short
-					(+ (+ (* mat-step1 i) (* channels j) ) 3))))
-		     (:int
-
-		      (setf b (mem-aref input :int
-					(+ (* mat-step1 i) (* channels j) )))
-		      (setf g (mem-aref input :int
-					(+ (+ (* mat-step1 i) (* channels j) ) 1)))
-		      (setf r (mem-aref input :int
-					(+ (+ (* mat-step1 i) (* channels j) ) 2)))
-		      (setf a (mem-aref input :int
-					(+ (+ (* mat-step1 i) (* channels j) ) 3))))
-		     (:float
-
-		      (setf b (mem-aref input :float
-					(+ (* mat-step1 i) (* channels j) )))
-		      (setf g (mem-aref input :float
-					(+ (+ (* mat-step1 i) (* channels j) ) 1)))
-		      (setf r (mem-aref input :float
-					(+ (+ (* mat-step1 i) (* channels j) ) 2)))
-		      (setf a (mem-aref input :float
-					(+ (+ (* mat-step1 i) (* channels j) ) 3))))
-		     (:double
-
-		      (setf b (mem-aref input :double
-					(+ (* mat-step1 i) (* channels j) )))
-		      (setf g (mem-aref input :double
-					(+ (+ (* mat-step1 i) (* channels j) ) 1)))
-		      (setf r (mem-aref input :double
-					(+ (+ (* mat-step1 i) (* channels j) ) 2)))
-		      (setf a (mem-aref input :double
-					(+ (+ (* mat-step1 i) (* channels j) ) 3)))))
-
-		   (cond ((eq 1 channels)
-
-			  (format str "~a" b))
-			 ((eq 2 channels)
-			  (format str "(~a ~a)" b g))
-			 ((eq 3 channels)
-			  (format str "(~a ~a ~a)" b g r))
-			 ((eq 4 channels)
-			  (format str "(~a ~a ~a ~a)" b g r a))) 
-
-		   (incf x)
-
-		   (if (< j (- (cols mat) 1)) (format str " ")))
-
-		 (format str ")")
-
-		 (if (= x mat-area) (format str ")~%") (format str "~%~a" spacer))))))
+	 (format t *personalize-print-3d-mat*)
+	 (format t  "(")
+	 (print-elements (i 0 (array-dimension arr 0)) ("(" (format nil ")~%    (") ")")
+	   (print-elements (j 0 (array-dimension arr 1)) ("(" (format nil ")~%     (") ")")
+	     (print-elements (k 0 (array-dimension arr 2)) ("" " " "")
+	       (prin1 (aref arr i j k)))))
+	 (format t ")~%"))
 
 
-	  ((eq to-file nil)
-	   (format t *personalize-print-mat*)
-	   (format t "(")           
-	   (dotimes (i mat-rows)
-	     (format t "(")
-	     (dotimes (j mat-cols)
-
-	       (ecase type 
-
-		 (:uchar
-
-		  (setf b (mem-aref input :uchar
-				    (+ (* mat-step1 i) (* channels j) )))
-		  (setf g (mem-aref input :uchar
-				    (+ (+ (* mat-step1 i) (* channels j) ) 1)))
-		  (setf r (mem-aref input :uchar
-				    (+ (+ (* mat-step1 i) (* channels j) ) 2)))
-		  (setf a (mem-aref input :uchar
-				    (+ (+ (* mat-step1 i) (* channels j) ) 3))))
-		 (:char
-
-		  (setf b (mem-aref input :char
-				    (+ (* mat-step1 i) (* channels j) )))
-		  (setf g (mem-aref input :char
-				    (+ (+ (* mat-step1 i) (* channels j) ) 1)))
-		  (setf r (mem-aref input :char
-				    (+ (+ (* mat-step1 i) (* channels j) ) 2)))
-		  (setf a (mem-aref input :char
-				    (+ (+ (* mat-step1 i) (* channels j) ) 3))))
-		 (:ushort
-
-		  (setf b (mem-aref input :ushort
-				    (+ (* mat-step1 i) (* channels j) )))
-		  (setf g (mem-aref input :ushort
-				    (+ (+ (* mat-step1 i) (* channels j) ) 1)))
-		  (setf r (mem-aref input :ushort
-				    (+ (+ (* mat-step1 i) (* channels j) ) 2)))
-		  (setf a (mem-aref input :ushort
-				    (+ (+ (* mat-step1 i) (* channels j) ) 3))))
-		 (:short
-
-		  (setf b (mem-aref input :short
-				    (+ (* mat-step1 i) (* channels j) )))
-		  (setf g (mem-aref input :short
-				    (+ (+ (* mat-step1 i) (* channels j) ) 1)))
-		  (setf r (mem-aref input :short
-				    (+ (+ (* mat-step1 i) (* channels j) ) 2)))
-		  (setf a (mem-aref input :short
-				    (+ (+ (* mat-step1 i) (* channels j) ) 3))))
-		 (:int
-
-		  (setf b (mem-aref input :int
-				    (+ (* mat-step1 i) (* channels j) )))
-		  (setf g (mem-aref input :int
-				    (+ (+ (* mat-step1 i) (* channels j) ) 1)))
-		  (setf r (mem-aref input :int
-				    (+ (+ (* mat-step1 i) (* channels j) ) 2)))
-		  (setf a (mem-aref input :int
-				    (+ (+ (* mat-step1 i) (* channels j) ) 3))))
-		 (:float
-
-		  (setf b (mem-aref input :float
-				    (+ (* mat-step1 i) (* channels j) )))
-		  (setf g (mem-aref input :float
-				    (+ (+ (* mat-step1 i) (* channels j) ) 1)))
-		  (setf r (mem-aref input :float
-				    (+ (+ (* mat-step1 i) (* channels j) ) 2)))
-		  (setf a (mem-aref input :float
-				    (+ (+ (* mat-step1 i) (* channels j) ) 3))))
-		 (:double
-
-		  (setf b (mem-aref input :double
-				    (+ (* mat-step1 i) (* channels j) )))
-		  (setf g (mem-aref input :double
-				    (+ (+ (* mat-step1 i) (* channels j) ) 1)))
-		  (setf r (mem-aref input :double
-				    (+ (+ (* mat-step1 i) (* channels j) ) 2)))
-		  (setf a (mem-aref input :double
-				    (+ (+ (* mat-step1 i) (* channels j) ) 3)))))
-
-	       (cond ((eq 1 channels)
-		      (format t "~a" b))
-		     ((eq 2 channels)
-		      (format t "(~a ~a)" b g))
-		     ((eq 3 channels)
-		      (format t "(~a ~a ~a)" b g r))
-		     ((eq 4 channels)
-		      (format t "(~a ~a ~a ~a)" b g r a))) 
-
-	       (incf x)
-
-	       (if (< j (- (cols mat) 1)) (format t " ")))
-
-	     (format t ")")
-
-	     (if (= x mat-area) (format t ")~%") (format t "~%~a" spacer)))))))
+(defun print-mat (mat)
+  (if (empty mat) 
+      (return-from print-mat 
+	(format t "Matrix is empty.")))
+  (let ((arr (mat-to-arr mat))
+	(channels (channels mat))) 
+    (if (eq channels 1)
+	(print-2d-arr-as-mat arr)
+	(print-3d-arr-as-mat arr))))
 
 
 (defun print-point (point)
@@ -1443,6 +1327,14 @@
 
 (defun print-point-3i (point-3i)
   (format t "~a(~a ~a ~a)" *personalize-print-point-3i* (point-3i-x point-3i) (point-3i-y point-3i) (point-3i-z point-3i)))
+
+
+(defun print-scalar (scalar)
+  (format t "~a(~a ~a ~a ~a)~%" *personalize-print-scalar* 
+	  (@ scalar :double) 
+	  (@ scalar :double 1) 
+	  (@ scalar :double 2)
+	  (@ scalar :double 3)))
 
 
 ;; MatExpr* promote(Mat* m) 
@@ -1729,20 +1621,24 @@
 	 (v3 :double))
 
 
-(defun scalar (&optional (v1 0d0) (v2 0d0) (v3 0d0) (v4 0d0))
+(defun scalar (&optional (v0 0d0) (v1 0d0) (v2 0d0) (v3 0d0))
   "SCALAR constructor"
-  (if (null v1) 
-      (scalar-0)
-      (scalar-4 (coerce v1 'double-float) (coerce v2 'double-float) 
-		(coerce v3 'double-float) (coerce v4 'double-float))))
+  (typecase v0 (null (scalar-0))
+	    (integer 
+	     (scalar-4 (coerce v0 'double-float) (coerce v1 'double-float) 
+		       (coerce v2 'double-float) (coerce v3 'double-float)))
+	    (double-float
+	     (scalar-4 v0 v1 v2 v3))))
 
 
-(defun make-scalar (&optional (v1 0d0) (v2 0d0) (v3 0d0) (v4 0d0))
+(defun make-scalar (&optional (v0 0d0) (v1 0d0) (v2 0d0) (v3 0d0))
   "SCALAR constructor"
-  (if (null v1) 
-      (scalar-0)
-      (scalar-4 (coerce v1 'double-float) (coerce v2 'double-float) 
-		(coerce v3 'double-float) (coerce v4 'double-float))))
+  (typecase v0 (null (scalar-0))
+	    (integer 
+	     (scalar-4 (coerce v0 'double-float) (coerce v1 'double-float) 
+		       (coerce v2 'double-float) (coerce v3 'double-float)))
+	    (double-float
+	     (scalar-4 v0 v1 v2 v3))))
 
 
 ;; Scalar::Scalar::all(double v0)

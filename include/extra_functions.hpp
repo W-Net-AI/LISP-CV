@@ -88,6 +88,8 @@ ADD_READ_FUNC_HEADERS_0(f, float);
 ADD_READ_FUNC_HEADERS_0(d, double);
 ADD_READ_FUNC_HEADERS_1(s, String);
 ADD_READ_FUNC_HEADERS_1(m, Mat);
+Vec3b* cv_Mat_at_Vec3b0(Mat* self, int i, int j);
+uchar &cv_Mat_at_uchar1(Mat* self, int i, int j);
 int cv_vector_int_get_value (vector_int* self, int idx);
 const float* cv_CvSVM_get_support_vector(SVM* self, int i);
 CvMat* cv_Mat_to_CvMat(Mat* self);

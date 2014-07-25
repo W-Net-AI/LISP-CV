@@ -13,7 +13,7 @@
 
 
 ;; FORMAT macro (to make debugging easier)
-(defmacro lout (&optional (val "test"))
+(defmacro f (&optional (val "test"))
   `(if ,val
        (format t "~%~a~%~%" ,val) nil))
 
@@ -49,16 +49,6 @@
 
 (defmacro free (ptr)
   `(foreign-free ,ptr))
-
-
-;; MEM-AREF macro
-
-
-(defun resolve-pointer (ptr)
-  (if (pointerp ptr) ptr (c-pointer ptr)))
-
-(defmacro ? (ptr type &optional (index 0))
-  `(mem-aref (resolve-pointer ,ptr) ,type ,index))
 
 
 ;; RUN

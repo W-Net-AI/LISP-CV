@@ -2,9 +2,7 @@
 ;;;; utils.lisp
 ;;;; Utility functions and macros(Most borrowed from the)
 
-
 (in-package :lisp-cv)
-
 
 ;;;-----------------------------------------------------------------------------------------
 ;;; package
@@ -78,8 +76,35 @@
 ;;; printing
 ;;;-----------------------------------------------------------------------------------------
 
+;; Prints text and objects, spaced, on same line.
+
 (defun println (thing &rest things)
   (format t "~&~{~a ~}~%" (cons thing things)))
+
+;; Used for matrix printing.
+
+(defmacro print-elements ((var min max) (prefix infix suffix) &body print-it)
+  (let ((vinter   (gensym))
+        (vmin     (gensym))
+        (vmax     (gensym))
+        (vprefix  (gensym))
+        (vinfix   (gensym))
+        (vsuffix  (gensym)))
+    `(loop
+	:with ,vmin    = ,min
+	:with ,vmax    = ,max
+	:with ,vprefix = ,prefix
+	:with ,vinfix  = ,infix
+	:with ,vsuffix = ,suffix
+	:with ,vinter  = nil
+	:for ,var :from ,vmin :below ,vmax
+	:initially (princ ,vprefix)
+	:finally   (princ ,vsuffix)
+	:do (if ,vinter
+		(princ ,vinfix)
+		(setf ,vinter t))
+	,@print-it)))
+
 
 ;;;-----------------------------------------------------------------------------------------
 ;;; sequence

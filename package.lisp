@@ -742,6 +742,7 @@
    #:adjust-roiadd all pathnames in a directory to a list lisp
    #:area
    #:area-2f
+   #:arr-to-mat
    #:at
    #:br
    #:channels
@@ -826,6 +827,7 @@
    #:mat-eye
    #:mat-ones
    #:mat-range
+   #:mat-to-arr
    #:mat-type
    #:mat-typed
    #:mat-value
