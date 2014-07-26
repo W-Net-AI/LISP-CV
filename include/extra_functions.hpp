@@ -88,8 +88,89 @@ ADD_READ_FUNC_HEADERS_0(f, float);
 ADD_READ_FUNC_HEADERS_0(d, double);
 ADD_READ_FUNC_HEADERS_1(s, String);
 ADD_READ_FUNC_HEADERS_1(m, Mat);
-Vec3b* cv_Mat_at_Vec3b0(Mat* self, int i, int j);
-uchar &cv_Mat_at_uchar1(Mat* self, int i, int j);
+Point* cv_Mat_at_Point(Mat* self, int i, int j);
+void cv_Mat_at_Point_set_Val(Mat* self, int i, int j, Point* val);
+Point2d* cv_Mat_at_Point2d(Mat* self, int i, int j);
+void cv_Mat_at_Point2d_set_Val(Mat* self, int i, int j, Point2d* val);
+Point2f* cv_Mat_at_Point2f(Mat* self, int i, int j);
+void cv_Mat_at_Point2f_set_Val(Mat* self, int i, int j, Point2f* val);
+Point3d* cv_Mat_at_Point3d(Mat* self, int i, int j);
+void cv_Mat_at_Point3d_set_Val(Mat* self, int i, int j, Point3d* val);
+Point3f* cv_Mat_at_Point3f(Mat* self, int i, int j);
+void cv_Mat_at_Point3f_set_Val(Mat* self, int i, int j, Point3f* val);
+Point3i* cv_Mat_at_Point3i(Mat* self, int i, int j);
+void cv_Mat_at_Point3i_set_Val(Mat* self, int i, int j, Point3i* val);
+Scalar* cv_Mat_at_Scalar(Mat* self, int i, int j);
+void cv_Mat_at_Scalar_set_Val(Mat* self, int i, int j, Scalar* val);
+char &cv_Mat_at_char_2(Mat* self, int i, int j);
+double &cv_Mat_at_double_2(Mat* self, int i, int j);
+float &cv_Mat_at_float_2(Mat* self, int i, int j);
+int &cv_Mat_at_int_2(Mat* self, int i, int j);
+short &cv_Mat_at_short_2(Mat* self, int i, int j);
+uchar &cv_Mat_at_uchar_2(Mat* self, int i, int j);
+ushort &cv_Mat_at_ushort_2(Mat* self, int i, int j);
+char &cv_Mat_at_char_3(Mat* self, int i, int j, int k);
+double &cv_Mat_at_double_3(Mat* self, int i, int j, int k);
+float &cv_Mat_at_float_3(Mat* self, int i, int j, int k);
+int &cv_Mat_at_int_3(Mat* self, int i, int j, int k);
+short &cv_Mat_at_short_3(Mat* self, int i, int j, int k);
+uchar &cv_Mat_at_uchar_3(Mat* self, int i, int j, int k);
+ushort &cv_Mat_at_ushort_3(Mat* self, int i, int j, int k);
+
+Vec2b* cv_Mat_at_Vec2b(Mat* self, int i, int j);
+void cv_Mat_at_Vec2b_set_Val(Mat* self, int i, int j, Vec2b* val);
+
+Vec2d* cv_Mat_at_Vec2d(Mat* self, int i, int j);
+void cv_Mat_at_Vec2d_set_Val(Mat* self, int i, int j, Vec2d* val);
+
+Vec2f* cv_Mat_at_Vec2f(Mat* self, int i, int j);
+void cv_Mat_at_Vec2f_set_Val(Mat* self, int i, int j, Vec2f* val);
+
+Vec2i* cv_Mat_at_Vec2i(Mat* self, int i, int j);
+void cv_Mat_at_Vec2i_set_Val(Mat* self, int i, int j, Vec2i* val);
+
+Vec2s* cv_Mat_at_Vec2s(Mat* self, int i, int j);
+void cv_Mat_at_Vec2s_set_Val(Mat* self, int i, int j, Vec2s* val);
+
+Vec2w* cv_Mat_at_Vec2w(Mat* self, int i, int j);
+void cv_Mat_at_Vec2w_set_Val(Mat* self, int i, int j, Vec2w* val);
+
+Vec3b* cv_Mat_at_Vec3b(Mat* self, int i, int j);
+void cv_Mat_at_Vec3b_set_Val(Mat* self, int i, int j, Vec3b* val);
+
+Vec3d* cv_Mat_at_Vec3d(Mat* self, int i, int j);
+void cv_Mat_at_Vec3d_set_Val(Mat* self, int i, int j, Vec3d* val);
+
+Vec3f* cv_Mat_at_Vec3f(Mat* self, int i, int j);
+void cv_Mat_at_Vec3f_set_Val(Mat* self, int i, int j, Vec3f* val);
+
+Vec3i* cv_Mat_at_Vec3i(Mat* self, int i, int j);
+void cv_Mat_at_Vec3i_set_Val(Mat* self, int i, int j, Vec3i* val);
+
+Vec3s* cv_Mat_at_Vec3s(Mat* self, int i, int j);
+void cv_Mat_at_Vec3s_set_Val(Mat* self, int i, int j, Vec3s* val);
+
+Vec3w* cv_Mat_at_Vec3w(Mat* self, int i, int j);
+void cv_Mat_at_Vec3w_set_Val(Mat* self, int i, int j, Vec3w* val);
+
+Vec4b* cv_Mat_at_Vec4b(Mat* self, int i, int j);
+void cv_Mat_at_Vec4b_set_Val(Mat* self, int i, int j, Vec4b* val);
+
+Vec4d* cv_Mat_at_Vec4d(Mat* self, int i, int j);
+void cv_Mat_at_Vec4d_set_Val(Mat* self, int i, int j, Vec4d* val);
+
+Vec4f* cv_Mat_at_Vec4f(Mat* self, int i, int j);
+void cv_Mat_at_Vec4f_set_Val(Mat* self, int i, int j, Vec4f* val);
+
+Vec4i* cv_Mat_at_Vec4i(Mat* self, int i, int j);
+void cv_Mat_at_Vec4i_set_Val(Mat* self, int i, int j, Vec4i* val);
+
+Vec4s* cv_Mat_at_Vec4s(Mat* self, int i, int j);
+void cv_Mat_at_Vec4s_set_Val(Mat* self, int i, int j, Vec4s* val);
+
+Vec4w* cv_Mat_at_Vec4w(Mat* self, int i, int j); 
+void cv_Mat_at_Vec4w_set_Val(Mat* self, int i, int j, Vec4w* val);
+
 int cv_vector_int_get_value (vector_int* self, int idx);
 const float* cv_CvSVM_get_support_vector(SVM* self, int i);
 CvMat* cv_Mat_to_CvMat(Mat* self);

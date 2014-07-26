@@ -1,7 +1,7 @@
 ;;;; -*- mode: lisp; indent-tabs: nil -*-
 ;;;; ml.lisp
 ;;;; OpenCV bindings
-;;;; Machine Learning
+;;;; Machine Learning.
 
 (in-package :lisp-cv)
 
@@ -275,12 +275,12 @@
 ;;; Support Vector Machines
 
 
-(defun c-value (self)
+(defun c (self)
   (if (typep self 'cv-svm-params)
       (mem-ref (c-pointer self) :double 32)))
 
 
-(defun (setf c-value) (val self)
+(defun (setf c) (val self)
   (if (typep self 'cv-svm-params)
       (setf (mem-ref (c-pointer self) :double 32) val)))
 
@@ -323,6 +323,19 @@
 (defun (setf gamma) (val self)
   (if (typep self 'cv-svm-params)
       (setf (mem-ref (c-pointer self) :double 16) val)))
+
+
+;; const float* CvSVM::get_support_vector(int i) const
+;; const float* cv_CvSVM_get_support_vector(SVM* self, int i);
+(defcfun ("cv_CvSVM_get_support_vector" get-support-vector) :pointer
+  (self svm)
+  (i :int))
+
+
+;; int CvSVM::get_support_vector_count() const
+;; int cv_CvSVM_get_support_vector_count(CvSVM* self)
+(defcfun ("cv_CvSVM_get_support_vector_count" get-support-vector-count) :int
+  (self svm))
 
 
 (defun kernel-type (self)
@@ -444,7 +457,7 @@
   (samples mat)
   (results mat))
 
-
+;
 (defun svm-predict (self arg1 &optional arg2)
   (cond ((typep arg2 'cv-mat)
 	 (svm-predict-2-0 self arg1 arg2))
@@ -485,7 +498,7 @@
 
 (defun term-crit (self)
   (if (typep self 'cv-svm-params)
-      (mem-ref (c-pointer self) 'term-criteria-struct 64)))
+      (mem-ref (c-pointer self) '(:pointer (:struct term-criteria-struct))  64)))
 
 
 (defun (setf term-crit) (val self)

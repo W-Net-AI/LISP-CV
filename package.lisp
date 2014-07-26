@@ -51,12 +51,11 @@
 ;; Macros
 
    #:$
-   #:?
+   #:@
    #:alloc
    #:d
    #:f
    #:free
-   #:print-mat
    #:size-of
 
 
@@ -222,27 +221,27 @@
    #:with-svm-params
    #:with-term-criteria
    #:with-vec-2b
-   #:with-vec-3b
-   #:with-vec-4b
    #:with-vec-2d
-   #:with-vec-3d
-   #:with-vec-4d
-   #:with-vec-6d
    #:with-vec-2f
-   #:with-vec-3f
-   #:with-vec-4f
-   #:with-vec-6f
    #:with-vec-2i
+   #:with-vec-2s
+   #:with-vec-2w
+   #:with-vec-3b
+   #:with-vec-3d
+   #:with-vec-3f
    #:with-vec-3i
+   #:with-vec-3s
+   #:with-vec-3w
+   #:with-vec-4b
+   #:with-vec-4d
+   #:with-vec-4f
    #:with-vec-4i
+   #:with-vec-4s
+   #:with-vec-4w
+   #:with-vec-6d
+   #:with-vec-6f
    #:with-vec-6i
    #:with-vec-8i
-   #:with-vec-2s
-   #:with-vec-3s
-   #:with-vec-4s
-   #:with-vec-2w
-   #:with-vec-3w
-   #:with-vec-4w
    #:with-vector-char
    #:with-vector-double
    #:with-vector-dmatch
@@ -744,6 +743,51 @@
    #:area-2f
    #:arr-to-mat
    #:at
+   #:at-char-2
+   #:at-char-3
+   #:at-char
+   #:at-double-2
+   #:at-double-3
+   #:at-double
+   #:at-float-2
+   #:at-float-3
+   #:at-float
+   #:at-int-2
+   #:at-int-3
+   #:at-int
+   #:at-short-2
+   #:at-short-3
+   #:at-short
+   #:at-uchar-2
+   #:at-uchar-3
+   #:at-uchar
+   #:at-ushort-2
+   #:at-ushort-3
+   #:at-ushort
+   #:at-scalar
+   #:at-point-2d
+   #:at-point-2f
+   #:at-point-3d
+   #:at-point-3f
+   #:at-point-3i
+   #:at-vec-2b
+   #:at-vec-2d
+   #:at-vec-2f
+   #:at-vec-2i
+   #:at-vec-2s
+   #:at-vec-2w
+   #:at-vec-3b
+   #:at-vec-3d
+   #:at-vec-3f
+   #:at-vec-3i
+   #:at-vec-3s
+   #:at-vec-3w
+   #:at-vec-4b
+   #:at-vec-4d
+   #:at-vec-4f
+   #:at-vec-4i
+   #:at-vec-4s
+   #:at-vec-4w
    #:br
    #:channels
    #:class-id
@@ -855,6 +899,36 @@
    #:point-3i-x
    #:point-3i-y
    #:point-3i-z
+   #:print-mat
+   #:print-point
+   #:print-point-2d
+   #:print-point-2f
+   #:print-point-3d
+   #:print-point-3f
+   #:print-point-3i
+   #:print-scalar
+   #:print-vec-2b
+   #:print-vec-2d
+   #:print-vec-2f
+   #:print-vec-2i
+   #:print-vec-2s
+   #:print-vec-2w
+   #:print-vec-3b
+   #:print-vec-3d
+   #:print-vec-3f
+   #:print-vec-3i
+   #:print-vec-3s
+   #:print-vec-3w
+   #:print-vec-4b
+   #:print-vec-4d
+   #:print-vec-4f
+   #:print-vec-4i
+   #:print-vec-4s
+   #:print-vec-4w
+   #:print-vec-6d
+   #:print-vec-6f
+   #:print-vec-6i
+   #:print-vec-8i
    #:promote
    #:%ptr
    #:ptr
@@ -1627,16 +1701,25 @@
    #:+svm-params-coef+ 
    #:+svm-params-degree+ 
 
+   #:c
+   #:class-weights
+   #:coef-0
+   #:degree
    #:gamma
+   #:get-support-vector
+   #:get-support-vector-count
    #:kernel-type
    #:make-svm
    #:make-svm-params
+   #:nu
+   #:p
    #:svm
    #:svm-params-0
    #:svm-params
    #:svm-predict
    #:svm-train
    #:svm-type
+   #:term-crit
 
 ;;; ml - Decision Trees
 

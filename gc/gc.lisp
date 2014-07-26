@@ -1001,7 +1001,8 @@ ret))
 	     (scalar-4 (coerce v0 'double-float) (coerce v1 'double-float) 
 		       (coerce v2 'double-float) (coerce v3 'double-float)))
 	    (double-float
-	     (scalar-4 v0 v1 v2 v3))))
+	     (scalar-4 v0 v1 v2 v3))
+            (t (error "The value ~a is not of type (SIGNED-BYTE 32) or DOUBLE-FLOAT." v0))))
 
 
 (defun make-scalar (&optional (v0 0d0) (v1 0d0) (v2 0d0) (v3 0d0))
@@ -1011,7 +1012,8 @@ ret))
 	     (scalar-4 (coerce v0 'double-float) (coerce v1 'double-float) 
 		       (coerce v2 'double-float) (coerce v3 'double-float)))
 	    (double-float
-	     (scalar-4 v0 v1 v2 v3))))
+	     (scalar-4 v0 v1 v2 v3))
+            (t (error "The value ~a is not of type (SIGNED-BYTE 32) or DOUBLE-FLOAT." v0))))
 
 
 ;; Scalar_<_Tp> Scalar_<_Tp>::all(_Tp v0)
@@ -2559,7 +2561,7 @@ ret))
   (nu :double)
   (p :double)
   (class-weights cv:mat-struct)
-  (term-crit cv:term-criteria-struct))
+  (term-crit (:pointer (:struct cv:term-criteria-struct))))
 
 
 (defun svm-params (&optional svm-type kernel-type degree gamma coef-0 c-value nu p class-weights term-crit)

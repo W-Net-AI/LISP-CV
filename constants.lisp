@@ -606,6 +606,7 @@
   (+row-sample+ 1)
   (+svm-c-svc+ 100) 
   (+svm-nu-svc+ 101)
+  (+svm-nu-svr+ 104)
   (+svm-one-class+ 102)
   (+svm-eps-svr+ 103) 
   (+svm-nu-svr+ 104)

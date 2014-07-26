@@ -3416,15 +3416,23 @@ C++: TermCriteria::TermCriteria()
 
 LISP-CV: (TERM-CRITERIA) => TERM-CRITERIA
 
+LISP-CV: (MAKE-TERM-CRITERIA) => TERM-CRITERIA
+
 C++: TermCriteria::TermCriteria(int type, int maxCount, double epsilon)
 
 LISP-CV: (TERM-CRITERIA (TYPE :INT) (MAX-COUNT :INT) (EPSILON :INT)) => TERM-CRITERIA
 
+LISP-CV: (MAKE-TERM-CRITERIA (TYPE :INT) (MAX-COUNT :INT) (EPSILON :INT)) => TERM-CRITERIA
+
+LISP-CV: (TERM-CRIT-TO-CV-TERM-CRIT (SELF TERM-CRITERIA)) => (:POINTER (:STRUCT TERM-CRITERIA-STRUCT))
 
 
     Parameters:	
 
-        TYPE - The type of termination criteria: +TERM-CRITERIA-COUNT+, +TERM-CRITERIA-EPS+ or (+ +TERM-CRITERIA-COUNT+ +TERM-CRITERIA-EPS+).  
+        SELF - A TERM-CRITERIA object.
+
+        TYPE - The type of termination criteria: +TERM-CRITERIA-COUNT+, +TERM-CRITERIA-EPS+ or 
+               (+ +TERM-CRITERIA-COUNT+ +TERM-CRITERIA-EPS+).  
 
                Note: The above constants are part of the TermCriteria class in C++. 
                In the OpenCV documentation the above constants are as follows:
@@ -3434,6 +3442,22 @@ LISP-CV: (TERM-CRITERIA (TYPE :INT) (MAX-COUNT :INT) (EPSILON :INT)) => TERM-CRI
         MAX-COUNT - The maximum number of iterations or elements to compute.
 
         EPSILON - The desired accuracy or change in parameters at which the iterative algorithm stops.
+
+
+Note: The TERM-CRIT-TO-CV-TERM-CRIT function converts a TERM-CRITERIA object into a TERM-CRITERIA-STRUCT 
+struct so it can be given to functions like SVM-PARAMS that still take the struct as a parameter. 
+
+Note: TERM-CRITERIA and MAKE-TERM-CRITERIA are bindings for the OpenCV TermCriteria class constructor.
+
+See: 
+
+http://docs.opencv.org/trunk/modules/core/doc/basic_structures.html?highlight=termcriteria#termcriteria-termcriteria
+
+for more details, and TERM-CRITERIA-STRUCT is a binding for OpenCV's CvTermCriteria struct, 
+
+See:
+
+http://docs.opencv.org/trunk/modules/core/doc/old_basic_structures.html?highlight=cvter#CvTermCriteria
 
 
 Example:
@@ -14616,7 +14640,7 @@ This function is parallelized with the TBB library.
 ========================================================================================================================================
 
 ========================================================================================================================================
-#ML - #MAKE-TRAINING-MATRIX
+#MAKE-TRAINING-MATRIX
 ========================================================================================================================================
 
 Constructs single-float training data matrix.
@@ -15475,6 +15499,313 @@ The function is parallelized with the TBB library.
 Example:
 
 See the K-NEAREST-EXAMPLE in this library
+
+========================================================================================================================================
+#ML - #SUPPORT VECTOR MACHINES
+========================================================================================================================================
+========================================================================================================================================
+#SVM
+========================================================================================================================================
+
+Default and training constructors.
+
+Note: Both SVM and MAKE-SVM are provided in this library. The first, to match OpenCV's naming conventions, 
+the second, to adhere to Common Lisp naming conventions. Except for the name, they are the same function. I 
+use the SVM function in the examples in this file because it will make them easier to compare with OpenCV 
+examples you find online, thus making this library easier to learn.
+
+
+C++: CvSVM::CvSVM()
+
+LISP-CV: (SVM) => SVM
+
+LISP-CV: (SVM) => MAKE-SVM
+
+C++: CvSVM::CvSVM(const Mat& trainData, const Mat& responses, const Mat& varIdx=Mat(), const Mat& sampleIdx=Mat(), 
+                  CvSVMParams params=CvSVMParams() )
+
+LISP-CV: (SVM &OPTIONAL (TRAIN-DATA MAT) (RESPONSES MAT) ((VAR-IDX MAT) (%MAT)) ((SAMPLE-IDX MAT) (%MAT)) 
+                       ((PARAMS SVM-PARAMS) (SVM-PARAMS-0))) => SVM
+
+LISP-CV: (MAKE-SVM &OPTIONAL (TRAIN-DATA MAT) (RESPONSES MAT) ((VAR-IDX MAT) (%MAT)) ((SAMPLE-IDX MAT) (%MAT)) 
+                       ((PARAMS SVM-PARAMS) (SVM-PARAMS-0))) => SVM
+
+
+The constructors follow conventions of (STAT-MODEL). See (STAT-MODEL-TRAIN) for parameters descriptions.
+
+
+Example:
+
+(defun svm-example ()
+
+  (let* ((window-name "SVM-EXAMPLE")
+	 (width 512)
+	 (height 512)
+         (term-crit-struct 0)
+	 (response 0)
+	 (thickness -1)
+	 (line-type 8)
+	 (c 0)
+	 (v 0))
+    (with-named-window (window-name)
+      (move-window window-name 704 175)
+      ;;Data for visual representation.
+      (with-mat ((image (mat-zeros height width +8uc3+)))
+	;;Set up training data.
+	(with-object ((*labels (alloc :float '(1.0 -1.0 -1.0 -1.0))))
+	  (with-mat ((labels-mat (mat 4 1 +32fc1+ *labels)))
+	    (with-object ((training-data (foreign-array-alloc #2A((501f0 10f0) 
+								  (255f0 10f0) 
+								  (501f0 255f0) 
+								  (10f0 501f0)) 
+							      '(:array :float 4 2))))
+	      (with-mat ((training-data-mat (mat 4 2 +32fc1+ training-data)))
+		;;Set up SVM's parameters.
+		(with-svm-params ((params (svm-params)))
+		  (with-term-criteria ((term-crit (term-criteria +termcrit-iter+ 100 
+								 (coerce 1e-6 'double-float))))
+		    (setf term-crit-struct (term-crit-to-cv-term-crit term-crit))
+		    (setf (svm-type params) +svm-c-svc+)
+		    (setf (kernel-type params) +svm-linear+)
+		    (setf (term-crit params) term-crit-struct)
+		    ;; Train the SVM.
+		    (with-svm ((svm (svm)))
+		      (with-mat ((mat (mat)))
+			(train svm  training-data-mat labels-mat mat mat params)
+
+			(with-vec-3b ((green (vec-3b 0 255 0))
+				      (blue (vec-3b 255 0 0)))
+			  ;;Show the decision regions given by the SVM.
+			  (dotimes (i (rows image))
+			    (dotimes (j (cols image))
+			      (with-object ((data (alloc :float (list (float j) (float i)))))
+				(with-mat ((sample-mat (mat 1 2 +32fc1+ data)))
+				  (setf response (predict svm sample-mat))
+
+				  (if (= response 1) 
+				      (setf (at-vec-3b image i j) green) 
+				      (if (= response -1)
+					  (setf (at-vec-3b image i j) blue)))))))
+
+			  ;;Show the training data.
+			  (with-point ((center-1 (point 501 10))
+				       (center-2 (point 255 10))
+				       (center-3 (point 501 255))
+				       (center-4 (point 10 501)))
+			    (with-scalar ((black (scalar 0 0 0))
+					  (white (scalar 255 255 255)))
+			      (circle image center-1 5 black thickness line-type)
+			      (circle image center-2 5 white thickness line-type)
+			      (circle image center-3 5 white thickness line-type)
+			      (circle image center-4 5 white thickness line-type)
+
+			      ;;Show support vectors.
+			      (setf thickness 2)
+			      (setf line-type 8)
+
+			      (setf c (get-support-vector-count svm))
+
+			      (dotimes (i c)
+				(setf v (get-support-vector svm i))
+				(with-point ((center-5 (point (floor (@ v :float 0)) 
+							      (floor (@ v :float 1)))))
+				  (with-scalar ((grey (scalar 128 128 128)))
+				    (circle image center-5 6 grey thickness line-type))))
+
+			      (imwrite "result.png" image) ;Save the image.
+			      (loop
+				 (imshow window-name image) ;Show it to the user.
+				 (let ((c (wait-key 33)))
+				   (when (= c 27)
+				     (return)))))))))))))))))))
+
+
+========================================================================================================================================
+SVM-PARAMS
+========================================================================================================================================
+
+The constructors.
+
+Note: Both SVM-PARAMS and MAKE-SVM-PARAMS are provided in this library. The first, to match OpenCV's 
+naming conventions, the second, to adhere to Common Lisp naming conventions. Except for the name, they 
+are the same function. I use the SVM-PARAMS function in the examples in this file because it will make 
+them easier to compare with OpenCV examples you find online, thus making this library easier to learn.
+
+C++: CvSVMParams::CvSVMParams()
+
+LISP-CV: (SVM-PARAMS) => SVM-PARAMS
+
+LISP-CV: (MAKE-SVM-PARAMS) => SVM-PARAMS
+
+C++: CvSVMParams::CvSVMParams(int svm_type, int kernel_type, double degree, double gamma, double coef0, double Cvalue, 
+                              double nu, double p, CvMat* class_weights, CvTermCriteria term_crit)
+
+LISP-CV: (svm-params (svm-type :int) (kernel-type :int) (degree :double) (gamma :double) (coef-0 :double) 
+                     (c-value :double) (nu :double) (p :double) (class-weights mat-struct)
+                     (term-crit (:pointer (:struct term-criteria-struct)))) => SVM-PARAMS
+
+
+See OpenCV documentation at this link:
+
+http://docs.opencv.org/trunk/modules/ml/doc/support_vector_machines.html?highlight=svmparams#CvSVMParams
+
+for a description of the parameters and formulae.
+
+
+The constants at above link are translated into LISP-CV as follows:
+
+
+(Using CvSVM::C_SVC as example):
+
+
+1. The Cv is stripped: SVM::C_SVC
+
+2. The :: is replaced with - : SVM-C_SVC
+
+3. The _ is replaced with - : SVM-C-SVC
+
+4. Plus signs are added to either end: +SVM-C-SVC+
+
+
+Example:
+
+
+(defun svm-params-example ()
+
+  "Per this excerpt from the OpenCv SVM tutorial here:
+
+   http://docs.opencv.org/doc/tutorials/ml/introduction_to_svm/introduction_to_svm.html
+
+   'A Support Vector Machine (SVM) is a discriminative classifier 
+    formally defined by a separating hyperplane. In other words, given 
+    labeled training data (supervised learning), the algorithm outputs 
+    an optimal hyperplane which categorizes new examples.'
+
+    This example allows you to change the data inside the training matrix, 
+    represented by black and white points on the screen, with the trackbars, 
+    moving the optimal separating hyperplane in the process."
+
+  (let* ((window-name "SVM-PARAMS-EXAMPLE")
+	 (width 512)
+	 (height 512)
+         (term-crit-struct 0)
+	 (response 0)
+	 (thickness -1)
+	 (line-type 8)
+	 (c 0)
+	 (v 0))
+    (with-named-window (window-name)
+      (move-window window-name 704 175)
+      ;;Allocate memory to hold the integer 
+      ;;values the trackbars will adjust.
+      (with-object ((svm-type (alloc :int 0))
+                    (0-0 (alloc :int 501))
+		    (0-1 (alloc :int 10))
+		    (1-0 (alloc :int 255))
+		    (1-1 (alloc :int 10))
+		    (2-0 (alloc :int 501))
+		    (2-1 (alloc :int 255))
+		    (3-0 (alloc :int 10))
+		    (3-1 (alloc :int 501)))
+        ;;Create trackbars used to change the eight 
+        ;;elements inside the training data matrix.
+        ;;The default training values are the same 
+        ;;as in the SVM-EXAMPLE in examples.lisp.
+	(create-trackbar "0,0" window-name 0-0 501)
+	(create-trackbar "0,1" window-name 0-1 500)
+	(create-trackbar "1,0" window-name 1-0 500)
+	(create-trackbar "1,1" window-name 1-1 500)
+	(create-trackbar "2,0" window-name 2-0 501)
+	(create-trackbar "2.1" window-name 2-1 500)
+	(create-trackbar "3,0" window-name 3-0 500)
+	(create-trackbar "3,1" window-name 3-1 501)
+	(loop
+	   ;;Data for visual representation.
+	   (with-mat ((image (mat-zeros height width +8uc3+)))
+
+	     ;;;Set up training data.
+
+	     (with-object ((*labels (alloc :float '(1.0 -1.0 -1.0 -1.0))))
+               ;;Create a 4x1 labels matrix, with a label of -1 for each 
+               ;;white dot and a label of 1 for the single black dot.
+	       (with-mat ((labels-mat (mat 4 1 +32fc1+ *labels)))
+                 ;;Create a training matrix with data output by trackbars.
+		 (with-object ((training-data (alloc :float (list
+							     (coerce (@ 0-0 :int) 'single-float) 
+							     (coerce (@ 0-1 :int) 'single-float) 
+							     (coerce (@ 1-0 :int) 'single-float) 
+							     (coerce (@ 1-1 :int) 'single-float) 
+							     (coerce (@ 2-0 :int) 'single-float) 
+							     (coerce (@ 2-1 :int) 'single-float) 
+							     (coerce (@ 3-0 :int) 'single-float) 
+							     (coerce (@ 3-1 :int) 'single-float)))))
+		   (with-mat ((training-data-mat (mat 4 2 +32fc1+ training-data)))
+
+		     ;;;In the next few lines, set up SVM's parameters.
+
+		     (with-svm-params ((params (svm-params)))
+                       ;; Termination criteria of the iterative SVM training procedure. 
+		       (with-term-criteria ((term-crit (term-criteria +termcrit-iter+ 100 
+								      (coerce 1e-6 'double-float))))
+
+			 ;;Convert the TERM-CRITERIA object, just created, into a struct 
+			 ;;(CvTermCriteria in OpenCV)before giving it to SVM-PARAMS. 
+			 (setf term-crit-struct (term-crit-to-cv-term-crit term-crit))
+                         ;;Set termination criteria into SVM-PARAMS object.
+			 (setf (term-crit params) term-crit-struct)
+                         ;;Set the type of the SVM formulation.
+			 (setf (svm-type params) +svm-c-svc+)
+                         ;;Create a linear kernel, the fastest kernel type.
+			 (setf (kernel-type params) +svm-linear+)
+                         
+			 ;; Train the SVM.
+			 (with-svm ((svm (svm)))
+			   (with-mat ((mat (mat)))
+			     (train svm  training-data-mat labels-mat mat mat params) 
+			     (with-vec-3b ((green (vec-3b 0 255 0))
+					   (blue (vec-3b 255 0 0)))
+			       ;;Show the decision regions given by the SVM.
+			       (dotimes (i (rows image))
+				 (dotimes (j (cols image))
+				   (with-object ((data (alloc :float (list (float j) (float i)))))
+				     (with-mat ((sample-mat (mat 1 2 +32fc1+ data)))
+				       (setf response (predict svm sample-mat))
+
+				       (if (= response 1) 
+					   (setf (at-vec-3b image i j) green) 
+					   (if (= response -1)
+					       (setf (at-vec-3b image i j) blue)))))))
+
+			       ;;Show the training data.
+			       (with-point ((center-1 (point (@ 0-0 :int) (@ 0-1 :int)))
+					    (center-2 (point (@ 1-0 :int) (@ 1-1 :int)))
+					    (center-3 (point (@ 2-0 :int) (@ 2-1 :int)))
+					    (center-4 (point (@ 3-0 :int) (@ 3-1 :int))))
+				 (with-scalar ((black (scalar 0 0 0))
+					       (white (scalar 255 255 255)))
+				   (circle image center-1 5 black thickness line-type)
+				   (circle image center-2 5 white thickness line-type)
+				   (circle image center-3 5 white thickness line-type)
+				   (circle image center-4 5 white thickness line-type)
+
+				   ;;Show support vectors.
+				   (setf thickness 2)
+				   (setf line-type 8)
+
+				   (setf c (get-support-vector-count svm))
+
+				   (dotimes (i c)
+				     (setf v (get-support-vector svm i))
+				     (with-point ((center-5 (point (floor (@ v :float 0)) 
+								   (floor (@ v :float 1)))))
+				       (with-scalar ((grey (scalar 128 128 128)))
+					 (circle image center-5 6 grey thickness line-type))))
+                                   ;;Show it to the user.
+				   (imshow window-name image) 
+
+				   (let ((c (wait-key 33)))
+				     (when (= c 27)
+				       (return))))))))))))))))))))
 
 ========================================================================================================================================
 #ML - #DECISION TREES
