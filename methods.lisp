@@ -98,9 +98,6 @@
 (defgeneric size (arg &rest args)
   (:documentation "Used for all class bindings with a SIZE member."))
 
-(defgeneric stat-model-save (self &rest args)
-  (:documentation "Used for all STAT-MODEL-SAVE methods."))
-
 (defgeneric train (self &rest args)
   (:documentation "Used for all class bindings with a TRAIN member."))
 
@@ -410,8 +407,13 @@
 (defmethod is-opened ((self cv-video-capture))
 	   (video-capture-is-opened self))
 
+
 (defmethod is-opened ((self cv-video-writer))
 	   (video-writer-is-opened self))
+
+
+(defmethod load ((self cv-svm) &rest args)
+  (apply #'stat-model-load self args))
 
 
 (defmethod length ((self std-vector-char))
@@ -543,6 +545,10 @@
 
 (defmethod release ((self cv-video-capture))
   (video-capture-release self))
+
+
+(defmethod save ((self cv-svm) &rest args)
+  (apply #'stat-model-save self args))
 
 
 (defmethod sqrt ((arg cv-mat) &rest args)

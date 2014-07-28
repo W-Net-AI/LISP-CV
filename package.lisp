@@ -19,17 +19,18 @@
 ;; utils - Utilities 
 
    #:->
+   #:cat
+   #:do-while
+   #:dup
    #:rename-package-nicknames
    #:full-pathname
    #:*lisp-cv-data-dir*
    #:*lisp-cv-src-dir*
-   #:run-program
-   #:println
+   #:make-pathname-list
    #:mklist
    #:partition
-   #:cat
-   #:dup
-   #:do-while
+   #:println
+   #:run-program
 
 
 ;; Change default parameters
@@ -673,10 +674,12 @@
    #:dot
    #:height
    #:is-opened
+   #:load
    #:length
    #:match
    #:predict
    #:release
+   #:save
    #:size
    #:train
    #:width
@@ -930,6 +933,7 @@
    #:print-vec-6i
    #:print-vec-8i
    #:promote
+   #:push-back
    #:%ptr
    #:ptr
    #:query-idx
@@ -1668,6 +1672,11 @@
 ;;; ml - LISP-CV specific
 
 ;;; make-training-matrix
+
+;;; ml - Statistical Models
+
+   #:stat-model-load
+   #:stat-model-save
 
 ;;; ml - Normal Bayes Classifier
 

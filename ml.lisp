@@ -9,174 +9,77 @@
 ;;; LISP-CV specific
 
 
-(defun make-training-matrix (&key directory directory-contents dsize test)
+(declaim (ftype (function (string symbol cv-size &optional boolean)
+                          cv-mat) make-training-matrix))
 
-  "Creates training data to give to Machine Learning functions.
-   First, converts all of the images in the directory you have 
-   specified to single float. Then, resizes them, to the size 
-   you specified, with the DSIZE parameter. Finally, reshapes 
-   the images to 1D and adds the now 1D images, one image per 
-   row, to the TRAINING-DATA matrix.
-  
-   Note: All of the images in the directory you specify must 
-   be square and width/height values of DSIZE must be equal."
+(defun make-training-matrix (directory directory-contents dsize &optional (test nil))
 
-  (let* ((window-name "Testing...")
-	 (directory-or-file-list (uiop:directory-files directory))
-	 (file-list-of-lists (list))
-	 (temp-list 0)
-	 (pathname-list (list))
-	 (img-list (list))
-         ;;Extra list for GC
-         (end-list (list))
-         (img-height (round (size-height dsize)))
-         (img-width (round (size-width dsize)))
+  (let* ((pathname-list (make-pathname-list :directory directory 
+					    :directory-contents directory-contents))
+	 (num-of-files (length pathname-list))
+	 (img-height (round (size-height dsize)))
+	 (img-width (round (size-width dsize)))
 	 (img-area (* img-height img-width))
-	 (num-of-files 0)
-         ;;Create matrix to hold the training data
-	 (training-data 0)
-         (pass-fail 0)
-	 (i 0))
+         (training-data (mat 0 img-area +32f+))
+         (i 0))
 
-    ;; Error checking section
-    (check-type test boolean)      
-    
-    (cond ((not (eq img-height img-width)) 
-	   (error "the width and height of DSIZE must be equal."))
-	  ((not directory-or-file-list)
-	   (error "invalid directory name or directory is empty."))
-	  ((not (uiop:directory-pathname-p directory))
-	   (error "error opening ~a:~%No such file or directory.~%Note: supplied pathnames must include a trailing backslash." 
-		  (cat "#P" (write-to-string directory)))))
-
-    ;;Load all pathnames correctly, whether or not, 
-    ;;a directory path was supplied to the function
-    (cond  ((eq directory-contents :directories)
-
-	    (dotimes (i (length directory-or-file-list))
-	      (if (uiop:directory-pathname-p (nth i directory-or-file-list)) nil
-		  (error "If :DIRECTORIES flag is specified, supplied path may only include directories."))) 
-
-	    (dotimes (i (length directory-or-file-list))
-	      (push 
-	       (uiop:directory-files (full-pathname (nth i directory-or-file-list))) 
-	       file-list-of-lists))
-
-	    (dotimes (i (length file-list-of-lists))
-	      (setf temp-list  (reverse (nth i file-list-of-lists)))
-
-	      (dotimes (j (length temp-list))
-		(push (full-pathname (nth j temp-list)) pathname-list)))
-
-                  (setf pathname-list (reverse pathname-list))            
-
-	    (setf num-of-files (length pathname-list))
-	    (setf training-data (mat-typed num-of-files img-area +32fc1+)))
-
-	   ((eq directory-contents :files)
-
-	    (dotimes (i (length directory-or-file-list))
-	      (if (uiop:file-pathname-p (nth i directory-or-file-list)) nil
-		  (error "If :FILES flag is specified, supplied path may only include files."))) 
-
-	    ;;Create a list of pathnames to
-	    ;;read with the IMREAD function.
-	    (dotimes (i (length directory-or-file-list))
-	      (push (full-pathname (nth i directory-or-file-list)) pathname-list))
-
-	    (setf num-of-files (length pathname-list))
-	    (setf training-data (mat-typed num-of-files img-area +32fc1+))))
-
-
-    ;;Make a list of all images in 
-    ;;the directory you specified.
-    (format t "~%Loading images in...~%~%'~a'...~%~%" directory)
-    (dotimes (i num-of-files)
-      (push  (imread (nth i pathname-list) +load-image-grayscale+) end-list))
-
-    ;;Convert all the images in 
-    ;;IMG-LIST to single float.
     (dotimes (n num-of-files)
-      (convert-to (nth n end-list) (nth n end-list) +32fc1+))
-
-    ;;Resize all of the images
-    (dotimes (n num-of-files)
-      (resize (nth n end-list) (nth n end-list)  dsize))
-    
-    ;;Fill TRAINING-DATA with all of the 
-    ;;1D matrices. One matrix per row.
-    (format t "Adding images to training matrix...")
-    (dotimes (k num-of-files)
-      (dotimes (i img-height)
-	(dotimes (j img-width)
-	  (setf (at training-data k (+ (* i img-height) j) :float) (at (nth k end-list) i j :float)))))
-
-    (if test (progn
-
-	       (format t "~%~%Testing...this may take a few seconds...")
-
-;;;Test to make sure all of the 
-;;;images are in TRAINING-DATA.   
-
-	       ;;Reset IMG-LIST so 
-	       ;;it can be reused.
-	       (setf img-list (list))    
-	       
-	       ;;Fill IMG-LIST with matrices.
-	       (dotimes (i num-of-files)
-		 (push (mat-typed 1 img-area +32fc1+) img-list))
-
-	       ;;Fill each matrix in IMG-LIST with 
-	       ;;a separate row from TRAINING-DATA.
-	       (dotimes (i num-of-files)
-		 (dotimes (k img-area)
-		   (setf (mem-aref (%ptr (nth i img-list) 0) :float k) 
-			 (mem-aref (%ptr training-data i) :float k))))
-
-	       ;;If test fails..Break!
-	       (dotimes (i num-of-files)
-		 (dotimes (k img-area)
-		   (if (eq (mem-aref (%ptr (nth i end-list) 0) :float k) 
-			   (mem-aref (%ptr training-data i) :float k))
-		       (setf pass-fail 1)
-		       (setf pass-fail 0))))
-
-	       ;;Garbage collect END-LIST
-	       (dotimes (i num-of-files)
-		 (del-mat (nth i end-list)))
-
-	       (if (eq pass-fail 0)	
+      (with-mat ((img (imread (nth n pathname-list) +load-image-grayscale+)))
+	(convert-to img img +32f+)
+	(%resize img img dsize 0d0 0d0 +inter-linear+)
+	(with-mat ((reshaped-img (reshape-rows img 0 1)))
+	  (push-back training-data reshaped-img) 
+	  (princ #\NewLine) 
+	  (princ "Pushing image ")
+	  (princ (+ n 1))
+	  (princ " into training matrix.")
+	  (princ #\NewLine))))
+    (if (null test)
+	(return-from make-training-matrix training-data)
+	(let ((window-name "Testing..."))
+	  (with-named-window (window-name +window-normal+)
+	    (move-window window-name 759 175)
+	    (loop
+	       (let* ((row (row training-data i))
+		      (reshaped-img (reshape-rows row 0 img-height)))
+		 (imshow window-name reshaped-img)
+		 (del-mat reshaped-img)
+		 (del-mat row))
+	       (if (< i (- num-of-files 1)) (incf i))
+	       (let ((c (wait-key 1)))
+		 (when (or (= c 27) (= i (- num-of-files 1)))
 		   (return-from make-training-matrix 
-		     (format t "~%~%Test failed...Break!~%~%"))
-		   (format t "~%~%Test passed...Proceed!~%~%"))
+		     training-data)
+		   (return)))))))))
 
-	       ;;Convert all the images in 
-	       ;;IMG-LIST to unsigned char.
-	       (dotimes (i num-of-files)
-		 (%convert-to (nth i img-list) (nth i img-list) +8uc1+ 1.0d0 0.0d0))
 
-	       (loop
-		  ;;Show the images in IMG-LIST in a window 
-		  ;;for an additional visual verification.
 
-		  (let ((reshaped-images (reshape-rows (nth i img-list) 
-						       0 img-height)))
-		    (imshow window-name reshaped-images)
-		    (del-mat reshaped-images))
+;;; Statistical Models
 
-		  (if (< i (- num-of-files 1)) (incf i))
-		  (sleep .001)
-		  (let ((c (wait-key 1)))
-		    (when (or (= c 27) (= i (- num-of-files 1)))
-		      ;;Garbage collect IMG-LIST
-		      (dotimes (i num-of-files)
-			(del-mat (nth i img-list)))
-		      (return-from make-training-matrix 
-			(progn 
-			  (destroy-window window-name)
-			  training-data)))))) 
-	(progn (format t "~%~%Done!...no tests were performed on the training matrix.~%~%")
-	       training-data))))
+
+
+;; void CvStatModel::load( const char* filename, const char* name=0 )
+;; void cv_CvStatModel_load2(CvStatModel* self, c_string filename, c_string name) 
+(defcfun ("cv_CvStatModel_load2" stat-model-load-svm) :void
+  (self svm)
+  (filename :string)
+  (name :string))
+
+
+(defun stat-model-load (self filename &optional (name (null-pointer)))
+   (stat-model-load-svm self filename name))
+
+
+;; void CvStatModel::save( const char* filename, const char* name=0 ) const;
+;; void cv_CvStatModel_save2(CvStatModel* self, c_string filename, c_string name) 
+(defcfun ("cv_CvStatModel_save2" stat-model-save-svm) :void
+  (self svm)
+  (filename :string)
+  (name :string))
+
+
+(defun stat-model-save (self filename &optional (name (null-pointer)))
+   (stat-model-save-svm self filename name))
 
 
 

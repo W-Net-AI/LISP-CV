@@ -6,16 +6,24 @@
 
 
 
-;; DEFPARAMETER macro (to make REPL testing easier)
+;; DEFPARAMETER macro (to make testing easier)
 
 (defmacro d (var val)
   `(defparameter ,var ,val))
 
 
 ;; FORMAT macro (to make debugging easier)
+
 (defmacro f (&optional (val "test"))
   `(if ,val
        (format t "~%~a~%~%" ,val) nil))
+
+
+;; LET macro (to make REPL testing easier)
+
+(defmacro l (var val &body body)
+  `(let ((,var ,val))
+     ,@body))
 
 
 ;;SIZEOF macro

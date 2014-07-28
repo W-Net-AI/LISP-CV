@@ -406,70 +406,82 @@ ret))
 ;;; MAT
 
 
-(defun mat (&rest args)
+(defun mat (&optional arg1 arg2 arg3 arg4)
   
   "MAT constructor"  
   
-  (cond ((eq (first args) nil) (%mat))
+  (cond ((eq arg1 nil) (%mat))
 
-	((and (eq (second args) nil) 
-	      (typep (first args) 'cv:cv-mat))
-	 (cv:mat-to-arr (first args)))
+	((and (eq arg2 nil) 
+	      (typep arg1 'cv:cv-mat))
 
-	((and (eq (second args) nil) 
-	      (typep (first args) 'simple-array))
+	 (cv:mat-to-arr arg1))
 
-	 (arr-to-mat (first args)))
+	((and (eq arg2 nil) 
 
-	((typep (second args) 'cv:cv-range)
-	 (apply #'mat-range args))
+	      (typep arg1 'simple-array))
+
+	 (arr-to-mat arg1))
+
+	((typep arg2 'cv:cv-range)
+
+	 (apply #'mat-range arg1 arg2 arg3))
 	
-	((and (eq (fourth args) nil) (first args))
-	 (apply #'mat-typed args))
-	
-	((typep (fourth args) 'cv:cv-scalar)
-	 (apply #'%mat-value args))
-	
-	((listp (fourth args))
-	 (apply #'mat-value args))
-	
-	((pointerp (fourth args))
+	((and (eq arg4 nil) arg1)
 
-	 (apply #'mat-data args))
+	 (mat-typed arg1 arg2 arg3))
+	
+	((typep arg4 'cv:cv-scalar)
+
+	 (%mat-value arg1 arg2 arg3 arg4))
+	
+	((listp arg4)
+
+	 (mat-value arg1 arg2 arg3 arg4))
+	
+	((pointerp arg4)
+
+	 (mat-data arg1 arg2 arg3 arg4))
 	
 	(t nil)))
 
 
-(defun make-mat (&rest args)
+(defun make-mat (&optional arg1 arg2 arg3 arg4)
   
   "MAT constructor"  
   
-  (cond ((eq (first args) nil) (%mat))
+  (cond ((eq arg1 nil) (%mat))
 
-	((and (eq (second args) nil) 
-	      (typep (first args) 'cv:cv-mat))
-	 (cv:mat-to-arr (first args)))
+	((and (eq arg2 nil) 
+	      (typep arg1 'cv:cv-mat))
 
-	((and (eq (second args) nil) 
-	      (typep (first args) 'simple-array))
+	 (cv:mat-to-arr arg1))
 
-	 (arr-to-mat (first args)))
+	((and (eq arg2 nil) 
 
-	((typep (second args) 'cv:cv-range)
-	 (apply #'mat-range args))
+	      (typep arg1 'simple-array))
+
+	 (arr-to-mat arg1))
+
+	((typep arg2 'cv:cv-range)
+
+	 (apply #'mat-range arg1 arg2 arg3))
 	
-	((and (eq (fourth args) nil) (first args))
-	 (apply #'mat-typed args))
-	
-	((typep (fourth args) 'cv:cv-scalar)
-	 (apply #'%mat-value args))
-	
-	((listp (fourth args))
-	 (apply #'mat-value args))
-	
-	((pointerp (fourth args))
+	((and (eq arg4 nil) arg1)
 
-	 (apply #'mat-data args))
+	 (mat-typed arg1 arg2 arg3))
+	
+	((typep arg4 'cv:cv-scalar)
+
+	 (%mat-value arg1 arg2 arg3 arg4))
+	
+	((listp arg4)
+
+	 (mat-value arg1 arg2 arg3 arg4))
+	
+	((pointerp arg4)
+
+	 (mat-data arg1 arg2 arg3 arg4))
 	
 	(t nil)))
 
@@ -2262,174 +2274,45 @@ ret))
 ;;; ML - LISP-CV specific
 
 
-(defun make-training-matrix (&key directory directory-contents dsize test)
+(defun make-training-matrix (directory directory-contents dsize &optional (test nil))
 
-  "Creates training data to give to Machine Learning functions.
-   First, converts all of the images in the directory you have 
-   specified to single float. Then, resizes them, to the size 
-   you specified, with the DSIZE parameter. Finally, reshapes 
-   the images to 1D and adds the now 1D images, one image per 
-   row, to the TRAINING-DATA matrix.
-  
-   Note: All of the images in the directory you specify must 
-   be square and width/height values of DSIZE must be equal."
-
-  (let* ((window-name "Testing...")
-	 (directory-or-file-list (uiop:directory-files directory))
-	 (file-list-of-lists (list))
-	 (temp-list 0)
-	 (pathname-list (list))
-	 (img-list (list))
-         ;;Extra list for GC
-         (end-list (list))
-         (img-height (round (cv:size-height dsize)))
-         (img-width (round (cv:size-width dsize)))
+  (let* ((pathname-list (cv:make-pathname-list :directory directory 
+					    :directory-contents directory-contents))
+	 (num-of-files (cv:length pathname-list))
+	 (img-height (round (cv:size-height dsize)))
+	 (img-width (round (cv:size-width dsize)))
 	 (img-area (* img-height img-width))
-	 (num-of-files 0)
-         ;;Create matrix to hold the training data
-	 (training-data 0)
-         (pass-fail 0)
-	 (i 0))
+         (training-data (mat 0 img-area cv:+32f+))
+         (i 0))
 
-    ;; Error checking section
-    (check-type test boolean)      
-    
-    (cond ((not (eq img-height img-width)) 
-	   (error "the width and height of DSIZE must be equal."))
-	  ((not directory-or-file-list)
-	   (error "invalid directory name or directory is empty."))
-	  ((not (uiop:directory-pathname-p directory))
-	   (error "error opening ~a:~%No such file or directory.~%Note: supplied pathnames must include a trailing backslash." 
-		  (cv:cat "#P" (write-to-string directory)))))
-
-    ;;Load all pathnames correctly, whether or not, 
-    ;;a directory path was supplied to the function
-    (cond  ((eq directory-contents :directories)
-
-	    (dotimes (i (cv:length directory-or-file-list))
-	      (if (uiop:directory-pathname-p (nth i directory-or-file-list)) nil
-		  (error "If :DIRECTORIES flag is specified, supplied path may only include directories."))) 
-
-	    (dotimes (i (cv:length directory-or-file-list))
-	      (push 
-	       (uiop:directory-files (cv:full-pathname (nth i directory-or-file-list))) 
-	       file-list-of-lists))
-
-	    (dotimes (i (cv:length file-list-of-lists))
-	      (setf temp-list  (reverse (nth i file-list-of-lists)))
-
-	      (dotimes (j (cv:length temp-list))
-		(push (cv:full-pathname (nth j temp-list)) pathname-list)))
-
-                  (setf pathname-list (reverse pathname-list)) 
-
-	    (setf num-of-files (length pathname-list))
-	    (setf training-data (mat-typed num-of-files img-area cv:+32fc1+)))
-
-	   ((eq directory-contents :files)
-
-	    (dotimes (i (cv:length directory-or-file-list))
-	      (if (uiop:file-pathname-p (nth i directory-or-file-list)) nil
-		  (error "If :FILES flag is specified, supplied path may only include files."))) 
-
-	    ;;Create a list of pathnames to
-	    ;;read with the IMREAD function.
-	    (dotimes (i (length directory-or-file-list))
-	      (push (cv:full-pathname (nth i directory-or-file-list)) pathname-list))
-
-	    (setf num-of-files (cv:length pathname-list))
-	    (setf training-data (mat-typed num-of-files img-area cv:+32fc1+))))
-
-
-    ;;Make a list of all images in 
-    ;;the directory you specified.
-    (format t "~%Loading images in...~%~%'~a'...~%~%" directory)
-    (dotimes (i num-of-files)
-      (push  (cv:imread (nth i pathname-list) cv:+load-image-grayscale+) end-list))
-
-    ;;Convert all the images in 
-    ;;IMG-LIST to single float.
     (dotimes (n num-of-files)
-      (cv:convert-to (nth n end-list) (nth n end-list) cv:+32fc1+))
-
-    ;;Resize all of the images
-    (dotimes (n num-of-files)
-      (cv:resize (nth n end-list) (nth n end-list)  dsize))
-    
-    ;;Fill TRAINING-DATA with all of the 
-    ;;1D matrices. One matrix per row.
-    (format t "Adding images to training matrix...")
-    (dotimes (k num-of-files)
-      (dotimes (i img-height)
-	(dotimes (j img-width)
-	  (setf (cv:at training-data k (+ (* i img-height) j) :float) (cv:at (nth k end-list) i j :float)))))
-
-    (if test (progn
-
-	       (format t "~%~%Testing...this may take a few seconds...")
-
-;;;Test to make sure all of the 
-;;;images are in TRAINING-DATA.   
-
-	       ;;Reset IMG-LIST so 
-	       ;;it can be reused.
-	       (setf img-list (list))    
-	       
-	       ;;Fill IMG-LIST with matrices.
-	       (dotimes (i num-of-files)
-		 (push (cv:mat-typed 1 img-area cv:+32fc1+) img-list))
-
-	       ;;Fill each matrix in IMG-LIST with 
-	       ;;a separate row from TRAINING-DATA.
-	       (dotimes (i num-of-files)
-		 (dotimes (k img-area)
-		   (setf (mem-aref (cv:%ptr (nth i img-list) 0) :float k) 
-			 (mem-aref (cv:%ptr training-data i) :float k))))
-
-	       ;;If test fails..Break!
-	       (dotimes (i num-of-files)
-		 (dotimes (k img-area)
-		   (if (eq (mem-aref (cv:%ptr (nth i end-list) 0) :float k) 
-			   (mem-aref (cv:%ptr training-data i) :float k))
-		       (setf pass-fail 1)
-		       (setf pass-fail 0))))
-
-	       ;;Garbage collect END-LIST
-	       (dotimes (i num-of-files)
-		 (cv:del-mat (nth i end-list)))
-
-	       (if (eq pass-fail 0)	
+      (cv:with-mat ((img (cv:imread (nth n pathname-list) cv:+load-image-grayscale+)))
+	(cv:convert-to img img cv:+32f+)
+	(cv:%resize img img dsize 0d0 0d0 cv:+inter-linear+)
+	(cv:with-mat ((reshaped-img (cv:reshape-rows img 0 1)))
+	  (cv:push-back training-data reshaped-img) 
+	  (princ #\NewLine) 
+	  (princ "Pushing image ")
+	  (princ (+ n 1))
+	  (princ " into training matrix.")
+	  (princ #\NewLine))))
+    (if (null test)
+	(return-from make-training-matrix training-data)
+	(let ((window-name "Testing..."))
+	  (cv:with-named-window (window-name cv:+window-normal+)
+	    (cv:move-window window-name 759 175)
+	    (loop
+	       (let* ((row (cv:row training-data i))
+		      (reshaped-img (cv:reshape-rows row 0 img-height)))
+		 (cv:imshow window-name reshaped-img)
+		 (cv:del-mat reshaped-img)
+		 (cv:del-mat row))
+	       (if (< i (- num-of-files 1)) (incf i))
+	       (let ((c (cv:wait-key 1)))
+		 (when (or (= c 27) (= i (- num-of-files 1)))
 		   (return-from make-training-matrix 
-		     (format t "~%~%Test failed...Break!~%~%"))
-		   (format t "~%~%Test passed...Proceed!~%~%"))
-
-	       ;;Convert all the images in 
-	       ;;IMG-LIST to unsigned char.
-	       (dotimes (i num-of-files)
-		 (cv:%convert-to (nth i img-list) (nth i img-list) cv:+8uc1+ 1.0d0 0.0d0))
-
-	       (loop
-		  ;;Show the images in IMG-LIST in a window 
-		  ;;for an additional visual verification.
-
-		  (let ((reshaped-images (cv:reshape-rows (nth i img-list) 
-						       0 img-height)))
-		    (cv:imshow window-name reshaped-images)
-		    (cv:del-mat reshaped-images))
-
-		  (if (< i (- num-of-files 1)) (incf i))
-		  (sleep .001)
-		  (let ((c (cv:wait-key 1)))
-		    (when (or (= c 27) (= i (- num-of-files 1)))
-		      ;;Garbage collect IMG-LIST
-		      (dotimes (i num-of-files)
-			(cv:del-mat (nth i img-list)))
-		      (return-from make-training-matrix 
-			(progn 
-			  (cv:destroy-window window-name)
-			  training-data)))))) 
-	(progn (format t "~%~%Done!...no tests were performed on the training matrix.~%~%")
-	       training-data))))
+		     training-data)
+		   (return)))))))))
 
 
 ;;; ML - Normal Bayes Classifier

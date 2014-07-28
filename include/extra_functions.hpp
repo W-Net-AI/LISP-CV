@@ -88,6 +88,7 @@ ADD_READ_FUNC_HEADERS_0(f, float);
 ADD_READ_FUNC_HEADERS_0(d, double);
 ADD_READ_FUNC_HEADERS_1(s, String);
 ADD_READ_FUNC_HEADERS_1(m, Mat);
+void cv_Mat_push_back(Mat* self, Mat* m);
 Point* cv_Mat_at_Point(Mat* self, int i, int j);
 void cv_Mat_at_Point_set_Val(Mat* self, int i, int j, Point* val);
 Point2d* cv_Mat_at_Point2d(Mat* self, int i, int j);

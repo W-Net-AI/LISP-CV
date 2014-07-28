@@ -132,6 +132,10 @@ ADD_READ_FUNC_IMPL_1(m, Mat);
 
 ADD_READ_FUNC_IMPL_2(vkp, vector_KeyPoint);
 
+void cv_Mat_push_back(Mat* self, Mat* m) {
+    self->push_back(*m);
+}
+
 Point* cv_Mat_at_Point(Mat* self, int i, int j) {
   return &self->at<Point>(i, j);
 }

@@ -1681,70 +1681,82 @@ ret))
 ;;; MAT
 
 
-(defun mat (&rest args)
+(defun mat (&optional arg1 arg2 arg3 arg4)
   
   "MAT constructor"  
   
-  (cond ((eq (first args) nil) (%mat))
+  (cond ((eq arg1 nil) (%mat))
 
-	((and (eq (second args) nil) 
-	      (typep (first args) 'cv-mat))
-	 (mat-to-arr (first args)))
+	((and (eq arg2 nil) 
+	      (typep arg1 'cv-mat))
 
-	((and (eq (second args) nil) 
-	      (typep (first args) 'simple-array))
+	 (mat-to-arr arg1))
 
-	 (arr-to-mat (first args)))
+	((and (eq arg2 nil) 
 
-	((typep (second args) 'cv-range)
-	 (apply #'mat-range args))
+	      (typep arg1 'simple-array))
+
+	 (arr-to-mat arg1))
+
+	((typep arg2 'cv-range)
+
+	 (apply #'mat-range arg1 arg2 arg3))
 	
-	((and (eq (fourth args) nil) (first args))
-	 (apply #'mat-typed args))
-	
-	((typep (fourth args) 'cv-scalar)
-	 (apply #'%mat-value args))
-	
-	((listp (fourth args))
-	 (apply #'mat-value args))
-	
-	((pointerp (fourth args))
+	((and (eq arg4 nil) arg1)
 
-	 (apply #'mat-data args))
+	 (mat-typed arg1 arg2 arg3))
+	
+	((typep arg4 'cv-scalar)
+
+	 (%mat-value arg1 arg2 arg3 arg4))
+	
+	((listp arg4)
+
+	 (mat-value arg1 arg2 arg3 arg4))
+	
+	((pointerp arg4)
+
+	 (mat-data arg1 arg2 arg3 arg4))
 	
 	(t nil)))
 
 
-(defun make-mat (&rest args)
+(defun make-mat (&optional arg1 arg2 arg3 arg4)
   
   "MAT constructor"  
   
-  (cond ((eq (first args) nil) (%mat))
+  (cond ((eq arg1 nil) (%mat))
 
-	((and (eq (second args) nil) 
-	      (typep (first args) 'cv-mat))
-	 (mat-to-arr (first args)))
+	((and (eq arg2 nil) 
+	      (typep arg1 'cv-mat))
 
-	((and (eq (second args) nil) 
-	      (typep (first args) 'simple-array))
+	 (mat-to-arr arg1))
 
-	 (arr-to-mat (first args)))
+	((and (eq arg2 nil) 
 
-	((typep (second args) 'cv-range)
-	 (apply #'mat-range args))
+	      (typep arg1 'simple-array))
+
+	 (arr-to-mat arg1))
+
+	((typep arg2 'cv-range)
+
+	 (apply #'mat-range arg1 arg2 arg3))
 	
-	((and (eq (fourth args) nil) (first args))
-	 (apply #'mat-typed args))
-	
-	((typep (fourth args) 'cv-scalar)
-	 (apply #'%mat-value args))
-	
-	((listp (fourth args))
-	 (apply #'mat-value args))
-	
-	((pointerp (fourth args))
+	((and (eq arg4 nil) arg1)
 
-	 (apply #'mat-data args))
+	 (mat-typed arg1 arg2 arg3))
+	
+	((typep arg4 'cv-scalar)
+
+	 (%mat-value arg1 arg2 arg3 arg4))
+	
+	((listp arg4)
+
+	 (mat-value arg1 arg2 arg3 arg4))
+	
+	((pointerp arg4)
+
+	 (mat-data arg1 arg2 arg3 arg4))
 	
 	(t nil)))
 
@@ -2348,6 +2360,13 @@ ret))
 (defun ptr (self &optional (i0 0))
        "Returns pointer to i0-th submatrix along the dimension #0"
        (%ptr self i0))
+
+
+;; void Mat::push_back(const Mat& m)
+;; void cv_Mat_push_back(Mat* self, Mat* elem) 
+(defcfun ("cv_Mat_push_back" push-back) :void
+  (self mat)
+  (m mat))
 
 
 (defun query-idx (self)

@@ -2333,6 +2333,36 @@ This function returns a pointer to the specified matrix row.
 		 (return)))))))))
 
 ========================================================================================================================================
+PUSH-BACK
+========================================================================================================================================
+
+Appends a matrix to another one.
+
+C++: void Mat::push_back(const Mat& m)
+
+LISP-CV: (PUSH-BACK (SELF MAT) (M MAT)) => MAT
+
+    Parameters:	
+
+        SELF - A MAT object.
+
+        M - Added line(s).
+
+This function pushes matrix M to the bottom of initial SELF matrix. It emulate the corresponding 
+method of the C++ STL vector class. The type and the number of columns must be the same as in the 
+container matrix.
+
+
+Example:
+
+(defun push-back-example ()
+
+  (with-mat ((matrix (mat 0 3 +32f+)))
+    (push-back matrix (mat-zeros 2 3 +32f+))
+    (push-back matrix (mat-ones 2 3 +32f+))
+    (print-mat matrix)))
+
+========================================================================================================================================
 #RANGE
 ========================================================================================================================================
 
@@ -4795,7 +4825,7 @@ Checks every element of an input array for invalid values.
 
 C++: bool checkRange(InputArray a, bool quiet=true, Point* pos=0, double minVal=-DBL_MAX, double maxVal=DBL_MAX )
 
-LISP-CV: (CHECK-RANGE (A MAT) &OPTIONAL ((QUIET :BOOLEAN) T) ((POS POINT) (NULL-POINTER)) ((MIN-VAL :DOUBLE) +-DBL-MAX+)
+LISP-CV: (CHECK-RANGE (A MAT) &OPTIONAL ((QUIET :BOOLEAN) T) ((POS POINT) (CFFI::NULL-POINTER)) ((MIN-VAL :DOUBLE) +-DBL-MAX+)
                       ((MAX-VAL :DOUBLE)  +DBL-MAX+)) => :BOOLEAN
 
     Parameters:	
@@ -4814,7 +4844,7 @@ LISP-CV: (CHECK-RANGE (A MAT) &OPTIONAL ((QUIET :BOOLEAN) T) ((POS POINT) (NULL-
 The function CHECK-RANGE checks that every array element is neither NaN nor infinite. When (< MINVAL +-DBL-MAX+) 
 and (< MAX-VAL +DBL-MAX+), the function also checks that each value is between MIN-VAL and MAX-VAL. In case of 
 multi-channel arrays, each channel is processed independently. If some values are out of range, position of the 
-first outlier is stored in POS (when: (NOT (EQ POS (NULL-POINTER))) ). Then, the functions either return NIL 
+first outlier is stored in POS (when: (NOT (EQ POS (CFFI::NULL-POINTER))) ). Then, the functions either return NIL 
 (when: (EQ QUIET T) ) or throw an exception.
 
 
@@ -5731,20 +5761,20 @@ Finds the global minimum and maximum in an array.
 
 C++: void minMaxLoc(InputArray src, double* minVal, double* maxVal=0, Point* minLoc=0, Point* maxLoc=0, InputArray mask=noArray())
 
-LISP-CV: (MIN-MAX-LOC (SRC MAT) (MIN-VAL :DOUBLE) &OPTIONAL ((MAX-VAL :DOUBLE) (NULL-POINTER)) ((MIN-LOC POINT) (NULL-POINTER)) 
-        ((MAX-LOC POINT) (NULL-POINTER)) ((MASK MAT) (MAT))) :VOID
+LISP-CV: (MIN-MAX-LOC (SRC MAT) (MIN-VAL :POINTER) &OPTIONAL ((MAX-VAL :POINTER) (CFFI::NULL-POINTER)) 
+                     ((MIN-LOC POINT) (CFFI::NULL-POINTER)) ((MAX-LOC POINT) (CFFI::NULL-POINTER)) ((MASK MAT) (MAT))) :VOID
 
     Parameters:	
 
         SRC - Input single-channel array.
 
-        MIN-VAL - Pointer to the returned minimum value; (NULL-POINTER) is used if not required.
+        MIN-VAL - Pointer to the returned minimum value; (CFFI::NULL-POINTER) is used if not required.
 
-        MAX-VAL - Pointer to the returned maximum value; (NULL-POINTER) is used if not required.
+        MAX-VAL - Pointer to the returned maximum value; (CFFI::NULL-POINTER) is used if not required.
 
-        MIN-LOC - Pointer to the returned minimum location (in 2D case); (NULL-POINTER) is used if not required.
+        MIN-LOC - Pointer to the returned minimum location (in 2D case); (CFFI::NULL-POINTER) is used if not required.
 
-        MAX-LOC - Pointer to the returned maximum location (in 2D case); (NULL-POINTER) is used if not required.
+        MAX-LOC - Pointer to the returned maximum location (in 2D case); (CFFI::NULL-POINTER) is used if not required.
 
         MASK - Optional mask used to select a sub-array.
 
@@ -10944,7 +10974,7 @@ with (GET-OPTIMAL-DFT-SIZE).
 
 C++: Point2d phaseCorrelate(InputArray src1, InputArray src2, InputArray window=noArray(), double* response=0)
 
-LISP-CV: (PHASE-CORRELATE (SRC-1 MAT) (SRC-2 MAT) ((WINDOW MAT) (MAT)) ((RESPONSE :POINTER) (NULL-POINTER))) => POINT-2D
+LISP-CV: (PHASE-CORRELATE (SRC-1 MAT) (SRC-2 MAT) ((WINDOW MAT) (MAT)) ((RESPONSE :POINTER) (CFFI::NULL-POINTER))) => POINT-2D
 
     Parameters:	
 
@@ -11463,7 +11493,7 @@ C++: int createTrackbar(const string& trackbarname, const string& winname, int* 
                         void* userdata=0)
 
 LISP-CV:  (CREATE-TRACKBAR (TRACKBARNAME :STRING) (WINNAME :STRING) (VALUE :POINTER) (COUNT :INT) &OPTIONAL 
-                          ((ON-CHANGE TRACKBAR-CALLBACK) (NULL-POINTER)) ((USERDATA :POINTER) (NULL-POINTER))) => :INT
+                          ((ON-CHANGE TRACKBAR-CALLBACK) (CFFI::NULL-POINTER)) ((USERDATA :POINTER) (CFFI::NULL-POINTER))) => :INT
 
     
     Parameters:	
@@ -12338,7 +12368,7 @@ LISP-CV: (IMREAD (FILENAME :STRING) &OPTIONAL ((FLAGS :INT) +LOAD-IMAGE-COLOR+))
 
 The function IMREAD loads an image from the specified file and returns it. If the image cannot be 
 read (because of missing file, improper permissions, unsupported or invalid format), the function 
-returns an empty matrix e.g. (EQ (NULL-POINTER-P (DATA MATRIX)) T). Currently, the following file 
+returns an empty matrix e.g. (EQ (CFFI::NULL-POINTER-P (DATA MATRIX)) T). Currently, the following file 
 formats are supported:
 
         Windows bitmaps - *.bmp, *.dib (always supported)
@@ -13570,7 +13600,7 @@ Example:
    start this program with a good amount of available RAM.
 
    Don't let this example make you nervous, it's basically 
-   12 FEATURE-DETECTOR-CREATE-EXAMPLEs stacked, in one. I'm
+   12 FEATURE-DETECTOR-CREATE-EXAMPLES stacked, in one. I'm
    basically just showing, in a quick easy to see fashion, 
    how the THRESH, OUTPUT and PATTERN-SCALE parameters of t-
    he function BRISK's parameters affect it's output. Each 
@@ -14645,9 +14675,9 @@ This function is parallelized with the TBB library.
 
 Constructs single-float training data matrix.
 
-C++: Specific to LISP-CV
+C++: Specific to LISP-CV.
 
-LISP-CV: (MAKE-TRAINING-MATRIX &KEY (DIRECTORY :STRING) (DIRECTORY-CONTENTS KEYWORD) (DSIZE :INT) (TEST :BOOLEAN)) => MAT
+LISP-CV: (MAKE-TRAINING-MATRIX &KEY (DIRECTORY :STRING) (DIRECTORY-CONTENTS KEYWORD) (DSIZE :INT)) => MAT
 
 
     Parameters:
@@ -14661,11 +14691,8 @@ LISP-CV: (MAKE-TRAINING-MATRIX &KEY (DIRECTORY :STRING) (DIRECTORY-CONTENTS KEYW
         DSIZE - The new rows and cols value each image in DIRECTORY is resized to before being added 
                 into the output training data matrix. (WIDTH DSIZE) and (HEIGHT DSIZE) must be equal. 
                 The bigger the DSIZE value, the longer this function takes to run, This function was 
-                tested with input images sized 128x128 and a DSIZE argument of (SIZE 50 50). Running 
-                times went from 2 seconds, without tests enabled, to up to 16 seconds with the tests 
-                enabled. 
-
-        TEST - Boolean value, toggles internal, and external visual tests on or off.
+                tested with 1016 input images, sized 128x128, and a DSIZE argument of (SIZE 50 50) on 
+                a two core 3.2GHZ chip. Running time in that configuration took about 0.8 seconds.
 
 
 To train specific Machine Learning functions in this library on a set of images, first you have to 
@@ -14674,14 +14701,9 @@ as follows: each row of the matrix corresponds to one image, and each element in
 to one feature of the class, in this case, the color of the pixel at a certain point. The pathname 
 given to this function must be a directory containing square images of the same size/type. 
 
-First, this function converts all images in the specified directory to single float and resizes them, 
-to the size specified, with the DSIZE parameter. Then, it reshapes the images to 1D and adds them, one 
-image per row, to the output training data matrix. 
-
-Internal tests are run on the matrix if (EQ TEST T). Running these tests makes the function take quite a
-bit longer. An external visual cue is provided that consists of images being reconstituted from the output 
-training matrix and shown sequentially in a window. This can aid you in spotting any anomalies in the output. 
-The internal tests are sufficient but this gives visual confirmation and makes the function alot more fun to use.
+First, this function loads all the images in the specified directory. Then, it resizes them, to the 
+size specified with the DSIZE parameter, and reshapes them to 1D. Finally, this function pushes the, 
+images, one image per row, to the output training data matrix. 
 
 Note: The output matrix must be garbage collected, You can use manual MM(DEL-MAT function), a with-* 
 macro (the WITH-MAT macro) or you can enable automatic finalization by adding a GC: or T: prefix to 
@@ -14737,8 +14759,7 @@ Example:
     ;; Here we create the training matrix using the MAKE-TRAINING-MATRIX function.
     ;; This functions adds all of the images in the TRAINING-IMAGE-DIRECTORY into 
     ;; TRAINING-MAT, as 1D images, one image per row.
-    (with-mat ((training-mat (make-training-matrix :directory training-image-directory
-						   :directory-contents :files :dsize dsize :test t))
+    (with-mat ((training-mat (make-training-matrix training-image-directory :files dsize))
 	       ;; Here we make a labels matrix with the MAKE-LABELS-MATRIX function
 	       ;; above, that we will later give to the SVM TRAIN method. A labels 
 	       ;; matrix is specified as a 1D matrix, where each element in the 1D 
@@ -14773,7 +14794,7 @@ Example:
 	(with-svm ((svm (svm)))
 	  ;; Train SVM based on the data entered.
 	  (with-mat ((mat (mat)))
-	    (format t "Training the SVM...this may take a few seconds...")
+	    (format t "~%Training the SVM...this may take a few seconds...")
 	    (train svm training-mat labels-mat mat mat params))
 	  (format t "~%~%Training Complete!!!")
 	  ;; Convert TEST-IMAGE to 1D matrix
@@ -14797,7 +14818,222 @@ Example:
 		   (let ((c (wait-key 33)))
 		     (when (= c 27)
 		       (return))))))))))))
- 
+  
+========================================================================================================================================
+#ML - #STATISTICAL-MODELS
+========================================================================================================================================
+
+========================================================================================================================================
+#STAT-MODEL-LOAD
+========================================================================================================================================
+
+Loads the model from a file.
+
+Note: The name STAT-MODEL-LOAD is used in the documentation to refer to the binding for the "load" 
+member of the OpenCV CvStatModel class because it is more descriptive and it is easier to search for 
+in this file. The LOAD method may also be used to call this binding.
+
+
+C++: void CvStatModel::load(const char* filename, const char* name=0 )
+
+LISP-CV: (LOAD (FILENAME :STRING) ((NAME :STRING) (CFFI::NULL-POINTER))) => :VOID
+
+LISP-CV: (STAT-MODEL-LOAD (FILENAME :STRING) ((NAME :STRING) (CFFI::NULL-POINTER))) => :VOID
+
+
+The method load loads the complete model state with the specified name (or default model-dependent 
+name) from the specified XML or YAML file. The previous model state is cleared by STAT-MODEL-CLEAR.
+
+
+Note:(to clarify) In OpenCV the CvStatModel class is the public class to the following OpenCV classes; 
+
+CvSVM, CvANN_MLP, CvBoost, CvDTree, CvGBTrees, CvKNearest, CvNormalBayesClassifier, CvRTrees.
+
+(LISP-CV variants: SVM, ANN-MLP, BOOST, D-TREE, GB-TREES, K-NEAREST, NORMAL-BAYES-CLASSIFIER, R-TREES). 
+
+As a result of that the CvStatModel::load method in OpenCV as well as this binding can load any saved 
+model state created with any of those classes train methods.
+
+
+Example:
+
+(defun stat-model-load-example (svm-model-state training-image-directory)
+
+  "This is a continuation of the STAT-MODEL-SAVE-EXAMPLE. Try checking 
+   out that example to get up to speed with this one. Once you are up to 
+   speed, the SVM model state saved in the STAT-MODEL-SAVE-EXAMPLE is used 
+   to predict which image you select with the trackbar.
+
+   Usage: The SVM-MODEL-STATE parameter is the exact .yml file that you saved
+          so it would be:
+      
+     'SAVE-DIRECTORY/SVM/ALPHANUMERIC/SVM_ALPHA_NUMERIC.yml'
+
+          The TRAINING-IMAGE-DIRECTORY parameter is the same path supplied as 
+          the TRAINING-IMAGE-DIRECTORY parameter in the STAT-MODEL-SAVE-EXAMPLE."
+
+  ;;Make list of all the files in all the subfolders in TRAINING-IMAGE-DIRECTORY.
+  (let ((pathname-list (make-pathname-list :directory 
+					   (ensure-trailing-slash training-image-directory) 
+					   :directory-contents :directories))
+	(window-name "STAT-MODEL-LOAD-EXAMPLE"))
+    ;;Create a window used to show all the
+    ;;images in TRAINING-IMAGE-DIRECTORY.
+    (with-named-window (window-name +window-normal+)
+      (move-window window-name 759 175)
+      ;;Allocated pointer to an integer that
+      ;;the trackbar can increment/decrement. 
+      (with-object ((n (alloc :int 0)))
+        ;;Sliding the trackbar selects which pathname 
+        ;;in PATNAME-LIST to give to IMREAD function.
+	(create-trackbar  "#IMAGE:" window-name n 4960)
+	(loop
+           ;;Load a TEST-IMAGE
+	   (with-mat ((test-image (imread (nth (@ n :int) pathname-list) +load-image-grayscale+)))
+             ;;Convert TEST-IMAGE to single float.
+	     (convert-to test-image test-image +32f+)
+             ;;Resize TEST-IMAGE to a 50x50 matrix.
+             ;;The 't:' prefix signifies automatic 
+             ;;finalization is enabled for (SIZE).
+	     (resize test-image test-image (t:size 50 50))
+             ;;Create a SVM object.
+	     (with-svm ((svm (svm)))
+               ;;Load SVM model state, created in the
+               ;;last example, into the SVM object.
+	       (load svm svm-model-state "SVM_ALPHA_NUMERIC")
+               ;;Convert TEST-IMAGE to a one dimensional matrix.
+	       (with-mat ((reshaped-test-image (reshape test-image 0 1)))
+                 ;;Predict which letter TEST-IMAGE is.
+		 (let* ((prediction (round (predict svm reshaped-test-image)))
+                        (result))
+                 ;;This COND is used to traverse the ASCII character 
+		 ;;codes, setting PREDICTION to 0...9, A...Z, a...z,
+                 ;;based on the output of the PREDICT method.
+		   (cond ((<= prediction 10) 
+			  (setf result (string (code-char (+ prediction 47)))))
+			 ((and (>= prediction 11) (<= prediction 35)) 
+			  (setf result (string (code-char (+ prediction 54)))))
+			 ((>= prediction 36) 
+			  (setf result (string (code-char (+ prediction 60))))))
+                   ;;Show prediction.
+		   (display-overlay window-name (cat "Prediction: " result) 1000)
+                   ;;Show current image
+		   (imshow window-name test-image)
+		   (let ((c (wait-key 33)))
+		     (when (= c 27)
+		       (format t "~%")
+		       (return))))))))))))
+
+========================================================================================================================================
+#STAT-MODEL-SAVE
+========================================================================================================================================
+
+Saves the model to a file.
+
+Note: The name STAT-MODEL-SAVE is used in the documentation to refer to the binding for the "save" 
+member of the OpenCV CvStatModel class because it is more descriptive and it is easier to search for 
+in this file. The SAVE method may also be used to call this binding.
+
+
+C++: void CvStatModel::save(const char* filename, const char* name=0 )
+
+LISP-CV: (SAVE (FILENAME :STRING) ((NAME :STRING) (CFFI::NULL-POINTER))) => :VOID
+
+LISP-CV: (STAT-MODEL-SAVE (FILENAME :STRING) ((NAME :STRING) (CFFI::NULL-POINTER))) => :VOID
+
+
+The method save saves the complete model state to the specified XML or YAML file with the specified 
+name or default name (which depends on a particular class). Data persistence functionality from CxCore 
+is used.
+
+
+Note:(to clarify) In OpenCV the CvStatModel class is the public class to the following OpenCV classes; 
+
+CvSVM, CvANN_MLP, CvBoost, CvDTree, CvGBTrees, CvKNearest, CvNormalBayesClassifier, CvRTrees.
+
+(LISP-CV variants: SVM, ANN-MLP, BOOST, D-TREE, GB-TREES, K-NEAREST, NORMAL-BAYES-CLASSIFIER, R-TREES). 
+
+As a result of that the CvStatModel::save method in OpenCV as well as this binding can save the 
+trained model state created with any of those classes train methods.
+
+
+Example:
+
+(defun make-labels-matrix (&key training-matrix)
+
+  (let ((label-matrix (mat (rows training-matrix) 1 +32fc1+)))
+    (loop for x from 0 below (rows label-matrix) do 
+	 (setf (at-float label-matrix x 0) (float (+ (truncate x 80) 1))))
+    label-matrix))
+
+(defun stat-model-save-example (training-image-directory save-directory)
+
+  "In this example, we train a SVM(Support Vector Machine) with 
+   OCR training data and save the resulting SVM model states to 
+   a subfolder of the folder you specified as the SAVE-DIRECTORY 
+   parameter.
+
+   You will need to use the small OCR training set I added to the:
+  
+   <LISP-CV-SRC-DIR>/IMAGES/OCR-TRAINING-DATA/ 
+
+   folder for the training images in this example. Just un-tar the 
+   english.tar.gz file in that folder and use the resulting:
+
+   <LISP-CV-SRC-DIR>/IMAGES/OCR-TRAINING-DATA/ENGLISH/FNT/  
+
+   as the TRAINING-IMAGE-DIRECTORY parameter. This example takes a few  
+   seconds to run(tested on a 3.2GHZ 2-CORE CPU), but you'll be informed 
+   of its progress as detailed notes are printed to the screen. When the 
+   example has completed, you will have a trained SVM model state, saved 
+   as a .yml files in SAVE-DIRECTORY/SVM/ALPHA_NUMERIC/. This example is 
+   part one of a two-parter. Check out the STAT-MODEL-LOAD-EXAMPLE which 
+   is in EXAMPLES.LISP to find out how to use it."
+
+  ;;DSIZE is the size that the MAKE-TRAINING-MATRIX function will 
+  ;;resize the 128x128 OCR images to before pushing them into the 
+  ;;training matrix.
+  (with-size ((dsize (size 50 50)))
+    ;;Make a list of all the subfolders <LISP-CV-SRC-DIR>/ENGLISH/FNT/.
+    (let* ((save-directory (ensure-trailing-slash save-directory))
+	   (svm-save-dir (ensure-directories-exist (cat save-directory ;Create directory to save
+							"SVM/ALPHA_NUMERIC/")))) ;the SVM state.
+      (if (uiop:directory-pathname-p save-directory) 
+	  nil 
+	  (return-from stat-model-save-example (format t "SAVE-DIRECTORY is not an actual directory.")))
+      ;;Make the training matrix with the LISP-CV specific MAKE-TRAINING-MATRIX function.
+      ;;This function will add all of the images in all of the subfolders of:
+      ;;                 TRAINING-IMAGE-DIRECTORY
+      ;;to TRAINING-MAT, as 1D images, one image per row.
+      ;;Search #MAKE-TRAINING-MATRIX in EXAMPLES.LISP for more details about this function.
+      (with-mat ((training-mat (make-training-matrix training-image-directory :directories dsize))
+		 ;;Create a 1x(NUM-OF-IMAGES) matrix of labels.
+		 (labels-mat (make-labels-matrix :training-matrix training-mat)))
+
+	;;Set the SVM's parameters.
+	(with-svm-params ((params (svm-params)))
+	  (setf (degree params) 1d0)
+	  (setf (svm-type params) +svm-c-svc+)
+	  (setf (kernel-type params) +svm-poly+)
+	  (setf (gamma params) 3d0)
+
+	  ;;Set the FILENAME and NAME parameters 
+	  ;;of the SAVE(STAT-MODL-SAVE) method.
+	  (let* ((name "SVM_ALPHA_NUMERIC")
+		 (filename (cat svm-save-dir name ".yml")))
+	    
+	    ;; Create an SVM object.
+	    (with-svm ((svm (svm)))
+	      (with-mat ((mat (mat)))
+		(format t "~%Training ~a..." name)
+                ;;Train the SVM with the OCR data.
+		(train svm training-mat labels-mat mat mat params))
+	      (format t "~%~%Training ~a Complete!~%" name)
+
+	      (format t "~%Saving:~%~% ~a...~%~%" filename)
+	      ;;Save current SVM's model state to SAVE-DIRECTORY/SVM/ALPHA_NUMERIC/.
+	      (save svm filename name))))))))
+
 ========================================================================================================================================
 #ML - #NORMAL BAYES CLASSIFIER
 ========================================================================================================================================
@@ -15110,8 +15346,8 @@ Predicts the response for sample(s).
 
 C++: float CvNormalBayesClassifier::predict(const Mat& samples, Mat* results=0, Mat* results_prob=0 ) const
 
-LISP-CV: (NORMAL-BAYES-CLASSIFIER-PREDICT (SELF NORMAL-BAYES-CLASSIFIER) (SAMPLES MAT) ((RESULTS MAT) (NULL-POINTER)) 
-                                          ((RESULTS-PROB MAT) (NULL-POINTER))) => :FLOAT
+LISP-CV: (NORMAL-BAYES-CLASSIFIER-PREDICT (SELF NORMAL-BAYES-CLASSIFIER) (SAMPLES MAT) ((RESULTS MAT) (CFFI::NULL-POINTER)) 
+                                          ((RESULTS-PROB MAT) (CFFI::NULL-POINTER))) => :FLOAT
 
 The method estimates the most probable classes for input vectors. Input vectors (one or more) are 
 stored as rows of the matrix samples. In case of multiple input vectors, there should be one output 
@@ -15146,10 +15382,10 @@ C++: CvKNearest::CvKNearest()
 C++: CvKNearest::CvKNearest(const Mat& trainData, const Mat& responses, const Mat& sampleIdx=Mat(), bool isRegression=false, 
                             int max_k=32 )
 
-LISP-CV: (K-NEAREST (&OPTIONAL (TRAIN-DATA MAT) (RESPONSES MAT) ((SAMPLE-IDX MAT) (NULL-POINTER)) ((IS-REGRESSION :BOOLEAN) NIL) 
+LISP-CV: (K-NEAREST (&OPTIONAL (TRAIN-DATA MAT) (RESPONSES MAT) ((SAMPLE-IDX MAT) (CFFI::NULL-POINTER)) ((IS-REGRESSION :BOOLEAN) NIL) 
                     ((MAX-K :INT) 32))) => K-NEAREST
 
-LISP-CV: (MAKE-K-NEAREST (&OPTIONAL (TRAIN-DATA MAT) (RESPONSES MAT) ((SAMPLE-IDX MAT) (NULL-POINTER)) ((IS-REGRESSION :BOOLEAN) NIL) 
+LISP-CV: (MAKE-K-NEAREST (&OPTIONAL (TRAIN-DATA MAT) (RESPONSES MAT) ((SAMPLE-IDX MAT) (CFFI::NULL-POINTER)) ((IS-REGRESSION :BOOLEAN) NIL) 
                     ((MAX-K :INT) 32))) => K-NEAREST
 
 
@@ -15458,8 +15694,8 @@ Finds the neighbors and predicts responses for input vectors.
 
 C++: float CvKNearest::find_nearest(const Mat& samples, int k, Mat& results, Mat& neighborResponses, Mat& dists) const
 
-LISP-CV: (K-NEAREST-FIND-NEAREST (SELF MAT) (SAMPLES MAT) &OPTIONAL ((RESULTS MAT) (NULL-POINTER)) 
-                                ((NEIGHBOR-RESPONSES MAT) (NULL-POINTER)) (DISTS (NULL-POINTER))) => :FLOAT
+LISP-CV: (K-NEAREST-FIND-NEAREST (SELF MAT) (SAMPLES MAT) &OPTIONAL ((RESULTS MAT) (CFFI::NULL-POINTER)) 
+                                ((NEIGHBOR-RESPONSES MAT) (CFFI::NULL-POINTER)) (DISTS (CFFI::NULL-POINTER))) => :FLOAT
 
     Parameters:	
 
