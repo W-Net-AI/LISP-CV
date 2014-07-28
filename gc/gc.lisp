@@ -2273,6 +2273,8 @@ ret))
 
 ;;; ML - LISP-CV specific
 
+(declaim (ftype (function (string symbol cv:cv-size &optional boolean)
+                          cv:cv-mat) make-training-matrix))
 
 (defun make-training-matrix (directory directory-contents dsize &optional (test nil))
 
