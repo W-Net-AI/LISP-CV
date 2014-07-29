@@ -37,6 +37,8 @@
 
 (defparameter *personalize-print-scalar* "#")
 
+(defparameter *personalize-print-size* "#")
+
 (defparameter *personalize-print-vec-2b* "#")
 
 (defparameter *personalize-print-vec-2d* "#")
@@ -340,16 +342,9 @@
 	 (setf (mem-aref ptr :double n) (row-major-aref arr n)))mat))))
 
 
-;; Mat* cv_Mat_assign(Mat* self, Mat* m) 
-(defcfun ("cv_Mat_assign" assgn) mat
-  "Assign matrix data to another matrix."
-  (self mat)
-  (m mat))
-
-
 ;; Mat* cv_Mat_assignVal(Mat* self, Scalar* s)
-(defcfun ("cv_Mat_assignVal" assgn-val) mat
-  "Assign a scalar value to a matrix."
+(defcfun ("cv_Mat_assignVal" assign-val) mat
+  "Assigns a scalar value to a matrix."
   (self mat)
   (s scalar))
 
@@ -1113,6 +1108,13 @@
   (at-vec-4w-set-val self i j val))
 
 
+;; Point_<_Tp> br() const
+;; Point* cv_Rect_br(Rect* self) 
+(defcfun ("cv_Rect_br" br) point 
+  "Retrievies the bottom-right corner of a rectangle."
+  (self rect))
+
+
 ;; int cv_Mat_channels(Mat* self)
 (defcfun ("cv_Mat_channels" channels) :int
   (self mat))
@@ -1120,19 +1122,6 @@
 
 (defun class-id (self)
   (mem-aref (c-pointer self) :int 6))
-
-
-;; Mat Mat::clone() const
-;; Mat* cv_Mat_clone(Mat* self) 
-(defcfun ("cv_Mat_clone" mat-clone) mat
-  (self mat))
-
-
-;; Rect::Rect(int x, int y, int width, int height)
-;; int x, y, width, height
-;; Rect* cv_Rect_clone(Rect* self)
-(defcfun ("cv_Rect_clone" rect-clone) rect
-  (self rect))
 
 
 ;; Mat Mat::colRange(int startcol, int endcol) const
@@ -1324,6 +1313,18 @@
 	 (other point-3i))
 
 
+;; size_t Mat::elemSize() const
+;; size_t cv_Mat_elemSize(Mat* self) {
+(defcfun ("cv_Mat_elemSize" elem-size) :unsigned-int
+  (self mat))
+
+
+;; size_t Mat::elemSize1() const
+;; size_t cv_Mat_elemSize1(Mat* self) {
+(defcfun ("cv_Mat_elemSize1" elem-size1) :unsigned-int
+  (self mat))
+
+
 ;; Mat* force(MatExpr* expr)
 (defcfun ("force" force) mat
   "Coerces a MAT-EXPR to a MAT."
@@ -1384,6 +1385,27 @@
 	 "MAT constructor")
 
 
+;; Mat& operator = (const Mat& m)
+;; Mat* cv_Mat_assign(Mat* self, Mat* m) 
+(defcfun ("cv_Mat_assign" mat-assign) mat
+  "Assign matrix data to another matrix."
+  (self mat)
+  (m mat))
+
+
+;; Mat* cv_Mat_assignVal(Mat* self, Scalar* s)
+(defcfun ("cv_Mat_assignVal" mat-assign-val) mat
+  "Assign a scalar value to a matrix."
+  (self mat)
+  (s scalar))
+
+
+;; Mat Mat::clone() const
+;; Mat* cv_Mat_clone(Mat* self) 
+(defcfun ("cv_Mat_clone" mat-clone) mat
+  (self mat))
+
+
 ;; Mat::Mat(int rows, int cols, int type, void* data) 
 ;; Mat* cv_create_Mat_with_data(int rows, int cols, int type, void* data)
 (defcfun ("cv_create_Mat_with_data" mat-data) mat
@@ -1391,6 +1413,116 @@
 	 (cols :int)
 	 (type :int)
 	 (data :pointer))
+
+
+(let ((previous nil))
+  (defun %mat-data-uchar (rows cols type data)
+
+    (unless (equal data (car previous))
+      (setf previous (cons data (gced-foreign-alloc :uchar
+						    :initial-contents data))))
+    (mat-data rows cols type (cdr previous))))
+
+
+(let ((previous nil))
+  (defun %mat-data-char (rows cols type data)
+
+    (unless (equal data (car previous))
+      (setf previous (cons data (gced-foreign-alloc :char
+						    :initial-contents data))))
+    (mat-data rows cols type (cdr previous))))
+
+
+(let ((previous nil))
+  (defun %mat-data-ushort (rows cols type data)
+
+    (unless (equal data (car previous))
+      (setf previous (cons data (gced-foreign-alloc :ushort
+						    :initial-contents data))))
+    (mat-data rows cols type (cdr previous))))
+
+
+(let ((previous nil))
+  (defun %mat-data-short (rows cols type data)
+
+    (unless (equal data (car previous))
+      (setf previous (cons data (gced-foreign-alloc :short
+						    :initial-contents data))))
+    (mat-data rows cols type (cdr previous))))
+
+
+(let ((previous nil))
+  (defun %mat-data-int (rows cols type data)
+
+    (unless (equal data (car previous))
+      (setf previous (cons data (gced-foreign-alloc :int
+						    :initial-contents data))))
+    (mat-data rows cols type (cdr previous))))
+
+
+(let ((previous nil))
+  (defun %mat-data-float (rows cols type data)
+
+    (unless (equal data (car previous))
+      (setf previous (cons data (gced-foreign-alloc :float
+						    :initial-contents data))))
+    (mat-data rows cols type (cdr previous))))
+
+
+(let ((previous nil))
+  (defun %mat-data-double (rows cols type data)
+
+    (unless (equal data (car previous))
+      (setf previous (cons data (gced-foreign-alloc :double
+						    :initial-contents data))))
+    (mat-data rows cols type (cdr previous))))
+
+
+(defun %mat-data (rows cols type data-list)
+  (let ((cffi-type (case type 
+		     (#.+8uc1+ ':uchar)
+		     (#.+8sc1+ ':char)
+		     (#.+16uc1+ ':ushort)
+		     (#.+16sc1+ ':short)
+		     (#.+32sc1+ ':int)
+		     (#.+32fc1+ ':float)
+		     (#.+64fc1+ ':double)
+		     (#.+8uc2+ ':uchar)
+		     (#.+8sc2+ ':char)
+		     (#.+16uc2+ ':ushort)
+		     (#.+16sc2+ ':short)
+		     (#.+32sc2+ ':int)
+		     (#.+32fc2+ ':float)
+		     (#.+64fc2+ ':double)
+		     (#.+8uc3+ ':uchar)
+		     (#.+8sc3+ ':char)
+		     (#.+16uc3+ ':ushort)
+		     (#.+16sc3+ ':short)
+		     (#.+32sc3+ ':int)
+		     (#.+32fc3+ ':float)
+		     (#.+64fc3+ ':double)
+		     (#.+8uc4+ ':uchar)
+		     (#.+8sc4+ ':char)
+		     (#.+16uc4+ ':ushort)
+		     (#.+16sc4+ ':short)
+		     (#.+32sc4+ ':int)
+		     (#.+32fc4+ ':float)
+		     (#.+64fc4+ ':double))))
+    (case cffi-type 
+      (:uchar
+       (%mat-data-uchar rows cols type data-list))
+      (:char
+       (%mat-data-char rows cols type data-list))
+      (:short
+       (%mat-data-short rows cols type data-list))
+      (:ushort
+       (%mat-data-ushort rows cols type data-list))
+      (:int
+       (%mat-data-int rows cols type data-list))
+      (:float
+       (%mat-data-float rows cols type data-list))
+      (:double
+       (%mat-data-double rows cols type data-list)))))
 
 
 ;; double Mat::dot(InputArray m) const
@@ -1611,7 +1743,7 @@
 	 (setf (row-major-aref arr n) (mem-aref ptr :double n)))arr)))))
 
 
-(defun mat-type-to-cffi (mat)
+(defun mat-and-cffi-type (mat)
   (let* ((mat-type (mat-type mat))
 	 (cffi-type (case mat-type 
 		      (#.+8uc1+ ':uchar)
@@ -1664,16 +1796,16 @@
 
 ;; Mat::Mat(int rows, int cols, int type, const Scalar& s)
 ;; Mat* cv_create_Mat_with_value(int rows, int cols, int type, Scalar* s)
-(defcfun ("cv_create_Mat_with_value" %mat-value) mat
+(defcfun ("cv_create_Mat_with_value" mat-value) mat
 	 (rows :int)
 	 (cols :int)
 	 (type :int)
 	 (s scalar))
 
 
-(defun mat-value (rows cols type values)
-  (let* ((scalar (apply #'scalar values))					 
-	(ret (%mat-value rows cols type scalar)))
+(defun mat-element (rows cols type value)
+  (let* ((scalar (apply #'scalar (list value)))					 
+	(ret (mat-value rows cols type scalar)))
     (del-scalar scalar)
 ret))
 
@@ -1708,15 +1840,19 @@ ret))
 	
 	((typep arg4 'cv-scalar)
 
-	 (%mat-value arg1 arg2 arg3 arg4))
+	 (mat-value arg1 arg2 arg3 arg4))
 	
 	((listp arg4)
 
-	 (mat-value arg1 arg2 arg3 arg4))
+	 (%mat-data arg1 arg2 arg3 arg4))
 	
 	((pointerp arg4)
 
 	 (mat-data arg1 arg2 arg3 arg4))
+
+	((integerp arg4)
+
+	 (mat-element arg1 arg2 arg3 arg4))
 	
 	(t nil)))
 
@@ -1748,15 +1884,19 @@ ret))
 	
 	((typep arg4 'cv-scalar)
 
-	 (%mat-value arg1 arg2 arg3 arg4))
+	 (mat-value arg1 arg2 arg3 arg4))
 	
 	((listp arg4)
 
-	 (mat-value arg1 arg2 arg3 arg4))
+	 (%mat-data arg1 arg2 arg3 arg4))
 	
 	((pointerp arg4)
 
 	 (mat-data arg1 arg2 arg3 arg4))
+
+	((integerp arg4)
+
+	 (mat-element arg1 arg2 arg3 arg4))
 	
 	(t nil)))
 
@@ -2173,6 +2313,12 @@ ret))
 	  (@ scalar :double 3)))
 
 
+(defun print-size (size)
+  (format t "~a(~a ~a)~%" *personalize-print-size* 
+	  (@ size :int) 
+	  (@ size :int 1)))
+
+
 (defun print-vec-2b (vec-2b)
   (if (typep vec-2b 'cv-vec-2b)
       (format t "~a(~a ~a)" *personalize-print-vec-2b* (@ vec-2b :uchar) (@ vec-2b :uchar 1))
@@ -2475,11 +2621,11 @@ ret))
 	       (t nil)))
 
 
-;; Point_<_Tp> br() const
-;; Point* cv_Rect_br(Rect* self) 
-(defcfun ("cv_Rect_br" br) point 
-	 "Retrievies the bottom-right corner of a rectangle."
-	 (self rect))
+;; Rect::Rect(int x, int y, int width, int height)
+;; int x, y, width, height
+;; Rect* cv_Rect_clone(Rect* self)
+(defcfun ("cv_Rect_clone" rect-clone) rect
+  (self rect))
 
 
 ;; _Tp x, y, width, height
@@ -2492,13 +2638,6 @@ ret))
 ;; Size* cv_Rect_size(Rect* self)  
 (defcfun ("cv_Rect_size" rect-size) size 
 	 "Size (width, height) of the rectangle."
-	 (self rect))
-
-
-;; Point_<_Tp> tl() const
-;; Point* cv_Rect_tl(Rect* self) 
-(defcfun ("cv_Rect_tl" tl) point 
-	 "Retrievies the top-left corner of a rectangle."
 	 (self rect))
 
 
@@ -2750,9 +2889,9 @@ ret))
   "Gets the width of a SIZE-2F"
   (self size-2f))
 
-
+;; Size_<_Tp>& Size_<_Tp>::operator = (const Size_<_Tp>& sz)
 ;; Size* cv_Size_assignTo(Size* self, Size* other) 
-(defcfun ("cv_Size_assignTo" size-assgn-to) size
+(defcfun ("cv_Size_assignTo" size-assign-to) size
   "Assign data from one SIZE object to another,
    OTHER to SELF."
   (self size)
@@ -2819,6 +2958,13 @@ ret))
 	      (type
 	       (term-criteria-3 type max-count epsilon))
 	       (t nil)))
+
+
+;; Point_<_Tp> tl() const
+;; Point* cv_Rect_tl(Rect* self) 
+(defcfun ("cv_Rect_tl" tl) point 
+	 "Retrievies the top-left corner of a rectangle."
+	 (self rect))
 
 
 ;; size_t Mat::total() const

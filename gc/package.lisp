@@ -306,11 +306,6 @@
    #:make-dmatch
    #:make-key-point
    #:make-mat
-   #:make-mat-data
-   #:make-mat-range
-   #:make-mat-typed
-   #:make-mat-value
-   #:make-mat-zeros
    #:make-point
    #:make-point-2d
    #:make-point-2f
@@ -351,6 +346,7 @@
    #:mat
    #:mat-data
    #:mat-dot
+   #:mat-element
    #:mat-expr-t
    #:mat-eye
    #:mat-ones

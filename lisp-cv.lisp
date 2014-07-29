@@ -9,80 +9,97 @@
 (when (member :darwin cl:*features*)
   (pushnew #p"/opt/local/lib/" *foreign-library-directories*))
 
-
 (define-foreign-library highgui
-    (:unix "/usr/local/lib/libopencv_highgui.so.3.0.0"))
+    (:unix "/usr/local/lib/libopencv_highgui.so.3.0.0")
+ (t (:default "highgui")))
 (use-foreign-library highgui)
 
 (define-foreign-library calib3d
-    (:unix "/usr/local/lib/libopencv_calib3d.so.3.0.0"))
+    (:unix "/usr/local/lib/libopencv_calib3d.so.3.0.0")
+(t (:default "calib3d")))
 (use-foreign-library calib3d)
 
 (define-foreign-library contrib
-    (:unix "/usr/local/lib/libopencv_contrib.so.3.0.0"))
+    (:unix "/usr/local/lib/libopencv_contrib.so.3.0.0")
+(t (:default "contrib")))
 (use-foreign-library contrib)
 
 (define-foreign-library core
-    (:unix "/usr/local/lib/libopencv_core.so.3.0.0"))
+    (:unix "/usr/local/lib/libopencv_core.so.3.0.0")
+(t (:default "core")))
 (use-foreign-library core)
 
 (define-foreign-library features2d
-    (:unix "/usr/local/lib/libopencv_features2d.so.3.0.0"))
+    (:unix "/usr/local/lib/libopencv_features2d.so.3.0.0")
+(t (:default "features2d")))
 (use-foreign-library features2d)
 
 (define-foreign-library flann
-    (:unix "/usr/local/lib/libopencv_flann.so.3.0.0"))
+    (:unix "/usr/local/lib/libopencv_flann.so.3.0.0")
+(t (:default "flann")))
 (use-foreign-library flann)
 
 ;;(define-foreign-library gpu
-;;    (:unix "/usr/local/lib/libopencv_gpu.so.3.0.0"))
+;;  (:unix "/usr/local/lib/libopencv_gpu.so.3.0.0")
+;;(t (:default "gpu")))
 ;;(use-foreign-library gpu)
 
 (define-foreign-library imgproc
-    (:unix "/usr/local/lib/libopencv_imgproc.so.3.0.0"))
+    (:unix "/usr/local/lib/libopencv_imgproc.so.3.0.0")
+(t (:default "imgproc")))
 (use-foreign-library imgproc)
 
 (define-foreign-library legacy
-    (:unix "/usr/local/lib/libopencv_legacy.so.3.0.0"))
+    (:unix "/usr/local/lib/libopencv_legacy.so.3.0.0")
+(t (:default "legacy")))
 (use-foreign-library legacy)
 
 (define-foreign-library ml 
-    (:unix "/usr/local/lib/libopencv_ml.so.3.0.0"))
+    (:unix "/usr/local/lib/libopencv_ml.so.3.0.0")
+(t (:default "ml")))
 (use-foreign-library ml)
 
 (define-foreign-library nonfree
-    (:unix "/usr/local/lib/libopencv_nonfree.so.3.0.0"))
+    (:unix "/usr/local/lib/libopencv_nonfree.so.3.0.0")
+(t (:default "nonfree")))
 (use-foreign-library nonfree)
 
 (define-foreign-library objdetect
-    (:unix "/usr/local/lib/libopencv_objdetect.so.3.0.0"))
+    (:unix "/usr/local/lib/libopencv_objdetect.so.3.0.0")
+(t (:default "objdetect")))
 (use-foreign-library objdetect)
 
 (define-foreign-library photo
-    (:unix "/usr/local/lib/libopencv_photo.so.3.0.0"))
+    (:unix "/usr/local/lib/libopencv_photo.so.3.0.0")
+(t (:default "photo")))
 (use-foreign-library photo)
 
 (define-foreign-library stitching
-    (:unix "/usr/local/lib/libopencv_stitching.so.3.0.0"))
+    (:unix "/usr/local/lib/libopencv_stitching.so.3.0.0")
+(t (:default "stitching")))
 (use-foreign-library stitching)
 
 (define-foreign-library superres
-    (:unix "/usr/local/lib/libopencv_superres.so.3.0.0"))
+    (:unix "/usr/local/lib/libopencv_superres.so.3.0.0")
+(t (:default "superres")))
 (use-foreign-library superres)
 
 (define-foreign-library video
-    (:unix "/usr/local/lib/libopencv_video.so.3.0.0"))
+    (:unix "/usr/local/lib/libopencv_video.so.3.0.0")
+(t (:default "video")))
 (use-foreign-library video)
 
 (define-foreign-library videostab
-    (:unix "/usr/local/lib/libopencv_videostab.so.3.0.0"))
+    (:unix "/usr/local/lib/libopencv_videostab.so.3.0.0")
+(t (:default "videostab")))
 (use-foreign-library videostab)
 
 ;; On new 3.0.0 OpenCV build and 154 lisp-cv-master
 ;; cd ~/Documents/opencv-master/build/modules/c/src
 ;; g++ -Wall -shared -fPIC -o opencv_generated.so opencv_generated.cpp
 (define-foreign-library opencv_c
-    (:unix "/usr/local/lib/opencv_generated.so"))
+    (:unix "/usr/local/lib/opencv_generated.so")
+(t (:default "opencv_generated")))
 (use-foreign-library opencv_c)
 
 ;; On new 3.0.0 OpenCV build
@@ -107,7 +124,8 @@
 ;; cd ~/Documents/opencv-master/modules/c/src
 ;; g++ -Wall -shared -fPIC -o rect.so rect.cpp
 (define-foreign-library rect
-  (:unix "/usr/local/lib/rect.so"))
+  (:unix "/usr/local/lib/rect.so")
+  (t (:default "rect")))
 (use-foreign-library rect)
 
 ;; On new 3.0.0 OpenCV build

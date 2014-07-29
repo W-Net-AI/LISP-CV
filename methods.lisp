@@ -17,6 +17,9 @@
 (defgeneric angle (self)
   (:documentation "Used for all class bindings with an ANGLE member."))
 
+(defgeneric assign (self other)
+  (:documentation "Used for bindings of the OpenCV = operator."))
+
 (defgeneric bounding-rect (self)
   (:documentation "Used for all class bindings with an ANGLE member."))
 
@@ -126,6 +129,22 @@
   "The rotation angle. When the angle is 0, 90, 180, 270 
     etc., the rectangle becomes an up-right rectangle."
   (rotated-rect-angle self))
+
+
+(defmethod assign ((self cv-mat) (other cv-mat))
+  "Assign matrix data to another matrix."
+  (mat-assign self other))
+
+
+(defmethod assign ((self cv-mat) (other cv-scalar))
+  "Assigns a scalar value to a matrix."
+  (mat-assign-val self other))
+
+
+(defmethod assign ((self cv-size) (other cv-size))
+  "Assign data from one SIZE object to another,
+   OTHER to SELF."
+  (size-assign-to self other))
 
 
 (defmethod bounding-rect ((self cv-rotated-rect))

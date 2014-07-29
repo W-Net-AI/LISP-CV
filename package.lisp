@@ -38,11 +38,6 @@
    #:def-params
 
 
-;; DEFPARAMETER macro
-
-   #:d
-
-
 ;; Live code editing
 
    #:continuable
@@ -54,9 +49,8 @@
    #:$
    #:@
    #:alloc
-   #:d
-   #:f
    #:free
+   #:gced-foreign-alloc
    #:size-of
 
 
@@ -297,7 +291,6 @@
    #:hog-descriptor
    #:key-point
    #:k-nearest
-   #:make-mat
    #:mat
    #:mat-expr
    #:mat-struct
@@ -390,9 +383,9 @@
    #:cv-hog-descriptor
    #:cv-key-point
    #:cv-k-nearest
-   #:cv-make-mat
    #:cv-mat
    #:cv-mat-expr
+   #:cv-mat-struct
    #:cv-mouse-callback
    #:cv-normal-bayes-classifier
    #:cv-point
@@ -466,7 +459,7 @@
    #:cv-video-capture
    #:cv-video-writer
 
-;; VECTORS
+;;; VECTORS
 
    #:vector-char
    #:make-vector-char
@@ -665,6 +658,7 @@
 
    #:*get
    #:angle
+   #:assign
    #:bounding-rect
    #:center
    #:clone
@@ -745,6 +739,7 @@
    #:area
    #:area-2f
    #:arr-to-mat
+   #:assign-val
    #:at
    #:at-char-2
    #:at-char-3
@@ -825,11 +820,6 @@
    #:make-dmatch
    #:make-key-point
    #:make-mat
-   #:make-mat-data
-   #:make-mat-range
-   #:make-mat-typed
-   #:make-mat-value
-   #:make-mat-zeros
    #:make-point
    #:make-point-2d
    #:make-point-2f
@@ -869,7 +859,11 @@
    #:make-vec-4w
    #:%mat
    #:mat
+   #:mat-assign
+   #:mat-assign-val
+   #:mat-and-cffi-type
    #:mat-data
+   #:mat-element
    #:mat-expr-t
    #:mat-eye
    #:mat-ones
@@ -957,7 +951,7 @@
    #:scalar-all
    #:scale
    #:size-2f
-   #:size-assgn-to
+   #:size-assign-to
    #:size-from-point
    #:size-height
    #:size-width

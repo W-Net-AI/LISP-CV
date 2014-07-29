@@ -226,7 +226,7 @@ CV> (DEFPARAMETER A (MAT-ZEROS 7 7 +64f+))
 
 A
 
-CV> (PRINT-MAT A :DOUBLE)
+CV> (PRINT-MAT A)
 
 #((0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0)
   (0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0)
@@ -241,10 +241,9 @@ CV> (DEFPARAMETER B (MAT))
 B
 
 CV> (PRINT-MAT B)
+Matrix is empty.
 
-NIL
-
-CV> (DEFPARAMETER C (ASSGN B A))
+CV> (DEFPARAMETER C (ASSIGN B A))
 
 C
 
@@ -269,14 +268,21 @@ CV> (PRINT-MAT B)
   (0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0))
 
 ========================================================================================================================================
-#ASSGN-VAL
+#MAT-ASSIGN-VAL
 ========================================================================================================================================
 
 Assign a scalar value to a matrix.
 
+Note: The name MAT-ASSIGN-VAL is used in the documentation to refer the binding for the OpenCV 
+Mat class assignment operator(Scalar version) because it is more descriptive and it is easier 
+to search for in this file. The ASSIGN method may also be used to call this binding.
+
 C++: Mat& Mat::operator=(const Scalar& s)
 
-LISP-CV: (ASSGN-VAL (SELF MAT) (S SCALAR)) => MAT
+LISP-CV: (ASSIGN (SELF MAT) (S SCALAR)) => MAT
+
+LISP-CV: (MAT-ASSIGN-VAL (SELF MAT) (S SCALAR)) => MAT
+
 
     Parameters:	
 
@@ -288,15 +294,15 @@ LISP-CV: (ASSGN-VAL (SELF MAT) (S SCALAR)) => MAT
 Use the function SCALAR-ALL, as the S parameter value, to set each matrix element to the same value
 for example: (SCALAR-ALL -1) will assign -1 to every element of the matrix. Use the function SCALAR 
 to assign a specific color value to each element of the matrix i.e. (SCALAR 0 255 0) will set every 
-matrix element to green. This is useful when you need to add/subtract a certain color value from an 
+matrix element to fgreen. This is useful when you need to add/subtract a certain color value from an 
 image. The matrix you assign the scalar value to will be overwritten by the operation, there is no 
-need to access the return value of ASSGN-VAL to complete the operation,
+need to access the return value of ASSIGN-VAL to complete the operation,
 
 
-(defun assgn-val-example (filename)
+(defun mat-assign-val-example (filename)
 
-  (let* ((window-name-1 "IMAGE - ASSGN-VAL Example")
-         (window-name-2 "MAT - ASSGN-VAL Example")
+  (let* ((window-name-1 "IMAGE - MAT-ASSIGN-VAL Example")
+         (window-name-2 "MAT - MAT-ASSIGN-VAL Example")
          (b (alloc :int 0))
          (g (alloc :int 0))
 	 (r (alloc :int 0)))
@@ -325,7 +331,7 @@ need to access the return value of ASSGN-VAL to complete the operation,
 	     (with-scalar ((scalar (scalar (@ b :int) 
 					   (@ g :int) 
 					   (@ r :int))))
-	       (assgn-val mat scalar))
+	       (assign mat scalar))
 	     ;; Subtract MAT from IMAGE
 	     (with-mat-expr ((result (sub image mat)))
 	       ;; Show results
@@ -572,7 +578,7 @@ nsions.
 
   "Uses COLS to find the number of columns in the matrix MAT"
 
-  (with-mat ((mat (mat 3 4 +64f+ (scalar 5))))
+  (with-mat ((mat (mat 3 4 +64f+ (t:scalar 5))))
     (format t "~%The number of columns in MAT = ~a~%~%" (cols mat))))
 
 
@@ -763,9 +769,10 @@ C++: uchar* data
 
 LISP-CV: (DATA (SELF MAT) ) => :POINTER
 
+
     Parameters:	
 
-        SELF  a pointer to matrix(MAT object)
+        SELF - A MAT object.
 
 
 Once a matrix is created, it will be automatically managed by using a reference-counting mechanism
@@ -1140,14 +1147,19 @@ LISP-CV: (ELEM-SIZE (SELF MAT)) => :UNSIGNED-INT
         SELF - A matrix.
 
 
-The method returns the matrix element size in bytes. For example, if the matrix type is +16SC3+ , the 
-method returns 3*sizeof(short) or 6.
+The method returns the matrix element size in bytes. For example, if the matrix type is +16SC3+,
+the method returns 3*sizeof(short) or 6.
 
 
 Example:
 
-See STEP1 example.
+CV> (ELEM-SIZE (MAT 3 3 +16SC1+))
 
+2
+
+CV> (ELEM-SIZE (MAT 3 3 +16SC3+))
+
+6
 
 ========================================================================================================================================
 #ELEM-SIZE1
@@ -1173,8 +1185,13 @@ For example, if the matrix type is +16SC3+ , the method returns (SIZE-OF :SHORT)
 
 Example:
 
-See STEP1 example.
+CV> (ELEM-SIZE1 (MAT 3 3 +16SC1+))
 
+2
+
+CV> (ELEM-SIZE1 (MAT 3 3 +16SC3+))
+
+2
 
 ========================================================================================================================================
 #EMPTY
@@ -1657,8 +1674,8 @@ Example 1:
     ;;Create matrices
     (let* ((mat (gc:mat))
 	   (mat-typed (gc:mat 4 4 +32s+))
-	   (mat-value-1 (gc:mat 3 3 +32f+ (scalar 255)))
-	   (mat-value-2 (gc:mat 3 3 +32f+ '(255)))
+	   (mat-value-1 (gc:mat 3 3 +32f+ (t:scalar 255)))
+	   (mat-value-2 (gc:mat 3 3 +32f+ (t:scalar 255)))
 	   (mat-data-1 (gc:mat 3 3 +64f+ data))
 	   (mat-data-2 (gc:mat 3 3 +64f+ data))
 	   (mat-data-2-row-1 (gc:mat mat-data-2 (range 0 1) (range-all)))
@@ -2870,7 +2887,7 @@ ons.
 
   "Uses ROWS to find the number of rows in the matrix MAT"
 
-  (let* ((mat (mat 3 4 +64f+ (scalar 100)) ))
+  (let* ((mat (mat 3 4 +64f+ (t:scalar 100)) ))
           (format t "The number of rows in MAT = ~a" (rows mat))))
 
 
@@ -3044,7 +3061,7 @@ listed second(COLS, ROWS). When the matrix is more than 2-dimensional, the retur
    HEIGHT functions and printed. Finally, the RANGE 
    object, RANGE, is created and its value printed."
   
-  (with-mat ((mat (mat 5 5 +8u+ (scalar 100 100 100))))
+  (with-mat ((mat (mat 5 5 +8u+ (t:scalar 100 100 100))))
     (with-rect ((rect (rect 0 0 640 480)))
       (with-size ((mat-size (size mat)))
 	(with-size ((rect-size (size rect)))
@@ -3103,15 +3120,20 @@ The function WIDTH-2F Finds the width of a SIZE-2F object.
 The function HEIGHT-2F Finds the height of a SIZE-2F object.
 
 ========================================================================================================================================
-#SIZE-ASSGN-TO
+#SIZE-ASSIGN-TO
 ========================================================================================================================================
 
-Create a SIZE object from another SIZE objects data.
+Assign data from one SIZE object to another.
 
+Note: The name SIZE-ASSIGN-TO is used in the documentation to refer to the binding for the OpenCV
+Size class assignment operator because it is more descriptive and it is easier to search for in this 
+file. The ASSIGN method may also be used to call this binding.
 
 C: Size* cv_Size_assignTo(Size* self, Size* other)
 
-LISP-CV: (SIZE-ASSGN-TO (SELF SIZE) (OTHER SIZE)) => SIZE
+LISP-CV: (ASSIGN (SELF SIZE) (OTHER SIZE)) => SIZE
+
+LISP-CV: (SIZE-ASSIGN-TO (SELF SIZE) (OTHER SIZE)) => SIZE
 
 
     Parameters: 
@@ -3121,41 +3143,42 @@ LISP-CV: (SIZE-ASSGN-TO (SELF SIZE) (OTHER SIZE)) => SIZE
         OTHER - A SIZE object
 
 
+Size data is assigned OTHER to SELF.
+
+
 Example:
 
-
-CV> (DEFPARAMETER A (SIZE 640 480))
+CV> (DEFPARAMETER A (SIZE 1 2))
 
 A
 
-CV> A
+CV> (PRINT-SIZE A)
 
-#<CV-SIZE {10042FE323}>
+#(1 2)
 
-CV> (DEFPARAMETER B (SIZE NIL))
+CV> (DEFPARAMETER B (SIZE 1 2))
 
 B
 
-CV> B
+CV> (PRINT-SIZE B)
 
-#<CV-SIZE {100431E313}>
+#(3 4)
 
-CV> (DEFPARAMETER C (SIZE-ASSGN-TO B A))
+CV> (DEFPARAMETER C (ASSIGN A B))
 
 C
 
-CV> C
+CV> (PRINT-SIZE A)
 
-#<CV-SIZE {1004345E93}>
+#(3 4)
 
-CV> (WIDTH C)
+CV> (PRINT-SIZE B)
 
-640.0d0
+#(3 4)
 
-CV> (HEIGHT C)
+CV> (PRINT-SIZE C)
 
-480.0d0
-
+#(3 4)
 
 ========================================================================================================================================
 #SIZE-FROM-POINT
@@ -3184,13 +3207,9 @@ CV> (DEFPARAMETER B (SIZE-FROM-POINT A))
 
 B
 
-CV> (WIDTH B)
+CV> (PRINT-SIZE B)
 
-1.0d0
-
-CV> (HEIGHT B)
-
-2.0d0
+#(1 2)
 
 
 ========================================================================================================================================
@@ -4117,14 +4136,14 @@ Example:
   "Look at the first window and notice that whatever is black
    in the first window has a beautiful glow in the third wind-
    ow. You can change the effect by altering the color of the 
-   matrix MAT-3 in the middle window with the trackbar .The t-
-   rackbar changes the scalar value the ASSGN-VAL function us-
-   es to decide what to set each element of MAT-3 to."
+   matrix MAT-3 in the middle window with the trackbar. The t-
+   rackbar changes the scalar value the ASSIGN method uses to
+   decide what to set each element of MAT-3 to."
 
   ;;Create camera capture, CAP, set CAP to default width and height
   (with-captured-camera (cap cam :width width :height height)  
     (let* ((window-name-1 "MAT-3 after THRESHOLD - MAX-Example")
-	   (window-name-2 "MAT-5 after ASSGN-VAL - MAX-Example")
+	   (window-name-2 "MAT-5 after ASSIGN - MAX-Example")
 	   (window-name-3 "MAT-4 after MAX - MAX-Example"))
       ;;Create two matrices: MAT-1 and MAT-2(used to show how MAX works)
       (with-object ((data-1 (alloc :int '(1 2 3 4 5 6 7 8 9)))
@@ -4163,7 +4182,7 @@ Example:
 		;;Allocate :int pointer for trackbar to change
 		(with-object ((val (alloc :int 76)))
 		  ;;Create trackbar on middle window which changes 
-		  ;;the scalar value ASSGN-VAL uses in loop
+		  ;;the scalar value ASSIGN uses in loop
 		  (create-trackbar "Value of mat-3" window-name-2 val 255)
 		  (with-mat ((frame (mat)))
 		    (loop
@@ -4181,7 +4200,7 @@ Example:
 		       ;;each array element of MAT-3
 		       (threshold mat-3 mat-3 128d0 255d0 +thresh-binary-inv+)
 		       ;;Assign each element of MAT-5 a scalar value
-		       (assgn-val mat-5 (scalar (mem-aref val :int)))
+		       (assign mat-5 (scalar (mem-aref val :int)))
 		       ;;Find the maximum of each element 
 		       ;;of MAT-4 and MAT-5, set to MAT-4
 		       (max mat-4 mat-5 mat-4)
@@ -4236,9 +4255,9 @@ Example:
   "Look at the first window and notice that whatever is black
    in the first window has a beautiful glow in the third wind-
    ow. You can change the effect by altering the color of the 
-   matrix MAT-3 in the middle window with the trackbar .The t-
-   rackbar changes the scalar value the ASSGN-VAL function us-
-   es to decide what to set each element of MAT-3 to."
+   matrix MAT-3 in the middle window with the trackbar. The t-
+   rackbar changes the scalar value the ASSIGN method uses to
+   decide what to set each element of MAT-3 to."
 
   ;;Create video capture, CAP. Set CAP to default width and height
   (with-captured-camera (cap cam :width width :height height)   
@@ -4255,7 +4274,7 @@ Example:
 		 (mat-4 (mat height width +8u+))
 		 (mat-5 (mat height width +8u+)))
 	(let ((window-name-1 "MAT-3 after THRESHOLD - MIN-Example")
-	      (window-name-2 "MAT-5 after ASSGN-VAL - MIN-Example")
+	      (window-name-2 "MAT-5 after ASSIGN - MIN-Example")
 	      (window-name-3 "MAT-4 after MIN - MIN-Example")) 
 	  ;;Create windows and move to specified locations
 	  (with-named-window (window-name-1 +window-normal+)
@@ -4266,8 +4285,8 @@ Example:
 		(move-window window-name-3 1210 175)
 		;;Allocate int pointer for trackbar to change
 		(with-object ((val (alloc :int '(128))))
-		  ;;Create a trackbar on the middle window which changes 
-		  ;;the scalar value the function ASSGN-VAL will use.
+		  ;;Create trackbar on the middle window that changes 
+		  ;;the scalar value the method ASSIGN will use.
 		  (create-trackbar "Value of mat-3" window-name-2 val 255)
 		  ;;Print MAT-1
 		  (format t "~%MAT-1:~%~%")
@@ -4306,7 +4325,7 @@ Example:
 		       ;;finalizer to true. Also, '@' is a macro for 
 		       ;;CFFI::MEM-AREF
 
-		       (assgn-val mat-5 (t:scalar (@ val :int)))
+		       (assign mat-5 (t:scalar (@ val :int)))
 		       ;;Find the minimum of each element 
 		       ;;of MAT-4 AND MAT-5, set to MAT-4
 		       (min mat-4 mat-5 mat-4)
@@ -4414,7 +4433,7 @@ Example:
    nteresting effect."
 
   (with-captured-camera (cap camera-index :width width :height height)
-    (let ((scalar (mat 1 1 +64f+ (scalar 128 128 128)))
+    (let ((scalar (mat 1 1 +64f+ (t:scalar 128 128 128)))
 	  (window-name "ABSDIFF Example"))
       (if (not (is-opened cap)) 
 	  (return-from absdiff-example 
@@ -5146,7 +5165,7 @@ See also:
 
   (with-scalar ((scalar (scalar 5)))
     (with-mat ((m1 (mat-ones 3 3 +32f+))
-	       (m2 (assgn-val (mat-ones 3 3 +32f+) scalar)))
+	       (m2 (assign (mat-ones 3 3 +32f+) scalar)))
       (with-mat ((result (mat 3 3 +32f+)))
 	(divide m1 m2 result)
 	(format t "~%M1:~%~%")
@@ -5155,7 +5174,7 @@ See also:
 	(print-mat m2)
 	(format t "~%RESULT:~%~%")
 	(print-mat result)))
-    (with-mat ((m1 (assgn-val 
+    (with-mat ((m1 (assign 
 		    (mat-ones 3 3 +32f+) 
 		    scalar))
 	       (result (mat 3 3 +32f+)))
@@ -5534,8 +5553,8 @@ Example:
 
 (defun magnitude-example ()
 
-  (with-mat ((x (mat 1 1 +32f+ '(3)))
-	     (y (mat 1 1 +32f+ '(-5)))
+  (with-mat ((x (mat 1 1 +32f+ (t:scalar 3)))
+	     (y (mat 1 1 +32f+ (t:scalar -5)))
 	     (magnitude (mat 1 1 +32f+)))
 
     (magnitude x y magnitude)
@@ -5595,7 +5614,7 @@ Example:
 			 (103f0 313f0 191f0)
 			 (123f0 3433f0 1100f0)))))
 
-    (with-mat ((points (mat rows cols +32f+ '(0)))
+    (with-mat ((points (mat rows cols +32f+ (t:scalar 0)))
 	       (mean (mat))
 	       (covar (mat))
 	       (invcovar (mat))
@@ -5612,7 +5631,7 @@ Example:
       ;;For covariance:
       (calc-covar-matrix points covar mean 
 			 (+ +covar-normal+ +covar-rows+) -1)
-      (assgn-val mat (gc:scalar (- (rows points) 1)))
+      (assign mat (gc:scalar (- (rows points) 1)))
       (format t "Covar matrix: ~%~%")
       (setf covar (gc:>> (gc:div covar mat)))
       (print-mat covar)
@@ -5638,7 +5657,7 @@ Calculates an average (mean) of array elements.
 
 C++: Scalar mean(InputArray src, InputArray mask=noArray())
 
-LISP-CV: (MEAN (SRC MAT) &OPTIONAL ((MASK (:POINTER (MAT)) (MAT)))) => SCALAR
+LISP-CV: (MEAN (SRC MAT) &OPTIONAL ((MASK MAT) (MAT)))) => SCALAR
 
 
     Parameters:	
@@ -5762,7 +5781,7 @@ Finds the global minimum and maximum in an array.
 C++: void minMaxLoc(InputArray src, double* minVal, double* maxVal=0, Point* minLoc=0, Point* maxLoc=0, InputArray mask=noArray())
 
 LISP-CV: (MIN-MAX-LOC (SRC MAT) (MIN-VAL :POINTER) &OPTIONAL ((MAX-VAL :POINTER) (CFFI::NULL-POINTER)) 
-                     ((MIN-LOC POINT) (CFFI::NULL-POINTER)) ((MAX-LOC POINT) (CFFI::NULL-POINTER)) ((MASK MAT) (MAT))) :VOID
+                     ((MIN-LOC POINT) (CFFI::NULL-POINTER)) ((MAX-LOC POINT) (CFFI::NULL-POINTER)) ((MASK MAT) data))) :VOID
 
     Parameters:	
 
@@ -6414,29 +6433,20 @@ See also:
 
 (RNG), (RANDN), (THE-RNG)
 
+Examples:
 
 (defun randu-example ()
-  (let* ((data (alloc :float '(1.
-0f0 2.0f0 3.0f0 4.0f0 5.0f0 
-			       6.0f0 7.0f0 8.0f0 9.0f0)))
-	 (m (mat 3 3 +32f+ data)))
-    (format t "Print matrix M:~%~%")
-    (dotimes (i (rows m))
-      (dotimes (j (cols m))
-	(format t "~a" (at m i j :float))
-	(princ #\Space))
-      (princ #\Newline))
-    (format t "~%")
-    (format t "*Fill matrix M with random values with RANDU*~%~%")
-    (randu m (scalar -100) (scalar 100))
-    (format t "Print matrix M again:~%~%")
-    (dotimes (i 3)
-      (dotimes (j 3)
-	(format t "~a" (at m i j :float))
-	(princ #\Space))
-      (princ #\Newline))
-    (princ #\Space)
-    (free data)))
+  (with-object ((data (alloc :float '(1.0f0 2.0f0 3.0f0 4.0f0 5.0f0 
+				      6.0f0 7.0f0 8.0f0 9.0f0))))
+    (with-mat ((m (mat 3 3 +32f+ data)))
+      (format t "~%Print matrix M:~%~%")
+      (print-mat m)
+      (format t "~%")
+      (format t "*Fill matrix M with random values with RANDU*~%~%")
+      (randu m (scalar -100) (scalar 100))
+      (format t "Print matrix M again:~%~%")
+      (print-mat m)
+      (format t "~%"))))
 
 ========================================================================================================================================
 #REPEAT
@@ -6746,7 +6756,7 @@ See also:
     ;Assign each each element 
     ;of MAT the sum of its ra-
     ;ndom elements
-    (assgn-val mat (sum mat))
+    (assign mat (sum mat))
     ;Print MAT
     (dotimes (i (rows mat))
       (dotimes (j (cols mat))
@@ -8606,7 +8616,7 @@ See also:
 	       (setf kernel-size (+ (* (mod ind 5) 2) 3))
 	       (with-mat ((temp (mat-ones kernel-size kernel-size +32f+)))
 		 (with-scalar ((scalar (scalar (* kernel-size kernel-size))))
-		   (convert-to (assgn-val temp scalar) temp +32f+)
+		   (convert-to (assign temp scalar) temp +32f+)
 		   (with-mat ((kernel (mat-ones kernel-size kernel-size +32f+)))
 		     (divide kernel temp kernel)
 		    ;Apply filter
@@ -10238,7 +10248,7 @@ C++: void warpAffine(InputArray src, OutputArray dst, InputArray M, Size dsize, 
                      int borderMode=BORDER_CONSTANT, const Scalar& borderValue=Scalar())
 
 LISP-CV:  (WARP-AFFINE (SRC MAT) (DEST MAT) (M MAT) (DSIZE SIZE) &OPTIONAL ((FLAGS :INT) +INTER-LINEAR+) 
-                      ((BORDER-MODE :INT) +BORDER-CONSTANT+) ((BORDER-VALUE SCALAR) (SCALAR-0) GIVEN-BORDER-VALUE)) => :VOID
+                      ((BORDER-MODE :INT) +BORDER-CONSTANT+) ((BORDER-VALUE SCALAR) (SCALAR-0))) => :VOID
 
 
     Parameters:	
@@ -13879,17 +13889,17 @@ to search for in this file. The DETECT method may also be used to call this bind
 
 C++: void FeatureDetector::detect(InputArray image, vector<KeyPoint>& keypoints, InputArray mask=noArray() ) const
 
-LISP-CV: (DETECT (SELF BF-MATCHER) (IMAGE MAT) (KEYPOINTS KEY-POINT) &OPTIONAL ((MASK MAT) (MAT) GIVEN-MASK)) => :VOID
+LISP-CV: (DETECT (SELF BF-MATCHER) (IMAGE MAT) (KEYPOINTS KEY-POINT) &OPTIONAL ((MASK MAT) (MAT))) => :VOID
 
-LISP-CV: (DETECT (SELF BRISK) (IMAGE MAT) (KEYPOINTS KEY-POINT) &OPTIONAL ((MASK MAT) (MAT) GIVEN-MASK)) => :VOID
+LISP-CV: (DETECT (SELF BRISK) (IMAGE MAT) (KEYPOINTS KEY-POINT) &OPTIONAL ((MASK MAT) (MAT))) => :VOID
 
-LISP-CV: (DETECT (SELF SURF) (IMAGE MAT) (KEYPOINTS KEY-POINT) &OPTIONAL ((MASK MAT) (MAT) GIVEN-MASK)) => :VOID
+LISP-CV: (DETECT (SELF SURF) (IMAGE MAT) (KEYPOINTS KEY-POINT) &OPTIONAL ((MASK MAT) (MAT))) => :VOID
 
-LISP-CV: (FEATURE-DETECTOR-DETECT (SELF BF-MATCHER) (IMAGE MAT) (KEYPOINTS KEY-POINT) &OPTIONAL ((MASK MAT) (MAT) GIVEN-MASK)) => :VOID
+LISP-CV: (FEATURE-DETECTOR-DETECT (SELF BF-MATCHER) (IMAGE MAT) (KEYPOINTS KEY-POINT) &OPTIONAL ((MASK MAT) (MAT))) => :VOID
 
-LISP-CV: (FEATURE-DETECTOR-DETECT (SELF BRISK) (IMAGE MAT) (KEYPOINTS KEY-POINT) &OPTIONAL ((MASK MAT) (MAT) GIVEN-MASK)) => :VOID
+LISP-CV: (FEATURE-DETECTOR-DETECT (SELF BRISK) (IMAGE MAT) (KEYPOINTS KEY-POINT) &OPTIONAL ((MASK MAT) (MAT))) => :VOID
 
-LISP-CV: (FEATURE-DETECTOR-DETECT (SELF SURF) (IMAGE MAT) (KEYPOINTS KEY-POINT) &OPTIONAL ((MASK MAT) (MAT) GIVEN-MASK)) => :VOID
+LISP-CV: (FEATURE-DETECTOR-DETECT (SELF SURF) (IMAGE MAT) (KEYPOINTS KEY-POINT) &OPTIONAL ((MASK MAT) (MAT))) => :VOID
 
 
     Parameters:	
@@ -14943,8 +14953,7 @@ LISP-CV: (STAT-MODEL-SAVE (FILENAME :STRING) ((NAME :STRING) (CFFI::NULL-POINTER
 
 
 The method save saves the complete model state to the specified XML or YAML file with the specified 
-name or default name (which depends on a particular class). Data persistence functionality from CxCore 
-is used.
+name or default name (which depends on a particular class).
 
 
 Note:(to clarify) In OpenCV the CvStatModel class is the public class to the following OpenCV classes; 
@@ -15055,11 +15064,11 @@ C++: CvNormalBayesClassifier::CvNormalBayesClassifier()
 C++: CvNormalBayesClassifier::CvNormalBayesClassifier(const Mat& trainData, const Mat& responses, const Mat& varIdx=Mat(), 
                                                       const Mat& sampleIdx=Mat() )
 
-LISP-CV: (NORMAL-BAYES-CLASSIFIER &OPTIONAL (TRAIN-DATA MAT) (RESPONSES MAT) ((VAR-IDX MAT) (MAT) GIVEN-VAR-IDX) 
-                                           ((SAMPLE-IDX MAT) (MAT) GIVEN-SAMPLE-IDX)) => NORMAL-BAYES-CLASSIFIER
+LISP-CV: (NORMAL-BAYES-CLASSIFIER &OPTIONAL (TRAIN-DATA MAT) (RESPONSES MAT) ((VAR-IDX MAT) (MAT)) 
+                                           ((SAMPLE-IDX MAT) (MAT))) => NORMAL-BAYES-CLASSIFIER
 
-LISP-CV: (MAKE-NORMAL-BAYES-CLASSIFIER &OPTIONAL (TRAIN-DATA MAT) (RESPONSES MAT) ((VAR-IDX MAT) (MAT) GIVEN-VAR-IDX) 
-                                                ((SAMPLE-IDX MAT) (MAT) GIVEN-SAMPLE-IDX)) => NORMAL-BAYES-CLASSIFIER
+LISP-CV: (MAKE-NORMAL-BAYES-CLASSIFIER &OPTIONAL (TRAIN-DATA MAT) (RESPONSES MAT) ((VAR-IDX MAT) (MAT)) 
+                                                ((SAMPLE-IDX MAT) (MAT))) => NORMAL-BAYES-CLASSIFIER
 
 
 The constructors follow conventions of (STAT-MODEL). See (STAT-MODEL-TRAIN) for parameters descriptions.
@@ -15243,7 +15252,7 @@ Example:
 (defun plot-binary(data classes name &optional x y) 
   (with-mat ((plot (mat *size* *size* +8uc3+)))
     (with-scalar ((scalar (scalar 255 255 255)))
-      (assgn-val plot scalar))
+      (assign plot scalar))
     (dotimes (i (rows data))
       (setf x (* (at data i 0 :float) *size*))
       (setf y (* (at data i 1 :float) *size*))
@@ -15589,7 +15598,7 @@ Example:
 (defun plot-binary(data classes name &optional x y) 
   (with-mat ((plot (mat *size* *size* +8uc3+)))
     (with-scalar ((scalar (scalar 255 255 255)))
-      (assgn-val plot scalar))
+      (assign plot scalar))
     (dotimes (i (rows data))
       (setf x (* (at data i 0 :float) *size*))
       (setf y (* (at data i 1 :float) *size*))
@@ -16293,7 +16302,7 @@ Example:
 (defun plot-binary(data classes name &optional x y) 
   (with-mat ((plot (mat *size* *size* +8uc3+)))
     (with-scalar ((scalar (scalar 255 255 255)))
-      (assgn-val plot scalar))
+      (assign plot scalar))
     (dotimes (i (rows data))
       (setf x (* (at data i 0 :float) *size*))
       (setf y (* (at data i 1 :float) *size*))
@@ -16501,7 +16510,7 @@ Returns the leaf node of a decision tree corresponding to the input vector.
 
 C++: CvDTreeNode* CvDTree::predict(const Mat& sample, const Mat& missingDataMask=Mat(), bool preprocessedInput=false ) const
 
-LISP-CV: (D-TREE-PREDICT (SELF D-TREE) (SAMPLE MAT) &OPTIONAL ((MISSING-DATA-MASK MAT) (MAT) GIVEN-MISSING-DATA-MASK) 
+LISP-CV: (D-TREE-PREDICT (SELF D-TREE) (SAMPLE MAT) &OPTIONAL ((MISSING-DATA-MASK MAT) (MAT)) 
                          ((PREPROCESSED-INPUT :BOOLEAN) NIL)) => (:POINTER (:STRUCT D-TREE-NODE))
 
 
@@ -16541,10 +16550,10 @@ Trains a decision tree.
 
 C++: bool CvDTree::train(const Mat& trainData, int tflag, const Mat& responses, const Mat& varIdx=Mat(), const Mat& sampleIdx=Mat(), const Mat& varType=Mat(), const Mat& missingDataMask=Mat(), CvDTreeParams params=CvDTreeParams() )
 
-LISP-CV:  (d-tree-train (self d-tree) (train-data mat) (tflag :int) (responses mat) &optional 
-                       ((var-idx mat) (mat) given-var-idx) ((sample-idx mat) (mat) given-sample-idx) 
-                       ((var-type mat) (mat) given-var-type) ((missing-data-mask mat) (mat) given-missing-data-mask) 
-                       ((params d-tree-params) (d-tree-params) given-params)) => :boolean
+LISP-CV:  (D-TREE-TRAIN (SELF D-TREE) (TRAIN-DATA MAT) (TFLAG :INT) (RESPONSES MAT) &OPTIONAL 
+                       ((VAR-IDX MAT) (MAT)) ((SAMPLE-IDX MAT) (MAT)) 
+                       ((VAR-TYPE MAT) (MAT)) ((MISSING-DATA-MASK MAT) (MAT)) 
+                       ((PARAMS D-TREE-PARAMS) (D-TREE-PARAMS))) => :BOOLEAN
 
     This function follows the generic (STAT-MODEL-TRAIN) conventions. It is the most complete form. 
     Both data layouts (EQ TFLAG +ROW-SAMPLE+) and (EQ TFLAG +COL-SAMPLE+) are supported, as well as 
@@ -16694,7 +16703,7 @@ Example:
 (defun plot-binary(data classes name &optional x y) 
   (with-mat ((plot (mat *size* *size* +8uc3+)))
     (with-scalar ((scalar (scalar 255 255 255)))
-      (assgn-val plot scalar))
+      (assign plot scalar))
     (dotimes (i (rows data))
       (setf x (* (at data i 0 :float) *size*))
       (setf y (* (at data i 1 :float) *size*))
@@ -16854,7 +16863,7 @@ Trains/updates MLP.
 C++: int CvANN_MLP::train(const Mat& inputs, const Mat& outputs, const Mat& sampleWeights, const Mat& sampleIdx=Mat(), CvANN_MLP_TrainParams params=CvANN_MLP_TrainParams(), int flags=0 )
 
 LISP-CV: (ANN-MLP-TRAIN (SELF ANN-MLP) (INPUTS MAT) (OUTPUTS MAT) (SAMPLE-WEIGHTS MAT) &OPTIONAL 
-                        ((SAMPLE-IDX MAT) (MAT) GIVEN-SAMPLE-IDX) ((PARAMS ANN-MLP-TRAIN-PARAMS) (ANN-MLP-TRAIN-PARAMS) GIVEN-PARAMS) 
+                        ((SAMPLE-IDX MAT) (MAT)) ((PARAMS ANN-MLP-TRAIN-PARAMS) (ANN-MLP-TRAIN-PARAMS)) 
                         ((FLAGS :INT) 0)) => :INT
 
     Parameters:	
@@ -17096,16 +17105,13 @@ Example:
 		   (return))
 	       (if (eq c 114)
 		   (with-scalar ((zeros (scalar-all 0)))
-		     (assgn-val in-paint-mask zeros)
+		     (assign in-paint-mask zeros)
 		     (copy-to img0 img)
 		     (imshow window-name-1 img)))
 	       (if (or (eq c 105) (eq c 32))
 		   (with-mat ((in-painted (mat)))
 		     (in-paint img in-paint-mask in-painted 3d0 +inpaint-telea+)  
-		     (imshow window-name-2 in-painted))))
-
-	     (when nil
-	       (return))))))))
+		     (imshow window-name-2 in-painted))))))))))
 
 ========================================================================================================================================
 #PHOTO - #DECOLORIZATION
@@ -17930,7 +17936,7 @@ LISP-CV: (MAT-TYPE (SELF MAT))
 
     Parameters:	
 
-        SELF - A matrix(MAT)
+        SELF - A matrix(MAT object)
 
 The method returns a matrix element type. This is an identifier compatible with OpenCV's CvMat type
 system, like CV_16SC3(+16SC3+ in LISP-CV) or 16-bit signed 3-channel array, and so on.
@@ -18871,7 +18877,7 @@ Example:
 	 (with-mat ((image (imread filename 1)))
 	   (incf x 1)
 	   (with-scalar ((value (scalar 0 0 0)))
-	     (if (= x 2) (progn (assgn-val image value) (decf x 2))))
+	     (if (= x 2) (progn (assign image value) (decf x 2))))
 	   (update-swank)
 	   (continuable (imshow window-name image)))
 	 (with-mat ((image (imread filename 1)))

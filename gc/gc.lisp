@@ -321,6 +321,116 @@
 	 (data :pointer))
 
 
+(let ((previous nil))
+  (defun %mat-data-uchar (rows cols type data)
+
+    (unless (equal data (car previous))
+      (setf previous (cons data (cv:gced-foreign-alloc :uchar
+						    :initial-contents data))))
+    (mat-data rows cols type (cdr previous))))
+
+
+(let ((previous nil))
+  (defun %mat-data-char (rows cols type data)
+
+    (unless (equal data (car previous))
+      (setf previous (cons data (cv:gced-foreign-alloc :char
+						    :initial-contents data))))
+    (mat-data rows cols type (cdr previous))))
+
+
+(let ((previous nil))
+  (defun %mat-data-ushort (rows cols type data)
+
+    (unless (equal data (car previous))
+      (setf previous (cons data (cv:gced-foreign-alloc :ushort
+						    :initial-contents data))))
+    (mat-data rows cols type (cdr previous))))
+
+
+(let ((previous nil))
+  (defun %mat-data-short (rows cols type data)
+
+    (unless (equal data (car previous))
+      (setf previous (cons data (cv:gced-foreign-alloc :short
+						    :initial-contents data))))
+    (mat-data rows cols type (cdr previous))))
+
+
+(let ((previous nil))
+  (defun %mat-data-int (rows cols type data)
+
+    (unless (equal data (car previous))
+      (setf previous (cons data (cv:gced-foreign-alloc :int
+						    :initial-contents data))))
+    (mat-data rows cols type (cdr previous))))
+
+
+(let ((previous nil))
+  (defun %mat-data-float (rows cols type data)
+
+    (unless (equal data (car previous))
+      (setf previous (cons data (cv:gced-foreign-alloc :float
+						    :initial-contents data))))
+    (mat-data rows cols type (cdr previous))))
+
+
+(let ((previous nil))
+  (defun %mat-data-double (rows cols type data)
+
+    (unless (equal data (car previous))
+      (setf previous (cons data (cv:gced-foreign-alloc :double
+						    :initial-contents data))))
+    (mat-data rows cols type (cdr previous))))
+
+
+(defun %mat-data (rows cols type data-list)
+  (let ((cffi-type (case type 
+		     (#.cv:+8uc1+ ':uchar)
+		     (#.cv:+8sc1+ ':char)
+		     (#.cv:+16uc1+ ':ushort)
+		     (#.cv:+16sc1+ ':short)
+		     (#.cv:+32sc1+ ':int)
+		     (#.cv:+32fc1+ ':float)
+		     (#.cv:+64fc1+ ':double)
+		     (#.cv:+8uc2+ ':uchar)
+		     (#.cv:+8sc2+ ':char)
+		     (#.cv:+16uc2+ ':ushort)
+		     (#.cv:+16sc2+ ':short)
+		     (#.cv:+32sc2+ ':int)
+		     (#.cv:+32fc2+ ':float)
+		     (#.cv:+64fc2+ ':double)
+		     (#.cv:+8uc3+ ':uchar)
+		     (#.cv:+8sc3+ ':char)
+		     (#.cv:+16uc3+ ':ushort)
+		     (#.cv:+16sc3+ ':short)
+		     (#.cv:+32sc3+ ':int)
+		     (#.cv:+32fc3+ ':float)
+		     (#.cv:+64fc3+ ':double)
+		     (#.cv:+8uc4+ ':uchar)
+		     (#.cv:+8sc4+ ':char)
+		     (#.cv:+16uc4+ ':ushort)
+		     (#.cv:+16sc4+ ':short)
+		     (#.cv:+32sc4+ ':int)
+		     (#.cv:+32fc4+ ':float)
+		     (#.cv:+64fc4+ ':double))))
+    (case cffi-type 
+      (:uchar
+       (%mat-data-uchar rows cols type data-list))
+      (:char
+       (%mat-data-char rows cols type data-list))
+      (:short
+       (%mat-data-short rows cols type data-list))
+      (:ushort
+       (%mat-data-ushort rows cols type data-list))
+      (:int
+       (%mat-data-int rows cols type data-list))
+      (:float
+       (%mat-data-float rows cols type data-list))
+      (:double
+       (%mat-data-double rows cols type data-list)))))
+
+
 ;; Mat::t
 ;; MatExpr* cv_Mat_transpose_mat(Mat* self) 
 (defcfun ("cv_Mat_transpose_mat" mat-expr-t) (cv:mat-expr :garbage-collect t)
@@ -389,16 +499,16 @@
 
 ;; Mat::Mat(int rows, int cols, int type, const Scalar& s)
 ;; Mat* cv_create_Mat_with_value(int rows, int cols, int type, Scalar* s)
-(defcfun ("cv_create_Mat_with_value" %mat-value) cv:mat
+(defcfun ("cv_create_Mat_with_value" mat-value) cv:mat
 	 (rows :int)
 	 (cols :int)
 	 (type :int)
 	 (s cv:scalar))
 
 
-(defun mat-value (rows cols type values)
-  (let* ((scalar (apply #'cv:scalar values))					 
-	(ret (%mat-value rows cols type scalar)))
+(defun mat-element (rows cols type value)
+  (let* ((scalar (apply #'cv:scalar (list value)))					 
+	(ret (mat-value rows cols type scalar)))
     (cv:del-scalar scalar)
 ret))
 
@@ -433,15 +543,19 @@ ret))
 	
 	((typep arg4 'cv:cv-scalar)
 
-	 (%mat-value arg1 arg2 arg3 arg4))
+	 (mat-value arg1 arg2 arg3 arg4))
 	
 	((listp arg4)
 
-	 (mat-value arg1 arg2 arg3 arg4))
+	 (%mat-data arg1 arg2 arg3 arg4))
 	
 	((pointerp arg4)
 
 	 (mat-data arg1 arg2 arg3 arg4))
+
+	((integerp arg4)
+
+	 (mat-element arg1 arg2 arg3 arg4))
 	
 	(t nil)))
 
@@ -473,15 +587,19 @@ ret))
 	
 	((typep arg4 'cv:cv-scalar)
 
-	 (%mat-value arg1 arg2 arg3 arg4))
+	 (mat-value arg1 arg2 arg3 arg4))
 	
 	((listp arg4)
 
-	 (mat-value arg1 arg2 arg3 arg4))
+	 (%mat-data arg1 arg2 arg3 arg4))
 	
 	((pointerp arg4)
 
 	 (mat-data arg1 arg2 arg3 arg4))
+
+	((integerp arg4)
+
+	 (mat-element arg1 arg2 arg3 arg4))
 	
 	(t nil)))
 
@@ -2619,7 +2737,7 @@ ret))
 (let ((previous nil))
   (defun arr-to-vec-char (a)
     (unless (equal a (car previous))
-      (setf previous (cons a (foreign-alloc :char :initial-contents 
+      (setf previous (cons a (cv:gced-foreign-alloc :char :initial-contents 
 					    (coerce a 'list)))))
     (c-arr-to-vec-char (cdr previous) (length a))))
 
@@ -2665,7 +2783,7 @@ ret))
 (let ((previous nil))
   (defun arr-to-vec-dmatch (a)
     (unless (equal a (car previous))
-      (setf previous (cons a (foreign-alloc :pointer :initial-contents
+      (setf previous (cons a (cv:gced-foreign-alloc :pointer :initial-contents
 					    (mapcar #!(cv:c-pointer %1) (coerce a 'list))))))
     (c-arr-to-vec-dmatch (cdr previous) (length a))))
 
@@ -2714,7 +2832,7 @@ ret))
 (let ((previous nil))
   (defun arr-to-vec-double (a)
     (unless (equal a (car previous))
-      (setf previous (cons a (foreign-alloc :double :initial-contents 
+      (setf previous (cons a (cv:gced-foreign-alloc :double :initial-contents 
 					    (coerce a 'list)))))
     (c-arr-to-vec-double (cdr previous) (length a))))
 
@@ -2759,7 +2877,7 @@ ret))
 (let ((previous nil))
   (defun arr-to-vec-float (a)
     (unless (equal a (car previous))
-      (setf previous (cons a (foreign-alloc :float :initial-contents 
+      (setf previous (cons a (cv:gced-foreign-alloc :float :initial-contents 
 					    (coerce a 'list)))))
     (c-arr-to-vec-float (cdr previous) (length a))))
 
@@ -2804,7 +2922,7 @@ ret))
 (let ((previous nil))
   (defun arr-to-vec-int (a)
     (unless (equal a (car previous))
-      (setf previous (cons a (foreign-alloc :int :initial-contents 
+      (setf previous (cons a (cv:gced-foreign-alloc :int :initial-contents 
 					    (coerce a 'list)))))
     (c-arr-to-vec-int (cdr previous) (length a))))
 
@@ -2849,7 +2967,7 @@ ret))
 (let ((previous nil))
   (defun arr-to-vec-key-point (a)
     (unless (equal a (car previous))
-      (setf previous (cons a (foreign-alloc :pointer :initial-contents
+      (setf previous (cons a (cv:gced-foreign-alloc :pointer :initial-contents
 					    (mapcar #!(cv:c-pointer %1) (coerce a 'list))))))
     (c-arr-to-vec-key-point (cdr previous) (length a))))
 
@@ -2899,7 +3017,7 @@ ret))
 (let ((previous nil))
   (defun arr-to-vec-mat (a)
     (unless (equal a (car previous))
-      (setf previous (cons a (foreign-alloc :pointer :initial-contents
+      (setf previous (cons a (cv:gced-foreign-alloc :pointer :initial-contents
 					    (mapcar #!(cv:c-pointer %1) (coerce a 'list))))))
     (c-arr-to-vec-mat (cdr previous) (length a))))
 
@@ -2945,7 +3063,7 @@ ret))
 (let ((previous nil))
   (defun arr-to-vec-point (a)
     (unless (equal a (car previous))
-      (setf previous (cons a (foreign-alloc :pointer :initial-contents
+      (setf previous (cons a (cv:gced-foreign-alloc :pointer :initial-contents
 					    (mapcar #!(cv:c-pointer %1) (coerce a 'list))))))
     (c-arr-to-vec-point (cdr previous) (length a))))
 
@@ -2991,7 +3109,7 @@ ret))
 (let ((previous nil))
   (defun arr-to-vec-point-2f (a)
     (unless (equal a (car previous))
-      (setf previous (cons a (foreign-alloc :pointer :initial-contents
+      (setf previous (cons a (cv:gced-foreign-alloc :pointer :initial-contents
 					    (mapcar #!(cv:c-pointer %1) (coerce a 'list))))))
     (c-arr-to-vec-point-2f (cdr previous) (length a))))
 
@@ -3037,7 +3155,7 @@ ret))
 (let ((previous nil))
   (defun arr-to-vec-rect (a)
     (unless (equal a (car previous))
-      (setf previous (cons a (foreign-alloc :pointer :initial-contents
+      (setf previous (cons a (cv:gced-foreign-alloc :pointer :initial-contents
 					    (mapcar #!(cv:c-pointer %1) (coerce a 'list))))))
     (c-arr-to-vec-rect (cdr previous) (length a))))
 
@@ -3083,7 +3201,7 @@ ret))
 (let ((previous nil))
   (defun arr-to-vec-uchar (a)
     (unless (equal a (car previous))
-      (setf previous (cons a (foreign-alloc :uchar :initial-contents 
+      (setf previous (cons a (cv:gced-foreign-alloc :uchar :initial-contents 
 					    (coerce a 'list)))))
     (c-arr-to-vec-uchar (cdr previous) (length a))))
 
@@ -3128,7 +3246,7 @@ ret))
 (let ((previous nil))
   (defun arr-to-vec-vec-2d (a)
     (unless (equal a (car previous))
-      (setf previous (cons a (foreign-alloc :pointer :initial-contents
+      (setf previous (cons a (cv:gced-foreign-alloc :pointer :initial-contents
 					    (mapcar #!(cv:c-pointer %1) (coerce a 'list))))))
     (c-arr-to-vec-vec-2d (cdr previous) (length a))))
 
@@ -3174,7 +3292,7 @@ ret))
 (let ((previous nil))
   (defun arr-to-vec-vec-3d (a)
     (unless (equal a (car previous))
-      (setf previous (cons a (foreign-alloc :pointer :initial-contents
+      (setf previous (cons a (cv:gced-foreign-alloc :pointer :initial-contents
 					    (mapcar #!(cv:c-pointer %1) (coerce a 'list))))))
     (c-arr-to-vec-vec-3d (cdr previous) (length a))))
 
@@ -3220,7 +3338,7 @@ ret))
 (let ((previous nil))
   (defun arr-to-vec-vec-4d (a)
     (unless (equal a (car previous))
-      (setf previous (cons a (foreign-alloc :pointer :initial-contents
+      (setf previous (cons a (cv:gced-foreign-alloc :pointer :initial-contents
 					    (mapcar #!(cv:c-pointer %1) (coerce a 'list))))))
     (c-arr-to-vec-vec-4d (cdr previous) (length a))))
 
@@ -3266,7 +3384,7 @@ ret))
 (let ((previous nil))
   (defun arr-to-vec-vec-6d (a)
     (unless (equal a (car previous))
-      (setf previous (cons a (foreign-alloc :pointer :initial-contents
+      (setf previous (cons a (cv:gced-foreign-alloc :pointer :initial-contents
 					    (mapcar #!(cv:c-pointer %1) (coerce a 'list))))))
     (c-arr-to-vec-vec-6d (cdr previous) (length a))))
 
@@ -3312,7 +3430,7 @@ ret))
 (let ((previous nil))
   (defun arr-to-vec-vec-2f (a)
     (unless (equal a (car previous))
-      (setf previous (cons a (foreign-alloc :pointer :initial-contents
+      (setf previous (cons a (cv:gced-foreign-alloc :pointer :initial-contents
 					    (mapcar #!(cv:c-pointer %1) (coerce a 'list))))))
     (c-arr-to-vec-vec-2f (cdr previous) (length a))))
 
@@ -3358,7 +3476,7 @@ ret))
 (let ((previous nil))
   (defun arr-to-vec-vec-3f (a)
     (unless (equal a (car previous))
-      (setf previous (cons a (foreign-alloc :pointer :initial-contents
+      (setf previous (cons a (cv:gced-foreign-alloc :pointer :initial-contents
 					    (mapcar #!(cv:c-pointer %1) (coerce a 'list))))))
     (c-arr-to-vec-vec-3f (cdr previous) (length a))))
 
@@ -3404,7 +3522,7 @@ ret))
 (let ((previous nil))
   (defun arr-to-vec-vec-4f (a)
     (unless (equal a (car previous))
-      (setf previous (cons a (foreign-alloc :pointer :initial-contents
+      (setf previous (cons a (cv:gced-foreign-alloc :pointer :initial-contents
 					    (mapcar #!(cv:c-pointer %1) (coerce a 'list))))))
     (c-arr-to-vec-vec-4f (cdr previous) (length a))))
 
@@ -3450,7 +3568,7 @@ ret))
 (let ((previous nil))
   (defun arr-to-vec-vec-6f (a)
     (unless (equal a (car previous))
-      (setf previous (cons a (foreign-alloc :pointer :initial-contents
+      (setf previous (cons a (cv:gced-foreign-alloc :pointer :initial-contents
 					    (mapcar #!(cv:c-pointer %1) (coerce a 'list))))))
     (c-arr-to-vec-vec-6f (cdr previous) (length a))))
 
@@ -3496,7 +3614,7 @@ ret))
 (let ((previous nil))
   (defun arr-to-vec-vec-2i (a)
     (unless (equal a (car previous))
-      (setf previous (cons a (foreign-alloc :pointer :initial-contents
+      (setf previous (cons a (cv:gced-foreign-alloc :pointer :initial-contents
 					    (mapcar #!(cv:c-pointer %1) (coerce a 'list))))))
     (c-arr-to-vec-vec-2i (cdr previous) (length a))))
 
@@ -3542,7 +3660,7 @@ ret))
 (let ((previous nil))
   (defun arr-to-vec-vec-3i (a)
     (unless (equal a (car previous))
-      (setf previous (cons a (foreign-alloc :pointer :initial-contents
+      (setf previous (cons a (cv:gced-foreign-alloc :pointer :initial-contents
 					    (mapcar #!(cv:c-pointer %1) (coerce a 'list))))))
     (c-arr-to-vec-vec-3i (cdr previous) (length a))))
 
@@ -3588,7 +3706,7 @@ ret))
 (let ((previous nil))
   (defun arr-to-vec-vec-4i (a)
     (unless (equal a (car previous))
-      (setf previous (cons a (foreign-alloc :pointer :initial-contents
+      (setf previous (cons a (cv:gced-foreign-alloc :pointer :initial-contents
 					    (mapcar #!(cv:c-pointer %1) (coerce a 'list))))))
     (c-arr-to-vec-vec-4i (cdr previous) (length a))))
 
@@ -3634,7 +3752,7 @@ ret))
 (let ((previous nil))
   (defun arr-to-vec-vec-6i (a)
     (unless (equal a (car previous))
-      (setf previous (cons a (foreign-alloc :pointer :initial-contents
+      (setf previous (cons a (cv:gced-foreign-alloc :pointer :initial-contents
 					    (mapcar #!(cv:c-pointer %1) (coerce a 'list))))))
     (c-arr-to-vec-vec-6i (cdr previous) (length a))))
 
@@ -3680,7 +3798,7 @@ ret))
 (let ((previous nil))
   (defun arr-to-vec-vec-8i (a)
     (unless (equal a (car previous))
-      (setf previous (cons a (foreign-alloc :pointer :initial-contents
+      (setf previous (cons a (cv:gced-foreign-alloc :pointer :initial-contents
 					    (mapcar #!(cv:c-pointer %1) (coerce a 'list))))))
     (c-arr-to-vec-vec-8i (cdr previous) (length a))))
 

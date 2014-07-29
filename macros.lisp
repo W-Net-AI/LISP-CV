@@ -26,7 +26,7 @@
      ,@body))
 
 
-;;SIZEOF macro
+;;sizeof macro
 
 (defmacro size-of (val)
   `(foreign-type-size ,val))
@@ -44,12 +44,21 @@
     `(time (dotimes (_ ,count-form) ,@arguments))))
 
 
+;; Foreign-alloc - Finalized Version
+
+(defun gced-foreign-alloc (type &rest rest)
+  (let* ((ptr (apply #'foreign-alloc type rest))
+         (addr (pointer-address ptr)))
+    (tg:finalize ptr
+                 (lambda ()
+                   (foreign-free (make-pointer addr))))))
+
 ;; FOREIGN-ALLOC macro
 
 (defmacro alloc (&optional type value)
        (cond ((listp value)
-	      `(foreign-alloc ,type ,:initial-contents ,value))
-	     (t `(foreign-alloc ,type ,:initial-element ,value))))
+	      `(gced-foreign-alloc ,type ,:initial-contents ,value))
+	     (t `(gced-foreign-alloc ,type ,:initial-element ,value))))
 
 
 ;; FOREIGN-FREE macro

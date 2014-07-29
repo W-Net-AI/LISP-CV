@@ -89,6 +89,11 @@ extract them to location reachable by ASDF. Discussing ways to make ASDF look fo
 definitions in custom directories is out of scope of this instruction, please refer to ASDF
 manual.
 
+Note: You may want to change the name of the extracted LISP-CV source folder from "LISP-CV-master"
+to "lisp-cv-master", to prevent any possible unforeseen issues. I don't think there would be, but, 
+better to be safe. The caps were just used to make the LISP-CV repo look nicer and do not appear 
+anywhere in the source code.
+
 If you built OpenCV with the extra modules correctly per this link:
 
 https://github.com/arjuncomar/opencv_contrib.
