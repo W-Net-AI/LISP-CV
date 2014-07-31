@@ -1,7 +1,7 @@
 ;;;; -*- mode: lisp; indent-tabs: nil -*-
 ;;;; core.lisp
 ;;;; OpenCV bindings
-;;;; The Core Functionality.
+;;;; The Core Functionality
 
 
 (in-package :lisp-cv)
@@ -22,6 +22,10 @@
 (defparameter *personalize-print-2d-mat* "#2M")
 
 (defparameter *personalize-print-3d-mat* "#3M")
+
+(defparameter *personalize-print-dmatch* "#")
+
+(defparameter *personalize-print-key-point* "#")
    
 (defparameter *personalize-print-point* "#")
 
@@ -35,9 +39,15 @@
 
 (defparameter *personalize-print-point-3i* "#")
 
+(defparameter *personalize-print-rect* "#")
+
+(defparameter *personalize-print-rotated-rect* "#")
+
 (defparameter *personalize-print-scalar* "#")
 
 (defparameter *personalize-print-size* "#")
+
+(defparameter *personalize-print-term-criteria* "#")
 
 (defparameter *personalize-print-vec-2b* "#")
 
@@ -137,6 +147,13 @@
   (len :unsigned-int))
 
 
+(defun c-string (string)
+  "If you need a speed boost and decide to use low-level functions, 
+   use this to create a C string for  their *STRING parameters."
+  (c-string-to-string string (cl:length string)))
+
+
+
 ;; Version for internal use.
 
 ;; string* std_cstringToString(char* s, size_t len) 
@@ -225,13 +242,6 @@
 (defcfun ("cv_Size_area" area) :int
   "Gets the area of a SIZE construct"
   (self size))
-
-
-;; _Tp area() const
-;; float cv_Size2f_area(Size2f* self) 
-(defcfun ("cv_Size2f_area" area-2f) :float
-  "Gets the area of a SIZE-2F construct"
-  (self size-2f))
 
 
 (defun arr-to-mat (arr)
@@ -1120,8 +1130,14 @@
   (self mat))
 
 
-(defun class-id (self)
-  (mem-aref (c-pointer self) :int 6))
+;; int KeyPoint::class_id
+;; int cv_KeyPoint_getClass_id(KeyPoint* self)
+(defcfun ("cv_KeyPoint_getClass_id" class-id) :int
+  (self key-point))
+
+
+(defun (setf class-id) (val self)
+  (key-point-set-class-id self val))
 
 
 ;; Mat Mat::colRange(int startcol, int endcol) const
@@ -1210,8 +1226,14 @@
        (%diag self d))
 
 
-(defun distance (self)
- (mem-aref (c-pointer self) :float 3))
+;; float DMatch::distance
+;; float cv_DMatch_getDistance(DMatch* self)
+(defcfun ("cv_DMatch_getDistance" distance) :float
+  (self dmatch))
+
+
+(defun (setf distance) (val self)
+  (dmatch-set-distance self val))
 
 
 ;; MatExpr / operator
@@ -1263,6 +1285,70 @@
 	       ((fourth args)
 		(dmatch-4 (first args) (second args) (third args) (fourth args)))
 		(t nil)))
+
+
+;; float DMatch::distance
+;; float cv_DMatch_getDistance(DMatch* self)
+(defcfun ("cv_DMatch_getDistance" dmatch-distance) :float
+  (self dmatch))
+
+
+;; float cv_DMatch_setDistance(DMatch* self, float val)
+(defcfun ("cv_DMatch_setDistance" dmatch-set-distance) :float
+  (self dmatch)
+  (val :float))
+
+
+(defun (setf dmatch-distance) (val self)
+  (dmatch-set-distance self val))
+
+
+;; int DMatch::ImgIdx
+;; int cv_DMatch_getImgIdx(DMatch* self)
+(defcfun ("cv_DMatch_getImgIdx" dmatch-img-idx) :int
+  (self dmatch))
+
+
+;; int cv_DMatch_setImgIdx(DMatch* self, int val)
+(defcfun ("cv_DMatch_setImgIdx" dmatch-set-img-idx) :int
+  (self dmatch)
+  (val :int))
+
+
+(defun (setf dmatch-img-idx) (val self)
+  (dmatch-set-img-idx self val))
+
+
+;; int DMatch::queryIdx
+;; int cv_DMatch_getQueryIdx(DMatch* self)
+(defcfun ("cv_DMatch_getQueryIdx" dmatch-query-idx) :int
+  (self dmatch))
+
+
+;; int cv_DMatch_setQueryIdx(DMatch* self, int val)
+(defcfun ("cv_DMatch_setQueryIdx" dmatch-set-query-idx) :int
+  (self dmatch)
+  (val :int))
+
+
+(defun (setf dmatch-query-idx) (val self)
+  (dmatch-set-query-idx self val))
+
+
+;; int DMatch::TrainIdx
+;; int cv_DMatch_getTrainIdx(DMatch* self)
+(defcfun ("cv_DMatch_getTrainIdx" dmatch-train-idx) :int
+  (self dmatch))
+
+
+;; int cv_DMatch_setTrainIdx(DMatch* self, int val)
+(defcfun ("cv_DMatch_setTrainIdx" dmatch-set-train-idx) :int
+  (self dmatch)
+  (val :int))
+
+
+(defun (setf dmatch-train-idx) (val self)
+  (dmatch-set-train-idx self val))
 
 
 ;; _Tp dot(const Point_& pt) const
@@ -1331,8 +1417,14 @@
   (mat-expr mat-expr))
 
 
-(defun img-idx (self)
-	 (mem-aref (c-pointer self) :int 2))
+;; int DMatch::ImgIdx
+;; int cv_DMatch_getImgIdx(DMatch* self)
+(defcfun ("cv_DMatch_getImgIdx" img-idx) :int
+  (self dmatch))
+
+
+(defun (setf img-idx) (val self)
+  (dmatch-set-img-idx self val))
 
 
 ;; KeyPoint::KeyPoint()
@@ -1368,6 +1460,101 @@
 	      (x
 	       (key-point-7 x y size angle response octave class-id))
 	       (t nil)))
+
+
+;; float KeyPoint::angle
+;; float cv_KeyPoint_getAngle(KeyPoint* self)
+(defcfun ("cv_KeyPoint_getAngle" key-point-angle) :float
+  (self key-point))
+
+
+;; float cv_KeyPoint_setAngle(KeyPoint* self, float val)
+(defcfun ("cv_KeyPoint_setAngle" key-point-set-angle) :float
+  (self key-point)
+  (val :float))
+
+
+(defun (setf key-point-angle) (val self)
+  (key-point-set-angle self val))
+
+
+;; int KeyPoint::class_id
+;; int cv_KeyPoint_getClass_id(KeyPoint* self)
+(defcfun ("cv_KeyPoint_getClass_id" key-point-class-id) :int
+  (self key-point))
+
+
+;; int cv_KeyPoint_setClass_id(KeyPoint* self, int val)
+(defcfun ("cv_KeyPoint_setClass_id" key-point-set-class-id) :int
+  (self key-point)
+  (val :int))
+
+
+(defun (setf key-point-class-id) (val self)
+  (key-point-set-class-id self val))
+
+
+;; Point2f KeyPoint::pt
+;; Point2f* cv_KeyPoint_getPT(KeyPoint* self)
+(defcfun ("cv_KeyPoint_getPt" key-point-pt) point-2f
+  (self key-point))
+
+
+;; Point2f* cv_KeyPoint_setPt(KeyPoint* self, Point2f* val)
+(defcfun ("cv_KeyPoint_setPt" key-point-set-pt) :void
+  (self key-point)
+  (val point-2f))
+
+(defun (setf key-point-pt) (val self)
+  (key-point-set-pt self val))
+
+
+;; int KeyPoint::octave
+;; int cv_KeyPoint_getOctave(KeyPoint* self)
+(defcfun ("cv_KeyPoint_getOctave" key-point-octave) :int
+  (self key-point))
+
+
+;; int cv_KeyPoint_setOctave(KeyPoint* self, int val)
+(defcfun ("cv_KeyPoint_setOctave" key-point-set-octave) :int
+  (self key-point)
+  (val :int))
+
+
+(defun (setf key-point-octave) (val self)
+  (key-point-set-octave self val))
+
+
+;; float KeyPoint::response
+;; float cv_KeyPoint_getResponse(KeyPoint* self)
+(defcfun ("cv_KeyPoint_getResponse" key-point-response) :float
+  (self key-point))
+
+
+;; float cv_KeyPoint_setResponse(KeyPoint* self, float val)
+(defcfun ("cv_KeyPoint_setResponse" key-point-set-response) :float
+  (self key-point)
+  (val :float))
+
+
+(defun (setf key-point-response) (val self)
+  (key-point-set-response self val))
+
+
+;; float KeyPoint::size;
+;; float cv_KeyPoint_getSize(KeyPoint* self)
+(defcfun ("cv_KeyPoint_getSize" key-point-size) :float
+  (self key-point))
+
+
+;; float cv_KeyPoint_setSize(KeyPoint* self, float val)
+(defcfun ("cv_KeyPoint_setSize" key-point-set-size) :float
+  (self key-point)
+  (val :float))
+
+
+(defun (setf key-point-size) (val self)
+  (key-point-set-size self val))
 
 
 ;; void Mat::locateROI(Size& wholeSize, Point& ofs) const
@@ -1932,16 +2119,22 @@ ret))
   (m2 mat))
 
 
-(defun octave (self)
-  (mem-aref (c-pointer self) :int 5))
+;; int KeyPoint::octave
+;; int cv_KeyPoint_getOctave(KeyPoint* self)
+(defcfun ("cv_KeyPoint_getOctave" octave) :int
+  (self key-point))
 
 
-;; Point_()
+(defun (setf octave) (val self)
+  (key-point-set-octave self val))
+
+
+;; Point::Point()
 ;; Point2##t * cv_create_Point2##(tn x, tn y)
 (defcfun ("cv_create_Point2i" point-0) point)
 
 
-;; Point_(_Tp _x, _Tp _y)
+;; Point::Point(int x, int y)
 ;; Point2##t * cv_create_Point2##(tn x, tn y) 
 (defcfun ("cv_create_Point2i" point-2) point
   (x :int)
@@ -1968,17 +2161,40 @@ ret))
 	       (t nil)))
 
 
-;; _Tp x, y
+;; int Point::x
 ;; int cv_Point_getX(Point* self) 
 (defcfun ("cv_Point2i_getX" point-x) :int 
 	 "Retrieves X coordinate of a POINT object."
 	 (self point))
 
-;; _Tp x, y
+
+;; int Point::y
 ;; int cv_Point_getY(Point* self)
 (defcfun ("cv_Point2i_getY" point-y) :int 
          "Retrieves Y coordinate of a POINT object."
 	 (self point))
+
+
+;; int cv_Point2i_setX(Point* self, int val) 
+(defcfun ("cv_Point2i_setX" point-set-x) :int 
+  (self point)
+  (val :int))
+
+
+(defun (setf point-x) (val self)
+  "Sets X coordinate of a POINT object."
+  (point-set-x self val))
+
+
+;; int cv_Point2i_setY(Point* self, int val) 
+(defcfun ("cv_Point2i_setY" point-set-y) :int 
+  (self point)
+  (val :int))
+
+
+(defun (setf point-y) (val self)
+  "Sets Y coordinate of a POINT object."
+  (point-set-y self val))
 
 
 ;; typedef Point_<double> Point2d
@@ -2011,18 +2227,40 @@ ret))
 	       (t nil)))
 
 
-;; _Tp x, y
+;; double Point2d::x
 ;; double cv_Point2d_getX(Point2d* self) 
 (defcfun ("cv_Point2d_getX" point-2d-x) :double
   "Retrieves X coordinate of a POINT-2D object."
   (self point-2d))
 
 
-;; _Tp x, y
+;; double Point2d::y
 ;; double cv_Point2d_getY(Point2d* self) 
 (defcfun ("cv_Point2d_getY" point-2d-y) :double
   "Retrieves Y coordinate of a POINT-2D object."
   (self point-2d))
+
+
+;; double cv_Point2d_setX(Point2d* self, double val) 
+(defcfun ("cv_Point2d_setX" point-2d-set-x) :double
+  (self point-2d)
+  (val :double))
+
+
+(defun (setf point-2d-x) (val self)
+  "Sets X coordinate of a POINT-2D object."
+  (point-2d-set-x self val))
+
+
+;; double cv_Point2d_setY(Point2d* self, double val) 
+(defcfun ("cv_Point2d_setY" point-2d-set-y) :double 
+  (self point-2d)
+  (val :double))
+
+
+(defun (setf point-2d-y) (val self)
+  "Sets Y coordinate of a POINT-2D object."
+  (point-2d-set-y self val))
 
 
 ;; typedef Point_<float> Point2f
@@ -2055,18 +2293,41 @@ ret))
 	       (t nil)))
 
 
-;; _Tp x, y;
+;; float Point2f::x
 ;; float cv_Point2f_getX(Point2f* self) 
 (defcfun ("cv_Point2f_getX" point-2f-x) :float
   "Retrieves X coordinate of a POINT-2F object."
   (self point-2f))
 
 
-;; _Tp x, y
+;; float Point2f::y
 ;; float cv_Point2f_getY(Point2f* self) 
 (defcfun ("cv_Point2f_getY" point-2f-y) :float
   "Retrieves Y coordinate of a POINT-2F object."
   (self point-2f))
+
+
+;; float cv_Point2f_setX(Point2f* self, float val) 
+(defcfun ("cv_Point2f_setX" point-2f-set-x) :float 
+  (self point-2f)
+  (val :float))
+
+
+(defun (setf point-2f-x) (val self)
+  "Sets X coordinate of a POINT-2F object."
+  (point-2f-set-x self val))
+
+
+;; float Point2f::y
+;; float cv_Point2f_setY(Point2f* self, float val) 
+(defcfun ("cv_Point2f_setY" point-2f-set-y) :float 
+  (self point-2f)
+  (val :float))
+
+
+(defun (setf point-2f-y) (val self)
+  "Sets Y coordinate of a POINT-2F object."
+  (point-2f-set-y self val))
 
 
 ;; typedef Point3_<double> Point3d
@@ -2173,6 +2434,78 @@ ret))
   (self point-3f))
 
 
+;; double Point3d::x
+;; double cv_Point3d_setX(Point3d* self, double val) 
+(defcfun ("cv_Point3d_setX" point-3d-set-x) :double 
+  (self point-3d)
+  (val :double))
+
+
+(defun (setf point-3d-x) (val self)
+  "Sets X coordinate of a POINT-3D object."
+  (point-3d-set-x self val))
+
+
+;; double Point3d::y
+;; double cv_Point3d_setY(Point3d* self, double val) 
+(defcfun ("cv_Point3d_setY" point-3d-set-y) :double 
+  (self point-3d)
+  (val :double))
+
+
+(defun (setf point-3d-y) (val self)
+  "Sets Y coordinate of a POINT-3D object."
+  (point-3d-set-y self val))
+
+
+;; double Point3d::z
+;; double cv_Point3d_setZ(Point3d* self, double val) 
+(defcfun ("cv_Point3d_setZ" point-3d-set-z) :double 
+  (self point-3d)
+  (val :double))
+
+
+(defun (setf point-3d-z) (val self)
+  "Sets Z coordinate of a POINT-3D object."
+  (point-3d-set-z self val))
+
+
+;; float Point3f::x
+;; float cv_Point3f_setX(Point3f* self, float val) 
+(defcfun ("cv_Point3f_setX" point-3f-set-x) :float 
+  (self point-3f)
+  (val :float))
+
+
+(defun (setf point-3f-x) (val self)
+  "Sets X coordinate of a POINT-3F object."
+  (point-3f-set-x self val))
+
+
+;; float Point3f::y
+;; float cv_Point3f_setY(Point3f* self, float val) 
+(defcfun ("cv_Point3f_setY" point-3f-set-y) :float 
+  (self point-3f)
+  (val :float))
+
+
+(defun (setf point-3f-y) (val self)
+  "Sets Y coordinate of a POINT-3F object."
+  (point-3f-set-y self val))
+
+
+;; float Point3f::z
+;; float cv_Point3f_setZ(Point3f* self, float val) 
+(defcfun ("cv_Point3f_setZ" point-3f-set-z) :float 
+  (self point-3f)
+  (val :float))
+
+
+(defun (setf point-3f-z) (val self)
+  "Sets Z coordinate of a POINT-3F object."
+  (point-3f-set-z self val))
+
+
 ;; typedef Point3_<double> Point3d
 ;; Point3##t * cv_create_Point3##(tn x, tn y, tn z)  
 (defcfun ("cv_create_Point3i" point-3i-0) point-3i 
@@ -2225,6 +2558,42 @@ ret))
   (self point-3i))
 
 
+;; int Point3i::x
+;; int cv_Point3i_setX(Point3i* self, int val) 
+(defcfun ("cv_Point3i_setX" point-3i-set-x) :int 
+  (self point-3i)
+  (val :int))
+
+
+(defun (setf point-3i-x) (val self)
+  "Sets X coordinate of a POINT-3I object."
+  (point-3i-set-x self val))
+
+
+;; int Point3i::y
+;; int cv_Point3i_setY(Point3i* self, int val) 
+(defcfun ("cv_Point3i_setY" point-3i-set-y) :int
+  (self point-3i)
+  (val :int))
+
+
+(defun (setf point-3i-y) (val self)
+  "Sets Y coordinate of a POINT-3I object."
+  (point-3i-set-y self val))
+
+
+;; int Point3i::z
+;; int cv_Point3i_setZ(Point3i* self, int val) 
+(defcfun ("cv_Point3i_setZ" point-3i-set-z) :int 
+  (self point-3i)
+  (val :int))
+
+
+(defun (setf point-3i-z) (val self)
+  "Sets Z coordinate of a POINT-3I object."
+  (point-3i-set-z self val))
+
+
 (defun print-2d-arr-as-mat (arr &optional (*standard-output* *standard-output*))
 
 	 (format t *personalize-print-2d-mat*)
@@ -2247,76 +2616,139 @@ ret))
 
 
 (defun print-mat (mat)
-  (if (empty mat) 
-      (return-from print-mat 
-	(format t "Matrix is empty.")))
-  (let ((arr (mat-to-arr mat))
-	(channels (channels mat))) 
-    (if (eq channels 1)
-	(print-2d-arr-as-mat arr)
-	(print-3d-arr-as-mat arr))))
+  (if (typep mat 'cv-mat)
+      (progn  
+	(if (empty mat)
+	    (return-from print-mat
+	      (format t "Matrix is empty.")))
+	(let ((arr (mat-to-arr mat))
+	      (channels (channels mat))) 
+	  (if (eq channels 1)
+	      (print-2d-arr-as-mat arr)
+	      (print-3d-arr-as-mat arr))))
+      (error "The value ~a is not of type CV-MAT." mat)))
 
 
 (defun pm (mat)
   "Alias for PRINT-MAT."
-  (if (empty mat) 
-      (return-from pm 
-	(format t "Matrix is empty.")))
-  (let ((arr (mat-to-arr mat))
-	(channels (channels mat))) 
-    (if (eq channels 1)
-	(print-2d-arr-as-mat arr)
-	(print-3d-arr-as-mat arr))))
+  (if (typep mat 'cv-mat)
+      (progn  
+	(if (empty mat)
+	    (return-from pm
+	      (format t "Matrix is empty.")))
+	(let ((arr (mat-to-arr mat))
+	      (channels (channels mat))) 
+	  (if (eq channels 1)
+	      (print-2d-arr-as-mat arr)
+	      (print-3d-arr-as-mat arr))))
+      (error "The value ~a is not of type CV-MAT." mat)))
+
+
+(defun print-dmatch (dmatch)
+  (if (typep dmatch 'cv-dmatch)
+      (format t "~a(query-idx: ~a train-idx: ~a img-idx: ~a distance: ~a)" *personalize-print-dmatch* 
+	      (dmatch-query-idx dmatch) 
+	      (dmatch-train-idx dmatch)
+	      (dmatch-img-idx dmatch)
+	      (dmatch-distance dmatch))
+      (error "The value ~a is not of type CV-DMATCH." dmatch)))
+
+
+(defun print-key-point (key-point)
+  (if (typep key-point 'cv-key-point)
+      (format t "~a(x: ~a y: ~a size: ~a angle: ~a response: ~a octave: ~a class-id: ~a)" *personalize-print-key-point* 
+              (@ (key-point-pt key-point) :float) 
+	      (@ (key-point-pt key-point) :float 1)
+	      (key-point-size key-point)
+	      (key-point-angle key-point)
+	      (key-point-response key-point)
+	      (key-point-octave key-point)
+	      (key-point-class-id key-point))
+      (error "The value ~a is not of type CV-KEY-POINT." key-point)))
 
 
 (defun print-point (point)
   (if (typep point 'cv-point)
-      (format t "~a(~a ~a)" *personalize-print-point* (x point) (y point))
+      (format t "~a(x: ~a y: ~a)" *personalize-print-point* (point-x point) (point-y point))
       (error "The value ~a is not of type CV-POINT." point)))
 
 
 (defun print-point-2d (point-2d)
   (if (typep point-2d 'cv-point-2d)
-      (format t "~a(~a ~a)" *personalize-print-point-2d* (x point-2d) (y point-2d))
+      (format t "~a(x: ~a y: ~a)" *personalize-print-point-2d* (point-2d-x point-2d) (point-2d-y point-2d))
       (error "The value ~a is not of type CV-POINT-2D." point-2d)))
 
 
 (defun print-point-2f (point-2f)
   (if (typep point-2f 'cv-point-2f)
-      (format t "~a(~a ~a)" *personalize-print-point-2f* (x point-2f) (y point-2f))
+      (format t "~a(x: ~a y: ~a)" *personalize-print-point-2f* (point-2f-x point-2f) (point-2f-y point-2f))
       (error "The value ~a is not of type CV-POINT-2F." point-2f)))
 
 
 (defun print-point-3d (point-3d)
   (if (typep point-3d 'cv-point-3d)
-      (format t "~a(~a ~a ~a)" *personalize-print-point-3d* (x point-3d) (y point-3d) (z point-3d))
+      (format t "~a(x: ~a y: ~a z: ~a)" *personalize-print-point-3d* (point-3d-x point-3d) (point-3d-y point-3d) (point-3d-z point-3d))
       (error "The value ~a is not of type CV-POINT-3D." point-3d)))
 
 
 (defun print-point-3f (point-3f)
   (if (typep point-3f 'cv-point-3f)
-      (format t "~a(~a ~a ~a)" *personalize-print-point-3f* (x point-3f) (y point-3f) (z point-3f))
+      (format t "~a(x: ~a y: ~a z: ~a)" *personalize-print-point-3f* (point-3f-x point-3f) (point-3f-y point-3f) (point-3f-z point-3f))
       (error "The value ~a is not of type CV-POINT-3F." point-3f)))
 
 
 (defun print-point-3i (point-3i)
   (if (typep point-3i 'cv-point-3i)
-      (format t "~a(~a ~a ~a)" *personalize-print-point-3i* (x point-3i) (y point-3i) (z point-3i))
+      (format t "~a(x: ~a y: ~a z: ~a)" *personalize-print-point-3i* (point-3i-x point-3i) (point-3i-y point-3i) (point-3i-z point-3i))
       (error "The value ~a is not of type CV-POINT-3I." point-3i)))
 
 
+(defun print-rect (rect)
+  (if (typep rect 'cv-rect)
+      (format t "~a(x: ~a y: ~a width: ~a height: ~a)~%" *personalize-print-rect* 
+	      (rect-x rect)
+	      (rect-y rect) 
+	      (rect-width rect) 
+	      (rect-height rect))
+      (error "The value ~a is not of type CV-RECT." rect)))
+
+;; Using mem-aref to access the member may not be safe if OpenCv changes something.
+(defun print-rotated-rect (rotated-rect)
+  (if (typep rotated-rect 'cv-rotated-rect)
+      (format t "~a(center: #(x: ~a y: ~a) size: #(:width ~a :height ~a) angle: ~a)~%" *personalize-print-rotated-rect* 
+	      (@ rotated-rect :float)
+	      (@ rotated-rect :float 1) 
+	      (@ rotated-rect :float 2)
+	      (@ rotated-rect :float 3)
+              (rotated-rect-angle rotated-rect))
+      (error "The value ~a is not of type CV-ROTATED-RECT." rotated-rect)))
+
+
 (defun print-scalar (scalar)
-  (format t "~a(~a ~a ~a ~a)~%" *personalize-print-scalar* 
-	  (@ scalar :double) 
-	  (@ scalar :double 1) 
-	  (@ scalar :double 2)
-	  (@ scalar :double 3)))
+  (if (typep scalar 'cv-scalar)
+      (format t "~a(v0: ~a v1: ~a v2: ~a v3: ~a)~%" *personalize-print-scalar* 
+	      (@ scalar :double) 
+	      (@ scalar :double 1) 
+	      (@ scalar :double 2)
+	      (@ scalar :double 3))
+      (error "The value ~a is not of type CV-SCALAR." scalar)))
 
 
 (defun print-size (size)
-  (format t "~a(~a ~a)~%" *personalize-print-size* 
-	  (@ size :int) 
-	  (@ size :int 1)))
+  (if (typep size 'cv-size)
+      (format t "~a(width: ~a height: ~a)~%" *personalize-print-size* 
+	      (@ size :int) 
+	      (@ size :int 1))
+      (error "The value ~a is not of type CV-SIZE." size)))
+
+
+(defun print-term-criteria (term-criteria)
+  (if (typep term-criteria 'cv-term-criteria)
+      (format t "~a(type: ~a max-count: ~a epsilon: ~a)~%" *personalize-print-term-criteria* 
+	      (@ term-criteria :int) 
+	      (@ term-criteria :int 1)
+              (@@ term-criteria :double 8))
+      (error "The value ~a is not of type CV-TERM-CRITERIA." term-criteria)))
 
 
 (defun print-vec-2b (vec-2b)
@@ -2496,6 +2928,16 @@ ret))
   (mat mat))
 
 
+;; Point2f KeyPoint::pt
+;; Point2f* cv_KeyPoint_getPT(KeyPoint* self)
+(defcfun ("cv_KeyPoint_getPt" pt) point-2f
+  (self key-point))
+
+
+(defun (setf pt) (val self)
+  (key-point-set-pt self val))
+
+
 ;; uchar* Mat::ptr(int i0=0)
 ;; uchar* cv_Mat_ptr_index(Mat* self, int i)
 (defcfun ("cv_Mat_ptr_index" %ptr) :pointer 
@@ -2515,8 +2957,14 @@ ret))
   (m mat))
 
 
-(defun query-idx (self)
-	 (mem-aref (c-pointer self) :int))
+;; int DMatch::queryIdx
+;; int cv_DMatch_getQueryIdx(DMatch* self)
+(defcfun ("cv_DMatch_getQueryIdx" query-idx) :int
+  (self dmatch))
+
+
+(defun (setf query-idx) (val self)
+  (dmatch-set-query-idx self val))
 
 
 ;; Range::Range(int _start, int _end)
@@ -2628,36 +3076,83 @@ ret))
   (self rect))
 
 
-;; _Tp x, y, width, height
-;; int &cv_Rect_getHeight(Rect* self)
+;; int Rect::height
+;; int cv_Rect_getHeight(Rect* self)
 (defcfun ("cv_Rect_getHeight" rect-height) :int
+  "Gets the height of a RECT object."
   (self rect))
 
 
-;; Size_<_Tp> size() const
+;; int cv_Rect_setHeight(Rect* self, int val)
+(defcfun ("cv_Rect_setHeight" rect-set-height) :int
+  (self rect)
+  (val :int))
+
+
+(defun (setf rect-height) (val self)
+  "Sets the height of a RECT object."
+  (rect-set-height self val))
+
+
+;; Size Rect::size()
 ;; Size* cv_Rect_size(Rect* self)  
 (defcfun ("cv_Rect_size" rect-size) size 
 	 "Size (width, height) of the rectangle."
 	 (self rect))
 
 
-;; _Tp x, y, width, height
+;; int Rect::width
 ;; int cv_Rect_getWidth(Rect* self)
 (defcfun ("cv_Rect_getWidth" rect-width) :int
+  "Gets the width of a RECT object."
   (self rect))
 
 
-;; _Tp x, y, width, height
+;; int cv_Rect_setWidth(Rect* self, int val)
+(defcfun ("cv_Rect_setWidth" rect-set-width) :int
+  (self rect)
+  (val :int))
+
+
+(defun (setf rect-width) (val self)
+  "Sets the width of a RECT object."
+  (rect-set-width self val))
+
+
+;; int Rect::x
 ;; int cv_Rect_getX(Rect* self) 
 (defcfun ("cv_Rect_getX" rect-x) :int
+  "Gets the x coordinate of a RECT object."
   (self rect))
 
 
-;; _Tp x, y, width, height
+;; int cv_Rect_setX(Rect* self, int val)
+(defcfun ("cv_Rect_setX" rect-set-x) :int
+  (self rect)
+  (val :int))
+
+
+(defun (setf rect-x) (val self)
+  "Sets the x coordinate of a RECT object."
+  (rect-set-x self val))
+
+
+;; int Rect::y
 ;; int cv_Rect_getY(Rect* self)
 (defcfun ("cv_Rect_getY" rect-y) :int
+  "Gets the y coordinate of a RECT object."
   (self rect))
 
+
+;; int cv_Rect_setY(Rect* self, int val)
+(defcfun ("cv_Rect_setY" rect-set-y) :int
+  (self rect)
+  (val :int))
+
+
+(defun (setf rect-y) (val self)
+  "Sets the y coordinate of a RECT object."
+  (rect-set-y self val))
 
 
 ;; Mat Mat::reshape(int cn, int rows=0) const
@@ -2683,8 +3178,14 @@ ret))
 	       (t nil)))
 
 
-(defun response (self)
-  (mem-aref (c-pointer self) :float 4))
+;; float KeyPoint::response
+;; float cv_KeyPoint_getResponse(KeyPoint* self)
+(defcfun ("cv_KeyPoint_getResponse" response) :float
+  (self key-point))
+
+
+(defun (setf response) (val self)
+  (key-point-set-response self val))
 
 
 ;; Mat::Mat(const Mat& m, const Rect& roi)
@@ -2712,10 +3213,21 @@ ret))
   (angle :float))
 
 
-;; RotatedRect::angle
+;; float RotatedRect::angle
 ;; float cv_RotatedRect_angle(RotatedRect* self)
 (defcfun ("cv_RotatedRect_angle" rotated-rect-angle) :float
+  "Gets the angle of a ROTATED-RECT."
   (self rotated-rect))
+
+
+;; float cv_RotatedRect_setAngle(RotatedRect* self, float val)
+(defcfun ("cv_RotatedRect_setAngle" rotated-rect-set-angle) :float
+  (self rotated-rect)
+  (val :float))
+
+(defun (setf rotated-rect-angle) (val self)
+  "Sets the angle of a ROTATED-RECT."
+   (rotated-rect-set-angle self val))
 
 
 ;; Rect RotatedRect::boundingRect() const
@@ -2725,17 +3237,16 @@ ret))
   (self rotated-rect))
 
 
-;; Point2f center;
+;; Point2f RotatedRect::center
 ;; Point* cv_RotatedRect_center(RotatedRect* self) 
 (defcfun ("cv_RotatedRect_center" rotated-rect-center) point
   (self rotated-rect))
 
 
-;; Size2f size;     
+;; Size2f RotatedRect::size     
 ;; Size* cv_RotatedRect_size(RotatedRect* self) 
 (defcfun ("cv_RotatedRect_size" rotated-rect-size) size
   (self rotated-rect))
-
 
 
 ;; Mat Mat::rowRange(int startrow, int endrow) const
@@ -2846,49 +3357,6 @@ ret))
 	(t nil)))
 
 
-;; Size_<float>()
-;; Size2f* cv_create_Size2f(float width, float height)
-(defcfun ("cv_create_Size2f" size-2f-0) size-2f)
-
-
-;; Size_<float>(float width, float height)
-;; Size2f* cv_create_Size2f(float width, float height)
-(defcfun ("cv_create_Size2f" size-2f-2) size-2f
-  (width :float)
-  (height :float))
-
-
-(defun size-2f (&optional (width nil) (height nil))
-  "SIZE-2F constructor"
-  (cond ((eq (or width height) nil)
-	 (size-2f-0))
-	 ((and width height)
-	  (size-2f-2 width height))
-	  (t nil)))
-
-
-(defun make-size-2f (&optional (width nil) (height nil))
-  "SIZE-2F constructor"
-  (cond ((eq (or width height) nil)
-	 (size-2f-0))
-	 ((and width height)
-	  (size-2f-2 width height))
-	  (t nil)))
-
-
-;; _Tp width, height
-;; float cv_Size2f_height(Size* self) 
-(defcfun ("cv_Size2f_height" size-2f-height) :float
-  "Gets the height of a SIZE-2F"
-  (self size-2f))
-
-
-;; _Tp width, height
-;; float cv_Size2f_width(Size* self) 
-(defcfun ("cv_Size2f_width" size-2f-width) :float
-  "Gets the width of a SIZE-2F"
-  (self size-2f))
-
 ;; Size_<_Tp>& Size_<_Tp>::operator = (const Size_<_Tp>& sz)
 ;; Size* cv_Size_assignTo(Size* self, Size* other) 
 (defcfun ("cv_Size_assignTo" size-assign-to) size
@@ -2974,8 +3442,14 @@ ret))
   (self mat))
 
 
-(defun train-idx (self)
-	 (mem-aref (c-pointer self) :int 1))
+;; int DMatch::TrainIdx
+;; int cv_DMatch_getTrainIdx(DMatch* self)
+(defcfun ("cv_DMatch_getTrainIdx" train-idx) :int
+  (self dmatch))
+
+
+(defun (setf train-idx) (val self)
+  (dmatch-set-train-idx self val))
 
 
 ;; typedef Vec<uchar, 2> Vec2b;

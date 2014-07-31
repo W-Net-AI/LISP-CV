@@ -218,13 +218,6 @@
 
 
 ;; void operator delete  ( void* ptr )
-;; void cv_delete_Size2f(Size2f* self)
-(defcfun ("cv_delete_Size2f" del-size-2f) :void
-  "Calls delete on a SIZE-2F object."
-  (self size-2f))
-
-
-;; void operator delete  ( void* ptr )
 ;; void cv_delete_std_string(string* self)
 (defcfun ("cv_delete_std_string" del-std-string) :void
   "Calls delete on a *STRING object."

@@ -200,14 +200,21 @@ See also:
 			   (return))))))))))))
 
 ========================================================================================================================================
-#ASSGN
+#MAT-ASSIGN
 ========================================================================================================================================
 
 Assign a matrices data to another matrix.
 
+Note: The name MAT-ASSIGN is used in the documentation to refer the binding for the OpenCV 
+Mat class assignment operator(Mat version) because it is more descriptive and it is easier to 
+search for in this file. The ASSIGN method may also be used to call this binding.
+
 C++: Mat& Mat::operator=(const Mat& m)
 
-LISP-CV: (ASSGN (SELF MAT) (M MAT)) => MAT
+LISP-CV: (ASSIGN (SELF MAT) (M MAT)) => MAT
+
+LISP-CV: (MAT-ASSIGN (SELF MAT) (M MAT)) => MAT
+
 
     Parameters:	
 
@@ -219,7 +226,7 @@ LISP-CV: (ASSGN (SELF MAT) (M MAT)) => MAT
             interface.
 
 
-ASSGN-EXAMPLE: 
+Example: 
 
 
 CV> (DEFPARAMETER A (MAT-ZEROS 7 7 +64f+))
@@ -350,53 +357,50 @@ need to access the return value of ASSIGN-VAL to complete the operation,
 
 Returns a reference to the specified array element.
 
-C++: uchar* Mat::ptr(int i0=0)
-
-CFFI: mem-aref ptr type &optional (index 0)
-
-CFFI: (setf (mem-aref ptr type &optional (index 0)) new-value) 
-
-LISP-CV: (AT (SELF MAT) (I :INT) (J :INT) (TYPE KEYWORD)) 
-
-LISP-CV: (AT (SELF MAT) (I :INT) (J :INT) (TYPE KEYWORD)) 
+ 
+C++: template<typename T> T& Mat::at(int i, int j)
+ 
+LISP-CV: (AT-<TYPE-NAME> (SELF MAT) (I :INT) (J :INT)) => <TYPE-NAME>
 
 
-    Parameters:	
-
+   The typenames associated with AT include:
+ 
+      uchar    point     vec2b   scalar
+      char     point2d   vec2d
+      ushort   point2f   vec2f
+      short    point3d   vec2i
+      int      point3f   vec2s
+      float              vec2w
+      double             vec3b
+                         vec3d
+                         vec3f
+                         vec3i
+                         vec3s
+                         vec3w
+                         vec4b
+                         vec4d
+                         vec4f
+                         vec4i
+                         vec4s 
+                         vec4w  
+    Parameters:     
+ 
         I - Index along the dimension 0
-
+ 
         J - Index along the dimension 1
-
-
-This isn't a binding for the OpenCV Mat::at functions. It was decided, when making the C bindings 
-for the C++ interface that LISP-CV wraps around, that they wouldn't be included. The reason was 
-they were slower than accessing the data directly with the Mat class ptr member. So this function 
-offers the same functionality as Mat::at but it is a binding for the Mat class ptr member. It is 
-setf-able, meaning you can retrieve a matrix element but also set data to a matrix element with it 
-as well using the SETF function. That functionality is gained by the inclusion the CFFI function 
-MEM-AREF in the binding. The use of typenames in OpenCV is simulated here with keyword parameters:
-
-The typenames associated with AT include(so far):
-
-:char     :int16    :short    :uint32
-:double   :int32    :uchar    :uint64
-:float    :int64    :uint     :ullong
-:int      :llong    :uint8    :ulong
-:int8     :long     :uint16   :ushort
-
-
+ 
+The template methods return a reference to the specified array element. For the sake of higher 
+performance, the index range checks are only performed in the Debug configuration.
+ 
+ 
 The example below initializes a Hilbert matrix:
-
-
+ 
 (defun at-example ()
   (let ((h (mat 5 5 +64f+)))
     (dotimes (i (rows h))
       (dotimes (j (cols h))
-	(setf (at h i j :double) (/ 1.0d0 (+ i j 1)))
-	(princ (at h i j :double))
-	(princ #\Space))
-      (princ #\Newline)))) 
-
+	(setf (at-double h i j) (/ 1d0 (+ i j 1)))))
+    (print-mat h))) 
 
 ========================================================================================================================================
 #CHANNELS
@@ -2166,12 +2170,12 @@ LISP-CV: (PRINT-MAT (MAT MAT)) => RESULT
 
 This function will print 1, 2, 3 and 4 channel matrices(MAT objects). When 2, 3 and 4 channel matrices
 are printed, they are printed length-wise, to make it easier to view specific pixels without having to  
-your output buffer.
+resize your output buffer.
 
 
 Example:
 
-CV> (DEFPARAMETER A (MAT-ONES 3 3 +8U+)) ;Create a 3x3 matrix filled with ones
+CV> (DEFPARAMETER A (MAT-ONES 3 3 +8U+)) ;Create a 3x3 matrix filled with ones.
 
 A
 
@@ -2181,21 +2185,21 @@ CV> (PRINT-MAT A)
     (1 1 1)
     (1 1 1))
 
-CV> (DEFPARAMETER A (MAT-ONES 3 3 +8UC3+))
+CV> (DEFPARAMETER A (MAT 3 3 +8UC3+ (T:SCALAR 1 1 1))) ;Create a 3x3x3 matrix filled with ones.
 
 A
 
-CV> (PRINT-MAT A) ;Create a 3x3x3 matrix filled with ones
+CV> (PRINT-MAT A)
 
-#3M(((1 0 0)
-     (1 0 0)
-     (1 0 0))
-    ((1 0 0)
-     (1 0 0)
-     (1 0 0))
-    ((1 0 0)
-     (1 0 0)
-     (1 0 0)))
+#3M(((1 1 1)
+     (1 1 1)
+     (1 1 1))
+    ((1 1 1)
+     (1 1 1)
+     (1 1 1))
+    ((1 1 1)
+     (1 1 1)
+     (1 1 1)))
 
 ========================================================================================================================================
 #PROMOTE
@@ -14488,7 +14492,7 @@ C++: void CascadeClassifier::detectMultiScale(InputArray image, vector<Rect>& ob
 
 LISP-CV: (DETECT-MULTI-SCALE (SELF CASCADE-CLASSIFIER) (IMAGE MAT) (OBJECTS VECTOR-RECT) &OPTIONAL 
                             ((SCALE-FACTOR :DOUBLE) 1.1D0) ((MIN-NEIGHBORS :INT) 3) ((FLAGS :INT) 0) 
-                           ((MIN-SIZE SIZE) (SIZE-0)) ((MAX-SIZE SIZE) (SIZE-0))) => :VOID
+                            ((MIN-SIZE SIZE) (SIZE-0)) ((MAX-SIZE SIZE) (SIZE-0))) => :VOID
 
 C++: void CascadeClassifier::detectMultiScale(InputArray image, vector<Rect>& objects, vector<int>& numDetections, 
                                               double scaleFactor=1.1, int minNeighbors=3, int flags=0, 
@@ -18780,12 +18784,12 @@ CV> (Y A) ;The y coordinate of A is retrieved
 
 2
 
-CV> (DEL-POINT A) ; A is deleted with DEL-POINT
+CV> (DEL-POINT A) ;A is deleted with DEL-POINT
 
 ; No value
 
 
-CV> (X A) ; The memory has been deallocated
+CV> (X A) ;The memory has been deallocated
 
 0
 

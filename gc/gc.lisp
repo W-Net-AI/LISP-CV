@@ -30,6 +30,12 @@
 	 (len :unsigned-int))
 
 
+(defun c-string (string)
+  "If you need a speed boost and decide to use low-level functions, 
+   use this to create a C string for  their *STRING parameters."
+  (c-string-to-string string (cl:length string)))
+
+
 ;;; CORE - Basic Structures
 
 
@@ -1196,48 +1202,10 @@ ret))
 	(t nil)))
 
 
-;; Size* cv_Size_assignTo(Size* self, Size* other) 
-(defcfun ("cv_Size_assignTo" size-assgn-to) (cv:size :garbage-collect t)
-	 "Assign data from one SIZE construct to another,
-   OTHER to SELF."
-   (self cv:size)
-   (other cv:size))
-
-
 ;; Size* cv_Size_fromPoint(Point* p)
 (defcfun ("cv_Size_fromPoint" size-from-point) (cv:size :garbage-collect t)
 	 "Create a SIZE construct from POINT data."
 	 (p cv:point))
-
-
-;; Size_<float>()
-;; Size2f* cv_create_Size2f(float width, float height)
-(defcfun ("cv_create_Size2f" size-2f-0) (cv:size-2f :garbage-collect t))
-
-
-;; Size_<float>(float width, float height)
-;; Size2f* cv_create_Size2f(float width, float height)
-(defcfun ("cv_create_Size2f" size-2f-2) (cv:size-2f :garbage-collect t)
-	 (width :float)
-	 (height :float))
-
-
-(defun size-2f (&optional (width nil) (height nil))
-  "SIZE-2F constructor"
-  (cond ((eq (or width height) nil)
-	 (size-2f-0))
-	 ((and width height)
-	  (size-2f-2 width height))
-	  (t nil)))
-
-
-(defun make-size-2f (&optional (width nil) (height nil))
-  "SIZE-2F constructor"
-  (cond ((eq (or width height) nil)
-	 (size-2f-0))
-	 ((and width height)
-	  (size-2f-2 width height))
-	  (t nil)))
 
 
 ;; MatExpr - operator

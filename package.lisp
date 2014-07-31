@@ -57,6 +57,7 @@
 ;; C-Interop
 
    #:%string
+   #:c-string
    #:c-string-to-string
 
 
@@ -118,7 +119,6 @@
    #:del-rot-rect
    #:del-scalar
    #:del-size
-   #:del-size-2f
    #:del-std-string
    #:del-svm
    #:del-svm-params
@@ -211,7 +211,6 @@
    #:with-rotated-rect
    #:with-scalar
    #:with-size
-   #:with-size-2f
    #:with-svm
    #:with-svm-params
    #:with-term-criteria
@@ -308,7 +307,6 @@
    #:rotated-rect
    #:scalar
    #:size
-   #:size-2f
    #:svm
    #:svm-params
    #:surf
@@ -400,7 +398,6 @@
    #:cv-rotated-rect
    #:cv-scalar
    #:cv-size
-   #:cv-size-2f
    #:std-string
    #:cv-svm
    #:cv-svm-params
@@ -737,7 +734,6 @@
    #:add
    #:adjust-roiadd all pathnames in a directory to a list lisp
    #:area
-   #:area-2f
    #:arr-to-mat
    #:assign-val
    #:at
@@ -801,6 +797,10 @@
    #:distance
    #:div
    #:dmatch
+   #:dmatch-distance
+   #:dmatch-img-idx
+   #:dmatch-query-idx
+   #:dmatch-train-idx
    #:dot-2d
    #:dot-2f
    #:dot-2i
@@ -811,11 +811,17 @@
    #:elem-size1
    #:empty
    #:force
-   #:height-2f
    #:img-idx
    #:inv
    #:is-continuous
    #:key-point
+   #:key-point-angle
+   #:key-point-class-id
+   #:key-point-octave
+   #:key-point-response
+   #:key-point-size
+   #:key-point-x
+   #:key-point-y
    #:locate-roi
    #:make-dmatch
    #:make-key-point
@@ -833,7 +839,6 @@
    #:make-scalar
    #:make-scalar-all
    #:make-size
-   #:make-size-2f
    #:make-term-criteria
    #:make-vec-2b
    #:make-vec-3b
@@ -950,13 +955,11 @@
    #:scalar
    #:scalar-all
    #:scale
-   #:size-2f
    #:size-assign-to
    #:size-from-point
    #:size-height
    #:size-width
    #:step1
-   #:width-2f
    #:sub
    #:tl
    #:term-criteria

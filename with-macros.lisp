@@ -309,14 +309,6 @@
        (values))))
 
 
-(defmacro with-size-2f (bind &body body)
-  "Ensures DEL-SIZE-2F gets called when 
-   a SIZE-2F object goes out of scope."
-  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
-     (unwind-protect (progn ,@body)
-       (mapcar #!(del-size-2f %1) ,(cons 'list (mapcar #!(car %1) bind)))
-       (values))))
-
 (defmacro with-string (bind &body body)
   "Ensures DEL-STD-STRING gets called when 
    a *STRING object goes out of scope."

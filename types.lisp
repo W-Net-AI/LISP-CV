@@ -43,10 +43,11 @@
 ;; TRACKBAR-CALLBACK
 (defctype trackbar-callback :pointer)
 
+;; BACKGROUND-SUBTRACTOR-MOG-2
+(defctype background-subtractor-mog-2 :pointer)
 
 
 ;; C++ INTEROP TYPES.
-
 
 
 ;; *STRING
@@ -1429,32 +1430,6 @@
     (when (garbage-collect c-type)
       (tg:finalize size (lambda () (del-size c-pointer))))
     size))
-
-
-
-;; SIZE-2F
-
-
-(define-foreign-type size-2f ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
-                     :garbage-collect))
-  (:actual-type :pointer)
-  (:simple-parser size-2f))
-
-
-(defclass cv-size-2f ()
-  ((c-pointer :reader c-pointer :initarg :c-pointer)))
-
-
-(defmethod translate-to-foreign ((lisp-value cv-size-2f) (c-type size-2f))
-  (values  (c-pointer lisp-value) lisp-value))
-
-
-(defmethod translate-from-foreign (c-pointer (c-type size-2f))
-  (let ((size-2f (make-instance 'cv-size-2f :c-pointer c-pointer)))
-    (when (garbage-collect c-type)
-      (tg:finalize size-2f (lambda () (del-size-2f c-pointer))))
-    size-2f))
 
 
 

@@ -17,14 +17,20 @@
 (defgeneric angle (self)
   (:documentation "Used for all class bindings with an ANGLE member."))
 
+(defgeneric (setf angle) (val self)
+  (:documentation "Used to setf the ANGLE value of class bindings with an ANGLE member."))
+
 (defgeneric assign (self other)
   (:documentation "Used for bindings of the OpenCV = operator."))
 
 (defgeneric bounding-rect (self)
-  (:documentation "Used for all class bindings with an ANGLE member."))
+  (:documentation "Used for the BOUNDING-RECT member of ROTATED-RECT."))
 
 (defgeneric center (self)
   (:documentation "Used for all class bindings with an CENTER member."))
+
+(defgeneric (setf center) (val self)
+  (:documentation "Used to setf the CENTER value of class bindings with an CENTER member."))
 
 (defgeneric clone (self)
   (:documentation "Used for all class bindings with a CLONE member."))
@@ -71,6 +77,9 @@
 (defgeneric height (self)
   (:documentation "Used for all class bindings with an HEIGHT member."))
 
+(defgeneric (setf height) (val self)
+  (:documentation "Used to setf the HEIGHT value of class bindings with an HEIGHT member."))
+
 (defgeneric is-opened (self)
   (:documentation "Used for all class bindings with an IS-OPENED member."))
 
@@ -101,20 +110,35 @@
 (defgeneric size (arg &rest args)
   (:documentation "Used for all class bindings with a SIZE member."))
 
+(defgeneric (setf size) (val self)
+  (:documentation "Used to setf the SIZE value of class bindings with an SIZE member."))
+
 (defgeneric train (self &rest args)
   (:documentation "Used for all class bindings with a TRAIN member."))
 
 (defgeneric width (self)
   (:documentation "Used for all class bindings with an WIDTH member."))
 
+(defgeneric (setf width) (val self)
+  (:documentation "Used to setf the WIDTH value of class bindings with an WIDTH member."))
+
 (defgeneric x (self)
   (:documentation "Used for all class bindings with an X member."))
+
+(defgeneric (setf x) (val self)
+  (:documentation "Used to setf the x coordinate of class bindings with an X member."))
+
+(defgeneric (setf y) (val self)
+  (:documentation "Used to setf the y coordinate of class bindings with an Y member."))
 
 (defgeneric y (self)
   (:documentation "Used for all class bindings with an Y member."))
 
 (defgeneric z (self)
   (:documentation "Used for all class bindings with an Z member."))
+
+(defgeneric (setf z) (val self)
+  (:documentation "Used to setf the z coordinate of class bindings with an Z member."))
 
 
 
@@ -126,9 +150,21 @@
 
 
 (defmethod angle ((self cv-rotated-rect))
-  "The rotation angle. When the angle is 0, 90, 180, 270 
-    etc., the rectangle becomes an up-right rectangle."
+  "Gets the rotation angle of a ROTATED-RECT object."
   (rotated-rect-angle self))
+
+
+(defmethod (setf angle) ((val single-float) (self cv-rotated-rect))
+  "Sets the rotation angle of a ROTATED-RECT object."
+  (rotated-rect-set-angle self val))
+
+
+(defmethod angle ((self cv-key-point))
+  (key-point-angle self))
+
+
+(defmethod (setf angle) ((val single-float) (self cv-key-point))
+  (key-point-set-angle self val))
 
 
 (defmethod assign ((self cv-mat) (other cv-mat))
@@ -154,8 +190,14 @@
 
 
 (defmethod center ((self cv-rotated-rect))
-  "The rectangle mass center."
+  "Gets the center of a ROTATED-RECT object."
   (rotated-rect-center self))
+
+;; Using mem-aref to access the member may not be safe if OpenCv changes something.
+(defmethod (setf center) ((val cv-point) (self cv-rotated-rect))
+  (setf (mem-aref (c-pointer self) :float) (coerce (mem-aref (c-pointer val) :int) 'single-float))
+  (setf (mem-aref (c-pointer self) :float 1) (coerce (mem-aref (c-pointer val) :int 1) 'single-float))
+  val)
 
 
 (defmethod clone ((self cv-mat))
@@ -412,15 +454,23 @@
 
 
 (defmethod height ((self cv-rect))
-  (mem-aref (c-pointer self) :int 2))
+  "Retrieves HEIGHT value of a RECT object."
+  (mem-aref (c-pointer self) :int 3))
+
+
+(defmethod (setf height) ((val integer) (self cv-rect))
+  "Sets HEIGHT value of a RECT object."
+  (rect-set-height self val))
 
 
 (defmethod height ((self cv-size))
+  "Retrieves HEIGHT value of a SIZE object."
   (mem-aref (c-pointer self) :int 1))
 
 
-(defmethod height ((self cv-size-2f))
-  (mem-aref (c-pointer self) :float 1))
+(defmethod (setf height) ((val integer) (self cv-size))
+  "Sets HEIGHT value of a SIZE object."
+  (setf (mem-aref (c-pointer self) :int 1) val))
 
 
 (defmethod is-opened ((self cv-video-capture))
@@ -581,7 +631,11 @@
 
 (defmethod size ((arg cv-key-point) &rest args)
   args
-  (mem-aref (c-pointer arg) :float 2))
+  (key-point-size arg))
+
+
+(defmethod (setf size) ((val single-float) (self cv-key-point))
+  (key-point-set-size self val))
 
 
 (defmethod size ((arg cv-mat) &rest args)
@@ -600,9 +654,15 @@
 
 
 (defmethod size ((arg cv-rotated-rect) &rest args)
-  "Width and height of the rectangle."
+  "Gets the size of a ROTATED-RECT object."
   args
   (rotated-rect-size arg))
+
+;; Using mem-aref to access the member may not be safe if OpenCv changes something.
+(defmethod (setf size) ((val cv-size) (self cv-rotated-rect))
+  (setf (mem-aref (c-pointer self) :float 2) (coerce (mem-aref (c-pointer val) :int) 'single-float))
+  (setf (mem-aref (c-pointer self) :float 3) (coerce (mem-aref (c-pointer val) :int 1) 'single-float))
+  val)
 
 
 (defmethod size ((arg null) &rest args)
@@ -619,108 +679,212 @@
 
 
 (defmethod width ((self cv-rect))
-  (mem-aref (c-pointer self) :int 3))
+  "Retrieves WIDTH value of a RECT object."
+  (rect-width self))
+
+
+(defmethod (setf width) ((val integer) (self cv-rect))
+  "Sets WIDTH value of a RECT object."
+  (rect-set-width self val))
 
 
 (defmethod width ((self cv-size))
+  "Retrieves WIDTH value of a SIZE object."
   (mem-aref (c-pointer self) :int))
 
 
-(defmethod width ((self cv-size-2f))
-  (mem-aref (c-pointer self) :float))
+(defmethod (setf width) ((val integer) (self cv-size))
+  "Sets WIDTH value of a SIZE object."
+  (setf (mem-aref (c-pointer self) :int) val))
 
 
 (defmethod x ((self cv-key-point))
-  (mem-aref (c-pointer self) :float))
+  "Retrieves X coordinate of a KEY-POINT object."
+  (point-2f-x (key-point-pt self)))
+
+
+(defmethod (setf x) ((val single-float) (self cv-key-point))
+  "Sets X coordinate of a KEY-POINT object."
+  (point-2f-set-x (key-point-pt self) val))
 
 
 (defmethod x ((self cv-point))
- "Retrieves X coordinate of a POINT object."
-  (mem-aref (c-pointer self) :int))
+  "Retrieves X coordinate of a POINT object."
+  (point-x self))
+
+
+(defmethod (setf x) ((val integer) (self cv-point))
+  "Sets X coordinate of a POINT object."
+  (point-set-x self val))
 
 
 (defmethod x ((self cv-point-2d))
   "Retrieves X coordinate of a POINT-2D object."
-  (mem-aref (c-pointer self) :double))
+  (point-2d-x self))
+
+
+(defmethod (setf x) ((val double-float) (self cv-point-2d))
+  "Sets X coordinate of a POINT-2D object."
+  (point-2d-set-x self val))
 
 
 (defmethod x ((self cv-point-2f))
   "Retrieves X coordinate of a POINT-2F object."
-  (mem-aref (c-pointer self) :float))
+  (point-2f-x self))
+
+
+(defmethod (setf x) ((val single-float) (self cv-point-2f))
+  "Sets X coordinate of a POINT-2F object."
+  (point-2f-set-x self val))
 
 
 (defmethod x ((self cv-point-3d))
   "Retrieves X coordinate of a POINT-3D object."
-  (mem-aref (c-pointer self) :double))
+  (point-3d-x self))
+
+
+(defmethod (setf x) ((val double-float) (self cv-point-3d))
+  "Sets X coordinate of a POINT-3D object."
+  (point-3d-set-x self val))
 
 
 (defmethod x ((self cv-point-3f))
   "Retrieves X coordinate of a POINT-3F object."
-  (mem-aref (c-pointer self) :float))
+  (point-3f-x self))
+
+
+(defmethod (setf x) ((val single-float) (self cv-point-3f))
+  "Sets X coordinate of a POINT-3F object."
+  (point-3f-set-x self val))
 
 
 (defmethod x ((self cv-point-3i))
   "Retrieves X coordinate of a POINT-3I object."
-  (mem-aref (c-pointer self) :int))
+  (point-3i-x self))
+
+
+(defmethod (setf x) ((val integer) (self cv-point-3i))
+  "Sets X coordinate of a POINT-3I object."
+  (point-3i-set-x self val))
 
 
 (defmethod x ((self cv-rect))
-  (mem-aref (c-pointer self) :int))
+  (rect-x self))
+
+
+(defmethod (setf x) ((val integer) (self cv-rect))
+  "Sets x coordinate of a RECT object."
+  (rect-set-x self val))
 
 
 (defmethod y ((self cv-key-point))
-  (mem-aref (c-pointer self) :float 1))
+  "Retrieves Y coordinate of a KEY-POINT object."
+  (point-2f-y (key-point-pt self)))
+
+
+(defmethod (setf y) ((val single-float) (self cv-key-point))
+  "Sets Y coordinate of a KEY-POINT object."
+  (point-2f-set-y (key-point-pt self) val))
 
 
 (defmethod y ((self cv-point))
   "Retrieves Y coordinate of a POINT object."
-  (mem-aref (c-pointer self) :int 1))
+  (point-y self))
+
+
+(defmethod (setf y) ((val integer) (self cv-point))
+  "Sets Y coordinate of a POINT object."
+  (point-set-y self val))
 
 
 (defmethod y ((self cv-point-2d))
   "Retrieves Y coordinate of a POINT-2D object."
-  (mem-aref (c-pointer self) :double 1))
+  (point-2d-y self))
+
+
+(defmethod (setf y) ((val double-float) (self cv-point-2d))
+  "Sets Y coordinate of a POINT-2D object."
+  (point-2d-set-y self val))
 
 
 (defmethod y ((self cv-point-2f))
   "Retrieves Y coordinate of a POINT-2F object."
-  (mem-aref (c-pointer self) :float 1))
+  (point-2f-y self))
+
+
+(defmethod (setf y) ((val single-float) (self cv-point-2f))
+  "Sets Y coordinate of a POINT-2F object."
+  (point-2f-set-y self val))
 
 
 (defmethod y ((self cv-point-3d))
   "Retrieves Y coordinate of a POINT-3D object."
-  (mem-aref (c-pointer self) :double 1))
+  (point-3d-y self))
+
+
+(defmethod (setf y) ((val double-float) (self cv-point-3d))
+  "Sets Y coordinate of a POINT-3D object."
+  (point-3d-set-y self val))
 
 
 (defmethod y ((self cv-point-3f))
   "Retrieves Y coordinate of a POINT-3F object."
-  (mem-aref (c-pointer self) :float 1))
+  (point-3f-y self))
+
+
+(defmethod (setf y) ((val single-float) (self cv-point-3f))
+  "Sets Y coordinate of a POINT-3F object."
+  (point-3f-set-y self val))
 
 
 (defmethod y ((self cv-point-3i))
   "Retrieves Y coordinate of a POINT-3I object."
-  (mem-aref (c-pointer self) :int 1))
+  (point-3i-y self))
+
+
+(defmethod (setf y) ((val integer) (self cv-point-3i))
+  "Sets Y coordinate of a POINT-3I object."
+  (point-3i-set-y self val))
 
 
 (defmethod y ((self cv-rect))
   "Retrieves Y coordinate of a RECT object."
-  (mem-aref (c-pointer self) :int 1))
+  (rect-y self))
+
+
+(defmethod (setf y) ((val integer) (self cv-rect))
+  "Sets y coordinate of a RECT object."
+  (rect-set-y self val))
 
 
 (defmethod z ((self cv-point-3d))
   "Retrieves Z coordinate of a POINT-3D object."
-  (mem-aref (c-pointer self) :double 2))
+  (point-3d-z self))
+
+
+(defmethod (setf z) ((val double-float) (self cv-point-3d))
+  "Sets Z coordinate of a POINT-3D object."
+  (point-3d-set-z self val))
 
 
 (defmethod z ((self cv-point-3f))
   "Retrieves Z coordinate of a POINT-3F object."
-  (mem-aref (c-pointer self) :float 2))
+  (point-3f-z self))
+
+
+(defmethod (setf z) ((val single-float) (self cv-point-3f))
+  "Sets Z coordinate of a POINT-3F object."
+  (point-3f-set-z self val))
 
 
 (defmethod z ((self cv-point-3i))
   "Retrieves Z coordinate of a POINT-3I object."
-  (mem-aref (c-pointer self) :int 2))
+  (point-3i-z self))
 
+
+(defmethod (setf z) ((val integer) (self cv-point-3i))
+  "Sets Z coordinate of a POINT-3I object."
+  (point-3i-set-z self val))
 
 
 ;;; Functions and methods used to 

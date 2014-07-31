@@ -132,8 +132,183 @@ ADD_READ_FUNC_IMPL_1(m, Mat);
 
 ADD_READ_FUNC_IMPL_2(vkp, vector_KeyPoint);
 
+Mat* test(uchar* a, size_t len ) {
+Mat* m = new Mat;
+for(size_t i = 0; i < len; i++) 
+m->ptr(a[i]);
+return m;
+}
+
 void cv_Mat_push_back(Mat* self, Mat* m) {
     self->push_back(*m);
+}
+
+void cv_RotatedRect_setCenter(RotatedRect* self, Point* val) {
+  self->center = *val;
+}
+
+void cv_RotatedRect_setSize(RotatedRect* self, Size* val) {
+  self->size = *val;
+}
+
+float cv_RotatedRect_setAngle(RotatedRect* self, float val) {
+  return self->angle = val;
+}
+
+int cv_Rect_setWidth(Rect* self, int val) {
+  return self->width = val;
+}
+
+int cv_Rect_setHeight(Rect* self, int val) {
+  return self->height = val;
+}
+
+int cv_Rect_setX(Rect* self, int val) {
+  return self->x = val;
+}
+
+int cv_Rect_setY(Rect* self, int val) {
+  return self->y = val;
+}
+
+int cv_Point2i_setX(Point* self, int val) {
+  return self->x = val;
+}
+
+int cv_Point2i_setY(Point* self, int val) {
+  return self->y = val;
+}
+
+double cv_Point2d_setX(Point2d* self, double val) {
+  return self->x = val;
+}
+
+double cv_Point2d_setY(Point2d* self, double val) {
+  return self->y = val;
+}
+
+float cv_Point2f_setX(Point2f* self, float val) {
+  return self->x = val;
+}
+
+float cv_Point2f_setY(Point2f* self, float val) {
+  return self->y = val;
+}
+
+int cv_Point3i_setX(Point3i* self, int val) {
+  return self->x = val;
+}
+
+int cv_Point3i_setY(Point3i* self, int val) {
+  return self->y = val;
+}
+
+int cv_Point3i_setZ(Point3i* self, int val) {
+  return self->z = val;
+}
+
+double cv_Point3d_setX(Point3d* self, double val) {
+  return self->x = val;
+}
+
+double cv_Point3d_setY(Point3d* self, double val) {
+  return self->y = val;
+}
+
+double cv_Point3d_setZ(Point3d* self, double val) {
+  return self->z = val;
+}
+
+float cv_Point3f_setX(Point3f* self, float val) {
+  return self->x = val;
+}
+
+float cv_Point3f_setY(Point3f* self, float val) {
+  return self->y = val;
+}
+
+float cv_Point3f_setZ(Point3f* self, float val) {
+  return self->z = val;
+}
+
+int cv_DMatch_getQueryIdx(DMatch* self) {
+  return self->queryIdx;
+}
+
+int cv_DMatch_setQueryIdx(DMatch* self, int val) {
+  return self->queryIdx = val;
+}
+
+int cv_DMatch_getTrainIdx(DMatch* self) {
+  return self->trainIdx;
+}
+
+int cv_DMatch_setTrainIdx(DMatch* self, int val) {
+  return self->trainIdx = val;
+}
+
+int cv_DMatch_getImgIdx(DMatch* self) {
+  return self->imgIdx;
+}
+
+float cv_DMatch_setImgIdx(DMatch* self, float val) {
+  return self->imgIdx = val;
+}
+
+float cv_DMatch_getDistance(DMatch* self) {
+  return self->distance;
+}
+
+float cv_DMatch_setDistance(DMatch* self, float val) {
+  return self->distance = val;
+}
+
+Point2f* cv_KeyPoint_getPt(KeyPoint* self) {
+  return &self->pt;
+}
+
+void cv_KeyPoint_setPt(KeyPoint* self, Point2f* val) {
+  self->pt = *val;
+}
+
+float cv_KeyPoint_getSize(KeyPoint* self) {
+  return self->size;
+}
+
+float cv_KeyPoint_setSize(KeyPoint* self, float val) {
+  return self->size = val;
+}
+
+float cv_KeyPoint_getAngle(KeyPoint* self) {
+  return self->angle;
+}
+
+float cv_KeyPoint_setAngle(KeyPoint* self, float val) {
+  return self->angle = val;
+}
+
+float cv_KeyPoint_getResponse(KeyPoint* self) {
+  return self->response;
+}
+
+float cv_KeyPoint_setResponse(KeyPoint* self, float val) {
+  return self->response = val;
+}
+
+int cv_KeyPoint_getOctave(KeyPoint* self) {
+  return self->octave;
+}
+
+int cv_KeyPoint_setOctave(KeyPoint* self, int val) {
+  return self->octave = val;
+}
+
+int cv_KeyPoint_getClass_id(KeyPoint* self) {
+  return self->class_id;
+}
+
+int cv_KeyPoint_setClass_id(KeyPoint* self, int val) {
+  return self->class_id = val;
 }
 
 Point* cv_Mat_at_Point(Mat* self, int i, int j) {

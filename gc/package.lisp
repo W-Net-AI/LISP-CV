@@ -14,6 +14,7 @@
 ;; C-Interop
 
    #:c-string-to-string
+   #:c-string
 
 
 ;; Vectors
@@ -319,7 +320,6 @@
    #:make-scalar
    #:make-scalar-all
    #:make-size
-   #:make-size-2f
    #:make-term-criteria
    #:make-vec-2b
    #:make-vec-3b
@@ -378,9 +378,7 @@
    #:scalar
    #:scalar-all
    #:size
-   #:size-assgn-to
    #:size-from-point
-   #:size-2f
    #:sub
    #:term-criteria
    #:tl
