@@ -17,8 +17,8 @@
 ;; int createTrackbar(const string& trackbarname, const string& winname, int* value, int count, TrackbarCallback onChange=0, void* userdata=0)
 ;; int cv_createTrackbar(String* trackbarname, String* winname, int* value, int count, TrackbarCallback* onChange, void* userdata)
 (defcfun ("cv_createTrackbar" %create-trackbar) :int
-  (trackbarname *string)
-  (winname *string)
+  (trackbarname string*)
+  (winname string*)
   (value :pointer)
   (count :int)
   (on-change trackbar-callback)
@@ -41,7 +41,7 @@
 ;; void cv_destroyWindow(String* winname)
 (defcfun ("cv_destroyWindow" %destroy-window) :void
   "Destroys a window."
-  (winname *string))
+  (winname string*))
 
 
 (defun destroy-window (winname)
@@ -52,8 +52,8 @@
 ;; int getTrackbarPos(const String& trackbarname, const String& winname)
 ;; int cv_getTrackbarPos(String* trackbarname, String* winname)
 (defcfun ("cv_getTrackbarPos" %get-trackbar-pos) :int
-  (trackbarname *string)
-  (winname *string))
+  (trackbarname string*)
+  (winname string*))
 
 
 (defun get-trackbar-pos (trackbarname winname)
@@ -64,7 +64,7 @@
 ;; void imshow(const string& winname, InputArray mat)
 ;; void cv_imshow(String* winname, Mat* mat)
 (defcfun ("cv_imshow" %imshow) :void
-  (winname *string)
+  (winname string*)
   (mat mat))
 
 
@@ -76,7 +76,7 @@
 ;; void moveWindow(const string& winname, int x, int y)
 ;; void cv_moveWindow(String* winname, int x, int y)
 (defcfun ("cv_moveWindow" %move-window) :void
-  (winname *string)
+  (winname string*)
   (x :int)
   (y :int))
 
@@ -89,7 +89,7 @@
 ;; void namedWindow(const string& winname, int flags=WINDOW_AUTOSIZE)
 ;; void cv_namedWindow(String* winname, int flags)
 (cffi:defcfun ("cv_namedWindow" %named-window) :void
-  (winname *string)
+  (winname string*)
   (flags :int))
 
 
@@ -101,7 +101,7 @@
 ;; void setMouseCallback(const string& winname, MouseCallback onMouse, void* userdata=0)
 ;;void cv_setMouseCallback(const char* winname, MouseCallback onMouse, void* userdata)
 (defcfun ("cv_setMouseCallback" %set-mouse-callback) :void
-  (winname *string)
+  (winname string*)
   (on-mouse mouse-callback)
   (userdata :pointer))
 
@@ -114,8 +114,8 @@
 ;; void setTrackbarPos(const String& trackbarname, const String& winname, int pos)
 ;; void cv_setTrackbarPos(String* trackbarname, String* winname, int pos)
 (defcfun ("cv_setTrackbarPos" %set-trackbar-pos) :void
-  (trackbarname *string)
-  (winname *string)
+  (trackbarname string*)
+  (winname string*)
   (pos :int))
 
 
@@ -181,7 +181,7 @@
 ;; VideoCapture* cv_create_VideoCapture1(String* filename) {
 (defcfun ("cv_create_VideoCapture1" video-capture-file) video-capture
 	 "VideoCapture constructor"
-	 (filename *string))
+	 (filename string*))
 
 
 (defun video-capture (&optional src)
@@ -277,7 +277,7 @@
 ;; Mat imread(const string& filename, int flags=1)
 ;; mat cv_imread (const char* filename, int flags)
 (defcfun ("cv_imread" %imread) mat
-  (filename *string)
+  (filename string*)
   (flags :int))
 
 
@@ -308,7 +308,7 @@
 ;; VideoWriter::VideoWriter(const string& filename, int fourcc, double fps, Size frameSize, bool isColor) 
 ;; VideoWriter* cv_create_VideoWriter5(String* filename, int fourcc, double fps, Size* frameSize, bool isColor)
 (defcfun ("cv_create_VideoWriter5" video-writer-5) video-writer
-	 (filename *string)
+	 (filename string*)
 	 (four-cc :int)
 	 (fps :double)
 	 (frame-size size)
@@ -366,8 +366,8 @@
 ;; void displayOverlay(const String& winname, const String& text, int delayms=0 )
 ;; void cv_displayOverlay(String* winname, String* text, int delayms)
 (cffi:defcfun ("cv_displayOverlay" %display-overlay) :void
-  (winname *string)
-  (text *string)
+  (winname string*)
+  (text string*)
   (flags :int))
 
 (defun display-overlay (winname text &optional (delayms 0))
@@ -378,7 +378,7 @@
 
 ;; double cv_getWindowProperty(String* winname, int prop_id) 
 (defcfun ("cv_getWindowProperty" %get-window-property) :double
-  (winname *string)
+  (winname string*)
   (prop-id :int))
 
 (defun get-window-property (winname prop-id)
@@ -389,7 +389,7 @@
 ;; void setWindowProperty(const string& winname, int prop_id, double prop_value)
 ;; void cv_setWindowProperty(String* winname, int prop_id, double prop_value)
 (defcfun ("cv_setWindowProperty" %set-window-property) :void
-  (winname *string)
+  (winname string*)
   (prop-id :int)
   (prop-value :double))
 

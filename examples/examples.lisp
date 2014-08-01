@@ -43,8 +43,8 @@ an example that uses TG finalizers):
 	  (format t "Cannot open the video camera")))      
     (let ((window-name "WITH-MACRO Example"))
       (format t "~%Frame Size : ~ax~a~%~%" 
-	      (*get cap +cap-prop-frame-width+)
-	      (*get cap +cap-prop-frame-height+))
+	      (get* cap +cap-prop-frame-width+)
+	      (get* cap +cap-prop-frame-height+))
       (with-named-window (window-name +window-normal+)
 	(move-window window-name 759 175)
 	(with-mat ((frame (mat)))
@@ -164,8 +164,8 @@ See also:
 	    (format t "Cannot open the video camera")))
       ;;Print width and height of CAP
       (format t "~%Frame Size : ~ax~a~%~%" 
-	      (*get cap +cap-prop-frame-width+)
-	      (*get cap +cap-prop-frame-height+))
+	      (get* cap +cap-prop-frame-width+)
+	      (get* cap +cap-prop-frame-height+))
       (with-named-window (window-name-1 +window-normal+)
 	(with-named-window (window-name-2 +window-normal+)
 	  (with-named-window (window-name-3 +window-normal+)
@@ -474,10 +474,10 @@ LISP-CV: (CLONE (SELF RECT)) => RECT
 
 MAT:
 
-This method creates a full copy of array. The original (*STEP), is not taken into account. So, 
+This method creates a full copy of array. The original (STEP*), is not taken into account. So, 
 the array copy is a continuous array occupying (* (TOTAL) (ELEM-SIZE)) bytes.
 
-Note (*STEP) is a binding for the OpenCV Mat class 'step[]' member.
+Note (STEP*) is a binding for the OpenCV Mat class 'step[]' member.
 
 RECT:
 
@@ -823,11 +823,11 @@ ix or because there can be some padding space in the end of each row for a prope
 	  (dotimes (i (rows img))
 	    (dotimes (j (cols img))
 	      (setf b (mem-aref input :uchar 
-				(+  (* (*step img) i) (* 3 j) )))
+				(+  (* (step* img) i) (* 3 j) )))
 	      (setf g (mem-aref input :uchar 
-				(+ (+  (* (*step img) i) (* 3 j) ) 1)))
+				(+ (+  (* (step* img) i) (* 3 j) ) 1)))
 	      (setf r (mem-aref input :uchar 
-				(+ (+  (* (*step img) i) (* 3 j) ) 2)))
+				(+ (+  (* (step* img) i) (* 3 j) ) 2)))
 	      (format str "(~a,~a,~a)~%" b g r))))
 	(imshow window-name img)
 	(loop
@@ -1505,8 +1505,8 @@ submatrix within the original matrix. The function LOCATE-ROI does exactly that.
 	  (return-from locate-roi-example 
 	    (format t "Cannot open the video camera")))
       (format t "~%Frame Size : ~ax~a~%~%" 
-	      (*get cap +cap-prop-frame-width+)
-	      (*get cap +cap-prop-frame-height+))
+	      (get* cap +cap-prop-frame-width+)
+	      (get* cap +cap-prop-frame-height+))
       ;;Create windows and move to specified positions
       (with-named-window (window-name-1 +window-normal+)
 	(with-named-window (window-name-2 +window-normal+)
@@ -2716,8 +2716,8 @@ Example:
 	  (return-from roi-example 
 	    (format t "Cannot open the video camera")))
       (format t "~%Frame Size : ~ax~a~%~%" 
-	      (*get cap +cap-prop-frame-width+)
-	      (*get cap +cap-prop-frame-height+))
+	      (get* cap +cap-prop-frame-width+)
+	      (get* cap +cap-prop-frame-height+))
       (with-named-window (window-name +window-normal+)
 	(move-window window-name 759 175)
 	(with-mat ((frame (mat)))
@@ -3217,7 +3217,7 @@ CV> (PRINT-SIZE B)
 
 
 ========================================================================================================================================
-*STEP
+STEP*
 ========================================================================================================================================
 
 Used to compute address of a matrix element
@@ -3232,13 +3232,13 @@ LISP-CV: (STEP (SELF MAT)) => :UNSIGNED-INT
 
 This function is used to compute the address of a matrix element. The image step gives you the dist-
 ance in bytes between the first element of one row and the first element of the next row. This func-
-tion is named *STEP, because the name STEP conflicts with a Lisp Macro.
+tion is named STEP*, because the name STEP conflicts with a Lisp Macro.
 
 
 Example:
 
 
-(defun *step-example (filename)
+(defun step*-example (filename)
   ;Load image
   (with-mat ((img (imread filename 1)))   
     ;Variables used to access the pixel data.
@@ -3248,19 +3248,19 @@ Example:
 	  (g 0)
 	  (r 0)
 	  (input (data img))
-	  (window-name "*STEP Example"))
+	  (window-name "STEP* Example"))
       (if (empty img) 
-	  (return-from *step-example 
+	  (return-from step*-example 
 	    (format t "Image not loaded")))
       (with-named-window (window-name +window-normal+)
 	(move-window window-name 759 175)
 	;Get pixel value at element 0,0 of IMG
 	(setf b (mem-aref input :uchar 
-			  (+  (* (*step img) 0) 0)))
+			  (+  (* (step* img) 0) 0)))
 	(setf g (mem-aref input :uchar 
-			  (+ (+  (* (*step img) 0) 0) 1)))
+			  (+ (+  (* (step* img) 0) 0) 1)))
 	(setf r (mem-aref input :uchar 
-			  (+ (+  (* (*step img) 0) 0) 2)))
+			  (+ (+  (* (step* img) 0) 0) 2)))
 	;Print the 0,0 pixel value
 	(format t "~%The pixel value at 0,0 is: (~a,~a,~a)~%" b g r)
 	(imshow window-name img)
@@ -4342,21 +4342,21 @@ Example:
 			   (return))))))))))))))
 
 ========================================================================================================================================
-*TRACE
+TRACE*
 ========================================================================================================================================
 
 Returns the trace of a matrix.
 
 C++: Scalar trace(InputArray mtx)
 
-LISP-CV: (*TRACE (MTX MAT)) => SCALAR
+LISP-CV: (TRACE* (MTX MAT)) => SCALAR
 
 
     Parameters:	
 
         MTX - Input matrix.
 
-The function *TRACE returns the sum of the diagonal elements of the matrix MTX.
+The function TRACE* returns the sum of the diagonal elements of the matrix MTX.
 
 
 See OpenCV Documentation at this link:
@@ -4366,12 +4366,12 @@ http://docs.opencv.org/trunk/modules/core/doc/operations_on_arrays.html?highligh
 for the formula.
 
 
-Note: This function is named *TRACE instead of TRACE because, TRACE is the name of a Common Lisp macro.
+Note: This function is named TRACE* instead of TRACE because, TRACE is the name of a Common Lisp macro.
 
 
 Example:
 
-(defun *trace-example ()
+(defun trace*-example ()
     ;;Create a 3x3 matrix called MTX
     (with-object ((data (alloc :uchar '(1 2 3 4 5 6 7 8 9))))
       (with-mat ((mtx (mat 3 3 +8u+ data)))
@@ -4379,7 +4379,7 @@ Example:
 	(format t "~%MTX = ~%~%")
 	(print-mat mtx)
 	;;Print the sum of the diagonal of MTX
-	(format t "~%The sum of the diagonal of MTX is ~a~%~%" (@ (*trace mtx) :double)))))
+	(format t "~%The sum of the diagonal of MTX is ~a~%~%" (@ (trace* mtx) :double)))))
 
 ========================================================================================================================================
 #ABSDIFF
@@ -5340,8 +5340,8 @@ Example:
 	  (return-from in-range-s-example 
 	    (format t "Cannot open the video camera")))
       (format t "~%Frame Size : ~ax~a~%~%" 
-	      (*get cap +cap-prop-frame-width+)
-	      (*get cap +cap-prop-frame-height+))
+	      (get* cap +cap-prop-frame-width+)
+	      (get* cap +cap-prop-frame-height+))
       (with-named-window (window-name-1 +window-normal+)
 	(with-named-window (window-name-2 +window-normal+)
 	  (move-window window-name-1 533 175)
@@ -8233,7 +8233,7 @@ C++: void copyMakeBorder(InputArray src, OutputArray dst, int top, int bottom, i
      const Scalar& value=Scalar() )
 
 LISP-CV: (COPY-MAKE-BORDER (SRC MAT) (DEST MAT) (TOP :INT) (BOTTOM :INT) (LEFT :INT) (RIGHT :INT) 
-         (BORDER-TYPE :INT) &OPTIONAL ((VALUE SCALAR) (SCALAR))) => :VOID
+         (BORDER-TYPE :INT) &OPTIONAL ((VALUE SCALAR) (SCALAR-0))) => :VOID
 
     Parameters:	
 
@@ -10600,8 +10600,8 @@ Example:
 	  (return-from cvt-color-example 
 	    (format t "Cannot open the video camera")))
       (format t "~%Frame Size : ~ax~a~%~%" 
-	      (*get cap +cap-prop-frame-width+)
-	      (*get cap +cap-prop-frame-height+))
+	      (get* cap +cap-prop-frame-width+)
+	      (get* cap +cap-prop-frame-height+))
       (with-named-window (window-name-1 +window-normal+)
 	(with-named-window (window-name-2 +window-normal+)
 	  (with-named-window (window-name-3 +window-normal+)
@@ -10757,6 +10757,130 @@ Example:
 
 
 ========================================================================================================================================
+#FLOOD-FILL
+========================================================================================================================================
+
+Fills a connected component with the given color.
+
+C++: int floodFill(InputOutputArray image, InputOutputArray mask, Point seedPoint, Scalar newVal, Rect* rect=0, 
+                   Scalar loDiff=Scalar(), Scalar upDiff=Scalar(), int flags=4 )
+
+LISP-CV: (FLOOD-FILL (IMAGE MAT) (MASK MAT) (SEED-POINT POINT) (NEW-VAL SCALAR) ((RECT RECT) (NULL-POINTER)) 
+                    ((LODIFF SCALAR) (SCALAR-0)) ((UPDIFF SCALAR) (SCALAR-0)) ((FLAGS :INT) 4)) => :INT
+
+    Parameters:	
+
+        IMAGE - Input/output 1 or 3-channel, 8-bit, or floating-point image. It is modified by the
+                function unless the +FLOODFILL-MASK-ONLY+ flag is set.
+
+        MASK - Operation mask that should be a single-channel 8-bit image, 2 pixels wider and 2 pixels 
+               taller than the IMAGE parameter. Since this is both an input and output parameter, you must 
+               take responsibility of initializing it. Flood-filling cannot go across non-zero pixels in the 
+               input mask. For example, an edge detector output can be used as a mask to stop filling at edges. 
+               On output, pixels in the mask corresponding to filled pixels in the image are set to 1 or to the 
+               value specified in FLAGS as described below. It is, for that reason, possible to use the same mask 
+               in multiple calls to the function to make sure the filled areas do not overlap.
+
+        Note: Since the mask is larger than the filled image, a pixel (x, y) in image corresponds to 
+              the pixel ((+ x 1), (+ y 1)) in the mask.
+
+        SEED-POINT - Starting point.
+
+        NEW-VAL - New value of the repainted domain pixels.
+
+        LO-DIFF - Maximal lower brightness/color difference between the currently observed pixel and 
+                  one of its neighbors belonging to the component, or a seed pixel being added to the
+                  component.
+
+        UP-DIFF - Maximal upper brightness/color difference between the currently observed pixel and 
+                  one of its neighbors belonging to the component, or a seed pixel being added to the 
+                  component.
+
+        RECT - Optional output parameter set by the function to the minimum bounding rectangle of the 
+               repainted domain.
+
+        FLAGS - Operation flags. The first 8 bits contain a connectivity value. The default value of 4 
+                means that only the four nearest neighbor pixels (those that share an edge) are considered. 
+                A connectivity value of 8 means that the eight nearest neighbor pixels (pixels that share a 
+                corner) will be considered. The next 8 bits (8-16) contain a value between 1 and 255 with which 
+                to fill the mask (the default value is 1). For example, (LOGIOR 4 (ASH 255 8)) will consider 4 
+                nearest neighbours and fill the mask with a value of 255. The following additional options occupy 
+                higher bits and therefore may be further combined with the connectivity and mask fill values using 
+                bit-wise or (LOGIOR):
+
+            +FLOODFILL-FIXED-RANGE+ If set, the difference between the current pixel and seed pixel 
+                                    is considered. Otherwise, the difference between neighbor pixels 
+                                    is considered (that is, the range is floating).
+
+            +FLOODFILL-MASK-ONLY+ If set, the function does not change the image (NEW-VAL is ignored), 
+                                  and only fills the mask with the value specified in bits 8-16 of FLAGS 
+                                  as described above. 
+
+The function FLOOD-FILL fills a connected component starting from the seed point with the specified 
+color. The connectivity is determined by the color/brightness closeness of the neighbor pixels. The 
+pixel at (x,y) is considered to belong to the repainted domain if...
+
+See OpenCV documentation at this link: 
+http://docs.opencv.org/trunk/modules/imgproc/doc/miscellaneous_transformations.html?highlight=floodfill#floodfill
+For further description of this function and related formulae.
+
+
+Example:
+
+(defun flood-fill-example ()
+
+  (let ((window-name-1 "INPUT IMAGE - FLOOD-FILL Example")
+        (window-name-2 "MASK - FLOOD-FILL Example"))
+    (with-named-window (window-name-1 +window-normal+)
+      (with-named-window (window-name-2 +window-normal+)
+	(move-window window-name-1 533 175)
+	(move-window window-name-2 984 175)
+
+	;;Create a simple input image:
+
+	;;Note: the t: prefix signifies that 
+	;;automatic finalization is enabled.
+
+	(with-point ((seed-point (point 4 4)))
+	  (with-mat ((img (mat-zeros 100 100 +8uc1+)))
+	    (circle img seed-point 20 (t:scalar 128) 3)
+
+	    ;;Show input image.
+
+	    (imshow window-name-1 img)
+
+	    ;;Create a mask from edges 
+	    ;;in the original image.
+
+	    (with-mat ((mask (mat)))
+	      (canny img mask 100d0 200d0)
+	      (copy-make-border mask mask 1 1 1 1 +border-replicate+)
+
+	      ;;Fill mask with value 128.
+
+	      ;;All zero-valued pixels in the same connected component 
+	      ;;as the seed point of the mask are replaced by the value 
+	      ;;you specify, in this case FILL-VALUE. This value must be 
+	      ;;added to FLAGS parameter and left-shifted by 8 bits, like
+	      ;;below, with the Common Lisp function ASH. The FLAG value 4 
+	      ;;specifies the pixel neighborhood with which to compare the 
+	      ;;color value difference.
+
+	      (let ((fill-value 128))
+		(flood-fill img mask seed-point (t:scalar 255) (null-pointer) (t:scalar) (t:scalar) 
+			    (logior 4 (logior +floodfill-mask-only+ (ash fill-value 8)))))
+
+	      ;;Show mask: The white pixels in the mask are the result of 
+	      ;;edge detection, while the grey pixels are the result of the 
+	      ;;flood-fill.
+
+	      (imshow window-name-2 mask)
+	      (loop
+		 (let ((c (wait-key 33)))
+		   (when (= c 27)
+		     (return)))))))))))
+
+========================================================================================================================================
 #THRESHOLD
 ========================================================================================================================================
 
@@ -10901,8 +11025,8 @@ Example:
 	  (return-from equalize-hist-example 
 	    (format t "Cannot open the video camera")))
       (format t "~%Frame Size : ~ax~a~%~%" 
-	      (*get cap +cap-prop-frame-width+)
-	      (*get cap +cap-prop-frame-height+))
+	      (get* cap +cap-prop-frame-width+)
+	      (get* cap +cap-prop-frame-height+))
       (with-named-window (window-name-1 +window-autosize+)
 	(with-named-window (window-name-2 +window-autosize+)
 	  (with-named-window (window-name-3 +window-autosize+)
@@ -12588,8 +12712,8 @@ Small example program used to extract frames from the camera feed:
     (let ((window-name "IMAGE-EXTRACTOR Example")
           (filename 0))
       (format t "~%Frame Size : ~ax~a~%~%" 
-	      (*get cap +cap-prop-frame-width+)
-	      (*get cap +cap-prop-frame-height+))
+	      (get* cap +cap-prop-frame-width+)
+	      (get* cap +cap-prop-frame-height+))
       (with-named-window (window-name +window-normal+)
 	(move-window window-name 759 175)
 	(with-mat ((frame (mat)))
@@ -12770,8 +12894,8 @@ value 0 is returned.
       (set cap +cap-prop-frame-width+ width)
       (set cap +cap-prop-frame-height+ height)
       (format t "~%Frame Size : ~ax~a~%~%" 
-	      (*get cap +cap-prop-frame-width+)
-	      (*get cap +cap-prop-frame-height+))
+	      (get* cap +cap-prop-frame-width+)
+	      (get* cap +cap-prop-frame-height+))
       (with-named-window (window-name +window-normal+)
 	(move-window window-name 759 175)
 	(with-mat ((frame (mat)))
@@ -13116,7 +13240,7 @@ Example:
 	    (format t "Cannot open the video camera")))
       (set cap +cap-prop-brightness+ 0.7)
       (format t "~%Brightness level: ~a~%~%" 
-	      (*get cap +cap-prop-brightness+))
+	      (get* cap +cap-prop-brightness+))
       (with-named-window (window-name +window-normal+)
 	(move-window window-name 759 175)
 	(with-mat ((frame (mat)))
@@ -13178,8 +13302,8 @@ FFMPEG or VFW is used; on MacOSX QTKit is used.
   (with-captured-camera (cap cam :width width :height height)
     (let* ((filename filename)
 	   (window-name "VIDEO-WRITER Example")
-	   (dheight (rational (*get cap +cap-prop-frame-height+)))
-	   (dwidth (rational (*get cap +cap-prop-frame-width+))))
+	   (dheight (rational (get* cap +cap-prop-frame-height+)))
+	   (dwidth (rational (get* cap +cap-prop-frame-width+))))
       (with-size ((frame-size (size width height)))
 	;;Initialize the VIDEO-WRITER object 
 	(with-video-writer ((o-video-writer (video-writer filename 
@@ -14657,8 +14781,8 @@ This function is parallelized with the TBB library.
       (with-named-window (window-name +window-autosize+)
 	(move-window window-name 0 300)
 	(format t "~%Frame Size : ~ax~a~%~%" 
-		(*get cap +cap-prop-frame-width+)
-		(*get cap +cap-prop-frame-height+))
+		(get* cap +cap-prop-frame-width+)
+		(get* cap +cap-prop-frame-height+))
 	(with-mat ((frame (mat)))
 	  (loop
              ;;Read the video stream.

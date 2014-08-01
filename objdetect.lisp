@@ -20,7 +20,7 @@
 ;; CascadeClassifier* cv_create_CascadeClassifier1(String* filename)
 (defcfun ("cv_create_CascadeClassifier1" cascade-classifier-1) cascade-classifier
   "Loads a classifier from a file."
-  (filename *string))
+  (filename string*))
 
 
 (defun cascade-classifier (&optional filename)
@@ -44,7 +44,7 @@
 (defcfun ("cv_CascadeClassifier_load1" %cascade-classifier-load) :boolean
   "Loads a classifier from a file."
   (self cascade-classifier)
-  (filename *string))
+  (filename string*))
 
 
 (defun cascade-classifier-load (self filename)

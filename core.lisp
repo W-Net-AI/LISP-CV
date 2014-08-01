@@ -113,13 +113,14 @@
 ;; Live code editing
 
 (defmacro continuable (&body body)
+  "Catches any error and gives the option to ignore it and continue."
 	  `(restart-case
 	    (progn ,@body)
 	    (continue () :report "Continue")))
 
 
 (defun update-swank ()
-       "Grabs SWANK connections and tells it to handle requests. 
+  "Grabs SWANK connections and tells it to handle requests. 
    Call this every loop in the main loop of your program"
    (continuable
     (let ((connection (or swank::*emacs-connection*
@@ -128,45 +129,42 @@
 			    (swank::handle-requests connection t)))))
 
 
-;; C-Interop - *String
+;; C-Interop - STRING*
 
-
-;; Version for internal use.
-
-;; stdstring* create_std_string()
-  "Creates a *STRING object."
-(defcfun ("create_std_string" %string) *string)
-
-
-;; Version for external use.
+;; Versions for external use.
 
 ;; string* std_cstringToString(char* s, size_t len) 
-(defcfun ("cstring_to_std_string" c-string-to-string) *string
-  "Converts C string to C++"
+(defcfun ("cstring_to_std_string" c-string-to-string) string*
+  "Converts C string to C++ string."
   (s :string)
   (len :unsigned-int))
 
 
 (defun c-string (string)
   "If you need a speed boost and decide to use low-level functions, 
-   use this to create a C string for  their *STRING parameters."
+   use this to create a C string for  their STRING* parameters."
   (c-string-to-string string (cl:length string)))
 
 
-
-;; Version for internal use.
+;; Versions for internal use.
 
 ;; string* std_cstringToString(char* s, size_t len) 
-(defcfun ("cstring_to_std_string" %c-string-to-string) (cv::*string :garbage-collect t)
+(defcfun ("cstring_to_std_string" %c-string-to-string) (cv::string* :garbage-collect t)
   "Converts C string to C++"
   (s :string)
   (len :unsigned-int))
+
+
+;; stdstring* create_std_string()
+  "Creates a C++ string object."
+(defcfun ("create_std_string" %string) string*)
 
 
 ;;; C-Interop - CV-MAT
 
 ;; CvMat* cv_Mat_to_CvMat(Mat* self)
 (defcfun ("cv_Mat_to_CvMat" mat-to-cv-mat) mat-struct
+  "Converts Mat object to an CvMat object."
   (self mat))
 
 
@@ -174,6 +172,7 @@
 
 ;; CvTermCriteria cv_TermCriteria_to_CvTermCriteria(TermCriteria* self)
 (defcfun ("cv_TermCriteria_to_CvTermCriteria" term-crit-to-cv-term-crit) (:pointer (:struct term-criteria-struct))
+  "Converts a TermCriteria object to a CvTermCriteria object."
   (self term-criteria))
 
 
@@ -183,24 +182,26 @@
   (if (pointerp ptr) ptr (c-pointer ptr)))
 
 (defmacro @ (ptr type &optional (index 0))
+  "CFFI:MEM-AREF macro with C-POINTER reader."
   `(mem-aref (resolve-pointer ,ptr) ,type ,index))
 
 (defmacro @@ (ptr type &optional (offset 0))
+  "CFFI:MEM-REF macro with C-POINTER reader."
   `(mem-ref (resolve-pointer ,ptr) ,type ,offset))
 
 
-;;; Basic Structures
+;;; Basic Structures###
 
 
 ;; size_t cv_Mat_get_Step(Mat* self) 
-(defcfun ("cv_Mat_get_Step" *step) :unsigned-int
+(defcfun ("cv_Mat_get_Step" step*) :unsigned-int
   "Used to compute address of a matrix element"
   (self mat))
 
 
 ;; Scalar trace(InputArray mtx)
 ;; Scalar* cv_trace(Mat* mtx)
-(defcfun ("cv_trace" *trace) scalar
+(defcfun ("cv_trace" trace*) scalar
   "Returns the trace of a matrix."
   (mtx mat))
 
@@ -2737,8 +2738,8 @@ ret))
 (defun print-size (size)
   (if (typep size 'cv-size)
       (format t "~a(width: ~a height: ~a)~%" *personalize-print-size* 
-	      (@ size :int) 
-	      (@ size :int 1))
+	      (size-width size) 
+	      (size-height size))
       (error "The value ~a is not of type CV-SIZE." size)))
 
 
@@ -3384,6 +3385,28 @@ ret))
 (defcfun ("cv_Size_width" size-width) :double
   "Gets the width of a SIZE construct"
   (self size)) 
+
+
+;; double cv_Size_set_width(Size* self, double val)
+(defcfun ("cv_Size_set_width" size-set-width) :double
+  "Sets the width of a SIZE construct"
+  (self size)
+  (val :double))
+
+
+(defun (setf size-width)  (val self)
+  (size-set-width self val))
+
+
+;; double cv_Size_set_height(Size* self, double val)
+(defcfun ("cv_Size_set_height" size-set-height) :double
+  "Sets the height of a SIZE construct"
+  (self size)
+  (val :double))
+
+
+(defun (setf size-height)  (val self)
+  (size-set-height self val))
 
 
 ;; size_t Mat::step1(int i=0 ) const
@@ -4625,6 +4648,14 @@ ret))
   (dest mat))
 
 
+(defun sqrt (arg1 &optional arg2)
+  "Used to overload CL:SQRT and 
+   OpenCV's sqrt function."
+  (if (typep arg1 'number)
+      (cl:sqrt arg1)
+      (%sqrt arg1 arg2)))
+
+
 ;; void scaleAdd(InputArray src1, double alpha, InputArray src2, OutputArray dst)
 ;; void cv_scaleAdd(Mat* src1, double alpha, Mat* src2, Mat* dst)
 (defcfun ("cv_scaleAdd" scale-add) :void 
@@ -4793,7 +4824,7 @@ ret))
 ;; Size getTextSize(const string& text, int fontFace, double fontScale, int thickness, int* baseLine)
 ;; Size* cv_getTextSize(String* text, int fontFace, double fontScale, int thickness, int* baseLine)
 (defcfun ("cv_getTextSize" %get-text-size) size
-  (text *string)
+  (text string*)
   (font-face :int)
   (font-scale :double)
   (thickness :int) 
@@ -4830,7 +4861,7 @@ ret))
 
 (defcfun ("cv_putText" %put-text) :void
   (img mat)
-  (text *string)
+  (text string*)
   (org point)
   (font-face :int)
   (font-scale :double)
@@ -4874,9 +4905,9 @@ ret))
 ;; FileStorage::FileStorage(const String& source, int flags, const String& encoding=String())
 ;; FileStorage* cv_create_FileStorage3(String* source, int flags, String* encoding)
 (defcfun ("cv_create_FileStorage3" %file-storage-3) file-storage
-  (source *string)
+  (source string*)
   (flags :int)
-  (encoding *string))
+  (encoding string*))
 
 
 (defun file-storage-3 (&optional source flags (encoding (%string) given-encoding))
@@ -4908,9 +4939,9 @@ ret))
 ;; bool cv_FileStorage_open(FileStorage* self, String* filename, int flags, String* encoding)
 (defcfun ("cv_FileStorage_open" %file-storage-open) :boolean
   (self file-storage)
-  (filename *string)
+  (filename string*)
   (flags :int)
-  (encoding *string))
+  (encoding string*))
 
 
 (defun file-storage-open (self &optional filename flags (encoding (%string) given-encoding))
@@ -4934,7 +4965,7 @@ ret))
 ;; void cv_FileNode_write_number_##(FileStorage* fs, String* name, tn value)
 (defcfun ("cv_FileNode_write_number_d" file-storage-write-double) :void
   (fs file-storage)
-  (name *string)
+  (name string*)
   (value :double))
 
 
@@ -4942,7 +4973,7 @@ ret))
 ;; void cv_FileNode_write_number_##(FileStorage* fs, String* name, tn value)
 (defcfun ("cv_FileNode_write_number_f" file-storage-write-float) :void
   (fs file-storage)
-  (name *string)
+  (name string*)
   (value :float))
 
 
@@ -4950,7 +4981,7 @@ ret))
 ;; void cv_FileNode_write_number_##(FileStorage* fs, String* name, tn value)
 (defcfun ("cv_FileNode_write_number_i" file-storage-write-int) :void
   (fs file-storage)
-  (name *string)
+  (name string*)
   (value :int))
 
 
@@ -4958,7 +4989,7 @@ ret))
 ;; void cv_FileNode_write_pointer_##(FileStorage* fs, String* name, tn* value)
 (defcfun ("cv_FileNode_write_pointer_vkp" file-storage-write-vector-key-point) :void
   (fs file-storage)
-  (name *string)
+  (name string*)
   (value vector-key-point))
 
 
@@ -4966,7 +4997,7 @@ ret))
 ;; void cv_FileNode_write_pointer_##(FileStorage* fs, String* name, tn* value)
 (defcfun ("cv_FileNode_write_pointer_m" file-storage-write-mat) :void
   (fs file-storage)
-  (name *string)
+  (name string*)
   (value mat))
 
 
@@ -4974,8 +5005,8 @@ ret))
 ;; void cv_FileNode_write_pointer_##(FileStorage* fs, String* name, tn* value)
 (defcfun ("cv_FileNode_write_pointer_s" file-storage-write-string) :void
   (fs file-storage)
-  (name *string)
-  (value *string))
+  (name string*)
+  (value string*))
 
 
 

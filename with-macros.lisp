@@ -311,7 +311,7 @@
 
 (defmacro with-string (bind &body body)
   "Ensures DEL-STD-STRING gets called when 
-   a *STRING object goes out of scope."
+   a STRING* object goes out of scope."
   `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
      (unwind-protect (progn ,@body)
        (mapcar #!(del-std-string %1) ,(cons 'list (mapcar #!(car %1) bind)))

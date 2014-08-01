@@ -220,8 +220,8 @@
 ;; void operator delete  ( void* ptr )
 ;; void cv_delete_std_string(string* self)
 (defcfun ("cv_delete_std_string" del-std-string) :void
-  "Calls delete on a *STRING object."
-  (self *string))
+  "Calls delete on a STRING* object."
+  (self string*))
 
 
 ;; void operator delete  ( void* ptr )

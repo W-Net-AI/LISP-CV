@@ -570,6 +570,8 @@
   (+lsd-refine-none+ 0)
   (+lsd-refine-std+ 1)
   (+lsd-refine-adv+ 2)
+  (+floodfill-fixed-range+ 65536)
+  (+floodfill-mask-only+ 131072)
 
 
 ;;; features2d

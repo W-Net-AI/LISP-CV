@@ -8,8 +8,8 @@
 
 ;;; DEFGENERIC
 
-(defgeneric *get (self value)
-  (:documentation "Used for all class bindings with a GET member"))
+(defgeneric get* (self value)
+  (:documentation "Used for all class bindings with a GET member function."))
 
 (defgeneric abs (self)
   (:documentation "Used to call the binding for the OpenCV function 'abs' and CL:ABS."))
@@ -23,6 +23,9 @@
 (defgeneric assign (self other)
   (:documentation "Used for bindings of the OpenCV = operator."))
 
+(defgeneric apply* (self arg1 arg2 &optional arg3)
+  (:documentation "Used for all class bindings with an APPLY member function."))
+
 (defgeneric bounding-rect (self)
   (:documentation "Used for the BOUNDING-RECT member of ROTATED-RECT."))
 
@@ -33,19 +36,19 @@
   (:documentation "Used to setf the CENTER value of class bindings with an CENTER member."))
 
 (defgeneric clone (self)
-  (:documentation "Used for all class bindings with a CLONE member."))
+  (:documentation "Used for all class bindings with a CLONE member function."))
 
 (defgeneric compute (type self &rest args)
-  (:documentation "Used for all class bindings with a COMPUTE member."))
+  (:documentation "Used for all class bindings with a COMPUTE member function."))
 
 (defgeneric create (type self &rest args)
-  (:documentation "Used for all class bindings with a CREATE member."))
+  (:documentation "Used for all class bindings with a CREATE member function."))
 
 ;(defgeneric data (self)
-;  (:documentation "Used for all class bindings with a DATA member."))
+;  (:documentation "Used for all class bindings with a DATA member function."))
 
 (defgeneric detect (self &rest args)
-  (:documentation "Used for all class bindings with a DETECT member."))
+  (:documentation "Used for all class bindings with a DETECT member function."))
 
 (defgeneric descriptor-extractor-compute (self image keypoints descriptors)
   (:documentation "Used for all DESCRIPTOR-EXTRACTOR-COMPUTE methods."))
@@ -60,7 +63,7 @@
   (:documentation "Used for all DESCRIPTOR-MATCHER-MATCH methods.")) 
 
 (defgeneric dot (self other)
-  (:documentation "Used for all class bindings with a DOT member"))
+  (:documentation "Used for all class bindings with a DOT member function."))
 
 (defgeneric feature-2d-compute (self image keypoints descriptors)
   (:documentation "Used for all FEATURE-2D-COMPUTE methods."))
@@ -81,31 +84,28 @@
   (:documentation "Used to setf the HEIGHT value of class bindings with an HEIGHT member."))
 
 (defgeneric is-opened (self)
-  (:documentation "Used for all class bindings with an IS-OPENED member."))
+  (:documentation "Used for all class bindings with an IS-OPENED member function."))
 
 (defgeneric file-storage-write (fs name value)
   (:documentation "Used for all FILE-STORAGE-WRITE methods."))
 
 (defgeneric match (self &rest args)
-  (:documentation "Used for all class bindings with a MATCH member."))
+  (:documentation "Used for all class bindings with a MATCH member function."))
 
 (defgeneric open (self &rest args)
-  (:documentation "Used for all class bindings with a OPEN member."))
+  (:documentation "Used for all class bindings with a OPEN member function."))
 
 (defgeneric predict (self &rest args)
-  (:documentation "Used for all class bindings with a PREDICT member."))
+  (:documentation "Used for all class bindings with a PREDICT member function."))
 
 (defgeneric *read (self arg)
-  (:documentation "Used for all class bindings with an READ member."))
+  (:documentation "Used for all class bindings with an READ member function."))
 
 (defgeneric release (self)
-  (:documentation "Used for all class bindings with a RELEASE member."))
+  (:documentation "Used for all class bindings with a RELEASE member function."))
 
 (defgeneric save (self &rest args)
-  (:documentation "Used for all class bindings with a SAVE member."))
-
-(defgeneric sqrt (arg &rest args)
-  (:documentation "Used for all class bindings with a SIZE member."))
+  (:documentation "Used for all class bindings with a SAVE member function."))
 
 (defgeneric size (arg &rest args)
   (:documentation "Used for all class bindings with a SIZE member."))
@@ -145,7 +145,7 @@
 ;;;DEFMETHODS
 
 
-(defmethod *get ((self cv-video-capture) (value integer))
+(defmethod get* ((self cv-video-capture) (value integer))
 	   (video-capture-get self value))
 
 
@@ -465,12 +465,12 @@
 
 (defmethod height ((self cv-size))
   "Retrieves HEIGHT value of a SIZE object."
-  (mem-aref (c-pointer self) :int 1))
+  (size-height self))
 
 
-(defmethod (setf height) ((val integer) (self cv-size))
+(defmethod (setf height) ((val double-float) (self cv-size))
   "Sets HEIGHT value of a SIZE object."
-  (setf (mem-aref (c-pointer self) :int 1) val))
+  (size-set-height self val))
 
 
 (defmethod is-opened ((self cv-video-capture))
@@ -620,15 +620,6 @@
   (apply #'stat-model-save self args))
 
 
-(defmethod sqrt ((arg cv-mat) &rest args)
-	   (%sqrt arg (first args)))
-
-
-(defmethod sqrt ((arg number) &rest args)
-  args
-  (cl:sqrt arg))
-
-
 (defmethod size ((arg cv-key-point) &rest args)
   args
   (key-point-size arg))
@@ -690,12 +681,12 @@
 
 (defmethod width ((self cv-size))
   "Retrieves WIDTH value of a SIZE object."
-  (mem-aref (c-pointer self) :int))
+  (size-width self))
 
 
-(defmethod (setf width) ((val integer) (self cv-size))
+(defmethod (setf width) ((val double-float) (self cv-size))
   "Sets WIDTH value of a SIZE object."
-  (setf (mem-aref (c-pointer self) :int) val))
+  (size-set-width self val))
 
 
 (defmethod x ((self cv-key-point))

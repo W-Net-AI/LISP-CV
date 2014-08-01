@@ -59,8 +59,7 @@
 ;; void copyMakeBorder(InputArray src, OutputArray dst, int top, int bottom, int left, int right, int borderType, 
 ;; const Scalar& value=Scalar())
 ;; void cv_copyMakeBorder(Mat* src, Mat* dst, int top, int bottom, int left, int right, int borderType, Scalar* value) 
-(defcfun ("cv_copyMakeBorder" copy-make-border) :void 
-  "Forms a border around an image."
+(defcfun ("cv_copyMakeBorder" %copy-make-border) :void 
   (src mat)
   (dest mat)
   (top :int)
@@ -69,6 +68,11 @@
   (right :int)
   (border-type :int)
   (value scalar))
+
+
+(defun copy-make-border (src dest top bottom left right border-type &optional (value (scalar-0)))
+  "Forms a border around an image."
+  (%copy-make-border src dest top bottom left right border-type value))
 
 
 ;; void dilate(InputArray src, OutputArray dst, InputArray kernel, Point anchor=Point(-1,-1), int iterations=1, 
@@ -454,6 +458,24 @@
   (if (typep (third args) 'cv-mat)
       (apply #'%distance-transform args)
       (apply #'distance-transform5 args)))
+
+
+;; int floodFill(InputOutputArray image, InputOutputArray mask, Point seedPoint, Scalar newVal, Rect* rect=0, 
+;;               Scalar loDiff=Scalar(), Scalar upDiff=Scalar(), int flags=4 )
+;; int cv_floodFill(Mat* image, Mat* mask, Point* seedPoint, Scalar* newVal, Rect* rect, Scalar* loDiff, Scalar* upDiff, int flags) 
+(defcfun ("cv_floodFill" %flood-fill) :int
+  (image mat)
+  (mask mat)
+  (seed-point point)
+  (new-val scalar)
+  (rect rect)
+  (lo-diff scalar)
+  (up-diff scalar)
+  (flags :int))
+
+
+(defun flood-fill (image mask seed-point new-val &optional (rect (null-pointer)) (lo-diff (scalar-0)) (up-diff (scalar-0)) (flags 4))
+  (%flood-fill image mask seed-point new-val rect lo-diff up-diff flags))
 
 
 ;; double threshold(InputArray src, OutputArray dst, double thresh, double maxval, int type)

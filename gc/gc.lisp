@@ -19,12 +19,12 @@
 
 
 ;; stdstring* create_std_string()
-  "Creates a *STRING object."
-(defcfun ("create_std_string" %string) (cv:*string :garbage-collect t))
+  "Creates a STRING* object."
+(defcfun ("create_std_string" %string) (cv:string* :garbage-collect t))
 
 
 ;; string* std_cstringToString(char* s, size_t len) 
-(defcfun ("cstring_to_std_string" c-string-to-string) (cv:*string :garbage-collect t)
+(defcfun ("cstring_to_std_string" c-string-to-string) (cv:string* :garbage-collect t)
 	 "Converts C string to C++"
 	 (s :string)
 	 (len :unsigned-int))
@@ -32,7 +32,7 @@
 
 (defun c-string (string)
   "If you need a speed boost and decide to use low-level functions, 
-   use this to create a C string for  their *STRING parameters."
+   use this to create a C string for  their STRING* parameters."
   (c-string-to-string string (cl:length string)))
 
 
@@ -2055,9 +2055,9 @@ ret))
 ;; FileStorage::FileStorage(const String& source, int flags, const String& encoding=String())
 ;; FileStorage* cv_create_FileStorage3(String* source, int flags, String* encoding)
 (defcfun ("cv_create_FileStorage3" %file-storage-3) (cv:file-storage :garbage-collect t) 
-  (source cv:*string)
+  (source cv:string*)
   (flags :int)
-  (encoding cv:*string))
+  (encoding cv:string*))
 
 
 (defun file-storage-3 (&optional source flags (encoding (cv:%string) given-encoding))
@@ -2198,7 +2198,7 @@ ret))
 ;; VideoCapture* cv_create_VideoCapture1(String* filename) 
 (defcfun ("cv_create_VideoCapture1" video-capture-file) (cv:video-capture :garbage-collect t)
 	 "VideoCapture constructor"
-	 (filename cv:*string))
+	 (filename cv:string*))
 
 
 (defun video-capture (&optional src)
@@ -2224,7 +2224,7 @@ ret))
 ;; Mat imread(const string& filename, int flags=1)
 ;; mat cv_imread (const char* filename, int flags)
 (defcfun ("cv_imread" %imread) (cv:mat :garbage-collect t)
-	 (filename cv:*string)
+	 (filename cv:string*)
 	 (flags :int))
 
 
@@ -2240,7 +2240,7 @@ ret))
 ;; VideoWriter::VideoWriter(const string& filename, int fourcc, double fps, Size frameSize, bool isColor) 
 ;; VideoWriter* cv_create_VideoWriter5(String* filename, int fourcc, double fps, Size* frameSize, bool isColor)
 (defcfun ("cv_create_VideoWriter5" video-writer-5) (cv:video-writer :garbage-collect t)
-	 (filename cv:*string)
+	 (filename cv:string*)
 	 (fourcc :int)
 	 (fps :double)
 	 (frame-size cv:size)
@@ -2334,7 +2334,7 @@ ret))
 ;; CascadeClassifier* cv_create_CascadeClassifier1(String* filename)
 (defcfun ("cv_create_CascadeClassifier1" cascade-classifier-1) (cv:cascade-classifier :garbage-collect t)
 	 "Loads a classifier from a file."
-	 (filename cv:*string))
+	 (filename cv:string*))
 
 
 (defun cascade-classifier (&optional filename)

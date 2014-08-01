@@ -28,6 +28,7 @@
                (:file "core" :depends-on ("package" "lisp-cv" "constants" "types"))
 	       (:file "imgproc" :depends-on ("package" "lisp-cv" "constants" "types" "core"))
 	       (:file "highgui" :depends-on ("package" "lisp-cv" "constants" "types" "core"))
+               (:file "video" :depends-on ("package" "lisp-cv" "constants" "types" "core"))
                (:file "calib3d" :depends-on ("package" "lisp-cv" "constants" "types" "core"))
                (:file "objdetect" :depends-on ("package" "lisp-cv" "constants" "types" "core"))
                (:file "ml" :depends-on ("package" "lisp-cv" "constants" "types" "core" "structs" "imgproc"))

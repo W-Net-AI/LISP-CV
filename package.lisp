@@ -6,7 +6,7 @@
   (:shadow #:abs #:exp #:get #:length #:load #:log #:min #:max #:open #:read #:set #:sqrt #:write)
   (:export 
 
-
+;
 ;; Default parameters.
 
    #:*camera-index* 
@@ -274,7 +274,7 @@
 
 ;; DEFINE-FOREIGN-TYPE
 
-   #:*string
+   #:string*
    #:ann-mlp
    #:ann-mlp-train-params
    #:bf-matcher
@@ -653,7 +653,7 @@
 
 ;; DEFGENERIC
 
-   #:*get
+   #:get*
    #:angle
    #:assign
    #:bounding-rect
@@ -727,8 +727,8 @@
    #:+termcrit-number+
    #:+termcrit-eps+
    
-   #:*step
-   #:*trace
+   #:step*
+   #:trace*
    #:<<
    #:>>
    #:add
@@ -1457,10 +1457,13 @@
    #:+dist-mask-3+
    #:+dist-mask-5+
    #:+dist-mask-precise+ 
+   #:+floodfill-fixed-range+
+   #:+floodfill-mask-only+ 
 
    #:adaptive-threshold 
    #:cvt-color
    #:distance-transform
+   #:flood-fill
    #:threshold
    
 ;; imgproc - Histograms

@@ -382,7 +382,7 @@
    #:sub
    #:term-criteria
    #:tl
-   #:*trace
+   #:trace*
    #:vec-2b
    #:vec-3b
    #:vec-4b

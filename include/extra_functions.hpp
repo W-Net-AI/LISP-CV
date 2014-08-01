@@ -17,7 +17,7 @@
 */
 
 #include <opencv2/c/opencv_generated.hpp>
-
+typedef Ptr<BackgroundSubtractor> Ptr_BackgroundSubtractor;
 #define ADD_VEC_FUNC_HEADERS_0_0(t) \
     Vec2##t * cv_create_0_Vec2##t(); \
     Vec3##t * cv_create_0_Vec3##t(); \
@@ -89,6 +89,10 @@ ADD_READ_FUNC_HEADERS_0(d, double);
 ADD_READ_FUNC_HEADERS_1(s, String);
 ADD_READ_FUNC_HEADERS_1(m, Mat);
 Mat* test(uchar* a, size_t len );
+double cv_Size_set_width(Size* self, double val);    
+double cv_Size_set_height(Size* self, double val);
+void cv_BackgroundSubtractorMOG2_getBackgroundImage(BackgroundSubtractorMOG2* self, Mat* backgroundImage);
+void cv_Mat_create_typed(Mat* self, int rows, int cols, int type);
 void cv_RotatedRect_setCenter(RotatedRect* self, Point* val);
 void cv_RotatedRect_setSize(RotatedRect* self, Size* val);
 float cv_RotatedRect_setAngle(RotatedRect* self, float val);

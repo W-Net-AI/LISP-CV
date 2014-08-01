@@ -139,6 +139,22 @@ m->ptr(a[i]);
 return m;
 }
 
+double cv_Size_set_width(Size* self, double val) {
+   return self->width = val;
+}
+    
+double cv_Size_set_height(Size* self, double val) {
+   return self->height = val;
+}
+
+void cv_BackgroundSubtractorMOG2_getBackgroundImage(BackgroundSubtractorMOG2* self, Mat* backgroundImage) {
+    self->getBackgroundImage(*backgroundImage);
+}
+
+void cv_Mat_create_typed(Mat* self, int rows, int cols, int type) {
+    self->create(rows, cols, type);
+}
+
 void cv_Mat_push_back(Mat* self, Mat* m) {
     self->push_back(*m);
 }

@@ -31,19 +31,19 @@
 ;; Feature2D* cv_Feature2D_create1_1(Feature2D* self, String* name) 
 (defcfun ("cv_Feature2D_create1_1" %feature-2d-create-bf-matcher) bf-matcher
   (self bf-matcher)
-  (name *string))
+  (name string*))
 
 
 ;; Feature2D* cv_Feature2D_create1_1(Feature2D* self, String* name) 
 (defcfun ("cv_Feature2D_create1_1" %feature-2d-create-brisk) brisk
   (self brisk)
-  (name *string))
+  (name string*))
 
 
 ;; Feature2D* cv_Feature2D_create1_1(Feature2D* self, String* name) 
 (defcfun ("cv_Feature2D_create1_1" %feature-2d-create-surf) surf
   (self surf)
-  (name *string))
+  (name string*))
 
 
 ;; void Feature2D::compute( InputArray image, vector<KeyPoint>& keypoints, OutputArray descriptors ) const
@@ -161,19 +161,19 @@
 ;; DescriptorExtractor* cv_DescriptorExtractor_create1_0(DescriptorExtractor* self, String* descriptorExtractorType) 
 (defcfun ("cv_DescriptorExtractor_create1_0" %descriptor-extractor-create-bf-matcher) bf-matcher
   (self bf-matcher)
-  (descriptor-extractor-type *string))
+  (descriptor-extractor-type string*))
 
 
 ;; DescriptorExtractor* cv_DescriptorExtractor_create1_0(DescriptorExtractor* self, String* descriptorExtractorType) 
 (defcfun ("cv_DescriptorExtractor_create1_0" %descriptor-extractor-create-brisk) brisk
   (self brisk)
-  (descriptor-extractor-type *string))
+  (descriptor-extractor-type string*))
 
 
 ;; DescriptorExtractor* cv_DescriptorExtractor_create1_0(DescriptorExtractor* self, String* descriptorExtractorType) 
 (defcfun ("cv_DescriptorExtractor_create1_0" %descriptor-extractor-create-surf) surf
   (self surf)
-  (descriptor-extractor-type *string))
+  (descriptor-extractor-type string*))
 
 
 
@@ -202,21 +202,21 @@
 ;; DescriptorMatcher* cv_DescriptorMatcher_create1_2(DescriptorMatcher* self, String* descriptorMatcherType) 
 (defcfun ("cv_DescriptorMatcher_create1_2" %descriptor-matcher-create-bf-matcher) bf-matcher
   (self bf-matcher)
-  (descriptor-matcher-type *string))
+  (descriptor-matcher-type string*))
 
 
 ;; Ptr<DescriptorMatcher> DescriptorMatcher::create(const string& descriptorMatcherType)
 ;; DescriptorMatcher* cv_DescriptorMatcher_create1_2(DescriptorMatcher* self, String* descriptorMatcherType) 
 (defcfun ("cv_DescriptorMatcher_create1_2" %descriptor-matcher-create-brisk) brisk
   (self brisk)
-  (descriptor-matcher-type *string))
+  (descriptor-matcher-type string*))
 
 
 ;; Ptr<DescriptorMatcher> DescriptorMatcher::create(const string& descriptorMatcherType)
 ;; DescriptorMatcher* cv_DescriptorMatcher_create1_2(DescriptorMatcher* self, String* descriptorMatcherType) 
 (defcfun ("cv_DescriptorMatcher_create1_2" %descriptor-matcher-create-surf) surf
   (self surf)
-  (descriptor-matcher-type *string))
+  (descriptor-matcher-type string*))
 
 
 ;; void DescriptorMatcher::match(const Mat& queryDescriptors, const Mat& trainDescriptors, vector<DMatch>& matches, 

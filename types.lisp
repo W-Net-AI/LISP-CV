@@ -43,33 +43,30 @@
 ;; TRACKBAR-CALLBACK
 (defctype trackbar-callback :pointer)
 
-;; BACKGROUND-SUBTRACTOR-MOG-2
-(defctype background-subtractor-mog-2 :pointer)
-
 
 ;; C++ INTEROP TYPES.
 
 
-;; *STRING
+;; STRING*
 
 
-(define-foreign-type *string ()
+(define-foreign-type string* ()
   ((garbage-collect  :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
-  (:simple-parser *string))
+  (:simple-parser string*))
 
 
 (defclass std-string ()
   ((c-pointer :reader c-pointer :initarg :c-pointer)))
 
 
-(defmethod translate-to-foreign ((lisp-value std-string) (c-type *string))
+(defmethod translate-to-foreign ((lisp-value std-string) (c-type string*))
   (values  (c-pointer lisp-value) lisp-value))
 
 
     
-(defmethod translate-from-foreign (c-pointer (c-type *string))
+(defmethod translate-from-foreign (c-pointer (c-type string*))
   (let ((string  (make-instance 'std-string :c-pointer c-pointer)))
     (when (garbage-collect c-type)
       (tg:finalize string (lambda () (del-std-string c-pointer))))
@@ -2089,6 +2086,32 @@
     (when (garbage-collect c-type)
       (tg:finalize video-writer (lambda () (del-video-writer c-pointer))))
     video-writer))
+
+
+
+;; VIDEO
+
+
+(define-foreign-type background-subtractor-mog-2 ()
+  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+                     :garbage-collect))
+  (:actual-type :pointer)
+  (:simple-parser background-subtractor-mog-2))
+
+
+(defclass cv-background-subtractor-mog-2 ()
+  ((c-pointer :reader c-pointer :initarg :c-pointer)))
+
+
+(defmethod translate-to-foreign ((lisp-value cv-background-subtractor-mog-2) (c-type background-subtractor-mog-2))
+  (values  (c-pointer lisp-value) lisp-value))
+
+
+(defmethod translate-from-foreign (c-pointer (c-type background-subtractor-mog-2))
+  (let ((background-subtractor-mog-2 (make-instance 'cv-background-subtractor-mog-2 :c-pointer c-pointer)))
+    (when (garbage-collect c-type)
+      (tg:finalize background-subtractor-mog-2 (lambda () (princ ""))))
+    background-subtractor-mog-2))
 
 
 

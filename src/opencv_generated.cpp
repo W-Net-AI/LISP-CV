@@ -1,9 +1,12 @@
-#include "/usr/local/include/opencv2/c/opencv_generated.hpp"
+#include <opencv2/c/opencv_generated.hpp>
 using namespace cv;
 using namespace std;
 using namespace flann;
 using namespace cvflann;
 extern "C" {
+AKAZE* cv_create_AKAZE() {
+	return new AKAZE();
+}
 BFMatcher* cv_create_BFMatcher(int normType, bool crossCheck) {
 	return new BFMatcher(normType, crossCheck);
 }
@@ -79,6 +82,9 @@ DMatch* cv_create_DMatch3(int _queryIdx, int _trainIdx, float _distance) {
 DMatch* cv_create_DMatch4(int _queryIdx, int _trainIdx, int _imgIdx, float _distance) {
 	return new DMatch(_queryIdx, _trainIdx, _imgIdx, _distance);
 }
+DenseFeatureDetector* cv_create_DenseFeatureDetector(float initFeatureScale, int featureScaleLevels, float featureScaleMul, int initXyStep, int initImgBound, bool varyXyStepWithScale, bool varyImgBoundWithScale) {
+	return new DenseFeatureDetector(initFeatureScale, featureScaleLevels, featureScaleMul, initXyStep, initImgBound, varyXyStepWithScale, varyImgBoundWithScale);
+}
 EM* cv_create_EM(int nclusters, int covMatType, TermCriteria* termCrit) {
 	return new EM(nclusters, covMatType, *termCrit);
 }
@@ -121,8 +127,8 @@ HOGDescriptor* cv_create_HOGDescriptor11(Size* _winSize, Size* _blockSize, Size*
 void cv_HoughCircles(Mat* image, Mat* circles, int method, double dp, double minDist, double param1, double param2, int minRadius, int maxRadius) {
 	cv::HoughCircles(*image, *circles, method, dp, minDist, param1, param2, minRadius, maxRadius);
 }
-void cv_HoughLines(Mat* image, Mat* lines, double rho, double theta, int threshold, double srn, double stn) {
-	cv::HoughLines(*image, *lines, rho, theta, threshold, srn, stn);
+void cv_HoughLines(Mat* image, Mat* lines, double rho, double theta, int threshold, double srn, double stn, double min_theta, double max_theta) {
+	cv::HoughLines(*image, *lines, rho, theta, threshold, srn, stn, min_theta, max_theta);
 }
 void cv_HoughLinesP(Mat* image, Mat* lines, double rho, double theta, int threshold, double minLineLength, double maxLineGap) {
 	cv::HoughLinesP(*image, *lines, rho, theta, threshold, minLineLength, maxLineGap);
@@ -135,6 +141,12 @@ Index* cv_create_Index() {
 }
 Index* cv_create_Index3(Mat* features, IndexParams* params, cvflann_flann_distance_t* distType) {
 	return new Index(*features, *params, *distType);
+}
+KAZE* cv_create_KAZE() {
+	return new KAZE();
+}
+KAZE* cv_create_KAZE2(bool extended, bool upright) {
+	return new KAZE(extended, upright);
 }
 KDTree* cv_create_KDTree() {
 	return new KDTree();
@@ -271,9 +283,6 @@ void cv_accumulateSquare(Mat* src, Mat* dst, Mat* mask) {
 void cv_accumulateWeighted(Mat* src, Mat* dst, double alpha, Mat* mask) {
 	cv::accumulateWeighted(*src, *dst, alpha, *mask);
 }
-void cv_adaptiveBilateralFilter(Mat* src, Mat* dst, Size* ksize, double sigmaSpace, Point* anchor, int borderType) {
-	cv::adaptiveBilateralFilter(*src, *dst, *ksize, sigmaSpace, *anchor, borderType);
-}
 void cv_adaptiveThreshold(Mat* src, Mat* dst, double maxValue, int adaptiveMethod, int thresholdType, int blockSize, double C) {
 	cv::adaptiveThreshold(*src, *dst, maxValue, adaptiveMethod, thresholdType, blockSize, C);
 }
@@ -345,6 +354,9 @@ void cv_Index_build3_0(Index* self, Mat* features, IndexParams* params, cvflann_
 }
 int cv_buildOpticalFlowPyramid(Mat* img, vector_Mat* pyramid, Size* winSize, int maxLevel, bool withDerivatives, int pyrBorder, int derivBorder, bool tryReuseInputImage) {
 	return cv::buildOpticalFlowPyramid(*img, *pyramid, *winSize, maxLevel, withDerivatives, pyrBorder, derivBorder, tryReuseInputImage);
+}
+void cv_DenseOpticalFlow_calc(DenseOpticalFlow* self, Mat* I0, Mat* I1, Mat* flow) {
+	self->calc(*I0, *I1, *flow);
 }
 void cv_calcBackProject(vector_Mat* images, vector_int* channels, Mat* hist, Mat* dst, vector_float* ranges, double scale) {
 	cv::calcBackProject(*images, *channels, *hist, *dst, *ranges, scale);
@@ -430,6 +442,9 @@ void cv_DescriptorMatcher_clear0_6(DescriptorMatcher* self) {
 bool cv_clipLine(Rect* imgRect, Point* pt1, Point* pt2) {
 	return cv::clipLine(*imgRect, *pt1, *pt2);
 }
+void cv_colorChange(Mat* src, Mat* mask, Mat* dst, float red_mul, float green_mul, float blue_mul) {
+	cv::colorChange(*src, *mask, *dst, red_mul, green_mul, blue_mul);
+}
 void cv_compare(Mat* src1, Mat* src2, Mat* dst, int cmpop) {
 	cv::compare(*src1, *src2, *dst, cmpop);
 }
@@ -477,6 +492,9 @@ double cv_contourArea(Mat* contour, bool oriented) {
 }
 void cv_KeyPoint_convert(KeyPoint* self, vector_KeyPoint* keypoints, vector_Point2f* points2f, vector_int* keypointIndexes) {
 	self->convert(*keypoints, *points2f, *keypointIndexes);
+}
+bool cv_CascadeClassifier_convert2(CascadeClassifier* self, String* oldcascade, String* newcascade) {
+	return self->convert(*oldcascade, *newcascade);
 }
 void cv_KeyPoint_convert6(KeyPoint* self, vector_Point2f* points2f, vector_KeyPoint* keypoints, float size, float response, int octave, int class_id) {
 	self->convert(*points2f, *keypoints, size, response, octave, class_id);
@@ -544,6 +562,9 @@ AlignMTB* cv_createAlignMTB(int max_bits, int exclude_range, bool cut) {
 BackgroundSubtractorGMG* cv_createBackgroundSubtractorGMG(int initializationFrames, double decisionThreshold) {
 	return &*cv::createBackgroundSubtractorGMG(initializationFrames, decisionThreshold);
 }
+BackgroundSubtractorKNN* cv_createBackgroundSubtractorKNN(int history, double dist2Threshold, bool detectShadows) {
+	return &*cv::createBackgroundSubtractorKNN(history, dist2Threshold, detectShadows);
+}
 BackgroundSubtractorMOG* cv_createBackgroundSubtractorMOG(int history, int nmixtures, double backgroundRatio, double noiseSigma) {
 	return &*cv::createBackgroundSubtractorMOG(history, nmixtures, backgroundRatio, noiseSigma);
 }
@@ -583,6 +604,9 @@ MergeMertens* cv_createMergeMertens(float contrast_weight, float saturation_weig
 MergeRobertson* cv_createMergeRobertson() {
 	return &*cv::createMergeRobertson();
 }
+DenseOpticalFlow* cv_createOptFlow_DualTVL1() {
+	return &*cv::createOptFlow_DualTVL1();
+}
 StereoBM* cv_createStereoBM(int numDisparities, int blockSize) {
 	return &*cv::createStereoBM(numDisparities, blockSize);
 }
@@ -613,11 +637,20 @@ void cv_cvtColor(Mat* src, Mat* dst, int code, int dstCn) {
 void cv_dct(Mat* src, Mat* dst, int flags) {
 	cv::dct(*src, *dst, flags);
 }
+void cv_decolor(Mat* src, Mat* grayscale, Mat* color_boost) {
+	cv::decolor(*src, *grayscale, *color_boost);
+}
 void cv_decomposeEssentialMat(Mat* E, Mat* R1, Mat* R2, Mat* t) {
 	cv::decomposeEssentialMat(*E, *R1, *R2, *t);
 }
 void cv_decomposeProjectionMatrix(Mat* projMatrix, Mat* cameraMatrix, Mat* rotMatrix, Mat* transVect, Mat* rotMatrixX, Mat* rotMatrixY, Mat* rotMatrixZ, Mat* eulerAngles) {
 	cv::decomposeProjectionMatrix(*projMatrix, *cameraMatrix, *rotMatrix, *transVect, *rotMatrixX, *rotMatrixY, *rotMatrixZ, *eulerAngles);
+}
+int cv_SIFT_defaultNorm(SIFT* self) {
+	return self->defaultNorm();
+}
+int cv_SURF_defaultNorm0(SURF* self) {
+	return self->defaultNorm();
 }
 void cv_demosaicing(Mat* _src, Mat* _dst, int code, int dcn) {
 	cv::demosaicing(*_src, *_dst, code, dcn);
@@ -639,6 +672,9 @@ void cv_destroyAllWindows() {
 }
 void cv_destroyWindow(String* winname) {
 	cv::destroyWindow(*winname);
+}
+void cv_detailEnhance(Mat* src, Mat* dst, float sigma_s, float sigma_r) {
+	cv::detailEnhance(*src, *dst, sigma_s, sigma_r);
 }
 void cv_LineSegmentDetector_detect(LineSegmentDetector* self, Mat* _image, Mat* _lines, Mat* width, Mat* prec, Mat* nfa) {
 	self->detect(*_image, *_lines, *width, *prec, *nfa);
@@ -676,8 +712,8 @@ int cv_KDTree_dims(KDTree* self) {
 void cv_distanceTransform(Mat* src, Mat* dst, Mat* labels, int distanceType, int maskSize, int labelType) {
 	cv::distanceTransform(*src, *dst, *labels, distanceType, maskSize, labelType);
 }
-void cv_distanceTransform4(Mat* src, Mat* dst, int distanceType, int maskSize) {
-	cv::distanceTransform(*src, *dst, distanceType, maskSize);
+void cv_distanceTransform5(Mat* src, Mat* dst, int distanceType, int maskSize, int dstType) {
+	cv::distanceTransform(*src, *dst, distanceType, maskSize, dstType);
 }
 void cv_divide(Mat* src1, Mat* src2, Mat* dst, double scale, int dtype) {
 	cv::divide(*src1, *src2, *dst, scale, dtype);
@@ -711,6 +747,9 @@ int cv_Subdiv2D_edgeDst(Subdiv2D* self, int edge, Point2f* dstpt) {
 }
 int cv_Subdiv2D_edgeOrg(Subdiv2D* self, int edge, Point2f* orgpt) {
 	return self->edgeOrg(edge, orgpt);
+}
+void cv_edgePreservingFilter(Mat* src, Mat* dst, int flags, float sigma_s, float sigma_r) {
+	cv::edgePreservingFilter(*src, *dst, flags, sigma_s, sigma_r);
 }
 bool cv_eigen(Mat* src, Mat* eigenvalues, Mat* eigenvectors) {
 	return cv::eigen(*src, *eigenvalues, *eigenvectors);
@@ -838,8 +877,8 @@ int cv_floodFill(Mat* image, Mat* mask, Point* seedPoint, Scalar* newVal, Rect* 
 int cv_VideoWriter_fourcc(VideoWriter* self, char c1, char c2, char c3, char c4) {
 	return self->fourcc(c1, c2, c3, c4);
 }
-void cv_gemm(Mat* src1, Mat* src2, double alpha, Mat* src3, double gamma, Mat* dst, int flags) {
-	cv::gemm(*src1, *src2, alpha, *src3, gamma, *dst, flags);
+void cv_gemm(Mat* src1, Mat* src2, double alpha, Mat* src3, double beta, Mat* dst, int flags) {
+	cv::gemm(*src1, *src2, alpha, *src3, beta, *dst, flags);
 }
 void cv_BRISK_generateKernel(BRISK* self, vector_float* radiusList, vector_int* numberList, float dMax, float dMin, vector_int* indexChange) {
 	self->generateKernel(*radiusList, *numberList, dMax, dMin, *indexChange);
@@ -892,6 +931,9 @@ int cv_Subdiv2D_getEdge(Subdiv2D* self, int edge, int nextEdgeType) {
 void cv_Subdiv2D_getEdgeList(Subdiv2D* self, vector_Vec4f* edgeList) {
 	self->getEdgeList(*edgeList);
 }
+int cv_CascadeClassifier_getFeatureType(CascadeClassifier* self) {
+	return self->getFeatureType();
+}
 FileNode* cv_FileStorage_getFirstTopLevelNode(FileStorage* self) {
 	return new FileNode(self->getFirstTopLevelNode());
 }
@@ -921,6 +963,9 @@ int cv_getOptimalDFTSize(int vecsize) {
 }
 Mat* cv_getOptimalNewCameraMatrix(Mat* cameraMatrix, Mat* distCoeffs, Size* imageSize, double alpha, Size* newImgSize, Rect* validPixROI, bool centerPrincipalPoint) {
 	return new Mat(cv::getOptimalNewCameraMatrix(*cameraMatrix, *distCoeffs, *imageSize, alpha, *newImgSize, validPixROI, centerPrincipalPoint));
+}
+Size* cv_CascadeClassifier_getOriginalWindowSize(CascadeClassifier* self) {
+	return new Size(self->getOriginalWindowSize());
 }
 void cv_Algorithm_getParams(Algorithm* self, vector_String* names) {
 	self->getParams(*names);
@@ -1009,6 +1054,9 @@ void cv_idct(Mat* src, Mat* dst, int flags) {
 void cv_idft(Mat* src, Mat* dst, int flags, int nonzeroRows) {
 	cv::idft(*src, *dst, flags, nonzeroRows);
 }
+void cv_illuminationChange(Mat* src, Mat* mask, Mat* dst, float alpha, float beta) {
+	cv::illuminationChange(*src, *mask, *dst, alpha, beta);
+}
 Mat* cv_imdecode(Mat* buf, int flags) {
 	return new Mat(cv::imdecode(*buf, flags));
 }
@@ -1054,11 +1102,11 @@ void cv_insertChannel(Mat* src, Mat* dst, int coi) {
 void cv_integral(Mat* src, Mat* sum, int sdepth) {
 	cv::integral(*src, *sum, sdepth);
 }
-void cv_integral4(Mat* src, Mat* sum, Mat* sqsum, int sdepth) {
-	cv::integral(*src, *sum, *sqsum, sdepth);
+void cv_integral5(Mat* src, Mat* sum, Mat* sqsum, int sdepth, int sqdepth) {
+	cv::integral(*src, *sum, *sqsum, sdepth, sqdepth);
 }
-void cv_integral5(Mat* src, Mat* sum, Mat* sqsum, Mat* tilted, int sdepth) {
-	cv::integral(*src, *sum, *sqsum, *tilted, sdepth);
+void cv_integral6(Mat* src, Mat* sum, Mat* sqsum, Mat* tilted, int sdepth, int sqdepth) {
+	cv::integral(*src, *sum, *sqsum, *tilted, sdepth, sqdepth);
 }
 float cv_intersectConvexConvex(Mat* _p1, Mat* _p2, Mat* _p12, bool handleNested) {
 	return cv::intersectConvexConvex(*_p1, *_p2, *_p12, handleNested);
@@ -1083,6 +1131,9 @@ bool cv_FileNode_isNamed(FileNode* self) {
 }
 bool cv_FileNode_isNone(FileNode* self) {
 	return self->isNone();
+}
+bool cv_CascadeClassifier_isOldFormatCascade(CascadeClassifier* self) {
+	return self->isOldFormatCascade();
 }
 bool cv_FileStorage_isOpened(FileStorage* self) {
 	return self->isOpened();
@@ -1120,6 +1171,9 @@ void cv_Index_knnSearch(Index* self, Mat* query, Mat* indices, Mat* dists, int k
 void cv_line(Mat* img, Point* pt1, Point* pt2, Scalar* color, int thickness, int lineType, int shift) {
 	cv::line(*img, *pt1, *pt2, *color, thickness, lineType, shift);
 }
+void cv_linearPolar(Mat* src, Mat* dst, Point2f* center, double maxRadius, int flags) {
+	cv::linearPolar(*src, *dst, *center, maxRadius, flags);
+}
 bool cv_Index_load(Index* self, Mat* features, String* filename) {
 	return self->load(*features, *filename);
 }
@@ -1140,6 +1194,9 @@ int cv_Subdiv2D_locate(Subdiv2D* self, Point2f* pt, int edge, int vertex) {
 }
 void cv_log(Mat* src, Mat* dst) {
 	cv::log(*src, *dst);
+}
+void cv_logPolar(Mat* src, Mat* dst, Point2f* center, double M, int flags) {
+	cv::logPolar(*src, *dst, *center, M, flags);
 }
 void cv_magnitude(Mat* x, Mat* y, Mat* magnitude) {
 	cv::magnitude(*x, *y, *magnitude);
@@ -1276,6 +1333,9 @@ int cv_Algorithm_paramType(Algorithm* self, String* name) {
 void cv_patchNaNs(Mat* a, double val) {
 	cv::patchNaNs(*a, val);
 }
+void cv_pencilSketch(Mat* src, Mat* dst1, Mat* dst2, float sigma_s, float sigma_r, float shade_factor) {
+	cv::pencilSketch(*src, *dst1, *dst2, sigma_s, sigma_r, shade_factor);
+}
 void cv_perspectiveTransform(Mat* src, Mat* dst, Mat* m) {
 	cv::perspectiveTransform(*src, *dst, *m);
 }
@@ -1303,28 +1363,28 @@ void cv_preCornerDetect(Mat* src, Mat* dst, int ksize, int borderType) {
 Mat* cv_KalmanFilter_predict(KalmanFilter* self, Mat* control) {
 	return new Mat(self->predict(*control));
 }
-float cv_CvNormalBayesClassifier_predict2(CvNormalBayesClassifier* self, Mat* samples, Mat* results) {
-	return self->predict(*samples, results);
-}
-float cv_CvSVM_predict2_0(CvSVM* self, Mat* sample, bool returnDFVal) {
+float cv_CvSVM_predict2(CvSVM* self, Mat* sample, bool returnDFVal) {
 	return self->predict(*sample, returnDFVal);
 }
-void cv_CvSVM_predict2_1(CvSVM* self, Mat* samples, Mat* results) {
+void cv_CvSVM_predict2_0(CvSVM* self, Mat* samples, Mat* results) {
 	self->predict(*samples, *results);
 }
-Vec2d* cv_EM_predict2_2(EM* self, Mat* sample, Mat* probs) {
+Vec2d* cv_EM_predict2_1(EM* self, Mat* sample, Mat* probs) {
 	return new Vec2d(self->predict(*sample, *probs));
 }
-float cv_CvRTrees_predict2_3(CvRTrees* self, Mat* sample, Mat* missing) {
+float cv_CvRTrees_predict2_2(CvRTrees* self, Mat* sample, Mat* missing) {
 	return self->predict(*sample, *missing);
 }
-float cv_CvANN_MLP_predict2_4(CvANN_MLP* self, Mat* inputs, Mat* outputs) {
+float cv_CvANN_MLP_predict2_3(CvANN_MLP* self, Mat* inputs, Mat* outputs) {
 	return self->predict(*inputs, *outputs);
 }
-CvDTreeNode* cv_CvDTree_predict3(CvDTree* self, Mat* sample, Mat* missingDataMask, bool preprocessedInput) {
+float cv_CvNormalBayesClassifier_predict3(CvNormalBayesClassifier* self, Mat* samples, Mat* results, Mat* results_prob) {
+	return self->predict(*samples, results, results_prob);
+}
+CvDTreeNode* cv_CvDTree_predict3_0(CvDTree* self, Mat* sample, Mat* missingDataMask, bool preprocessedInput) {
 	return self->predict(*sample, *missingDataMask, preprocessedInput);
 }
-void cv_FaceRecognizer_predict3_0(FaceRecognizer* self, Mat* src, int label, double confidence) {
+void cv_FaceRecognizer_predict3_1(FaceRecognizer* self, Mat* src, int label, double confidence) {
 	self->predict(*src, label, confidence);
 }
 float cv_CvGBTrees_predict4(CvGBTrees* self, Mat* sample, Mat* missing, Range* slice, int k) {
@@ -1405,6 +1465,9 @@ void cv_randu(Mat* dst, Mat* low, Mat* high) {
 bool cv_VideoCapture_read(VideoCapture* self, Mat* image) {
 	return self->read(*image);
 }
+bool cv_CascadeClassifier_read1(CascadeClassifier* self, FileNode* node) {
+	return self->read(*node);
+}
 int cv_recoverPose(Mat* E, Mat* points1, Mat* points2, Mat* R, Mat* t, double focal, Point2d* pp, Mat* mask) {
 	return cv::recoverPose(*E, *points1, *points2, *R, *t, focal, *pp, *mask);
 }
@@ -1474,6 +1537,9 @@ void cv_HOGDescriptor_save2_0(HOGDescriptor* self, String* filename, String* obj
 void cv_scaleAdd(Mat* src1, double alpha, Mat* src2, Mat* dst) {
 	cv::scaleAdd(*src1, alpha, *src2, *dst);
 }
+void cv_seamlessClone(Mat* src, Mat* dst, Mat* mask, Point* p, Mat* blend, int flags) {
+	cv::seamlessClone(*src, *dst, *mask, *p, *blend, flags);
+}
 void cv_segmentMotion(Mat* mhi, Mat* segmask, vector_Rect* boundingRects, double timestamp, double segThresh) {
 	cv::segmentMotion(*mhi, *segmask, *boundingRects, timestamp, segThresh);
 }
@@ -1531,8 +1597,14 @@ void cv_BackgroundSubtractorGMG_setDefaultLearningRate(BackgroundSubtractorGMG* 
 void cv_BackgroundSubtractorMOG2_setDetectShadows(BackgroundSubtractorMOG2* self, bool detectShadows) {
 	self->setDetectShadows(detectShadows);
 }
+void cv_BackgroundSubtractorKNN_setDetectShadows1(BackgroundSubtractorKNN* self, bool detectShadows) {
+	self->setDetectShadows(detectShadows);
+}
 void cv_StereoMatcher_setDisp12MaxDiff(StereoMatcher* self, int disp12MaxDiff) {
 	self->setDisp12MaxDiff(disp12MaxDiff);
+}
+void cv_BackgroundSubtractorKNN_setDist2Threshold(BackgroundSubtractorKNN* self, double _dist2Threshold) {
+	self->setDist2Threshold(_dist2Threshold);
 }
 void cv_Algorithm_setDouble(Algorithm* self, String* name, double value) {
 	self->setDouble(*name, value);
@@ -1550,6 +1622,9 @@ void cv_BackgroundSubtractorMOG_setHistory(BackgroundSubtractorMOG* self, int nf
 	self->setHistory(nframes);
 }
 void cv_BackgroundSubtractorMOG2_setHistory1(BackgroundSubtractorMOG2* self, int history) {
+	self->setHistory(history);
+}
+void cv_BackgroundSubtractorKNN_setHistory1_0(BackgroundSubtractorKNN* self, int history) {
 	self->setHistory(history);
 }
 void cv_setIdentity(Mat* mtx, Scalar* s) {
@@ -1599,6 +1674,9 @@ void cv_BackgroundSubtractorMOG_setNMixtures(BackgroundSubtractorMOG* self, int 
 }
 void cv_BackgroundSubtractorMOG2_setNMixtures1(BackgroundSubtractorMOG2* self, int nmixtures) {
 	self->setNMixtures(nmixtures);
+}
+void cv_BackgroundSubtractorKNN_setNSamples(BackgroundSubtractorKNN* self, int _nN) {
+	self->setNSamples(_nN);
 }
 void cv_BackgroundSubtractorMOG_setNoiseSigma(BackgroundSubtractorMOG* self, double noiseSigma) {
 	self->setNoiseSigma(noiseSigma);
@@ -1663,7 +1741,13 @@ void cv_TonemapMantiuk_setScale(TonemapMantiuk* self, float scale) {
 void cv_BackgroundSubtractorMOG2_setShadowThreshold(BackgroundSubtractorMOG2* self, double threshold) {
 	self->setShadowThreshold(threshold);
 }
+void cv_BackgroundSubtractorKNN_setShadowThreshold1(BackgroundSubtractorKNN* self, double threshold) {
+	self->setShadowThreshold(threshold);
+}
 void cv_BackgroundSubtractorMOG2_setShadowValue(BackgroundSubtractorMOG2* self, int value) {
+	self->setShadowValue(value);
+}
+void cv_BackgroundSubtractorKNN_setShadowValue1(BackgroundSubtractorKNN* self, int value) {
 	self->setShadowValue(value);
 }
 void cv_TonemapDurand_setSigmaColor(TonemapDurand* self, float sigma_color) {
@@ -1729,6 +1813,9 @@ void cv_BackgroundSubtractorMOG2_setVarThresholdGen(BackgroundSubtractorMOG2* se
 void cv_setWindowProperty(String* winname, int prop_id, double prop_value) {
 	cv::setWindowProperty(*winname, prop_id, prop_value);
 }
+void cv_BackgroundSubtractorKNN_setkNNSamples(BackgroundSubtractorKNN* self, int _nkNN) {
+	self->setkNNSamples(_nkNN);
+}
 void cv_AlignMTB_shiftMat(AlignMTB* self, Mat* src, Mat* dst, Point* shift) {
 	self->shiftMat(*src, *dst, *shift);
 }
@@ -1759,20 +1846,26 @@ void cv_sortIdx(Mat* src, Mat* dst, int flags) {
 void cv_split(Mat* m, vector_Mat* mv) {
 	cv::split(*m, *mv);
 }
+void cv_sqrBoxFilter(Mat* _src, Mat* _dst, int ddepth, Size* ksize, Point* anchor, bool normalize, int borderType) {
+	cv::sqrBoxFilter(*_src, *_dst, ddepth, *ksize, *anchor, normalize, borderType);
+}
 void cv_sqrt(Mat* src, Mat* dst) {
 	cv::sqrt(*src, *dst);
 }
 int cv_startWindowThread() {
 	return cv::startWindowThread();
 }
-double cv_stereoCalibrate(vector_Mat* objectPoints, vector_Mat* imagePoints1, vector_Mat* imagePoints2, Mat* cameraMatrix1, Mat* distCoeffs1, Mat* cameraMatrix2, Mat* distCoeffs2, Size* imageSize, Mat* R, Mat* T, Mat* E, Mat* F, TermCriteria* criteria, int flags) {
-	return cv::stereoCalibrate(*objectPoints, *imagePoints1, *imagePoints2, *cameraMatrix1, *distCoeffs1, *cameraMatrix2, *distCoeffs2, *imageSize, *R, *T, *E, *F, *criteria, flags);
+double cv_stereoCalibrate(vector_Mat* objectPoints, vector_Mat* imagePoints1, vector_Mat* imagePoints2, Mat* cameraMatrix1, Mat* distCoeffs1, Mat* cameraMatrix2, Mat* distCoeffs2, Size* imageSize, Mat* R, Mat* T, Mat* E, Mat* F, int flags, TermCriteria* criteria) {
+	return cv::stereoCalibrate(*objectPoints, *imagePoints1, *imagePoints2, *cameraMatrix1, *distCoeffs1, *cameraMatrix2, *distCoeffs2, *imageSize, *R, *T, *E, *F, flags, *criteria);
 }
 void cv_stereoRectify(Mat* cameraMatrix1, Mat* distCoeffs1, Mat* cameraMatrix2, Mat* distCoeffs2, Size* imageSize, Mat* R, Mat* T, Mat* R1, Mat* R2, Mat* P1, Mat* P2, Mat* Q, int flags, double alpha, Size* newImageSize, Rect* validPixROI1, Rect* validPixROI2) {
 	cv::stereoRectify(*cameraMatrix1, *distCoeffs1, *cameraMatrix2, *distCoeffs2, *imageSize, *R, *T, *R1, *R2, *P1, *P2, *Q, flags, alpha, *newImageSize, validPixROI1, validPixROI2);
 }
 bool cv_stereoRectifyUncalibrated(Mat* points1, Mat* points2, Mat* F, Size* imgSize, Mat* H1, Mat* H2, double threshold) {
 	return cv::stereoRectifyUncalibrated(*points1, *points2, *F, *imgSize, *H1, *H2, threshold);
+}
+void cv_stylization(Mat* src, Mat* dst, float sigma_s, float sigma_r) {
+	cv::stylization(*src, *dst, sigma_s, sigma_r);
 }
 void cv_subtract(Mat* src1, Mat* src2, Mat* dst, Mat* mask, int dtype) {
 	cv::subtract(*src1, *src2, *dst, *mask, dtype);
@@ -1782,6 +1875,9 @@ Scalar* cv_sum(Mat* src) {
 }
 int cv_Subdiv2D_symEdge(Subdiv2D* self, int edge) {
 	return self->symEdge(edge);
+}
+void cv_textureFlattening(Mat* src, Mat* mask, Mat* dst, double low_threshold, double high_threshold, int kernel_size) {
+	cv::textureFlattening(*src, *mask, *dst, low_threshold, high_threshold, kernel_size);
 }
 double cv_threshold(Mat* src, Mat* dst, double thresh, double maxval, int type) {
 	return cv::threshold(*src, *dst, thresh, maxval, type);
