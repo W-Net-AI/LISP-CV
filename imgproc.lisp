@@ -548,7 +548,44 @@
        (%canny image edges low-thresh high-thresh aperture-size l2-gradient))
 
 
+;; void cv_cornerSubPix(Mat* image, Mat* corners, Size* winSize, Size* zeroZone, TermCriteria* criteria)
+;; void cv_cornerSubPix2(Mat* image, Mat* corners, Size* winSize, Size* zeroZone, TermCriteria* criteria)
+(defcfun ("cv_cornerSubPix" corner-sub-pix) :void
+  "Refines the corner locations."
+  (image mat)
+  (corners mat)
+  (win-size size)
+  (zero-zone size)
+  (criteria term-criteria))
+
+
+;; void goodFeaturesToTrack(InputArray image, OutputArray corners, int maxCorners, double qualityLevel, double minDistance, 
+;; InputArray mask=noArray(), int blockSize=3, bool useHarrisDetector=false, double k=0.04 )
+
+;; void cv_goodFeaturesToTrack(Mat* image, Mat* corners, int maxCorners, double qualityLevel, double minDistance, Mat* mask, 
+;; int blockSize, bool useHarrisDetector, double k) 
+
+(defcfun ("cv_goodFeaturesToTrack" %good-features-to-track) :void
+  (image mat)
+  (corners mat)
+  (max-corners :int)
+  (quality-level :double)
+  (min-distance :double)
+  (mask mat)
+  (block-size :int)
+  (use-harris-detector :boolean)
+  (k :double))
+
+
+(defun good-features-to-track (image corners max-corners quality-level min-distance &optional (mask (null-pointer)) (block-size 3) 
+                              (use-harris-detector nil) (k 0.04d0))
+  "Determines strong corners on an image."
+  (%good-features-to-track image corners max-corners quality-level min-distance mask block-size use-harris-detector k))
+
+
+
 ;;; Object Detection
+
 
 
 ;; void matchTemplate(InputArray image, InputArray templ, OutputArray result, int method)

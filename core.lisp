@@ -7,6 +7,23 @@
 (in-package :lisp-cv)
 
 
+;; Pending
+
+;; int checkVector(int elemChannels, int depth=-1, bool requireContinuous=true) const
+;; int cv_Mat_checkVector(Mat* self, int elemChannels, int depth, bool requireContinuous) 
+(cffi:defcfun ("cv_Mat_checkVector" %check-vector) :int
+  (self mat)
+  (elem-Channels :int)
+  (depth :int)
+  (require-continuous :boolean))
+
+
+(defun check-vector (self elem-channels &optional (depth -1) (require-continuous t))
+  "returns N if the matrix is 1-channel (N x ptdim) or ptdim-channel 
+   (1 x N) or (N x 1); negative number otherwise."
+  (%check-vector self elem-channels depth require-continuous))
+
+
 ;; Default parameters
 
 (defvar *camera-index* 0)
@@ -245,9 +262,10 @@
   (self size))
 
 
-(defun arr-to-mat (arr)
+(defun arr-to-mat (arr &optional mat-type)
 
-  (let* ((array-dimensions (array-dimensions arr))
+  (let* ((array-element-type (array-element-type arr))
+        (array-dimensions (array-dimensions arr))
 	 (x (car array-dimensions))
 	 (y (cadr array-dimensions))
 	 (z (caddr array-dimensions))
@@ -257,7 +275,6 @@
 	 (ptr 0)
          (cffi-type  
 	  (typecase arr
-	    ((simple-array t) :uchar)
 	    ((simple-array (unsigned-byte 8)) :uchar)
 	    ((simple-array (signed-byte 8)) :char)
 	    ((simple-array (unsigned-byte 16)) :ushort)
@@ -266,92 +283,134 @@
 	    ((simple-array single-float) :float)
 	    ((simple-array double-float) :double))))
 
+    (if (and (not mat-type) (eq array-element-type t))
+	(error "~%If (EQ ARRAY-ELEMENT-TYPE T): you must specify the type of the output matrix.~%"))
+    (if (eq array-element-type t) 
+
+(setf cffi-type (case mat-type 
+		      (#.+8uc1+ :uchar) 
+		      (#.+8sc1+ :char)
+		      (#.+16uc1+ :ushort)
+		      (#.+16sc1+ :short)
+		      (#.+32sc1+ :int)
+		      (#.+32fc1+ :float)
+		      (#.+64fc1+ :double)
+		      (#.+8uc2+  :uchar)
+		      (#.+8sc2+  :char)
+		      (#.+16uc2+ :ushort)
+		      (#.+16sc2+ :short)
+		      (#.+32sc2+ :int)
+		      (#.+32fc2+ :float)
+		      (#.+64fc2+ :double)
+		      (#.+8uc3+  :uchar)
+		      (#.+8sc3+  :char)
+		      (#.+16uc3+ :ushort)
+		      (#.+16sc3+ :short)
+		      (#.+32sc3+ :int)
+		      (#.+32fc3+ :float)
+		      (#.+64fc3+ :double)
+		      (#.+8uc4+  :uchar)
+		      (#.+8sc4+  :char)
+		      (#.+16uc4+ :ushort)
+		      (#.+16sc4+ :short)
+		      (#.+32sc4+ :int)
+		      (#.+32fc4+ :float)
+		      (#.+64fc4+ :double))))
+
+
+
     (case cffi-type
 
       (:uchar 
-       (case channels (1
-		       (setf mat (mat-typed x y +8uc1+)))
-	     ((2 3 4)
-	      (setf mat (mat-typed x y (case channels 
-					 (2 #.+8uc2+)
-					 (3 #.+8uc3+)
-					 (4 #.+8uc4+))))))
+       (if mat-type (setf mat (mat-typed x y mat-type))
+	   (case channels (1
+			   (setf mat (mat-typed x y +8uc1+)))
+		 ((2 3 4)
+		  (setf mat (mat-typed x y (case channels 
+					     (2 #.+8uc2+)
+					     (3 #.+8uc3+)
+					     (4 #.+8uc4+)))))))
        (setf ptr (%ptr mat 0))
        (dotimes (n (* area channels))
 	 (setf (mem-aref ptr :uchar n) (row-major-aref arr n)))mat)
 
       (:char 
+       (if mat-type (setf mat (mat-typed x y mat-type))
        (case channels (1
 		       (setf mat (mat-typed x y +8sc1+)))
 	     ((2 3 4)
 	      (setf mat (mat-typed x y (case channels 
 					 (2 #.+8sc2+)
 					 (3 #.+8sc3+)
-					 (4 #.+8sc4+))))))
+					 (4 #.+8sc4+)))))))
        (setf ptr (%ptr mat 0))
        (dotimes (n (* area channels))
 	 (setf (mem-aref ptr :char n) (row-major-aref arr n)))mat)
 
       (:ushort 
+       (if mat-type (setf mat (mat-typed x y mat-type))
        (case channels (1
 		       (setf mat (mat-typed x y +16uc1+)))
 	     ((2 3 4)
 	      (setf mat (mat-typed x y (case channels 
 					 (2 #.+16uc2+)
 					 (3 #.+16uc3+)
-					 (4 #.+16uc4+))))))
+					 (4 #.+16uc4+)))))))
        (setf ptr (%ptr mat 0))
        (dotimes (n (* area channels))
 	 (setf (mem-aref ptr :ushort n) (row-major-aref arr n)))mat)
 
       (:short 
+       (if mat-type (setf mat (mat-typed x y mat-type))
        (case channels (1
 		       (setf mat (mat-typed x y +16sc1+)))
 	     ((2 3 4)
 	      (setf mat (mat-typed x y (case channels 
 					 (2 #.+16sc2+)
 					 (3 #.+16sc3+)
-					 (4 #.+16sc4+))))))
+					 (4 #.+16sc4+)))))))
        (setf ptr (%ptr mat 0))
        (dotimes (n (* area channels))
 	 (setf (mem-aref ptr :short n) (row-major-aref arr n)))mat)
 
       (:int 
+       (if mat-type (setf mat (mat-typed x y mat-type))
        (case channels (1
 		       (setf mat (mat-typed x y +32sc1+)))
 	     ((2 3 4)
 	      (setf mat (mat-typed x y (case channels 
 					 (2 #.+32sc2+)
 					 (3 #.+32sc3+)
-					 (4 #.+32sc4+))))))
+					 (4 #.+32sc4+)))))))
        (setf ptr (%ptr mat 0))
        (dotimes (n (* area channels))
 	 (setf (mem-aref ptr :int n) (row-major-aref arr n)))mat)
 
       (:float 
+       (if mat-type (setf mat (mat-typed x y mat-type))
        (case channels (1
 		       (setf mat (mat-typed x y +32fc1+)))
 	     ((2 3 4)
 	      (setf mat (mat-typed x y (case channels 
 					 (2 #.+32fc2+)
 					 (3 #.+32fc3+)
-					 (4 #.+32fc4+))))))
+					 (4 #.+32fc4+)))))))
        (setf ptr (%ptr mat 0))
        (dotimes (n (* area channels))
 	 (setf (mem-aref ptr :float n) (row-major-aref arr n)))mat)
 
       (:double 
+       (if mat-type (setf mat (mat-typed x y mat-type))
        (case channels (1
 		       (setf mat (mat-typed x y +64fc1+)))
 	     ((2 3 4)
 	      (setf mat (mat-typed x y (case channels 
 					 (2 #.+64fc2+)
 					 (3 #.+64fc3+)
-					 (4 #.+64fc4+))))))
+					 (4 #.+64fc4+)))))))
        (setf ptr (%ptr mat 0))
        (dotimes (n (* area channels))
 	 (setf (mem-aref ptr :double n) (row-major-aref arr n)))mat))))
-
 
 ;; Mat* cv_Mat_assignVal(Mat* self, Scalar* s)
 (defcfun ("cv_Mat_assignVal" assign-val) mat
@@ -2004,7 +2063,7 @@ ret))
 (defun mat (&optional arg1 arg2 arg3 arg4)
   
   "MAT constructor"  
-  
+
   (cond ((eq arg1 nil) (%mat))
 
 	((and (eq arg2 nil) 
@@ -2012,11 +2071,11 @@ ret))
 
 	 (mat-to-arr arg1))
 
-	((and (eq arg2 nil) 
+	((and (or (not arg2) (typep arg2 'integer))
 
 	      (typep arg1 'simple-array))
 
-	 (arr-to-mat arg1))
+	 (arr-to-mat arg1 arg2))
 
 	((typep arg2 'cv-range)
 
@@ -2045,6 +2104,7 @@ ret))
 	(t nil)))
 
 
+
 (defun make-mat (&optional arg1 arg2 arg3 arg4)
   
   "MAT constructor"  
@@ -2056,11 +2116,11 @@ ret))
 
 	 (mat-to-arr arg1))
 
-	((and (eq arg2 nil) 
+	((and (or (not arg2) (typep arg2 'integer))
 
 	      (typep arg1 'simple-array))
 
-	 (arr-to-mat arg1))
+	 (arr-to-mat arg1 arg2))
 
 	((typep arg2 'cv-range)
 

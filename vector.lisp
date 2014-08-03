@@ -468,8 +468,8 @@
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
-;; vector_##t * carray_to_std_vector##tn( t * a, size_t len )
-(defcfun ("carray_to_std_vectorm" c-arr-to-vec-mat) vector-mat
+;; vector_Mat* std_carrayTovectorm(Mat** a, size_t len)
+(defcfun ("std_carrayTovectorm1" c-arr-to-vec-mat) vector-mat
   (a :pointer)
   (len :unsigned-int))
 

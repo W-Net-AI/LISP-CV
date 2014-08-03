@@ -17,7 +17,7 @@
 */
 
 #include <opencv2/c/opencv_generated.hpp>
-typedef Ptr<BackgroundSubtractor> Ptr_BackgroundSubtractor;
+
 #define ADD_VEC_FUNC_HEADERS_0_0(t) \
     Vec2##t * cv_create_0_Vec2##t(); \
     Vec3##t * cv_create_0_Vec3##t(); \
@@ -89,6 +89,9 @@ ADD_READ_FUNC_HEADERS_0(d, double);
 ADD_READ_FUNC_HEADERS_1(s, String);
 ADD_READ_FUNC_HEADERS_1(m, Mat);
 Mat* test(uchar* a, size_t len );
+vector_Mat* std_carrayTovectorm2(Mat** a, size_t len);
+vector_Mat1* std_carrayTovectorm1(Mat** a, size_t len);
+int cv_Mat_checkVector(Mat* self, int elemChannels, int depth, bool requireContinuous);
 double cv_Size_set_width(Size* self, double val);    
 double cv_Size_set_height(Size* self, double val);
 void cv_BackgroundSubtractorMOG2_getBackgroundImage(BackgroundSubtractorMOG2* self, Mat* backgroundImage);

@@ -291,6 +291,17 @@
   (+wnd-prop-aspectratio+ 2)
 
 
+;;; video
+
+  (+optflow-use-initial-flow+ 4)
+  (+optflow-lk-get-min-eigenvals+ 8)
+  (+optflow-farneback-gaussian+ 256)
+  (+motion-translation+ 0)
+  (+motion-euclidean+ 1)
+  (+motion-affine+ 2)
+  (+motion-homography+ 3)
+
+
 ;;; calib3d:
 
   (+calib-cb-adaptive-thresh+ 1)

@@ -139,6 +139,26 @@ m->ptr(a[i]);
 return m;
 }
 
+vector_Mat* std_carrayTovectorm2(Mat** a, size_t len) {
+    vector_Mat* v = new vector_Mat();
+    for(size_t i = 0; i < len; i++) 
+        v->push_back(*a[i]);
+    return v;
+}
+
+typedef vector<Mat*> vector_Mat1;
+
+vector_Mat1* std_carrayTovectorm1(Mat** a, size_t len) {
+    vector_Mat1* v = new vector_Mat1();
+    for(size_t i = 0; i < len; i++) 
+        v->push_back(a[i]);
+    return v;
+}
+
+int cv_Mat_checkVector(Mat* self, int elemChannels, int depth, bool requireContinuous) {
+    return self->checkVector(elemChannels, depth, requireContinuous);
+}
+
 double cv_Size_set_width(Size* self, double val) {
    return self->width = val;
 }

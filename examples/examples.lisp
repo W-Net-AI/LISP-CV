@@ -180,7 +180,6 @@ See also:
 				      (round (/ height 2)))))
 		(loop
 
-
 		   ;;Set camera feed to FRAME
 		   (read cap frame)
 		   ;;Show original FRAME in window
@@ -1602,7 +1601,7 @@ LISP-CV SPECIFIC:
 
 LISP-CV: (MAT (SELF MAT)) => ARRAY
 
-LISP-CV: (MAT (SELF ARRAY)) => MAT
+LISP-CV: (MAT (SELF ARRAY) &OPTIONAL (MAT-TYPE INTEGER)) => MAT
 
 
     Parameters:	
@@ -1624,19 +1623,27 @@ LISP-CV: (MAT (SELF ARRAY)) => MAT
 
         COL-RANGE - Another RANGE object.
 
+        MAT-TYPE - The type of the output matrix, e.g. +8U+, 16SC2, +32FC3+(See below).
+
 
 Concerning converting MAT objects to Lisp ARRAYS:
 
-The (MAT (SELF ARRAY)) version of this function will convert a MAT object into a Lisp ARRAY and the 
-(MAT (SELF MAT)) version of this function converts Lisp ARRAY to a MAT object. You might want to be 
-mindful of how you use these functions because the conversions are done by iterations done in a loop. 
-This causes the functions to take longer to run, and even though you can get quite a speed increase 
-if you convert your images to lisp arrays at the head of your program and perform whatever operations 
-you need to with Lisp code in your loop, If you are constantly converting back and forth between Mat 
-objects and Lisp arrays in your loop you may notice a performance decrease. The MAT-EXAMPLE-2 function 
-below converts a MAT object to a Lisp ARRAY and back and times the operations in the process. You can 
-enter any image pathnames you want to that function to get an idea of the time the conversions to and 
-from Lisp ARRAYS will take.
+The (MAT (SELF MAT)) version of this function will convert a MAT object into a Lisp ARRAY and the 
+(MAT (SELF ARRAY) &OPTIONAL (MAT-TYPE INTEGER)) version of this function will convert a Lisp ARRAY 
+to a MAT object. You may want to be mindful of how you use these functions because the conversions 
+are done by iterations done in a loop. This causes the functions to take longer to run, and though 
+you can get quite a speed increase if you convert your matrices to Lisp arrays at the head of your 
+program and do whatever operations you need to with Lisp code in your loop, if you are constantly 
+converting back and forth between Mat objects and Lisp arrays in your loop, you may notice decrease 
+in performance, when using larger matrices or arrays, over what you would get by just doing all the
+operations inside the underlying C++ code. The MAT-EXAMPLE-2 function below will convert both a MAT 
+object to a Lisp ARRAY and back and time the operations in the process. You can enter any MAT object 
+you like to that function to get an idea of the time, the conversions to and from an ARRAY, will take.
+
+Note: When using this version: (MAT (SELF ARRAY) &OPTIONAL (MAT-TYPE INTEGER)), you only need to supply 
+the MAT-TYPE parameter if converting a SIMPLE-ARRAY of type T. Otherwise the function will convert the
+MAT object to a Lisp ARRAY of equal dimensions and type. If the ARRAY is not type of T, and you supply 
+the MAT-TYPE parameter, the output ARRAY will be sized and typed according to the MAT-TYPE value.
 
 Speed notes:
 
@@ -13691,6 +13698,194 @@ Example:
 	   (let ((c (wait-key 33)))
 	     (when (= c 27)
 	       (return))))))))
+
+========================================================================================================================================
+#VIDEO - #MOTION ANALYSIS AND OBJECT TRACKING
+========================================================================================================================================
+
+========================================================================================================================================
+#CALC-OPTICAL-FLOW-PYR-LK
+========================================================================================================================================
+
+Calculates an optical flow for a sparse feature set using the iterative Lucas-Kanade method with pyramids.
+
+C++: void calcOpticalFlowPyrLK(InputArray prevImg, InputArray nextImg, InputArray prevPts, InputOutputArray nextPts, 
+                               OutputArray status, OutputArray err, Size winSize=Size(21,21), int maxLevel=3, 
+                               TermCriteria criteria=TermCriteria(TermCriteria::COUNT+TermCriteria::EPS, 30, 0.01), 
+                               int flags=0, double minEigThreshold=1e-4 )
+
+LISP-CV: (CALC-OPTICAL-FLOW-PYR-LK (PREV-IMG MAT) (NEXT-IMG MAT) (PREV-PTS MAT) (NEXT-PTS MAT) (STATUS MAT) (ERR MAT) &OPTIONAL 
+                                  ((WIN-SIZE SIZE) (SIZE-2 21 21)) ((MAX-LEVEL :INT) 3) 
+                                  ((CRITERIA TERM-CRITERIA) 
+                                   (TERM-CRITERIA-3 (+ +TERM-CRITERIA-COUNT+ +TERM-CRITERIA-EPS+) 30 0.01D0)) 
+                                  ((FLAGS :INT) 0) ((MIN-EIGEN-THRESHOLD :DOUBLE) 1.D-4)) => :VOID
+    Parameters:	
+
+        PREV-IMG - First 8-bit input image or pyramid constructed by (BUILD-OPTICAL-FLOW-PYRAMID).
+
+        NEXT-IMG - Second input image or pyramid of the same size and the same type as PREV-IMG.
+
+        PREV-PTS - Vector of 2D points for which the flow needs to be found; point coordinates must 
+                   be single-precision floating-point numbers.
+
+        NEXT-PTS - Output vector of 2D points (with single-precision floating-point coordinates) 
+                   containing the calculated new positions of input features in the second image; 
+                   when +OPTFLOW-USE-INITIAL-FLOW+ flag is passed, the vector must have the same 
+                   size as in the input.
+
+        STATUS - Output status vector (of unsigned chars); each element of the vector is set to 1 
+                 if the flow for the corresponding features has been found, otherwise, is set to 0.
+
+        ERR - Output vector of errors; each element of the vector is set to an error for the corresponding 
+              feature, type of the error measure can be set in FLAGS parameter; if the flow wasn’t found then 
+              the error is not defined (use the STATUS parameter to find such cases).
+
+        WIN-SIZE - size of the search window at each pyramid level.
+
+        MAX-LEVEL - 0-based maximal pyramid level number; if set to 0, pyramids are not used (single level), 
+                    if set to 1, two levels are used, and so on; if pyramids are passed to input then algorithm 
+                    will use as many levels as pyramids have but no more than MAX-LEVEL.
+
+        CRITERIA - parameter, specifying the termination criteria of the iterative search algorithm (after the 
+                   specified maximum number of iterations (MAX-COUNT CRITERIA) <criteria.maxCount in OpenCV>
+                   or when the search window moves by less than (EPSILON CRITERIA) <criteria.epsilon in OpenCV>.
+
+        FLAGS - operation flags:
+
+            +OPTFLOW-USE-INITIAL-FLOW+ uses initial estimations, stored in NEXT-PTS; if the flag is not set, then PREV-PTS 
+                                       is copied to NEXT-PTS and is considered the initial estimate.
+
+            +OPTFLOW-LK-GET-MIN-EIGENVALS+ use minimum eigen values as an error measure (see MIN-EIG-THRESHOLD description); 
+                                           if the flag is not set, then L1 distance between patches around the original and a 
+                                           moved point, divided by number of pixels in a window, is used as a error measure.
+
+        MIN-EIG-THRESHOLD - the algorithm calculates the minimum eigen value of a 2x2 normal matrix of optical flow equations 
+                           (this matrix has been called a spatial gradient matrix), divided by number of pixels in a window; 
+                            if this value is less than MIN-EIG-THRESHOLD, then a corresponding feature is filtered out and 
+                            its flow is not processed, so it allows to remove bad points and get a performance boost.
+
+
+The function implements a sparse iterative version of the Lucas-Kanade optical flow in pyramids. 
+
+
+Example:
+
+(defun calc-optical-flow-pyr-lk-example ()
+  
+  (let ((window-name-1 "ImageA - CALC-OPTICAL-FLOW-PYR-LK Example")
+	(window-name-2 "ImageB - CALC-OPTICAL-FLOW-PYR-LK Example")
+	(window-name-3 "ImageC - CALC-OPTICAL-FLOW-PYR-LK Example")
+	(quality-level 0.05d0)
+	(min-distance 5.0d0)
+	(thickness -1)
+	(line-type 8))
+    (with-named-window (window-name-1 +window-autosize+)
+      (with-named-window (window-name-2 +window-autosize+)
+	(with-named-window (window-name-3 +window-autosize+)
+	  (move-window window-name-1 250 175)
+	  (move-window window-name-2 760 175)
+	  (move-window window-name-3 1270 175)
+          ;;Allocate integers the trackbars 
+          ;;can increment/decrement. Later, 
+          ;;the CFFI:MEM-AREF macro(@) will
+          ;;dereference these pointers and
+          ;;apply these adjusted values to 
+          ;;functions that are integral to 
+          ;;this process.
+	  (with-object ((max-corners (alloc :int 20))
+			(win-size.width (alloc :int 15))
+			(win-size.height (alloc :int 15))
+			(pt1.x (alloc :int 163))
+			(pt1.y (alloc :int 152))
+			(pt2.x (alloc :int 240))
+			(pt2.y (alloc :int 280))
+			(pt3.x (alloc :int 260))
+			(pt3.y (alloc :int 140))
+			(pt4.x (alloc :int 380))
+			(pt4.y (alloc :int 260)))
+	    (create-trackbar "max-corners" window-name-1 max-corners 480)
+	    (create-trackbar "win-size.width" window-name-1 win-size.width 480)
+	    (create-trackbar "win-size.height" window-name-1 win-size.height 480)
+	    (create-trackbar "pt1.x" window-name-1 pt1.x 480)
+	    (create-trackbar "pt1.y" window-name-1 pt1.y 480)
+	    (create-trackbar "pt2.x" window-name-1 pt2.x 480)
+	    (create-trackbar "pt2.y" window-name-1 pt2.y 480)
+	    (create-trackbar "pt3.x" window-name-1 pt3.x 480)
+	    (create-trackbar "pt3.y" window-name-1 pt3.y 480)
+	    (create-trackbar "pt4.x" window-name-1 pt4.x 480)
+	    (create-trackbar "pt4.y" window-name-1 pt4.y 480)
+	    (with-mat ((mat (mat)))
+	      (with-scalar ((black (scalar-all 0)))
+		(with-size ((*win-size (size (@ win-size.width :int) (@ win-size.height :int)))
+			    (zero-zone (size -1 -1)))
+		  (loop     
+		     
+		     ;;;Create three images...
+		     
+		     ;;IMG-A will be one rectangle.
+
+		     ;;IMG-B will be another rectangle.
+
+		     ;;IMG-C will shows the 2 rectangles together...
+
+                     ;;First, create 3 matrices...
+		     (with-mat ((img-a (mat 480 480 +8u+ 255))
+				(img-b (mat 480 480 +8u+ 255))
+				(img-c (mat (rows img-a) (cols img-a) 16 255)))
+                       ;;Then, create vertexes of the rectangles...
+		       (with-point ((pt1 (point (@ pt1.x :int) (@ pt1.y :int)))
+				    (pt2 (point (@ pt2.x :int) (@ pt2.y :int)))
+				    (pt3 (point (@ pt3.x :int) (@ pt3.y :int)))
+				    (pt4 (point (@ pt4.x :int) (@ pt4.y :int))))
+                         ;;Finally, draw the rectangles.
+			 (rectangle img-a pt1 pt2 black thickness line-type)
+			 (rectangle img-b pt3 pt4 black thickness line-type)
+			 (rectangle img-c pt1 pt2 black thickness line-type)
+			 (rectangle img-c pt3 pt4 black thickness line-type))
+                       ;;Create matrices to hold the detected corners.
+		       (with-mat ((corners-a (mat (@ max-corners :int) 2 +32f+))
+				  (corners-b (mat (@ max-corners :int) 2 +32f+)))
+                         ;;Find the features.
+			 (good-features-to-track img-a corners-a (@ max-corners :int) 
+						 quality-level min-distance mat)
+			 (good-features-to-track img-b corners-b (@ max-corners :int) 
+						 quality-level min-distance mat)
+			 (with-term-criteria ((criteria (term-criteria 
+							 (logior +termcrit-iter+ +termcrit-eps+)
+							 20 0.03d0)))
+                           ;;Refine the features.
+			   (corner-sub-pix img-a corners-a *win-size zero-zone criteria)
+			   (corner-sub-pix img-b corners-b *win-size zero-zone criteria)
+			   (with-mat ((features-found (mat (@ max-corners :int) 1 +8u+))                                                                             (feature-errors (mat (@ max-corners :int) 1 +32f+)))
+			     (with-term-criteria ((criteria (term-criteria (+ +termcrit-iter+ 
+									      +termcrit-eps+) 
+									   20 0.3d0)))
+			       ;;Call Lucas Kanade algorithm. This does the actual optic flow calculations.
+			       (calc-optical-flow-pyr-lk img-a img-b corners-a corners-b 
+							 features-found 
+							 feature-errors 
+							 *win-size 5 criteria 0))
+			     ;;Draw the flow vectors on a combination of the two images to show this works.
+			     (format t "~%Print ERROR vector;~%") 
+			     (dotimes (i (* (rows features-found) (cols features-found)))
+			       (format t "~%Error is: ~a,~%" (@ (ptr feature-errors 0) :float i))
+			       (with-point ((p0 (point (ceiling (@ (at-point-2f corners-a 0 i) :float)) 
+						       (ceiling (@ (at-point-2f corners-a 0 i) :float 1))))
+					    (p1 (point (ceiling (@ (at-point-2f corners-b 0 i) :float)) 
+						       (ceiling (@ (at-point-2f corners-b 0 i) :float 1)))))
+				 (line img-C p0 p1 (t:RGB 255 0 0) 2)))
+			     ;;Print status vector: Each element of 
+                             ;;the vector is set to 1 if the flow 
+			     ;;for the corresponding features has 
+                             ;;been found, otherwise, it's set to 0.
+			     (format t "~%Current status;~%~%") 
+			     (print-mat features-found) 
+			     (imshow window-name-1 img-a)
+			     (imshow window-name-2 img-b)
+			     (imshow window-name-3 img-c)
+			     (let ((c (wait-key 33)))
+			       (when (= c 27)
+				 (return)))))))))))))))))
 
 ========================================================================================================================================
 #FEATURES2D - #FEATURE DETECTION AND DESCRIPTION

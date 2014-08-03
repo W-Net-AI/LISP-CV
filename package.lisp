@@ -1601,6 +1601,16 @@
    #:set-window-property
 
 
+;; video - Video Analysis
+
+   #:+optflow-use-initial-flow+
+   #:+optflow-lk-get-min-eigenvals+
+   #:+optflow-farneback-gaussian+
+   #:+motion-translation+
+   #:+motion-euclidean+
+   #:+motion-affine+
+   #:+motion-homography+
+
 ;; calib3d - Camera Calibration and 3D Reconstruction
 
 
