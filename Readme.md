@@ -129,7 +129,7 @@ This should work fine but, due to the error, I am unable to test the install at 
 to verify it."
 ```
 
-You will need to copy these files. They can be found in the Lisp-CV src and include directories:
+You will need thes files as well. They can be found in the Lisp-CV src and include directories:
 ```
 path-to-LISP-CV/include/extra_functions.hpp
 path-to-LISP-CV/src/extra_functions.cpp
@@ -137,12 +137,12 @@ path-to-LISP-CV/include/interop.hpp
 path-to-LISP-CV/src/interop.cpp
 ```
 
-Use any C++ compiler to compile provided files. In example provided I will use GCC:
+Use any C++ compiler to compile all the above files. In example provided I will use GCC:
 ```
 g++ -Wall -shared -fPIC -o <filename>.so <filename>.cpp
 ```
 
-Then install resulting so-files using your distro's recommended way to install custom libraries.
+Then install resulting so-files manually to a location on your PATH(i.e usr/local/lib in Linux).
 
 Now you can start your Lisp and load LISP-CV:
 ```
@@ -151,17 +151,18 @@ Now you can start your Lisp and load LISP-CV:
 (asdf:load-system :gc)
 ```
 
-You're all done! Now you can switch your package to LISP-CV's one for extra comfort:
+You're all done! Now you can switch your package to LISP-CV's for extra comfort:
 ```
 (in-package #:lisp-cv)
+
+(in-package #:gc) ;The garbage collection Module.
 ```
 
-Let's do some tests just to be sure:
+Let's do some tests just to be sure. You'll need to compile this...
 
 ```
 (defun imread-example-2 (filename)
-  "Open the image FILENAME with IMREAD and show it in a window. This example uses with-*
-macros for memory management"
+  "Open the image FILENAME with IMREAD and show it in a window."
   (let ((window-name "IMREAD Example 2"))
     (with-named-window (window-name +window-normal+)
       (move-window window-name 759 175)
@@ -173,6 +174,9 @@ macros for memory management"
           (let ((c (wait-key 33)))
             (when (= c 27)
               (return))))))))
+
+
+And then evaluate this at the REPL...
 
 (imread-example-2  <path-to-any-image>)
 
