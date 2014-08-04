@@ -155,7 +155,7 @@ You're all done! Now you can switch your package to LISP-CV's for extra comfort:
 ```
 (in-package #:lisp-cv)
 
-(in-package #:gc) ;The garbage collection Module.
+(in-package #:gc) 
 ```
 
 Let's do some tests just to be sure. You'll need to compile this...
