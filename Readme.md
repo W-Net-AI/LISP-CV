@@ -184,7 +184,7 @@ And then evaluate this at the REPL...
 ```
 
 
-If all went as planned, you should see your picture in a window.
+If all went as planned, you should see your picture in a window!
 
 --------------------------------------------------------------------------------
 
@@ -196,14 +196,11 @@ lisp-cv-master/examples/examples.lisp.
 ```
 If you want to know if a function has been wrapped and is available, do a search
 for the C++ function name in the examples.lisp folder. All functions are documented
-and all have the C++ function declarations above the Lisp one. Some function names
-aren't well defined but you can do a search for the C++ class name i.e To find the
-Lisp equivalent of the Matrix Expressions "*" , "/", "+" or "-" operators just do a
-search for MatExpr in the examples.lisp file. Learning how to search this file will
-help answer a lot of questions about this Library and put incredible amounts of code
-snippets right at your fingertips. Every function provided in this library has an
-example program associated with it and all of the names of the examples are formatted
-as <function-name>-example.
+and all have the C++ function declarations above the Lisp one. Learning how to search 
+this file will help answer a lot of questions about this Library and put incredible 
+amounts of code snippets right at your fingertips. Every function provided in this 
+library has an example program associated with it and all of the names of the examples 
+are formatted as <function-name>-example.
 
 
 You can also learn how to use the library by comparing the OpenCV C++ tutorials
@@ -211,7 +208,7 @@ at this link:
 
 http://opencv-srf.blogspot.com/2011/09/capturing-images-videos.html
 
-to the VIDEO-CAPTURE-EXAMPLE example in examples.lisp.
+to the VIDEO-CAPTURE-EXAMPLE in examples.lisp.
 
 By comparing the tutorials at this link:
 
@@ -256,8 +253,8 @@ of this page* (Remember to include how you got it done!)
 
 *If you have a function and example that you would like to add*
 
-*If you would like add a code sample to the examples folder(something you made
-with Lisp-CV)*
+*If you would like add a code sample to the examples folder(something you made with 
+Lisp-CV)*
 
 *If you would like to add some other unspecified addition to the library*
 
