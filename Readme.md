@@ -146,7 +146,7 @@ Then install resulting so-files manually to a location on your PATH(i.e usr/loca
 
 Now you can start your Lisp and load LISP-CV:
 ```
-(asdf:load-system :lisp-cv)
+(asdf:load-system :lisp-cv) ;The main package.
 
 (asdf:load-system :gc) ;Automatically finalized functions.
 ```
