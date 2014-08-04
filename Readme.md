@@ -174,10 +174,11 @@ Let's do some tests just to be sure. You'll need to compile this...
           (let ((c (wait-key 33)))
             (when (= c 27)
               (return))))))))
+```
 
 
 And then evaluate this at the REPL...
-
+```
 (imread-example-2  <path-to-any-image>)
 
 ```
