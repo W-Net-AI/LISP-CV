@@ -57,8 +57,8 @@
 
 (defmacro alloc (&optional type value)
        (cond ((listp value)
-	      `(gced-foreign-alloc ,type ,:initial-contents ,value))
-	     (t `(gced-foreign-alloc ,type ,:initial-element ,value))))
+	      `(foreign-alloc ,type ,:initial-contents ,value))
+	     (t `(foreign-alloc ,type ,:initial-element ,value))))
 
 
 ;; FOREIGN-FREE macro

@@ -207,12 +207,12 @@
   `(mem-ref (resolve-pointer ,ptr) ,type ,offset))
 
 
-;;; Basic Structures###
+;;; Basic Structures
 
 
 ;; size_t cv_Mat_get_Step(Mat* self) 
 (defcfun ("cv_Mat_get_Step" step*) :unsigned-int
-  "Used to compute address of a matrix element"
+  "Used to compute address of a matrix element."
   (self mat))
 
 
@@ -225,23 +225,23 @@
 
 ;; Mat* force(MatExpr* expr)
 (defcfun ("force" >>) mat
-  "Coerces a MAT-EXPR to a MAT. 
-   This is a shorthand version of the FORCE function."
+  "Coerces a MAT-EXPR to a MAT."
    (mat-expr mat-expr))
 
 
 ;; MatExpr* promote(Mat* m) 
 (defcfun ("promote" <<) mat-expr
-  "Converts a MAT to a MAT-EXPR.
-   This is a shorthand version of the PROMOTE function." 
+  "Converts a MAT to a MAT-EXPR." 
    (mat mat))
 
 
 ;; MatExpr + operator
 ;; MatExpr* cv_Mat_add(Mat* m1, Mat* m2)
 (defcfun ("cv_Mat_add" add) mat-expr
+  "Adds M1 to M2."
   (m1 mat)
   (m2 mat))
+
 
 
 ;; Mat& Mat::adjustROI(int dtop, int dbottom, int dleft, int dright)
@@ -258,7 +258,7 @@
 ;; _Tp area() const
 ;; int cv_Size_area(Size* self)
 (defcfun ("cv_Size_area" area) :int
-  "Gets the area of a SIZE construct"
+  "Gets the area of a SIZE object."
   (self size))
 
 

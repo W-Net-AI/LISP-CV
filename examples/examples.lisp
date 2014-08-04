@@ -1255,6 +1255,51 @@ CV> (EMPTY C)
 
 T
 
+========================================================================================================================================
+#FORCE
+========================================================================================================================================
+
+Coverts a MAT-EXPR to MAT
+
+LISP-CV: (FORCE (SELF MAT-EXPR)) => MAT
+
+LISP-CV: (>> (SELF MAT-EXPR)) => MAT
+
+
+  Parameters:	
+
+        SELF - A Matrix Expression.
+
+
+The function FORCE converts a functions output from MAT-EXPR to MAT.  This is useful if you have just 
+done mathematical computation with a Matrix Expressions(MAT-EXPR) function and would like to use the 
+result in a function that only accepts a MAT as input i.e. IMSHOW. The function >> is an identical 
+shorthand version of the FORCE function supplied for ease of use. 
+
+
+(defun force-example ()
+
+  "In this example, matrix M1 is filled with 122, 
+   and matrix M2 is filled with 122. Matrix M1 is 
+   multiplied by M2 and the result is stored in R-
+   ESULT. Before being shown in a window, the ret-
+   urn value of the MUL function, which is of typ-
+   e MAT-EXPR, must be coerced back to type MAT s-
+   o the IMSHOW function can read it.  The functi-
+   on FORCE(actually the shorthand version >>) is
+   used to do this."
+
+  (let ((window-name "RESULT - FORCE Example"))
+    (with-mat ((m1 (mat 3 3 +8u+ 1))
+	       (m2 (mat 3 3 +8u+ 255)))
+      (with-mat-expr ((result (add m1 m2)))
+	(with-named-window (window-name +window-normal+)
+	  (move-window window-name 759 175)
+	  (loop
+	     (imshow window-name (t:>> result))
+	     (let ((c (wait-key 33)))
+	       (when (= c 27)
+		 (return)))))))))
 
 ========================================================================================================================================
 #INV
@@ -11291,6 +11336,268 @@ Example:
 		 (when (= c 27)
 		   (return))))))))))
 
+
+========================================================================================================================================
+GOOD-FEATURES-TO-TRACK
+========================================================================================================================================
+
+Determines strong corners on an image.
+
+C++: void goodFeaturesToTrack(InputArray image, OutputArray corners, int maxCorners, double qualityLevel, 
+                              double minDistance, InputArray mask=noArray(), int blockSize=3, bool useHarrisDetector=false, 
+                              double k=0.04 )
+
+LISP-CV: (GOOD-FEATURES-TO-TRACK (IMAGE MAT) (CORNERS MAT) (MAX-CORNERS :INT) (QUALITY-LEVEL :DOUBLE) (MIN-DISTANCE :DOUBLE) 
+                                  &OPTIONAL ((MASK MAT) (%MAT)) ((BLOCK-SIZE :INT) 3) ((USE-HARRIS-DETECTOR :BOOLEAN) NIL) 
+                                 ((K :DOUBLE) 0.04)) => :VOID
+
+    Parameters:	
+
+        IMAGE - Input 8-bit or floating-point 32-bit, single-channel image.
+
+        CORNERS - Output vector of detected corners.
+
+        MAX-CORNERS - Maximum number of corners to return. If there are more corners than are found, 
+                      the strongest of them is returned.
+
+        QUALITY-LEVEL - Parameter characterizing the minimal accepted quality of image corners. The 
+                        parameter value is multiplied by the best corner quality measure, which is 
+                        the minimal eigenvalue (see (CORNER-MIN-EIGEN-VAL)) or the Harris function 
+                        response (see (CORNER-HARRIS)). The corners with the quality measure less 
+                        than the product are rejected. i.e., if the best corner has quality measure 
+                        equal to 1500, and  (= QUALITY-LEVEL 0.01d0), then all the corners with the 
+                        quality measure less than 15 are rejected.
+
+        MIN-DISTANCE - Minimum possible Euclidean distance between the returned corners.
+
+        MASK - Optional region of interest. If the image is not empty (it needs to have type +8UC1+ 
+               and the same size as IMAGE), it specifies the region in which the corners are detected.
+
+        BLOCK-SIZE - Size of an average block for computing a derivative covariation matrix over each 
+                     pixel neighborhood. See (CORNER-EIGEN-VALS-AND-VECS).
+
+        USE-HARRIS-DETECTOR - Parameter indicating whether to use a Harris detector (see (CORNER-HARRIS)) 
+                              or (CORNER-MIN-EIGEN-VAL)).
+
+        k - Free parameter of the Harris detector.
+
+The function finds the most prominent corners in the image or in the specified image region, as 
+described in [Shi94]:
+
+
+[Shi94] =	
+
+    Shi and C. Tomasi. Good Features to Track. Proceedings of the IEEE Conference on Computer Vision 
+    and Pattern Recognition, pages 593-600, June 1994.
+
+
+See OpenCV documentation at this link:
+
+http://docs.opencv.org/trunk/modules/imgproc/doc/feature_detection.html?highlight=goodf#goodfeaturestotrack
+
+for further description and formulae:
+
+
+See also:
+
+(CORNER-MIN-EIGEN-VAL), (CORNER-HARRIS), (CALC-OPTICAL-FLOW-PYR-LK), (ESTIMATE-RIGID-TRANSFORM)
+
+
+Example:
+
+;;Path to the classifier.
+(defparameter face-cascade-name "<opencv-src-dir>/data/haarcascades/haarcascade_frontalface_alt.xml")
+;;Create CASCADE-CLASSIFIER object.
+(defparameter face-cascade (cascade-classifier))
+
+
+(defun detect-face (frame &optional mask)
+
+  (let ((num-buffers 2)
+        (size-factor 1.1d0)
+	(faces-list 0)
+        (roi 0))
+    (with-vector-rect ((faces (vector-rect)))
+      (with-mat ((frame-gray (mat)))
+	(with-size ((face-size (size 30 30)))
+	  ;;Detect faces with DETECT-MULTI-SCALE.
+	  (detect-multi-scale face-cascade frame faces size-factor 
+			      num-buffers +cascade-do-canny-pruning+ face-size))
+	;;Convert VECTOR-RECT to a Lisp list for speed.
+	(setf faces-list (vector-rect :to-lisp-list faces))
+	;;Iterate through all current elements (detected faces).
+	(dotimes (index-current (length faces-list))
+	  (setf roi (clone (nth index-current faces-list))) 
+	  ;;Display detected faces on main window.
+	  (with-point ((pt1 (point (x (nth index-current faces-list)) 
+				   (y (nth index-current faces-list))))
+		       (pt2 (point (+ (x (nth index-current faces-list)) 
+				      (height (nth index-current faces-list)))
+				   (+ (y (nth index-current faces-list)) 
+				      (width (nth index-current faces-list))))))
+	    (with-scalar ((white (scalar 255 255 255)))
+
+	      (rectangle mask pt1 pt2 white -1 8 0))))))
+    (tg:finalize roi (lambda () (del-rect roi)))))
+
+
+(defun good-features-to-track-example (&optional 
+					 (cam *camera-index*) 
+					 (width *default-width*)
+					 (height *default-height*))
+
+  "In this example we detect faces in the camera feed with 
+   DETECT-MULTI-SCALE. Then we use GOOD-FEATURES-TO-TRACK 
+   to determine the best points to track in those detected 
+   faces."
+
+  (with-captured-camera (cap cam :width width :height height)
+    (if (not (is-opened cap)) 
+	(return-from good-features-to-track-example
+	  (format t "Cannot open the video camera")))
+    ;;Load the classifier.
+    (if (not (cascade-classifier-load face-cascade face-cascade-name))
+	(return-from good-features-to-track-example 
+	  (format t "Error Loading")))
+    (let ((window-name-1 "MASK - GOOD-FEATURES-TO-TRACK Example")
+          (window-name-2 "FRAME - GOOD-FEATURES-TO-TRACK Example")
+
+	  ;;Below are some GOOD-FEATURES-TO-TRACK parameters
+	  ;;that you can change with the trackbars and their 
+          ;;definitions.
+	  
+          ;;Note: The t: prefix signifies auto GC is enabled.
+
+	  ;;          MAX-CORNERS              
+	  ;;          ===========
+
+	  ;;The maximum number of corners to return. 
+	  ;;If there are more corners than that the 
+	  ;;strongest of them will be returned.
+	  (max-corners (t:alloc :int 10))
+
+
+	  ;;         QUALITY-LEVEL
+	  ;;         =============
+
+	  ;;The minimal accepted quality of corners
+	  ;;of the image, The value of the parameter 
+	  ;;is multiplied by the best corner quality  
+	  ;;measure (which is the minimum eigenvalue,
+	  
+	  ;;     See: (CORNER-MIN-EIGEN-VAL)
+
+	  ;;or the Harris function response,
+
+	  ;;     See: (CORNER-HARRIS)
+
+	  ;;The corners, which quality measure is less 
+	  ;;than the product, will be rejected. i.e. if 
+	  ;;the best corner has the quality measure equal 
+          ;;to 1500 and (= QUALITY-LEVEL 0.01d0) , then all 
+          ;;corners which quality measure is less than 15 is 
+          ;;rejected.
+	  (quality-level (t:alloc :int 1))
+
+
+	  ;;         MIN-DISTANCE
+	  ;;         ============
+
+	  ;;The minimum possible Euclidean distance 
+	  ;;between the returned corners.
+	  (min-distance  (t:alloc :int 20))
+	  ;;Size of the averaging block for computing derivative 
+	  ;;covariation matrix over each pixel neighborhood, 
+
+	  ;;     See: (CORNER-EIGENVALS-AND-VECS)
+
+	  (block-size (t:alloc :int 3))
+
+
+	  ;;       USE-HARRIS-DETECTOR
+	  ;;       ===================
+
+	  ;;Indicates, whether to use a Harris detector or: 
+	  
+	  ;;      (CORNER-MIN-EIGEN-VAL)
+
+	  (use-harris-detector (t:alloc :int 0))
+
+
+	  ;;               K
+	  ;;               =
+
+	  ;;Free parameter of Harris detector.
+
+	  (k (t:alloc :int 4))
+	  (mask 0)
+          (roi 0))
+
+      (with-named-window (window-name-1 +window-autosize+)
+	(with-named-window (window-name-2 +window-autosize+)
+	  (move-window window-name-1 280 175)
+	  (move-window window-name-2 997 175)
+	  (create-trackbar "MAX CRNRS" window-name-2 max-corners 500)
+	  (create-trackbar "QUAL-LEVEL" window-name-2 quality-level 500)
+	  (create-trackbar "MIN-DIST." window-name-2 min-distance 500)
+	  (create-trackbar "BLOCK-SIZE" window-name-2 block-size 500)
+	  (create-trackbar "USE-HARRIS" window-name-2 use-harris-detector 1)
+	  (create-trackbar "K" window-name-2 k 500)
+	  (with-mat ((frame (mat)))
+
+	    (loop
+	       (read cap frame)
+	       ;;The optional region of interest. If the mask is 
+	       ;;not empty (then it needs to have the type +8UC1+ 
+	       ;;and the same size as image), it will specify the 
+	       ;;region in which the corners are detected.
+	       (setf mask (mat (rows frame) (cols frame) +8uc1+ 0))
+	       ;;Convert to 1 channel image.
+	       (cvt-color frame frame +bgr2gray+)
+	       ;;Equalize frame histogram 
+	       ;;to get better tracking.
+	       (equalize-hist frame frame)
+	       (if (not (empty frame)) 
+		   ;;Apply the classifier to the frame.
+		   (setf roi (detect-face frame mask))
+		   (format t "No captured frame: Break!"))
+               ;;Don't let trackbar go below 1 for QUAL-LEVEL/BLOCK-SIZE
+	       (with-mat ((corners (mat (@ max-corners :int) 2 +32f+)))
+		 (if (< (get-trackbar-pos "QUAL-LEVEL" window-name-2) 1) 
+		     (set-trackbar-pos "QUAL-LEVEL" window-name-2 1) nil)
+		 (if (< (get-trackbar-pos "BLOCK-SIZE" window-name-2) 1) 
+		     (set-trackbar-pos "BLOCK-SIZE" window-name-2 1) nil)
+                 ;;Detect strong corners in the face ROI.
+		 (good-features-to-track frame corners 
+					 (@ max-corners :int)
+					 (* (@ quality-level :int) 0.001d0)
+					 (* (@ min-distance :int) 1d0) 
+					 mask
+					 (@ block-size :int)	
+					 (if (= (@ use-harris-detector :int) 1) t nil))
+                 ;;Convert frame back to 3 channel image 
+                 ;;so circles and rectangle have color.
+		 (cvt-color frame frame +gray2bgr+)
+		 (dotimes (i (* (rows corners) (cols corners)))
+		   (with-point ((center (point (ceiling (@ (at-point-2f corners 0 i) :float)) 
+					       (ceiling (@ (at-point-2f corners 0 i) :float 1)))))
+		     (circle frame center 8 (t:bgr 255 0 111) -1)
+		     (circle frame center 8 (t:bgr 0 255 0) 1)))
+
+		 (format t "~%Output Matrix of Corners:~%~%")
+		 (print-mat corners)
+		 (format t "~%")
+
+		 (imshow window-name-1 mask)
+		 (del-mat mask)
+		 (if (rect-p roi) 
+		     (with-scalar ((white (scalar 255 255 255)))
+		       (rectangle frame (tl roi) (br roi) white 2 8 0))))
+	       (imshow window-name-2 frame)
+	       (let ((c (wait-key 33)))
+		 (when (= c 27)
+		   (return))))))))))
+
 ========================================================================================================================================
 #IMGPROC - #OBJECT DETECTION
 ========================================================================================================================================
@@ -14867,7 +15174,7 @@ This function is parallelized with the TBB library.
 
 ;Global variables
 
-;;Load file
+;;Path to the classifier.
 (defparameter face-cascade-name "<opencv-src-dir>/data/haarcascades/haarcascade_frontalface_default.xml")
 ;;Create CASCADE-CLASSIFIER object.
 (defparameter face-cascade (cascade-classifier))
@@ -14969,7 +15276,7 @@ This function is parallelized with the TBB library.
       (if (not (is-opened cap)) 
 	  (return-from detect-multi-scale-example 
 	    (format t "Cannot open the video camera")))
-      ;;Load the cascade.
+      ;;Load the classifier.
       (if (not (cascade-classifier-load face-cascade face-cascade-name))
 	  (return-from detect-multi-scale-example 
 	    (format t "Error Loading")))
@@ -16071,6 +16378,37 @@ See the K-NEAREST-EXAMPLE in this library
 ========================================================================================================================================
 #ML - #SUPPORT VECTOR MACHINES
 ========================================================================================================================================
+
+========================================================================================================================================
+GET-SUPPORT-VECTOR
+========================================================================================================================================
+
+Retrieves a number of support vectors and the particular vector.
+
+
+C++: int CvSVM::get_support_vector_count() const
+
+LISP-CV: (GET-SUPPORT-VECTOR-COUNT (SELF SVM)) => :INT
+
+C++: const float* CvSVM::get_support_vector(int i) const
+
+LISP-CV: (GET-SUPPORT-VECTOR (SELF SVM) (I :INT)) => :POINTER
+
+  
+  Parameters:	
+
+        SELF - A SVM object.
+
+        I - Index of the particular support vector.
+
+
+The methods can be used to retrieve a set of support vectors.
+
+
+Example:
+
+See SVM-EXAMPLE in this file.
+
 ========================================================================================================================================
 #SVM
 ========================================================================================================================================
@@ -18589,51 +18927,6 @@ CV> (PRINT-MAT (T:>> (T:MAT-EXPR-T A))) ;;;coerce the return value, back to MAT
   (2 5 8)                               
   (3 6 9))
 
-========================================================================================================================================
-#FORCE
-========================================================================================================================================
-
-Coverts a MAT-EXPR to MAT
-
-LISP-CV: (FORCE (SELF MAT-EXPR)) => MAT
-
-LISP-CV: (>> (SELF MAT-EXPR)) => MAT
-
-
-  Parameters:	
-
-        SELF - A Matrix Expression.
-
-
-The function FORCE converts a functions output from MAT-EXPR to MAT.  This is useful if you have just 
-done mathematical computation with a Matrix Expressions(MAT-EXPR) function and would like to use the 
-result in a function that only accepts a MAT as input i.e. IMSHOW. The function >> is an identical 
-shorthand version of the FORCE function supplied for ease of use. 
-
-
-(defun force-example ()
-
-  "In this example a matrix filled with ones(MAT) is 
-   created. MAT is then added to itself and the resu-
-   lt is shown in a window. The function >> which is 
-   a shorthand version of the FORCE function, is nec-
-   essary here is because the return of the matrix a-
-   ddition function ADD is MAT-EXPR and that return 
-   must be coerced to MAT before it can be shown in 
-   a window with IMSHOW."
-
-  (let* ((mat (mat-ones 3 3 +8u+))
-         (out (add mat mat))
-	 (window-name "FORCE Example"))
-    (named-window window-name +window-normal+)
-    (move-window window-name 759 175)
-    (imshow window-name  (>> out))
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name)))
-
-
-(>>-example)
-
 ========================================================================================================================================         
 DIAG
 ========================================================================================================================================
@@ -18799,8 +19092,11 @@ LISP-CV: (ALLOC TYPE VALUE) => :POINTER
 
 Example:
 
+Note: The T: prefix to ALLOC signifies automatic GC is enabled for this function. If you use with-* 
+macros(WITH-OBJECT) or manual MM(DEL) to GC this function, you'll get a slightly better performance 
+out of it.
 
-CV> (DEFPARAMETER A (ALLOC :DOUBLE 8.0D0))
+CV> (DEFPARAMETER A (T:ALLOC :DOUBLE 8.0D0))
 
 A
 
@@ -18808,7 +19104,7 @@ CV> (@ A :DOUBLE)
 
 8.0d0
 
-CV> (DEFPARAMETER B (ALLOC :INT '(1 2 3)))
+CV> (DEFPARAMETER B (T:ALLOC :INT '(1 2 3)))
 
 B
 

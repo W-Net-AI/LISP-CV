@@ -11,10 +11,15 @@
    #:alloc
 
 
-;; C-Interop
+;; Interop
 
    #:c-string-to-string
    #:c-string
+
+
+;; CFFI
+
+    #:alloc
 
 
 ;; Vectors

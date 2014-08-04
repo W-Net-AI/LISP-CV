@@ -36,6 +36,15 @@
   (c-string-to-string string (cl:length string)))
 
 
+;; CFFI - FOREIGN-ALLOC
+
+(defmacro alloc (&optional type value)
+  "A GC'ed version of foreign-alloc."
+       (cond ((listp value)
+	      `(cv:gced-foreign-alloc ,type ,:initial-contents ,value))
+	     (t `(cv:gced-foreign-alloc ,type ,:initial-element ,value))))
+
+
 ;;; CORE - Basic Structures
 
 

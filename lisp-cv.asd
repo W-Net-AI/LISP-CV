@@ -21,6 +21,7 @@
                (:file "utils" :depends-on ("package" "lisp-cv"))
                (:file "constants" :depends-on ("package" "lisp-cv"))
                (:file "types" :depends-on ("package" "lisp-cv"))
+               (:file "predicates" :depends-on ("package" "lisp-cv" "types"))
                (:file "structs" :depends-on ("package" "lisp-cv"))
                (:file "vector" :depends-on ("package" "lisp-cv" "types"))
                (:file "delete" :depends-on ("package" "lisp-cv" "types"))

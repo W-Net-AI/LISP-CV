@@ -577,10 +577,11 @@
   (k :double))
 
 
-(defun good-features-to-track (image corners max-corners quality-level min-distance &optional (mask (null-pointer)) (block-size 3) 
-                              (use-harris-detector nil) (k 0.04d0))
+(defun good-features-to-track (image corners max-corners quality-level min-distance &optional (mask (%mat) given-mask) (block-size 3) 
+										      (use-harris-detector nil) (k 0.04d0))
   "Determines strong corners on an image."
-  (%good-features-to-track image corners max-corners quality-level min-distance mask block-size use-harris-detector k))
+  (%good-features-to-track image corners max-corners quality-level min-distance mask block-size use-harris-detector k)
+  (if given-mask nil (del-mat mask)))
 
 
 
