@@ -148,7 +148,7 @@ Now you can start your Lisp and load LISP-CV:
 ```
 (asdf:load-system :lisp-cv)
 
-(asdf:load-system :gc)
+(asdf:load-system :gc) ;Automatically finalized functions.
 ```
 
 You're all done! Now you can switch your package to LISP-CV's for extra comfort:
