@@ -115,8 +115,8 @@ some-random-path/opencv_contrib/modules/c/src/scalar.cpp
 some-random-path/opencv_contrib/modules/c/src/size.cpp
 some-random-path/opencv_contrib/modules/c/src/excluded_functions.cpp
 ```
-
-Note: for the time being, until an error in the opencv_contrib module is ironed
+```
+"Note: for the time being, until an error in the opencv_contrib module is ironed
 out, the opencv_generated.cpp and opencv_generated.hpp will be provided in the: 
 
 lisp-cv-src-dir/src
@@ -126,8 +126,8 @@ lisp-cv-src-dir/include
 directories. You will still need to build OpenCv with the instructions at the above 
 link, but when your done, will need to place these files at the appropriate paths below. 
 This should work fine but, due to the error, I am unable to test the install at this time 
-to verify it.
-
+to verify it."
+```
 
 You will need to copy these files. They can be found in the Lisp-CV src and include directories:
 ```
