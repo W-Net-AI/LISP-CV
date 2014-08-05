@@ -405,7 +405,7 @@
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; t * std_vector##tn##_to_carray( vector_##t * v ) 
-(defcfun ("std_vectorkp_to_carray" vec-key-point-to-c-arr) key-point
+(defcfun ("std_vectorkp_to_carray" vec-key-point-to-c-arr) :pointer
   (v vector-key-point))
 
 

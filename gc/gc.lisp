@@ -140,11 +140,11 @@
     (case cffi-type
 
       (:uchar 
-       (if mat-type (setf mat (mat-typed x y mat-type))
+       (if mat-type (setf mat (create-mat-typed x y mat-type))
 	   (case channels (1
-			   (setf mat (mat-typed x y cv:+8uc1+)))
+			   (setf mat (create-mat-typed x y cv:+8uc1+)))
 		 ((2 3 4)
-		  (setf mat (mat-typed x y (case channels 
+		  (setf mat (create-mat-typed x y (case channels 
 					     (2 #.cv:+8uc2+)
 					     (3 #.cv:+8uc3+)
 					     (4 #.cv:+8uc4+)))))))
@@ -153,11 +153,11 @@
 	 (setf (mem-aref ptr :uchar n) (row-major-aref arr n)))mat)
 
       (:char 
-       (if mat-type (setf mat (mat-typed x y mat-type))
+       (if mat-type (setf mat (create-mat-typed x y mat-type))
        (case channels (1
-		       (setf mat (mat-typed x y cv:+8sc1+)))
+		       (setf mat (create-mat-typed x y cv:+8sc1+)))
 	     ((2 3 4)
-	      (setf mat (mat-typed x y (case channels 
+	      (setf mat (create-mat-typed x y (case channels 
 					 (2 #.cv:+8sc2+)
 					 (3 #.cv:+8sc3+)
 					 (4 #.cv:+8sc4+)))))))
@@ -166,11 +166,11 @@
 	 (setf (mem-aref ptr :char n) (row-major-aref arr n)))mat)
 
       (:ushort 
-       (if mat-type (setf mat (mat-typed x y mat-type))
+       (if mat-type (setf mat (create-mat-typed x y mat-type))
        (case channels (1
-		       (setf mat (mat-typed x y cv:+16uc1+)))
+		       (setf mat (create-mat-typed x y cv:+16uc1+)))
 	     ((2 3 4)
-	      (setf mat (mat-typed x y (case channels 
+	      (setf mat (create-mat-typed x y (case channels 
 					 (2 #.cv:+16uc2+)
 					 (3 #.cv:+16uc3+)
 					 (4 #.cv:+16uc4+)))))))
@@ -179,11 +179,11 @@
 	 (setf (mem-aref ptr :ushort n) (row-major-aref arr n)))mat)
 
       (:short 
-       (if mat-type (setf mat (mat-typed x y mat-type))
+       (if mat-type (setf mat (create-mat-typed x y mat-type))
        (case channels (1
-		       (setf mat (mat-typed x y cv:+16sc1+)))
+		       (setf mat (create-mat-typed x y cv:+16sc1+)))
 	     ((2 3 4)
-	      (setf mat (mat-typed x y (case channels 
+	      (setf mat (create-mat-typed x y (case channels 
 					 (2 #.cv:+16sc2+)
 					 (3 #.cv:+16sc3+)
 					 (4 #.cv:+16sc4+)))))))
@@ -192,11 +192,11 @@
 	 (setf (mem-aref ptr :short n) (row-major-aref arr n)))mat)
 
       (:int 
-       (if mat-type (setf mat (mat-typed x y mat-type))
+       (if mat-type (setf mat (create-mat-typed x y mat-type))
        (case channels (1
-		       (setf mat (mat-typed x y cv:+32sc1+)))
+		       (setf mat (create-mat-typed x y cv:+32sc1+)))
 	     ((2 3 4)
-	      (setf mat (mat-typed x y (case channels 
+	      (setf mat (create-mat-typed x y (case channels 
 					 (2 #.cv:+32sc2+)
 					 (3 #.cv:+32sc3+)
 					 (4 #.cv:+32sc4+)))))))
@@ -205,11 +205,11 @@
 	 (setf (mem-aref ptr :int n) (row-major-aref arr n)))mat)
 
       (:float 
-       (if mat-type (setf mat (mat-typed x y mat-type))
+       (if mat-type (setf mat (create-mat-typed x y mat-type))
        (case channels (1
-		       (setf mat (mat-typed x y cv:+32fc1+)))
+		       (setf mat (create-mat-typed x y cv:+32fc1+)))
 	     ((2 3 4)
-	      (setf mat (mat-typed x y (case channels 
+	      (setf mat (create-mat-typed x y (case channels 
 					 (2 #.cv:+32fc2+)
 					 (3 #.cv:+32fc3+)
 					 (4 #.cv:+32fc4+)))))))
@@ -218,11 +218,11 @@
 	 (setf (mem-aref ptr :float n) (row-major-aref arr n)))mat)
 
       (:double 
-       (if mat-type (setf mat (mat-typed x y mat-type))
+       (if mat-type (setf mat (create-mat-typed x y mat-type))
        (case channels (1
-		       (setf mat (mat-typed x y cv:+64fc1+)))
+		       (setf mat (create-mat-typed x y cv:+64fc1+)))
 	     ((2 3 4)
-	      (setf mat (mat-typed x y (case channels 
+	      (setf mat (create-mat-typed x y (case channels 
 					 (2 #.cv:+64fc2+)
 					 (3 #.cv:+64fc3+)
 					 (4 #.cv:+64fc4+)))))))
@@ -372,7 +372,7 @@
 
 ;; Mat::Mat(int rows, int cols, int type, void* data) 
 ;; Mat* cv_create_Mat_with_data(int rows, int cols, int type, void* data)
-(defcfun ("cv_create_Mat_with_data" mat-data) (cv:mat :garbage-collect t)
+(defcfun ("cv_create_Mat_with_data" create-mat-with-data) (cv:mat :garbage-collect t)
 	 (rows :int)
 	 (cols :int)
 	 (type :int)
@@ -380,69 +380,69 @@
 
 
 (let ((previous nil))
-  (defun %mat-data-uchar (rows cols type data)
+  (defun %create-mat-with-data-uchar (rows cols type data)
 
     (unless (equal data (car previous))
       (setf previous (cons data (cv:gced-foreign-alloc :uchar
 						    :initial-contents data))))
-    (mat-data rows cols type (cdr previous))))
+    (create-mat-with-data rows cols type (cdr previous))))
 
 
 (let ((previous nil))
-  (defun %mat-data-char (rows cols type data)
+  (defun %create-mat-with-data-char (rows cols type data)
 
     (unless (equal data (car previous))
       (setf previous (cons data (cv:gced-foreign-alloc :char
 						    :initial-contents data))))
-    (mat-data rows cols type (cdr previous))))
+    (create-mat-with-data rows cols type (cdr previous))))
 
 
 (let ((previous nil))
-  (defun %mat-data-ushort (rows cols type data)
+  (defun %create-mat-with-data-ushort (rows cols type data)
 
     (unless (equal data (car previous))
       (setf previous (cons data (cv:gced-foreign-alloc :ushort
 						    :initial-contents data))))
-    (mat-data rows cols type (cdr previous))))
+    (create-mat-with-data rows cols type (cdr previous))))
 
 
 (let ((previous nil))
-  (defun %mat-data-short (rows cols type data)
+  (defun %create-mat-with-data-short (rows cols type data)
 
     (unless (equal data (car previous))
       (setf previous (cons data (cv:gced-foreign-alloc :short
 						    :initial-contents data))))
-    (mat-data rows cols type (cdr previous))))
+    (create-mat-with-data rows cols type (cdr previous))))
 
 
 (let ((previous nil))
-  (defun %mat-data-int (rows cols type data)
+  (defun %create-mat-with-data-int (rows cols type data)
 
     (unless (equal data (car previous))
       (setf previous (cons data (cv:gced-foreign-alloc :int
 						    :initial-contents data))))
-    (mat-data rows cols type (cdr previous))))
+    (create-mat-with-data rows cols type (cdr previous))))
 
 
 (let ((previous nil))
-  (defun %mat-data-float (rows cols type data)
+  (defun %create-mat-with-data-float (rows cols type data)
 
     (unless (equal data (car previous))
       (setf previous (cons data (cv:gced-foreign-alloc :float
 						    :initial-contents data))))
-    (mat-data rows cols type (cdr previous))))
+    (create-mat-with-data rows cols type (cdr previous))))
 
 
 (let ((previous nil))
-  (defun %mat-data-double (rows cols type data)
+  (defun %create-mat-with-data-double (rows cols type data)
 
     (unless (equal data (car previous))
       (setf previous (cons data (cv:gced-foreign-alloc :double
 						    :initial-contents data))))
-    (mat-data rows cols type (cdr previous))))
+    (create-mat-with-data rows cols type (cdr previous))))
 
 
-(defun %mat-data (rows cols type data-list)
+(defun %create-mat-with-data (rows cols type data-list)
   (let ((cffi-type (case type 
 		     (#.cv:+8uc1+ ':uchar)
 		     (#.cv:+8sc1+ ':char)
@@ -474,19 +474,19 @@
 		     (#.cv:+64fc4+ ':double))))
     (case cffi-type 
       (:uchar
-       (%mat-data-uchar rows cols type data-list))
+       (%create-mat-with-data-uchar rows cols type data-list))
       (:char
-       (%mat-data-char rows cols type data-list))
+       (%create-mat-with-data-char rows cols type data-list))
       (:short
-       (%mat-data-short rows cols type data-list))
+       (%create-mat-with-data-short rows cols type data-list))
       (:ushort
-       (%mat-data-ushort rows cols type data-list))
+       (%create-mat-with-data-ushort rows cols type data-list))
       (:int
-       (%mat-data-int rows cols type data-list))
+       (%create-mat-with-data-int rows cols type data-list))
       (:float
-       (%mat-data-float rows cols type data-list))
+       (%create-mat-with-data-float rows cols type data-list))
       (:double
-       (%mat-data-double rows cols type data-list)))))
+       (%create-mat-with-data-double rows cols type data-list)))))
 
 
 ;; Mat::t
@@ -515,15 +515,15 @@
 
 ;; Mat::Mat(const Mat& m, const Range& rowRange, const Range& colRange=Range::all() )
 ;; Mat* cv_Mat_get_Range(Mat* self, Range* rowRange, Range* colRange)
-(defcfun ("cv_Mat_with_Range" %mat-range) (cv:mat :garbage-collect t)
+(defcfun ("cv_Mat_with_Range" %create-mat-with-range) (cv:mat :garbage-collect t)
   "MAT constructor with Range parameters."
   (self cv:mat)
   (row-range cv:range)
   (col-range cv:range))
 
 
-(defun mat-range (self row-range &optional (col-range (cv:range-all) given-col-range))
-  (let ((return (%mat-range self row-range col-range)))
+(defun create-mat-with-range (self row-range &optional (col-range (cv:range-all) given-col-range))
+  (let ((return (%create-mat-with-range self row-range col-range)))
     (if given-col-range nil (cv:del-range col-range))
     return))
 
@@ -548,7 +548,7 @@
 
 ;; Mat::Mat(int rows, int cols, int type)
 ;; Mat* cv_create_Mat_typed(int rows, int cols, int type)
-(defcfun ("cv_create_Mat_typed" mat-typed) (cv:mat :garbage-collect t)
+(defcfun ("cv_create_Mat_typed" create-mat-typed) (cv:mat :garbage-collect t)
 	 "MAT constructor with a row, column and type parameter."
 	 (rows :int)
 	 (cols :int)
@@ -557,16 +557,16 @@
 
 ;; Mat::Mat(int rows, int cols, int type, const Scalar& s)
 ;; Mat* cv_create_Mat_with_value(int rows, int cols, int type, Scalar* s)
-(defcfun ("cv_create_Mat_with_value" mat-value) cv:mat
+(defcfun ("cv_create_Mat_with_value" create-mat-with-value) cv:mat
 	 (rows :int)
 	 (cols :int)
 	 (type :int)
 	 (s cv:scalar))
 
 
-(defun mat-element (rows cols type value)
+(defun create-mat-with-element (rows cols type value)
   (let* ((scalar (apply #'cv:scalar (list value)))					 
-	(ret (mat-value rows cols type scalar)))
+	(ret (create-mat-with-value rows cols type scalar)))
     (cv:del-scalar scalar)
 ret))
 
@@ -593,27 +593,27 @@ ret))
 
 	((typep arg2 'cv:cv-range)
 
-	 (apply #'mat-range arg1 arg2 arg3))
+	 (apply #'create-mat-with-range arg1 arg2 arg3))
 	
 	((and (eq arg4 nil) arg1)
 
-	 (mat-typed arg1 arg2 arg3))
+	 (create-mat-typed arg1 arg2 arg3))
 	
 	((typep arg4 'cv:cv-scalar)
 
-	 (mat-value arg1 arg2 arg3 arg4))
+	 (create-mat-with-value arg1 arg2 arg3 arg4))
 	
 	((listp arg4)
 
-	 (%mat-data arg1 arg2 arg3 arg4))
+	 (%create-mat-with-data arg1 arg2 arg3 arg4))
 	
 	((pointerp arg4)
 
-	 (mat-data arg1 arg2 arg3 arg4))
+	 (create-mat-with-data arg1 arg2 arg3 arg4))
 
 	((integerp arg4)
 
-	 (mat-element arg1 arg2 arg3 arg4))
+	 (create-mat-with-element arg1 arg2 arg3 arg4))
 	
 	(t nil)))
 
@@ -637,27 +637,27 @@ ret))
 
 	((typep arg2 'cv:cv-range)
 
-	 (apply #'mat-range arg1 arg2 arg3))
+	 (apply #'create-mat-with-range arg1 arg2 arg3))
 	
 	((and (eq arg4 nil) arg1)
 
-	 (mat-typed arg1 arg2 arg3))
+	 (create-mat-typed arg1 arg2 arg3))
 	
 	((typep arg4 'cv:cv-scalar)
 
-	 (mat-value arg1 arg2 arg3 arg4))
+	 (create-mat-with-value arg1 arg2 arg3 arg4))
 	
 	((listp arg4)
 
-	 (%mat-data arg1 arg2 arg3 arg4))
+	 (%create-mat-with-data arg1 arg2 arg3 arg4))
 	
 	((pointerp arg4)
 
-	 (mat-data arg1 arg2 arg3 arg4))
+	 (create-mat-with-data arg1 arg2 arg3 arg4))
 
 	((integerp arg4)
 
-	 (mat-element arg1 arg2 arg3 arg4))
+	 (create-mat-with-element arg1 arg2 arg3 arg4))
 	
 	(t nil)))
 

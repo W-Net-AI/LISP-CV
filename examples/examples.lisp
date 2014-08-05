@@ -11338,7 +11338,185 @@ Example:
 
 
 ========================================================================================================================================
-GOOD-FEATURES-TO-TRACK
+CORNER-SUB-PIX
+========================================================================================================================================
+
+Refines the corner locations.
+
+C++: void cornerSubPix(InputArray image, InputOutputArray corners, Size winSize, Size zeroZone, TermCriteria criteria)
+
+LISP-CV: (CORNER-SUB-PIX (IMAGE MAT) (CORNERS MAT) (WIN-SIZE SIZE) (ZERO-ZONE SIZE) (CRITERIA TERM-CRITERIA)) => :VOID
+
+
+    Parameters:	
+
+        IMAGE - Input image.
+
+        CORNERS - Initial coordinates of the input corners and refined coordinates provided for output.
+
+        WIN-SIZE - Half of the side length of the search window. For example, if (EQ WIN-SIZE (SIZE 5 5)), 
+                   then a (=  (*  (+ (* 5 2) 1)  (+ (* 5 2) 1) )  (* 11 11) ) search window is used.
+
+        ZERO-ZONE - Half of the size of the dead region in the middle of the search zone over which the 
+                    summation in the formula below is not done. It is used sometimes to avoid possible 
+                    singularities of the autocorrelation matrix. The value of (-1 -1) indicates that there 
+                    is no such a size.
+
+        CRITERIA - Criteria for termination of the iterative process of corner refinement. That is, the 
+                   process of corner position refinement stops either after (CRITERIA MAX-COUNT) iterations 
+                   or when the corner position moves by less than (EPSILON CRITERIA) on some iteration.
+
+
+The function iterates to find the sub-pixel accurate location of corners or radial saddle points. 
+
+
+See OpenCV documentation at this link:
+
+http://docs.opencv.org/trunk/modules/imgproc/doc/feature_detection.html?highlight=corn#cornersubpix
+
+for images, further description and formulae.
+
+
+Example:
+
+(defun coner-sub-pix-example (&optional 
+				(cam *camera-index*) 
+				(width *default-width*)
+				(height *default-height*))
+
+  (with-captured-camera (cap cam :width width :height height)
+    (if (not (is-opened cap)) 
+	(return-from coner-sub-pix-example
+	  (format t "Cannot open the video camera")))
+    (let ((window-name "FRAME - GOOD-FEATURES-TO-TRACK Example")
+
+	  ;;Below are all the GOOD-FEATURES-TO-TRACK 
+          ;;parameters, that you can change with the 
+          ;;trackbars, and their definitions.
+
+	  ;;The maximum number of corners to return. 
+	  (max-corners (t:alloc :int 71))
+	  ;;Minimal accepted quality of the corners
+	  (quality-level (t:alloc :int 1))
+	  ;;Minimum possible Euclidean distance 
+	  ;;between the returned corners.
+	  (min-distance  (t:alloc :int 20))
+	  ;;Size of the averaging block for computing derivative 
+	  ;;covariation matrix over each pixel neighborhood. 
+	  (block-size (t:alloc :int 3))
+	  ;;Indicates, whether to use a Harris 
+          ;;detector or (CORNER-MIN-EIGEN-VAL)
+	  (use-harris-detector (t:alloc :int 0))
+	  ;;Free parameter of Harris detector.
+	  (k (t:alloc :int 4))
+
+	  ;;Below are some CORNER-SUB-PIX parameters
+	  ;;that you can change with the trackbars and 
+          ;;their definitions.
+
+          ;;Allows you to turn CORNER-SUB-PIX on or off.
+	  (use-corner-sub-pix (t:alloc :int 0))
+
+          ;;        WIN-SIZE
+          ;;        ========
+
+          ;;Half of the side length of the search window. 
+	  (win-size-width (t:alloc :int 21))
+	  (win-size-height (t:alloc :int 21))
+
+          ;;        ZERO-ZONE
+          ;;        =========
+
+          ;;Half of the size of the dead region in the middle 
+          ;;of the search zone over which the summation in the 
+          ;;formula below is not done.  
+	  (zero-zone-width (t:alloc :int 0))
+	  (zero-zone-height (t:alloc :int 0)))
+
+      (with-named-window (window-name +window-autosize+)
+	(move-window window-name 640 159)
+        
+	(create-trackbar "MAX CRNRS" window-name max-corners 450)
+	(create-trackbar "QUAL-LEVEL" window-name quality-level 500)
+	(create-trackbar "MIN-DIST." window-name min-distance 500)
+	(create-trackbar "BLOCK-SIZE" window-name block-size 500)
+	(create-trackbar "USE-HARRIS" window-name use-harris-detector 1)
+	(create-trackbar "K" window-name k 500)
+	(create-trackbar "USE-CORNER-SUB-PIX" window-name use-corner-sub-pix 1)
+	(create-trackbar "WIN-SIZE-WIDTH" window-name win-size-width 200)
+	(create-trackbar "WIN-SIZE-HEIGHT" window-name win-size-width 200)
+	(create-trackbar "ZERO-ZONE-WIDTH" window-name zero-zone-width 200)
+	(create-trackbar "ZERO-ZONE-HEIGHT" window-name zero-zone-height 200)
+
+	(with-mat ((frame (mat)))
+
+	  (loop
+	     (read cap frame)
+	     ;;Convert FRAME to 1 channel image.
+	     (cvt-color frame frame +bgr2gray+)
+	     ;;Equalize histogram of FRAME 
+	     ;;so we get better tracking.
+	     (equalize-hist frame frame)
+	     ;;Here we stop trackbar going below 1 on the
+             ;;following trackbars(or program will freeze)
+	     (with-mat ((corners (mat (@ max-corners :int) 2 +32f+)))
+	       (if (< (get-trackbar-pos "QUAL-LEVEL" window-name) 1) 
+		   (set-trackbar-pos "QUAL-LEVEL" window-name 1) nil)
+	       (if (< (get-trackbar-pos "BLOCK-SIZE" window-name) 1) 
+		   (set-trackbar-pos "BLOCK-SIZE" window-name 1) nil)
+	       (if (< (get-trackbar-pos "WIN-SIZE-WIDTH" window-name) 1) 
+		   (set-trackbar-pos "WIN-SIZE-WIDTH" window-name 1) nil)
+	       (if (< (get-trackbar-pos "WIN-SIZE-HEIGHT" window-name) 1) 
+		   (set-trackbar-pos "WIN-SIZE-HEIGHT" window-name 1) nil)
+	       ;;Detect strong corners in FRAME.
+               ;;Note: the @ macro dereferences the 
+               ;;integer pointer created by ALLOC.
+	       (good-features-to-track frame corners 
+				       (@ max-corners :int)
+				       (* (@ quality-level :int) 0.001d0)
+				       (* (@ min-distance :int) 1d0) 
+				       (t:mat)
+				       (@ block-size :int)	
+				       (if (= (@ use-harris-detector :int) 1) t nil))
+
+               ;;Here, we evaluate CORNER-SUB-PIX, if the 
+               ;;USE-CORNER-SUB-PIX trackbar is set to 1.
+
+	       (if (= (@ use-corner-sub-pix :int) 1)
+		   (with-term-criteria ((criteria (term-criteria 
+						   (logior +termcrit-iter+ +termcrit-eps+)
+						   20 0.03d0)))
+
+		     (with-size ((win-size (size (@ win-size-width :int) 
+						 (@ win-size-height :int))))
+		       (with-size ((zero-zone (size (- (@ zero-zone-width :int) 1) 
+						    (- (@ zero-zone-height :int) 1))))
+			 ;;Refine the features.
+			 (corner-sub-pix frame corners win-size zero-zone criteria)))))
+
+	       ;;Convert frame back to a 3 channel
+	       ;;image so the circles have color.
+	       (cvt-color frame frame +gray2bgr+)
+
+               ;;Draw the detected corners with CIRCLE.
+	       (dotimes (i (* (rows corners) (cols corners)))
+		 (with-point ((center (point (ceiling (@ (at-point-2f corners 0 i) :float)) 
+					     (ceiling (@ (at-point-2f corners 0 i) :float 1)))))
+		   (circle frame center 8 (t:bgr 255 0 111) -1)
+		   (circle frame center 8 (t:bgr 0 255 0) 1)))
+
+               ;;Print the corner locations.
+	       (format t "~%CORNERS:~%~%")
+	       (print-mat corners)
+	       (format t "~%")
+
+	       (imshow window-name frame)
+	       (let ((c (wait-key 33)))
+		 (when (= c 27)
+		   (return))))))))))
+
+========================================================================================================================================
+#GOOD-FEATURES-TO-TRACK
 ========================================================================================================================================
 
 Determines strong corners on an image.
@@ -11578,6 +11756,7 @@ Example:
                  ;;Convert frame back to 3 channel image 
                  ;;so circles and rectangle have color.
 		 (cvt-color frame frame +gray2bgr+)
+                 ;;Draw the detected corners.
 		 (dotimes (i (* (rows corners) (cols corners)))
 		   (with-point ((center (point (ceiling (@ (at-point-2f corners 0 i) :float)) 
 					       (ceiling (@ (at-point-2f corners 0 i) :float 1)))))
@@ -15236,7 +15415,7 @@ This function is parallelized with the TBB library.
 	    (cvt-color crop gray +bgr2gray+)
 	    ;;Form a filename. It is suggested that you create a directory to 
             ;;put the cropped images in because there will be a lot or them.
-	    (setf filename (concatenate 'string "/home/users/my-face/my-face-" 
+	    (setf filename (concatenate 'string "/home/user/Pictures/my-face/my-face-" 
 					(write-to-string filenumber) ".png"))
 	    (incf filenumber)
             ;;Write cropped images to directory

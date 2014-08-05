@@ -548,7 +548,7 @@
        (%canny image edges low-thresh high-thresh aperture-size l2-gradient))
 
 
-;; void cv_cornerSubPix(Mat* image, Mat* corners, Size* winSize, Size* zeroZone, TermCriteria* criteria)
+;; void cornerSubPix(InputArray image, InputOutputArray corners, Size winSize, Size zeroZone, TermCriteria criteria)
 ;; void cv_cornerSubPix2(Mat* image, Mat* corners, Size* winSize, Size* zeroZone, TermCriteria* criteria)
 (defcfun ("cv_cornerSubPix" corner-sub-pix) :void
   "Refines the corner locations."

@@ -44,8 +44,8 @@
 (defgeneric create (type self &rest args)
   (:documentation "Used for all class bindings with a CREATE member function."))
 
-;(defgeneric data (self)
-;  (:documentation "Used for all class bindings with a DATA member function."))
+(defgeneric data (self)
+  (:documentation "Used for all class bindings with a DATA member function."))
 
 (defgeneric detect (self &rest args)
   (:documentation "Used for all class bindings with a DETECT member function."))
@@ -268,6 +268,106 @@
 	 (%feature-2d-create-surf self (first args)))
 	((eq :feature-detector type)
 	 (%feature-detector-create-surf self (first args)))))
+
+
+(defmethod data ((self cv-mat))
+  (mat-data self))
+
+
+(defmethod data ((self std-vector-char))
+  (vec-char-to-c-arr self))
+
+
+(defmethod data ((self std-vector-dmatch))
+  (vec-dmatch-to-c-arr self))
+
+
+(defmethod data ((self std-vector-double))
+  (vec-double-to-c-arr self))
+
+
+(defmethod data ((self std-vector-float))
+  (vec-float-to-c-arr self))
+
+
+(defmethod data ((self std-vector-int))
+  (vec-int-to-c-arr self))
+
+
+(defmethod data ((self std-vector-key-point))
+  (vec-key-point-to-c-arr self))
+
+
+(defmethod data ((self std-vector-mat))
+  (vec-mat-to-c-arr self))
+
+
+(defmethod data ((self std-vector-point))
+  (vec-point-to-c-arr self))
+
+
+(defmethod data ((self std-vector-point-2f))
+  (vec-point-2f-to-c-arr self))
+
+
+(defmethod data ((self std-vector-rect))
+  (vec-rect-to-c-arr self))
+
+
+(defmethod data ((self std-vector-uchar))
+  (vec-uchar-to-c-arr self))
+
+
+(defmethod data ((self std-vector-vec-2d))
+  (vec-vec-2d-to-c-arr self))
+
+
+(defmethod data ((self std-vector-vec-3d))
+  (vec-vec-3d-to-c-arr self))
+
+
+(defmethod data ((self std-vector-vec-4d))
+  (vec-vec-4d-to-c-arr self))
+
+
+(defmethod data ((self std-vector-vec-6d))
+  (vec-vec-6d-to-c-arr self))
+
+
+(defmethod data ((self std-vector-vec-2f))
+  (vec-vec-2f-to-c-arr self))
+
+
+(defmethod data ((self std-vector-vec-3f))
+  (vec-vec-3f-to-c-arr self))
+
+
+(defmethod data ((self std-vector-vec-4f))
+  (vec-vec-4f-to-c-arr self))
+
+
+(defmethod data ((self std-vector-vec-6f))
+  (vec-vec-6f-to-c-arr self))
+
+
+(defmethod data ((self std-vector-vec-2i))
+  (vec-vec-2i-to-c-arr self))
+
+
+(defmethod data ((self std-vector-vec-3i))
+  (vec-vec-3i-to-c-arr self))
+
+
+(defmethod data ((self std-vector-vec-4i))
+  (vec-vec-4i-to-c-arr self))
+
+
+(defmethod data ((self std-vector-vec-6i))
+  (vec-vec-6i-to-c-arr self))
+
+
+(defmethod data ((self std-vector-vec-8i))
+  (vec-vec-8i-to-c-arr self))
 
 
 (defmethod descriptor-extractor-compute ((self cv-bf-matcher) image keypoints descriptors)

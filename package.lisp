@@ -458,8 +458,8 @@
 
 ;;; VECTORS
 
-   #:vector-char
    #:make-vector-char
+   #:vector-char
    #:c-arr-to-vec-char
    #:arr-to-vec-char
    #:vec-char-to-c-arr
@@ -661,6 +661,7 @@
    #:clone
    #:compute
    #:create
+   #:data
    #:detect
    #:dot
    #:height
@@ -791,6 +792,11 @@
    #:convert-to
    #:cross
    #:copy-to
+   #:create-mat-typed
+   #:create-mat-with-data
+   #:create-mat-with-element
+   #:create-mat-with-range
+   #:create-mat-with-value
    #:data
    #:depth
    #:diag
@@ -867,16 +873,13 @@
    #:mat-assign
    #:mat-assign-val
    #:mat-and-cffi-type
-   #:mat-data
-   #:mat-element
+   #:mat-cross
+   #:mat-depth
    #:mat-expr-t
    #:mat-eye
    #:mat-ones
-   #:mat-range
    #:mat-to-arr
    #:mat-type
-   #:mat-typed
-   #:mat-value
    #:mat-zeros
    #:mul
    #:octave

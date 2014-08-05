@@ -303,6 +303,11 @@
    #:br
    #:clone
    #:col-range
+   #:create-mat-typed
+   #:create-mat-with-data
+   #:create-mat-with-element
+   #:create-mat-with-range
+   #:create-mat-with-value
    #:diag
    #:div
    #:dmatch
@@ -349,17 +354,12 @@
    #:make-vec-3w
    #:make-vec-4w
    #:mat
-   #:mat-data
    #:mat-dot
-   #:mat-element
    #:mat-expr-t
    #:mat-eye
    #:mat-ones
-   #:mat-range
    #:mat-size
    #:mat-type
-   #:mat-typed
-   #:mat-value
    #:mat-zeros
    #:mul
    #:point
