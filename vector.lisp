@@ -484,7 +484,7 @@
 
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; t * std_vector##tn##_to_carray( vector_##t * v ) 
-(defcfun ("std_vectorm_to_carray" vec-mat-to-c-arr) :pointer 
+(defcfun ("std_vectorm_to_carray1" vec-mat-to-c-arr) :pointer 
   (v vector-mat))
 
 

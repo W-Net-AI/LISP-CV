@@ -6464,6 +6464,88 @@ See also:
 (SQRT), (EXP), (LOG), (CART-TO-POLAR), (POLAR-TO-CART)
 
 ========================================================================================================================================
+#RAND-SHUFFLE
+========================================================================================================================================
+
+Shuffles the array elements randomly.
+
+C++: void randShuffle(InputOutputArray dst, double iterFactor=1., RNG* rng=0 )
+
+LISP-CV: (RAND-SHUFFLE (DEST MAT) &OPTIONAL ((ITER-FACTOR :DOUBLE) 1D0) ((RNG RNG) (NULL-POINTER))) => :VOID
+
+    Parameters:	
+
+        DEST - Input/output numerical 1D array.
+
+        ITER-FACTOR - Scale factor that determines the number of random swap operations (see the details below).
+
+        RNG - Optional random number generator used for shuffling; if it is zero, theRNG()(<=internal C++ function) 
+              is used instead.
+
+The function RAND-SHUFFLE shuffles the specified 1D array by randomly choosing pairs of elements and 
+swapping them. The number of such swap operations will be (* (ROWS DEST) (COLS DEST) ITER-FACTOR).
+
+See also:
+
+RNG, (SORT)
+
+
+Example:
+
+(defun rand-shuffle-example (filename)
+  ;;Load an image.
+  (with-mat ((img (imread filename 0)))
+    (let ((window-name "RAND-SHUFFLE Example")
+	  ;;Integer values trackbar can adjust.
+	  (iter-factor (t:alloc :int 0))
+	  (img-width (t:alloc :int (list (cols img))))
+	  (img-height (t:alloc :int (list (rows img))))
+	  (delay (t:alloc :int 0)))
+      (with-named-window (window-name +window-normal+)
+	;;Set window to fullscreen.
+	(set-window-property window-name +wnd-prop-fullscreen+ 
+			     +window-fullscreen+)
+	;;Move next trackbar to choose number of random swap operations.
+	;;(See documentation for details on the ITER-FACTOR parameter.)
+	(create-trackbar "ITER-FACTOR" window-name iter-factor 100)
+	;;Move next two trackbars to choose the new width and height of 
+	;;IMG. If you resize IMG to the pixel level you'll be able to see
+	;;RAND-SHUFFLE randomly choosing pairs of elements and swapping them.
+	(create-trackbar "IMG-WIDTH" window-name img-width 1280)
+	(create-trackbar "IMG-HEIGHT" window-name img-height 1024)
+	;;This trackbar allows you to slow down/speed up 
+	;;the example so you can precisely see the swap 
+	;;operations take place.
+	(create-trackbar "DELAY" window-name delay 50)
+	(loop
+	   ;;Reload the image.
+	   (with-mat ((img (imread filename 0)))
+             ;;Don't let IMG get resized to 0 or example will freeze.
+	     (if (< (get-trackbar-pos "IMG-WIDTH" window-name) 1) 
+		 (set-trackbar-pos "IMG-WIDTH" window-name 1) nil)
+	     (if (< (get-trackbar-pos "IMG-HEIGHT" window-name) 1) 
+		 (set-trackbar-pos "IMG-HEIGHT" window-name 1) nil)
+	     (resize img img (t:size (@ img-width :int) (@ img-height :int)))
+	     (with-mat ((1d-img (reshape img 0 1)))
+	       (if (empty img) 
+		   (return-from rand-shuffle-example 
+		     (format t "Image not loaded")))
+	       ;;Randomly shuffle all elements of image:
+	       ;;Note: This creates a snowy kind of effect
+	       ;;like on a tv. You can also click the window 
+               ;;and then scroll in until you see pixels and 
+               ;;see the random swap operations in action that way too.
+	       (rand-shuffle 1d-img (float (@ iter-factor :int) 1d0))
+	       ;;Convert 1D-IMAGE back to 3d matrix 
+	       ;;so it can be shown in the window.
+	       (with-mat ((3d-img (reshape 1d-img 0 (rows img))))
+		 (imshow window-name 3d-img))
+	       (sleep (* (@ delay :int) 0.01))
+	       (let ((c (wait-key 1)))
+		 (when (= c 27)
+		   (return))))))))))
+
+========================================================================================================================================
 #RANDU
 ========================================================================================================================================
 
@@ -6635,6 +6717,95 @@ CV> (UNIFORM RNG 0F0 10F0)
 
 3.1438508
 
+========================================================================================================================================
+RNG-FILL
+========================================================================================================================================
+
+Fills arrays with random numbers.
+
+Note: The name RNG-FILL is used in the documentation to refer to the binding for the "fill" member 
+of the OpenCV RNG class because it is more descriptive and it is easier to search for in this file. 
+The FILL function may also be used to call this binding.
+
+Note: The LISP-CV function FILL overloads the Common Lisp function FILL so both functions can use the 
+same name. The LISP-CV function FILL provides the the same functionality as the Common Lisp function 
+FILL and the OpenCV C++ FILL function. To use the Common Lisp function FILL directly, while you are in 
+the LISP-CV package, you need to evaluate CL:FILL.
+
+C++: void RNG::fill(InputOutputArray mat, int distType, InputArray a, InputArray b, bool saturateRange=false )
+
+LISP-CV: (FILL (SELF RNG) (MAT MAT) (DIST-TYPE :INT) (A SCALAR) (B SCALAR) &OPTIONAL ((SATURATE-RANGE :BOOLEAN) NIL)) => :VOID
+
+LISP-CV: (RNG-FILL (SELF RNG) (MAT MAT) (DIST-TYPE :INT) (A SCALAR) (B SCALAR) &OPTIONAL ((SATURATE-RANGE :BOOLEAN) NIL)) => :VOID
+
+    Parameters:	
+
+        MAT - 2D or N-dimensional matrix; currently matrices with more than 4 channels are not supported 
+              by the functions, use (RESHAPE) as a possible workaround.
+
+        DIST-TYPE - Distribution type, +RNG-UNIFORM+ or +RNG-NORMAL+.
+
+        A - First distribution parameter; in case of the uniform distribution, this is an inclusive 
+            lower boundary, in case of the normal distribution, this is a mean value.
+
+        B - Second distribution parameter; in case of the uniform distribution, this is a non-inclusive 
+            upper boundary, in case of the normal distribution, this is a standard deviation (diagonal 
+            of the standard deviation matrix or the full standard deviation matrix).
+
+        SATURATE-RANGE - Pre-saturation flag; for uniform distribution only; if T, the function will 
+                         first convert A and B to the acceptable value range (according to MAT datatype) 
+                         and then will generate uniformly distributed random numbers within the range 
+                         [saturate(A), saturate(B)], if (= SATURATE-RANGE MIL), the method will generate 
+                         uniformly distributed random numbers in the original range [A, B) and then will 
+                         saturate them, it means, for example, that:
+
+                              (RNG-FILL (MAT ROWS COLS +8U+) +RNG-UNIFORM+ +-DBL-MAX+ +DBL-MAX+) 
+
+                         will likely produce array mostly filled with 0’s and 255’s, since the range (0 255) 
+                         (for the +8U+ matrix type, uchar)is significantly smaller than (+-DBL-MAX+ +DBL-MAX+).
+
+Each of the methods fills the matrix with the random values from the specified distribution. As the 
+new numbers are generated, the RNG state is updated accordingly. In case of multiple-channel images, 
+every channel is filled independently, which means that RNG cannot generate samples from the multi-
+dimensional Gaussian distribution with non-diagonal covariance matrix directly. To do that, RNG-FILL
+generates samples from multi-dimensional standard Gaussian distribution with zero mean and identity 
+covariation matrix, and then transforms them using (TRANSFORM) to get samples from the specified 
+Gaussian distribution.
+
+
+Example:
+
+(defun rng-fill-example ()
+  ;;Create matrix filled with zeros.
+  (with-mat ((mat (mat 10 10 +8u+ 0)))
+    (with-rng ((rng (rng 12345)))
+      (let ((window-name "RNG-FILL Example")
+	    ;;Integer values trackbar can adjust.
+	    (a-val (t:alloc :int 0))
+	    (b-val (t:alloc :int 0))
+	    (delay (t:alloc :int 0)))
+	(with-named-window (window-name +window-normal+)
+	  ;;Set window to fullscreen with stretched aspect ratio.
+	  (set-window-property window-name +wnd-prop-fullscreen+ 
+			       +window-fullscreen+)
+	  (set-window-property window-name +wnd-prop-aspectratio+ 
+			       +window-freeratio+)
+          ;;Adjust the inclusive lower boundary.
+	  (create-trackbar "A-VAL" window-name a-val 255)
+          ;;Adjust the non-inclusive upper boundary.
+	  (create-trackbar "B-VAL" window-name b-val 255)
+          ;;Set a delay in the loop.
+	  (create-trackbar "DELAY" window-name delay 100)
+	  (loop
+	     (sleep (* (@ delay :int) 0.01))
+             ;;Fill MAT with random numbers based on trackbar selections.
+	     (fill rng mat +rng-uniform+ (scalar (@ a-val :int)) 
+		   (scalar (@ b-val :int)) nil)
+             ;;Show MAT in a window.
+	     (imshow window-name mat)
+	     (let ((c (wait-key 1)))
+	       (when (= c 27)
+		 (return)))))))))
 
 ========================================================================================================================================
 #SCALE-ADD
@@ -7799,6 +7970,139 @@ Example:
 	    ;;Release FILE-STORAGE object
 	    (release fs)
 	    (imshow "FILE-STORAGE-WRITE Example" image)
+	    (loop
+	       (let ((c (wait-key 33)))
+		 (when (= c 27)
+		   (return))))))))))
+
+
+========================================================================================================================================
+#CORE - #CLUSTERING
+========================================================================================================================================
+
+========================================================================================================================================
+KMEANS
+========================================================================================================================================
+
+Finds centers of clusters and groups input samples around the clusters.
+
+C++: double kmeans(InputArray data, int K, InputOutputArray bestLabels, TermCriteria criteria, int attempts, int flags, 
+                   OutputArray centers=noArray() )
+
+LISP-CV: (KMEANS (DATA MAT) (K :INT) (BEST-LABELS MAT) (CRITERIA TERM-CRITERIA) (ATTEMPTS :INT) (FLAGS :INT) 
+                  &OPTIONAL ((CENTERS MAT) (%MAT))) => :VOID
+
+    Parameters:	
+
+        DATA - Data for clustering. An array of N-Dimensional points with float coordinates is needed. 
+
+               Examples of this array can be:
+
+                   (DEFPARAMETER POINTS (MAT COUNT 2 +32F+))
+
+                   (DEFPARAMETER POINTS (MAT COUNT 1 +32FC2+))
+
+                   (DEFPARAMETER POINTS (MAT 1 COUNT +32FC2+))
+
+        K - Number of clusters to split the set by.
+
+        BEST-LABELS - Input/output integer array that stores the cluster indices for every sample.
+
+        CRITERIA - The algorithm termination criteria, that is, the maximum number of iterations and/or 
+                   the desired accuracy. The accuracy is specified as (EPSILON CRITERIA). As soon as each 
+                   of the cluster centers moves by less than (EPSILON CRITERIA) on some iteration, the algorithm 
+                   stops.
+
+        ATTEMPTS - Flag to specify the number of times the algorithm is executed using different initial labellings. 
+                   The algorithm returns the labels that yield the best compactness (see the last function parameter).
+
+        FLAGS - Flag that can take the following values:
+
+            +KMEANS-RANDOM-CENTERS+ Select random initial centers in each attempt.
+
+            +KMEANS-PP-CENTERS+ Use kmeans++ center initialization by Arthur and Vassilvitskii.
+
+            +KMEANS-USE-INITIAL-LABELS+ During the first (and possibly the only) attempt, use the 
+                                        user-supplied labels instead of computing them from the initial 
+                                        centers. For the second and further attempts, use the random or semi-
+                                        random centers. Use one of the +KMEANS-*-CENTERS+ flags to specify the 
+                                        exact method.
+
+        CENTERS - Output matrix of the cluster centers, one row per each cluster center.
+
+
+See OpenCV documentation at this link:
+
+http://docs.opencv.org/trunk/modules/core/doc/clustering.html?highlight=kmeans#kmeans
+
+for further description and formulae:
+
+
+Example:
+
+(defun kmeans-example ()
+
+  (let ((window-name "Clusters - KMEANS example")
+        (max-clusters 5)
+	(cluster-count)
+	(sample-count)
+        (cluster-idx)
+        (ipt)
+	;;Create an array of color values.
+	(color-tab 
+	 (t:alloc 'scalar (list
+			   (scalar 0 0 255)
+			   (scalar 0 255 0)
+			   (scalar 255 100 100)
+			   (scalar 255 0 255)
+			   (scalar 0 255 255)))))
+    (with-named-window (window-name +window-autosize+)
+      (move-window window-name 710 175)
+      (with-mat ((img (mat 500 500 +8UC3+)))
+        ;;Create random number generator.
+	(with-rng ((rng (rng 12345)))
+	  ;;Set CLUSTER-COUNT and SAMPLE-COUNT to random numbers.
+	  (setf cluster-count (uniform rng 2 (+ max-clusters 1)))
+	  (setf sample-count (uniform rng 1 1001))
+	  (with-mat ((points (mat sample-count 1 +32FC2+))
+		     (labels* (mat)))
+	    (setf cluster-count (min cluster-count sample-count))
+	    (with-mat ((centers (mat)))
+
+	      ;;;Generate random sample from multigaussian distribution:
+
+	      (dotimes (k cluster-count)
+
+		(with-point ((center (point)))
+
+		  (setf (x center) (uniform rng 0 (cols img)))
+		  (setf (y center) (uniform rng 0 (rows img)))
+		  (with-mat ((point-chunk 
+			      (row-range points (* k 
+						   (floor 
+						    (/ sample-count cluster-count)))
+					 (if (eq k (- cluster-count 1)) sample-count
+					     (floor (* (+ k 1) (/ sample-count cluster-count)))))))
+		    ;;Fill POINT-CHUNK with random numbers.
+		    (fill rng point-chunk +rng-normal+ (scalar (x center) (y center))
+			  (scalar (* (cols img) 0.05d0) (* (cols img) 0.05d0))))))
+
+	      ;;Shuffle the array elements.
+	      (rand-shuffle points 1d0 rng)
+
+	      (with-term-criteria ((criteria (term-criteria (+ 
+							     +term-criteria-eps+
+							     +term-criteria-count+) 10 1.0d0)))
+                ;;Find centers of clusters and groups input samples around the clusters.
+		(kmeans points cluster-count labels* criteria 3 +kmeans-pp-centers+ centers)))
+            ;;Fill IMG with 0's.
+	    (assign img (scalar-all 0))
+	    ;;Draw input samples.
+	    (dotimes (i sample-count)
+	      (setf cluster-Idx (at-int labels* i))
+	      (setf ipt (at-point-2f points i))
+	      (circle img ipt 2 (@ color-tab 'scalar cluster-idx) +filled+ +aa+))
+	    (imshow window-name img)
 	    (loop
 	       (let ((c (wait-key 33)))
 		 (when (= c 27)

@@ -1,7 +1,7 @@
 ;;;; -*- mode: lisp; indent-tabs: nil -*-
 ;;;; core.lisp
 ;;;; OpenCV bindings
-;;;; The Core Functionality
+;;;; The Core Functionality.
 
 
 (in-package :lisp-cv)
@@ -425,8 +425,16 @@
 	  `(mem-aref (%ptr ,self ,i) ,type ,j))
 
 
+;; template<typename T> T& Mat::at(int i) const
+;; char cv_Mat_at_char_1(Mat* self, int i)
+(defcfun ("cv_Mat_at_char_1" at-char-1) :pointer
+  "Returns a reference to the specified array element."
+  (self mat)
+  (i :int))
+ 
+
 ;; template<typename T> T& Mat::at(int i, int j)
-;; char cv_Mat_at_char(Mat* self, int row, int col)
+;; char cv_Mat_at_char(Mat* self, int i, int j)
 (defcfun ("cv_Mat_at_char_2" at-char-2) :pointer
   "Returns a reference to the specified array element."
   (self mat)
@@ -444,18 +452,34 @@
   (k :int))
  
 
-(defun at-char (self i j &optional k)
-  (if k (@ (at-char-3 self i j k) :char)
-      (@ (at-char-2 self i j) :char))) 
+(defun at-char (self i &optional j k)
+  (cond (k 
+	 (@ (at-char-3 self i j k) :char))
+	((and j (not k))
+	 (@ (at-char-2 self i j) :char))
+	(t
+	 (@ (at-char-1 self i) :char))))
 
 
-(defun (setf at-char) (val self i j &optional k)
-  (if k (setf (@ (at-char-3 self i j k) :char) val)
-  (setf (@ (at-char-2 self i j) :char) val)))
+(defun (setf at-char) (val self &optional i j k)
+  (cond (k 
+	 (setf (@ (at-char-3 self i j k) :char) val))
+	((and j (not k))
+	 (setf (@ (at-char-2 self i j) :char) val))
+	(t
+	 (setf (@ (at-char-1 self i) :char) val))))
+
+
+;; template<typename T> T& Mat::at(int i) const
+;; double cv_Mat_at_double_1(Mat* self, int i)
+(defcfun ("cv_Mat_at_double_1" at-double-1) :pointer
+  "Returns a reference to the specified array element."
+  (self mat)
+  (i :int))
 
 
 ;; template<typename T> T& Mat::at(int i, int j) 
-;; double cv_Mat_at_double_2(Mat* self, int row, int col)
+;; double cv_Mat_at_double_2(Mat* self, int i, int j)
 (defcfun ("cv_Mat_at_double_2" at-double-2) :pointer
   "Returns a reference to the specified array element."
   (self mat)
@@ -473,18 +497,34 @@
   (k :int))
 
  
-(defun at-double (self i j &optional k)
-  (if k (@ (at-double-3 self i j k) :double)
-      (@ (at-double-2 self i j) :double))) 
+(defun at-double (self i &optional j k)
+  (cond (k 
+	 (@ (at-double-3 self i j k) :double))
+	((and j (not k))
+	 (@ (at-double-2 self i j) :double))
+	(t
+	 (@ (at-double-1 self i) :double))))
 
 
-(defun (setf at-double) (val self i j &optional k)
-  (if k (setf (@ (at-double-3 self i j k) :double) val)
-  (setf (@ (at-double-2 self i j) :double) val)))
+(defun (setf at-double) (val self &optional i j k)
+  (cond (k 
+	 (setf (@ (at-double-3 self i j k) :double) val))
+	((and j (not k))
+	 (setf (@ (at-double-2 self i j) :double) val))
+	(t
+	 (setf (@ (at-double-1 self i) :double) val))))
+
+
+;; template<typename T> T& Mat::at(int i) const
+;; float cv_Mat_at_float_1(Mat* self, int i)
+(defcfun ("cv_Mat_at_float_1" at-float-1) :pointer
+  "Returns a reference to the specified array element."
+  (self mat)
+  (i :int))
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
-;; float cv_Mat_at_float_2(Mat* self, int row, int col)
+;; float cv_Mat_at_float_2(Mat* self, int i, int j)
 (defcfun ("cv_Mat_at_float_2" at-float-2) :pointer
   "Returns a reference to the specified array element."
   (self mat)
@@ -502,18 +542,34 @@
   (k :int))
  
 
-(defun at-float (self i j &optional k)
-  (if k (@ (at-float-3 self i j k) :float)
-      (@ (at-float-2 self i j) :float))) 
+(defun at-float (self i &optional j k)
+  (cond (k 
+	 (@ (at-float-3 self i j k) :float))
+	((and j (not k))
+	 (@ (at-float-2 self i j) :float))
+	(t
+	 (@ (at-float-1 self i) :float))))
 
 
-(defun (setf at-float) (val self i j &optional k)
-  (if k (setf (@ (at-float-3 self i j k) :float) val)
-  (setf (@ (at-float-2 self i j) :float) val)))
+(defun (setf at-float) (val self &optional i j k)
+  (cond (k 
+	 (setf (@ (at-float-3 self i j k) :float) val))
+	((and j (not k))
+	 (setf (@ (at-float-2 self i j) :float) val))
+	(t
+	 (setf (@ (at-float-1 self i) :float) val))))
 
+
+;; template<typename T> T& Mat::at(int i) const
+;; int cv_Mat_at_int_1(Mat* self, int i)
+(defcfun ("cv_Mat_at_int_1" at-int-1) :pointer
+  "Returns a reference to the specified array element."
+  (self mat)
+  (i :int))
+ 
 
 ;; template<typename T> T& Mat::at(int i, int j)
-;; int cv_Mat_at_int_2(Mat* self, int row, int col)
+;; int cv_Mat_at_int_2(Mat* self, int i, int j)
 (defcfun ("cv_Mat_at_int_2" at-int-2) :pointer
   "Returns a reference to the specified array element."
   (self mat)
@@ -531,18 +587,34 @@
   (k :int))
 
 
-(defun at-int (self i j &optional k)
-  (if k (@ (at-int-3 self i j k) :int)
-      (@ (at-int-2 self i j) :int))) 
+(defun at-int (self i &optional j k)
+  (cond (k 
+	 (@ (at-int-3 self i j k) :int))
+	((and j (not k))
+	 (@ (at-int-2 self i j) :int))
+	(t
+	 (@ (at-int-1 self i) :int))))
 
 
-(defun (setf at-int) (val self i j &optional k)
-  (if k (setf (@ (at-int-3 self i j k) :int) val)
-  (setf (@ (at-int-2 self i j) :int) val)))
+(defun (setf at-int) (val self &optional i j k)
+  (cond (k 
+	 (setf (@ (at-int-3 self i j k) :int) val))
+	((and j (not k))
+	 (setf (@ (at-int-2 self i j) :int) val))
+	(t
+	 (setf (@ (at-int-1 self i) :int) val))))
+
+
+;; template<typename T> T& Mat::at(int i) const
+;; short cv_Mat_at_short_1(Mat* self, int i)
+(defcfun ("cv_Mat_at_short_1" at-short-1) :pointer
+  "Returns a reference to the specified array element."
+  (self mat)
+  (i :int))
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
-;; short cv_Mat_at_short_2(Mat* self, int row, int col)
+;; short cv_Mat_at_short_2(Mat* self, int i, int j)
 (defcfun ("cv_Mat_at_short_2" at-short-2) :pointer
   "Returns a reference to the specified array element."
   (self mat)
@@ -560,18 +632,34 @@
   (k :int))
 
 
-(defun at-short (self i j &optional k)
-  (if k (@ (at-short-3 self i j k) :short)
-      (@ (at-short-2 self i j) :short))) 
+(defun at-short (self i &optional j k)
+  (cond (k 
+	 (@ (at-short-3 self i j k) :short))
+	((and j (not k))
+	 (@ (at-short-2 self i j) :short))
+	(t
+	 (@ (at-short-1 self i) :short))))
 
 
-(defun (setf at-short) (val self i j &optional k)
-  (if k (setf (@ (at-short-3 self i j k) :short) val)
-  (setf (@ (at-short-2 self i j) :short) val)))
+(defun (setf at-short) (val self &optional i j k)
+  (cond (k 
+	 (setf (@ (at-short-3 self i j k) :short) val))
+	((and j (not k))
+	 (setf (@ (at-short-2 self i j) :short) val))
+	(t
+	 (setf (@ (at-short-1 self i) :short) val))))
+
+
+;; template<typename T> T& Mat::at(int i) const
+;; uchar cv_Mat_at_uchar_1(Mat* self, int i)
+(defcfun ("cv_Mat_at_uchar_1" at-uchar-1) :pointer
+  "Returns a reference to the specified array element."
+  (self mat)
+  (i :int))
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
-;; uchar cv_Mat_at_uchar_2(Mat* self, int row, int col)
+;; uchar cv_Mat_at_uchar_2(Mat* self, int i, int j)
 (defcfun ("cv_Mat_at_uchar_2" at-uchar-2) :pointer
   "Returns a reference to the specified array element."
   (self mat)
@@ -589,18 +677,34 @@
   (k :int))
 
 
-(defun at-uchar (self i j &optional k)
-  (if k (@ (at-uchar-3 self i j k) :uchar)
-      (@ (at-uchar-2 self i j) :uchar))) 
+(defun at-uchar (self i &optional j k)
+  (cond (k 
+	 (@ (at-uchar-3 self i j k) :uchar))
+	((and j (not k))
+	 (@ (at-uchar-2 self i j) :uchar))
+	(t
+	 (@ (at-uchar-1 self i) :uchar))))
 
 
-(defun (setf at-uchar) (val self i j &optional k)
-  (if k (setf (@ (at-uchar-3 self i j k) :uchar) val)
-  (setf (@ (at-uchar-2 self i j) :uchar) val)))
+(defun (setf at-uchar) (val self &optional i j k)
+  (cond (k 
+	 (setf (@ (at-uchar-3 self i j k) :uchar) val))
+	((and j (not k))
+	 (setf (@ (at-uchar-2 self i j) :uchar) val))
+	(t
+	 (setf (@ (at-uchar-1 self i) :uchar) val))))
+
+
+;; template<typename T> T& Mat::at(int i) const
+;; ushort cv_Mat_at_ushort_1(Mat* self, int i)
+(defcfun ("cv_Mat_at_ushort_1" at-ushort-1) :pointer
+  "Returns a reference to the specified array element."
+  (self mat)
+  (i :int))
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
-;; ushort cv_Mat_at_ushort_2(Mat* self, int row, int col)
+;; ushort cv_Mat_at_ushort_2(Mat* self, int i, int j)
 (defcfun ("cv_Mat_at_ushort_2" at-ushort-2) :pointer
   "Returns a reference to the specified array element."
   (self mat)
@@ -618,18 +722,26 @@
   (k :int))
 
 
-(defun at-ushort (self i j &optional k)
-  (if k (@ (at-ushort-3 self i j k) :ushort)
-      (@ (at-ushort-2 self i j) :ushort))) 
+(defun at-ushort (self i &optional j k)
+  (cond (k 
+	 (@ (at-ushort-3 self i j k) :ushort))
+	((and j (not k))
+	 (@ (at-ushort-2 self i j) :ushort))
+	(t
+	 (@ (at-ushort-1 self i) :ushort))))
 
 
-(defun (setf at-ushort) (val self i j &optional k)
-  (if k (setf (@ (at-ushort-3 self i j k) :ushort) val)
-  (setf (@ (at-ushort-2 self i j) :ushort) val)))
+(defun (setf at-ushort) (val self &optional i j k)
+  (cond (k 
+	 (setf (@ (at-ushort-3 self i j k) :ushort) val))
+	((and j (not k))
+	 (setf (@ (at-ushort-2 self i j) :ushort) val))
+	(t
+	 (setf (@ (at-ushort-1 self i) :ushort) val))))
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
-;; Scalar* cv_Mat_at_Scalar(Mat* self, int row, int col)
+;; Scalar* cv_Mat_at_Scalar(Mat* self, int i, int j)
 (defcfun ("cv_Mat_at_Scalar" at-scalar) scalar
   "Returns a reference to the specified array element."
   (self mat)
@@ -650,17 +762,33 @@
   (at-scalar-set-val self i j val))
 
 
+;; template<typename T> T& Mat::at(int i)
+;; Point* cv_Mat_at_Point_1(Mat* self, int i)
+(defcfun ("cv_Mat_at_Point_1" at-point-1) point
+  "Returns a reference to the specified array element."
+  (self mat)
+  (i :int))
+
+
 ;; template<typename T> T& Mat::at(int i, int j)
-;; Point* cv_Mat_at_Point(Mat* self, int row, int col)
-(defcfun ("cv_Mat_at_Point" at-point) point
+;; Point* cv_Mat_at_Point_2(Mat* self, int i, int j)
+(defcfun ("cv_Mat_at_Point_2" at-point-2) point
   "Returns a reference to the specified array element."
   (self mat)
   (i :int)
   (j :int))
  
  
-;; void cv_Mat_at_Point_set_Val(Mat* self, int i, int j, Point* val)
-(defcfun ("cv_Mat_at_Point_set_Val" at-point-set-val) point
+;; void cv_Mat_at_Point_set_Val_1(Mat* self, int i, Point* val)
+(defcfun ("cv_Mat_at_Point_set_Val_1" at-point-set-val-1) point
+  "Sets an array element."
+  (self mat)
+  (i :int)
+  (val point))
+
+
+;; void cv_Mat_at_Point_set_Val_2(Mat* self, int i, int j, Point* val)
+(defcfun ("cv_Mat_at_Point_set_Val_2" at-point-set-val-2) point
   "Sets an array element."
   (self mat)
   (i :int)
@@ -668,21 +796,47 @@
   (val point))
 
 
-(defun (setf at-point) (val self i j)
-  (at-point-set-val self i j val))
+(defun at-point (self i &optional j)
+  (cond (j 
+	 (at-point-2 self i j))
+	(t 
+	 (at-point-1 self i))))
+
+
+(defun (setf at-point) (val self i &optional j)
+  (cond (j 
+	 (at-point-set-val-2 self i j val))
+	(t 
+	 (at-point-set-val-1 self i val))))
+
+
+;; template<typename T> T& Mat::at(int i)
+;; Point2d* cv_Mat_at_Point2d_1(Mat* self, int i)
+(defcfun ("cv_Mat_at_Point2d_1" at-point-2d-1) point-2d
+  "Returns a reference to the specified array element."
+  (self mat)
+  (i :int))
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
-;; Point2d* cv_Mat_at_Point2d(Mat* self, int row, int col)
-(defcfun ("cv_Mat_at_Point2d" at-point-2d) point-2d
+;; Point2d* cv_Mat_at_Point2d_2(Mat* self, int i, int j)
+(defcfun ("cv_Mat_at_Point2d_2" at-point-2d-2) point-2d
   "Returns a reference to the specified array element."
   (self mat)
   (i :int)
   (j :int))
  
  
-;; void cv_Mat_at_Point2d_set_Val(Mat* self, int i, int j, Point2d* val)
-(defcfun ("cv_Mat_at_Point2d_set_Val" at-point-2d-set-val) point-2d
+;; void cv_Mat_at_Point2d_set_Val_1(Mat* self, int i, Point2d* val)
+(defcfun ("cv_Mat_at_Point2d_set_Val_1" at-point-2d-set-val-1) point-2d
+  "Sets an array element."
+  (self mat)
+  (i :int)
+  (val point-2d))
+
+
+;; void cv_Mat_at_Point2d_set_Val_2(Mat* self, int i, int j, Point2d* val)
+(defcfun ("cv_Mat_at_Point2d_set_Val_2" at-point-2d-set-val-2) point-2d
   "Sets an array element."
   (self mat)
   (i :int)
@@ -690,21 +844,47 @@
   (val point-2d))
 
 
-(defun (setf at-point-2d) (val self i j)
-  (at-point-2d-set-val self i j val))
+(defun at-point-2d (self i &optional j)
+  (cond (j 
+	 (at-point-2d-2 self i j))
+	(t 
+	 (at-point-2d-1 self i))))
+
+
+(defun (setf at-point-2d) (val self i &optional j)
+  (cond (j 
+	 (at-point-2d-set-val-2 self i j val))
+	(t 
+	 (at-point-2d-set-val-1 self i val))))
+
+
+;; template<typename T> T& Mat::at(int i)
+;; Point2f* cv_Mat_at_Point2f_1(Mat* self, int i)
+(defcfun ("cv_Mat_at_Point2f_1" at-point-2f-1) point-2f
+  "Returns a reference to the specified array element."
+  (self mat)
+  (i :int))
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
-;; Point2f* cv_Mat_at_Point2f(Mat* self, int row, int col)
-(defcfun ("cv_Mat_at_Point2f" at-point-2f) point-2f
+;; Point2f* cv_Mat_at_Point2f_2(Mat* self, int i, int j)
+(defcfun ("cv_Mat_at_Point2f_2" at-point-2f-2) point-2f
   "Returns a reference to the specified array element."
   (self mat)
   (i :int)
   (j :int))
  
- 
-;; void cv_Mat_at_Point2f_set_Val(Mat* self, int i, int j, Point2f* val)
-(defcfun ("cv_Mat_at_Point2f_set_Val" at-point-2f-set-val) point-2f
+
+;; void cv_Mat_at_Point2f_set_Val_1(Mat* self, int i, Point2f* val)
+(defcfun ("cv_Mat_at_Point2f_set_Val_1" at-point-2f-set-val-1) point-2f
+  "Sets an array element."
+  (self mat)
+  (i :int)
+  (val point-2f))
+
+
+;; void cv_Mat_at_Point2f_set_Val_2(Mat* self, int i, int j, Point2f* val)
+(defcfun ("cv_Mat_at_Point2f_set_Val_2" at-point-2f-set-val-2) point-2f
   "Sets an array element."
   (self mat)
   (i :int)
@@ -712,21 +892,47 @@
   (val point-2f))
 
 
-(defun (setf at-point-2f) (val self i j)
-  (at-point-2f-set-val self i j val))
+(defun at-point-2f (self i &optional j)
+  (cond (j 
+	 (at-point-2f-2 self i j))
+	(t 
+	 (at-point-2f-1 self i))))
+
+
+(defun (setf at-point-2f) (val self i &optional j)
+  (cond (j 
+	 (at-point-2f-set-val-2 self i j val))
+	(t 
+	 (at-point-2f-set-val-1 self i val))))
+
+
+;; template<typename T> T& Mat::at(int i)
+;; Point3d* cv_Mat_at_Point3d_1(Mat* self, int i)
+(defcfun ("cv_Mat_at_Point3d_1" at-point-3d-1) point-3d
+  "Returns a reference to the specified array element."
+  (self mat)
+  (i :int))
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
-;; Point3d* cv_Mat_at_Point3d(Mat* self, int row, int col)
-(defcfun ("cv_Mat_at_Point3d" at-point-3d) point-3d
+;; Point3d* cv_Mat_at_Point3d_2(Mat* self, int i, int j)
+(defcfun ("cv_Mat_at_Point3d_2" at-point-3d-2) point-3d
   "Returns a reference to the specified array element."
   (self mat)
   (i :int)
   (j :int))
  
- 
-;; void cv_Mat_at_Point3d_set_Val(Mat* self, int i, int j, Point3d* val)
-(defcfun ("cv_Mat_at_Point3d_set_Val" at-point-3d-set-val) point-3d
+
+;; void cv_Mat_at_Point3d_set_Val_1(Mat* self, int i, Point3d* val)
+(defcfun ("cv_Mat_at_Point3d_set_Val_1" at-point-3d-set-val-1) point-3d
+  "Sets an array element."
+  (self mat)
+  (i :int)
+  (val point-3d))
+
+
+;; void cv_Mat_at_Point3d_set_Val_2(Mat* self, int i, int j, Point3d* val)
+(defcfun ("cv_Mat_at_Point3d_set_Val_2" at-point-3d-set-val-2) point-3d
   "Sets an array element."
   (self mat)
   (i :int)
@@ -734,21 +940,47 @@
   (val point-3d))
 
 
-(defun (setf at-point-3d) (val self i j)
-  (at-point-3d-set-val self i j val))
+(defun at-point-3d (self i &optional j)
+  (cond (j 
+	 (at-point-3d-2 self i j))
+	(t 
+	 (at-point-3d-1 self i))))
+
+
+(defun (setf at-point-3d) (val self i &optional j)
+  (cond (j 
+	 (at-point-3d-set-val-2 self i j val))
+	(t 
+	 (at-point-3d-set-val-1 self i val))))
+
+
+;; template<typename T> T& Mat::at(int i)
+;; Point3f* cv_Mat_at_Point3f_1(Mat* self, int i)
+(defcfun ("cv_Mat_at_Point3f_1" at-point-3f-1) point-3f
+  "Returns a reference to the specified array element."
+  (self mat)
+  (i :int))
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
-;; Point3f* cv_Mat_at_Point3f(Mat* self, int row, int col)
-(defcfun ("cv_Mat_at_Point3f" at-point-3f) point-3f
+;; Point3f* cv_Mat_at_Point3f_2(Mat* self, int i, int j)
+(defcfun ("cv_Mat_at_Point3f_2" at-point-3f-2) point-3f
   "Returns a reference to the specified array element."
   (self mat)
   (i :int)
   (j :int))
  
- 
-;; void cv_Mat_at_Point3f_set_Val(Mat* self, int i, int j, Point3f* val)
-(defcfun ("cv_Mat_at_Point3f_set_Val" at-point-3f-set-val) point-3f
+
+;; void cv_Mat_at_Point3f_set_Val_1(Mat* self, int i, Point3f* val)
+(defcfun ("cv_Mat_at_Point3f_set_Val_1" at-point-3f-set-val-1) point-3f
+  "Sets an array element."
+  (self mat)
+  (i :int)
+  (val point-3f))
+
+
+;; void cv_Mat_at_Point3f_set_Val_2(Mat* self, int i, int j, Point3f* val)
+(defcfun ("cv_Mat_at_Point3f_set_Val_2" at-point-3f-set-val-2) point-3f
   "Sets an array element."
   (self mat)
   (i :int)
@@ -756,21 +988,47 @@
   (val point-3f))
 
 
-(defun (setf at-point-3f) (val self i j)
-  (at-point-3f-set-val self i j val))
+(defun at-point-3f (self i &optional j)
+  (cond (j 
+	 (at-point-3f-2 self i j))
+	(t 
+	 (at-point-3f-1 self i))))
+
+
+(defun (setf at-point-3f) (val self i &optional j)
+  (cond (j 
+	 (at-point-3f-set-val-2 self i j val))
+	(t 
+	 (at-point-3f-set-val-1 self i val))))
+
+
+;; template<typename T> T& Mat::at(int i)
+;; Point3i* cv_Mat_at_Point3i_1(Mat* self, int i)
+(defcfun ("cv_Mat_at_Point3i_1" at-point-3i-1) point-3i
+  "Returns a reference to the specified array element."
+  (self mat)
+  (i :int))
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
-;; Point3i* cv_Mat_at_Point3i(Mat* self, int row, int col)
-(defcfun ("cv_Mat_at_Point3i" at-point-3i) point-3i
-  "RReturns a reference to the specified array element."
+;; Point3i* cv_Mat_at_Point3i_2(Mat* self, int i, int j)
+(defcfun ("cv_Mat_at_Point3i_2" at-point-3i-2) point-3i
+  "Returns a reference to the specified array element."
   (self mat)
   (i :int)
   (j :int))
  
- 
-;; void cv_Mat_at_Point3i_set_Val(Mat* self, int i, int j, Point3i* val)
-(defcfun ("cv_Mat_at_Point3i_set_Val" at-point-3i-set-val) point-3i
+
+;; void cv_Mat_at_Point3i_set_Val_1(Mat* self, int i, Point3i* val)
+(defcfun ("cv_Mat_at_Point3i_set_Val_1" at-point-3i-set-val-1) point-3i
+  "Sets an array element."
+  (self mat)
+  (i :int)
+  (val point-3i))
+
+
+;; void cv_Mat_at_Point3i_set_Val_2(Mat* self, int i, int j, Point3i* val)
+(defcfun ("cv_Mat_at_Point3i_set_Val_2" at-point-3i-set-val-2) point-3i
   "Sets an array element."
   (self mat)
   (i :int)
@@ -778,12 +1036,22 @@
   (val point-3i))
 
 
-(defun (setf at-point-3i) (val self i j)
-  (at-point-3i-set-val self i j val))
+(defun at-point-3i (self i &optional j)
+  (cond (j 
+	 (at-point-3i-2 self i j))
+	(t 
+	 (at-point-3i-1 self i))))
+
+
+(defun (setf at-point-3i) (val self i &optional j)
+  (cond (j 
+	 (at-point-3i-set-val-2 self i j val))
+	(t 
+	 (at-point-3i-set-val-1 self i val))))
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
-;; Vec2b* cv_Mat_at_Vec2b(Mat* self, int row, int col)
+;; Vec2b* cv_Mat_at_Vec2b(Mat* self, int i, int j)
 (defcfun ("cv_Mat_at_Vec2b" at-vec-2b) vec-2b
   "Returns a reference to the specified array element."
   (self mat)
@@ -805,7 +1073,7 @@
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
-;; Vec2d cv_Mat_at_Vec2d(Mat* self, int row, int col)
+;; Vec2d cv_Mat_at_Vec2d(Mat* self, int i, int j)
 (defcfun ("cv_Mat_at_Vec2d" at-vec-2d) vec-2d
   "Returns a reference to the specified array element."
   (self mat)
@@ -827,7 +1095,7 @@
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
-;; Vec2f* cv_Mat_at_Vec2f(Mat* self, int row, int col)
+;; Vec2f* cv_Mat_at_Vec2f(Mat* self, int i, int j)
 (defcfun ("cv_Mat_at_Vec2f" at-vec-2f) vec-2f
   "Returns a reference to the specified array element."
   (self mat)
@@ -849,7 +1117,7 @@
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
-;; Vec2i* cv_Mat_at_Vec2i(Mat* self, int row, int col)
+;; Vec2i* cv_Mat_at_Vec2i(Mat* self, int i, int j)
 (defcfun ("cv_Mat_at_Vec2i" at-vec-2i) vec-2i
   "Returns a reference to the specified array element."
   (self mat)
@@ -871,7 +1139,7 @@
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
-;; Vec2s* cv_Mat_at_Vec2s(Mat* self, int row, int col)
+;; Vec2s* cv_Mat_at_Vec2s(Mat* self, int i, int j)
 (defcfun ("cv_Mat_at_Vec2s" at-vec-2s) vec-2s
   "Returns a reference to the specified array element."
   (self mat)
@@ -893,7 +1161,7 @@
 
  
 ;; template<typename T> T& Mat::at(int i, int j)
-;; Vec2w* cv_Mat_at_Vec2w(Mat* self, int row, int col)
+;; Vec2w* cv_Mat_at_Vec2w(Mat* self, int i, int j)
 (defcfun ("cv_Mat_at_Vec2w" at-vec-2w) vec-2w
   "Returns a reference to the specified array element."
   (self mat)
@@ -915,7 +1183,7 @@
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
-;; Vec3b* cv_Mat_at_Vec3b(Mat* self, int row, int col)
+;; Vec3b* cv_Mat_at_Vec3b(Mat* self, int i, int j)
 (defcfun ("cv_Mat_at_Vec3b" at-vec-3b) vec-3b
   "Returns a reference to the specified array element."
   (self mat)
@@ -937,7 +1205,7 @@
  
  
 ;; template<typename T> T& Mat::at(int i, int j)
-;; Vec3d* cv_Mat_at_Vec3d(Mat* self, int row, int col)
+;; Vec3d* cv_Mat_at_Vec3d(Mat* self, int i, int j)
 (defcfun ("cv_Mat_at_Vec3d" at-vec-3d) vec-3d
   "Returns a reference to the specified array element."
   (self mat)
@@ -959,7 +1227,7 @@
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
-;; Vec3f* cv_Mat_at_Vec3f(Mat* self, int row, int col)
+;; Vec3f* cv_Mat_at_Vec3f(Mat* self, int i, int j)
 (defcfun ("cv_Mat_at_Vec3f" at-vec-3f) vec-3f
   "Returns a reference to the specified array element."
   (self mat)
@@ -981,7 +1249,7 @@
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
-;; Vec3i* cv_Mat_at_Vec3i(Mat* self, int row, int col)
+;; Vec3i* cv_Mat_at_Vec3i(Mat* self, int i, int j)
 (defcfun ("cv_Mat_at_Vec3i" at-vec-3i) vec-3i
   "Returns a reference to the specified array element."
   (self mat)
@@ -1003,7 +1271,7 @@
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
-;; Vec3s* cv_Mat_at_Vec3s(Mat* self, int row, int col)
+;; Vec3s* cv_Mat_at_Vec3s(Mat* self, int i, int j)
 (defcfun ("cv_Mat_at_Vec3s" at-vec-3s) vec-3s
   "Returns a reference to the specified array element."
   (self mat)
@@ -1025,7 +1293,7 @@
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
-;; Vec3w* cv_Mat_at_Vec3w(Mat* self, int row, int col)
+;; Vec3w* cv_Mat_at_Vec3w(Mat* self, int i, int j)
 (defcfun ("cv_Mat_at_Vec3w" at-vec-3w) vec-3w
   "Returns a reference to the specified array element."
   (self mat)
@@ -1047,7 +1315,7 @@
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
-;; Vec4b* cv_Mat_at_Vec4b(Mat* self, int row, int col)
+;; Vec4b* cv_Mat_at_Vec4b(Mat* self, int i, int j)
 (defcfun ("cv_Mat_at_Vec4b" at-vec-4b) vec-4b
   "Returns a reference to the specified array element."
   (self mat)
@@ -1069,7 +1337,7 @@
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
-;; Vec4d* cv_Mat_at_Vec4d(Mat* self, int row, int col)
+;; Vec4d* cv_Mat_at_Vec4d(Mat* self, int i, int j)
 (defcfun ("cv_Mat_at_Vec4d" at-vec-4d) vec-4d
   "Returns a reference to the specified array element."
   (self mat)
@@ -1091,7 +1359,7 @@
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
-;; Vec4f* cv_Mat_at_Vec4f(Mat* self, int row, int col)
+;; Vec4f* cv_Mat_at_Vec4f(Mat* self, int i, int j)
 (defcfun ("cv_Mat_at_Vec4f" at-vec-4f) vec-4f
   "Returns a reference to the specified array element."
   (self mat)
@@ -1113,7 +1381,7 @@
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
-;; Vec4i cv_Mat_at_Vec4i(Mat* self, int row, int col)
+;; Vec4i cv_Mat_at_Vec4i(Mat* self, int i, int j)
 (defcfun ("cv_Mat_at_Vec4i" at-vec-4i) vec-4i
   "Returns a reference to the specified array element."
   (self mat)
@@ -1135,7 +1403,7 @@
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
-;; Vec4s cv_Mat_at_Vec4s(Mat* self, int row, int col)
+;; Vec4s cv_Mat_at_Vec4s(Mat* self, int i, int j)
 (defcfun ("cv_Mat_at_Vec4s" at-vec-4s) vec-4s
   "Returns a reference to the specified array element."
   (self mat)
@@ -1157,7 +1425,7 @@
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
-;; Vec4s cv_Mat_at_Vec4w(Mat* self, int row, int col)
+;; Vec4s cv_Mat_at_Vec4w(Mat* self, int i, int j)
 (defcfun ("cv_Mat_at_Vec4w" at-vec-4w) vec-4w
   "Returns a reference to the specified array element."
   (self mat)
@@ -4671,6 +4939,18 @@ ret))
   (dest mat))
 
 
+;; void randShuffle(InputOutputArray dst, double iterFactor=1., RNG* rng=0 )
+;; void cv_randShuffle(Mat* dst, double iterFactor, RNG* rng)
+(defcfun ("cv_randShuffle" %rand-shuffle) :void
+  (dest mat)
+  (iter-factor :double)
+  (rng rng))
+
+
+(defun rand-shuffle (dest iter-factor &optional (rng (null-pointer)))
+  (%rand-shuffle dest iter-factor rng))
+
+
 ;; void randu(InputOutputArray dst, InputArray low, InputArray high)
 ;; void cv_randu2(Mat* dst, Scalar* low, Scalar* high)
 (defcfun ("cv_randu2" randu) :void
@@ -4712,6 +4992,21 @@ ret))
 	      (%rng))
 	      ((integerp state) (rng-state state))
 	      (t nil)))
+
+
+;; void RNG::fill(InputOutputArray mat, int distType, InputArray a, InputArray b, bool saturateRange=false )
+;; void cv_RNG_fill(RNG* self, Mat* mat, int distType, Scalar* a, Scalar* b, bool saturateRange)
+(defcfun ("cv_RNG_fill" %rng-fill) :void
+  (self rng)
+  (mat mat)
+  (dist-type :int)
+  (a scalar)
+  (b scalar)
+  (saturate-range :boolean))
+
+
+(defun rng-fill (self mat dist-type a b &optional (saturate-range nil))
+  (%rng-fill self mat dist-type a b saturate-range))
 
 
 ;; void sqrt(InputArray src, OutputArray dst)
@@ -4828,7 +5123,7 @@ ret))
 
 ;; void circle(Mat& img, Point center, int radius, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
 ;; void cv_circle(Mat* img, Point* center, int radius, Scalar* color, int thickness, int lineType, int shift) 
-(defcfun ("cv_circle" %circle) :void
+(defcfun ("cv_circle" circle-point) :void
   (img mat)
   (center point)
   (radius :int)
@@ -4838,9 +5133,23 @@ ret))
   (shift :int))
 
 
+;; void circle(Mat& img, Point center, int radius, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
+;; void cv_circle(Mat* img, Point* center, int radius, Scalar* color, int thickness, int lineType, int shift) 
+(defcfun ("cv_circle_2" circle-point-2f) :void
+  (img mat)
+  (center point-2f)
+  (radius :int)
+  (color scalar)
+  (thickness :int)
+  (line-type :int)
+  (shift :int))
+
+
 (defun circle (img center radius color &optional (thickness 1) (line-type 8) (shift 0))
        "Draws a circle."
-       (%circle img center radius color thickness line-type shift))
+       (if (typep center 'cv-point)
+	   (circle-point img center radius color thickness line-type shift)
+			 (circle-point-2f img center radius color thickness line-type shift)))
 
 
 ;; bool clipLine(Rect imgRect, Point& pt1, Point& pt2)
@@ -5081,6 +5390,29 @@ ret))
   (fs file-storage)
   (name string*)
   (value string*))
+
+
+
+;;; Clustering
+
+
+
+;; double kmeans(InputArray data, int K, InputOutputArray bestLabels, TermCriteria criteria, int attempts, 
+;;               int flags, OutputArray centers=noArray() )
+;; double cv_kmeans(Mat* data, int K, Mat* bestLabels, TermCriteria* criteria, int attempts, int flags, Mat* centers)
+(defcfun ("cv_kmeans" %kmeans) :void
+  (data mat)
+  (k :int)
+  (best-labels mat)
+  (criteria term-criteria)
+  (attempts :int)
+  (flags :int)
+  (centers mat))
+
+
+(defun kmeans (data k best-labels criteria attempts flags &optional (centers (%mat) given-centers))
+  (%kmeans data k best-labels criteria attempts flags centers)
+  (if given-centers nil (del-mat centers)))
 
 
 

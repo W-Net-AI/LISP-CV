@@ -997,6 +997,13 @@
 	(t (apply #'cl:exp args))))
 
 
+(defun fill (arg &rest args)
+  (cond ((or (listp arg) (vectorp arg))
+	 (apply #'cl:fill arg args))
+	((typep arg 'cv-rng)
+	 (apply #'rng-fill arg args))))
+
+
 (defun log (&rest args)
   (cond ((typep (first args) 'cv-mat)
 	 (apply #'%log args))
@@ -1004,15 +1011,13 @@
 
 
 (defun max (&rest args)
-  (cond ((typep (first args) 'cv-mat)
-	 (apply #'%max args))
-	(t (apply #'cl:max args))))
+  (cond ((realp (first args)) (apply #'cl:max args))
+	((typep (first args) 'cv-mat) (apply #'%max args))))
 
 
 (defun min (&rest args)
-  (cond ((typep (first args) 'cv-mat)
-	 (apply #'%min args))
-	(t (apply #'cl:min args))))
+  (cond ((realp (first args)) (apply #'cl:min args))
+	((typep (first args) 'cv-mat) (apply #'%min args))))
 
 
 (defun read (&rest args)

@@ -139,6 +139,14 @@ m->ptr(a[i]);
 return m;
 }
 
+void cv_circle_2(Mat* img, Point2f* center, int radius, Scalar* color, int thickness, int lineType, int shift) {
+	cv::circle(*img, *center, radius, *color, thickness, lineType, shift);
+}
+
+void cv_RNG_fill(RNG* self, Mat* mat, int distType, Scalar* a, Scalar* b, bool saturateRange) {
+    self->fill(*mat, distType, *a, *b, saturateRange);
+}
+
 vector_Mat* std_carrayTovectorm2(Mat** a, size_t len) {
     vector_Mat* v = new vector_Mat();
     for(size_t i = 0; i < len; i++) 
@@ -153,6 +161,14 @@ vector_Mat1* std_carrayTovectorm1(Mat** a, size_t len) {
     for(size_t i = 0; i < len; i++) 
         v->push_back(a[i]);
     return v;
+}
+
+Mat** std_vectorm_to_carray1( vector_Mat1* v ) {
+return v->data();
+}
+
+void cv_findContours1(Mat* image, vector_Mat1* contours, Mat* hierarchy, int mode, int method, Point* offset) {
+	cv::findContours(*image, *contours, *hierarchy, mode, method, *offset);
 }
 
 int cv_Mat_checkVector(Mat* self, int elemChannels, int depth, bool requireContinuous) {
@@ -347,52 +363,99 @@ int cv_KeyPoint_setClass_id(KeyPoint* self, int val) {
   return self->class_id = val;
 }
 
-Point* cv_Mat_at_Point(Mat* self, int i, int j) {
+Point* cv_Mat_at_Point_1(Mat* self, int i) {
+  return &self->at<Point>(i);
+}
+
+Point* cv_Mat_at_Point_2(Mat* self, int i, int j) {
   return &self->at<Point>(i, j);
 }
 
-void cv_Mat_at_Point_set_Val(Mat* self, int i, int j, Point* val) {
+void cv_Mat_at_Point_set_Val_1(Mat* self, int i, Point* val) {
+  self->at<Point>(i) = *val;
+}
+
+void cv_Mat_at_Point_set_Val_2(Mat* self, int i, int j, Point* val) {
   self->at<Point>(i, j) = *val;
 }
 
-Point2d* cv_Mat_at_Point2d(Mat* self, int i, int j) {
+Point2d* cv_Mat_at_Point2d_1(Mat* self, int i) {
+  return &self->at<Point2d>(i);
+}
+
+Point2d* cv_Mat_at_Point2d_2(Mat* self, int i, int j) {
   return &self->at<Point2d>(i, j);
 }
 
-void cv_Mat_at_Point2d_set_Val(Mat* self, int i, int j, Point2d* val) {
+void cv_Mat_at_Point2d_set_Val_1(Mat* self, int i, Point2d* val) {
+  self->at<Point2d>(i) = *val;
+}
+
+void cv_Mat_at_Point2d_set_Val_2(Mat* self, int i, int j, Point2d* val) {
   self->at<Point2d>(i, j) = *val;
 }
 
+Point2f* cv_Mat_at_Point2f_1(Mat* self, int i) {
+  return &self->at<Point2f>(i);
+}
 
-Point2f* cv_Mat_at_Point2f(Mat* self, int i, int j) {
+Point2f* cv_Mat_at_Point2f_2(Mat* self, int i, int j) {
   return &self->at<Point2f>(i, j);
 }
 
-void cv_Mat_at_Point2f_set_Val(Mat* self, int i, int j, Point2f* val) {
+void cv_Mat_at_Point2f_set_Val_1(Mat* self, int i, Point2f* val) {
+  self->at<Point2f>(i) = *val;
+}
+
+void cv_Mat_at_Point2f_set_Val_2(Mat* self, int i, int j, Point2f* val) {
   self->at<Point2f>(i, j) = *val;
 }
 
-Point3d* cv_Mat_at_Point3d(Mat* self, int i, int j) {
+Point3d* cv_Mat_at_Point3d_1(Mat* self, int i) {
+  return &self->at<Point3d>(i);
+}
+
+Point3d* cv_Mat_at_Point3d_2(Mat* self, int i, int j) {
   return &self->at<Point3d>(i, j);
 }
 
-void cv_Mat_at_Point3d_set_Val(Mat* self, int i, int j, Point3d* val) {
+void cv_Mat_at_Point3d_set_Val_1(Mat* self, int i, Point3d* val) {
+  self->at<Point3d>(i) = *val;
+}
+
+void cv_Mat_at_Point3d_set_Val_2(Mat* self, int i, int j, Point3d* val) {
   self->at<Point3d>(i, j) = *val;
 }
 
-Point3f* cv_Mat_at_Point3f(Mat* self, int i, int j) {
+Point3f* cv_Mat_at_Point3f_1(Mat* self, int i) {
+  return &self->at<Point3f>(i);
+}
+
+Point3f* cv_Mat_at_Point3f_2(Mat* self, int i, int j) {
   return &self->at<Point3f>(i, j);
 }
 
-void cv_Mat_at_Point3f_set_Val(Mat* self, int i, int j, Point3f* val) {
+void cv_Mat_at_Point3f_set_Val_1(Mat* self, int i, Point3f* val) {
+  self->at<Point3f>(i) = *val;
+}
+
+void cv_Mat_at_Point3f_set_Val_2(Mat* self, int i, int j, Point3f* val) {
   self->at<Point3f>(i, j) = *val;
 }
 
-Point3i* cv_Mat_at_Point3i(Mat* self, int i, int j) {
+Point3i* cv_Mat_at_Point3i_1(Mat* self, int i) {
+  return &self->at<Point3i>(i);
+}
+
+Point3i* cv_Mat_at_Point3i_2(Mat* self, int i, int j) {
   return &self->at<Point3i>(i, j);
 }
 
-void cv_Mat_at_Point3i_set_Val(Mat* self, int i, int j, Point3i* val) {
+void cv_Mat_at_Point3i_set_Val_1(Mat* self, int i, Point3i* val) {
+  self->at<Point3i>(i) = *val;
+}
+
+void cv_Mat_at_Point3i_set_Val_2(Mat* self, int i, int j, Point3i* val) {
   self->at<Point3i>(i, j) = *val;
 }
 
@@ -402,6 +465,34 @@ Scalar* cv_Mat_at_Scalar(Mat* self, int i, int j) {
 
 void cv_Mat_at_Scalar_set_Val(Mat* self, int i, int j, Scalar* val) {
   self->at<Scalar>(i, j) = *val;
+}
+
+char &cv_Mat_at_char_1(Mat* self, int i) {
+  return self->at<char>(i);
+}
+
+double &cv_Mat_at_double_1(Mat* self, int i) {
+  return self->at<double>(i);
+}
+
+float &cv_Mat_at_float_1(Mat* self, int i) {
+  return self->at<float>(i);
+}
+
+int &cv_Mat_at_int_1(Mat* self, int i) {
+  return self->at<int>(i);
+}
+
+short &cv_Mat_at_short_1(Mat* self, int i) {
+  return self->at<short>(i);
+}
+
+uchar &cv_Mat_at_uchar_1(Mat* self, int i) {
+  return self->at<uchar>(i);
+}
+
+ushort &cv_Mat_at_ushort_1(Mat* self, int i) {
+  return self->at<ushort>(i);
 }
 
 char &cv_Mat_at_char_2(Mat* self, int i, int j) {

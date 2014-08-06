@@ -3,7 +3,7 @@
 (defpackage :lisp-cv
   (:nicknames #:lisp-cv #:lcv #:cv)
   (:use #:cffi #:common-lisp #:swank #:trivial-garbage #:lisp-executable #:bordeaux-threads) 
-  (:shadow #:abs #:exp #:get #:length #:load #:log #:min #:max #:open #:read #:set #:sqrt #:write)
+  (:shadow #:abs #:exp #:fill #:get #:length #:load #:log #:min #:max #:open #:read #:set #:sqrt #:write)
   (:export 
 
 ;
@@ -738,26 +738,12 @@
    #:arr-to-mat
    #:assign-val
    #:at
-   #:at-char-2
-   #:at-char-3
    #:at-char
-   #:at-double-2
-   #:at-double-3
    #:at-double
-   #:at-float-2
-   #:at-float-3
    #:at-float
-   #:at-int-2
-   #:at-int-3
    #:at-int
-   #:at-short-2
-   #:at-short-3
    #:at-short
-   #:at-uchar-2
-   #:at-uchar-3
    #:at-uchar
-   #:at-ushort-2
-   #:at-ushort-3
    #:at-ushort
    #:at-scalar
    #:at-point-2d
@@ -1037,6 +1023,8 @@
    #:+covar-scale+ 
    #:+covar-rows+ 
    #:+covar-cols+ 
+   #:+rng-uniform+
+   #:+rng-normal+
 
    #:abs-diff
    #:add-weighted
@@ -1109,6 +1097,14 @@
    #:file-storage-open
    #:file-storage-release
    #:file-storage-write
+
+;; core - Clustering
+
+   #:+kmeans-random-centers+ 
+   #:+kmeans-pp-centers+
+   #:+kmeans-use-initial-labels+
+
+   #:kmeans
 
 ;; core - Utility and System Functions and Macros
 

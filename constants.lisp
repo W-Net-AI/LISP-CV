@@ -214,6 +214,11 @@
   (+file-storage-write+ 1)
   (+file-storage-append+ 2)
   (+file-storage-memory+ 4)
+  (+rng-uniform+ 0)
+  (+rng-normal+ 1)
+  (+kmeans-random-centers+ 0)
+  (+kmeans-pp-centers+ 2)
+  (+kmeans-use-initial-labels+ 1)
 
 
 ;;; highgui
