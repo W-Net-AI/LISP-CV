@@ -163,6 +163,11 @@
   (c-string-to-string string (cl:length string)))
 
 
+;; const char* std_string_to_cstring(stdstring* s)
+(defcfun ("std_string_to_cstring" std-string-to-c-string) :string
+  (s string*))
+
+
 ;; Versions for internal use.
 
 ;; string* std_cstringToString(char* s, size_t len) 
@@ -243,7 +248,6 @@
   (m2 mat))
 
 
-
 ;; Mat& Mat::adjustROI(int dtop, int dbottom, int dleft, int dright)
 ;; Mat* cv_Mat_adjustROI(Mat* self, int dtop, int dbottom, int dleft, int dright) 
 (defcfun ("cv_Mat_adjustROI" adjust-roi) mat
@@ -260,6 +264,125 @@
 (defcfun ("cv_Size_area" area) :int
   "Gets the area of a SIZE object."
   (self size))
+
+
+;; Mat::Mat(int rows, int cols, int type, void* data) 
+;; Mat* cv_create_Mat_with_data(int rows, int cols, int type, void* data)
+(defcfun ("cv_create_Mat_with_data" create-mat-with-data) mat
+	 (rows :int)
+	 (cols :int)
+	 (type :int)
+	 (data :pointer))
+
+
+(let ((previous nil))
+  (defun %create-mat-with-data-uchar (rows cols type data)
+
+    (unless (equal data (car previous))
+      (setf previous (cons data (gced-foreign-alloc :uchar
+						    :initial-contents data))))
+    (create-mat-with-data rows cols type (cdr previous))))
+
+
+(let ((previous nil))
+  (defun %create-mat-with-data-char (rows cols type data)
+
+    (unless (equal data (car previous))
+      (setf previous (cons data (gced-foreign-alloc :char
+						    :initial-contents data))))
+    (create-mat-with-data rows cols type (cdr previous))))
+
+
+(let ((previous nil))
+  (defun %create-mat-with-data-ushort (rows cols type data)
+
+    (unless (equal data (car previous))
+      (setf previous (cons data (gced-foreign-alloc :ushort
+						    :initial-contents data))))
+    (create-mat-with-data rows cols type (cdr previous))))
+
+
+(let ((previous nil))
+  (defun %create-mat-with-data-short (rows cols type data)
+
+    (unless (equal data (car previous))
+      (setf previous (cons data (gced-foreign-alloc :short
+						    :initial-contents data))))
+    (create-mat-with-data rows cols type (cdr previous))))
+
+
+(let ((previous nil))
+  (defun %create-mat-with-data-int (rows cols type data)
+
+    (unless (equal data (car previous))
+      (setf previous (cons data (gced-foreign-alloc :int
+						    :initial-contents data))))
+    (create-mat-with-data rows cols type (cdr previous))))
+
+
+(let ((previous nil))
+  (defun %create-mat-with-data-float (rows cols type data)
+
+    (unless (equal data (car previous))
+      (setf previous (cons data (gced-foreign-alloc :float
+						    :initial-contents data))))
+    (create-mat-with-data rows cols type (cdr previous))))
+
+
+(let ((previous nil))
+  (defun %create-mat-with-data-double (rows cols type data)
+
+    (unless (equal data (car previous))
+      (setf previous (cons data (gced-foreign-alloc :double
+						    :initial-contents data))))
+    (create-mat-with-data rows cols type (cdr previous))))
+
+
+(defun %create-mat-with-data (rows cols type data-list)
+  (let ((cffi-type (case type 
+		     (#.+8uc1+ ':uchar)
+		     (#.+8sc1+ ':char)
+		     (#.+16uc1+ ':ushort)
+		     (#.+16sc1+ ':short)
+		     (#.+32sc1+ ':int)
+		     (#.+32fc1+ ':float)
+		     (#.+64fc1+ ':double)
+		     (#.+8uc2+ ':uchar)
+		     (#.+8sc2+ ':char)
+		     (#.+16uc2+ ':ushort)
+		     (#.+16sc2+ ':short)
+		     (#.+32sc2+ ':int)
+		     (#.+32fc2+ ':float)
+		     (#.+64fc2+ ':double)
+		     (#.+8uc3+ ':uchar)
+		     (#.+8sc3+ ':char)
+		     (#.+16uc3+ ':ushort)
+		     (#.+16sc3+ ':short)
+		     (#.+32sc3+ ':int)
+		     (#.+32fc3+ ':float)
+		     (#.+64fc3+ ':double)
+		     (#.+8uc4+ ':uchar)
+		     (#.+8sc4+ ':char)
+		     (#.+16uc4+ ':ushort)
+		     (#.+16sc4+ ':short)
+		     (#.+32sc4+ ':int)
+		     (#.+32fc4+ ':float)
+		     (#.+64fc4+ ':double))))
+    (case cffi-type 
+      (:uchar
+       (%create-mat-with-data-uchar rows cols type data-list))
+      (:char
+       (%create-mat-with-data-char rows cols type data-list))
+      (:short
+       (%create-mat-with-data-short rows cols type data-list))
+      (:ushort
+       (%create-mat-with-data-ushort rows cols type data-list))
+      (:int
+       (%create-mat-with-data-int rows cols type data-list))
+      (:float
+       (%create-mat-with-data-float rows cols type data-list))
+      (:double
+       (%create-mat-with-data-double rows cols type data-list)))))
 
 
 (defun arr-to-mat (arr &optional mat-type)
@@ -1523,25 +1646,10 @@
 
 ;; Mat Mat::cross(InputArray m) const
 ;; Mat* cv_Mat_cross(Mat* self, Mat* m)
-(defcfun ("cv_Mat_cross" mat-cross) mat
-  "Computes a cross-product of two 3-element vectors."
-  (self mat)
-  (m mat))
-
-
-;; Mat Mat::cross(InputArray m) const
-;; Mat* cv_Mat_cross(Mat* self, Mat* m)
 (defcfun ("cv_Mat_cross" cross) mat
   "Computes a cross-product of two 3-element vectors."
   (self mat)
   (m mat))
-
-
-;; uchar* data
-;; uchar* cv_Mat_get_Data(Mat* self)
-(defcfun ("cv_Mat_get_Data" mat-data) :pointer
-  "Pointer to the data."
-  (self mat))
 
 
 ;; int Mat::depth() const
@@ -1753,6 +1861,18 @@
   (self mat))
 
 
+;; double TermCriteria::epsilon
+;; int cv_TermCriteria_getEpsilon(TermCriteria* self);
+(defcfun ("cv_TermCriteria_getEpsilon" epsilon) :double
+  "Gets the epsilon value of a TERM-CRITERIA object."
+  (self term-criteria))
+
+
+(defun (setf epsilon) (val self)
+  "Sets the epsilon value of a TERM-CRITERIA object."
+  (term-criteria-set-epsilon self val))
+
+
 ;; Mat* force(MatExpr* expr)
 (defcfun ("force" force) mat
   "Coerces a MAT-EXPR to a MAT."
@@ -1935,123 +2055,19 @@
   (self mat))
 
 
-;; Mat::Mat(int rows, int cols, int type, void* data) 
-;; Mat* cv_create_Mat_with_data(int rows, int cols, int type, void* data)
-(defcfun ("cv_create_Mat_with_data" create-mat-with-data) mat
-	 (rows :int)
-	 (cols :int)
-	 (type :int)
-	 (data :pointer))
+;; Mat Mat::cross(InputArray m) const
+;; Mat* cv_Mat_cross(Mat* self, Mat* m)
+(defcfun ("cv_Mat_cross" mat-cross) mat
+  "Computes a cross-product of two 3-element vectors."
+  (self mat)
+  (m mat))
 
 
-(let ((previous nil))
-  (defun %create-mat-with-data-uchar (rows cols type data)
-
-    (unless (equal data (car previous))
-      (setf previous (cons data (gced-foreign-alloc :uchar
-						    :initial-contents data))))
-    (create-mat-with-data rows cols type (cdr previous))))
-
-
-(let ((previous nil))
-  (defun %create-mat-with-data-char (rows cols type data)
-
-    (unless (equal data (car previous))
-      (setf previous (cons data (gced-foreign-alloc :char
-						    :initial-contents data))))
-    (create-mat-with-data rows cols type (cdr previous))))
-
-
-(let ((previous nil))
-  (defun %create-mat-with-data-ushort (rows cols type data)
-
-    (unless (equal data (car previous))
-      (setf previous (cons data (gced-foreign-alloc :ushort
-						    :initial-contents data))))
-    (create-mat-with-data rows cols type (cdr previous))))
-
-
-(let ((previous nil))
-  (defun %create-mat-with-data-short (rows cols type data)
-
-    (unless (equal data (car previous))
-      (setf previous (cons data (gced-foreign-alloc :short
-						    :initial-contents data))))
-    (create-mat-with-data rows cols type (cdr previous))))
-
-
-(let ((previous nil))
-  (defun %create-mat-with-data-int (rows cols type data)
-
-    (unless (equal data (car previous))
-      (setf previous (cons data (gced-foreign-alloc :int
-						    :initial-contents data))))
-    (create-mat-with-data rows cols type (cdr previous))))
-
-
-(let ((previous nil))
-  (defun %create-mat-with-data-float (rows cols type data)
-
-    (unless (equal data (car previous))
-      (setf previous (cons data (gced-foreign-alloc :float
-						    :initial-contents data))))
-    (create-mat-with-data rows cols type (cdr previous))))
-
-
-(let ((previous nil))
-  (defun %create-mat-with-data-double (rows cols type data)
-
-    (unless (equal data (car previous))
-      (setf previous (cons data (gced-foreign-alloc :double
-						    :initial-contents data))))
-    (create-mat-with-data rows cols type (cdr previous))))
-
-
-(defun %create-mat-with-data (rows cols type data-list)
-  (let ((cffi-type (case type 
-		     (#.+8uc1+ ':uchar)
-		     (#.+8sc1+ ':char)
-		     (#.+16uc1+ ':ushort)
-		     (#.+16sc1+ ':short)
-		     (#.+32sc1+ ':int)
-		     (#.+32fc1+ ':float)
-		     (#.+64fc1+ ':double)
-		     (#.+8uc2+ ':uchar)
-		     (#.+8sc2+ ':char)
-		     (#.+16uc2+ ':ushort)
-		     (#.+16sc2+ ':short)
-		     (#.+32sc2+ ':int)
-		     (#.+32fc2+ ':float)
-		     (#.+64fc2+ ':double)
-		     (#.+8uc3+ ':uchar)
-		     (#.+8sc3+ ':char)
-		     (#.+16uc3+ ':ushort)
-		     (#.+16sc3+ ':short)
-		     (#.+32sc3+ ':int)
-		     (#.+32fc3+ ':float)
-		     (#.+64fc3+ ':double)
-		     (#.+8uc4+ ':uchar)
-		     (#.+8sc4+ ':char)
-		     (#.+16uc4+ ':ushort)
-		     (#.+16sc4+ ':short)
-		     (#.+32sc4+ ':int)
-		     (#.+32fc4+ ':float)
-		     (#.+64fc4+ ':double))))
-    (case cffi-type 
-      (:uchar
-       (%create-mat-with-data-uchar rows cols type data-list))
-      (:char
-       (%create-mat-with-data-char rows cols type data-list))
-      (:short
-       (%create-mat-with-data-short rows cols type data-list))
-      (:ushort
-       (%create-mat-with-data-ushort rows cols type data-list))
-      (:int
-       (%create-mat-with-data-int rows cols type data-list))
-      (:float
-       (%create-mat-with-data-float rows cols type data-list))
-      (:double
-       (%create-mat-with-data-double rows cols type data-list)))))
+;; uchar* data
+;; uchar* cv_Mat_get_Data(Mat* self)
+(defcfun ("cv_Mat_get_Data" mat-data) :pointer
+  "Pointer to the data."
+  (self mat))
 
 
 ;; double Mat::dot(InputArray m) const
@@ -2447,12 +2463,16 @@ ret))
   (type :int))
 
 
-;; static MatExpr Mat::zeros(int rows, int cols, int type)
-;; Mat* cv_create_zeros(int rows, int cols, int type)
-(defcfun ("cv_create_zeros" %mat-zeros) mat
-  (rows :int)
-  (cols :int)
-  (type :int))
+;; int TermCriteria::maxCount
+;; int cv_TermCriteria_getMaxCount(TermCriteria* self);
+(defcfun ("cv_TermCriteria_getMaxCount" max-count) :int
+  "Gets the MAX-COUNT value of a TERM-CRITERIA object."
+  (self term-criteria))
+
+
+(defun (setf max-count) (val self)
+  "Sets the MAX-COUNT value of a TERM-CRITERIA object."
+  (term-criteria-set-max-count self val))
 
 
 ;; MatExpr * operator
@@ -3012,37 +3032,37 @@ ret))
 
 (defun print-point (point)
   (if (typep point 'cv-point)
-      (format t "~a(x: ~a y: ~a)" *personalize-print-point* (point-x point) (point-y point))
+      (format t "~a(x: ~a y: ~a)~%" *personalize-print-point* (point-x point) (point-y point))
       (error "The value ~a is not of type CV-POINT." point)))
 
 
 (defun print-point-2d (point-2d)
   (if (typep point-2d 'cv-point-2d)
-      (format t "~a(x: ~a y: ~a)" *personalize-print-point-2d* (point-2d-x point-2d) (point-2d-y point-2d))
+      (format t "~a(x: ~a y: ~a)~%" *personalize-print-point-2d* (point-2d-x point-2d) (point-2d-y point-2d))
       (error "The value ~a is not of type CV-POINT-2D." point-2d)))
 
 
 (defun print-point-2f (point-2f)
   (if (typep point-2f 'cv-point-2f)
-      (format t "~a(x: ~a y: ~a)" *personalize-print-point-2f* (point-2f-x point-2f) (point-2f-y point-2f))
+      (format t "~a(x: ~a y: ~a)~%" *personalize-print-point-2f* (point-2f-x point-2f) (point-2f-y point-2f))
       (error "The value ~a is not of type CV-POINT-2F." point-2f)))
 
 
 (defun print-point-3d (point-3d)
   (if (typep point-3d 'cv-point-3d)
-      (format t "~a(x: ~a y: ~a z: ~a)" *personalize-print-point-3d* (point-3d-x point-3d) (point-3d-y point-3d) (point-3d-z point-3d))
+      (format t "~a(x: ~a y: ~a z: ~a)~%" *personalize-print-point-3d* (point-3d-x point-3d) (point-3d-y point-3d) (point-3d-z point-3d))
       (error "The value ~a is not of type CV-POINT-3D." point-3d)))
 
 
 (defun print-point-3f (point-3f)
   (if (typep point-3f 'cv-point-3f)
-      (format t "~a(x: ~a y: ~a z: ~a)" *personalize-print-point-3f* (point-3f-x point-3f) (point-3f-y point-3f) (point-3f-z point-3f))
+      (format t "~a(x: ~a y: ~a z: ~a)~%" *personalize-print-point-3f* (point-3f-x point-3f) (point-3f-y point-3f) (point-3f-z point-3f))
       (error "The value ~a is not of type CV-POINT-3F." point-3f)))
 
 
 (defun print-point-3i (point-3i)
   (if (typep point-3i 'cv-point-3i)
-      (format t "~a(x: ~a y: ~a z: ~a)" *personalize-print-point-3i* (point-3i-x point-3i) (point-3i-y point-3i) (point-3i-z point-3i))
+      (format t "~a(x: ~a y: ~a z: ~a)~%" *personalize-print-point-3i* (point-3i-x point-3i) (point-3i-y point-3i) (point-3i-z point-3i))
       (error "The value ~a is not of type CV-POINT-3I." point-3i)))
 
 
@@ -3088,9 +3108,9 @@ ret))
 (defun print-term-criteria (term-criteria)
   (if (typep term-criteria 'cv-term-criteria)
       (format t "~a(type: ~a max-count: ~a epsilon: ~a)~%" *personalize-print-term-criteria* 
-	      (@ term-criteria :int) 
-	      (@ term-criteria :int 1)
-              (@@ term-criteria :double 8))
+	      (term-criteria-type term-criteria)
+	      (term-criteria-max-count term-criteria)
+              (term-criteria-epsilon term-criteria))
       (error "The value ~a is not of type CV-TERM-CRITERIA." term-criteria)))
 
 
@@ -3412,8 +3432,6 @@ ret))
 	       (t nil)))
 
 
-;; Rect::Rect(int x, int y, int width, int height)
-;; int x, y, width, height
 ;; Rect* cv_Rect_clone(Rect* self)
 (defcfun ("cv_Rect_clone" rect-clone) rect
   (self rect))
@@ -3791,6 +3809,60 @@ ret))
 	      (type
 	       (term-criteria-3 type max-count epsilon))
 	       (t nil)))
+
+
+;; double TermCriteria::epsilon
+;; int cv_TermCriteria_getEpsilon(TermCriteria* self);
+(defcfun ("cv_TermCriteria_getEpsilon" term-criteria-epsilon) :double
+  "Gets the epsilon value of a TERM-CRITERIA object."
+  (self term-criteria))
+
+
+;; int cv_TermCriteria_set_Epsilon(TermCriteria* self, double val)
+(defcfun ("cv_TermCriteria_set_Epsilon" term-criteria-set-epsilon) :double
+  (self term-criteria)
+  (val :double))
+
+
+(defun (setf term-criteria-epsilon) (val self)
+  "Sets the epsilon value of a TERM-CRITERIA object."
+  (term-criteria-set-epsilon self val))
+
+
+;; int TermCriteria::maxCount
+;; int cv_TermCriteria_getMaxCount(TermCriteria* self);
+(defcfun ("cv_TermCriteria_getMaxCount" term-criteria-max-count) :int
+  "Gets the MAX-COUNT value of a TERM-CRITERIA object."
+  (self term-criteria))
+
+
+;; int cv_TermCriteria_set_MaxCount(TermCriteria* self, int val)
+(defcfun ("cv_TermCriteria_set_MaxCount" term-criteria-set-max-count) :int
+  (self term-criteria)
+  (val :int))
+
+
+(defun (setf term-criteria-max-count) (val self)
+  "Sets the max-count value of a TERM-CRITERIA object."
+  (term-criteria-set-max-count self val))
+
+
+;; int TermCriteria::type
+;; int cv_TermCriteria_getType(TermCriteria* self);
+(defcfun ("cv_TermCriteria_getType" term-criteria-type) :int
+  "Gets the type of a TERM-CRITERIA object."
+  (self term-criteria))
+
+
+;; int cv_TermCriteria_set_Type(TermCriteria* self, int val)
+(defcfun ("cv_TermCriteria_set_Type" term-criteria-set-type) :int
+  (self term-criteria)
+  (val :int))
+
+
+(defun (setf term-criteria-type) (val self)
+  "Sets the type of a TERM-CRITERIA object."
+  (term-criteria-set-type self val))
 
 
 ;; Point_<_Tp> tl() const
@@ -5442,9 +5514,18 @@ ret))
 	 (y :float))
 
 
+;; const String& getBuildInformation()
+;; String* cv_getBuildInformation()
+(defcfun ("cv_getBuildInformation" %get-build-information) String*)
+
+
+(defun get-build-information ()
+  (std-string-to-c-string (%get-build-information)))
+
+
 ;; int getNumberOfCPUs()
 ;; cv_getNumberOfCPUs()
-(defcfun ("cv_getNumberOfCPUs" get-number-of-cpu-s) :int)
+(defcfun ("cv_getNumberOfCPUs" get-number-of-cpus) :int)
 
 
 ;; int64 getTickCount()

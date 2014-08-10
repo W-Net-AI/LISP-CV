@@ -2228,6 +2228,30 @@
     cascade-classifier))
 
 
+;; FAST-FEATURE-DETECTOR
+
+
+(define-foreign-type fast-feature-detector ()
+  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+                     :garbage-collect))
+  (:actual-type :pointer)
+  (:simple-parser fast-feature-detector))
+
+
+(defclass cv-fast-feature-detector ()
+  ((c-pointer :reader c-pointer :initarg :c-pointer)))
+
+
+(defmethod translate-to-foreign ((lisp-value cv-fast-feature-detector) (c-type fast-feature-detector))
+  (values  (c-pointer lisp-value) lisp-value))
+
+
+(defmethod translate-from-foreign (c-pointer (c-type fast-feature-detector))
+  (let ((fast-feature-detector (make-instance 'cv-fast-feature-detector :c-pointer c-pointer)))
+    (when (garbage-collect c-type)
+      (tg:finalize fast-feature-detector (lambda () (del-fast-feature-detector c-pointer))))
+    fast-feature-detector))
+
 
 ;; HOG-DESCRIPTOR
 

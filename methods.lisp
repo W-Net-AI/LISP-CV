@@ -62,6 +62,9 @@
 (defgeneric descriptor-matcher-match (self query-descriptors train-descriptors matches &optional mask)
   (:documentation "Used for all DESCRIPTOR-MATCHER-MATCH methods.")) 
 
+(defgeneric descriptor-matcher-knn-match (self query-descriptors train-descriptors matches k &optional mask compact-result)
+  (:documentation "Used for all DESCRIPTOR-MATCHER-KNN-MATCH methods.")) 
+
 (defgeneric dot (self other)
   (:documentation "Used for all class bindings with a DOT member function."))
 
@@ -89,6 +92,9 @@
 (defgeneric file-storage-write (fs name value)
   (:documentation "Used for all FILE-STORAGE-WRITE methods."))
 
+(defgeneric knn-match (self &rest args)
+  (:documentation "Used for all class bindings with a KNN-MATCH member function."))
+
 (defgeneric match (self &rest args)
   (:documentation "Used for all class bindings with a MATCH member function."))
 
@@ -115,6 +121,12 @@
 
 (defgeneric train (self &rest args)
   (:documentation "Used for all class bindings with a TRAIN member."))
+
+(defgeneric type* (self)
+  (:documentation "Used for all class bindings with a TYPE member."))
+
+(defgeneric (setf type*) (val self)
+  (:documentation "Used to setf the TYPE of class bindings with an TYPE member."))
 
 (defgeneric width (self)
   (:documentation "Used for all class bindings with an WIDTH member."))
@@ -416,26 +428,17 @@
   (if given-mask nil (del-mat mask)))
 
 
-(defmethod descriptor-matcher-match ((self cv-brisk) query-descriptors train-descriptors matches 
-				     &optional (mask (%mat) given-mask))
-  "Finds the best match for each descriptor from a query set."
-  (%descriptor-matcher-match-bf-matcher self query-descriptors train-descriptors matches mask)
-  (if given-mask nil (del-mat mask)))
-
-
-(defmethod descriptor-matcher-match ((self cv-surf) query-descriptors train-descriptors matches 
-				     &optional (mask (%mat) given-mask))
-  "Finds the best match for each descriptor from a query set."
-  (%descriptor-matcher-match-bf-matcher self query-descriptors train-descriptors matches mask)
-  (if given-mask nil (del-mat mask)))
-
-
 (defmethod detect ((self cv-bf-matcher) &rest args)
   "Detects keypoints in an image."
   (apply #'feature-detector-detect self args))
 
 
 (defmethod detect ((self cv-brisk) &rest args)
+  "Detects keypoints in an image."
+  (apply #'feature-detector-detect self args))
+
+
+(defmethod detect ((self cv-fast-feature-detector) &rest args)
   "Detects keypoints in an image."
   (apply #'feature-detector-detect self args))
 
@@ -521,6 +524,12 @@
 (defmethod feature-detector-detect ((self cv-brisk) image keypoints &optional (mask (%mat) given-mask))
   "Detects keypoints in an image."
   (%feature-detector-detect-brisk self image keypoints mask)
+  (if given-mask nil (del-mat mask)))
+
+
+(defmethod feature-detector-detect ((self cv-fast-feature-detector) image keypoints &optional (mask (%mat) given-mask))
+  "Detects keypoints in an image."
+  (%feature-detector-detect-fast-feature-detector self image keypoints mask)
   (if given-mask nil (del-mat mask)))
 
 
@@ -686,16 +695,6 @@
   (apply #'descriptor-matcher-match self args))
 
 
-(defmethod match ((self cv-brisk) &rest args)
-  "Finds the best match for each descriptor from a query set."
-  (apply #'descriptor-matcher-match self args))
-
-
-(defmethod match ((self cv-surf) &rest args)
-  "Finds the best match for each descriptor from a query set."
-  (apply #'descriptor-matcher-match self args))
-
-
 (defmethod open ((self cv-file-storage) &rest args)
   (apply #'file-storage-open self args))
 
@@ -767,6 +766,16 @@
 
 (defmethod train ((self cv-svm) &rest args)
   (apply #'svm-train self args))
+
+
+(defmethod type* ((self cv-term-criteria))
+  "Gets the type of a TERM-CRITERIA object."
+  (term-criteria-type self))
+
+
+(defmethod (setf type*) ((val integer) (self cv-term-criteria))
+  "Sets the type of a TERM-CRITERIA object."
+  (term-criteria-set-type self val))
 
 
 (defmethod width ((self cv-rect))

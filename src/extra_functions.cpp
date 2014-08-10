@@ -132,11 +132,46 @@ ADD_READ_FUNC_IMPL_1(m, Mat);
 
 ADD_READ_FUNC_IMPL_2(vkp, vector_KeyPoint);
 
+typedef vector<DMatch> vector_DMatch;
+
+DMatch* cv_vector_DMatch_at_1(vector_DMatch* self, int idx) {
+  return & (self->at(idx) );
+}
+
+DMatch* cv_vector_DMatch_at_2(std::vector<DMatch> *self, int idx) {
+vector<DMatch>::iterator it = self->begin() + idx;
+return &(*it);
+}
+
 Mat* test(uchar* a, size_t len ) {
 Mat* m = new Mat;
 for(size_t i = 0; i < len; i++) 
 m->ptr(a[i]);
 return m;
+}
+
+int cv_TermCriteria_getType(TermCriteria* self) {
+  return self->type;
+}
+
+int cv_TermCriteria_set_Type(TermCriteria* self, int val) {
+   return self->type = val;
+}
+
+int cv_TermCriteria_getMaxCount(TermCriteria* self) {
+  return self->maxCount;
+}
+
+int cv_TermCriteria_set_MaxCount(TermCriteria* self, int val) {
+   return self->maxCount = val;
+}
+
+double cv_TermCriteria_getEpsilon(TermCriteria* self) {
+  return self->epsilon;
+}
+
+double cv_TermCriteria_set_Epsilon(TermCriteria* self, double val) {
+   return self->epsilon = val;
 }
 
 void cv_circle_2(Mat* img, Point2f* center, int radius, Scalar* color, int thickness, int lineType, int shift) {
@@ -551,156 +586,296 @@ ushort &cv_Mat_at_ushort_3(Mat* self, int i, int j, int k) {
   return self->at<ushort>(i, j, k);
 }
 
-Vec2b* cv_Mat_at_Vec2b(Mat* self, int i, int j) {
+Vec2b* cv_Mat_at_Vec2b_1(Mat* self, int i) {
+  return &self->at<Vec2b>(i);
+}
+
+void cv_Mat_at_Vec2b_set_Val_1(Mat* self, int i, Vec2b* val) {
+  self->at<Vec2b>(i) = *val;
+}
+
+Vec2b* cv_Mat_at_Vec2b_2(Mat* self, int i, int j) {
   return &self->at<Vec2b>(i, j);
 }
 
-void cv_Mat_at_Vec2b_set_Val(Mat* self, int i, int j, Vec2b* val) {
+void cv_Mat_at_Vec2b_set_Val_2(Mat* self, int i, int j, Vec2b* val) {
   self->at<Vec2b>(i, j) = *val;
 }
 
-Vec2d* cv_Mat_at_Vec2d(Mat* self, int i, int j) {
+Vec2d* cv_Mat_at_Vec2d_1(Mat* self, int i) {
+  return &self->at<Vec2d>(i);
+}
+
+void cv_Mat_at_Vec2d_set_Val_1(Mat* self, int i, Vec2d* val) {
+  self->at<Vec2d>(i) = *val;
+}
+
+Vec2d* cv_Mat_at_Vec2d_2(Mat* self, int i, int j) {
   return &self->at<Vec2d>(i, j);
 }
 
-void cv_Mat_at_Vec2d_set_Val(Mat* self, int i, int j, Vec2d* val) {
+void cv_Mat_at_Vec2d_set_Val_2(Mat* self, int i, int j, Vec2d* val) {
   self->at<Vec2d>(i, j) = *val;
 }
 
-Vec2f* cv_Mat_at_Vec2f(Mat* self, int i, int j) {
+Vec2f* cv_Mat_at_Vec2f_1(Mat* self, int i) {
+  return &self->at<Vec2f>(i);
+}
+
+void cv_Mat_at_Vec2f_set_Val_1(Mat* self, int i, Vec2f* val) {
+  self->at<Vec2f>(i) = *val;
+}
+
+Vec2f* cv_Mat_at_Vec2f_2(Mat* self, int i, int j) {
   return &self->at<Vec2f>(i, j);
 }
 
-void cv_Mat_at_Vec2f_set_Val(Mat* self, int i, int j, Vec2f* val) {
+void cv_Mat_at_Vec2f_set_Val_2(Mat* self, int i, int j, Vec2f* val) {
   self->at<Vec2f>(i, j) = *val;
 }
 
-Vec2i* cv_Mat_at_Vec2i(Mat* self, int i, int j) {
+Vec2i* cv_Mat_at_Vec2i_1(Mat* self, int i) {
+  return &self->at<Vec2i>(i);
+}
+
+void cv_Mat_at_Vec2i_set_Val_1(Mat* self, int i, Vec2i* val) {
+  self->at<Vec2i>(i) = *val;
+}
+
+Vec2i* cv_Mat_at_Vec2i_2(Mat* self, int i, int j) {
   return &self->at<Vec2i>(i, j);
 }
 
-void cv_Mat_at_Vec2i_set_Val(Mat* self, int i, int j, Vec2i* val) {
+void cv_Mat_at_Vec2i_set_Val_2(Mat* self, int i, int j, Vec2i* val) {
   self->at<Vec2i>(i, j) = *val;
 }
 
-Vec2s* cv_Mat_at_Vec2s(Mat* self, int i, int j) {
+Vec2s* cv_Mat_at_Vec2s_1(Mat* self, int i) {
+  return &self->at<Vec2s>(i);
+}
+
+void cv_Mat_at_Vec2s_set_Val_1(Mat* self, int i, Vec2s* val) {
+  self->at<Vec2s>(i) = *val;
+}
+
+Vec2s* cv_Mat_at_Vec2s_2(Mat* self, int i, int j) {
   return &self->at<Vec2s>(i, j);
 }
 
-void cv_Mat_at_Vec2s_set_Val(Mat* self, int i, int j, Vec2s* val) {
+void cv_Mat_at_Vec2s_set_Val_2(Mat* self, int i, int j, Vec2s* val) {
   self->at<Vec2s>(i, j) = *val;
 }
 
-Vec2w* cv_Mat_at_Vec2w(Mat* self, int i, int j) {
+Vec2w* cv_Mat_at_Vec2w_1(Mat* self, int i) {
+  return &self->at<Vec2w>(i);
+}
+
+void cv_Mat_at_Vec2w_set_Val_1(Mat* self, int i, Vec2w* val) {
+  self->at<Vec2w>(i) = *val;
+}
+
+Vec2w* cv_Mat_at_Vec2w_2(Mat* self, int i, int j) {
   return &self->at<Vec2w>(i, j);
 }
 
-void cv_Mat_at_Vec2w_set_Val(Mat* self, int i, int j, Vec2w* val) {
+void cv_Mat_at_Vec2w_set_Val_2(Mat* self, int i, int j, Vec2w* val) {
   self->at<Vec2w>(i, j) = *val;
 }
 
-Vec3b* cv_Mat_at_Vec3b(Mat* self, int i, int j) {
+Vec3b* cv_Mat_at_Vec3b_1(Mat* self, int i) {
+  return &self->at<Vec3b>(i);
+}
+
+void cv_Mat_at_Vec3b_set_Val_1(Mat* self, int i, Vec3b* val) {
+  self->at<Vec3b>(i) = *val;
+}
+
+Vec3b* cv_Mat_at_Vec3b_2(Mat* self, int i, int j) {
   return &self->at<Vec3b>(i, j);
 }
 
-void cv_Mat_at_Vec3b_set_Val(Mat* self, int i, int j, Vec3b* val) {
+void cv_Mat_at_Vec3b_set_Val_2(Mat* self, int i, int j, Vec3b* val) {
   self->at<Vec3b>(i, j) = *val;
 }
 
-Vec3d* cv_Mat_at_Vec3d(Mat* self, int i, int j) {
+Vec3d* cv_Mat_at_Vec3d_1(Mat* self, int i) {
+  return &self->at<Vec3d>(i);
+}
+
+void cv_Mat_at_Vec3d_set_Val_1(Mat* self, int i, Vec3d* val) {
+  self->at<Vec3d>(i) = *val;
+}
+
+Vec3d* cv_Mat_at_Vec3d_2(Mat* self, int i, int j) {
   return &self->at<Vec3d>(i, j);
 }
 
-void cv_Mat_at_Vec3d_set_Val(Mat* self, int i, int j, Vec3d* val) {
+void cv_Mat_at_Vec3d_set_Val_2(Mat* self, int i, int j, Vec3d* val) {
   self->at<Vec3d>(i, j) = *val;
 }
 
-Vec3f* cv_Mat_at_Vec3f(Mat* self, int i, int j) {
+Vec3f* cv_Mat_at_Vec3f_1(Mat* self, int i) {
+  return &self->at<Vec3f>(i);
+}
+
+void cv_Mat_at_Vec3f_set_Val_1(Mat* self, int i, Vec3f* val) {
+  self->at<Vec3f>(i) = *val;
+}
+
+Vec3f* cv_Mat_at_Vec3f_2(Mat* self, int i, int j) {
   return &self->at<Vec3f>(i, j);
 }
 
-void cv_Mat_at_Vec3f_set_Val(Mat* self, int i, int j, Vec3f* val) {
+void cv_Mat_at_Vec3f_set_Val_2(Mat* self, int i, int j, Vec3f* val) {
   self->at<Vec3f>(i, j) = *val;
 }
 
-Vec3i* cv_Mat_at_Vec3i(Mat* self, int i, int j) {
+Vec3i* cv_Mat_at_Vec3i_1(Mat* self, int i) {
+  return &self->at<Vec3i>(i);
+}
+
+void cv_Mat_at_Vec3i_set_Val_1(Mat* self, int i, Vec3i* val) {
+  self->at<Vec3i>(i) = *val;
+}
+
+Vec3i* cv_Mat_at_Vec3i_2(Mat* self, int i, int j) {
   return &self->at<Vec3i>(i, j);
 }
 
-void cv_Mat_at_Vec3i_set_Val(Mat* self, int i, int j, Vec3i* val) {
+void cv_Mat_at_Vec3i_set_Val_2(Mat* self, int i, int j, Vec3i* val) {
   self->at<Vec3i>(i, j) = *val;
 }
 
-Vec3s* cv_Mat_at_Vec3s(Mat* self, int i, int j) {
+Vec3s* cv_Mat_at_Vec3s_1(Mat* self, int i) {
+  return &self->at<Vec3s>(i);
+}
+
+void cv_Mat_at_Vec3s_set_Val_1(Mat* self, int i, Vec3s* val) {
+  self->at<Vec3s>(i) = *val;
+}
+
+Vec3s* cv_Mat_at_Vec3s_2(Mat* self, int i, int j) {
   return &self->at<Vec3s>(i, j);
 }
 
-void cv_Mat_at_Vec3s_set_Val(Mat* self, int i, int j, Vec3s* val) {
+void cv_Mat_at_Vec3s_set_Val_2(Mat* self, int i, int j, Vec3s* val) {
   self->at<Vec3s>(i, j) = *val;
 }
 
-Vec3w* cv_Mat_at_Vec3w(Mat* self, int i, int j) {
+Vec3w* cv_Mat_at_Vec3w_1(Mat* self, int i) {
+  return &self->at<Vec3w>(i);
+}
+
+void cv_Mat_at_Vec3w_set_Val_1(Mat* self, int i, Vec3w* val) {
+  self->at<Vec3w>(i) = *val;
+}
+
+Vec3w* cv_Mat_at_Vec3_2(Mat* self, int i, int j) {
   return &self->at<Vec3w>(i, j);
 } 
 
-void cv_Mat_at_Vec3w_set_Val(Mat* self, int i, int j, Vec3w* val) {
+void cv_Mat_at_Vec3w_set_Val_2(Mat* self, int i, int j, Vec3w* val) {
   self->at<Vec3w>(i, j) = *val;
 }
 
-Vec4b* cv_Mat_at_Vec4b(Mat* self, int i, int j) {
+Vec4b* cv_Mat_at_Vec4b_1(Mat* self, int i) {
+  return &self->at<Vec4b>(i);
+}
+
+void cv_Mat_at_Vec4b_set_Val_1(Mat* self, int i, Vec4b* val) {
+  self->at<Vec4b>(i) = *val;
+}
+
+Vec4b* cv_Mat_at_Vec4b_2(Mat* self, int i, int j) {
   return &self->at<Vec4b>(i, j);
 }
 
-void cv_Mat_at_Vec4b_set_Val(Mat* self, int i, int j, Vec4b* val) {
+void cv_Mat_at_Vec4b_set_Val_2(Mat* self, int i, int j, Vec4b* val) {
   self->at<Vec4b>(i, j) = *val;
 }
 
-Vec4d* cv_Mat_at_Vec4d(Mat* self, int i, int j) {
+Vec4d* cv_Mat_at_Vec4d_1(Mat* self, int i) {
+  return &self->at<Vec4d>(i);
+}
+
+void cv_Mat_at_Vec4d_set_Val_1(Mat* self, int i, Vec4d* val) {
+  self->at<Vec4d>(i) = *val;
+}
+
+Vec4d* cv_Mat_at_Vec4d_2(Mat* self, int i, int j) {
   return &self->at<Vec4d>(i, j);
 }
 
-void cv_Mat_at_Vec4d_set_Val(Mat* self, int i, int j, Vec4d* val) {
+void cv_Mat_at_Vec4d_set_Val_2(Mat* self, int i, int j, Vec4d* val) {
   self->at<Vec4d>(i, j) = *val;
 }
 
-Vec4f* cv_Mat_at_Vec4f(Mat* self, int i, int j) {
+Vec4f* cv_Mat_at_Vec4f_1(Mat* self, int i) {
+  return &self->at<Vec4f>(i);
+}
+
+void cv_Mat_at_Vec4f_set_Val_1(Mat* self, int i, Vec4f* val) {
+  self->at<Vec4f>(i) = *val;
+}
+
+Vec4f* cv_Mat_at_Vec4f_2(Mat* self, int i, int j) {
   return &self->at<Vec4f>(i, j);
 }
 
-void cv_Mat_at_Vec4f_set_Val(Mat* self, int i, int j, Vec4f* val) {
+void cv_Mat_at_Vec4f_set_Val_2(Mat* self, int i, int j, Vec4f* val) {
   self->at<Vec4f>(i, j) = *val;
 }
 
-Vec4i* cv_Mat_at_Vec4i(Mat* self, int i, int j) {
+Vec4i* cv_Mat_at_Vec4i_1(Mat* self, int i) {
+  return &self->at<Vec4i>(i);
+}
+
+void cv_Mat_at_Vec4i_set_Val_1(Mat* self, int i, Vec4i* val) {
+  self->at<Vec4i>(i) = *val;
+}
+
+Vec4i* cv_Mat_at_Vec4i_2(Mat* self, int i, int j) {
   return &self->at<Vec4i>(i, j);
 }
 
-void cv_Mat_at_Vec4i_set_Val(Mat* self, int i, int j, Vec4i* val) {
+void cv_Mat_at_Vec4i_set_Val_2(Mat* self, int i, int j, Vec4i* val) {
   self->at<Vec4i>(i, j) = *val;
 }
 
-Vec4s* cv_Mat_at_Vec4s(Mat* self, int i, int j) {
+Vec4s* cv_Mat_at_Vec4s_1(Mat* self, int i) {
+  return &self->at<Vec4s>(i);
+}
+
+void cv_Mat_at_Vec4s_set_Val_1(Mat* self, int i, Vec4s* val) {
+  self->at<Vec4s>(i) = *val;
+}
+
+Vec4s* cv_Mat_at_Vec4s_2(Mat* self, int i, int j) {
   return &self->at<Vec4s>(i, j);
 }
 
-void cv_Mat_at_Vec4s_set_Val(Mat* self, int i, int j, Vec4s* val) {
+void cv_Mat_at_Vec4s_set_Val_2(Mat* self, int i, int j, Vec4s* val) {
   self->at<Vec4s>(i, j) = *val;
 }
 
-Vec4w* cv_Mat_at_Vec4w(Mat* self, int i, int j) {
+Vec4w* cv_Mat_at_Vec4w_1(Mat* self, int i) {
+  return &self->at<Vec4w>(i);
+}
+
+void cv_Mat_at_Vec4w_set_Val_1(Mat* self, int i, Vec4w* val) {
+  self->at<Vec4w>(i) = *val;
+}
+
+Vec4w* cv_Mat_at_Vec4w_2(Mat* self, int i, int j) {
   return &self->at<Vec4w>(i, j);
 }
 
-void cv_Mat_at_Vec4w_set_Val(Mat* self, int i, int j, Vec4w* val) {
+void cv_Mat_at_Vec4w_set_Val_2(Mat* self, int i, int j, Vec4w* val) {
   self->at<Vec4w>(i, j) = *val;
 }
 
 const float* cv_CvSVM_get_support_vector(SVM* self, int i) {
     return self->get_support_vector(i);
-}
-
-int cv_vector_int_get_value (vector_int* self, int idx) {
-    return (*self)[idx];
 }
 
 CvMat* cv_Mat_to_CvMat(Mat* self) {
@@ -959,6 +1134,10 @@ void cv_delete_CvDTree(CvDTree* self) {
 }
 
 void cv_delete_CvDTreeParams(CvDTreeParams* self) {
+    delete self;
+}
+
+void cv_delete_FastFeatureDetector(FastFeatureDetector* self) {
     delete self;
 }
 

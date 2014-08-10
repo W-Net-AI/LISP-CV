@@ -78,6 +78,13 @@
 
 
 ;; void operator delete  ( void* ptr )
+;; void cv_delete_FastFeatureDetector(FastFeatureDetector* self)
+(defcfun ("cv_delete_FastFeatureDetector" del-fast-feature-detector) :void
+  "Calls delete on a FAST-FEATURE-DETECTOR object."
+  (self fast-feature-detector))
+
+
+;; void operator delete  ( void* ptr )
 ;; void cv_delete_FileNode(FileNode* self)
 (defcfun ("cv_delete_FileNode" del-file-node) :void
   "Calls delete on a FILE-NODE object."

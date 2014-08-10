@@ -584,6 +584,46 @@
   (if given-mask nil (del-mat mask)))
 
 
+;; void HoughLines(InputArray image, OutputArray lines, double rho, double theta, int threshold, double srn=0, double stn=0, 
+;;                 double min_theta=0, double max_theta=CV_PI )
+;; void cv_HoughLines(Mat* image, Mat* lines, double rho, double theta, int threshold, double srn, double stn, double min_theta, 
+;;                    double max_theta)
+(cffi:defcfun ("cv_HoughLines" %hough-lines) :void
+  (image mat)
+  (lines mat)
+  (rho :double)
+  (theta :double)
+  (threshold :int)
+  (srn :double)
+  (stn :double)
+  (min-theta :double)
+  (max-theta :double))
+
+
+(defun hough-lines (image lines rho theta threshold &optional (srn 0d0) (stn 0d0) (min-theta 0d0) (max-theta +pi+))
+  "Finds lines in a binary image using the standard Hough transform."
+  (%hough-lines image lines rho theta threshold srn stn min-theta max-theta))
+
+
+;; void HoughLinesP(InputArray image, OutputArray lines, double rho, double theta, int threshold, double minLineLength=0, 
+;;                  double maxLineGap=0 )
+;; void cv_HoughLinesP(Mat* image, Mat* lines, double rho, double theta, int threshold, double minLineLength, 
+;;                     double maxLineGap) 
+(cffi:defcfun ("cv_HoughLinesP" %hough-lines-p) :void
+  (image mat)
+  (lines mat)
+  (rho :double)
+  (theta :double)
+  (threshold :int)
+  (min-line-length :double)
+  (max-line-gap :double))
+
+
+(defun hough-lines-p (image lines rho theta threshold &optional (min-line-length 0d0) (max-line-gap 0d0))
+  "Finds line segments in a binary image using the probabilistic Hough transform."
+  (%hough-lines-p image lines rho theta threshold min-line-length max-line-gap))
+
+
 
 ;;; Object Detection
 

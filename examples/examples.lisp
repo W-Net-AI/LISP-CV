@@ -199,158 +199,6 @@ See also:
 			   (return))))))))))))
 
 ========================================================================================================================================
-#MAT-ASSIGN
-========================================================================================================================================
-
-Assign a matrices data to another matrix.
-
-Note: The name MAT-ASSIGN is used in the documentation to refer the binding for the OpenCV 
-Mat class assignment operator(Mat version) because it is more descriptive and it is easier to 
-search for in this file. The ASSIGN method may also be used to call this binding.
-
-C++: Mat& Mat::operator=(const Mat& m)
-
-LISP-CV: (ASSIGN (SELF MAT) (M MAT)) => MAT
-
-LISP-CV: (MAT-ASSIGN (SELF MAT) (M MAT)) => MAT
-
-
-    Parameters:	
-
-        SELF - A matrix
-
-        M - The assigned, right-hand-side matrix. Matrix assignment is O(1) operation, that is, no 
-            data is copied. Instead, the data is shared and the reference counter, if any, is incremented. 
-            Before assigning new data, the old data is dereferenced via Mat::release in the underlying C++ 
-            interface.
-
-
-Example: 
-
-
-CV> (DEFPARAMETER A (MAT-ZEROS 7 7 +64f+))
-
-A
-
-CV> (PRINT-MAT A)
-
-#((0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0)
-  (0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0)
-  (0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0)
-  (0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0)
-  (0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0)
-  (0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0)
-  (0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0))
-
-CV> (DEFPARAMETER B (MAT))
-
-B
-
-CV> (PRINT-MAT B)
-Matrix is empty.
-
-CV> (DEFPARAMETER C (ASSIGN B A))
-
-C
-
-CV> (PRINT-MAT C)
-
-#((0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0)
-  (0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0)
-  (0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0)
-  (0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0)
-  (0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0)
-  (0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0)
-  (0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0))
-
-CV> (PRINT-MAT B)
-
-#((0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0)
-  (0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0)
-  (0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0)
-  (0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0)
-  (0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0)
-  (0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0)
-  (0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0))
-
-========================================================================================================================================
-#MAT-ASSIGN-VAL
-========================================================================================================================================
-
-Assign a scalar value to a matrix.
-
-Note: The name MAT-ASSIGN-VAL is used in the documentation to refer the binding for the OpenCV 
-Mat class assignment operator(Scalar version) because it is more descriptive and it is easier 
-to search for in this file. The ASSIGN method may also be used to call this binding.
-
-C++: Mat& Mat::operator=(const Scalar& s)
-
-LISP-CV: (ASSIGN (SELF MAT) (S SCALAR)) => MAT
-
-LISP-CV: (MAT-ASSIGN-VAL (SELF MAT) (S SCALAR)) => MAT
-
-
-    Parameters:	
-
-        SELF - A matrix
-
-        S - Scalar assigned to each matrix element. The matrix size or type is not changed.
-
-
-Use the function SCALAR-ALL, as the S parameter value, to set each matrix element to the same value
-for example: (SCALAR-ALL -1) will assign -1 to every element of the matrix. Use the function SCALAR 
-to assign a specific color value to each element of the matrix i.e. (SCALAR 0 255 0) will set every 
-matrix element to fgreen. This is useful when you need to add/subtract a certain color value from an 
-image. The matrix you assign the scalar value to will be overwritten by the operation, there is no 
-need to access the return value of ASSIGN-VAL to complete the operation,
-
-
-(defun mat-assign-val-example (filename)
-
-  (let* ((window-name-1 "IMAGE - MAT-ASSIGN-VAL Example")
-         (window-name-2 "MAT - MAT-ASSIGN-VAL Example")
-         (b (alloc :int 0))
-         (g (alloc :int 0))
-	 (r (alloc :int 0)))
-    ;; Load an image
-    (with-mat ((image (imread filename 1))
-	       ;; Create a matrix to fill with a 
-               ;; scalar value defined below
-	       (mat (mat (rows image) (cols image) +8uc3+)))
-      ;; Print IMAGE type. It is important to know this
-      ;; Before subtracting a matrix from an image. You 
-      ;; must set the matrix size and type to be the sa-
-      ;; me as the image
-      (format t "~%IMAGE type = ~a(+8UC3+)~%~%" (mat-type image))
-      (with-named-window (window-name-1 +window-normal+)
-	(with-named-window (window-name-2 +window-normal+)	
-	  (move-window window-name-1 533 175)
-	  (move-window window-name-2 984 175)
-          ;; Create trackbars to change the BGR 
-          ;; values we will later subtract from 
-          ;; IMAGE
-	  (create-trackbar  "B" window-name-2 b 255)
-	  (create-trackbar  "G" window-name-2 g 255)
-	  (create-trackbar  "R" window-name-2 r 255)
-	  (loop
-	     ;; Set all elements of MAT to SCALAR.
-	     (with-scalar ((scalar (scalar (@ b :int) 
-					   (@ g :int) 
-					   (@ r :int))))
-	       (assign mat scalar))
-	     ;; Subtract MAT from IMAGE
-	     (with-mat-expr ((result (sub image mat)))
-	       ;; Show results
-	       (imshow window-name-1 image)
-               ;; Coerce RESULT to a MAT 
-               ;; before showing in window
-	       (with-mat ((forced-result (>> result)))
-		 (imshow window-name-2 forced-result)
-		 (let ((c (wait-key 33)))
-		   (when (= c 27)
-		     (return)))))))))))
-
-========================================================================================================================================
 #AT
 ========================================================================================================================================
 
@@ -359,8 +207,11 @@ Returns a reference to the specified array element.
  
 C++: template<typename T> T& Mat::at(int i, int j)
  
+LISP-CV: (AT-<TYPE-NAME> (SELF MAT) (I :INT)) => <TYPE-NAME>
+
 LISP-CV: (AT-<TYPE-NAME> (SELF MAT) (I :INT) (J :INT)) => <TYPE-NAME>
 
+LISP-CV: (AT-<TYPE-NAME> (SELF MAT) (I :INT) (J :INT) (K :INT)) => <TYPE-NAME>
 
    The typenames associated with AT include:
  
@@ -1803,6 +1654,305 @@ Example 2:
 	     (when (= c 27)
 	       (return))))))))
 
+========================================================================================================================================
+#MAT-ASSIGN
+========================================================================================================================================
+
+Assign a matrices data to another matrix.
+
+Note: The name MAT-ASSIGN is used in the documentation to refer the binding for the OpenCV 
+Mat class assignment operator(Mat version) because it is more descriptive and it is easier to 
+search for in this file. The ASSIGN method may also be used to call this binding.
+
+C++: Mat& Mat::operator=(const Mat& m)
+
+LISP-CV: (ASSIGN (SELF MAT) (M MAT)) => MAT
+
+LISP-CV: (MAT-ASSIGN (SELF MAT) (M MAT)) => MAT
+
+
+    Parameters:	
+
+        SELF - A matrix
+
+        M - The assigned, right-hand-side matrix. Matrix assignment is O(1) operation, that is, no 
+            data is copied. Instead, the data is shared and the reference counter, if any, is incremented. 
+            Before assigning new data, the old data is dereferenced via Mat::release in the underlying C++ 
+            interface.
+
+
+Example: 
+
+
+CV> (DEFPARAMETER A (MAT-ZEROS 7 7 +64f+))
+
+A
+
+CV> (PRINT-MAT A)
+
+#((0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0)
+  (0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0)
+  (0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0)
+  (0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0)
+  (0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0)
+  (0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0)
+  (0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0))
+
+CV> (DEFPARAMETER B (MAT))
+
+B
+
+CV> (PRINT-MAT B)
+Matrix is empty.
+
+CV> (DEFPARAMETER C (ASSIGN B A))
+
+C
+
+CV> (PRINT-MAT C)
+
+#((0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0)
+  (0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0)
+  (0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0)
+  (0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0)
+  (0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0)
+  (0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0)
+  (0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0))
+
+CV> (PRINT-MAT B)
+
+#((0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0)
+  (0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0)
+  (0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0)
+  (0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0)
+  (0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0)
+  (0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0)
+  (0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0 0.0d0))
+
+========================================================================================================================================
+#MAT-ASSIGN-VAL
+========================================================================================================================================
+
+Assign a scalar value to a matrix.
+
+Note: The name MAT-ASSIGN-VAL is used in the documentation to refer the binding for the OpenCV 
+Mat class assignment operator(Scalar version) because it is more descriptive and it is easier 
+to search for in this file. The ASSIGN method may also be used to call this binding.
+
+C++: Mat& Mat::operator=(const Scalar& s)
+
+LISP-CV: (ASSIGN (SELF MAT) (S SCALAR)) => MAT
+
+LISP-CV: (MAT-ASSIGN-VAL (SELF MAT) (S SCALAR)) => MAT
+
+
+    Parameters:	
+
+        SELF - A matrix
+
+        S - Scalar assigned to each matrix element. The matrix size or type is not changed.
+
+
+Use the function SCALAR-ALL, as the S parameter value, to set each matrix element to the same value
+for example: (SCALAR-ALL -1) will assign -1 to every element of the matrix. Use the function SCALAR 
+to assign a specific color value to each element of the matrix i.e. (SCALAR 0 255 0) will set every 
+matrix element to fgreen. This is useful when you need to add/subtract a certain color value from an 
+image. The matrix you assign the scalar value to will be overwritten by the operation, there is no 
+need to access the return value of ASSIGN-VAL to complete the operation,
+
+
+(defun mat-assign-val-example (filename)
+
+  (let* ((window-name-1 "IMAGE - MAT-ASSIGN-VAL Example")
+         (window-name-2 "MAT - MAT-ASSIGN-VAL Example")
+         (b (alloc :int 0))
+         (g (alloc :int 0))
+	 (r (alloc :int 0)))
+    ;; Load an image
+    (with-mat ((image (imread filename 1))
+	       ;; Create a matrix to fill with a 
+               ;; scalar value defined below
+	       (mat (mat (rows image) (cols image) +8uc3+)))
+      ;; Print IMAGE type. It is important to know this
+      ;; Before subtracting a matrix from an image. You 
+      ;; must set the matrix size and type to be the sa-
+      ;; me as the image
+      (format t "~%IMAGE type = ~a(+8UC3+)~%~%" (mat-type image))
+      (with-named-window (window-name-1 +window-normal+)
+	(with-named-window (window-name-2 +window-normal+)	
+	  (move-window window-name-1 533 175)
+	  (move-window window-name-2 984 175)
+          ;; Create trackbars to change the BGR 
+          ;; values we will later subtract from 
+          ;; IMAGE
+	  (create-trackbar  "B" window-name-2 b 255)
+	  (create-trackbar  "G" window-name-2 g 255)
+	  (create-trackbar  "R" window-name-2 r 255)
+	  (loop
+	     ;; Set all elements of MAT to SCALAR.
+	     (with-scalar ((scalar (scalar (@ b :int) 
+					   (@ g :int) 
+					   (@ r :int))))
+	       (assign mat scalar))
+	     ;; Subtract MAT from IMAGE
+	     (with-mat-expr ((result (sub image mat)))
+	       ;; Show results
+	       (imshow window-name-1 image)
+               ;; Coerce RESULT to a MAT 
+               ;; before showing in window
+	       (with-mat ((forced-result (>> result)))
+		 (imshow window-name-2 forced-result)
+		 (let ((c (wait-key 33)))
+		   (when (= c 27)
+		     (return)))))))))))
+
+========================================================================================================================================
+#MAT-EXPR-T
+========================================================================================================================================
+
+Transposes a matrix.
+
+C++: MatExpr Mat::t() const
+
+LISP-CV: (MAT-EXPR-T (SELF MAT)) => MAT-EXPR
+
+The method performs matrix transposition by means of matrix expressions. It does not perform the 
+actual transposition but returns a temporary matrix transposition object that can be further used 
+as a part of more complex matrix expressions or can be assigned to a matrix.
+
+
+  Parameters:	
+
+        SELF - Input matrix
+
+
+MAT-EXPR-T-EXAMPLE:
+
+CV> (DEFPARAMETER A (T:MAT 3 3 +8U+ :UCHAR '(1 2 3 4 5 6 7 8 9)))
+
+A
+
+CV> (PRINT-MAT A)
+
+#((1 2 3)
+  (4 5 6)
+  (7 8 9))
+
+CV> (PRINT-MAT (T:>> (T:MAT-EXPR-T A))) ;;;coerce the return value, back to MAT 
+                                        ;;;with the (>>) function before printing.
+#((1 4 7)                               ;;;Note: 'T:' enables auto finalization.                             
+  (2 5 8)                               
+  (3 6 9))
+
+========================================================================================================================================
+#MAT-EYE
+========================================================================================================================================
+
+Returns an identity matrix of the specified size and type.
+
+C++: static MatExpr Mat::eye(int rows, int cols, int type)
+
+LISP-CV: (MAT-EYE (ROWS :INT) (COLS :INT) (TYPE :INT)) => MAT
+
+
+    Parameters:	
+
+        ROWS - Number of rows.
+
+        COLS - Number of columns.
+
+        TYPE - Created matrix type.
+
+
+The method returns a Matlab-style identity matrix initializer, similarly to (MAT-ZEROS). Similarly 
+to (MAT-ONES), you can use a scale operation to create a scaled identity matrix efficiently:
+
+
+Example:
+
+Note: I supply a t: prefix to some functions in this example, 
+      this enables automatic finalization on those functions."
+
+(defun mat-eye-example ()
+
+  ;;Create a UCHAR and SINGLE FLOAT identity matrix.
+  (with-mat ((identity-mat-1 (mat-eye 3 3 +8u+))
+	     (identity-mat-2 (mat-eye 4 4 +32f+)))
+    ;;Coerce IDENTITY-MAT-2 from MAT type to a MAT-EXPR 
+    ;;type with the <<(PROMOTE function) so the function 
+    ;;SCALE can accept it as a parameter and then scale it 
+    ;;by 0.1.
+    (with-mat-expr ((scaled-identity-mat (scale (t:<< identity-mat-2) 0.1d0)))
+      (let ((window-name-1 "IDENTITY-MAT-1 - MAT-EYE Example")
+	    (window-name-2 "IDENTITY-MAT-2 - MAT-EYE Example")
+	    (window-name-3 "SCALED-IDENTITY-MAT - MAT-EYE Example"))
+	(with-named-window (window-name-1 +window-normal+)
+	  (with-named-window (window-name-2 +window-normal+)
+	    (with-named-window (window-name-3 +window-normal+)
+	      (move-window window-name-1 310 175)
+	      (move-window window-name-2 760 175)
+	      (move-window window-name-3 1210 175)
+	      ;;Show the identity matrices in windows.
+              ;;Notice SCALED-IDENTITY-MAT is darker as
+              ;;a reult of the scale operation.
+	      (imshow window-name-1 identity-mat-1)
+	      (imshow window-name-2 identity-mat-2)
+	      (imshow window-name-3  (t:>> scaled-identity-mat))
+	      (loop
+		 (let ((c (wait-key 33)))
+		   (when (= c 27)
+		     (return)))))))))))
+
+========================================================================================================================================
+#MAT-ZEROS
+========================================================================================================================================
+
+Returns a zero array of the specified size and type.
+
+Note: Both MAT-ZEROS and MAKE-MAT-ZEROS are provided in this library. The first, to match OpenCV's 
+naming conventions, the second, to adhere to Common Lisp naming conventions. Except for the name, 
+they are the same function. I use the MAT-ZEROS function in the examples in this file because it 
+will make them easier to compare with OpenCV examples you find online, thus making this library 
+easier to learn.
+
+C++: static MatExpr Mat::zeros(int rows, int cols, int type)
+
+LISP-CV: (MAT-ZEROS (ROWS :INT) (COLS :INT) (TYPE :INT)) => MAT
+
+LISP-CV: (MAKE-MAT-ZEROS (ROWS :INT) (COLS :INT) (TYPE :INT)) => MAT
+
+
+    Parameters:	
+
+        ROWS - Number of rows.
+
+        COLS - Number of columns.
+
+        TYPE - Created matrix type.
+
+
+The method returns a Matlab-style zero array initializer. It can be used to quickly form a constant
+array as a function parameter, part of a matrix expression, or as a matrix initializer.
+
+
+Examples:
+
+(defun mat-zeros-example ()
+
+  "In this example the function MAT-ZEROS 
+   is used to create a matrix(MAT) filled 
+   with zeros. MAT is then shown in a win-
+   dow for verification."
+
+  (with-mat ((mat (mat-zeros 3 3 +8u+)))
+    (let ((window-name "MAT-ZEROS Example"))
+      (with-named-window (window-name +window-normal+)
+	(move-window window-name 759 175)
+	(imshow window-name mat)
+	(loop 
+	   (let ((c (wait-key 33)))
+	     (when (= c 27)
+	       (return))))))))
 
 ========================================================================================================================================
 #MUL
@@ -1850,7 +2000,7 @@ functions.
 	  (format t "~%"))))))
 
 ========================================================================================================================================
-#POINT
+#POINT, #X, #Y, #POINT-X, #POINT-Y
 ========================================================================================================================================
 
 POINT constructor.
@@ -1860,23 +2010,29 @@ conventions, the second, to adhere to Common Lisp naming conventions. Except for
 the same function. I use the POINT function in the examples in this file because it will make them 
 easier to compare with OpenCV examples you find online, thus making this library easier to learn.
 
-C++: Point_()
+C++: Point()
 
 LISP-CV: (POINT) => POINT
 
 LISP-CV: (MAKE-POINT) => POINT
 
-C++: Point_(_Tp _x, _Tp _y)
+C++: Point(int x, int y)
 
 LISP-CV:  (POINT (X :INT) (Y :INT)) => POINT
 
 LISP-CV:  (MAKE-POINT (X :INT) (Y :INT)) => POINT
 
-C++: _Tp x, y;
+SETF-able member accessors. 
+
+C++: Point::x, Point::y
 
 LISP-CV: (X (SELF POINT)) => :INT
 
 LISP-CV: (Y (SELF POINT)) => :INT
+
+LISP-CV: (POINT-X (SELF POINT)) => :INT ;Alias for X
+
+LISP-CV: (POINT-Y (SELF POINT)) => :INT ;Alias for Y
 
 
     Parameters:	
@@ -1908,7 +2064,7 @@ to extract the x,y coordinates of a point.
 
 
 ========================================================================================================================================
-#POINT-2D
+#POINT-2D, #X, #Y, #POINT-2D-X, #POINT-2D-Y
 ========================================================================================================================================
 
 POINT-2D constructor.
@@ -1928,11 +2084,17 @@ LISP-CV: (POINT-2D (X :INT) (Y :INT)) => POINT-2D
 
 LISP-CV: (MAKE-POINT-2D (X :INT) (Y :INT)) => POINT-2D
 
-C++: _Tp x, y
+SETF-able member accessors. 
+
+C++: Point2d::x, Point2d::y
 
 LISP-CV: (X (SELF POINT-2D)) => :DOUBLE
 
 LISP-CV: (Y (SELF POINT-2D)) => :DOUBLE
+
+LISP-CV: (POINT-2D-X (SELF POINT-2D)) => :DOUBLE ;Alias for X
+
+LISP-CV: (POINT-2D-Y (SELF POINT-2D)) => :DOUBLE ;Alias for Y
 
 
     Parameters:	
@@ -1965,7 +2127,7 @@ used to extract the x,y coordinates of the double float point.
 
 
 ========================================================================================================================================
-#POINT-2F
+#POINT-2F, #X, #Y, #POINT-2F-X, #POINT-2F-Y
 ========================================================================================================================================
 
 POINT-2F constructor.
@@ -1985,11 +2147,17 @@ LISP-CV:  (POINT-2F (X :FLOAT) (Y :FLOAT)) => POINT-2F
 
 LISP-CV:  (MAKE-POINT-2F (X :FLOAT) (Y :FLOAT)) => POINT-2F
 
-C++: _Tp x, y
+SETF-able member accessors. 
+
+C++: Point2f::x, Point2f::y
 
 LISP-CV: (X (SELF POINT-2F)) => :FLOAT
 
 LISP-CV: (Y (SELF POINT-2F)) => :FLOAT
+
+LISP-CV: (POINT-2F-X (SELF POINT-2F)) => :FLOAT ;Alias for X
+
+LISP-CV: (POINT-2F-Y (SELF POINT-2F)) => :FLOAT ;Alias for Y
 
 
     Parameters:	
@@ -2022,7 +2190,7 @@ used to extract the x,y coordinates the single float point.
 
 
 ========================================================================================================================================
-#POINT-3D
+#POINT-3D, #X, #Y, #Z, #POINT-3D-X, #POINT-3D-Y, #POINT-3D-Z
 ========================================================================================================================================
 
 POINT-3D constructor.
@@ -2042,13 +2210,22 @@ LISP-CV:  (POINT-3D (X :DOUBLE) (Y :DOUBLE) (Z :DOUBLE)) => POINT-3D
 
 LISP-CV:  (MAKE-POINT-3D (X :DOUBLE) (Y :DOUBLE) (Z :DOUBLE)) => POINT-3D
 
-C++: _Tp x, y, z
+SETF-able member accessors. 
+
+C++: Point3d::x, Point3d::y, Point3d::z
 
 LISP-CV: (X (SELF POINT-3D)) => :DOUBLE
 
 LISP-CV: (Y (SELF POINT-3D)) => :DOUBLE
 
 LISP-CV: (Z (SELF POINT-3D)) => :DOUBLE
+
+LISP-CV: (POINT-3D-X (SELF POINT-3D)) => :DOUBLE ;Alias for X
+
+LISP-CV: (POINT-3D-Y (SELF POINT-3D)) => :DOUBLE ;Alias for Y
+
+LISP-CV: (POINT-3D-Z (SELF POINT-3D)) => :DOUBLE ;Alias for Z
+
 
 
     Parameters:	
@@ -2084,7 +2261,7 @@ are used to extract the x,y,Z coordinates the double float point.
 
 
 ========================================================================================================================================
-#POINT-3F
+#POINT-3F, #X, #Y, #Z, #POINT-3F-X, #POINT-3F-Y, #POINT-3F-Z
 ========================================================================================================================================
 
 POINT-3F constructor.
@@ -2104,13 +2281,21 @@ LISP-CV:  (POINT-3F (X :FLOAT) (Y :FLOAT) (Z :FLOAT)) => POINT-3F
 
 LISP-CV:  (MAKE-POINT-3F (X :FLOAT) (Y :FLOAT) (Z :FLOAT)) => POINT-3F
 
-C++: _Tp x, y, z
+SETF-able member accessors. 
+
+C++: Point3f::x, Point3f::y, Point3f::z
 
 LISP-CV: (X (SELF POINT-3F)) => :FLOAT
 
 LISP-CV: (Y (SELF POINT-3F)) => :FLOAT
 
 LISP-CV: (Z (SELF POINT-3F)) => :FLOAT
+
+LISP-CV: (POINT-3F-X (SELF POINT-3F)) => :FLOAT ;Alias for X
+
+LISP-CV: (POINT-3F-Y (SELF POINT-3F)) => :FLOAT ;Alias for Y
+
+LISP-CV: (POINT-3F-Z (SELF POINT-3F)) => :FLOAT ;Alias for Z
 
 
     Parameters:	
@@ -2146,7 +2331,7 @@ are used to extract the x,y,Z coordinates the single float point.
 
 
 ========================================================================================================================================
-#POINT-3I
+#POINT-3I, #X, #Y, #Z, #POINT-3I-X, #POINT-3I-Y, #POINT-3I-Z
 ========================================================================================================================================
 
 POINT-3I constructor.
@@ -2166,13 +2351,21 @@ LISP-CV:  (POINT-3I (X :INT) (Y :INT) (Z :INT)) => POINT-3I
 
 LISP-CV:  (MAKE-POINT-3I (X :INT) (Y :INT) (Z :INT)) => POINT-3I
 
-C++: _Tp x, y, z
+SETF-able member accessors. 
+
+C++: Point3i::x, Point3i::y, Point3i::z
 
 LISP-CV: (X (SELF POINT-3I)) => :INT
 
 LISP-CV: (Y (SELF POINT-3I)) => :INT
 
 LISP-CV: (Z (SELF POINT-3I)) => :INT
+
+LISP-CV: (POINT-3I-X (SELF POINT-3I)) => :INT ;Alias for X
+
+LISP-CV: (POINT-3I-Y (SELF POINT-3I)) => :INT ;Alias for Y
+
+LISP-CV: (POINT-3I-Z (SELF POINT-3I)) => :INT ;Alias for Z
 
 
     Parameters:	
@@ -8225,8 +8418,28 @@ in degrees and varies from 0 to 360 degrees. The accuracy is about 0.3 degrees.
     (format t "Angle of vector - float = ~a~%~%" 
 	    (fast-atan2 float-y float-x))))
 
+
 ========================================================================================================================================
-#GET-NUMBER-OF-CPU-S
+get-Build-Information
+========================================================================================================================================
+
+Returns full configuration time cmake output.
+
+C++: const String& getBuildInformation()
+
+LISP-CV: (GET-BUILD-INFORMATION) => :STRING
+
+Returned value is raw cmake output including version control system revision, compiler version, 
+compiler flags, enabled modules and third party libraries, etc. Output format depends on target 
+architecture.
+
+
+Example:
+
+No example neccessary here. All you do is evaluate the function:).
+
+========================================================================================================================================
+#GET-NUMBER-OF-CPUS
 ========================================================================================================================================
 
 Returns the number of logical CPUs available for the process.
@@ -8234,16 +8447,16 @@ Returns the number of logical CPUs available for the process.
 
 C++: int getNumberOfCPUs()
 
-LISP-CV: (GET-NUMBER-OF-CPU-S) => :INT
+LISP-CV: (GET-NUMBER-OF-CPUS) => :INT
 
 
 Example:
 
-(defun get-number-of-cpu-s-example ()
+(defun get-number-of-cpus-example ()
 
   (format t "~%The number of CPU's = ~a~%~%" 
 
-	  (get-number-of-cpu-s)))
+	  (get-number-of-cpus)))
 
 ========================================================================================================================================
 #GET-TICK-COUNT
@@ -12082,6 +12295,180 @@ Example:
 		   (return))))))))))
 
 ========================================================================================================================================
+#HOUGH-LINES
+========================================================================================================================================
+
+Finds lines in a binary image using the standard Hough transform.
+
+C++: void HoughLines(InputArray image, OutputArray lines, double rho, double theta, int threshold, double srn=0, 
+                     double stn=0, double min_theta=0, double max_theta=CV_PI )
+
+LISP-CV: (HOUGH-LINES (IMAGE MAT) (LINES MAT) (RHO :DOUBLE) (THETA :DOUBLE) (THRESHOLD :INT) &OPTIONAL 
+                     ((SRN :DOUBLE) 0D0)  ((STN :DOUBLE) 0D0) ((MIN-THETA :DOUBLE) 0D0) ((MAX-THETA :DOUBLE) +PI+)) => :VOID
+    Parameters:	
+
+        IMAGE - 8-bit, single-channel binary source image. The image may be modified by the function.
+
+        LINES - Output matrix of lines. Each line is represented by a two-element row of the matrix.
+ 
+                See OpenCV documentation at the link below for a more formulaic description of this parameter:.
+
+                    http://docs.opencv.org/trunk/modules/imgproc/doc/feature_detection.html?highlight=hough#houghlines
+
+        RHO - Distance resolution of the accumulator in pixels.
+
+        THETA - Angle resolution of the accumulator in radians.
+
+        THRESHOLD - Accumulator threshold parameter. Only those lines are returned that get enough 
+                    votes (> THRESHOLD).
+
+        SRN - For the multi-scale Hough transform, it is a divisor for the distance resolution RHO. 
+              The coarse accumulator distance resolution is RHO and the accurate accumulator resolution 
+              is (/ RHO SRN). If both (= SRN 0d0) and (= STN 0d0) , the classical Hough transform is used. 
+              Otherwise, both these parameters should be positive.
+
+        STN - For the multi-scale Hough transform, it is a divisor for the distance resolution THETA.
+
+        MIN-THETA - For standard and multi-scale Hough transform, minimum angle to check for lines. 
+                    Must fall between 0 and MAX-THETA.
+
+        MAX-THETA - For standard and multi-scale Hough transform, maximum angle to check for lines. 
+                    Must fall between MIN-THETA and +PI+.
+
+
+This function implements the standard or standard multi-scale Hough transform algorithm for line detection. 
+
+See: http://homepages.inf.ed.ac.uk/rbf/HIPR2/hough.htm for a good explanation of Hough transform. 
+
+
+Example:
+
+;;Define global parameters.
+(defparameter edges (t:mat))
+(defparameter probabilistic-name "Probabilistic - HOUGH-LINES Example")
+(defparameter standard-name "Standard - HOUGH-LINES Example")
+(defparameter min-threshold 50)
+(defparameter max-trackbar 150)
+(defparameter s-trackbar (t:alloc :int max-trackbar))
+(defparameter p-trackbar (t:alloc :int max-trackbar))
+
+;;Callback function STANDARD-HOUGH.
+(defcallback standard-hough :void ()
+
+  (let ((r)
+	(t*)
+	(cos-t)
+	(sin-t)
+	(x0)
+	(y0)
+	(alpha 1000))
+    (with-mat ((s-lines (mat))
+	       (standard-hough (mat)))
+      (cvt-color edges standard-hough +gray2bgr+)
+      ;;Use Standard Hough Transform.
+      (hough-lines edges s-lines 1d0 (/ +pi+ 180) (+ min-threshold (@ s-trackbar :int) 0 0))
+      ;;Show the result.
+      (dotimes (i (* (rows s-lines) (cols s-lines)))
+	(setf r (at-float s-lines i 0))
+	(setf t* (at-float s-lines i 1))
+	(setf cos-t (cos t*))
+	(setf sin-t (sin t*))
+	(setf x0 (* cos-t r)) 
+	(setf y0 (* sin-t r))
+	(line standard-hough (t:point (round (+ x0 (* alpha (- sin-t)))) (round (+ y0 (* alpha cos-t))))
+	      (t:point (round (- x0 (* alpha (- sin-t)))) (round (- y0 (* alpha cos-t))))
+	      (t:scalar 255 0 0) 3 +aa+))
+
+      (imshow standard-name standard-hough))))
+
+;;Callback function PROBABILISTIC-HOUGH.
+(defcallback probabilistic-hough :void ()
+
+  (with-mat ((p-lines (mat))
+	     (probabilistic-hough (mat)))
+    (cvt-color edges probabilistic-hough +gray2bgr+)
+    ;;Use Probabilistic Hough Transform.
+    (hough-lines-p edges p-lines 1d0 (/ +pi+ 180) 
+		   (round (+ min-threshold (@ p-trackbar :int))) 30d0 10d0)
+					;lShow the result.
+    (dotimes (i (* (rows p-lines) (cols p-lines)))
+      (let ((ptr (ptr p-lines i)))
+	(line probabilistic-hough (t:point (round (@ ptr :int)) (round (@ ptr :int 1))) 
+	      (t:point (round (@ ptr :int 2)) (round (@ ptr :int 3))) 
+	      (t:scalar 0 0 255) 3 +aa+)))
+    (imshow probabilistic-name probabilistic-hough)))
+
+
+(defun hough-lines-example (filename)
+
+  (let ((thresh-label-1 "Thres: 50")
+	(thresh-label-2 "Thres: 50"))
+    ;;Read the image.
+    (with-mat ((src (imread filename +load-image-color+)))
+      (if (empty src) 
+	  (return-from hough-lines-example
+	    (format t "Image not loaded")))
+      ;;Pass the image to gray.
+      (with-mat ((src-gray (mat)))
+	(cvt-color src src-gray +rgb2gray+)
+	;;Apply Canny edge detector.
+	(canny src-gray edges 50d0 200d0 3)
+	;;Create trackbars for thresholds.
+	(with-named-window  (standard-name +window-autosize+)
+	  (create-trackbar thresh-label-1 standard-name s-trackbar max-trackbar 
+			   (callback standard-hough))
+	  (with-named-window (probabilistic-name +window-autosize+)
+	    (create-trackbar thresh-label-2 probabilistic-name p-trackbar max-trackbar 
+			     (callback probabilistic-hough))
+	    ;;Initialize callback functions.
+	    (set-trackbar-pos thresh-label-1 standard-name (- max-trackbar 1))
+	    (set-trackbar-pos thresh-label-2 probabilistic-name (- max-trackbar 1))
+	    (loop
+	       (let ((c (wait-key 33)))
+		 (when (= c 27)
+		   (return))))))))))
+
+========================================================================================================================================
+HOUGH-LINES-P
+========================================================================================================================================
+
+Finds line segments in a binary image using the probabilistic Hough transform.
+
+C++: void HoughLinesP(InputArray image, OutputArray lines, double rho, double theta, int threshold, double minLineLength=0, 
+                      double maxLineGap=0 )
+
+LISP-CV: (HOUGH-LINES-P (IMAGE MAT) (LINES MAT) (RHO :DOUBLE) (THETA :DOUBLE) (THRESHOLD :INT) ((MIN-LINE-LENGTH :DOUBLE) 0D0) 
+                       ((MAX-LINE-GAP :DOUBLE) 0D0)) => :VOID
+
+    Parameters:	
+
+        image - 8-bit, single-channel binary source image. The image may be modified by the function.
+
+        LINES - Output matrix of lines. Each line is represented by a 4-element row of the matrix (x-1 y-1 x-2 y-2)
+                where (x-1 y-1) and (x-2, y-2) are the ending points of each detected line segment.
+
+        RHO - Distance resolution of the accumulator in pixels.
+
+        THETA - Angle resolution of the accumulator in radians.
+
+        THRESHOLD - Accumulator threshold parameter. Only those lines are returned that get enough 
+                    votes ( > THRESHOLD).
+
+        MIN-LINE-LENGTH - Minimum line length. Line segments shorter than that are rejected.
+
+        MAX-LINE-GAP - Maximum allowed gap between points on the same line to link them.
+
+
+The function implements the probabilistic Hough transform algorithm for line detection, described in:
+
+Matas, J. and Galambos, C. and Kittler, J.V., Robust Detection of Lines Using the Progressive Probabilistic Hough Transform.
+
+
+Example:
+
+See the HOUGH-LINES-EXAMPLE in this file.
+
+========================================================================================================================================
 #IMGPROC - #OBJECT DETECTION
 ========================================================================================================================================
 
@@ -14857,6 +15244,33 @@ Example:
       (destroy-window (aref window-name-arr i)))))
 
 ========================================================================================================================================
+#FAST
+========================================================================================================================================
+
+Detects corners using the FAST algorithm
+
+C++: FastFeatureDetector( int threshold=10, bool nonmaxSuppression=true)
+
+LISP-CV: (FAST-FEATURE-DETECTOR ((THRESHOLD :INT) 10) ((NON-MAX-SUPPRESSION :BOOLEAN) T)) => FAST-FEATURE-DETECTOR
+
+
+    Parameters:	
+
+        THRESHOLD - Threshold on difference between intensity of the central pixel and pixels of a
+                    circle around this pixel.
+
+        NON-MAX-SUPPRESSION - If true, non-maximum suppression is applied to detected corners.
+
+
+Detects corners using the FAST algorithm by Edward Rosten - 2006.
+
+
+Example:
+
+See DRAW-KEYPOINTS-EXAMPLE in this file.
+
+
+========================================================================================================================================
 #FEATURES2D - #COMMON INTERFACES OF FEATURE DETECTORS
 ========================================================================================================================================
 
@@ -15006,11 +15420,16 @@ LISP-CV: (DETECT (SELF BF-MATCHER) (IMAGE MAT) (KEYPOINTS KEY-POINT) &OPTIONAL (
 
 LISP-CV: (DETECT (SELF BRISK) (IMAGE MAT) (KEYPOINTS KEY-POINT) &OPTIONAL ((MASK MAT) (MAT))) => :VOID
 
+LISP-CV: (DETECT (SELF FAST-FEATURE-DETECTOR) (IMAGE MAT) (KEYPOINTS KEY-POINT) &OPTIONAL ((MASK MAT) (MAT))) => :VOID
+
 LISP-CV: (DETECT (SELF SURF) (IMAGE MAT) (KEYPOINTS KEY-POINT) &OPTIONAL ((MASK MAT) (MAT))) => :VOID
 
 LISP-CV: (FEATURE-DETECTOR-DETECT (SELF BF-MATCHER) (IMAGE MAT) (KEYPOINTS KEY-POINT) &OPTIONAL ((MASK MAT) (MAT))) => :VOID
 
 LISP-CV: (FEATURE-DETECTOR-DETECT (SELF BRISK) (IMAGE MAT) (KEYPOINTS KEY-POINT) &OPTIONAL ((MASK MAT) (MAT))) => :VOID
+
+LISP-CV: (FEATURE-DETECTOR-DETECT (SELF FAST-FEATURE-DETECTOR) (IMAGE MAT) (KEYPOINTS KEY-POINT) &OPTIONAL 
+                                 ((MASK MAT) (MAT))) => :VOID
 
 LISP-CV: (FEATURE-DETECTOR-DETECT (SELF SURF) (IMAGE MAT) (KEYPOINTS KEY-POINT) &OPTIONAL ((MASK MAT) (MAT))) => :VOID
 
@@ -15036,7 +15455,7 @@ Example:
 					  (height *default-height*))
 
   "Note: The 'GC:' prefix to some of these functions 
-    signifies automatic garbage collection is enabled"
+   signifies automatic garbage collection is enabled."
 
   (with-captured-camera (cap cam :width width :height height)
     ;;Initialize the template location, dimension and 
@@ -15240,6 +15659,66 @@ Example:(Coming soon)
 ========================================================================================================================================
 
 ========================================================================================================================================
+#DRAW-KEYPOINTS
+========================================================================================================================================
+
+Draws keypoints.
+
+C++: void drawKeypoints(InputArray image, const vector<KeyPoint>& keypoints, InputOutputArray outImage, 
+                        const Scalar& color=Scalar::all(-1), int flags=DrawMatchesFlags::DEFAULT )
+
+LISP-CV: (DRAW-KEYPOINTS (IMAGE MAT) (KEYPOINTS VECTOR-KEY-POINT) (OUT-IMAGE MAT) &OPTIONAL 
+                        ((COLOR SCALAR) (SCALAR-ALL -1)) ((FLAGS :INT) +DRAW-MATCHES-FLAGS-DEFAULT+)) => :VOID
+
+    Parameters:	
+
+        IMAGE - Source image.
+
+        KEYPOINTS - Keypoints from the source image.
+
+        OUT-IMAGE - Output image. Its content depends on the FLAGS value defining what is drawn in 
+                    the output image. See possible FLAGS bit values below.
+
+        COLOR - Color of keypoints.
+
+        FLAGS - Flags setting drawing features. See details below in (DRAW-MATCHES).
+
+
+Example:
+
+
+(defun draw-keypoints-example (&optional filename)
+
+  (if (not filename) 
+      (setf filename 
+	    (cat *lisp-cv-images-dir* "Phoenician.jpg")))
+
+  (let ((window-name "FAST Features - DRAW-KEYPOINTS Example"))
+    (with-named-window (window-name +window-autosize+)
+      (move-window window-name 560 175)
+      (with-mat ((image (imread filename +load-image-color+)))
+	(if (empty image) 
+	    (return-from draw-keypoints-example 
+	      (format t "Image not loaded")))
+	(with-vector-key-point ((keypoints (vector-key-point)))
+	  ;;Construction of the Fast feature detector object
+	  (with-fast-feature-detector ((fast (fast-feature-detector 40)));threshold for detection
+	    ;;Feature point detection
+	    (detect fast image keypoints)
+	    ;;Draw keypoints on an image
+	    (draw-Keypoints image ;Original image
+			    keypoints ;Vector of keypoints
+			    image ;The output image
+			    (t:scalar 255 255 255) ;Key point color
+			    +draw-matches-flags-draw-over-outimg+ ;Drawing flag
+			    )
+	    (imshow window-name image)
+	    (loop
+	       (let ((c (wait-key 33)))
+		 (when (= c 27)
+		   (return))))))))))
+
+========================================================================================================================================
 #DRAW-MATCHES
 ========================================================================================================================================
 
@@ -15254,7 +15733,7 @@ C++: void drawMatches(const Mat& img1, const vector<KeyPoint>& keypoints1, const
 
 LISP-CV: (DRAW-MATCHES (IMG1 MAT) (KEYPOINTS1 KEYPOINT) (IMG2 MAT) (KEYPOINTS2 KEYPOINT) (MATCHES1TO2 VECTOR-DMATCH) 
                        (OUT-IMG MAT) (MATCH-COLOR SCALAR) (SINGLE-POINT-COLOR SCALAR) &OPTIONAL ((MATCHES-MASK VECTOR-CHAR) 
-                       (VECTOR-CHAR)) ((FLAGS :INT) +DEFAULT+)) => :VOID
+                       (VECTOR-CHAR)) ((FLAGS :INT) +DRAW-MATCHES-FLAGS-DEFAULT+)) => :VOID
 
 
     Parameters:	
@@ -15287,18 +15766,18 @@ LISP-CV: (DRAW-MATCHES (IMG1 MAT) (KEYPOINTS1 KEYPOINT) (IMG2 MAT) (KEYPOINTS2 K
 This function draws matches of keypoints from two images in the output image. Match is a line connecting 
 two keypoints (circles). The FLAGS parameters are defined as follows:
 
-        +DEFAULT+ = 0 - Output image matrix will be created (MAT-CREATE), i.e. existing memory of 
-                        output image may be reused. Two source images, matches, and single keypoints 
-                        will be drawn. For each keypoint, only the center point will be drawn (without 
-                        a circle around the keypoint with the keypoint size and orientation).
+        +DRAW-MATCHES-FLAGS-DEFAULT+ - Output image matrix will be created (MAT-CREATE), i.e. existing memory of 
+                                       output image may be reused. Two source images, matches, and single keypoints 
+                                       will be drawn. For each keypoint, only the center point will be drawn (without 
+                                       a circle around the keypoint with the keypoint size and orientation).
 
-        +DRAW-OVER-OUTIMG+ = 1 - Output image matrix will not be created (using MAT-CREATE). Matches 
-                                 will be drawn on existing content of output image.
+        +DRAW-MATCHES-FLAGS-DRAW-OVER-OUTIMG+ - Output image matrix will not be created (using MAT-CREATE). Matches 
+                                                will be drawn on existing content of output image.
 
-        +NOT-DRAW-SINGLE-POINTS = 2 - Single keypoints will not be drawn.
+        +DRAW-MATCHES-FLAGS-NOT-DRAW-SINGLE-POINTS+ - Single keypoints will not be drawn.
 
-        +DRAW-RICH-KEYPOINTS+ = 4 - For each keypoint, the circle around keypoint with keypoint siz-
-                                    e and orientation wilL be drawn.
+        +DRAW-MATCHES-FLAGS-DRAW-RICH-KEYPOINTS+ - For each keypoint, the circle around keypoint with keypoint size
+                                                   and orientation wilL be drawn.
 
 
 Example:
@@ -15312,18 +15791,18 @@ Example:
    ood matches between images, the MATCH-COLOR parameter. Secondly the co-
    lor used to mark empty keypoints or non-matches, the SINGLE-POINT-COLOR 
    parameter. Finally, each window is labeled with the name of the flag u-
-   sed to set  drawing features for that particular window, for example:
+   sed to set drawing features for that particular window, for example:
  
-      * RED * WHITE * +NOT-DRAW-SINGLE-POINTS+ *
+      * BLUE * WHITE * NOT-DRAW-SINGLE-POINTS *
     
     Try using the box.png and box-in-scene.png images located inside the
     LISP-CV-MASTER/IMAGES directory to get a clearer understanding of th-
     is example the first time you run it."
 
-  (let ((window-name-1 "RANDOM * RANDOM * +DEFAULT+")
-	(window-name-2 "BLACK * WHITE * +DRAW-RICH-KEYPOINTS+")
-	(window-name-3 "RED * WHITE * +NOT-DRAW-SINGLE-POINTS+")
-	(window-name-4 "WHITE * RANDOM * +DRAW-RICH-KEYPOINTS+")
+  (let ((window-name-1 "RANDOM * RANDOM * DEFAULT")
+	(window-name-2 "PURPLE * WHITE * DRAW-OVER-OUTIMG")
+	(window-name-3 "BLUE * WHITE * NOT-DRAW-SINGLE-POINTS")
+	(window-name-4 "WHITE * RANDOM * DRAW-RICH-KEYPOINTS")
 	;; Set brisk parameters
 	(thresh 60)
 	(octaves 4)
@@ -15336,18 +15815,18 @@ Example:
 	    (move-window window-name-2 894 98)
 	    (move-window window-name-3 485 444)
 	    (move-window window-name-4 894 444)
-	    ;; declare feature detector
+	    ;; Declare feature detector
 	    (with-brisk ((briskd (brisk thresh octaves pattern-scale)))
-	      ;; declare matcher
+	      ;; Declare matcher
 	      (with-bf-matcher ((matcher (bf-matcher)))
-		;; the object you want to track 
+		;; The object you want to track 
 		(with-mat ((object (imread filename-1 +load-image-grayscale+))
-			   ;; the image the object is a part of
+			   ;; The image the object is a part of
 			   (image (imread filename-2 +load-image-grayscale+))
-			   ;; matrices used to hold the descriptors
+			   ;; Matrices used to hold the descriptors
 			   (descriptors-a (mat))
 			   (descriptors-b (mat))) 
-		  ;; vectors used to hold the keypoints
+		  ;; Vectors used to hold the keypoints
 		  (with-vector-key-point ((keypoints-a (vector-key-point))
 					  (keypoints-b (vector-key-point)))
 		    (with-vector-dmatch ((matches (vector-dmatch)))
@@ -15356,53 +15835,51 @@ Example:
 			  (return-from draw-matches-example 
 			    (format t "Both images were not loaded")))
 
-		      ;; create a feature detector
+		      ;; Create a feature detector
 		      (create :feature-detector briskd "SimpleBlob")
-		      ;; detect keypoints in OBJECT
+		      ;; Detect keypoints in OBJECT
 		      (detect briskd object keypoints-a)
 		      ;; Compute the descriptors for a set of keypoints detected in object
 		      (compute :feature-2d briskd object keypoints-a descriptors-a)
-		      ;; detect keypoints in IMAGE
+		      ;; Detect keypoints in IMAGE
 		      (detect briskd image keypoints-b)
 		      ;; Compute the descriptors for a set of keypoints detected in IMAGE
 		      (compute :feature-2d briskd image keypoints-b descriptors-b)
-		      ;; find the best match for each descriptor
+		      ;; Find the best match for each descriptor
 		      (match matcher descriptors-a descriptors-b matches)
-		      ;; draw the found matches and show in a window 
+		      ;; Draw the found matches and show in a window, 
 		      ;; four times, each with different parameters
-		      ;; output matrix
 		      (with-mat ((all-matches (mat)))
 			(draw-matches object keypoints-a image keypoints-b matches all-matches 
 				      (gc:scalar-all -1) (gc:scalar-all -1) (gc:vector-char) 
-				      +default+)
+				      +draw-matches-flags-default+)
 			(imshow window-name-1 all-matches))
-		      (with-mat ((all-matches (mat)))
+		      (with-mat ((all-matches (mat (rows image) (+ (cols image) (cols image)) 16)))
 			(draw-matches object keypoints-a image keypoints-b matches all-matches 
-				      (gc:scalar 0 0 0) (gc:scalar 255 255 255) (gc:vector-char) 
-				      +draw-rich-keypoints+)
+				      (gc:scalar 255 0 128) (gc:scalar 255 255 255) (gc:vector-char)
+				      +draw-matches-flags-draw-over-outimg+)
 			(imshow window-name-2 all-matches))
 		      (with-mat ((all-matches (mat)))
 			(draw-matches object keypoints-a image keypoints-b matches all-matches 
-				      (gc:scalar 0 0 255) (gc:scalar 255 255 2555) (gc:vector-char) 
-				      +not-draw-single-points+)
+				      (gc:scalar 255 0 0) (gc:scalar 255 255 2555) (gc:vector-char)
+				      +draw-matches-flags-not-draw-single-points+)
 			(imshow window-name-3 all-matches))
 		      (with-mat ((all-matches (mat)))
 			(draw-matches object keypoints-a image keypoints-b matches all-matches 
 				      (gc:scalar-all 255) (gc:scalar-all -1) (gc:vector-char) 
-				      +draw-rich-keypoints+)
+				      +draw-matches-flags-draw-rich-keypoints+)
 			(imshow window-name-4 all-matches))
 		      (loop
 			 (let ((c (wait-key 33)))
 			   (when (= c 27)
 			     (return)))))))))))))))
 
-
 ========================================================================================================================================
 #FEATURES2D - #COMMON INTERFACES OF DESCRIPTOR MATCHERS
 ========================================================================================================================================
 
 ========================================================================================================================================
-BF-MATCHER
+#BF-MATCHER
 ========================================================================================================================================
 
 Brute-force matcher constructor.
@@ -18893,7 +19370,7 @@ Example:
 	 (img-matches (gc:mat))
 	 (window-name "Image Matches - SURF Example"))
     (if (empty (or img-1 img-2)) 
-	(returhttp://www.fourcc.org/codecs.phpn-from surf-example 
+	(return-from surf-example 
 	  (format t "Both images were not loaded")))
     (with-named-window (window-name +window-normal+)
       (move-window window-name 759 175)
@@ -19203,60 +19680,6 @@ Example:
 		   (return))))))))))
 
 ========================================================================================================================================
-#MAT-ZEROS
-========================================================================================================================================
-
-Returns a zero array of the specified size and type.
-
-Note: Both MAT-ZEROS and MAKE-MAT-ZEROS are provided in this library. The first, to match OpenCV's 
-naming conventions, the second, to adhere to Common Lisp naming conventions. Except for the name, 
-they are the same function. I use the MAT-ZEROS function in the examples in this file because it 
-will make them easier to compare with OpenCV examples you find online, thus making this library 
-easier to learn.
-
-C++: static MatExpr Mat::zeros(int rows, int cols, int type)
-
-LISP-CV: (MAT-ZEROS (ROWS :INT) (COLS :INT) (TYPE :INT)) => MAT
-
-LISP-CV: (MAKE-MAT-ZEROS (ROWS :INT) (COLS :INT) (TYPE :INT)) => MAT
-
-
-    Parameters:	
-
-        ROWS - Number of rows.
-
-        COLS - Number of columns.
-
-        TYPE - Created matrix type.
-
-
-The method returns a Matlab-style zero array initializer. It can be used to quickly form a constant
-array as a function parameter, part of a matrix expression, or as a matrix initializer.
-
-CV> (DEFPARAMETER A (MAT))
-
-CV> (SETF A (MAT-ZEROS 3 3 +32F+))
-
-In the example above, a new matrix is allocated only if A is not a 3x3 floating-point matrix. Other-
-wise, the existing matrix A is filled with zeros.
-
-
-(defun mat-zeros-example ()
-
-  "In this example the function MAT-ZEROS 
-   is used to create a matrix MAT filled 
-   with zeros. MAT is then shown in a win-
-   dow for verification."
-
-  (let* ((mat (mat-zeros 3 3 +8u+))
-	 (window-name "MAT - MAT-ZEROS Example"))
-    (named-window window-name +window-normal+)
-    (move-window window-name 759 175)
-    (imshow window-name mat)
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-window window-name)))
-
-========================================================================================================================================
 #MAT-ONES
 ========================================================================================================================================
 
@@ -19299,116 +19722,6 @@ remembers the scale factor (3 in this case) and uses it when actually invoking t
     (imshow window-name mat)
     (loop while (not (= (wait-key 0) 27)))
     (destroy-window window-name)))
-
-========================================================================================================================================
-#MAT-EYE
-========================================================================================================================================
-
-Returns an identity matrix of the specified size and type.
-
-C++: static MatExpr Mat::eye(int rows, int cols, int type)
-
-LISP-CV: (MAT-EYE (ROWS :INT) (COLS :INT) (TYPE :INT)) => MAT
-
-
-    Parameters:	
-
-        ROWS - Number of rows.
-
-        COLS - Number of columns.
-
-        TYPE - Created matrix type.
-
-
-The method returns a Matlab-style identity matrix initializer, similarly to (MAT-ZEROS). Similarly 
-to (MAT-ONES), you can use a scale operation to create a scaled identity matrix efficiently:
-
-;; Make a 4x4 diagonal matrix with 0.1's on the diagonal.
-
-(DEFPARAMETER A (GC:SCALE (GC:<< (GC:MAT-EYE 4 4 +32F+)) 0.1D0))
-
-
-(defun mat-eye-example ()
-
-  "Here we use the function MAT-EYE to create a 3x3 
-   identity matrix IDENTITY-MAT-1, which is shown i-
-   n the left-most window. 
-
-   Next an identity matrix, IDENTITY-MAT-2 is creat-
-   ed and using the function SCALE is scaled by 0.1. 
-   Then both the pre-scaled version and the scaled 
-   version are shown in the 2 right-most windows. T-
-   his allows you to see the fact that, because the-
-   y are single-float matrices, their elements are 
-   shown as colors, not numbers, unlike the matrix 
-   in the left-most window. So an identity matrix w-
-   hich has a diagonal that is all ones, it's diago-
-   nal would be represented as pure white. An ident-
-   ity matrix whose diagonal is all 0.1, it's diago-
-   nal would be represented as a dark, dark grey Ve-
-   ry close to black, a colored boolean.
-
-   Note: The PROMOTE(<<) function was needed in the 
-   SCALE function to coerce IDENTITY-MAT-2 to MAT-E-
-   XPR from MAT type for the scaling operation. The 
-   FORCE(>>) function is then used in IMSHOW to coe-
-   rce SCALED-IDENTITY-MAT-3 back to MAT."
-
-  (let* ((identity-mat-1 (mat-eye 3 3 +8u+))
-         (identity-mat-2 (mat-eye 4 4 +32f+))
-	 (scaled-identity-mat (scale (<< identity-mat-2) 0.1d0))
-	 (window-name-1 "IDENTITY-MAT-1 - MAT-EYE Example")
-	 (window-name-2 "IDENTITY-MAT-3 - MAT-EYE Example")
-         (window-name-3 "SCALED-IDENTITY-MAT-3 - MAT-EYE Example"))
-    (named-window window-name-1 +window-normal+)
-    (named-window window-name-2 +window-normal+)
-    (named-window window-name-3 +window-normal+)
-    (move-window window-name-1 310 175)
-    (move-window window-name-2 760 175)
-    (move-window window-name-3 1210 175)
-    (imshow window-name-1 identity-mat-1)
-    (imshow window-name-2 identity-mat-2)
-    (imshow window-name-3  (>> scaled-identity-mat))
-    (loop while (not (= (wait-key 0) 27)))
-    (destroy-all-windows)))
-
-========================================================================================================================================
-#MAT-EXPR-T
-========================================================================================================================================
-
-Transposes a matrix.
-
-C++: MatExpr Mat::t() const
-
-LISP-CV: (MAT-EXPR-T (SELF MAT)) => MAT-EXPR
-
-The method performs matrix transposition by means of matrix expressions. It does not perform the 
-actual transposition but returns a temporary matrix transposition object that can be further used 
-as a part of more complex matrix expressions or can be assigned to a matrix.
-
-
-  Parameters:	
-
-        SELF - Input matrix
-
-
-MAT-EXPR-T-EXAMPLE:
-
-CV> (DEFPARAMETER A (T:MAT 3 3 +8U+ :UCHAR '(1 2 3 4 5 6 7 8 9)))
-
-A
-
-CV> (PRINT-MAT A)
-
-#((1 2 3)
-  (4 5 6)
-  (7 8 9))
-
-CV> (PRINT-MAT (T:>> (T:MAT-EXPR-T A))) ;;;coerce the return value, back to MAT 
-                                        ;;;with the (>>) function before printing.
-#((1 4 7)                               ;;;Note: 'T:' enables auto finalization.                             
-  (2 5 8)                               
-  (3 6 9))
 
 ========================================================================================================================================         
 DIAG

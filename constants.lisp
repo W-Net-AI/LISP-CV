@@ -34,9 +34,14 @@
   (+rand-max+ 2147483647)
 
 
-;;; core
+;;;Extra OpenCv constants
 
   (+max-dim+ 32)
+  (+pi+ 3.14159d0)
+
+
+;;; core
+
   (+8u+ 0)
   (+8uc1+ 0)
   (+8uc2+ 8)
@@ -592,10 +597,10 @@
 
 ;;; features2d
 
-  (+default+ 0)
-  (+draw-over-outimg+ 1)
-  (+not-draw-single-points+ 2)
-  (+draw-rich-keypoints+ 4)
+  (+draw-matches-flags-default+ 0)
+  (+draw-matches-flags-draw-over-outimg+ 1)
+  (+draw-matches-flags-not-draw-single-points+ 2)
+  (+draw-matches-flags-draw-rich-keypoints+ 4)
 
 ;;; objdetect
 

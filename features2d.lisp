@@ -28,6 +28,17 @@
    (%brisk thresh octaves pattern-scale))
 
 
+;; FastFeatureDetector( int threshold=10, bool nonmaxSuppression=true)
+;; FastFeatureDetector* cv_create_FastFeatureDetector(int threshold, bool nonmaxSuppression)
+(defcfun ("cv_create_FastFeatureDetector" %fast-feature-detector) fast-feature-detector
+  (threshold :int)
+  (non-max-suppression :boolean))
+
+
+(defun fast-feature-detector (&optional (threshold 10) (non-max-suppression t))
+  (%fast-feature-detector threshold non-max-suppression))
+
+
 ;; Feature2D* cv_Feature2D_create1_1(Feature2D* self, String* name) 
 (defcfun ("cv_Feature2D_create1_1" %feature-2d-create-bf-matcher) bf-matcher
   (self bf-matcher)
@@ -112,6 +123,15 @@
 ;; void cv_FeatureDetector_detect3(FeatureDetector* self, Mat* image, vector_KeyPoint* keypoints, Mat* mask)
 (defcfun ("cv_FeatureDetector_detect3" %feature-detector-detect-brisk) :void
   (self brisk)
+  (image mat)
+  (key-points vector-key-point)
+  (mask mat))
+
+
+;; void FeatureDetector::detect(const Mat& image, vector<KeyPoint>& keypoints, const Mat& mask=Mat() ) const
+;; void cv_FeatureDetector_detect3(FeatureDetector* self, Mat* image, vector_KeyPoint* keypoints, Mat* mask)
+(defcfun ("cv_FeatureDetector_detect3" %feature-detector-detect-fast-feature-detector) :void
+  (self fast-feature-detector)
   (image mat)
   (key-points vector-key-point)
   (mask mat))
@@ -231,37 +251,28 @@
   (mask mat))
 
 
-;; void DescriptorMatcher::match(const Mat& queryDescriptors, const Mat& trainDescriptors, vector<DMatch>& matches, 
-;; const Mat& mask=Mat() ) const
-;; void cv_DescriptorMatcher_match(DescriptorMatcher* self, Mat* queryDescriptors, Mat* trainDescriptors, vector_DMatch* matches, 
-;; Mat* mask)
-(defcfun ("cv_DescriptorMatcher_match" %descriptor-matcher-match-brisk) :void
-  (self brisk)
-  (query-descriptors mat)
-  (train-descriptors mat)
-  (matches vector-dmatch)
-  (mask mat))
-
-
-;; void DescriptorMatcher::match(const Mat& queryDescriptors, const Mat& trainDescriptors, vector<DMatch>& matches, 
-;; const Mat& mask=Mat() ) const
-;; void cv_DescriptorMatcher_match(DescriptorMatcher* self, Mat* queryDescriptors, Mat* trainDescriptors, vector_DMatch* matches, 
-;; Mat* mask)
-(defcfun ("cv_DescriptorMatcher_match" %descriptor-matcher-match-surf) :void
-  (self surf)
-  (query-descriptors mat)
-  (train-descriptors mat)
-  (matches vector-dmatch)
-  (mask mat))
-
-
-
 ;;; Drawing Function of Keypoints and Matches
 
 
+;; void drawKeypoints(InputArray image, const vector<KeyPoint>& keypoints, InputOutputArray outImage, 
+;;                    const Scalar& color=Scalar::all(-1), int flags=DrawMatchesFlags::DEFAULT )
+;; void cv_drawKeypoints(Mat* image, vector_KeyPoint* keypoints, Mat* outImage, Scalar* color, int flags)
+(defcfun ("cv_drawKeypoints" %draw-keypoints) :void
+  (image mat)
+  (keypoints vector-key-point)
+  (out-image mat)
+  (color scalar) 
+  (flags :int))
+
+(defun draw-keypoints (image keypoints out-image &optional (color (scalar-all -1) given-color) (flags +draw-matches-flags-default+))
+  "Draws keypoints."
+  (%draw-keypoints image keypoints out-image color flags)
+  (if given-color nil (del-scalar color)))
+
 
 ;; void drawMatches(const Mat& img1, const vector<KeyPoint>& keypoints1, const Mat& img2, const vector<KeyPoint>& keypoints2, 
-;; const vector<DMatch>& matches1to2, Mat& outImg, const Scalar& matchColor=Scalar::all(-1), const Scalar& singlePointColor=Scalar::all(-1),
+;;                  const vector<DMatch>& matches1to2, Mat& outImg, const Scalar& matchColor=Scalar::all(-1), 
+;;                  const Scalar& singlePointColor=Scalar::all(-1),
 ;; const vector<char>& matchesMask=vector<char>(), int flags=DrawMatchesFlags::DEFAULT)
 
 ;; void cv_drawMatches(Mat* img1, vector_KeyPoint* keypoints1, Mat* img2, vector_KeyPoint* keypoints2, vector_DMatch* matches1to2, 
@@ -284,7 +295,7 @@
 									  (match-color (scalar-all -1) given-match-color) 
 									  (single-point-color (scalar-all -1) given-single-point-color) 
 									  (matches-mask (make-vector-char) given-matches-mask) 
-									  (flags +default+))
+									  (flags +draw-matches-flags-default+))
   "Draws the found matches of keypoints from two images."
   (%draw-matches img1 keypoints1 img2 keypoints2 matches1to2 out-img match-color single-point-color matches-mask flags)
   (if given-match-color nil (del-scalar match-color)) 

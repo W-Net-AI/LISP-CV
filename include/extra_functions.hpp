@@ -17,6 +17,11 @@
 */
 
 #include <opencv2/c/opencv_generated.hpp>
+#include <vector>
+#include <opencv2/opencv.h>
+
+using namespace std;
+
 
 #define ADD_VEC_FUNC_HEADERS_0_0(t) \
     Vec2##t * cv_create_0_Vec2##t(); \
@@ -56,6 +61,7 @@ typedef vector< tn > vector_##tn; \
 #define ADD_READ_FUNC_HEADERS_2(t, tn) \
     void cv_FileNode_read_pointer_vkp(FileNode* node, tn* keypoints); \
 
+
 extern "C" {
 ADD_VEC_FUNC_HEADER_0_0(b);
 ADD_VEC_FUNC_HEADER_0_0(d);
@@ -88,6 +94,14 @@ ADD_READ_FUNC_HEADERS_0(f, float);
 ADD_READ_FUNC_HEADERS_0(d, double);
 ADD_READ_FUNC_HEADERS_1(s, String);
 ADD_READ_FUNC_HEADERS_1(m, Mat);
+DMatch* cv_vector_DMatch_at_1(vector_DMatch* self, int idx);
+DMatch* cv_vector_DMatch_at_2(std::vector<DMatch> *self, int idx);
+int cv_TermCriteria_getType(TermCriteria* self);
+int cv_TermCriteria_set_Type(TermCriteria* self, int val);
+int cv_TermCriteria_getMaxCount(TermCriteria* self);
+int cv_TermCriteria_set_MaxCount(TermCriteria* self, int val);
+double cv_TermCriteria_getEpsilon(TermCriteria* self);
+double cv_TermCriteria_set_Epsilon(TermCriteria* self, double val);
 void cv_circle_2(Mat* img, Point2f* center, int radius, Scalar* color, int thickness, int lineType, int shift);
 void cv_RNG_fill(RNG* self, Mat* mat, int distType, Scalar* a, Scalar* b, bool saturateRange);
 Mat* test(uchar* a, size_t len );
@@ -190,62 +204,77 @@ int &cv_Mat_at_int_3(Mat* self, int i, int j, int k);
 short &cv_Mat_at_short_3(Mat* self, int i, int j, int k);
 uchar &cv_Mat_at_uchar_3(Mat* self, int i, int j, int k);
 ushort &cv_Mat_at_ushort_3(Mat* self, int i, int j, int k);
-
-Vec2b* cv_Mat_at_Vec2b(Mat* self, int i, int j);
-void cv_Mat_at_Vec2b_set_Val(Mat* self, int i, int j, Vec2b* val);
-
-Vec2d* cv_Mat_at_Vec2d(Mat* self, int i, int j);
-void cv_Mat_at_Vec2d_set_Val(Mat* self, int i, int j, Vec2d* val);
-
-Vec2f* cv_Mat_at_Vec2f(Mat* self, int i, int j);
-void cv_Mat_at_Vec2f_set_Val(Mat* self, int i, int j, Vec2f* val);
-
-Vec2i* cv_Mat_at_Vec2i(Mat* self, int i, int j);
-void cv_Mat_at_Vec2i_set_Val(Mat* self, int i, int j, Vec2i* val);
-
-Vec2s* cv_Mat_at_Vec2s(Mat* self, int i, int j);
-void cv_Mat_at_Vec2s_set_Val(Mat* self, int i, int j, Vec2s* val);
-
-Vec2w* cv_Mat_at_Vec2w(Mat* self, int i, int j);
-void cv_Mat_at_Vec2w_set_Val(Mat* self, int i, int j, Vec2w* val);
-
-Vec3b* cv_Mat_at_Vec3b(Mat* self, int i, int j);
-void cv_Mat_at_Vec3b_set_Val(Mat* self, int i, int j, Vec3b* val);
-
-Vec3d* cv_Mat_at_Vec3d(Mat* self, int i, int j);
-void cv_Mat_at_Vec3d_set_Val(Mat* self, int i, int j, Vec3d* val);
-
-Vec3f* cv_Mat_at_Vec3f(Mat* self, int i, int j);
-void cv_Mat_at_Vec3f_set_Val(Mat* self, int i, int j, Vec3f* val);
-
-Vec3i* cv_Mat_at_Vec3i(Mat* self, int i, int j);
-void cv_Mat_at_Vec3i_set_Val(Mat* self, int i, int j, Vec3i* val);
-
-Vec3s* cv_Mat_at_Vec3s(Mat* self, int i, int j);
-void cv_Mat_at_Vec3s_set_Val(Mat* self, int i, int j, Vec3s* val);
-
-Vec3w* cv_Mat_at_Vec3w(Mat* self, int i, int j);
-void cv_Mat_at_Vec3w_set_Val(Mat* self, int i, int j, Vec3w* val);
-
-Vec4b* cv_Mat_at_Vec4b(Mat* self, int i, int j);
-void cv_Mat_at_Vec4b_set_Val(Mat* self, int i, int j, Vec4b* val);
-
-Vec4d* cv_Mat_at_Vec4d(Mat* self, int i, int j);
-void cv_Mat_at_Vec4d_set_Val(Mat* self, int i, int j, Vec4d* val);
-
-Vec4f* cv_Mat_at_Vec4f(Mat* self, int i, int j);
-void cv_Mat_at_Vec4f_set_Val(Mat* self, int i, int j, Vec4f* val);
-
-Vec4i* cv_Mat_at_Vec4i(Mat* self, int i, int j);
-void cv_Mat_at_Vec4i_set_Val(Mat* self, int i, int j, Vec4i* val);
-
-Vec4s* cv_Mat_at_Vec4s(Mat* self, int i, int j);
-void cv_Mat_at_Vec4s_set_Val(Mat* self, int i, int j, Vec4s* val);
-
-Vec4w* cv_Mat_at_Vec4w(Mat* self, int i, int j); 
-void cv_Mat_at_Vec4w_set_Val(Mat* self, int i, int j, Vec4w* val);
-
-int cv_vector_int_get_value (vector_int* self, int idx);
+Vec2b* cv_Mat_at_Vec2b_1(Mat* self, int i);
+void cv_Mat_at_Vec2b_set_Val_1(Mat* self, int i, Vec2b* val);
+Vec2b* cv_Mat_at_Vec2b_2(Mat* self, int i, int j);
+void cv_Mat_at_Vec2b_set_Val_2(Mat* self, int i, int j, Vec2b* val);
+Vec2d* cv_Mat_at_Vec2d_1(Mat* self, int i);
+void cv_Mat_at_Vec2d_set_Val_1(Mat* self, int i, Vec2d* val);
+Vec2d* cv_Mat_at_Vec2d_2(Mat* self, int i, int j);
+void cv_Mat_at_Vec2d_set_Val_2(Mat* self, int i, int j, Vec2d* val);
+Vec2f* cv_Mat_at_Vec2f_1(Mat* self, int i);
+void cv_Mat_at_Vec2f_set_Val_1(Mat* self, int i, Vec2f* val);
+Vec2f* cv_Mat_at_Vec2f_2(Mat* self, int i, int j);
+void cv_Mat_at_Vec2f_set_Val_2(Mat* self, int i, int j, Vec2f* val);
+Vec2i* cv_Mat_at_Vec2i_1(Mat* self, int i);
+void cv_Mat_at_Vec2i_set_Val_1(Mat* self, int i, Vec2i* val);
+Vec2i* cv_Mat_at_Vec2i_2(Mat* self, int i, int j);
+void cv_Mat_at_Vec2i_set_Val_2(Mat* self, int i, int j, Vec2i* val);
+Vec2s* cv_Mat_at_Vec2s_1(Mat* self, int i);
+void cv_Mat_at_Vec2s_set_Val_1(Mat* self, int i, Vec2s* val);
+Vec2s* cv_Mat_at_Vec2s_2(Mat* self, int i, int j);
+void cv_Mat_at_Vec2s_set_Val_2(Mat* self, int i, int j, Vec2s* val);
+Vec2w* cv_Mat_at_Vec2w_1(Mat* self, int i);
+void cv_Mat_at_Vec2w_set_Val_1(Mat* self, int i, Vec2w* val);
+Vec2w* cv_Mat_at_Vec2w_2(Mat* self, int i, int j);
+void cv_Mat_at_Vec2w_set_Val_2(Mat* self, int i, int j, Vec2w* val);
+Vec3b* cv_Mat_at_Vec3b_1(Mat* self, int i);
+void cv_Mat_at_Vec3b_set_Val_1(Mat* self, int i, Vec3b* val);
+Vec3b* cv_Mat_at_Vec3b_2(Mat* self, int i, int j); 
+void cv_Mat_at_Vec3b_set_Val_2(Mat* self, int i, int j, Vec3b* val);
+Vec3d* cv_Mat_at_Vec3d_1(Mat* self, int i);
+void cv_Mat_at_Vec3d_set_Val_1(Mat* self, int i, Vec3d* val);
+Vec3d* cv_Mat_at_Vec3d_2(Mat* self, int i, int j);
+void cv_Mat_at_Vec3d_set_Val_2(Mat* self, int i, int j, Vec3d* val);
+Vec3f* cv_Mat_at_Vec3f_1(Mat* self, int i);
+void cv_Mat_at_Vec3f_set_Val_1(Mat* self, int i, Vec3f* val);
+Vec3f* cv_Mat_at_Vec3f_2(Mat* self, int i, int j);
+void cv_Mat_at_Vec3f_set_Val_2(Mat* self, int i, int j, Vec3f* val);
+Vec3i* cv_Mat_at_Vec3i_1(Mat* self, int i);
+void cv_Mat_at_Vec3i_set_Val_1(Mat* self, int i, Vec3i* val);
+Vec3i* cv_Mat_at_Vec3i_2(Mat* self, int i, int j);
+void cv_Mat_at_Vec3i_set_Val_2(Mat* self, int i, int j, Vec3i* val);
+Vec3s* cv_Mat_at_Vec3s_1(Mat* self, int i);
+void cv_Mat_at_Vec3s_set_Val_1(Mat* self, int i, Vec3s* val);
+Vec3s* cv_Mat_at_Vec3s_2(Mat* self, int i, int j);
+void cv_Mat_at_Vec3s_set_Val_2(Mat* self, int i, int j, Vec3s* val);
+Vec3w* cv_Mat_at_Vec3w_1(Mat* self, int i);
+void cv_Mat_at_Vec3w_set_Val_1(Mat* self, int i, Vec3w* val);
+Vec3w* cv_Mat_at_Vec3_2(Mat* self, int i, int j);
+void cv_Mat_at_Vec3w_set_Val_2(Mat* self, int i, int j, Vec3w* val);
+Vec4b* cv_Mat_at_Vec4b_1(Mat* self, int i);
+void cv_Mat_at_Vec4b_set_Val_1(Mat* self, int i, Vec4b* val);
+Vec4b* cv_Mat_at_Vec4b_2(Mat* self, int i, int j);
+void cv_Mat_at_Vec4b_set_Val_2(Mat* self, int i, int j, Vec4b* val);
+Vec4d* cv_Mat_at_Vec4d_1(Mat* self, int i);
+void cv_Mat_at_Vec4d_set_Val_1(Mat* self, int i, Vec4d* val);
+Vec4d* cv_Mat_at_Vec4d_2(Mat* self, int i, int j);
+void cv_Mat_at_Vec4d_set_Val_2(Mat* self, int i, int j, Vec4d* val);
+Vec4f* cv_Mat_at_Vec4f_1(Mat* self, int i);
+void cv_Mat_at_Vec4f_set_Val_1(Mat* self, int i, Vec4f* val);
+Vec4f* cv_Mat_at_Vec4f_2(Mat* self, int i, int j);
+Vec4i* cv_Mat_at_Vec4i_1(Mat* self, int i);
+void cv_Mat_at_Vec4i_set_Val_1(Mat* self, int i, Vec4i* val);
+Vec4i* cv_Mat_at_Vec4i_2(Mat* self, int i, int j);
+void cv_Mat_at_Vec4i_set_Val_2(Mat* self, int i, int j, Vec4i* val);
+Vec4s* cv_Mat_at_Vec4s_1(Mat* self, int i);
+void cv_Mat_at_Vec4s_set_Val_1(Mat* self, int i, Vec4s* val);
+Vec4s* cv_Mat_at_Vec4s_2(Mat* self, int i, int j);
+void cv_Mat_at_Vec4s_set_Val_2(Mat* self, int i, int j, Vec4s* val);
+Vec4w* cv_Mat_at_Vec4w_1(Mat* self, int i);
+void cv_Mat_at_Vec4w_set_Val_1(Mat* self, int i, Vec4w* val);
+Vec4w* cv_Mat_at_Vec4w_2(Mat* self, int i, int j);
+void cv_Mat_at_Vec4w_set_Val_2(Mat* self, int i, int j, Vec4w* val)
 const float* cv_CvSVM_get_support_vector(SVM* self, int i);
 CvMat* cv_Mat_to_CvMat(Mat* self);
 CvTermCriteria cv_TermCriteria_to_CvTermCriteria(TermCriteria* self);
@@ -313,8 +342,7 @@ void cv_delete_DescriptorMatcher(DescriptorMatcher* self);
 void cv_delete_DMatch(DMatch* ptr);
 void cv_delete_CvDTree(CvDTree* self);
 void cv_delete_CvDTreeParams(CvDTreeParams* self);
-void cv_delete_Feature2D(Feature2D* self);
-void cv_delete_FeatureDetector(FeatureDetector* self);
+void cv_delete_FastFeatureDetector(FastFeatureDetector* self);
 void cv_delete_FileNode(FileNode* self);
 void cv_delete_FileStorage(FileStorage* self);
 void cv_delete_HOGDescriptor(HOGDescriptor* self);

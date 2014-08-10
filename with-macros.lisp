@@ -114,6 +114,15 @@
        (values))))
 
 
+(defmacro with-fast-feature-detector (bind &body body)
+  "Ensures DEL-FAST-FEATURE-DETECTOR gets called when 
+   a FAST-FEATURE-DETECTOR object goes out of scope."
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-fast-feature-detector %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
+
+
 (defmacro with-file-node (bind &body body)
   "Ensures DEL-FILE-NODE gets called when 
    a FILE-NODE object goes out of scope."

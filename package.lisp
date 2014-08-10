@@ -3,7 +3,7 @@
 (defpackage :lisp-cv
   (:nicknames #:lisp-cv #:lcv #:cv)
   (:use #:cffi #:common-lisp #:swank #:trivial-garbage #:lisp-executable #:bordeaux-threads) 
-  (:shadow #:abs #:exp #:fill #:get #:length #:load #:log #:min #:max #:open #:read #:set #:sqrt #:write)
+  (:shadow #:abs #:exp #:fill #:length #:load #:log #:min #:max #:open #:read #:set #:sqrt #:write)
   (:export 
 
 ;
@@ -59,11 +59,13 @@
    #:%string
    #:c-string
    #:c-string-to-string
+   #:std-string-to-c-string
 
 
 ;; Extra OpenCV constants
 
    #:+max-dim+
+   #:+pi+
 
 ;; C Constants
 
@@ -666,14 +668,13 @@
    #:dot
    #:height
    #:is-opened
-   #:load
-   #:length
    #:match
    #:predict
    #:release
    #:save
    #:size
    #:train
+   #:type*
    #:width
    #:x
    #:y
@@ -684,6 +685,8 @@
 
    #:abs
    #:exp
+   #:load
+   #:length
    #:log
    #:max
    #:min
@@ -802,6 +805,7 @@
    #:elem-size
    #:elem-size1
    #:empty
+   #:epsilon
    #:force
    #:img-idx
    #:inv
@@ -867,6 +871,7 @@
    #:mat-to-arr
    #:mat-type
    #:mat-zeros
+   #:max-count
    #:mul
    #:octave
    #:point
@@ -952,6 +957,9 @@
    #:sub
    #:tl
    #:term-criteria
+   #:term-criteria-epsilon
+   #:term-criteria-max-count
+   #:term-criteria-type
    #:total
    #:train-idx
    #:vec-2b
@@ -1175,7 +1183,8 @@
    #:check-hardware-support
    #:cube-root
    #:fast-atan2
-   #:get-number-of-cpu-s
+   #:get-build-information
+   #:get-number-of-cpus
    #:get-tick-count
    #:get-tick-frequency
 
@@ -1482,6 +1491,10 @@
    #:+lsd-refine-adv+
 
    #:canny
+   #:corner-sub-pix
+   #:good-features-to-track
+   #:hough-lines
+   #:hough-lines-p
 
 ;; imgproc - Object Detection
 
@@ -1645,10 +1658,10 @@
 
 ;;; features2d - Drawing Function of Keypoints and Matches
 
-   #:+default+
-   #:+draw-over-outimg+
-   #:+not-draw-single-points+
-   #:+draw-rich-keypoints+
+   #:+draw-matches-flags-default+
+   #:+draw-matches-flags-draw-over-outimg+
+   #:+draw-matches-flags-not-draw-single-points+
+   #:+draw-matches-flags-draw-rich-keypoints+
 
    #:draw-matches
 
