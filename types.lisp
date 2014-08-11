@@ -1117,6 +1117,30 @@
     matrix-expressions))
 
 
+;; PCA
+
+
+(define-foreign-type pca ()
+  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+                     :garbage-collect))
+  (:actual-type :pointer)
+  (:simple-parser pca))
+
+
+(defclass cv-pca ()
+  ((c-pointer :reader c-pointer :initarg :c-pointer)))
+
+
+ (defmethod translate-to-foreign ((lisp-value cv-pca) (c-type pca))
+    (values  (c-pointer lisp-value) lisp-value))
+
+
+(defmethod translate-from-foreign (c-pointer (c-type pca))
+  (let ((pca (make-instance 'cv-pca :c-pointer c-pointer)))
+    (when (garbage-collect c-type)
+      (tg:finalize pca (lambda () (del-pca c-pointer))))
+    pca))
+
 
 ;; POINT
 

@@ -98,6 +98,12 @@
 (defgeneric match (self &rest args)
   (:documentation "Used for all class bindings with a MATCH member function."))
 
+(defgeneric mean (self &rest args)
+  (:documentation "Used to overload the MEAN name for functions, members, and member functions."))
+
+(defgeneric (setf mean) (val self)
+  (:documentation "Used to setf the MEAN value of class bindings with an MEAN member."))
+
 (defgeneric open (self &rest args)
   (:documentation "Used for all class bindings with a OPEN member function."))
 
@@ -693,6 +699,20 @@
 (defmethod match ((self cv-bf-matcher) &rest args)
   "Finds the best match for each descriptor from a query set."
   (apply #'descriptor-matcher-match self args))
+
+
+(defmethod mean ((self cv-mat) &rest args)
+  "Calculates an average mean of matrix elements."
+  (apply #'%mean self args))
+
+
+(defmethod mean ((self cv-pca) &rest args)
+  args
+  (pca-mean self))
+
+
+(defmethod (setf mean) ((val cv-mat) (self cv-pca))
+  (pca-set-mean self val))
 
 
 (defmethod open ((self cv-file-storage) &rest args)

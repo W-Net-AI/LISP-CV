@@ -224,6 +224,9 @@
   (+kmeans-random-centers+ 0)
   (+kmeans-pp-centers+ 2)
   (+kmeans-use-initial-labels+ 1)
+  (+pca-data-as-row+ 0)
+  (+pca-data-as-col+ 1)
+  (+pca-use-avg+ 2)
 
 
 ;;; highgui

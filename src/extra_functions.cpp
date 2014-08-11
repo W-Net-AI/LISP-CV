@@ -132,6 +132,46 @@ ADD_READ_FUNC_IMPL_1(m, Mat);
 
 ADD_READ_FUNC_IMPL_2(vkp, vector_KeyPoint);
 
+Mat* cv_PCA_get_eigenvectors(PCA* self) {
+    return new Mat(self->eigenvectors);
+}
+
+Mat* cv_PCA_set_Eigenvectors(PCA* self, Mat* val) {
+   return new Mat(self->eigenvectors = *val);
+}
+
+Mat* cv_PCA_get_eigenvalues(PCA* self) {
+    return new Mat(self->eigenvalues);
+}
+
+Mat* cv_PCA_set_Eigenvalues(PCA* self, Mat* val) {
+   return new Mat(self->eigenvalues = *val);
+}
+
+Mat* cv_PCA_get_Mean(PCA* self) {
+    return new Mat(self->mean);
+}
+
+Mat* cv_PCA_set_Mean(PCA* self, Mat* val) {
+   return new Mat(self->mean = *val);
+}
+
+Mat* cv_PCA_BackProject1(PCA* self, Mat* vec) {
+    return new Mat (self->backProject(*vec));
+}
+
+Mat* cv_PCA_Project1(PCA* self, Mat* vec) {
+    return new Mat (self->project(*vec));
+}
+
+PCA* cv_create_PCA() {
+    return new PCA();
+}
+
+PCA* cv_create_PCA4(Mat* data, Mat* mean, int flags, double retainedVariance) {
+    return new PCA(*data, *mean, flags, retainedVariance);
+}
+
 typedef vector<DMatch> vector_DMatch;
 
 DMatch* cv_vector_DMatch_at_1(vector_DMatch* self, int idx) {
@@ -770,7 +810,7 @@ void cv_Mat_at_Vec3w_set_Val_1(Mat* self, int i, Vec3w* val) {
   self->at<Vec3w>(i) = *val;
 }
 
-Vec3w* cv_Mat_at_Vec3_2(Mat* self, int i, int j) {
+Vec3w* cv_Mat_at_Vec3w_2(Mat* self, int i, int j) {
   return &self->at<Vec3w>(i, j);
 } 
 
@@ -1162,6 +1202,10 @@ void cv_delete_CvKNearest(CvKNearest* self) {
 }
 
 void cv_delete_CvNormalBayesClassifier(CvNormalBayesClassifier* self) {
+     delete self;
+}
+
+void cv_delete_PCA(PCA* self) {
      delete self;
 }
 

@@ -10,7 +10,7 @@
 ;;; D-TREE-NODE 
 
 
-(cffi:defcstruct d-tree-node
+(defcstruct d-tree-node
 
 	(class_idx :int)
 	(Tn :int)
@@ -39,7 +39,7 @@
 
 ;;; CV-TERM-CRITERIA
 
-(cffi:defcstruct term-criteria-struct
+(defcstruct term-criteria-struct
 
 	(type :int)
 	(max-iter :int)
@@ -50,7 +50,7 @@
 ;; try (:actual-type (:pointer (:struct key-point)))
 
 
-;(cffi:defcstruct key-point1
+;(defcstruct key-point1
 	;(x :float)
 ;        (y :float)
 	;(size :float)

@@ -11,6 +11,12 @@
 (defgeneric clone (self)
   (:documentation "Used for all bindings with a clone member."))
 
+(defgeneric mean (self &rest args)
+  (:documentation "Used to overload the MEAN name for functions, members, and member functions."))
+
+(defgeneric (setf mean) (val self)
+  (:documentation "Used to setf the MEAN value of class bindings with an MEAN member."))
+
 (defgeneric size (arg &rest args)
   (:documentation "Used for all bindings with a size member."))
 
@@ -2027,16 +2033,140 @@ ret))
 
 ;; Scalar mean(InputArray src, InputArray mask=noArray())
 ;; Scalar* cv_mean(Mat* src, Mat* mask)
-(defcfun ("cv_mean" %mean) (cv:scalar :garbage-collect t)
+(defcfun ("cv_mean" %%mean) (cv:scalar :garbage-collect t)
 	 (src cv:mat)
 	 (mask cv:mat))
 
 
-(defun mean (src &optional (mask (cv:%mat) given-mask) return)
-  "Calculates an average mean of array elements."
-  (setf return (%mean src mask))
+(defun %mean (src &optional (mask (cv:%mat) given-mask) return)
+  "Calculates an average mean of matrix elements."
+  (setf return (%%mean src mask))
   (if given-mask nil (cv:del-mat mask))
   return)
+
+
+(defmethod mean ((self cv:cv-mat) &rest args)
+  "Calculates an average mean of matrix elements."
+  (apply #'%mean self args))
+
+
+;; PCA::PCA()
+;; PCA* cv_create_PCA()
+(defcfun ("cv_create_PCA" pca-0) (cv:pca :garbage-collect t))
+
+
+;; PCA::PCA(InputArray data, InputArray mean, int flags, double retainedVariance)
+;; PCA* cv_create_PCA4(Mat* data, Mat* mean, int flags, double retainedVariance) 
+(defcfun ("cv_create_PCA4" pca-4) (cv:pca :garbage-collect t)
+  (data cv:mat)
+  (mean cv:mat)
+  (flags :int)
+  (retained-variance :double))
+
+
+(defun pca (&optional data mean flags retained-variance)
+  "PCA constructor"
+  (cond (data
+	 (pca-4 data mean flags retained-variance))
+	(t
+	 (pca-0))))
+
+
+(defun make-pca (&optional data mean flags retained-variance)
+  "PCA constructor"
+  (cond (data
+	 (pca-4 data mean flags retained-variance))
+	(t
+	 (pca-0))))
+
+
+;; Mat PCA::eigenvalues
+;; Mat* cv_PCA_get_eigenvalues(PCA* self)
+(defcfun ("cv_PCA_get_eigenvalues" pca-eigenvalues) (cv:mat :garbage-collect t) 
+  "Gets the eigenvalues of the covariation matrix(PCA)."
+  (self cv:pca))
+ 
+
+;; Mat PCA::eigenvalues
+;; Mat* cv_PCA_get_eigenvalues(PCA* self)
+(defcfun ("cv_PCA_get_eigenvalues" eigenvalues) (cv:mat :garbage-collect t) 
+  "Gets the eigenvalues of the covariation matrix(PCA)."
+  (self cv:pca))
+
+
+;; Mat* cv_PCA_set_Eigenvalues(PCA* self, Mat* val)
+(defcfun ("cv_PCA_set_Eigenvalues" pca-set-eigenvalues) (cv:mat :garbage-collect t) 
+  "Sets the eigenvalues of the covariation matrix(PCA)."
+  (self cv:pca)
+  (val cv:mat))
+
+
+(defun (setf pca-eigenvalues) (val self)
+  (pca-set-eigenvalues self val))
+
+
+(defun (setf eigenvalues) (val self)
+  (pca-set-eigenvalues self val))
+
+
+;; Mat PCA::eigenvectors
+;; Mat* cv_PCA_get_eigenvectors(PCA* self)
+(defcfun ("cv_PCA_get_eigenvectors" pca-eigenvectors) (cv:mat :garbage-collect t) 
+  "Gets the eigenvectors of the covariation matrix(PCA)."
+  (self cv:pca))
+
+ 
+;; Mat PCA::eigenvectors
+;; Mat* cv_PCA_get_eigenvectors(PCA* self)
+(defcfun ("cv_PCA_get_eigenvectors" eigenvectors) (cv:mat :garbage-collect t) 
+  "Gets the eigenvectors of the covariation matrix(PCA)."
+  (self cv:pca))
+
+
+;; Mat* cv_PCA_set_Eigenvectors(PCA* self, Mat* val)
+(defcfun ("cv_PCA_set_Eigenvectors" pca-set-eigenvectors) (cv:mat :garbage-collect t) 
+  "Sets the eigenvectors of the covariation matrix(PCA)."
+  (self cv:pca)
+  (val cv:mat))
+
+
+(defun (setf pca-eigenvectors) (val self)
+  (pca-set-eigenvectors self val))
+
+
+(defun (setf eigenvectors) (val self)
+  (pca-set-eigenvectors self val))
+
+
+;; Mat PCA::mean
+;; Mat* cv_PCA_get_Mean(PCA* self)
+(defcfun ("cv_PCA_get_Mean" pca-mean) (cv:mat :garbage-collect t) 
+  "This function gets the mean value subtracted before 
+   the projection and added after the back projection.
+   (PCA)"
+  (self cv:pca))
+ 
+ 
+;; Mat* cv_PCA_set_Mean(PCA* self, Mat* val)
+(defcfun ("cv_PCA_set_Mean" pca-set-mean) (cv:mat :garbage-collect t) 
+  "This function sets the mean value subtracted before 
+   the projection and added after the back projection.
+   (PCA)"
+  (self cv:pca)
+  (val cv:mat))
+
+
+(defun (setf pca-mean) (val self)
+  (pca-set-mean self val))
+
+
+(defmethod mean ((self cv:cv-pca) &rest args)
+  args
+  (pca-mean self))
+
+
+(defmethod (setf mean) ((val cv:cv-mat) (self cv:cv-pca))
+  (pca-set-mean self val))
 
 
 ;; RNG::RNG()

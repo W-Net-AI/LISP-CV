@@ -141,6 +141,13 @@
 
 
 ;; void operator delete  ( void* ptr )
+;; void cv_delete_PCA(PCA* self)
+(defcfun ("cv_delete_PCA" del-pca) :void
+  "Calls delete on a PCA object."
+  (self pca))
+
+
+;; void operator delete  ( void* ptr )
 ;; void cv_delete_Point(Point* self)
 (defcfun ("cv_delete_Point" del-point) :void
   "Calls delete on a POINT object."

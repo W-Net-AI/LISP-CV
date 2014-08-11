@@ -210,6 +210,15 @@
        (values))))
 
 
+(defmacro with-pca (bind &body body)
+  "Ensures DEL-PCA gets called when 
+   a PCA object goes out of scope."
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-pca %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
+
+
 (defmacro with-point (bind &body body)
   "Ensures DEL-POINT gets called when 
    a POINT object goes out of scope."

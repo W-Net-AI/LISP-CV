@@ -109,6 +109,7 @@
    #:del-mat
    #:del-mat-expr
    #:del-normal-bayes-classifier
+   #:del-pca
    #:del-point
    #:del-point-2d
    #:del-point-2f
@@ -201,6 +202,7 @@
    #:with-named-window
    #:with-normal-bayes-classifier
    #:with-object
+   #:with-pca
    #:with-point
    #:with-point-2d
    #:with-point-2f
@@ -297,6 +299,7 @@
    #:mat-struct
    #:mouse-callback
    #:normal-bayes-classifier
+   #:pca
    #:point
    #:point-2d
    #:point-2f
@@ -388,6 +391,7 @@
    #:cv-mat-struct
    #:cv-mouse-callback
    #:cv-normal-bayes-classifier
+   #:cv-pca
    #:cv-point
    #:cv-point-2d
    #:cv-point-2f
@@ -669,6 +673,7 @@
    #:height
    #:is-opened
    #:match
+   #:mean
    #:predict
    #:release
    #:save
@@ -1033,9 +1038,13 @@
    #:+covar-cols+ 
    #:+rng-uniform+
    #:+rng-normal+
+   #+pca-data-as-row+
+   #+pca-data-as-col+
+   #+pca-use-avg+
 
    #:abs-diff
    #:add-weighted
+   #:back-project
    #:bitwise-and
    #:bitwise-not
    #:bitwise-or
@@ -1046,19 +1055,29 @@
    #:convert-scale-abs
    #:determinant
    #:divide
+   #:eigenvalues
+   #:eigenvectors
    #:flip
    #:in-range-s
    #:inv
    #:invert
    #:magnitude
    #:mahalanobis
+   #:make-pca
    #:make-rng
-   #:mean
    #:min-max-loc
    #:mul-transposed
    #:multiply
    #:norm
    #:normalize
+   #:pca
+   #:pca-eigenvalues
+   #:pca-eigenvectors
+   #:pca-mean
+   #:pca-back-project
+   #:pca-project
+   #:pca-back-project
+   #:project
    #:phase
    #:pow
    #:randu

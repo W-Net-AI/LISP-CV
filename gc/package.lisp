@@ -289,6 +289,13 @@
    #:vec-vec-4w-to-lisp-list
    #:vec-vec-4w-to-lisp-vec
 
+
+;; DEFGENERIC
+
+   #:clone
+   #:mean
+   #:size
+
 ;;; Functions and methods used to 
 ;;; re-import shadowed symbols.
 
@@ -416,9 +423,15 @@
 
 ;; core - Operations on Arrays
 
+   #:eigenvalues
+   #:eigenvectors
    #:inv
-   #:mean
+   #:make-pca
    #:make-rng
+   #:pca
+   #:pca-eigenvalues
+   #:pca-eigenvectors
+   #:pca-mean
    #:rng
    #:sum
 

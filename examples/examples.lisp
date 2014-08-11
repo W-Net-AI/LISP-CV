@@ -4164,6 +4164,45 @@ Example:
 ========================================================================================================================================
 #CORE - #OPERATIONS ON ARRAYS
 ========================================================================================================================================
+========================================================================================================================================
+#TRACE*
+========================================================================================================================================
+
+Returns the trace of a matrix.
+
+C++: Scalar trace(InputArray mtx)
+
+LISP-CV: (TRACE* (MTX MAT)) => SCALAR
+
+
+    Parameters:	
+
+        MTX - Input matrix.
+
+The function TRACE* returns the sum of the diagonal elements of the matrix MTX.
+
+
+See OpenCV Documentation at this link:
+
+http://docs.opencv.org/trunk/modules/core/doc/operations_on_arrays.html?highlight=trace#trace
+
+for the formula.
+
+
+Note: This function is named TRACE* instead of TRACE because, TRACE is the name of a Common Lisp macro.
+
+
+Example:
+
+(defun trace*-example ()
+    ;;Create a 3x3 matrix called MTX
+    (with-object ((data (alloc :uchar '(1 2 3 4 5 6 7 8 9))))
+      (with-mat ((mtx (mat 3 3 +8u+ data)))
+	;;Print MTX
+	(format t "~%MTX = ~%~%")
+	(print-mat mtx)
+	;;Print the sum of the diagonal of MTX
+	(format t "~%The sum of the diagonal of MTX is ~a~%~%" (@ (trace* mtx) :double)))))
 
 ========================================================================================================================================
 #ABS
@@ -4217,414 +4256,6 @@ Example:
           (format t "~%The absolute value of all MAT elements:~%~%")
 	  (print-mat forced-abs-val)
 	  (format t "~%"))))))
-
-========================================================================================================================================
-EXP
-========================================================================================================================================
-
-Calculates the exponent of every array element.
-
-Note: The LISP-CV function EXP overloads the Common Lisp function EXP so both functions can use the 
-same name. The LISP-CV function EXP provides the the same functionality as the Common Lisp function 
-EXP and the OpenCV 'exp' function. To use the Common Lisp function EXP directly, while you are in the 
-LISP-CV package, you need to evaluate CL:EXP.
-
-C++: void exp(InputArray src, OutputArray dst)
-
-LISP-CV: (EXP (SRC MAT) (DEST MAT)) => :VOID
-
-
-    Parameters:	
-
-        SRC - Input array.
-
-        DEST - Output array of the same size and type as SRC.
-
-
-The function EXP calculates the exponent of every element of the input array:
-
-See OpenCV documentation:
-
-http://docs.opencv.org/modules/core/doc/operations_on_arrays.html?highlight=log#exp 
-
-for a description and formula.
-
-
-See also:
-
-(LOG), (CART-TO-POLAR), (POLAR-TO-CART), (PHASE), (POW), (SQRT), (MAGNITUDE)
-
-
-Example:
-
-(defun exp-example ()
-  ;;Create double float matrix data
-  (with-object ((data (alloc :double '(1d0 2d0 3d0 4d0 5d0 
-				       6d0 7d0 8d0 9d0))))
-    ;;Create double float matrix
-    (with-mat ((mat (mat 3 3 +64f+ data)))
-      (format t "~%MAT: ~%~%")
-      ;;Print MAT
-      (print-mat mat)
-      ;;Calculate exponent of each element of 
-      ;;MAT, using MAT as destination matrix
-      (format t "~%Calculate exponent of each element of MAT: ~%~%")
-      (exp mat mat)
-      (format t "MAT: ~%~%")
-      ;;Print MAT
-      (print-mat mat)
-      ;;Calculating natural logarithm of each 
-      ;;matrix element of MAT, virtually reve-
-      ;;rts MAT to it's original state
-      (format t "~%Calculate natural logarithm or each element of MAT: ~%~%")
-      (log mat mat)
-      (format t "MAT: ~%~%")
-      ;;Print MAT
-      (print-mat mat)
-      (format t "~%"))))
-
-========================================================================================================================================
-#LOG
-========================================================================================================================================
-
-Calculates the natural logarithm of every array element.
-
-Note: The LISP-CV function LOG overloads the Common Lisp function LOG so both functions can use the 
-same name. The LISP-CV function LOG provides the the same functionality as the Common Lisp function 
-LOG and the OpenCV 'log' function. To use the Common Lisp function LOG directly, while in the LISP-CV
-package, you need to evaluate CL:LOG.
-
-C++: void log(InputArray src, OutputArray dst)
-
-LISP-CV: (LOG (SRC MAT) (DEST MAT)) => :VOID
-
-
-    Parameters:	
-
-        SRC - Input array.
-
-        DST - Output array of the same size and type as SRC.
-
-
-The function LOG calculates the natural logarithm of the absolute value of every element of the 
-input array:
-
-
-See OpenCV documentation:
-
-http://docs.opencv.org/modules/core/doc/operations_on_arrays.html?highlight=log#log
-
-for a description and formula.
-
-
-See also:
-
-(EXP), (CART-TO-POLAR), (POLAR-TO-CART), (PHASE), (POW), (SQRT), (MAGNITUDE)
-
-
-Example:
-
-(defun log-example ()
-
-  ;;Create double float matrix data
-  (with-object ((data (alloc :double '(1d0 2d0 3d0 4d0 5d0 
-				       6d0 7d0 8d0 9d0))))
-    (with-mat ((mat (mat 3 3 +64f+ data)))
-      (format t "~%MAT:~%~%")
-      ;;Print MAT
-      (print-mat mat)
-      ;;Calculate natural logarithm of each element 
-      ;;of MAT, using MAT as destination matrix
-      (format t "~%Calculate natural logarithm... ~%~%")
-      (log mat mat)
-      (format t "MAT:~%~%")
-      ;;Print MAT
-      (print-mat mat)
-      (format t "~%"))))
-
-========================================================================================================================================
-#MAX
-========================================================================================================================================
-
-Calculates per-element maximum of two arrays.
-
-Note: The LISP-CV function MAX overloads the Common Lisp function MAX so both functions can use the 
-same name. The LISP-CV function MAX provides the the same functionality as the Common Lisp function 
-MAX and the OpenCV 'max' function. To use the Common Lisp function MAX directly, while in the LISP-CV 
-package, you need to evaluate CL:MAX.
-
-C++: void max(InputArray src1, InputArray src2, OutputArray dst)
-
-LISP-CV: (MAX (SRC1 MAT) (SRC2 MAT) (DEST MAT)) => :VOID    (loop while (not (= (wait-key 0) 27)))
-
-
-    Parameters:	
-
-        SRC1 - First input array.
-
-        SRC2 - Second input array of the same size and type as SRC1.
-
-        DEST - Output array of the same size and type as SRC1.
-
-
-The function MAX calculates the per-element maximum of two arrays. When the input array is multi-channel, 
-each channel is compared with value independently.
-
-
-See also:
-
-(MIN), (COMPARE), (IN-RANGE), (MIN-MAX-LOC), Matrix Expressions(MAT-EXPR)
-
-
-Example:
-
-(defun max-example (&optional (cam 0)
-		      (width *default-width*)
-		      (height *default-height*))
-
-  "Look at the first window and notice that whatever is black
-   in the first window has a beautiful glow in the third wind-
-   ow. You can change the effect by altering the color of the 
-   matrix MAT-3 in the middle window with the trackbar. The t-
-   rackbar changes the scalar value the ASSIGN method uses to
-   decide what to set each element of MAT-3 to."
-
-  ;;Create camera capture, CAP, set CAP to default width and height
-  (with-captured-camera (cap cam :width width :height height)  
-    (let* ((window-name-1 "MAT-3 after THRESHOLD - MAX-Example")
-	   (window-name-2 "MAT-5 after ASSIGN - MAX-Example")
-	   (window-name-3 "MAT-4 after MAX - MAX-Example"))
-      ;;Create two matrices: MAT-1 and MAT-2(used to show how MAX works)
-      (with-object ((data-1 (alloc :int '(1 2 3 4 5 6 7 8 9)))
-		    (data-2 (alloc :int '(9 8 7 6 5 4 3 2 1))))
-	(with-mat ((mat-1 (mat 3 3 +32s+ data-1))
-		   (mat-2 (mat 3 3 +32s+ data-2))
-		   ;;Create destination matrix of same size and type: DEST
-		   (dest (mat 3 3 +32s+))
-		   ;;Create 3 matrices used to hold 
-		   ;;data we use later in the example
-		   (mat-3 (mat height width +8u+))
-		   (mat-4 (mat height width +8u+))
-		   (mat-5 (mat height width +8u+))) 
-	  ;;Create windows and move to specified locations
-	  (with-named-window (window-name-1 +window-normal+)
-	    (with-named-window (window-name-2 +window-normal+)
-	      (with-named-window (window-name-3 +window-normal+)
-		(move-window window-name-1 310 175)
-		(move-window window-name-2 760 175)
-		(move-window window-name-3 1210 175)
-		;;Print MAT-1
-		(format t "~%~%MAT-1:~%~%")
-		(print-mat mat-1)
-		(format t "~%~%")
-		;;Print MAT-2
-		(format t "MAT-2:~%~%")
-		(print-mat mat-2)
-		(format t "~%~%")
-		;;Find per element maximum of 
-		;;MAT-1 and MAT-2, set to DEST
-		(max mat-1 mat-2 dest)
-		;;Print DEST
-		(format t "Per element maximum of MAT-1 and  MAT-2:~%~%")
-		(print-mat dest)
-		(format t "~%~%")
-		;;Allocate :int pointer for trackbar to change
-		(with-object ((val (alloc :int 76)))
-		  ;;Create trackbar on middle window which changes 
-		  ;;the scalar value ASSIGN uses in loop
-		  (create-trackbar "Value of mat-3" window-name-2 val 255)
-		  (with-mat ((frame (mat)))
-		    (loop
-		       ;;Set camera feed to FRAME
-		       (read cap frame)
-		       ;;Convert FRAME to 1 channel 
-		       ;;grayscale image, set to mat-1
-		       ;;FRAME stays the same
-		       (cvt-color frame mat-3 +bgr2gray+)
-		       ;;Convert FRAME to 1 channel 
-		       ;;grayscale image, set to MAT-4
-		       ;;FRAME stays the same
-		       (cvt-color frame mat-4  +bgr2gray+)
-		       ;;Apply a fixed-level threshold to 
-		       ;;each array element of MAT-3
-		       (threshold mat-3 mat-3 128d0 255d0 +thresh-binary-inv+)
-		       ;;Assign each element of MAT-5 a scalar value
-		       (assign mat-5 (scalar (mem-aref val :int)))
-		       ;;Find the maximum of each element 
-		       ;;of MAT-4 and MAT-5, set to MAT-4
-		       (max mat-4 mat-5 mat-4)
-		       ;;Show MAT-3, MAT-5 and MAT-4 in windows
-		       (imshow window-name-1 mat-3)
-		       (imshow window-name-2 mat-5)
-		       (imshow window-name-3 mat-4)
-		       (let ((c (wait-key 33)))
-			 (when (= c 27)
-			   (return))))))))))))))
-
-========================================================================================================================================
-#MIN
-========================================================================================================================================
-
-Calculates per-element minimum of two arrays.
-
-Note: The LISP-CV function MIN overloads the Common Lisp function MIN so both functions can use the 
-same name. The LISP-CV function MIN provides the the same functionality as the Common Lisp function 
-MIN and the OpenCV 'min' function. To use the Common Lisp function MIN directly, while in the LISP-CV 
-package, you need to evaluate CL:MIN.
-
-C++: void min(InputArray src1, InputArray src2, OutputArray dst)
-
-LISP-CV: (MIN (SRC1 MAT) (SRC2 MAT) (DEST MAT)) => :VOID
-
-
-    Parameters:	
-
-        SRC1 - First input array.
-
-        SRC2 - Second input array of the same size and type as SRC1.
-
-        DEST - Output array of the same size and type as SRC1.
-
-
-The function MIN calculates the per-element minimum of two arrays. When the input array is multi-
-channel, each channel is compared with value independently.
-
-
-See also:
-
-(MAX), (COMPARE), (IN-RANGE), (MIN-MAX-LOC), Matrix Expressions(MAT-EXPR)
-
-
-Example:
-
-(defun min-example (&optional (cam 0)
-		      (width *default-width*)
-		      (height *default-height*))
-
-  "Look at the first window and notice that whatever is black
-   in the first window has a beautiful glow in the third wind-
-   ow. You can change the effect by altering the color of the 
-   matrix MAT-3 in the middle window with the trackbar. The t-
-   rackbar changes the scalar value the ASSIGN method uses to
-   decide what to set each element of MAT-3 to."
-
-  ;;Create video capture, CAP. Set CAP to default width and height
-  (with-captured-camera (cap cam :width width :height height)   
-    ;;Create two matrices: MAT-1 and MAT-2(used to show how MIN works)
-    (with-object ((data-1 (alloc :int '(1 2 3 4 5 6 7 8 9)))
-		  (data-2  (alloc :int '(9 8 7 6 5 4 3 2 1))))
-      (with-mat ((mat-1 (mat 3 3 +32s+ data-1))
-		 (mat-2 (mat 3 3 +32s+ data-2))
-		 ;;Create destination matrix of same size and type, DEST
-		 (dest (mat 3 3 +32s+))
-		 ;;Create 3 matrices used to hold the
-		 ;;data we use later in the example
-		 (mat-3 (mat height width +8u+))
-		 (mat-4 (mat height width +8u+))
-		 (mat-5 (mat height width +8u+)))
-	(let ((window-name-1 "MAT-3 after THRESHOLD - MIN-Example")
-	      (window-name-2 "MAT-5 after ASSIGN - MIN-Example")
-	      (window-name-3 "MAT-4 after MIN - MIN-Example")) 
-	  ;;Create windows and move to specified locations
-	  (with-named-window (window-name-1 +window-normal+)
-	    (with-named-window (window-name-2 +window-normal+)
-	      (with-named-window (window-name-3 +window-normal+)
-		(move-window window-name-1 310 175)
-		(move-window window-name-2 760 175)
-		(move-window window-name-3 1210 175)
-		;;Allocate int pointer for trackbar to change
-		(with-object ((val (alloc :int '(128))))
-		  ;;Create trackbar on the middle window that changes 
-		  ;;the scalar value the method ASSIGN will use.
-		  (create-trackbar "Value of mat-3" window-name-2 val 255)
-		  ;;Print MAT-1
-		  (format t "~%MAT-1:~%~%")
-		  (print-mat mat-1)
-		  (format t "~%")
-		  ;;Print MAT-2
-		  (format t "MAT-2:~%~%")
-		  (print-mat mat-2)
-		  (format t "~%")
-		  ;;Find per element minimum of 
-		  ;;MAT-1 and MAT-2, set to DEST
-		  (min mat-1 mat-2 dest)
-		  ;;Print DEST
-		  (format t "Per element minimum of MAT-1 and  MAT-2:~%~%")
-		  (print-mat dest)
-		  (format t "~%")
-		  (with-mat ((frame (mat)))
-		    (loop
-		       ;;Set camera feed to FRAME
-		       (read cap frame)
-		       ;;Convert FRAME to 1 channel grayscale 
-		       ;;image, set to MAT-3. FRAME stays the 
-		       ;;same
-		       (cvt-color frame mat-3 +bgr2gray+)
-		       ;;Convert FRAME to 1 channel grayscale 
-		       ;;image, set to MAT-4. FRAME stays the 
-		       ;;same
-		       (cvt-color frame mat-4  +bgr2gray+)
-		       ;;Apply a fixed-level threshold to 
-		       ;;each array element of MAT-3
-		       (threshold mat-3 mat-3 128d0 255d0 +thresh-binary-inv+)
-		       
-		       ;;Assign each element of MAT-5 a scalar value
-
-		       ;;Note: The 't:' prefix to SCALAR toggles its 
-		       ;;finalizer to true. Also, '@' is a macro for 
-		       ;;CFFI::MEM-AREF
-
-		       (assign mat-5 (t:scalar (@ val :int)))
-		       ;;Find the minimum of each element 
-		       ;;of MAT-4 AND MAT-5, set to MAT-4
-		       (min mat-4 mat-5 mat-4)
-		       ;;Show MAT-3, MAT-4 and MAT-5 in windows
-		       (imshow window-name-1 mat-3)
-		       (imshow window-name-2 mat-5)
-		       (imshow window-name-3 mat-4) 
-		       (let ((c (wait-key 33)))
-			 (when (= c 27)
-			   (return))))))))))))))
-
-========================================================================================================================================
-TRACE*
-========================================================================================================================================
-
-Returns the trace of a matrix.
-
-C++: Scalar trace(InputArray mtx)
-
-LISP-CV: (TRACE* (MTX MAT)) => SCALAR
-
-
-    Parameters:	
-
-        MTX - Input matrix.
-
-The function TRACE* returns the sum of the diagonal elements of the matrix MTX.
-
-
-See OpenCV Documentation at this link:
-
-http://docs.opencv.org/trunk/modules/core/doc/operations_on_arrays.html?highlight=trace#trace
-
-for the formula.
-
-
-Note: This function is named TRACE* instead of TRACE because, TRACE is the name of a Common Lisp macro.
-
-
-Example:
-
-(defun trace*-example ()
-    ;;Create a 3x3 matrix called MTX
-    (with-object ((data (alloc :uchar '(1 2 3 4 5 6 7 8 9))))
-      (with-mat ((mtx (mat 3 3 +8u+ data)))
-	;;Print MTX
-	(format t "~%MTX = ~%~%")
-	(print-mat mtx)
-	;;Print the sum of the diagonal of MTX
-	(format t "~%The sum of the diagonal of MTX is ~a~%~%" (@ (trace* mtx) :double)))))
 
 ========================================================================================================================================
 #ABSDIFF
@@ -5435,6 +5066,71 @@ See also:
       (format t "~%"))))
 
 ========================================================================================================================================
+#EXP
+========================================================================================================================================
+
+Calculates the exponent of every array element.
+
+Note: The LISP-CV function EXP overloads the Common Lisp function EXP so both functions can use the 
+same name. The LISP-CV function EXP provides the the same functionality as the Common Lisp function 
+EXP and the OpenCV 'exp' function. To use the Common Lisp function EXP directly, while you are in the 
+LISP-CV package, you need to evaluate CL:EXP.
+
+C++: void exp(InputArray src, OutputArray dst)
+
+LISP-CV: (EXP (SRC MAT) (DEST MAT)) => :VOID
+
+
+    Parameters:	
+
+        SRC - Input array.
+
+        DEST - Output array of the same size and type as SRC.
+
+
+The function EXP calculates the exponent of every element of the input array:
+
+See OpenCV documentation:
+
+http://docs.opencv.org/modules/core/doc/operations_on_arrays.html?highlight=log#exp 
+
+for a description and formula.
+
+
+See also:
+
+(LOG), (CART-TO-POLAR), (POLAR-TO-CART), (PHASE), (POW), (SQRT), (MAGNITUDE)
+
+
+Example:
+
+(defun exp-example ()
+  ;;Create double float matrix data
+  (with-object ((data (alloc :double '(1d0 2d0 3d0 4d0 5d0 
+				       6d0 7d0 8d0 9d0))))
+    ;;Create double float matrix
+    (with-mat ((mat (mat 3 3 +64f+ data)))
+      (format t "~%MAT: ~%~%")
+      ;;Print MAT
+      (print-mat mat)
+      ;;Calculate exponent of each element of 
+      ;;MAT, using MAT as destination matrix
+      (format t "~%Calculate exponent of each element of MAT: ~%~%")
+      (exp mat mat)
+      (format t "MAT: ~%~%")
+      ;;Print MAT
+      (print-mat mat)
+      ;;Calculating natural logarithm of each 
+      ;;matrix element of MAT, virtually reve-
+      ;;rts MAT to it's original state
+      (format t "~%Calculate natural logarithm or each element of MAT: ~%~%")
+      (log mat mat)
+      (format t "MAT: ~%~%")
+      ;;Print MAT
+      (print-mat mat)
+      (format t "~%"))))
+
+========================================================================================================================================
 #FLIP
 ========================================================================================================================================
 
@@ -5763,6 +5459,65 @@ Example:
 		   (return))))))))))
 
 ========================================================================================================================================
+#LOG
+========================================================================================================================================
+
+Calculates the natural logarithm of every array element.
+
+Note: The LISP-CV function LOG overloads the Common Lisp function LOG so both functions can use the 
+same name. The LISP-CV function LOG provides the the same functionality as the Common Lisp function 
+LOG and the OpenCV 'log' function. To use the Common Lisp function LOG directly, while in the LISP-CV
+package, you need to evaluate CL:LOG.
+
+C++: void log(InputArray src, OutputArray dst)
+
+LISP-CV: (LOG (SRC MAT) (DEST MAT)) => :VOID
+
+
+    Parameters:	
+
+        SRC - Input array.
+
+        DST - Output array of the same size and type as SRC.
+
+
+The function LOG calculates the natural logarithm of the absolute value of every element of the 
+input array:
+
+
+See OpenCV documentation:
+
+http://docs.opencv.org/modules/core/doc/operations_on_arrays.html?highlight=log#log
+
+for a description and formula.
+
+
+See also:
+
+(EXP), (CART-TO-POLAR), (POLAR-TO-CART), (PHASE), (POW), (SQRT), (MAGNITUDE)
+
+
+Example:
+
+(defun log-example ()
+
+  ;;Create double float matrix data
+  (with-object ((data (alloc :double '(1d0 2d0 3d0 4d0 5d0 
+				       6d0 7d0 8d0 9d0))))
+    (with-mat ((mat (mat 3 3 +64f+ data)))
+      (format t "~%MAT:~%~%")
+      ;;Print MAT
+      (print-mat mat)
+      ;;Calculate natural logarithm of each element 
+      ;;of MAT, using MAT as destination matrix
+      (format t "~%Calculate natural logarithm... ~%~%")
+      (log mat mat)
+      (format t "MAT:~%~%")
+      ;;Print MAT
+      (print-mat mat)
+      (format t "~%"))))
+
+========================================================================================================================================
 #MAGNITUDE
 ========================================================================================================================================
 
@@ -5899,6 +5654,125 @@ Example:
       (format t "~a~%~%"(mahalanobis p1 p2 invcovar)))))
 
 ========================================================================================================================================
+#MAX
+========================================================================================================================================
+
+Calculates per-element maximum of two arrays.
+
+Note: The LISP-CV function MAX overloads the Common Lisp function MAX so both functions can use the 
+same name. The LISP-CV function MAX provides the the same functionality as the Common Lisp function 
+MAX and the OpenCV 'max' function. To use the Common Lisp function MAX directly, while in the LISP-CV 
+package, you need to evaluate CL:MAX.
+
+C++: void max(InputArray src1, InputArray src2, OutputArray dst)
+
+LISP-CV: (MAX (SRC1 MAT) (SRC2 MAT) (DEST MAT)) => :VOID    (loop while (not (= (wait-key 0) 27)))
+
+
+    Parameters:	
+
+        SRC1 - First input array.
+
+        SRC2 - Second input array of the same size and type as SRC1.
+
+        DEST - Output array of the same size and type as SRC1.
+
+
+The function MAX calculates the per-element maximum of two arrays. When the input array is multi-channel, 
+each channel is compared with value independently.
+
+
+See also:
+
+(MIN), (COMPARE), (IN-RANGE), (MIN-MAX-LOC), Matrix Expressions(MAT-EXPR)
+
+
+Example:
+
+(defun max-example (&optional (cam 0)
+		      (width *default-width*)
+		      (height *default-height*))
+
+  "Look at the first window and notice that whatever is black
+   in the first window has a beautiful glow in the third wind-
+   ow. You can change the effect by altering the color of the 
+   matrix MAT-3 in the middle window with the trackbar. The t-
+   rackbar changes the scalar value the ASSIGN method uses to
+   decide what to set each element of MAT-3 to."
+
+  ;;Create camera capture, CAP, set CAP to default width and height
+  (with-captured-camera (cap cam :width width :height height)  
+    (let* ((window-name-1 "MAT-3 after THRESHOLD - MAX-Example")
+	   (window-name-2 "MAT-5 after ASSIGN - MAX-Example")
+	   (window-name-3 "MAT-4 after MAX - MAX-Example"))
+      ;;Create two matrices: MAT-1 and MAT-2(used to show how MAX works)
+      (with-object ((data-1 (alloc :int '(1 2 3 4 5 6 7 8 9)))
+		    (data-2 (alloc :int '(9 8 7 6 5 4 3 2 1))))
+	(with-mat ((mat-1 (mat 3 3 +32s+ data-1))
+		   (mat-2 (mat 3 3 +32s+ data-2))
+		   ;;Create destination matrix of same size and type: DEST
+		   (dest (mat 3 3 +32s+))
+		   ;;Create 3 matrices used to hold 
+		   ;;data we use later in the example
+		   (mat-3 (mat height width +8u+))
+		   (mat-4 (mat height width +8u+))
+		   (mat-5 (mat height width +8u+))) 
+	  ;;Create windows and move to specified locations
+	  (with-named-window (window-name-1 +window-normal+)
+	    (with-named-window (window-name-2 +window-normal+)
+	      (with-named-window (window-name-3 +window-normal+)
+		(move-window window-name-1 310 175)
+		(move-window window-name-2 760 175)
+		(move-window window-name-3 1210 175)
+		;;Print MAT-1
+		(format t "~%~%MAT-1:~%~%")
+		(print-mat mat-1)
+		(format t "~%~%")
+		;;Print MAT-2
+		(format t "MAT-2:~%~%")
+		(print-mat mat-2)
+		(format t "~%~%")
+		;;Find per element maximum of 
+		;;MAT-1 and MAT-2, set to DEST
+		(max mat-1 mat-2 dest)
+		;;Print DEST
+		(format t "Per element maximum of MAT-1 and  MAT-2:~%~%")
+		(print-mat dest)
+		(format t "~%~%")
+		;;Allocate :int pointer for trackbar to change
+		(with-object ((val (alloc :int 76)))
+		  ;;Create trackbar on middle window which changes 
+		  ;;the scalar value ASSIGN uses in loop
+		  (create-trackbar "Value of mat-3" window-name-2 val 255)
+		  (with-mat ((frame (mat)))
+		    (loop
+		       ;;Set camera feed to FRAME
+		       (read cap frame)
+		       ;;Convert FRAME to 1 channel 
+		       ;;grayscale image, set to mat-1
+		       ;;FRAME stays the same
+		       (cvt-color frame mat-3 +bgr2gray+)
+		       ;;Convert FRAME to 1 channel 
+		       ;;grayscale image, set to MAT-4
+		       ;;FRAME stays the same
+		       (cvt-color frame mat-4  +bgr2gray+)
+		       ;;Apply a fixed-level threshold to 
+		       ;;each array element of MAT-3
+		       (threshold mat-3 mat-3 128d0 255d0 +thresh-binary-inv+)
+		       ;;Assign each element of MAT-5 a scalar value
+		       (assign mat-5 (scalar (mem-aref val :int)))
+		       ;;Find the maximum of each element 
+		       ;;of MAT-4 and MAT-5, set to MAT-4
+		       (max mat-4 mat-5 mat-4)
+		       ;;Show MAT-3, MAT-5 and MAT-4 in windows
+		       (imshow window-name-1 mat-3)
+		       (imshow window-name-2 mat-5)
+		       (imshow window-name-3 mat-4)
+		       (let ((c (wait-key 33)))
+			 (when (= c 27)
+			   (return))))))))))))))
+
+========================================================================================================================================
 #MEAN
 ========================================================================================================================================
 
@@ -6020,6 +5894,131 @@ Example:
 	       (let ((c (wait-key 33)))
 		 (when (= c 27)
 		   (return))))))))))
+
+========================================================================================================================================
+#MIN
+========================================================================================================================================
+
+Calculates per-element minimum of two arrays.
+
+Note: The LISP-CV function MIN overloads the Common Lisp function MIN so both functions can use the 
+same name. The LISP-CV function MIN provides the the same functionality as the Common Lisp function 
+MIN and the OpenCV 'min' function. To use the Common Lisp function MIN directly, while in the LISP-CV 
+package, you need to evaluate CL:MIN.
+
+C++: void min(InputArray src1, InputArray src2, OutputArray dst)
+
+LISP-CV: (MIN (SRC1 MAT) (SRC2 MAT) (DEST MAT)) => :VOID
+
+
+    Parameters:	
+
+        SRC1 - First input array.
+
+        SRC2 - Second input array of the same size and type as SRC1.
+
+        DEST - Output array of the same size and type as SRC1.
+
+
+The function MIN calculates the per-element minimum of two arrays. When the input array is multi-
+channel, each channel is compared with value independently.
+
+
+See also:
+
+(MAX), (COMPARE), (IN-RANGE), (MIN-MAX-LOC), Matrix Expressions(MAT-EXPR)
+
+
+Example:
+
+(defun min-example (&optional (cam 0)
+		      (width *default-width*)
+		      (height *default-height*))
+
+  "Look at the first window and notice that whatever is black
+   in the first window has a beautiful glow in the third wind-
+   ow. You can change the effect by altering the color of the 
+   matrix MAT-3 in the middle window with the trackbar. The t-
+   rackbar changes the scalar value the ASSIGN method uses to
+   decide what to set each element of MAT-3 to."
+
+  ;;Create video capture, CAP. Set CAP to default width and height
+  (with-captured-camera (cap cam :width width :height height)   
+    ;;Create two matrices: MAT-1 and MAT-2(used to show how MIN works)
+    (with-object ((data-1 (alloc :int '(1 2 3 4 5 6 7 8 9)))
+		  (data-2  (alloc :int '(9 8 7 6 5 4 3 2 1))))
+      (with-mat ((mat-1 (mat 3 3 +32s+ data-1))
+		 (mat-2 (mat 3 3 +32s+ data-2))
+		 ;;Create destination matrix of same size and type, DEST
+		 (dest (mat 3 3 +32s+))
+		 ;;Create 3 matrices used to hold the
+		 ;;data we use later in the example
+		 (mat-3 (mat height width +8u+))
+		 (mat-4 (mat height width +8u+))
+		 (mat-5 (mat height width +8u+)))
+	(let ((window-name-1 "MAT-3 after THRESHOLD - MIN-Example")
+	      (window-name-2 "MAT-5 after ASSIGN - MIN-Example")
+	      (window-name-3 "MAT-4 after MIN - MIN-Example")) 
+	  ;;Create windows and move to specified locations
+	  (with-named-window (window-name-1 +window-normal+)
+	    (with-named-window (window-name-2 +window-normal+)
+	      (with-named-window (window-name-3 +window-normal+)
+		(move-window window-name-1 310 175)
+		(move-window window-name-2 760 175)
+		(move-window window-name-3 1210 175)
+		;;Allocate int pointer for trackbar to change
+		(with-object ((val (alloc :int '(128))))
+		  ;;Create trackbar on the middle window that changes 
+		  ;;the scalar value the method ASSIGN will use.
+		  (create-trackbar "Value of mat-3" window-name-2 val 255)
+		  ;;Print MAT-1
+		  (format t "~%MAT-1:~%~%")
+		  (print-mat mat-1)
+		  (format t "~%")
+		  ;;Print MAT-2
+		  (format t "MAT-2:~%~%")
+		  (print-mat mat-2)
+		  (format t "~%")
+		  ;;Find per element minimum of 
+		  ;;MAT-1 and MAT-2, set to DEST
+		  (min mat-1 mat-2 dest)
+		  ;;Print DEST
+		  (format t "Per element minimum of MAT-1 and  MAT-2:~%~%")
+		  (print-mat dest)
+		  (format t "~%")
+		  (with-mat ((frame (mat)))
+		    (loop
+		       ;;Set camera feed to FRAME
+		       (read cap frame)
+		       ;;Convert FRAME to 1 channel grayscale 
+		       ;;image, set to MAT-3. FRAME stays the 
+		       ;;same
+		       (cvt-color frame mat-3 +bgr2gray+)
+		       ;;Convert FRAME to 1 channel grayscale 
+		       ;;image, set to MAT-4. FRAME stays the 
+		       ;;same
+		       (cvt-color frame mat-4  +bgr2gray+)
+		       ;;Apply a fixed-level threshold to 
+		       ;;each array element of MAT-3
+		       (threshold mat-3 mat-3 128d0 255d0 +thresh-binary-inv+)
+		       
+		       ;;Assign each element of MAT-5 a scalar value
+
+		       ;;Note: The 't:' prefix to SCALAR toggles its 
+		       ;;finalizer to true. Also, '@' is a macro for 
+		       ;;CFFI::MEM-AREF
+
+		       (assign mat-5 (t:scalar (@ val :int)))
+		       ;;Find the minimum of each element 
+		       ;;of MAT-4 AND MAT-5, set to MAT-4
+		       (min mat-4 mat-5 mat-4)
+		       ;;Show MAT-3, MAT-4 and MAT-5 in windows
+		       (imshow window-name-1 mat-3)
+		       (imshow window-name-2 mat-5)
+		       (imshow window-name-3 mat-4) 
+		       (let ((c (wait-key 33)))
+			 (when (= c 27)
+			   (return))))))))))))))
 
 ========================================================================================================================================
 #MIN-MAX-LOC
@@ -6493,6 +6492,210 @@ See also:
 Example:
 
 See MATCH-TEMPLATE-EXAMPLE for example usage of NORMALIZE.
+
+========================================================================================================================================
+#PCA
+========================================================================================================================================
+
+PCA constructors
+
+Note: Both PCA and MAKE-PCA are provided in this library. The first, to match OpenCV's naming 
+conventions, the second, to adhere to Common Lisp naming conventions. Except for the name, they 
+are the same function. I use the PCA function in the examples in this file because it will make 
+them easier to compare with OpenCV examples you find online, thus making this library easier to 
+learn.
+
+C++: PCA::PCA()
+
+LISP-CV: (PCA) => PCA
+
+LISP-CV: (MAKE-PCA) => PCA
+
+C++: PCA::PCA(InputArray data, InputArray mean, int flags, double retainedVariance)
+
+LISP-CV: (PCA (DATA MAT) (MEAN MAT) (FLAGS :INT) (RETAINED-VARIANCE :DOUBLE)) => PCA
+
+    Parameters:	
+
+        DATA - Input samples stored as matrix rows or matrix columns.
+
+        MEAN - Optional mean value; if the matrix is empty, the mean is computed from the data.
+
+        FLAGS - Operation flags; currently the parameter is only used to specify the data layout:
+
+            +PCA-DATA-AS-ROW+ indicates that the input samples are stored as matrix rows.
+
+            +PCA-DATA-AS-COL+ indicates that the input samples are stored as matrix columns.
+
+        RETAINED-VARIANCE - Percentage of variance that PCA should retain. Using this parameter will 
+                            let the PCA decided how many components to retain but it will always keep 
+                            at least 2.
+
+
+The default constructor initializes an empty PCA structure. The other constructors initialize the 
+structure and call PCA::operator()(In the underlying C++ code).
+
+
+Example:
+
+#|
+
+This program demonstrates how to use LispCV PCA with
+a specified amount of variance to retain. The effect 
+is illustrated further by using a trackbar to change 
+the value for retained varaince. The program takes a
+text file as input with each line of the file consis-
+ting of the full path to an image. PCA will be perfo-
+rmed on this list of images. It is reccommended that 
+you use the first 15 faces of the AT&T face data set:
+http://www.cl.cam.ac.uk/research/dtg/attarchive/facedatabase.html
+so your input text file would end up looking like this:
+
+<path_to_at&t_faces>/orl_faces/s1/1.pgm
+<path_to_at&t_faces>/orl_faces/s2/1.pgm
+<path_to_at&t_faces>/orl_faces/s3/1.pgm
+<path_to_at&t_faces>/orl_faces/s4/1.pgm
+<path_to_at&t_faces>/orl_faces/s5/1.pgm
+<path_to_at&t_faces>/orl_faces/s6/1.pgm
+<path_to_at&t_faces>/orl_faces/s7/1.pgm
+<path_to_at&t_faces>/orl_faces/s8/1.pgm
+<path_to_at&t_faces>/orl_faces/s9/1.pgm
+<path_to_at&t_faces>/orl_faces/s10/1.pgm
+<path_to_at&t_faces>/orl_faces/s11/1.pgm
+<path_to_at&t_faces>/orl_faces/s12/1.pgm
+<path_to_at&t_faces>/orl_faces/s13/1.pgm
+<path_to_at&t_faces>/orl_faces/s14/1.pgm
+<path_to_at&t_faces>/orl_faces/s15/1.pgm
+
+|#
+
+;;Note: The t: prefix to some of these functions enables automatic GC.
+
+;;Initialize global variables.
+(defparameter win-name "Reconstruction - PCA Example") 
+(defparameter data 0) 
+(defparameter ch 0) 
+(defparameter rows 0) 
+(defparameter pca 0) 
+
+
+;;;Functions:
+
+(defun read-img-list (filename)
+  (let ((in (open filename :if-does-not-exist nil))
+	(img-list (list)))
+    (if in
+	(loop for line = (read-line in nil)
+
+	   while line do
+	     (push (t:imread line 0) img-list))
+	(error "No valid input file was given, please check the given filename."))
+    (close in)
+    (reverse img-list)))
+
+
+(defun format-images-for-pca (data-list)
+
+  (let* ((dest (mat (length data-list) (* (cols (nth 0 data-list)) 
+					  (rows (nth 0 data-list))) +32F+))
+         (image-row)
+	 (row-i))
+    (dotimes (i (length data-list))
+      (setf image-row (t:reshape (t:clone (nth i data-list)) 1 1))
+      (setf row-i (t:row dest i))
+      (convert-to image-row row-i +32f+))
+    dest))
+
+
+(defun to-grayscale (src) 
+  ;;Only allow one channel.
+  (if (not (= (channels src) 1))
+      (error  "Only Matrices with one channel are supported")
+      ;;Create and return normalized image.
+      (let ((dest (mat)))
+	(normalize src dest 0d0 255d0 +norm-minmax+ +8uc1+)
+	dest)))
+
+
+(defcallback on-trackbar :void ((pos :int))
+
+  (format t "Retained Variance = ~a%~%" pos)
+  (format t "re-calculating PCA...~%")
+
+  ;;Don't let POS go below 1 
+  ;;or program will freeze.
+  (if (eq pos 0) (setf pos 1))
+
+  (let ((var (float (/ pos 100) 1d0)))
+
+    (setf pca (pca data (t:mat) +pca-data-as-row+ var))
+
+    (with-mat ((data-row-0 (row data 0))
+	       (point (project pca data-row-0))
+	       (reconstruction (back-project pca point))
+	       (reshaped-reconstruction (reshape reconstruction ch rows))
+	       (grayscale-reconstruction (to-grayscale reshaped-reconstruction)))
+
+      (imshow win-name grayscale-reconstruction)
+      (format t "done!  # of principal components: ~a~%" 
+	      (rows (t:eigenvectors pca))))))
+
+
+(defun pca-example (csv)
+
+  ;;Vector to hold the images.
+  (let ((img-list (read-img-list csv)))
+
+    ;;Quit if there are not enough images for this demo.
+    (if (<= (length img-list) 1)       
+	(error "This demo needs at least 2 images to work. Please add more images to your data set!"))
+
+    ;;Reshape and stack images into a row matrix.
+    (with-mat ((data (format-images-for-pca img-list)))
+
+      ;;;Perform PCA.
+
+      ;;Trackbar is initially set here, also this is a common value 
+      ;;for RETAINED-VARIANCE.
+      (with-pca ((pca (pca data (t:mat) +pca-data-as-row+ 0.95d0))) 
+
+	;;;Demonstration of the effect of RETAINED-VARIANCE on the first image.
+
+	(with-mat ((data-row-0 (row data 0))
+		   ;;Project into the eigenspace, thus the image becomes a "point".
+		   (point (project pca data-row-0)) 
+		   ;;Re-create the image from the "point".
+		   (reconstruction (back-project pca point))
+		   ;;Reshape from a row vector into image shape.
+		   (reshaped-reconstruction (reshape reconstruction (channels (nth 0 img-list)) 
+						     (rows (nth 0 img-list))))
+		   ;;Re-scale for displaying purposes.
+		   (grayscale-reconstruction (to-grayscale reshaped-reconstruction))) 
+
+	  ;;Data the trackbar can adjust.
+	  (let ((pos (t:alloc :int 95)))
+
+	    ;;Initialize highgui window.
+	    (with-named-window (win-name +window-normal+)
+	      (move-window win-name 759 175)
+
+	      ;;Pass data to trackbar handler 
+              ;;through the global variables.
+	      (setf data data)
+	      (setf ch (channels (nth 0 img-list)))
+	      (setf rows (rows (nth 0 img-list)))
+	      (setf pca pca)
+	      
+	      ;;Create the tracbar.
+	      (create-trackbar "Retained Variance (%)" win-name pos 
+			       100 (callback on-trackbar))
+
+	      ;;Display until user presses Esc.
+	      (imshow win-name grayscale-reconstruction)
+	      (loop
+		 (let ((c (wait-key )))
+		   (when (= c 27)
+		     (return)))))))))))
 
 ========================================================================================================================================
 #PHASE
