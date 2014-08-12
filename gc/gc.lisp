@@ -8,6 +8,9 @@
 
 ;;; DEFGENERIC (*defgeneric functions are placed here so the whole file can use them*)
 
+(defgeneric abs (self)
+  (:documentation "Used to call the GC'ed binding for the OpenCV function 'abs'"))
+
 (defgeneric clone (self)
   (:documentation "Used for all bindings with a clone member."))
 
@@ -1049,15 +1052,22 @@ ret))
 	       (t nil)))
 
 
-;; Point_<_Tp> br() const
+;; Point Rect::br() const
 ;; Point* cv_Rect_br(Rect* self) 
 (defcfun ("cv_Rect_br" rect-br) (cv:point :garbage-collect t)
-	 "Retrievies the bottom-right corner of a rectangle."
-	 (self cv:rect))
+  "Retrieves the bottom-right corner of a rectangle."
+  (self cv:rect))
 
 
-;; Rect_(_Tp _x, _Tp _y, _Tp _width, _Tp _height)
-;; _Tp x, y, width, height
+;; Point Rect::br() const
+;; Point* cv_Rect_br(Rect* self) 
+(defcfun ("cv_Rect_br" br) (cv:point :garbage-collect t)
+  "Retrieves the bottom-right corner of a rectangle."
+  (self cv:rect))
+
+
+;; Rect(int x, int y, int width, int height)
+;; Rect::x, Rect::y, Rect::width, Rect::height
 ;; Rect* cv_Rect_clone(Rect* self)
 (defcfun ("cv_Rect_clone" clone-rect) (cv:rect :garbage-collect t)
 	 (self cv:rect))
@@ -1080,11 +1090,18 @@ ret))
   (rect-size arg))
 
 
-;; Point_<_Tp> tl() const
+;; Point Rect::tl() const
 ;; Point* cv_Rect_tl(Rect* self) 
-(defcfun ("cv_Rect_tl" rect-tl) (cv:point :garbage-collect t) 
-	 "Retrievies the top-left corner of a rectangle."
-	 (self cv:rect))
+(defcfun ("cv_Rect_tl" rect-tl) (cv:point :garbage-collect t)
+  "Retrieves the top-left corner of a rectangle."
+  (self cv:rect))
+
+
+;; Point Rect::tl() const
+;; Point* cv_Rect_tl(Rect* self) 
+(defcfun ("cv_Rect_tl" tl) (cv:point :garbage-collect t)
+  "Retrieves the top-left corner of a rectangle."
+  (self cv:rect))
 
 
 ;; Mat Mat::reshape(int cn, int rows=0) const
@@ -2018,7 +2035,7 @@ ret))
 
 ;; Scalar trace(InputArray mtx)
 ;; Scalar* cv_trace(Mat* mtx)
-(defcfun ("cv_trace" %trace) (cv:scalar :garbage-collect t)
+(defcfun ("cv_trace" trace*) (cv:scalar :garbage-collect t)
   "Returns the trace of a matrix."
   (mtx cv:mat))
 
@@ -2167,6 +2184,46 @@ ret))
 
 (defmethod (setf mean) ((val cv:cv-mat) (self cv:cv-pca))
   (pca-set-mean self val))
+
+
+;; Mat PCA::backProject(InputArray vec) const
+;; Mat* cv_PCA_BackProject1(PCA* self, Mat* vec)
+(defcfun ("cv_PCA_BackProject1" pca-back-project-1) (cv:mat :garbage-collect t) 
+  "Reconstructs vectors from their PC projections."
+  (self cv:pca)
+  (vec cv:mat))
+
+
+(defun pca-back-project (self vec &optional result)
+  (if result
+      (cv:pca-back-project-2 self vec result)
+      (pca-back-project-1 self vec)))
+
+
+(defun back-project (self vec &optional result)
+  (if result
+      (cv:pca-back-project-2 self vec result)
+      (pca-back-project-1 self vec)))
+
+
+;; Mat PCA::project(InputArray vec) const
+;; Mat* cv_PCA_project1(PCA* self, Mat* vec)
+(defcfun ("cv_PCA_Project1" pca-project-1) (cv:mat :garbage-collect t) 
+  "Projects vector(s) to the principal component subspace."
+  (self cv:pca)
+  (vec cv:mat))
+
+
+(defun pca-project (self vec &optional result)
+  (if result
+      (cv:pca-project-2 self vec result)
+      (pca-project-1 self vec)))
+
+
+(defun project (self vec &optional result)
+  (if result
+      (cv:pca-project-2 self vec result)
+      (pca-project-1 self vec)))
 
 
 ;; RNG::RNG()

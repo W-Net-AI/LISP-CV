@@ -379,6 +379,8 @@
    #:range
    #:range-all
    #:rect
+   #:rect-br
+   #:rect-tl
    #:rect-size
    #:reshape
    #:reshape-rows
@@ -423,15 +425,19 @@
 
 ;; core - Operations on Arrays
 
+   #:back-project
    #:eigenvalues
    #:eigenvectors
    #:inv
    #:make-pca
    #:make-rng
    #:pca
+   #:pca-back-project
    #:pca-eigenvalues
    #:pca-eigenvectors
    #:pca-mean
+   #:pca-project
+   #:project
    #:rng
    #:sum
 

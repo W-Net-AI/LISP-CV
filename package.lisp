@@ -879,6 +879,7 @@
    #:max-count
    #:mul
    #:octave
+   #:pm
    #:point
    #:point-x
    #:point-y
@@ -900,14 +901,17 @@
    #:point-3i-x
    #:point-3i-y
    #:point-3i-z
+   #:pp
    #:print-mat
    #:print-point
+   #:print-point-2i
    #:print-point-2d
    #:print-point-2f
    #:print-point-3d
    #:print-point-3f
    #:print-point-3i
    #:print-scalar
+   #:print-vec
    #:print-vec-2b
    #:print-vec-2d
    #:print-vec-2f
@@ -931,6 +935,7 @@
    #:print-vec-6i
    #:print-vec-8i
    #:promote
+   #:pv
    #:push-back
    #:%ptr
    #:ptr
@@ -940,6 +945,8 @@
    #:range-all
    #:range-start
    #:rect
+   #:rect-br
+   #:rect-tl
    #:reshape
    #:reshape-rows
    #:response
@@ -1074,9 +1081,10 @@
    #:pca-eigenvalues
    #:pca-eigenvectors
    #:pca-mean
+   #:pca-back-project-2
    #:pca-back-project
+   #:pca-project-2
    #:pca-project
-   #:pca-back-project
    #:project
    #:phase
    #:pow

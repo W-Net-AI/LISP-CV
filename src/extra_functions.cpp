@@ -132,6 +132,10 @@ ADD_READ_FUNC_IMPL_1(m, Mat);
 
 ADD_READ_FUNC_IMPL_2(vkp, vector_KeyPoint);
 
+void cv_Mat_set_Type(Mat* self, int val) {
+    self->convertTo(*self, val);
+}
+
 Mat* cv_PCA_get_eigenvectors(PCA* self) {
     return new Mat(self->eigenvectors);
 }
@@ -160,8 +164,16 @@ Mat* cv_PCA_BackProject1(PCA* self, Mat* vec) {
     return new Mat (self->backProject(*vec));
 }
 
+void cv_PCA_BackProject2(PCA* self, Mat* vec, Mat* result) {
+    self->backProject(*vec, *result);
+}
+
 Mat* cv_PCA_Project1(PCA* self, Mat* vec) {
     return new Mat (self->project(*vec));
+}
+
+void cv_PCA_Project2(PCA* self, Mat* vec, Mat* result) {
+    self->project(*vec, *result);
 }
 
 PCA* cv_create_PCA() {
@@ -1005,11 +1017,11 @@ int cv_Range_getend(Range* self) {
 }
 
 void cv_HOGDescriptor_detectMultiScale9_2(HOGDescriptor* self, Mat* img, vector_Rect* foundLocations, double hitThreshold, Size* winStride, Size* padding, double scale, double finalThreshold, bool useMeanshiftGrouping) {
-	self->detectMultiScale(*img, *foundLocations,  hitThreshold, *winStride, *padding, scale, finalThreshold, useMeanshiftGrouping);
+    self->detectMultiScale(*img, *foundLocations,  hitThreshold, *winStride, *padding, scale, finalThreshold, useMeanshiftGrouping);
 }
 
 void cv_HOGDescriptor_setSVMDetector2(HOGDescriptor* self, vector_float* _svmdetector) {
-	self->setSVMDetector(*_svmdetector);
+    self->setSVMDetector(*_svmdetector);
 }
 
 CvSVMParams* cv_create_CvSVMParams() {
@@ -1017,15 +1029,15 @@ CvSVMParams* cv_create_CvSVMParams() {
 }
 
 CvSVMParams* cv_create_CvSVMParams10(int svm_type, int kernel_type, double degree, double gamma, double coef0, double Cvalue, double nu, double p, CvMat* class_weights, CvTermCriteria term_crit) {
-   return new CvSVMParams(svm_type, kernel_type, degree, gamma, coef0, Cvalue, nu, p, class_weights, term_crit);
+    return new CvSVMParams(svm_type, kernel_type, degree, gamma, coef0, Cvalue, nu, p, class_weights, term_crit);
 }
 
 void cv_displayOverlay(String* winname, String* text, int delayms) {
-	cv::displayOverlay(*winname, *text, delayms);
+    cv::displayOverlay(*winname, *text, delayms);
 }
 
 MatExpr* cv_abs(Mat* m) {
-	return new MatExpr(cv::abs(*m));
+    return new MatExpr(cv::abs(*m));
 }
 
 float cv_RotatedRect_angle(RotatedRect* self) {

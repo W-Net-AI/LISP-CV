@@ -798,6 +798,21 @@
   (term-criteria-set-type self val))
 
 
+(defmethod (setf type*) ((val integer) (self cv-term-criteria))
+  "Sets the type of a TERM-CRITERIA object."
+  (term-criteria-set-type self val))
+
+
+(defmethod type* ((self cv-mat))
+  "Gets the type of a MAT object."
+  (mat-type self))
+
+
+(defmethod (setf type*) ((val integer) (self cv-mat))
+  "Sets the type of a MAT object."
+  (mat-set-type self val))
+
+
 (defmethod width ((self cv-rect))
   "Retrieves WIDTH value of a RECT object."
   (rect-width self))

@@ -241,8 +241,12 @@
 ;;; #! read-macro - clojure style of lambda functions.
 
 (defvar *name-db*)
-(defmethod name-parse ((symbol symbol))
-  (let ((name-string (string-upcase symbol)))
+
+(defgeneric name-parse (self)
+  (:documentation "Used to overload the name NAME-PARSE."))
+
+(defmethod name-parse ((self symbol))
+  (let ((name-string (string-upcase self)))
     (if (char= #\% (elt name-string 0))
 	(let ((number (progn (when (= 1 (length name-string))
 			       (setq name-string (format nil "~a1" name-string)))
@@ -253,7 +257,7 @@
 	      (let ((new-symb (cons number (gensym))))
 		(setf *name-db* (append *name-db* (list new-symb)))
 		(cdr new-symb)))))
-      symbol)))
+      self)))
 
 (defmethod name-parse ((self t))
   self)

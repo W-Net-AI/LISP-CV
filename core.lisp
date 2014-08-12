@@ -1,7 +1,7 @@
 ;;;; -*- mode: lisp; indent-tabs: nil -*-
 ;;;; core.lisp
 ;;;; OpenCV bindings
-;;;; The Core Functionality.
+;;;; The Core Functionality
 
 
 (in-package :lisp-cv)
@@ -43,8 +43,8 @@
 (defparameter *personalize-print-dmatch* "#")
 
 (defparameter *personalize-print-key-point* "#")
-   
-(defparameter *personalize-print-point* "#")
+
+(defparameter *personalize-print-point-2i* "#")
 
 (defparameter *personalize-print-point-2d* "#")
 
@@ -114,16 +114,16 @@
 ;; Change default parameters
 
 (defun def-params (width height &optional camera-index fps)
-       (setf *default-width* width)
-       (setf *default-height* height)
-       (if camera-index (setf *camera-index* camera-index))
-       (if fps (setf *frames-per-second* fps))
-       (format t "*default-width* = ~a~%" width)
-       (format t "*default-height* = ~a~%" height)
-       (if camera-index (format t "*camera-index* = ~a~%" camera-index)
-	   (format t "*camera-index* = ~a~%" *camera-index*))
-	   (if fps (format t "*frames-per-second* = ~a~%" fps)
-	       (format t "*frames-per-second* = ~a~%" *frames-per-second*)))
+  (setf *default-width* width)
+  (setf *default-height* height)
+  (if camera-index (setf *camera-index* camera-index))
+  (if fps (setf *frames-per-second* fps))
+  (format t "*default-width* = ~a~%" width)
+  (format t "*default-height* = ~a~%" height)
+  (if camera-index (format t "*camera-index* = ~a~%" camera-index)
+      (format t "*camera-index* = ~a~%" *camera-index*))
+  (if fps (format t "*frames-per-second* = ~a~%" fps)
+      (format t "*frames-per-second* = ~a~%" *frames-per-second*)))
 
 
 
@@ -131,19 +131,19 @@
 
 (defmacro continuable (&body body)
   "Catches any error and gives the option to ignore it and continue."
-	  `(restart-case
-	    (progn ,@body)
-	    (continue () :report "Continue")))
+  `(restart-case
+       (progn ,@body)
+     (continue () :report "Continue")))
 
 
 (defun update-swank ()
   "Grabs SWANK connections and tells it to handle requests. 
    Call this every loop in the main loop of your program"
-   (continuable
+  (continuable
     (let ((connection (or swank::*emacs-connection*
 			  (swank::default-connection))))
-			  (when connection
-			    (swank::handle-requests connection t)))))
+      (when connection
+	(swank::handle-requests connection t)))))
 
 
 ;; C-Interop - STRING*
@@ -178,7 +178,7 @@
 
 
 ;; stdstring* create_std_string()
-  "Creates a C++ string object."
+"Creates a C++ string object."
 (defcfun ("create_std_string" %string) string*)
 
 
@@ -204,11 +204,11 @@
   (if (pointerp ptr) ptr (c-pointer ptr)))
 
 (defmacro @ (ptr type &optional (index 0))
-  "CFFI:MEM-AREF macro with C-POINTER reader."
+    "CFFI:MEM-AREF macro with C-POINTER reader."
   `(mem-aref (resolve-pointer ,ptr) ,type ,index))
 
 (defmacro @@ (ptr type &optional (offset 0))
-  "CFFI:MEM-REF macro with C-POINTER reader."
+    "CFFI:MEM-REF macro with C-POINTER reader."
   `(mem-ref (resolve-pointer ,ptr) ,type ,offset))
 
 
@@ -231,13 +231,13 @@
 ;; Mat* force(MatExpr* expr)
 (defcfun ("force" >>) mat
   "Coerces a MAT-EXPR to a MAT."
-   (mat-expr mat-expr))
+  (mat-expr mat-expr))
 
 
 ;; MatExpr* promote(Mat* m) 
 (defcfun ("promote" <<) mat-expr
   "Converts a MAT to a MAT-EXPR." 
-   (mat mat))
+  (mat mat))
 
 
 ;; MatExpr + operator
@@ -269,10 +269,10 @@
 ;; Mat::Mat(int rows, int cols, int type, void* data) 
 ;; Mat* cv_create_Mat_with_data(int rows, int cols, int type, void* data)
 (defcfun ("cv_create_Mat_with_data" create-mat-with-data) mat
-	 (rows :int)
-	 (cols :int)
-	 (type :int)
-	 (data :pointer))
+  (rows :int)
+  (cols :int)
+  (type :int)
+  (data :pointer))
 
 
 (let ((previous nil))
@@ -388,7 +388,7 @@
 (defun arr-to-mat (arr &optional mat-type)
 
   (let* ((array-element-type (array-element-type arr))
-        (array-dimensions (array-dimensions arr))
+	 (array-dimensions (array-dimensions arr))
 	 (x (car array-dimensions))
 	 (y (cadr array-dimensions))
 	 (z (caddr array-dimensions))
@@ -410,35 +410,35 @@
 	(error "~%If (EQ ARRAY-ELEMENT-TYPE T): you must specify the type of the output matrix.~%"))
     (if (eq array-element-type t) 
 
-(setf cffi-type (case mat-type 
-		      (#.+8uc1+ :uchar) 
-		      (#.+8sc1+ :char)
-		      (#.+16uc1+ :ushort)
-		      (#.+16sc1+ :short)
-		      (#.+32sc1+ :int)
-		      (#.+32fc1+ :float)
-		      (#.+64fc1+ :double)
-		      (#.+8uc2+  :uchar)
-		      (#.+8sc2+  :char)
-		      (#.+16uc2+ :ushort)
-		      (#.+16sc2+ :short)
-		      (#.+32sc2+ :int)
-		      (#.+32fc2+ :float)
-		      (#.+64fc2+ :double)
-		      (#.+8uc3+  :uchar)
-		      (#.+8sc3+  :char)
-		      (#.+16uc3+ :ushort)
-		      (#.+16sc3+ :short)
-		      (#.+32sc3+ :int)
-		      (#.+32fc3+ :float)
-		      (#.+64fc3+ :double)
-		      (#.+8uc4+  :uchar)
-		      (#.+8sc4+  :char)
-		      (#.+16uc4+ :ushort)
-		      (#.+16sc4+ :short)
-		      (#.+32sc4+ :int)
-		      (#.+32fc4+ :float)
-		      (#.+64fc4+ :double))))
+	(setf cffi-type (case mat-type 
+			  (#.+8uc1+ :uchar) 
+			  (#.+8sc1+ :char)
+			  (#.+16uc1+ :ushort)
+			  (#.+16sc1+ :short)
+			  (#.+32sc1+ :int)
+			  (#.+32fc1+ :float)
+			  (#.+64fc1+ :double)
+			  (#.+8uc2+  :uchar)
+			  (#.+8sc2+  :char)
+			  (#.+16uc2+ :ushort)
+			  (#.+16sc2+ :short)
+			  (#.+32sc2+ :int)
+			  (#.+32fc2+ :float)
+			  (#.+64fc2+ :double)
+			  (#.+8uc3+  :uchar)
+			  (#.+8sc3+  :char)
+			  (#.+16uc3+ :ushort)
+			  (#.+16sc3+ :short)
+			  (#.+32sc3+ :int)
+			  (#.+32fc3+ :float)
+			  (#.+64fc3+ :double)
+			  (#.+8uc4+  :uchar)
+			  (#.+8sc4+  :char)
+			  (#.+16uc4+ :ushort)
+			  (#.+16sc4+ :short)
+			  (#.+32sc4+ :int)
+			  (#.+32fc4+ :float)
+			  (#.+64fc4+ :double))))
 
 
 
@@ -450,87 +450,87 @@
 			   (setf mat (create-mat-typed x y +8uc1+)))
 		 ((2 3 4)
 		  (setf mat (create-mat-typed x y (case channels 
-					     (2 #.+8uc2+)
-					     (3 #.+8uc3+)
-					     (4 #.+8uc4+)))))))
+						    (2 #.+8uc2+)
+						    (3 #.+8uc3+)
+						    (4 #.+8uc4+)))))))
        (setf ptr (%ptr mat 0))
        (dotimes (n (* area channels))
 	 (setf (mem-aref ptr :uchar n) (row-major-aref arr n)))mat)
 
       (:char 
        (if mat-type (setf mat (create-mat-typed x y mat-type))
-       (case channels (1
-		       (setf mat (create-mat-typed x y +8sc1+)))
-	     ((2 3 4)
-	      (setf mat (create-mat-typed x y (case channels 
-					 (2 #.+8sc2+)
-					 (3 #.+8sc3+)
-					 (4 #.+8sc4+)))))))
+	   (case channels (1
+			   (setf mat (create-mat-typed x y +8sc1+)))
+		 ((2 3 4)
+		  (setf mat (create-mat-typed x y (case channels 
+						    (2 #.+8sc2+)
+						    (3 #.+8sc3+)
+						    (4 #.+8sc4+)))))))
        (setf ptr (%ptr mat 0))
        (dotimes (n (* area channels))
 	 (setf (mem-aref ptr :char n) (row-major-aref arr n)))mat)
 
       (:ushort 
        (if mat-type (setf mat (create-mat-typed x y mat-type))
-       (case channels (1
-		       (setf mat (create-mat-typed x y +16uc1+)))
-	     ((2 3 4)
-	      (setf mat (create-mat-typed x y (case channels 
-					 (2 #.+16uc2+)
-					 (3 #.+16uc3+)
-					 (4 #.+16uc4+)))))))
+	   (case channels (1
+			   (setf mat (create-mat-typed x y +16uc1+)))
+		 ((2 3 4)
+		  (setf mat (create-mat-typed x y (case channels 
+						    (2 #.+16uc2+)
+						    (3 #.+16uc3+)
+						    (4 #.+16uc4+)))))))
        (setf ptr (%ptr mat 0))
        (dotimes (n (* area channels))
 	 (setf (mem-aref ptr :ushort n) (row-major-aref arr n)))mat)
 
       (:short 
        (if mat-type (setf mat (create-mat-typed x y mat-type))
-       (case channels (1
-		       (setf mat (create-mat-typed x y +16sc1+)))
-	     ((2 3 4)
-	      (setf mat (create-mat-typed x y (case channels 
-					 (2 #.+16sc2+)
-					 (3 #.+16sc3+)
-					 (4 #.+16sc4+)))))))
+	   (case channels (1
+			   (setf mat (create-mat-typed x y +16sc1+)))
+		 ((2 3 4)
+		  (setf mat (create-mat-typed x y (case channels 
+						    (2 #.+16sc2+)
+						    (3 #.+16sc3+)
+						    (4 #.+16sc4+)))))))
        (setf ptr (%ptr mat 0))
        (dotimes (n (* area channels))
 	 (setf (mem-aref ptr :short n) (row-major-aref arr n)))mat)
 
       (:int 
        (if mat-type (setf mat (create-mat-typed x y mat-type))
-       (case channels (1
-		       (setf mat (create-mat-typed x y +32sc1+)))
-	     ((2 3 4)
-	      (setf mat (create-mat-typed x y (case channels 
-					 (2 #.+32sc2+)
-					 (3 #.+32sc3+)
-					 (4 #.+32sc4+)))))))
+	   (case channels (1
+			   (setf mat (create-mat-typed x y +32sc1+)))
+		 ((2 3 4)
+		  (setf mat (create-mat-typed x y (case channels 
+						    (2 #.+32sc2+)
+						    (3 #.+32sc3+)
+						    (4 #.+32sc4+)))))))
        (setf ptr (%ptr mat 0))
        (dotimes (n (* area channels))
 	 (setf (mem-aref ptr :int n) (row-major-aref arr n)))mat)
 
       (:float 
        (if mat-type (setf mat (create-mat-typed x y mat-type))
-       (case channels (1
-		       (setf mat (create-mat-typed x y +32fc1+)))
-	     ((2 3 4)
-	      (setf mat (create-mat-typed x y (case channels 
-					 (2 #.+32fc2+)
-					 (3 #.+32fc3+)
-					 (4 #.+32fc4+)))))))
+	   (case channels (1
+			   (setf mat (create-mat-typed x y +32fc1+)))
+		 ((2 3 4)
+		  (setf mat (create-mat-typed x y (case channels 
+						    (2 #.+32fc2+)
+						    (3 #.+32fc3+)
+						    (4 #.+32fc4+)))))))
        (setf ptr (%ptr mat 0))
        (dotimes (n (* area channels))
 	 (setf (mem-aref ptr :float n) (row-major-aref arr n)))mat)
 
       (:double 
        (if mat-type (setf mat (create-mat-typed x y mat-type))
-       (case channels (1
-		       (setf mat (create-mat-typed x y +64fc1+)))
-	     ((2 3 4)
-	      (setf mat (create-mat-typed x y (case channels 
-					 (2 #.+64fc2+)
-					 (3 #.+64fc3+)
-					 (4 #.+64fc4+)))))))
+	   (case channels (1
+			   (setf mat (create-mat-typed x y +64fc1+)))
+		 ((2 3 4)
+		  (setf mat (create-mat-typed x y (case channels 
+						    (2 #.+64fc2+)
+						    (3 #.+64fc3+)
+						    (4 #.+64fc4+)))))))
        (setf ptr (%ptr mat 0))
        (dotimes (n (* area channels))
 	 (setf (mem-aref ptr :double n) (row-major-aref arr n)))mat))))
@@ -545,7 +545,7 @@
 ;; uchar* ptr(int i0=0)
 ;; uchar* cv_Mat_ptr_index(Mat* self, int i)
 (defmacro at (&optional self i j type)
-	  `(mem-aref (%ptr ,self ,i) ,type ,j))
+  `(mem-aref (%ptr ,self ,i) ,type ,j))
 
 
 ;; template<typename T> T& Mat::at(int i) const
@@ -554,7 +554,7 @@
   "Returns a reference to the specified matrix element."
   (self mat)
   (i :int))
- 
+
 
 ;; template<typename T> T& Mat::at(int i, int j)
 ;; char cv_Mat_at_char(Mat* self, int i, int j)
@@ -573,7 +573,7 @@
   (i :int)
   (j :int)
   (k :int))
- 
+
 
 (defun at-char (self i &optional j k)
   (cond (k 
@@ -608,7 +608,7 @@
   (self mat)
   (i :int)
   (j :int))
- 
+
 
 ;; template<typename T> T& Mat::at(int i, int j, int k) 
 ;; double &cv_Mat_at_double_3(Mat* self, int i, int j, int k)
@@ -619,7 +619,7 @@
   (j :int)
   (k :int))
 
- 
+
 (defun at-double (self i &optional j k)
   (cond (k 
 	 (@ (at-double-3 self i j k) :double))
@@ -653,8 +653,8 @@
   (self mat)
   (i :int)
   (j :int))
- 
- 
+
+
 ;; template<typename T> T& Mat::at(int i, int j, int k)
 ;; float &cv_Mat_at_float_3(Mat* self, int i, int j, int k)
 (defcfun ("cv_Mat_at_float_3" at-float-3) :pointer
@@ -663,7 +663,7 @@
   (i :int)
   (j :int)
   (k :int))
- 
+
 
 (defun at-float (self i &optional j k)
   (cond (k 
@@ -689,7 +689,7 @@
   "Returns a reference to the specified matrix element."
   (self mat)
   (i :int))
- 
+
 
 ;; template<typename T> T& Mat::at(int i, int j)
 ;; int cv_Mat_at_int_2(Mat* self, int i, int j)
@@ -698,7 +698,7 @@
   (self mat)
   (i :int)
   (j :int))
- 
+
 
 ;; template<typename T> T& Mat::at(int i, int j, int k)
 ;; int &cv_Mat_at_int_3(Mat* self, int i, int j, int k)
@@ -743,7 +743,7 @@
   (self mat)
   (i :int)
   (j :int))
- 
+
 
 ;; template<typename T> T& Mat::at(int i, int j, int k) 
 ;; short &cv_Mat_at_short_3(Mat* self, int i, int j, int k)
@@ -833,8 +833,8 @@
   (self mat)
   (i :int)
   (j :int))
- 
- 
+
+
 ;; template<typename T> T& Mat::at(int i, int j, int k)
 ;; ushort &cv_Mat_at_ushort_3(Mat* self, int i, int j, int k)
 (defcfun ("cv_Mat_at_ushort_3" at-ushort-3) :pointer
@@ -870,8 +870,8 @@
   (self mat)
   (i :int)
   (j :int))
- 
- 
+
+
 ;; void cv_Mat_at_Scalar_set_Val(Mat* self, int i, int j, Scalar* val)
 (defcfun ("cv_Mat_at_Scalar_set_Val" at-scalar-set-val) scalar
   "Sets an matrix element."
@@ -900,8 +900,8 @@
   (self mat)
   (i :int)
   (j :int))
- 
- 
+
+
 ;; void cv_Mat_at_Point_set_Val_1(Mat* self, int i, Point* val)
 (defcfun ("cv_Mat_at_Point_set_Val_1" at-point-set-val-1) point
   "Sets an matrix element."
@@ -948,8 +948,8 @@
   (self mat)
   (i :int)
   (j :int))
- 
- 
+
+
 ;; void cv_Mat_at_Point2d_set_Val_1(Mat* self, int i, Point2d* val)
 (defcfun ("cv_Mat_at_Point2d_set_Val_1" at-point-2d-set-val-1) point-2d
   "Sets an matrix element."
@@ -996,7 +996,7 @@
   (self mat)
   (i :int)
   (j :int))
- 
+
 
 ;; void cv_Mat_at_Point2f_set_Val_1(Mat* self, int i, Point2f* val)
 (defcfun ("cv_Mat_at_Point2f_set_Val_1" at-point-2f-set-val-1) point-2f
@@ -1044,7 +1044,7 @@
   (self mat)
   (i :int)
   (j :int))
- 
+
 
 ;; void cv_Mat_at_Point3d_set_Val_1(Mat* self, int i, Point3d* val)
 (defcfun ("cv_Mat_at_Point3d_set_Val_1" at-point-3d-set-val-1) point-3d
@@ -1092,7 +1092,7 @@
   (self mat)
   (i :int)
   (j :int))
- 
+
 
 ;; void cv_Mat_at_Point3f_set_Val_1(Mat* self, int i, Point3f* val)
 (defcfun ("cv_Mat_at_Point3f_set_Val_1" at-point-3f-set-val-1) point-3f
@@ -1140,7 +1140,7 @@
   (self mat)
   (i :int)
   (j :int))
- 
+
 
 ;; void cv_Mat_at_Point3i_set_Val_1(Mat* self, int i, Point3i* val)
 (defcfun ("cv_Mat_at_Point3i_set_Val_1" at-point-3i-set-val-1) point-3i
@@ -1173,17 +1173,33 @@
 	 (at-point-3i-set-val-1 self i val))))
 
 
+;; template<typename T> T& Mat::at(int i)
+;; Vec2b* cv_Mat_at_Vec2b_1(Mat* self, int i)
+(defcfun ("cv_Mat_at_Vec2b_1" at-vec-2b-1) vec-2b
+  "Returns a reference to the specified matrix element."
+  (self mat)
+  (i :int))
+
+
+;; void cv_Mat_at_Vec2b_set_Val_1(Mat* self, int i, Vec2b* val)
+(defcfun ("cv_Mat_at_Vec2b_set_Val_1" at-vec-2b-set-val-1) vec-2b
+  "Sets an matrix element."
+  (self mat)
+  (i :int)
+  (val vec-2b))
+
+
 ;; template<typename T> T& Mat::at(int i, int j)
 ;; Vec2b* cv_Mat_at_Vec2b_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Vec2b_2" at-vec-2b) vec-2b
+(defcfun ("cv_Mat_at_Vec2b_2" at-vec-2b-2) vec-2b
   "Returns a reference to the specified matrix element."
   (self mat)
   (i :int)
   (j :int))
- 
- 
+
+
 ;; void cv_Mat_at_Vec2b_set_Val_2(Mat* self, int i, int j, Vec2b* val)
-(defcfun ("cv_Mat_at_Vec2b_set_Val_2" at-vec-2b-set-val) vec-2b
+(defcfun ("cv_Mat_at_Vec2b_set_Val_2" at-vec-2b-set-val-2) vec-2b
   "Sets an matrix element."
   (self mat)
   (i :int)
@@ -1191,21 +1207,45 @@
   (val vec-2b))
 
 
-(defun (setf at-vec-2b) (val self i j)
-  (at-vec-2b-set-val self i j val))
+(defun at-vec-2b (self i &optional j)
+  (if j
+      (at-vec-2b-2 self i j)
+      (at-vec-2b-1 self i)))
+
+
+(defun (setf at-vec-2b) (val self i &optional j)
+  (if j
+      (at-vec-2b-set-val-2 self i j val)
+      (at-vec-2b-set-val-1 self i val)))
+
+
+;; template<typename T> T& Mat::at(int i)
+;; Vec2d* cv_Mat_at_Vec2d_1(Mat* self, int i)
+(defcfun ("cv_Mat_at_Vec2d_1" at-vec-2d-1) vec-2d
+  "Returns a reference to the specified matrix element."
+  (self mat)
+  (i :int))
+
+
+;; void cv_Mat_at_Vec2d_set_Val_1(Mat* self, int i, Vec2d* val)
+(defcfun ("cv_Mat_at_Vec2d_set_Val_1" at-vec-2d-set-val-1) vec-2d
+  "Sets an matrix element."
+  (self mat)
+  (i :int)
+  (val vec-2d))
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
 ;; Vec2d cv_Mat_at_Vec2d_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Vec2d_2" at-vec-2d) vec-2d
+(defcfun ("cv_Mat_at_Vec2d_2" at-vec-2d-2) vec-2d
   "Returns a reference to the specified matrix element."
   (self mat)
   (i :int)
   (j :int))
- 
- 
+
+
 ;; void cv_Mat_at_Vec2d_set_Val_2(Mat* self, int i, int j, Vec2d* val)
-(defcfun ("cv_Mat_at_Vec2d_set_Val_2" at-vec-2d-set-val) vec-2d
+(defcfun ("cv_Mat_at_Vec2d_set_Val_2" at-vec-2d-set-val-2) vec-2d
   "Sets an matrix element."
   (self mat)
   (i :int)
@@ -1213,21 +1253,45 @@
   (val vec-2d))
 
 
-(defun (setf at-vec-2d) (val self i j)
-  (at-vec-2d-set-val self i j val))
+(defun at-vec-2d (self i &optional j)
+  (if j
+      (at-vec-2d-2 self i j)
+      (at-vec-2d-1 self i)))
+
+
+(defun (setf at-vec-2d) (val self i &optional j)
+  (if j
+      (at-vec-2d-set-val-2 self i j val)
+      (at-vec-2d-set-val-1 self i val)))
+
+
+;; template<typename T> T& Mat::at(int i)
+;; Vec2f* cv_Mat_at_Vec2f_1(Mat* self, int i)
+(defcfun ("cv_Mat_at_Vec2f_1" at-vec-2f-1) vec-2f
+  "Returns a reference to the specified matrix element."
+  (self mat)
+  (i :int))
+
+
+;; void cv_Mat_at_Vec2f_set_Val_1(Mat* self, int i, Vec2f* val)
+(defcfun ("cv_Mat_at_Vec2f_set_Val_1" at-vec-2f-set-val-1) vec-2f
+  "Sets an matrix element."
+  (self mat)
+  (i :int)
+  (val vec-2f))
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
 ;; Vec2f* cv_Mat_at_Vec2f_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Vec2f_2" at-vec-2f) vec-2f
+(defcfun ("cv_Mat_at_Vec2f_2" at-vec-2f-2) vec-2f
   "Returns a reference to the specified matrix element."
   (self mat)
   (i :int)
   (j :int))
- 
- 
+
+
 ;; void cv_Mat_at_Vec2f_set_Val_2(Mat* self, int i, int j, Vec2f* val)
-(defcfun ("cv_Mat_at_Vec2f_set_Val_2" at-vec-2f-set-val) vec-2f
+(defcfun ("cv_Mat_at_Vec2f_set_Val_2" at-vec-2f-set-val-2) vec-2f
   "Sets an matrix element."
   (self mat)
   (i :int)
@@ -1235,21 +1299,45 @@
   (val vec-2f))
 
 
-(defun (setf at-vec-2f) (val self i j)
-  (at-vec-2f-set-val self i j val))
+(defun at-vec-2f (self i &optional j)
+  (if j
+      (at-vec-2f-2 self i j)
+      (at-vec-2f-1 self i)))
+
+
+(defun (setf at-vec-2f) (val self i &optional j)
+  (if j
+      (at-vec-2f-set-val-2 self i j val)
+      (at-vec-2f-set-val-1 self i val)))
+
+
+;; template<typename T> T& Mat::at(int i)
+;; Vec2i* cv_Mat_at_Vec2i_1(Mat* self, int i)
+(defcfun ("cv_Mat_at_Vec2i_1" at-vec-2i-1) vec-2i
+  "Returns a reference to the specified matrix element."
+  (self mat)
+  (i :int))
+
+
+;; void cv_Mat_at_Vec2i_set_Val_1(Mat* self, int i, Vec2i* val)
+(defcfun ("cv_Mat_at_Vec2i_set_Val_1" at-vec-2i-set-val-1) vec-2i
+  "Sets an matrix element."
+  (self mat)
+  (i :int)
+  (val vec-2i))
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
 ;; Vec2i* cv_Mat_at_Vec2i_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Vec2i_2" at-vec-2i) vec-2i
+(defcfun ("cv_Mat_at_Vec2i_2" at-vec-2i-2) vec-2i
   "Returns a reference to the specified matrix element."
   (self mat)
   (i :int)
   (j :int))
- 
- 
+
+
 ;; void cv_Mat_at_Vec2i_set_Val_2(Mat* self, int i, int j, Vec2i* val)
-(defcfun ("cv_Mat_at_Vec2i_set_Val_2" at-vec-2i-set-val) vec-2i
+(defcfun ("cv_Mat_at_Vec2i_set_Val_2" at-vec-2i-set-val-2) vec-2i
   "Sets an matrix element."
   (self mat)
   (i :int)
@@ -1257,21 +1345,45 @@
   (val vec-2i))
 
 
-(defun (setf at-vec-2i) (val self i j)
-  (at-vec-2i-set-val self i j val))
+(defun at-vec-2i (self i &optional j)
+  (if j
+      (at-vec-2i-2 self i j)
+      (at-vec-2i-1 self i)))
+
+
+(defun (setf at-vec-2i) (val self i &optional j)
+  (if j
+      (at-vec-2i-set-val-2 self i j val)
+      (at-vec-2i-set-val-1 self i val)))
+
+
+;; template<typename T> T& Mat::at(int i)
+;; Vec2s* cv_Mat_at_Vec2s_1(Mat* self, int i)
+(defcfun ("cv_Mat_at_Vec2s_1" at-vec-2s-1) vec-2s
+  "Returns a reference to the specified matrix element."
+  (self mat)
+  (i :int))
+
+
+;; void cv_Mat_at_Vec2s_set_Val_1(Mat* self, int i, Vec2s* val)
+(defcfun ("cv_Mat_at_Vec2s_set_Val_1" at-vec-2s-set-val-1) vec-2s
+  "Sets an matrix element."
+  (self mat)
+  (i :int)
+  (val vec-2s))
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
 ;; Vec2s* cv_Mat_at_Vec2s_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Vec2s_2" at-vec-2s) vec-2s
+(defcfun ("cv_Mat_at_Vec2s_2" at-vec-2s-2) vec-2s
   "Returns a reference to the specified matrix element."
   (self mat)
   (i :int)
   (j :int))
- 
+
 
 ;; void cv_Mat_at_Vec2s_set_Val_2(Mat* self, int i, int j, Vec2s* val)
-(defcfun ("cv_Mat_at_Vec2s_set_Val_2" at-vec-2s-set-val) vec-2s
+(defcfun ("cv_Mat_at_Vec2s_set_Val_2" at-vec-2s-set-val-2) vec-2s
   "Sets an matrix element."
   (self mat)
   (i :int)
@@ -1279,21 +1391,45 @@
   (val vec-2s))
 
 
-(defun (setf at-vec-2s) (val self i j)
-  (at-vec-2s-set-val self i j val))
+(defun at-vec-2s (self i &optional j)
+  (if j
+      (at-vec-2s-2 self i j)
+      (at-vec-2s-1 self i)))
 
- 
+
+(defun (setf at-vec-2s) (val self i &optional j)
+  (if j
+      (at-vec-2s-set-val-2 self i j val)
+      (at-vec-2s-set-val-1 self i val)))
+
+
+;; template<typename T> T& Mat::at(int i)
+;; Vec2w* cv_Mat_at_Vec2w_1(Mat* self, int i)
+(defcfun ("cv_Mat_at_Vec2w_1" at-vec-2w-1) vec-2w
+  "Returns a reference to the specified matrix element."
+  (self mat)
+  (i :int))
+
+
+;; void cv_Mat_at_Vec2w_set_Val_1(Mat* self, int i, Vec2w* val)
+(defcfun ("cv_Mat_at_Vec2w_set_Val_1" at-vec-2w-set-val-1) vec-2w
+  "Sets an matrix element."
+  (self mat)
+  (i :int)
+  (val vec-2w))
+
+
 ;; template<typename T> T& Mat::at(int i, int j)
 ;; Vec2w* cv_Mat_at_Vec2w_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Vec2w_2" at-vec-2w) vec-2w
+(defcfun ("cv_Mat_at_Vec2w_2" at-vec-2w-2) vec-2w
   "Returns a reference to the specified matrix element."
   (self mat)
   (i :int)
   (j :int))
- 
- 
+
+
 ;; void cv_Mat_at_Vec2w_set_Val_2(Mat* self, int i, int j, Vec2w* val)
-(defcfun ("cv_Mat_at_Vec2w_set_Val_2" at-vec-2w-set-val) vec-2w
+(defcfun ("cv_Mat_at_Vec2w_set_Val_2" at-vec-2w-set-val-2) vec-2w
   "Sets an matrix element."
   (self mat)
   (i :int)
@@ -1301,13 +1437,37 @@
   (val vec-2w))
 
 
-(defun (setf at-vec-2w) (val self i j)
-  (at-vec-2w-set-val self i j val))
+(defun at-vec-2w (self i &optional j)
+  (if j
+      (at-vec-2w-2 self i j)
+      (at-vec-2w-1 self i)))
+
+
+(defun (setf at-vec-2w) (val self i &optional j)
+  (if j
+      (at-vec-2w-set-val-2 self i j val)
+      (at-vec-2w-set-val-1 self i val)))
+
+
+;; template<typename T> T& Mat::at(int i)
+;; Vec3b* cv_Mat_at_Vec3b_1(Mat* self, int i)
+(defcfun ("cv_Mat_at_Vec3b_1" at-vec-3b-1) vec-3b
+  "Returns a reference to the specified matrix element."
+  (self mat)
+  (i :int))
+
+
+;; void cv_Mat_at_Vec3b_set_Val_1(Mat* self, int i, Vec3b* val)
+(defcfun ("cv_Mat_at_Vec3b_set_Val_1" at-vec-3b-set-val-1) vec-3b
+  "Sets an matrix element."
+  (self mat)
+  (i :int)
+  (val vec-3b))
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
 ;; Vec3b* cv_Mat_at_Vec3b_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Vec3b_2" at-vec-3b) vec-3b
+(defcfun ("cv_Mat_at_Vec3b_2" at-vec-3b-2) vec-3b
   "Returns a reference to the specified matrix element."
   (self mat)
   (i :int)
@@ -1315,7 +1475,7 @@
 
 
 ;; void cv_Mat_at_Vec3b_set_Val_2(Mat* self, int i, int j, Vec3b* val)
-(defcfun ("cv_Mat_at_Vec3b_set_Val_2" at-vec-3b-set-val) vec-3b
+(defcfun ("cv_Mat_at_Vec3b_set_Val_2" at-vec-3b-set-val-2) vec-3b
   "Sets an matrix element."
   (self mat)
   (i :int)
@@ -1323,21 +1483,45 @@
   (val vec-3b))
 
 
-(defun (setf at-vec-3b) (val self i j)
-  (at-vec-3b-set-val self i j val))
- 
- 
+(defun at-vec-3b (self i &optional j)
+  (if j
+      (at-vec-3b-2 self i j)
+      (at-vec-3b-1 self i)))
+
+
+(defun (setf at-vec-3b) (val self i &optional j)
+  (if j
+      (at-vec-3b-set-val-2 self i j val)
+      (at-vec-3b-set-val-1 self i val)))
+
+
+;; template<typename T> T& Mat::at(int i)
+;; Vec3d* cv_Mat_at_Vec3d_1(Mat* self, int i)
+(defcfun ("cv_Mat_at_Vec3d_1" at-vec-3d-1) vec-3d
+  "Returns a reference to the specified matrix element."
+  (self mat)
+  (i :int))
+
+
+;; void cv_Mat_at_Vec3d_set_Val_1(Mat* self, int i, Vec3d* val)
+(defcfun ("cv_Mat_at_Vec3d_set_Val_1" at-vec-3d-set-val-1) vec-3d
+  "Sets an matrix element."
+  (self mat)
+  (i :int)
+  (val vec-3d))
+
+
 ;; template<typename T> T& Mat::at(int i, int j)
 ;; Vec3d* cv_Mat_at_Vec3d_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Vec3d_2" at-vec-3d) vec-3d
+(defcfun ("cv_Mat_at_Vec3d_2" at-vec-3d-2) vec-3d
   "Returns a reference to the specified matrix element."
   (self mat)
   (i :int)
   (j :int))
- 
- 
+
+
 ;; void cv_Mat_at_Vec3d_set_Val_2(Mat* self, int i, int j, Vec3d* val)
-(defcfun ("cv_Mat_at_Vec3d_set_Val_2" at-vec-3d-set-val) vec-3d
+(defcfun ("cv_Mat_at_Vec3d_set_Val_2" at-vec-3d-set-val-2) vec-3d
   "Sets an matrix element."
   (self mat)
   (i :int)
@@ -1345,21 +1529,45 @@
   (val vec-3d))
 
 
-(defun (setf at-vec-3d) (val self i j)
-  (at-vec-3d-set-val self i j val))
+(defun at-vec-3d (self i &optional j)
+  (if j
+      (at-vec-3d-2 self i j)
+      (at-vec-3d-1 self i)))
+
+
+(defun (setf at-vec-3d) (val self i &optional j)
+  (if j
+      (at-vec-3d-set-val-2 self i j val)
+      (at-vec-3d-set-val-1 self i val)))
+
+
+;; template<typename T> T& Mat::at(int i)
+;; Vec3f* cv_Mat_at_Vec3f_1(Mat* self, int i)
+(defcfun ("cv_Mat_at_Vec3f_1" at-vec-3f-1) vec-3f
+  "Returns a reference to the specified matrix element."
+  (self mat)
+  (i :int))
+
+
+;; void cv_Mat_at_Vec3f_set_Val_1(Mat* self, int i, Vec3f* val)
+(defcfun ("cv_Mat_at_Vec3f_set_Val_1" at-vec-3f-set-val-1) vec-3f
+  "Sets an matrix element."
+  (self mat)
+  (i :int)
+  (val vec-3f))
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
 ;; Vec3f* cv_Mat_at_Vec3f_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Vec3f_2" at-vec-3f) vec-3f
+(defcfun ("cv_Mat_at_Vec3f_2" at-vec-3f-2) vec-3f
   "Returns a reference to the specified matrix element."
   (self mat)
   (i :int)
   (j :int))
- 
- 
+
+
 ;; void cv_Mat_at_Vec3f_set_Val_2(Mat* self, int i, int j, Vec3f* val)
-(defcfun ("cv_Mat_at_Vec3f_set_Val_2" at-vec-3f-set-val) vec-3f
+(defcfun ("cv_Mat_at_Vec3f_set_Val_2" at-vec-3f-set-val-2) vec-3f
   "Sets an matrix element."
   (self mat)
   (i :int)
@@ -1367,21 +1575,45 @@
   (val vec-3f))
 
 
-(defun (setf at-vec-3f) (val self i j)
-  (at-vec-3f-set-val self i j val))
+(defun at-vec-3f (self i &optional j)
+  (if j
+      (at-vec-3f-2 self i j)
+      (at-vec-3f-1 self i)))
+
+
+(defun (setf at-vec-3f) (val self i &optional j)
+  (if j
+      (at-vec-3f-set-val-2 self i j val)
+      (at-vec-3f-set-val-1 self i val)))
+
+
+;; template<typename T> T& Mat::at(int i)
+;; Vec3i* cv_Mat_at_Vec3i_1(Mat* self, int i)
+(defcfun ("cv_Mat_at_Vec3i_1" at-vec-3i-1) vec-3i
+  "Returns a reference to the specified matrix element."
+  (self mat)
+  (i :int))
+
+
+;; void cv_Mat_at_Vec3i_set_Val_1(Mat* self, int i, Vec3i* val)
+(defcfun ("cv_Mat_at_Vec3i_set_Val_1" at-vec-3i-set-val-1) vec-3i
+  "Sets an matrix element."
+  (self mat)
+  (i :int)
+  (val vec-3i))
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
 ;; Vec3i* cv_Mat_at_Vec3i_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Vec3i_2" at-vec-3i) vec-3i
+(defcfun ("cv_Mat_at_Vec3i_2" at-vec-3i-2) vec-3i
   "Returns a reference to the specified matrix element."
   (self mat)
   (i :int)
   (j :int))
- 
- 
+
+
 ;; void cv_Mat_at_Vec3i_set_Val_2(Mat* self, int i, int j, Vec3i* val)
-(defcfun ("cv_Mat_at_Vec3i_set_Val_2" at-vec-3i-set-val) vec-3i
+(defcfun ("cv_Mat_at_Vec3i_set_Val_2" at-vec-3i-set-val-2) vec-3i
   "Sets an matrix element."
   (self mat)
   (i :int)
@@ -1389,21 +1621,45 @@
   (val vec-3i))
 
 
-(defun (setf at-vec-3i) (val self i j)
-  (at-vec-3i-set-val self i j val))
+(defun at-vec-3i (self i &optional j)
+  (if j
+      (at-vec-3i-2 self i j)
+      (at-vec-3i-1 self i)))
+
+
+(defun (setf at-vec-3i) (val self i &optional j)
+  (if j
+      (at-vec-3i-set-val-2 self i j val)
+      (at-vec-3i-set-val-1 self i val)))
+
+
+;; template<typename T> T& Mat::at(int i)
+;; Vec3s* cv_Mat_at_Vec3s_1(Mat* self, int i)
+(defcfun ("cv_Mat_at_Vec3s_1" at-vec-3s-1) vec-3s
+  "Returns a reference to the specified matrix element."
+  (self mat)
+  (i :int))
+
+
+;; void cv_Mat_at_Vec3s_set_Val_1(Mat* self, int i, Vec3s* val)
+(defcfun ("cv_Mat_at_Vec3s_set_Val_1" at-vec-3s-set-val-1) vec-3s
+  "Sets an matrix element."
+  (self mat)
+  (i :int)
+  (val vec-3s))
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
 ;; Vec3s* cv_Mat_at_Vec3s_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Vec3s_2" at-vec-3s) vec-3s
+(defcfun ("cv_Mat_at_Vec3s_2" at-vec-3s-2) vec-3s
   "Returns a reference to the specified matrix element."
   (self mat)
   (i :int)
   (j :int))
- 
- 
+
+
 ;; void cv_Mat_at_Vec3s_set_Val_2(Mat* self, int i, int j, Vec3s* val)
-(defcfun ("cv_Mat_at_Vec3s_set_Val_2" at-vec-3s-set-val) vec-3s
+(defcfun ("cv_Mat_at_Vec3s_set_Val_2" at-vec-3s-set-val-2) vec-3s
   "Sets an matrix element."
   (self mat)
   (i :int)
@@ -1411,21 +1667,45 @@
   (val vec-3s))
 
 
-(defun (setf at-vec-3s) (val self i j)
-  (at-vec-3s-set-val self i j val))
+(defun at-vec-3s (self i &optional j)
+  (if j
+      (at-vec-3s-2 self i j)
+      (at-vec-3s-1 self i)))
+
+
+(defun (setf at-vec-3s) (val self i &optional j)
+  (if j
+      (at-vec-3s-set-val-2 self i j val)
+      (at-vec-3s-set-val-1 self i val)))
+
+
+;; template<typename T> T& Mat::at(int i)
+;; Vec3w* cv_Mat_at_Vec3w_1(Mat* self, int i)
+(defcfun ("cv_Mat_at_Vec3w_1" at-vec-3w-1) vec-3w
+  "Returns a reference to the specified matrix element."
+  (self mat)
+  (i :int))
+
+
+;; void cv_Mat_at_Vec3w_set_Val_1(Mat* self, int i, Vec3w* val)
+(defcfun ("cv_Mat_at_Vec3w_set_Val_1" at-vec-3w-set-val-1) vec-3w
+  "Sets an matrix element."
+  (self mat)
+  (i :int)
+  (val vec-3w))
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
 ;; Vec3w* cv_Mat_at_Vec3w_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Vec3w_2" at-vec-3w) vec-3w
+(defcfun ("cv_Mat_at_Vec3w_2" at-vec-3w-2) vec-3w
   "Returns a reference to the specified matrix element."
   (self mat)
   (i :int)
   (j :int))
- 
- 
+
+
 ;; void cv_Mat_at_Vec3w_set_Val_2(Mat* self, int i, int j, Vec3w* val)
-(defcfun ("cv_Mat_at_Vec3w_set_Val_2" at-vec-3w-set-val) vec-3w
+(defcfun ("cv_Mat_at_Vec3w_set_Val_2" at-vec-3w-set-val-2) vec-3w
   "Sets an matrix element."
   (self mat)
   (i :int)
@@ -1433,21 +1713,45 @@
   (val vec-3w))
 
 
-(defun (setf at-vec-3w) (val self i j)
-  (at-vec-3w-set-val self i j val))
+(defun at-vec-3w (self i &optional j)
+  (if j
+      (at-vec-3w-2 self i j)
+      (at-vec-3w-1 self i)))
+
+
+(defun (setf at-vec-3w) (val self i &optional j)
+  (if j
+      (at-vec-3w-set-val-2 self i j val)
+      (at-vec-3w-set-val-1 self i val)))
+
+
+;; template<typename T> T& Mat::at(int i)
+;; Vec4b* cv_Mat_at_Vec4b_1(Mat* self, int i)
+(defcfun ("cv_Mat_at_Vec4b_1" at-vec-4b-1) vec-4b
+  "Returns a reference to the specified matrix element."
+  (self mat)
+  (i :int))
+
+
+;; void cv_Mat_at_Vec4b_set_Val_1(Mat* self, int i, Vec4b* val)
+(defcfun ("cv_Mat_at_Vec4b_set_Val_1" at-vec-4b-set-val-1) vec-4b
+  "Sets an matrix element."
+  (self mat)
+  (i :int)
+  (val vec-4b))
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
 ;; Vec4b* cv_Mat_at_Vec4b_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Vec4b_2" at-vec-4b) vec-4b
+(defcfun ("cv_Mat_at_Vec4b_2" at-vec-4b-2) vec-4b
   "Returns a reference to the specified matrix element."
   (self mat)
   (i :int)
   (j :int))
- 
- 
+
+
 ;; void cv_Mat_at_Vec4b_set_Val_2(Mat* self, int i, int j, Vec4b* val)
-(defcfun ("cv_Mat_at_Vec4b_set_Val_2" at-vec-4b-set-val) vec-4b
+(defcfun ("cv_Mat_at_Vec4b_set_Val_2" at-vec-4b-set-val-2) vec-4b
   "Sets an matrix element."
   (self mat)
   (i :int)
@@ -1455,21 +1759,45 @@
   (val vec-4b))
 
 
-(defun (setf at-vec-4b) (val self i j)
-  (at-vec-4b-set-val self i j val))
+(defun at-vec-4b (self i &optional j)
+  (if j
+      (at-vec-4b-2 self i j)
+      (at-vec-4b-1 self i)))
+
+
+(defun (setf at-vec-4b) (val self i &optional j)
+  (if j
+      (at-vec-4b-set-val-2 self i j val)
+      (at-vec-4b-set-val-1 self i val)))
+
+
+;; template<typename T> T& Mat::at(int i)
+;; Vec4d* cv_Mat_at_Vec4d_1(Mat* self, int i)
+(defcfun ("cv_Mat_at_Vec4d_1" at-vec-4d-1) vec-4d
+  "Returns a reference to the specified matrix element."
+  (self mat)
+  (i :int))
+
+
+;; void cv_Mat_at_Vec4d_set_Val_1(Mat* self, int i, Vec4d* val)
+(defcfun ("cv_Mat_at_Vec4d_set_Val_1" at-vec-4d-set-val-1) vec-4d
+  "Sets an matrix element."
+  (self mat)
+  (i :int)
+  (val vec-4d))
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
 ;; Vec4d* cv_Mat_at_Vec4d_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Vec4d_2" at-vec-4d) vec-4d
+(defcfun ("cv_Mat_at_Vec4d_2" at-vec-4d-2) vec-4d
   "Returns a reference to the specified matrix element."
   (self mat)
   (i :int)
   (j :int))
- 
- 
+
+
 ;; void cv_Mat_at_Vec4d_set_Val_2(Mat* self, int i, int j, Vec4d* val)
-(defcfun ("cv_Mat_at_Vec4d_set_Val_2" at-vec-4d-set-val) vec-4d
+(defcfun ("cv_Mat_at_Vec4d_set_Val_2" at-vec-4d-set-val-2) vec-4d
   "Sets an matrix element."
   (self mat)
   (i :int)
@@ -1477,21 +1805,45 @@
   (val vec-4d))
 
 
-(defun (setf at-vec-4d) (val self i j)
-  (at-vec-4d-set-val self i j val))
+(defun at-vec-4d (self i &optional j)
+  (if j
+      (at-vec-4d-2 self i j)
+      (at-vec-4d-1 self i)))
+
+
+(defun (setf at-vec-4d) (val self i &optional j)
+  (if j
+      (at-vec-4d-set-val-2 self i j val)
+      (at-vec-4d-set-val-1 self i val)))
+
+
+;; template<typename T> T& Mat::at(int i)
+;; Vec4f* cv_Mat_at_Vec4f_1(Mat* self, int i)
+(defcfun ("cv_Mat_at_Vec4f_1" at-vec-4f-1) vec-4f
+  "Returns a reference to the specified matrix element."
+  (self mat)
+  (i :int))
+
+
+;; void cv_Mat_at_Vec4f_set_Val_1(Mat* self, int i, Vec4f* val)
+(defcfun ("cv_Mat_at_Vec4f_set_Val_1" at-vec-4f-set-val-1) vec-4f
+  "Sets an matrix element."
+  (self mat)
+  (i :int)
+  (val vec-4f))
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
 ;; Vec4f* cv_Mat_at_Vec4f_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Vec4f_2" at-vec-4f) vec-4f
+(defcfun ("cv_Mat_at_Vec4f_2" at-vec-4f-2) vec-4f
   "Returns a reference to the specified matrix element."
   (self mat)
   (i :int)
   (j :int))
- 
+
 
 ;; void cv_Mat_at_Vec4f_set_Val_2(Mat* self, int i, int j, Vec4f* val)
-(defcfun ("cv_Mat_at_Vec4f_set_Val_2" at-vec-4f-set-val) vec-4f
+(defcfun ("cv_Mat_at_Vec4f_set_Val_2" at-vec-4f-set-val-2) vec-4f
   "Sets an matrix element."
   (self mat)
   (i :int)
@@ -1499,21 +1851,45 @@
   (val vec-4f))
 
 
-(defun (setf at-vec-4f) (val self i j)
-  (at-vec-4f-set-val self i j val))
+(defun at-vec-4f (self i &optional j)
+  (if j
+      (at-vec-4f-2 self i j)
+      (at-vec-4f-1 self i)))
+
+
+(defun (setf at-vec-4f) (val self i &optional j)
+  (if j
+      (at-vec-4f-set-val-2 self i j val)
+      (at-vec-4f-set-val-1 self i val)))
+
+
+;; template<typename T> T& Mat::at(int i)
+;; Vec4i* cv_Mat_at_Vec4i_1(Mat* self, int i)
+(defcfun ("cv_Mat_at_Vec4i_1" at-vec-4i-1) vec-4i
+  "Returns a reference to the specified matrix element."
+  (self mat)
+  (i :int))
+
+
+;; void cv_Mat_at_Vec4i_set_Val_1(Mat* self, int i, Vec4i* val)
+(defcfun ("cv_Mat_at_Vec4i_set_Val_1" at-vec-4i-set-val-1) vec-4i
+  "Sets an matrix element."
+  (self mat)
+  (i :int)
+  (val vec-4i))
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
 ;; Vec4i cv_Mat_at_Vec4i_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Vec4i_2" at-vec-4i) vec-4i
+(defcfun ("cv_Mat_at_Vec4i_2" at-vec-4i-2) vec-4i
   "Returns a reference to the specified matrix element."
   (self mat)
   (i :int)
   (j :int))
- 
- 
+
+
 ;; void cv_Mat_at_Vec4i_set_Val_2(Mat* self, int i, int j, Vec4i* val)
-(defcfun ("cv_Mat_at_Vec4i_set_Val_2" at-vec-4i-set-val) vec-4i
+(defcfun ("cv_Mat_at_Vec4i_set_Val_2" at-vec-4i-set-val-2) vec-4i
   "Sets an matrix element."
   (self mat)
   (i :int)
@@ -1521,13 +1897,37 @@
   (val vec-4i))
 
 
-(defun (setf at-vec-4i) (val self i j)
-  (at-vec-4i-set-val self i j val))
+(defun at-vec-4i (self i &optional j)
+  (if j
+      (at-vec-4i-2 self i j)
+      (at-vec-4i-1 self i)))
+
+
+(defun (setf at-vec-4i) (val self i &optional j)
+  (if j
+      (at-vec-4i-set-val-2 self i j val)
+      (at-vec-4i-set-val-1 self i val)))
+
+
+;; template<typename T> T& Mat::at(int i)
+;; Vec4s* cv_Mat_at_Vec4s_1(Mat* self, int i)
+(defcfun ("cv_Mat_at_Vec4s_1" at-vec-4s-1) vec-4s
+  "Returns a reference to the specified matrix element."
+  (self mat)
+  (i :int)) 
+
+
+;; void cv_Mat_at_Vec4s_set_Val_1(Mat* self, int i, Vec4s* val)
+(defcfun ("cv_Mat_at_Vec4s_set_Val_1" at-vec-4s-set-val-1) vec-4s
+  "Sets an matrix element."
+  (self mat)
+  (i :int)
+  (val vec-4s))
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
 ;; Vec4s cv_Mat_at_Vec4s_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Vec4s_2" at-vec-4s) vec-4s
+(defcfun ("cv_Mat_at_Vec4s_2" at-vec-4s-2) vec-4s
   "Returns a reference to the specified matrix element."
   (self mat)
   (i :int)
@@ -1535,7 +1935,7 @@
 
 
 ;; void cv_Mat_at_Vec4s_set_Val_2(Mat* self, int i, int j, Vec4s* val)
-(defcfun ("cv_Mat_at_Vec4s_set_Val_2" at-vec-4s-set-val) vec-4s
+(defcfun ("cv_Mat_at_Vec4s_set_Val_2" at-vec-4s-set-val-2) vec-4s
   "Sets an matrix element."
   (self mat)
   (i :int)
@@ -1543,13 +1943,37 @@
   (val vec-4s))
 
 
-(defun (setf at-vec-4s) (val self i j)
-  (at-vec-4s-set-val self i j val))
+(defun at-vec-4s (self i &optional j)
+  (if j
+      (at-vec-4s-2 self i j)
+      (at-vec-4s-1 self i)))
+
+
+(defun (setf at-vec-4s) (val self i &optional j)
+  (if j
+      (at-vec-4s-set-val-2 self i j val)
+      (at-vec-4s-set-val-1 self i val)))
+
+
+;; template<typename T> T& Mat::at(int i)
+;; Vec4w* cv_Mat_at_Vec4w_1(Mat* self, int i)
+(defcfun ("cv_Mat_at_Vec4w_1" at-vec-4w-1) vec-4w
+  "Returns a reference to the specified matrix element."
+  (self mat)
+  (i :int)) 
+
+
+;; void cv_Mat_at_Vec4w_set_Val_1(Mat* self, int i, Vec4w* val)
+(defcfun ("cv_Mat_at_Vec4w_set_Val_1" at-vec-4w-set-val-1) vec-4w
+  "Sets an matrix element."
+  (self mat)
+  (i :int)
+  (val vec-4w))
 
 
 ;; template<typename T> T& Mat::at(int i, int j)
 ;; Vec4s cv_Mat_at_Vec4w_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Vec4w_2" at-vec-4w) vec-4w
+(defcfun ("cv_Mat_at_Vec4w_2" at-vec-4w-2) vec-4w
   "Returns a reference to the specified matrix element."
   (self mat)
   (i :int)
@@ -1557,7 +1981,7 @@
 
 
 ;; void cv_Mat_at_Vec4w_set_Val_2(Mat* self, int i, int j, Vec4w* val)
-(defcfun ("cv_Mat_at_Vec4w_set_Val_2" at-vec-4w-set-val) vec-4w
+(defcfun ("cv_Mat_at_Vec4w_set_Val_2" at-vec-4w-set-val-2) vec-4w
   "Sets an matrix element."
   (self mat)
   (i :int)
@@ -1565,15 +1989,16 @@
   (val vec-4w))
 
 
-(defun (setf at-vec-4w) (val self i j)
-  (at-vec-4w-set-val self i j val))
+(defun at-vec-4w (self i &optional j)
+  (if j
+      (at-vec-4w-2 self i j)
+      (at-vec-4w-1 self i)))
 
 
-;; Point_<_Tp> br() const
-;; Point* cv_Rect_br(Rect* self) 
-(defcfun ("cv_Rect_br" br) point 
-  "Retrievies the bottom-right corner of a rectangle."
-  (self rect))
+(defun (setf at-vec-4w) (val self i &optional j)
+  (if j
+      (at-vec-4w-set-val-2 self i j val)
+      (at-vec-4w-set-val-1 self i val)))
 
 
 ;; int cv_Mat_channels(Mat* self)
@@ -1617,8 +2042,8 @@
 
 
 (defun convert-to (self m rtype &optional (alpha 1.0d0) (beta 0.0d0))
-       "Converts an array to another data type with optional scaling."
-       (%convert-to self m rtype alpha beta))
+  "Converts an array to another data type with optional scaling."
+  (%convert-to self m rtype alpha beta))
 
 
 ;; void Mat::copyTo(OutputArray m) const
@@ -1639,9 +2064,9 @@
 
 
 (defun copy-to (&optional mat m mask)
-       (cond ((eq mask nil)
-	      (copy-to-2 mat m))
-	      (t (copy-to-3 mat m mask))))
+  (cond ((eq mask nil)
+	 (copy-to-2 mat m))
+	(t (copy-to-3 mat m mask))))
 
 
 ;; Mat Mat::cross(InputArray m) const
@@ -1655,13 +2080,13 @@
 ;; int Mat::depth() const
 ;; int cv_Mat_depth(Mat* self)
 (defcfun ("cv_Mat_depth" mat-depth) :int 
-	 (self mat))
+  (self mat))
 
 
 ;; int Mat::depth() const
 ;; int cv_Mat_depth(Mat* self)
 (defcfun ("cv_Mat_depth" depth) :int 
-	 (self mat))
+  (self mat))
 
 
 ;; Mat* cv_Mat_diag_d(Mat* self, int d)
@@ -1672,8 +2097,8 @@
 
 
 (defun diag (self &optional (d 0))
-       "Extracts a diagonal from a matrix."
-       (%diag self d))
+  "Extracts a diagonal from a matrix."
+  (%diag self d))
 
 
 ;; float DMatch::distance
@@ -1717,24 +2142,24 @@
 
 (defun dmatch (&rest args)
   "DMatch constructor"
-       (cond ((eq (first args) nil)
-	      (dmatch-0))
-	      ((and (first args) (not (fourth args)))
-	       (dmatch-3 (first args) (second args) (third args)))
-	       ((fourth args)
-		(dmatch-4 (first args) (second args) (third args) (fourth args)))
-		(t nil)))
+  (cond ((eq (first args) nil)
+	 (dmatch-0))
+	((and (first args) (not (fourth args)))
+	 (dmatch-3 (first args) (second args) (third args)))
+	((fourth args)
+	 (dmatch-4 (first args) (second args) (third args) (fourth args)))
+	(t nil)))
 
 
 (defun make-dmatch (&rest args)
   "DMatch constructor"
-       (cond ((eq (first args) nil)
-	      (dmatch-0))
-	      ((and (first args) (not (fourth args)))
-	       (dmatch-3 (first args) (second args) (third args)))
-	       ((fourth args)
-		(dmatch-4 (first args) (second args) (third args) (fourth args)))
-		(t nil)))
+  (cond ((eq (first args) nil)
+	 (dmatch-0))
+	((and (first args) (not (fourth args)))
+	 (dmatch-3 (first args) (second args) (third args)))
+	((fourth args)
+	 (dmatch-4 (first args) (second args) (third args) (fourth args)))
+	(t nil)))
 
 
 ;; float DMatch::distance
@@ -1804,9 +2229,9 @@
 ;; _Tp dot(const Point_& pt) const
 ;; tn cv_Point2##t##_dot( Point2##t * self, Point2##t * other)
 (defcfun ("cv_Point2i_dot" dot-2i) :int 
-	 "Finds the dot product of a point."
-	 (self point)
-	 (other point))
+  "Finds the dot product of a point."
+  (self point)
+  (other point))
 
 
 ;; _Tp dot(const Point_& pt) const
@@ -1828,25 +2253,25 @@
 ;; _Tp dot(const Point3_& pt) const
 ;; tn cv_Point3##t##_dot( Point3##t * self, Point3##t * other)
 (defcfun ("cv_Point3d_dot" dot-3d) :double 
-	 "Finds the dot product of a point-3d."
-	 (self point-3d)
-	 (other point-3d))
+  "Finds the dot product of a point-3d."
+  (self point-3d)
+  (other point-3d))
 
 
 ;; _Tp dot(const Point3_& pt) const
 ;; tn cv_Point3##t##_dot( Point3##t * self, Point3##t * other)
 (defcfun ("cv_Point3f_dot" dot-3f) :float 
-	 "Finds the dot product of a point-3f."
-	 (self point-3f)
-	 (other point-3f))
+  "Finds the dot product of a point-3f."
+  (self point-3f)
+  (other point-3f))
 
 
 ;; _Tp dot(const Point3_& pt) const
 ;; tn cv_Point3##t##_dot( Point3##t * self, Point3##t * other)
 (defcfun ("cv_Point3i_dot" dot-3i) :int 
-	 "Finds the dot product of a point-3i."
-	 (self point-3i)
-	 (other point-3i))
+  "Finds the dot product of a point-3i."
+  (self point-3i)
+  (other point-3i))
 
 
 ;; size_t Mat::elemSize() const
@@ -1909,19 +2334,19 @@
 
 
 (defun key-point (&optional x y size (angle -1f0) (response 0f0) (octave 0) (class-id -1))
-       (cond ((eq x nil)
-	      (key-point-0))
-	      (x
-	       (key-point-7 x y size angle response octave class-id))
-	       (t nil)))
+  (cond ((eq x nil)
+	 (key-point-0))
+	(x
+	 (key-point-7 x y size angle response octave class-id))
+	(t nil)))
 
 
 (defun make-key-point (&optional x y size (angle -1f0) (response 0f0) (octave 0) (class-id -1))
-       (cond ((eq x nil)
-	      (key-point-0))
-	      (x
-	       (key-point-7 x y size angle response octave class-id))
-	       (t nil)))
+  (cond ((eq x nil)
+	 (key-point-0))
+	(x
+	 (key-point-7 x y size angle response octave class-id))
+	(t nil)))
 
 
 ;; float KeyPoint::angle
@@ -2022,16 +2447,16 @@
 ;; void Mat::locateROI(Size& wholeSize, Point& ofs) const
 ;; void cv_Mat_locateROI(Mat* self, Size* s, Point* p) 
 (defcfun ("cv_Mat_locateROI" locate-roi) :void 
-	 "Locates the matrix header within a parent matrix."
-	 (self mat)
-	 (whole-size size)
-	 (ofs point))
+  "Locates the matrix header within a parent matrix."
+  (self mat)
+  (whole-size size)
+  (ofs point))
 
 
 ;; Mat::Mat()
 ;; Mat* cv_create_Mat()
 (defcfun ("cv_create_Mat" %mat) mat
-	 "MAT constructor")
+  "MAT constructor")
 
 
 ;; Mat& operator = (const Mat& m)
@@ -2173,119 +2598,119 @@
     (unless (equal mat (car previous))
       (setf previous (cons mat (mat-info mat))))
 
-  (if (empty mat) 
-      (return-from mat-to-arr 
-	(format t "Matrix is empty.")))
+    (if (empty mat) 
+	(return-from mat-to-arr 
+	  (format t "Matrix is empty.")))
 
-  (let* ((mat-info (cdr previous))
-	 (mat-rows (first mat-info))
-	 (mat-cols (second mat-info))
-         (mat-type (third mat-info))
-	 (mat-area (* mat-rows mat-cols))
-	 (channels (fifth mat-info))
-         (arr 0)
-	 (ptr (ptr mat 0))
-         (cffi-type (case mat-type  
+    (let* ((mat-info (cdr previous))
+	   (mat-rows (first mat-info))
+	   (mat-cols (second mat-info))
+	   (mat-type (third mat-info))
+	   (mat-area (* mat-rows mat-cols))
+	   (channels (fifth mat-info))
+	   (arr 0)
+	   (ptr (ptr mat 0))
+	   (cffi-type (case mat-type  
 
-		      (#.+8uc1+ :uchar) 
-		      (#.+8sc1+ :char)
-		      (#.+16uc1+ :ushort)
-		      (#.+16sc1+ :short)
-		      (#.+32sc1+ :int)
-		      (#.+32fc1+ :float)
-		      (#.+64fc1+ :double)
-		      (#.+8uc2+  :uchar)
-		      (#.+8sc2+  :char)
-		      (#.+16uc2+ :ushort)
-		      (#.+16sc2+ :short)
-		      (#.+32sc2+ :int)
-		      (#.+32fc2+ :float)
-		      (#.+64fc2+ :double)
-		      (#.+8uc3+  :uchar)
-		      (#.+8sc3+  :char)
-		      (#.+16uc3+ :ushort)
-		      (#.+16sc3+ :short)
-		      (#.+32sc3+ :int)
-		      (#.+32fc3+ :float)
-		      (#.+64fc3+ :double)
-		      (#.+8uc4+  :uchar)
-		      (#.+8sc4+  :char)
-		      (#.+16uc4+ :ushort)
-		      (#.+16sc4+ :short)
-		      (#.+32sc4+ :int)
-		      (#.+32fc4+ :float)
-		      (#.+64fc4+ :double))))
-    (case cffi-type
+			(#.+8uc1+ :uchar) 
+			(#.+8sc1+ :char)
+			(#.+16uc1+ :ushort)
+			(#.+16sc1+ :short)
+			(#.+32sc1+ :int)
+			(#.+32fc1+ :float)
+			(#.+64fc1+ :double)
+			(#.+8uc2+  :uchar)
+			(#.+8sc2+  :char)
+			(#.+16uc2+ :ushort)
+			(#.+16sc2+ :short)
+			(#.+32sc2+ :int)
+			(#.+32fc2+ :float)
+			(#.+64fc2+ :double)
+			(#.+8uc3+  :uchar)
+			(#.+8sc3+  :char)
+			(#.+16uc3+ :ushort)
+			(#.+16sc3+ :short)
+			(#.+32sc3+ :int)
+			(#.+32fc3+ :float)
+			(#.+64fc3+ :double)
+			(#.+8uc4+  :uchar)
+			(#.+8sc4+  :char)
+			(#.+16uc4+ :ushort)
+			(#.+16sc4+ :short)
+			(#.+32sc4+ :int)
+			(#.+32fc4+ :float)
+			(#.+64fc4+ :double))))
+      (case cffi-type
 
-      (:uchar 
+	(:uchar 
 
-       (setf arr (if (= channels 1) 
-		     (make-array (list mat-rows mat-cols) 
-				 :element-type '(unsigned-byte 8)) 
-		     (make-array (list mat-rows mat-cols channels) 
-				 :element-type '(unsigned-byte 8))))
-       (dotimes (n (* mat-area channels))
-	 (setf (row-major-aref arr n) (mem-aref ptr :uchar n)))arr)
+	 (setf arr (if (= channels 1) 
+		       (make-array (list mat-rows mat-cols) 
+				   :element-type '(unsigned-byte 8)) 
+		       (make-array (list mat-rows mat-cols channels) 
+				   :element-type '(unsigned-byte 8))))
+	 (dotimes (n (* mat-area channels))
+	   (setf (row-major-aref arr n) (mem-aref ptr :uchar n)))arr)
 
-      (:char 
+	(:char 
 
-       (setf arr (if (= channels 1) 
-		     (make-array (list mat-rows mat-cols) 
-				 :element-type '(signed-byte 8)) 
-		     (make-array (list mat-rows mat-cols channels) 
-				 :element-type '(signed-byte 8))))
-       (dotimes (n (* mat-area channels))
-	 (setf (row-major-aref arr n) (mem-aref ptr :char n)))arr)
+	 (setf arr (if (= channels 1) 
+		       (make-array (list mat-rows mat-cols) 
+				   :element-type '(signed-byte 8)) 
+		       (make-array (list mat-rows mat-cols channels) 
+				   :element-type '(signed-byte 8))))
+	 (dotimes (n (* mat-area channels))
+	   (setf (row-major-aref arr n) (mem-aref ptr :char n)))arr)
 
-      (:ushort 
+	(:ushort 
 
-       (setf arr (if (= channels 1) 
-		     (make-array (list mat-rows mat-cols) 
-				 :element-type '(unsigned-byte 16)) 
-		     (make-array (list mat-rows mat-cols channels) 
-				 :element-type '(unsigned-byte 16))))
-       (dotimes (n (* mat-area channels))
-	 (setf (row-major-aref arr n) (mem-aref ptr :ushort n)))arr)
+	 (setf arr (if (= channels 1) 
+		       (make-array (list mat-rows mat-cols) 
+				   :element-type '(unsigned-byte 16)) 
+		       (make-array (list mat-rows mat-cols channels) 
+				   :element-type '(unsigned-byte 16))))
+	 (dotimes (n (* mat-area channels))
+	   (setf (row-major-aref arr n) (mem-aref ptr :ushort n)))arr)
 
-      (:short 
+	(:short 
 
-       (setf arr (if (= channels 1) 
-		     (make-array (list mat-rows mat-cols) 
-				 :element-type '(signed-byte 16)) 
-		     (make-array (list mat-rows mat-cols channels) 
-				 :element-type '(signed-byte 16))))
-       (dotimes (n (* mat-area channels))
-	 (setf (row-major-aref arr n) (mem-aref ptr :short n)))arr)
+	 (setf arr (if (= channels 1) 
+		       (make-array (list mat-rows mat-cols) 
+				   :element-type '(signed-byte 16)) 
+		       (make-array (list mat-rows mat-cols channels) 
+				   :element-type '(signed-byte 16))))
+	 (dotimes (n (* mat-area channels))
+	   (setf (row-major-aref arr n) (mem-aref ptr :short n)))arr)
 
-      (:int 
+	(:int 
 
-       (setf arr (if (= channels 1) 
-		     (make-array (list mat-rows mat-cols) 
-				 :element-type '(signed-byte 32)) 
-		     (make-array (list mat-rows mat-cols channels) 
-				 :element-type '(signed-byte 32))))
-       (dotimes (n (* mat-area channels))
-	 (setf (row-major-aref arr n) (mem-aref ptr :int n)))arr)
+	 (setf arr (if (= channels 1) 
+		       (make-array (list mat-rows mat-cols) 
+				   :element-type '(signed-byte 32)) 
+		       (make-array (list mat-rows mat-cols channels) 
+				   :element-type '(signed-byte 32))))
+	 (dotimes (n (* mat-area channels))
+	   (setf (row-major-aref arr n) (mem-aref ptr :int n)))arr)
 
-      (:float 
+	(:float 
 
-       (setf arr (if (= channels 1) 
-		     (make-array (list mat-rows mat-cols) 
-				 :element-type 'single-float) 
-		     (make-array (list mat-rows mat-cols channels) 
-				 :element-type 'single-float)))
-       (dotimes (n (* mat-area channels))
-	 (setf (row-major-aref arr n) (mem-aref ptr :float n)))arr)
+	 (setf arr (if (= channels 1) 
+		       (make-array (list mat-rows mat-cols) 
+				   :element-type 'single-float) 
+		       (make-array (list mat-rows mat-cols channels) 
+				   :element-type 'single-float)))
+	 (dotimes (n (* mat-area channels))
+	   (setf (row-major-aref arr n) (mem-aref ptr :float n)))arr)
 
-      (:double 
+	(:double 
 
-       (setf arr (if (= channels 1) 
-		     (make-array (list mat-rows mat-cols) 
-				 :element-type 'double-float) 
-		     (make-array (list mat-rows mat-cols channels) 
-				 :element-type 'double-float)))
-       (dotimes (n (* mat-area channels))
-	 (setf (row-major-aref arr n) (mem-aref ptr :double n)))arr)))))
+	 (setf arr (if (= channels 1) 
+		       (make-array (list mat-rows mat-cols) 
+				   :element-type 'double-float) 
+		       (make-array (list mat-rows mat-cols channels) 
+				   :element-type 'double-float)))
+	 (dotimes (n (* mat-area channels))
+	   (setf (row-major-aref arr n) (mem-aref ptr :double n)))arr)))))
 
 
 (defun mat-and-cffi-type (mat)
@@ -2327,7 +2752,20 @@
 ;; int Mat::type() const
 ;; int cv_Mat_type(Mat* self)
 (defcfun ("cv_Mat_type" mat-type) :int
+  "Returns the type of a matrix element."
   (self mat))
+
+
+;; void Mat::convertTo(OutputArray m, int rtype, double alpha=1, double beta=0 ) const
+;; void cv_Mat_set_Type(Mat* self, int val)
+(defcfun ("cv_Mat_set_Type" mat-set-type) :void
+  (self mat)
+  (val :int))
+
+
+(defun (setf mat-type) (val self)
+  "Sets the type of a matrix element."
+  (mat-set-type self val))
 
 
 ;; Mat::Mat(int rows, int cols, int type)
@@ -2342,17 +2780,17 @@
 ;; Mat::Mat(int rows, int cols, int type, const Scalar& s)
 ;; Mat* cv_create_Mat_with_value(int rows, int cols, int type, Scalar* s)
 (defcfun ("cv_create_Mat_with_value" create-mat-with-value) mat
-	 (rows :int)
-	 (cols :int)
-	 (type :int)
-	 (s scalar))
+  (rows :int)
+  (cols :int)
+  (type :int)
+  (s scalar))
 
 
 (defun create-mat-with-element (rows cols type value)
   (let* ((scalar (apply #'scalar (list value)))					 
-	(ret (create-mat-with-value rows cols type scalar)))
+	 (ret (create-mat-with-value rows cols type scalar)))
     (del-scalar scalar)
-ret))
+    ret))
 
 
 ;;; MAT
@@ -2506,36 +2944,36 @@ ret))
 
 (defun point (&optional x y)
   "Point constructor"
-       (cond ((eq (or x y) nil)
-	      (point-0))
-	      ((and x y)
-	       (point-2 x y))
-	       
-	       (t nil)))
+  (cond ((eq (or x y) nil)
+	 (point-0))
+	((and x y)
+	 (point-2 x y))
+	
+	(t nil)))
 
 
 (defun make-point (&optional x y)
   "Point constructor"
-       (cond ((eq (or x y) nil)
-	      (point-0))
-	      ((and x y)
-	       (point-2 x y))
-	       
-	       (t nil)))
+  (cond ((eq (or x y) nil)
+	 (point-0))
+	((and x y)
+	 (point-2 x y))
+	
+	(t nil)))
 
 
 ;; int Point::x
 ;; int cv_Point_getX(Point* self) 
 (defcfun ("cv_Point2i_getX" point-x) :int 
-	 "Retrieves X coordinate of a POINT object."
-	 (self point))
+  "Retrieves X coordinate of a POINT object."
+  (self point))
 
 
 ;; int Point::y
 ;; int cv_Point_getY(Point* self)
 (defcfun ("cv_Point2i_getY" point-y) :int 
-         "Retrieves Y coordinate of a POINT object."
-	 (self point))
+  "Retrieves Y coordinate of a POINT object."
+  (self point))
 
 
 ;; int cv_Point2i_setX(Point* self, int val) 
@@ -2563,31 +3001,31 @@ ret))
 ;; typedef Point_<double> Point2d
 ;; Point2##t * cv_create_Point2##(tn x, tn y) 
 (defcfun ("cv_create_Point2d" point-2d-0) point-2d 
-	 "Point2d constructor")
+  "Point2d constructor")
 
 
 ;; typedef Point_<double> Point2d
 ;; Point2##t * cv_create_Point2##(tn x, tn y)  
 (defcfun ("cv_create_Point2d" point-2d-2) point-2d 
-	 "Point2d constructor"
-	 (x :double)
-	 (y :double))
+  "Point2d constructor"
+  (x :double)
+  (y :double))
 
 
 (defun point-2d (&optional x y)
-       (cond ((eq (or x y) nil)
-	      (point-2d-0))
-	      ((and x y)
-	       (point-2d-2 x y))
-	       (t nil)))
+  (cond ((eq (or x y) nil)
+	 (point-2d-0))
+	((and x y)
+	 (point-2d-2 x y))
+	(t nil)))
 
 
 (defun make-point-2d (&optional x y)
-       (cond ((eq (or x y) nil)
-	      (point-2d-0))
-	      ((and x y)
-	       (point-2d-2 x y))
-	       (t nil)))
+  (cond ((eq (or x y) nil)
+	 (point-2d-0))
+	((and x y)
+	 (point-2d-2 x y))
+	(t nil)))
 
 
 ;; double Point2d::x
@@ -2629,31 +3067,31 @@ ret))
 ;; typedef Point_<float> Point2f
 ;; tn cv_Point2##t##_getX( Point2##t * self) 
 (defcfun ("cv_create_Point2f" point-2f-0) point-2f 
-	 "Point2f constructor")
+  "Point2f constructor")
 
 
 ;; typedef Point_<float> Point2f
 ;; Point2##t * cv_create_Point2##(tn x, tn y)  
 (defcfun ("cv_create_Point2f" point-2f-2) point-2f 
-	 "Point2f constructor"
-	 (x :float)
-	 (y :float))
+  "Point2f constructor"
+  (x :float)
+  (y :float))
 
 
 (defun point-2f (&optional x y)
-       (cond ((eq (or x y) nil)
-	      (point-2f-0))
-	      ((and x y)
-	       (point-2f-2 x y))
-	       (t nil)))
+  (cond ((eq (or x y) nil)
+	 (point-2f-0))
+	((and x y)
+	 (point-2f-2 x y))
+	(t nil)))
 
 
 (defun make-point-2f (&optional x y)
-       (cond ((eq (or x y) nil)
-	      (point-2f-0))
-	      ((and x y)
-	       (point-2f-2 x y))
-	       (t nil)))
+  (cond ((eq (or x y) nil)
+	 (point-2f-0))
+	((and x y)
+	 (point-2f-2 x y))
+	(t nil)))
 
 
 ;; float Point2f::x
@@ -2696,32 +3134,32 @@ ret))
 ;; typedef Point3_<double> Point3d
 ;; Point3##t * cv_create_Point3##(tn x, tn y, tn z) 
 (defcfun ("cv_create_Point3d" point-3d-0) point-3d 
-	 "Point3d constructotr")
+  "Point3d constructotr")
 
 
 ;; typedef Point3_<double> Point3d
 ;; Point3##t * cv_create_Point3##(tn x, tn y, tn z) 
 (defcfun ("cv_create_Point3d" point-3d-2) point-3d 
-	 "Point3d constructor"
-	 (x :double)
-	 (y :double)
-	 (z :double))
+  "Point3d constructor"
+  (x :double)
+  (y :double)
+  (z :double))
 
 
 (defun point-3d (&optional x y z)
-       (cond ((eq (or x y) nil)
-	      (point-3d-0))
-	      ((and x y)
-	       (point-3d-2 x y z))
-	       (t nil)))
+  (cond ((eq (or x y) nil)
+	 (point-3d-0))
+	((and x y)
+	 (point-3d-2 x y z))
+	(t nil)))
 
 
 (defun make-point-3d (&optional x y z)
-       (cond ((eq (or x y) nil)
-	      (point-3d-0))
-	      ((and x y)
-	       (point-3d-2 x y z))
-	       (t nil)))
+  (cond ((eq (or x y) nil)
+	 (point-3d-0))
+	((and x y)
+	 (point-3d-2 x y z))
+	(t nil)))
 
 
 ;; _Tp x, y, z
@@ -2748,32 +3186,32 @@ ret))
 ;; typedef Point3_<double> Point3d
 ;; Point3##t * cv_create_Point3##(tn x, tn y, tn z)  
 (defcfun ("cv_create_Point3f" point-3f-0) point-3f 
-	 "Point3f constructor")
+  "Point3f constructor")
 
 
 ;; typedef Point3_<double> Point3d
 ;; Point3##t * cv_create_Point3##(tn x, tn y, tn z)  
 (defcfun ("cv_create_Point3f" point-3f-2) point-3f 
-	 "Point3f constructor"
-	 (x :float)
-	 (y :float)
-	 (z :float))
+  "Point3f constructor"
+  (x :float)
+  (y :float)
+  (z :float))
 
 
 (defun point-3f (&optional x y z)
-       (cond ((eq (or x y) nil)
-	      (point-3f-0))
-	      ((and x y)
-	       (point-3f-2 x y z))
-	       (t nil)))
+  (cond ((eq (or x y) nil)
+	 (point-3f-0))
+	((and x y)
+	 (point-3f-2 x y z))
+	(t nil)))
 
 
 (defun make-point-3f (&optional x y z)
-       (cond ((eq (or x y) nil)
-	      (point-3f-0))
-	      ((and x y)
-	       (point-3f-2 x y z))
-	       (t nil)))
+  (cond ((eq (or x y) nil)
+	 (point-3f-0))
+	((and x y)
+	 (point-3f-2 x y z))
+	(t nil)))
 
 
 ;; _Tp x, y, z
@@ -2872,39 +3310,39 @@ ret))
 ;; typedef Point3_<double> Point3d
 ;; Point3##t * cv_create_Point3##(tn x, tn y, tn z)  
 (defcfun ("cv_create_Point3i" point-3i-0) point-3i 
-	 "Point3i constructor")
+  "Point3i constructor")
 
 
 ;; typedef Point3_<double> Point3d
 ;; Point3##t * cv_create_Point3##(tn x, tn y, tn z)  
 (defcfun ("cv_create_Point3i" point-3i-2) point-3i 
-	 "Point3i constructor"
-	 (x :int)
-	 (y :int)
-	 (z :int))
+  "Point3i constructor"
+  (x :int)
+  (y :int)
+  (z :int))
 
 
 (defun point-3i (&optional x y z)
-       (cond ((eq (or x y) nil)
-	      (point-3i-0))
-	      ((and x y)
-	       (point-3i-2 x y z))
-	       (t nil)))
+  (cond ((eq (or x y) nil)
+	 (point-3i-0))
+	((and x y)
+	 (point-3i-2 x y z))
+	(t nil)))
 
 
 (defun make-point-3i (&optional x y z)
-       (cond ((eq (or x y) nil)
-	      (point-3i-0))
-	      ((and x y)
-	       (point-3i-2 x y z))
-	       (t nil)))
+  (cond ((eq (or x y) nil)
+	 (point-3i-0))
+	((and x y)
+	 (point-3i-2 x y z))
+	(t nil)))
 
 
 ;; _Tp x, y, z
 ;; int cv_Point3i_getX(Point3i* self) 
 (defcfun ("cv_Point3i_getX" point-3i-x) :int 
   "Retrieves X coordinate of a POINT-3I object."
-	 (self point-3i))
+  (self point-3i))
 
 
 ;; _Tp x, y, z
@@ -2959,23 +3397,23 @@ ret))
 
 (defun print-2d-arr-as-mat (arr &optional (*standard-output* *standard-output*))
 
-	 (format t *personalize-print-2d-mat*)
-	 (format t  "(")
-	 (print-elements (i 0 (array-dimension arr 0)) ("(" (format nil ")~%    (") ")")
-	   (print-elements (j 0 (array-dimension arr 1)) ("" " " "")
-	     (prin1 (aref arr i j))))
-	 (format t ")~%"))
+  (format t *personalize-print-2d-mat*)
+  (format t  "(")
+  (print-elements (i 0 (array-dimension arr 0)) ("(" (format nil ")~%    (") ")")
+    (print-elements (j 0 (array-dimension arr 1)) ("" " " "")
+      (prin1 (aref arr i j))))
+  (format t ")~%"))
 
 
 (defun print-3d-arr-as-mat (arr &optional (*standard-output* *standard-output*))
 
-	 (format t *personalize-print-3d-mat*)
-	 (format t  "(")
-	 (print-elements (i 0 (array-dimension arr 0)) ("(" (format nil ")~%    (") ")")
-	   (print-elements (j 0 (array-dimension arr 1)) ("(" (format nil ")~%     (") ")")
-	     (print-elements (k 0 (array-dimension arr 2)) ("" " " "")
-	       (prin1 (aref arr i j k)))))
-	 (format t ")~%"))
+  (format t *personalize-print-3d-mat*)
+  (format t  "(")
+  (print-elements (i 0 (array-dimension arr 0)) ("(" (format nil ")~%    (") ")")
+    (print-elements (j 0 (array-dimension arr 1)) ("(" (format nil ")~%     (") ")")
+      (print-elements (k 0 (array-dimension arr 2)) ("" " " "")
+	(prin1 (aref arr i j k)))))
+  (format t ")~%"))
 
 
 (defun print-mat (mat)
@@ -3030,9 +3468,9 @@ ret))
       (error "The value ~a is not of type CV-KEY-POINT." key-point)))
 
 
-(defun print-point (point)
+(defun print-point-2i (point)
   (if (typep point 'cv-point)
-      (format t "~a(x: ~a y: ~a)~%" *personalize-print-point* (point-x point) (point-y point))
+      (format t "~a(x: ~a y: ~a)~%" *personalize-print-point-2i* (point-x point) (point-y point))
       (error "The value ~a is not of type CV-POINT." point)))
 
 
@@ -3066,6 +3504,29 @@ ret))
       (error "The value ~a is not of type CV-POINT-3I." point-3i)))
 
 
+(defun print-point (self)
+  "All in one POINT-* printing function."
+  (typecase self
+    (cv-point (print-point-2i self))
+    (cv-point-2d (print-point-2d self))
+    (cv-point-2f (print-point-2f self))
+    (cv-point-3d (print-point-3d self))
+    (cv-point-3f (print-point-3f self))
+    (cv-point-3i (print-point-3i self))))
+
+
+(defun pp (self)
+  "Alias for PRINT-POINT-*.
+   (Useful for debugging)"
+  (typecase self
+    (cv-point (print-point self))
+    (cv-point-2d (print-point-2d self))
+    (cv-point-2f (print-point-2f self))
+    (cv-point-3d (print-point-3d self))
+    (cv-point-3f (print-point-3f self))
+    (cv-point-3i (print-point-3i self))))
+
+
 (defun print-rect (rect)
   (if (typep rect 'cv-rect)
       (format t "~a(x: ~a y: ~a width: ~a height: ~a)~%" *personalize-print-rect* 
@@ -3074,6 +3535,19 @@ ret))
 	      (rect-width rect) 
 	      (rect-height rect))
       (error "The value ~a is not of type CV-RECT." rect)))
+
+
+(defun pr (rect)
+  "Alias for PRINT-RECT.
+  (Useful for debugging)"
+  (if (typep rect 'cv-rect)
+      (format t "~a(x: ~a y: ~a width: ~a height: ~a)~%" *personalize-print-rect* 
+	      (rect-x rect)
+	      (rect-y rect) 
+	      (rect-width rect) 
+	      (rect-height rect))
+      (error "The value ~a is not of type CV-RECT." rect)))
+
 
 ;; Using mem-aref to access the member may not be safe if OpenCv changes something.
 (defun print-rotated-rect (rotated-rect)
@@ -3285,6 +3759,61 @@ ret))
       (error "The value ~a is not of type CV-VEC-8I." vec-8i)))
 
 
+(defun print-vec (self)
+  "All in one VEC-* printing function."
+  (typecase self
+    (cv-vec-2b (print-vec-2b self))
+    (cv-vec-2d (print-vec-2d self))
+    (cv-vec-2f (print-vec-2f self))
+    (cv-vec-2i (print-vec-2i self))
+    (cv-vec-2s (print-vec-2s self))
+    (cv-vec-2w (print-vec-2w self))
+    (cv-vec-3b (print-vec-3b self))
+    (cv-vec-3d (print-vec-3d self))
+    (cv-vec-3f (print-vec-3f self))
+    (cv-vec-3i (print-vec-3i self))
+    (cv-vec-3s (print-vec-3s self))
+    (cv-vec-3w (print-vec-4w self))
+    (cv-vec-4b (print-vec-4b self))
+    (cv-vec-4d (print-vec-4d self))
+    (cv-vec-4f (print-vec-4f self))
+    (cv-vec-4i (print-vec-4i self))
+    (cv-vec-4s (print-vec-4s self))
+    (cv-vec-4w (print-vec-4w self))
+    (cv-vec-6d (print-vec-6d self))
+    (cv-vec-6f (print-vec-6f self))
+    (cv-vec-6i (print-vec-6i self))
+    (cv-vec-8i (print-vec-8i self))))
+
+
+(defun pv (self)
+  "Alias for PRINT-VEC-*.
+   (Useful for debugging)"
+  (typecase self
+    (cv-vec-2b (print-vec-2b self))
+    (cv-vec-2d (print-vec-2d self))
+    (cv-vec-2f (print-vec-2f self))
+    (cv-vec-2i (print-vec-2i self))
+    (cv-vec-2s (print-vec-2s self))
+    (cv-vec-2w (print-vec-2w self))
+    (cv-vec-3b (print-vec-3b self))
+    (cv-vec-3d (print-vec-3d self))
+    (cv-vec-3f (print-vec-3f self))
+    (cv-vec-3i (print-vec-3i self))
+    (cv-vec-3s (print-vec-3s self))
+    (cv-vec-3w (print-vec-4w self))
+    (cv-vec-4b (print-vec-4b self))
+    (cv-vec-4d (print-vec-4d self))
+    (cv-vec-4f (print-vec-4f self))
+    (cv-vec-4i (print-vec-4i self))
+    (cv-vec-4s (print-vec-4s self))
+    (cv-vec-4w (print-vec-4w self))
+    (cv-vec-6d (print-vec-6d self))
+    (cv-vec-6f (print-vec-6f self))
+    (cv-vec-6i (print-vec-6i self))
+    (cv-vec-8i (print-vec-8i self))))
+
+
 ;; MatExpr* promote(Mat* m) 
 (defcfun ("promote" promote) mat-expr
   "Converts a MAT to a MAT-EXPR."
@@ -3304,13 +3833,13 @@ ret))
 ;; uchar* Mat::ptr(int i0=0)
 ;; uchar* cv_Mat_ptr_index(Mat* self, int i)
 (defcfun ("cv_Mat_ptr_index" %ptr) :pointer 
-	 (self mat)
-	 (i0 :int))
+  (self mat)
+  (i0 :int))
 
 
 (defun ptr (self &optional (i0 0))
-       "Returns pointer to i0-th submatrix along the dimension #0"
-       (%ptr self i0))
+  "Returns pointer to i0-th submatrix along the dimension #0"
+  (%ptr self i0))
 
 
 ;; void Mat::push_back(const Mat& m)
@@ -3371,11 +3900,11 @@ ret))
 
 
 (defun empty (arg)
-       (cond ((typep arg 'cv-mat)
-	      (mat-empty arg))
-	      ((typep arg 'cv-range)
-	       (range-empty arg))
-	       (t nil)))
+  (cond ((typep arg 'cv-mat)
+	 (mat-empty arg))
+	((typep arg 'cv-range)
+	 (range-empty arg))
+	(t nil)))
 
 
 ;; int Range::end
@@ -3403,7 +3932,7 @@ ret))
 ;; Rect_()
 ;; Rect* cv_create_Rect() 
 (defcfun ("cv_create_Rect" rect-0) rect 
-	 "RECT constructor.")
+  "RECT constructor.")
 
 
 ;; Rect_(_Tp _x, _Tp _y, _Tp _width, _Tp _height)
@@ -3417,19 +3946,81 @@ ret))
 
 
 (defun rect (&optional x y width height)
-       (cond ((eq (or x y) nil)
-	      (rect-0))
-	      ((and x y)
-	       (rect-4 x y width height))
-	       (t nil)))
+  (cond ((eq (or x y) nil)
+	 (rect-0))
+	((and x y)
+	 (rect-4 x y width height))
+	(t nil)))
 
 
 (defun make-rect (&optional x y width height)
-       (cond ((eq (or x y) nil)
-	      (rect-0))
-	      ((and x y)
-	       (rect-4 x y width height))
-	       (t nil)))
+  (cond ((eq (or x y) nil)
+	 (rect-0))
+	((and x y)
+	 (rect-4 x y width height))
+	(t nil)))
+
+
+;; Point Rect::br() const
+;; Point* cv_Rect_br(Rect* self) 
+(defcfun ("cv_Rect_br" rect-br) point 
+  "Retrieves the bottom-right corner of a rectangle."
+  (self rect))
+
+
+;; Point Rect::br() const
+;; Point* cv_Rect_br(Rect* self) 
+(defcfun ("cv_Rect_br" br) point 
+  "Retrieves the bottom-right corner of a rectangle."
+  (self rect))
+
+
+(defun (setf rect-br) (val self)
+  (let ((rect-x      (@ self :int 0))
+        (rect-y      (@ self :int 1))
+        (rect-width  (@ self :int 2))
+        (rect-height (@ self :int 3))
+        (point-x     (@ val :int 0))
+        (point-y     (@ val :int 1))
+        (new-x)
+        (new-y))
+    (when (>= point-x rect-x)
+      (setf new-x (- point-x rect-width)))
+    (when (>= point-y rect-y)
+      (setf new-y (- point-y rect-height)))
+    (when (<= point-x rect-x)
+      (setf new-x (- point-x rect-width)))
+    (when (<= point-y rect-y)
+	 (setf new-y (- point-y rect-height)))
+    (setf (@ self :int 0) new-x
+          (@ self :int 1) new-y
+          (@ self :int 2) rect-width
+          (@ self :int 3) rect-height)
+    val))
+
+
+(defun (setf br) (val self)
+  (let ((rect-x      (@ self :int 0))
+        (rect-y      (@ self :int 1))
+        (rect-width  (@ self :int 2))
+        (rect-height (@ self :int 3))
+        (point-x     (@ val :int 0))
+        (point-y     (@ val :int 1))
+        (new-x)
+        (new-y))
+    (when (>= point-x rect-x)
+      (setf new-x (- point-x rect-width)))
+    (when (>= point-y rect-y)
+      (setf new-y (- point-y rect-height)))
+    (when (<= point-x rect-x)
+      (setf new-x (- point-x rect-width)))
+    (when (<= point-y rect-y)
+	 (setf new-y (- point-y rect-height)))
+    (setf (@ self :int 0) new-x
+          (@ self :int 1) new-y
+          (@ self :int 2) rect-width
+          (@ self :int 3) rect-height)
+    val))
 
 
 ;; Rect* cv_Rect_clone(Rect* self)
@@ -3458,8 +4049,36 @@ ret))
 ;; Size Rect::size()
 ;; Size* cv_Rect_size(Rect* self)  
 (defcfun ("cv_Rect_size" rect-size) size 
-	 "Size (width, height) of the rectangle."
-	 (self rect))
+  "Size (width, height) of the rectangle."
+  (self rect))
+
+
+;; Point Rect::tl() const
+;; Point* cv_Rect_tl(Rect* self) 
+(defcfun ("cv_Rect_tl" rect-tl) point 
+  "Retrieves the top-left corner of a rectangle."
+  (self rect))
+
+
+;; Point Rect::tl() const
+;; Point* cv_Rect_tl(Rect* self) 
+(defcfun ("cv_Rect_tl" tl) point 
+  "Retrieves the top-left corner of a rectangle."
+  (self rect))
+
+
+(defun (setf rect-tl) (val self)
+  (setf (@ self :int 0) (@ val :int)
+	(@ self :int 1) (@ val :int 1)
+	(@ self :int 2) (@ self :int 2)
+	(@ self :int 3) (@ self :int 3))val)
+
+
+(defun (setf tl) (val self)
+  (setf (@ self :int 0) (@ val :int)
+	(@ self :int 1) (@ val :int 1)
+	(@ self :int 2) (@ self :int 2)
+	(@ self :int 3) (@ self :int 3))val)
 
 
 ;; int Rect::width
@@ -3532,11 +4151,11 @@ ret))
 
 
 (defun reshape (&optional self cn (rows 0))
-       (cond ((eq rows 0)
-	      (%reshape self cn))
-	      ((> rows 0)
-	       (reshape-rows self cn rows))
-	       (t nil)))
+  (cond ((eq rows 0)
+	 (%reshape self cn))
+	((> rows 0)
+	 (reshape-rows self cn rows))
+	(t nil)))
 
 
 ;; float KeyPoint::response
@@ -3552,9 +4171,9 @@ ret))
 ;; Mat::Mat(const Mat& m, const Rect& roi)
 ;; Mat* cv_Mat_get_ROI(Mat* self, Rect* roi)
 (defcfun ("cv_Mat_get_ROI" roi) mat 
-	 "Returns matrix header corresponding to the rectangular sub-array of input MAT."
-	 (self mat)
-	 (roi rect))
+  "Returns matrix header corresponding to the rectangular sub-array of input MAT."
+  (self mat)
+  (roi rect))
 
 
 
@@ -3588,7 +4207,7 @@ ret))
 
 (defun (setf rotated-rect-angle) (val self)
   "Sets the angle of a ROTATED-RECT."
-   (rotated-rect-set-angle self val))
+  (rotated-rect-set-angle self val))
 
 
 ;; Rect RotatedRect::boundingRect() const
@@ -3618,7 +4237,7 @@ ret))
   (startrow :int)
   (endrow :int))
 
-;
+					;
 ;; Mat Mat::row(int y) const
 ;; Mat* cv_Mat_getRow(Mat* self, int y) 
 (defcfun ("cv_Mat_getRow" row) mat
@@ -3640,10 +4259,10 @@ ret))
 ;; Scalar::Scalar(double v0, double v1, double v2, double v3)
 ;; Scalar* cv_create_Scalar4(double val0, (double val1, double val2, double val3)
 (defcfun ("cv_create_Scalar4" scalar-4) scalar
-	 (v0 :double)
-	 (v1 :double)
-	 (v2 :double)
-	 (v3 :double))
+  (v0 :double)
+  (v1 :double)
+  (v2 :double)
+  (v3 :double))
 
 
 (defun scalar (&optional (v0 0d0) (v1 0d0) (v2 0d0) (v3 0d0))
@@ -3675,15 +4294,15 @@ ret))
 
 
 (defun scalar-all (v0)
-       "SCALAR conctctor - Initializes all of 
+  "SCALAR conctctor - Initializes all of 
         the scalar values 0...3 with V0"
-       (%scalar-all (coerce v0 'double-float)))
+  (%scalar-all (coerce v0 'double-float)))
 
 
 (defun make-scalar-all (v0)
-       "SCALAR conctctor - Initializes all of 
+  "SCALAR conctctor - Initializes all of 
         the scalar values 0...3 with v0"
-       (%scalar-all (coerce v0 'double-float)))
+  (%scalar-all (coerce v0 'double-float)))
 
 
 ;; MatExpr * operator
@@ -3713,7 +4332,7 @@ ret))
 	
 	((numberp arg1) 
 	 (size-2 (coerce arg1 'double-float) 
-		(coerce arg2 'double-float)))
+		 (coerce arg2 'double-float)))
 
 	(t nil)))
 
@@ -3796,19 +4415,19 @@ ret))
 
 
 (defun term-criteria (&optional type max-count epsilon)
-       (cond ((eq type nil)
-	      (term-criteria-0))
-	      (type
-	       (term-criteria-3 type max-count epsilon))
-	       (t nil)))
+  (cond ((eq type nil)
+	 (term-criteria-0))
+	(type
+	 (term-criteria-3 type max-count epsilon))
+	(t nil)))
 
 
 (defun make-term-criteria (&optional type max-count epsilon)
-       (cond ((eq type nil)
-	      (term-criteria-0))
-	      (type
-	       (term-criteria-3 type max-count epsilon))
-	       (t nil)))
+  (cond ((eq type nil)
+	 (term-criteria-0))
+	(type
+	 (term-criteria-3 type max-count epsilon))
+	(t nil)))
 
 
 ;; double TermCriteria::epsilon
@@ -3863,13 +4482,6 @@ ret))
 (defun (setf term-criteria-type) (val self)
   "Sets the type of a TERM-CRITERIA object."
   (term-criteria-set-type self val))
-
-
-;; Point_<_Tp> tl() const
-;; Point* cv_Rect_tl(Rect* self) 
-(defcfun ("cv_Rect_tl" tl) point 
-	 "Retrievies the top-left corner of a rectangle."
-	 (self rect))
 
 
 ;; size_t Mat::total() const
@@ -4620,19 +5232,19 @@ ret))
 ;; void max(InputArray src1, InputArray src2, OutputArray dst)
 ;; void cv_max(Mat* src1, Mat* src2, Mat* dst)
 (defcfun ("cv_max" %max) :void 
-	 "Calculates per-element maximum of two arrays."
-	 (src1 mat)
-	 (src2 mat)
-	 (dest mat))
+  "Calculates per-element maximum of two arrays."
+  (src1 mat)
+  (src2 mat)
+  (dest mat))
 
 
 ;; void min(InputArray src1, InputArray src2, OutputArray dst)
 ;; void cv_min(Mat* src1, Mat* src2, Mat* dst)
 (defcfun ("cv_min" %min) :void 
-	 "Calculates per-element minimum of two arrays."
-	 (src1 mat)
-	 (src2 mat)
-	 (dest mat))
+  "Calculates per-element minimum of two arrays."
+  (src1 mat)
+  (src2 mat)
+  (dest mat))
 
 
 ;; C++: void absdiff(InputArray src1, InputArray src2, OutputArray dst)
@@ -4657,8 +5269,8 @@ ret))
 
 
 (defun add-weighted (src1 alpha src2 beta gamma dest &optional (dtype -1))
-       "Calculates the weighted sum of two arrays."
-       (%add-weighted src1 alpha src2 beta gamma dest dtype))
+  "Calculates the weighted sum of two arrays."
+  (%add-weighted src1 alpha src2 beta gamma dest dtype))
 
 
 ;; void bitwise_and(InputArray src1, InputArray src2, OutputArray dst, InputArray mask=noArray())
@@ -4731,8 +5343,8 @@ ret))
 
 
 (defun calc-covar-matrix (samples covar mean flags &optional (ctype +64f+))
-       "Calculates the covariance matrix of a set of vectors."
-       (%calc-covar-matrix samples covar mean flags ctype))
+  "Calculates the covariance matrix of a set of vectors."
+  (%calc-covar-matrix samples covar mean flags ctype))
 
 
 ;; bool checkRange(InputArray a, bool quiet=true, Point* pos=0, double minVal=-DBL_MAX, double maxVal=DBL_MAX )
@@ -4770,15 +5382,15 @@ ret))
 
 
 (defun convert-scale-abs (src dest &optional (alpha 1d0) (beta 0d0))
-       "Scales, calculates absolute values, and converts the result to 8-bit."
-       (%convert-scale-abs src dest alpha beta))
+  "Scales, calculates absolute values, and converts the result to 8-bit."
+  (%convert-scale-abs src dest alpha beta))
 
 
 ;; double determinant(InputArray mtx)
 ;; double cv_determinant(Mat* mtx) 
 (defcfun ("cv_determinant" det) :double 
-	 "Returns the determinant of a square floating-point matrix."
-	 (mtx mat))
+  "Returns the determinant of a square floating-point matrix."
+  (mtx mat))
 
 
 ;; void divide(InputArray src1, InputArray src2, OutputArray dst, double scale=1, int dtype=-1)
@@ -4801,11 +5413,11 @@ ret))
 
 
 (defun divide (&optional arg1 arg2 arg3 (arg4 1d0) (arg5 -1))
-       (cond ((eq (type-of arg1) 'cv-mat)
-	      (divide5 arg1 arg2 arg3 arg4 arg5))
-	      ((eq (type-of arg1) 'double-float)
-	       (divide4 arg1 arg2 arg3 arg5))
-	       (t nil)))
+  (cond ((eq (type-of arg1) 'cv-mat)
+	 (divide5 arg1 arg2 arg3 arg4 arg5))
+	((eq (type-of arg1) 'double-float)
+	 (divide4 arg1 arg2 arg3 arg5))
+	(t nil)))
 
 
 ;; void flip(InputArray src, OutputArray dst, int flipCode)
@@ -4830,9 +5442,9 @@ ret))
 ;; MatExpr Mat::inv(int method=DECOMP_LU) const
 ;; MatExpr* cv_Mat_inv_mat(Mat* self, int method)
 (defcfun ("cv_Mat_inv_mat" inv) mat-expr 
-	 "Inverses a matrix."
-	 (self mat)
-	 (method :int))
+  "Inverses a matrix."
+  (self mat)
+  (method :int))
 
 
 ;; double invert(InputArray src, OutputArray dst, int flags=DECOMP_LU)
@@ -4844,8 +5456,8 @@ ret))
 
 
 (defun invert (src dest &optional (flags +decomp-lu+))
-       "Finds the inverse or pseudo-inverse of a matrix."
-       (%invert src dest flags))
+  "Finds the inverse or pseudo-inverse of a matrix."
+  (%invert src dest flags))
 
 
 ;; bool Mat::isContinuous() const
@@ -4881,8 +5493,8 @@ ret))
 (defun %mean (src &optional (mask (%mat) given-mask))
   "Calculates an average mean of matrix elements."
   (let ((return (%%mean src mask)))
-  (if given-mask nil (del-mat mask))
-  return))
+    (if given-mask nil (del-mat mask))
+    return))
 
 
 ;; void minMaxLoc(InputArray src, double* minVal, double* maxVal=0, Point* minLoc=0, Point* maxLoc=0, InputArray mask=noArray())
@@ -4914,8 +5526,8 @@ ret))
 
 
 (defun mul-transposed (src dest a-t-a &optional (delta (%mat) given-delta) (scale 1d0) (dtype -1)) 
-       (%mul-transposed src dest a-t-a delta scale dtype)
-       (if given-delta nil (del-mat delta)))
+  (%mul-transposed src dest a-t-a delta scale dtype)
+  (if given-delta nil (del-mat delta)))
 
 
 ;; void multiply(InputArray src1, InputArray src2, OutputArray dst, double scale=1, int dtype=-1 )
@@ -4929,8 +5541,8 @@ ret))
 
 
 (defun multiply (src1 src2 dest &optional (scale 1.0d0) (dtype -1))
-       "Calculates the per-element scaled product of two arrays."
-       (%multiply src1 src2 dest scale dtype))
+  "Calculates the per-element scaled product of two arrays."
+  (%multiply src1 src2 dest scale dtype))
 
 
 ;;double norm(InputArray src1, int normType=NORM_L2, InputArray mask=noArray())
@@ -4988,13 +5600,13 @@ ret))
   (%normalize src dest alpha beta norm-type  dtype  mask)
   (if given-mask nil (del-mat mask)))
 
- 
+
 ;; Mat PCA::eigenvalues
 ;; Mat* cv_PCA_get_eigenvalues(PCA* self)
 (defcfun ("cv_PCA_get_eigenvalues" pca-eigenvalues) mat
   "Gets the eigenvalues of the covariation matrix(PCA)."
   (self pca))
- 
+
 
 ;; Mat PCA::eigenvalues
 ;; Mat* cv_PCA_get_eigenvalues(PCA* self)
@@ -5024,7 +5636,7 @@ ret))
   "Gets the eigenvectors of the covariation matrix(PCA)."
   (self pca))
 
- 
+
 ;; Mat PCA::eigenvectors
 ;; Mat* cv_PCA_get_eigenvectors(PCA* self)
 (defcfun ("cv_PCA_get_eigenvectors" eigenvectors) mat
@@ -5054,8 +5666,8 @@ ret))
    the projection and added after the back projection.
    (PCA)"
   (self pca))
- 
- 
+
+
 ;; Mat* cv_PCA_set_Mean(PCA* self, Mat* val)
 (defcfun ("cv_PCA_set_Mean" pca-set-mean) mat
   "This function sets the mean value subtracted before 
@@ -5122,28 +5734,28 @@ ret))
 
 ;; RNG::RNG()
 (defcfun ("cv_create_RNG" %rng) rng 
-	 "RNG constructor") 
+  "RNG constructor") 
 
 
 ;; RNG::RNG(uint64 state)
 ;; RNG* cv_create_RNG_state(uint64 state)
 (defcfun ("cv_create_RNG_state" rng-state) rng 
-	 "RNG constructor -  sets the RNG state to the specified value."
-	 (state :uint64))
+  "RNG constructor -  sets the RNG state to the specified value."
+  (state :uint64))
 
 
 (defun rng (&optional (state nil))
-       (cond ((eq state nil)
-	      (%rng))
-	      ((integerp state) (rng-state state))
-	      (t nil)))
+  (cond ((eq state nil)
+	 (%rng))
+	((integerp state) (rng-state state))
+	(t nil)))
 
 
 (defun make-rng (&optional (state nil))
-       (cond ((eq state nil)
-	      (%rng))
-	      ((integerp state) (rng-state state))
-	      (t nil)))
+  (cond ((eq state nil)
+	 (%rng))
+	((integerp state) (rng-state state))
+	(t nil)))
 
 
 ;; void RNG::fill(InputOutputArray mat, int distType, InputArray a, InputArray b, bool saturateRange=false )
@@ -5180,11 +5792,11 @@ ret))
 ;; void scaleAdd(InputArray src1, double alpha, InputArray src2, OutputArray dst)
 ;; void cv_scaleAdd(Mat* src1, double alpha, Mat* src2, Mat* dst)
 (defcfun ("cv_scaleAdd" scale-add) :void 
-	 "Calculates the sum of a scaled array and another array."
-	 (src1 mat)
-	 (alpha :double)
-	 (src2 mat)
-	 (dest mat))
+  "Calculates the sum of a scaled array and another array."
+  (src1 mat)
+  (alpha :double)
+  (src2 mat)
+  (dest mat))
 
 
 ;; void subtract(InputArray src1, InputArray src2, OutputArray dst, InputArray mask=noArray(), int dtype=-1)
@@ -5239,12 +5851,12 @@ ret))
 
 
 (defun uniform  (rng a b)
-       (cond ((or (eq (type-of (and a b)) 'FIXNUM)
-		  (integerp (and a b)))
-	      (uniform-i rng a b))
-	      ((eq (type-of (and a b)) 'single-float) (uniform-f rng a b))
-	      ((eq (type-of (and a b)) 'double-float) (uniform-d rng a b))
-	      (t nil)))
+  (cond ((or (eq (type-of (and a b)) 'FIXNUM)
+	     (integerp (and a b)))
+	 (uniform-i rng a b))
+	((eq (type-of (and a b)) 'single-float) (uniform-f rng a b))
+	((eq (type-of (and a b)) 'double-float) (uniform-d rng a b))
+	(t nil)))
 
 
 ;;; Operations on Arrays
@@ -5254,23 +5866,23 @@ ret))
 
 
 (defmacro bgr (b g r)
-	  "BGR value constructor macro"
-	  `(scalar ,b ,g ,r))
+  "BGR value constructor macro"
+  `(scalar ,b ,g ,r))
 
 
 (defmacro make-bgr (b g r)
-	  "BGR value constructor macro"
-	  `(scalar ,b ,g ,r))
+  "BGR value constructor macro"
+  `(scalar ,b ,g ,r))
 
 
 (defmacro rgb (r g b)
-	  "BGR value constructor macro"
-	  `(scalar ,b ,g ,r))
+  "BGR value constructor macro"
+  `(scalar ,b ,g ,r))
 
 
 (defmacro make-rgb (r g b)
-	  "BGR value constructor macro"
-	  `(scalar ,b ,g ,r))
+  "BGR value constructor macro"
+  `(scalar ,b ,g ,r))
 
 
 ;; void circle(Mat& img, Point center, int radius, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
@@ -5298,10 +5910,10 @@ ret))
 
 
 (defun circle (img center radius color &optional (thickness 1) (line-type 8) (shift 0))
-       "Draws a circle."
-       (if (typep center 'cv-point)
-	   (circle-point img center radius color thickness line-type shift)
-			 (circle-point-2f img center radius color thickness line-type shift)))
+  "Draws a circle."
+  (if (typep center 'cv-point)
+      (circle-point img center radius color thickness line-type shift)
+      (circle-point-2f img center radius color thickness line-type shift)))
 
 
 ;; bool clipLine(Rect imgRect, Point& pt1, Point& pt2)
@@ -5323,8 +5935,8 @@ ret))
 
 
 (defun ellipse5 (img box color &optional (thickness 1) (line-type 8))
-       "Fills an ellipse sector."
-       (%ellipse5 img box color thickness line-type))
+  "Fills an ellipse sector."
+  (%ellipse5 img box color thickness line-type))
 
 
 ;; void ellipse(Mat& img, Point center, Size axes, double angle, double startAngle, double endAngle, const Scalar& color, 
@@ -5345,15 +5957,15 @@ ret))
 
 
 (defun ellipse10 (img center axes angle start-angle end-angle color &optional (thickness 1) (line-type 8) (shift 0))
-       "Draws a simple or thick elliptic arc."
-       (%ellipse10 img center axes angle start-angle end-angle color thickness line-type shift))
+  "Draws a simple or thick elliptic arc."
+  (%ellipse10 img center axes angle start-angle end-angle color thickness line-type shift))
 
 
 (defun ellipse (&rest args)
-       (case (length args)
-	     ((3 4 5) (apply #'ellipse5 args))
-	     ((7 8 9 10) (apply #'ellipse10 args))
-	     (otherwise (error "Wrong number arguments to ELLIPSE (~A)" (length args)))))
+  (case (length args)
+    ((3 4 5) (apply #'ellipse5 args))
+    ((7 8 9 10) (apply #'ellipse10 args))
+    (otherwise (error "Wrong number arguments to ELLIPSE (~A)" (length args)))))
 
 
 ;; Size getTextSize(const string& text, int fontFace, double fontScale, int thickness, int* baseLine)
@@ -5384,8 +5996,8 @@ ret))
 
 
 (defun line (img pt-1 pt-2 color &optional (thickness 1) (line-type 8) (shift 0))
-       "Draws a line segment connecting two points."
-       (%line img pt-1 pt-2 color thickness line-type shift))
+  "Draws a line segment connecting two points."
+  (%line img pt-1 pt-2 color thickness line-type shift))
 
 
 ;; PCA::PCA()
@@ -5419,35 +6031,61 @@ ret))
 
 
 ;; Mat PCA::backProject(InputArray vec) const
-;; Mat PCA::backProject(InputArray vec) const
-(defcfun ("cv_PCA_BackProject1" pca-back-project) mat
+;; Mat* cv_PCA_BackProject1(PCA* self, Mat* vec)
+(defcfun ("cv_PCA_BackProject1" pca-back-project-1) mat
   "Reconstructs vectors from their PC projections."
   (self pca)
   (vec mat))
 
 
-;; Mat PCA::backProject(InputArray vec) const
-;; Mat PCA::backProject(InputArray vec) const
-(defcfun ("cv_PCA_BackProject1" back-project) mat
+;; void PCA::backProject(InputArray vec, OutputArray result) const
+;; void cv_PCA_BackProject2(PCA* self, Mat* vec, Mat* result)
+(defcfun ("cv_PCA_BackProject2" pca-back-project-2) mat
   "Reconstructs vectors from their PC projections."
   (self pca)
-  (vec mat))
+  (vec mat)
+  (result mat))
+
+
+(defun pca-back-project (self vec &optional result)
+  (if result
+      (pca-back-project-2 self vec result)
+      (pca-back-project-1 self vec)))
+
+
+(defun back-project (self vec &optional result)
+  (if result
+      (pca-back-project-2 self vec result)
+      (pca-back-project-1 self vec)))
 
 
 ;; Mat PCA::project(InputArray vec) const
 ;; Mat* cv_PCA_project1(PCA* self, Mat* vec)
-(defcfun ("cv_PCA_Project1" pca-project) mat
+(defcfun ("cv_PCA_Project1" pca-project-1) mat
   "Projects vector(s) to the principal component subspace."
   (self pca)
   (vec mat))
 
 
-;; Mat PCA::project(InputArray vec) const
-;; Mat* cv_PCA_project1(PCA* self, Mat* vec)
-(defcfun ("cv_PCA_Project1" project) mat
+;; void PCA::project(InputArray vec, OutputArray result) const
+;; void cv_PCA_Project2(PCA* self, Mat* vec, Mat* result)
+(defcfun ("cv_PCA_Project2" pca-project-2) :void
   "Projects vector(s) to the principal component subspace."
   (self pca)
-  (vec mat))
+  (vec mat)
+  (result mat))
+
+
+(defun pca-project (self vec &optional result)
+  (if result
+      (pca-project-2 self vec result)
+      (pca-project-1 self vec)))
+
+
+(defun project (self vec &optional result)
+  (if result
+      (pca-project-2 self vec result)
+      (pca-project-1 self vec)))
 
 
 ;; void putText(Mat& img, const string& text, Point org, int fontFace, double fontScale, Scalar color, int thickness=1, int lineType=8, 
@@ -5469,8 +6107,8 @@ ret))
 
 
 (defun put-text (img text org font-face font-scale color &optional (thickness 1) (line-type 8) (bottom-left-origin nil))
-       "Draws a text string."
-       (%put-text img (%c-string-to-string text (length text)) org font-face font-scale color thickness line-type bottom-left-origin))
+  "Draws a text string."
+  (%put-text img (%c-string-to-string text (length text)) org font-face font-scale color thickness line-type bottom-left-origin))
 
 
 ;; void rectangle(Mat& img, Point pt1, Point pt2, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
@@ -5486,8 +6124,8 @@ ret))
 
 
 (defun rectangle (img pt1 pt2 color &optional (thickness 1) (line-type 8) (shift 0))
-       "Draws a simple, thick, or filled up-right rectangle."
-       (%rectangle img pt1 pt2 color thickness line-type shift))
+  "Draws a simple, thick, or filled up-right rectangle."
+  (%rectangle img pt1 pt2 color thickness line-type shift))
 
 
 
@@ -5542,13 +6180,13 @@ ret))
 
 
 (defun file-storage-open (self &optional filename flags (encoding (%string) given-encoding))
-       (let ((return (%file-storage-open self (%c-string-to-string filename (length filename)) 
-					 flags 
-					 (if given-encoding 
-					     (%c-string-to-string encoding (length encoding)) 
-					     encoding))))
-	 (if given-encoding nil (del-std-string encoding))
-	 return))
+  (let ((return (%file-storage-open self (%c-string-to-string filename (length filename)) 
+				    flags 
+				    (if given-encoding 
+					(%c-string-to-string encoding (length encoding)) 
+					encoding))))
+    (if given-encoding nil (del-std-string encoding))
+    return))
 
 
 ;; void FileStorage::release()
@@ -5651,9 +6289,9 @@ ret))
 ;; float fastAtan2(float y, float x)
 ;; float cv_fastAtan2(float y, float x)
 (defcfun ("cv_fastAtan2" fast-atan2) :float 
-	 "Calculates the angle of a 2D vector in degrees."
-	 (x :float)
-	 (y :float))
+  "Calculates the angle of a 2D vector in degrees."
+  (x :float)
+  (y :float))
 
 
 ;; const String& getBuildInformation()

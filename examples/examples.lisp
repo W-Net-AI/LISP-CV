@@ -2028,11 +2028,19 @@ C++: Point::x, Point::y
 
 LISP-CV: (X (SELF POINT)) => :INT
 
+LISP-CV: (SETF (X (SELF POINT)) (VAL :INT)) => :INT
+
 LISP-CV: (Y (SELF POINT)) => :INT
+
+LISP-CV: (SETF (Y (SELF POINT)) (VAL :INT)) => :INT
 
 LISP-CV: (POINT-X (SELF POINT)) => :INT ;Alias for X
 
+LISP-CV: (SETF (POINT-X (SELF POINT)) (VAL :INT)) => :INT ;Alias for (SETF X)
+
 LISP-CV: (POINT-Y (SELF POINT)) => :INT ;Alias for Y
+
+LISP-CV: (SETF (POINT-Y (SELF POINT)) (VAL :INT)) => :INT ;Alias for (SETF Y)
 
 
     Parameters:	
@@ -2042,6 +2050,8 @@ LISP-CV: (POINT-Y (SELF POINT)) => :INT ;Alias for Y
         X - X-coordinate of the point.
 
         Y - Y-coordinate of the point.
+
+        VAL - A new integer value.
 
 
 POINT creates a 2D point with integer coordinates (usually zero-based). The methods X and Y are used 
@@ -2090,11 +2100,19 @@ C++: Point2d::x, Point2d::y
 
 LISP-CV: (X (SELF POINT-2D)) => :DOUBLE
 
+LISP-CV: (SETF (X (SELF POINT-2D)) (VAL :DOUBLE)) => :DOUBLE
+
 LISP-CV: (Y (SELF POINT-2D)) => :DOUBLE
+
+LISP-CV: (SETF (Y (SELF POINT-2D)) (VAL :DOUBLE)) => :DOUBLE
 
 LISP-CV: (POINT-2D-X (SELF POINT-2D)) => :DOUBLE ;Alias for X
 
+LISP-CV: (SETF (POINT-2D-X (SELF POINT-2D)) (VAL :DOUBLE)) => :DOUBLE ;Alias for (SETF X)
+
 LISP-CV: (POINT-2D-Y (SELF POINT-2D)) => :DOUBLE ;Alias for Y
+
+LISP-CV: (SETF (POINT-2D-Y (SELF POINT-2D)) (VAL :DOUBLE)) => :DOUBLE ;Alias for (SETF Y)
 
 
     Parameters:	
@@ -2104,6 +2122,8 @@ LISP-CV: (POINT-2D-Y (SELF POINT-2D)) => :DOUBLE ;Alias for Y
         X - X-coordinate of the point.
 
         Y - Y-coordinate of the point.
+
+        VAL - A new double float value.
 
 
 POINT-2D creates a 2D point with double-float coordinates (usually zero-based). Methods X and Y are 
@@ -2153,11 +2173,19 @@ C++: Point2f::x, Point2f::y
 
 LISP-CV: (X (SELF POINT-2F)) => :FLOAT
 
+LISP-CV: (SETF (X (SELF POINT-2F)) (VAL :FLOAT)) => :FLOAT
+
 LISP-CV: (Y (SELF POINT-2F)) => :FLOAT
+
+LISP-CV: (SETF (Y (SELF POINT-2F)) (VAL :FLOAT)) => :FLOAT
 
 LISP-CV: (POINT-2F-X (SELF POINT-2F)) => :FLOAT ;Alias for X
 
+LISP-CV: (SETF (POINT-2F-X (SELF POINT-2F)) (VAL :FLOAT)) => :FLOAT ;Alias for (SETF X)
+
 LISP-CV: (POINT-2F-Y (SELF POINT-2F)) => :FLOAT ;Alias for Y
+
+LISP-CV: (SETF (POINT-2F-Y (SELF POINT-2F)) (VAL :FLOAT)) => :FLOAT ;Alias for (SETF Y)
 
 
     Parameters:	
@@ -2167,6 +2195,8 @@ LISP-CV: (POINT-2F-Y (SELF POINT-2F)) => :FLOAT ;Alias for Y
         X - X-coordinate of the point.
 
         Y - Y-coordinate of the point.
+
+        VAL - A new single float value.
 
 
 POINT-2F creates a 2D point with single float coordinates (usually zero-based). Methods X and Y are 
@@ -2212,20 +2242,31 @@ LISP-CV:  (MAKE-POINT-3D (X :DOUBLE) (Y :DOUBLE) (Z :DOUBLE)) => POINT-3D
 
 SETF-able member accessors. 
 
-C++: Point3d::x, Point3d::y, Point3d::z
+C++: Point3d::x, Point3d::y
 
 LISP-CV: (X (SELF POINT-3D)) => :DOUBLE
 
+LISP-CV: (SETF (X (SELF POINT-3D)) (VAL :DOUBLE)) => :DOUBLE
+
 LISP-CV: (Y (SELF POINT-3D)) => :DOUBLE
+
+LISP-CV: (SETF (Y (SELF POINT-3D)) (VAL :DOUBLE)) => :DOUBLE
 
 LISP-CV: (Z (SELF POINT-3D)) => :DOUBLE
 
+LISP-CV: (SETF (Z (SELF POINT-3D)) (VAL :DOUBLE)) => :DOUBLE
+
 LISP-CV: (POINT-3D-X (SELF POINT-3D)) => :DOUBLE ;Alias for X
+
+LISP-CV: (SETF (POINT-3D-X (SELF POINT-3D)) (VAL :DOUBLE)) => :DOUBLE ;Alias for (SETF X)
 
 LISP-CV: (POINT-3D-Y (SELF POINT-3D)) => :DOUBLE ;Alias for Y
 
+LISP-CV: (SETF (POINT-3D-Y (SELF POINT-3D)) (VAL :DOUBLE)) => :DOUBLE ;Alias for (SETF Y)
+
 LISP-CV: (POINT-3D-Z (SELF POINT-3D)) => :DOUBLE ;Alias for Z
 
+LISP-CV: (SETF (POINT-3D-Z (SELF POINT-3D)) (VAL :DOUBLE)) => :DOUBLE ;Alias for (SETF Z)
 
 
     Parameters:	
@@ -2237,6 +2278,8 @@ LISP-CV: (POINT-3D-Z (SELF POINT-3D)) => :DOUBLE ;Alias for Z
         Y - Y-coordinate of the point.
         
         Z - Z-coordinate of the point.
+
+        VAL - A new double float value.
 
 
 POINT-3D creates a 3D point with double float coordinates (usually zero-based). methods X, Y and Z 
@@ -2283,19 +2326,31 @@ LISP-CV:  (MAKE-POINT-3F (X :FLOAT) (Y :FLOAT) (Z :FLOAT)) => POINT-3F
 
 SETF-able member accessors. 
 
-C++: Point3f::x, Point3f::y, Point3f::z
+C++: Point3f::x, Point3f::y
 
 LISP-CV: (X (SELF POINT-3F)) => :FLOAT
 
+LISP-CV: (SETF (X (SELF POINT-3F)) (VAL :FLOAT)) => :FLOAT
+
 LISP-CV: (Y (SELF POINT-3F)) => :FLOAT
+
+LISP-CV: (SETF (Y (SELF POINT-3F)) (VAL :FLOAT)) => :FLOAT
 
 LISP-CV: (Z (SELF POINT-3F)) => :FLOAT
 
+LISP-CV: (SETF (Z (SELF POINT-3F)) (VAL :FLOAT)) => :FLOAT
+
 LISP-CV: (POINT-3F-X (SELF POINT-3F)) => :FLOAT ;Alias for X
+
+LISP-CV: (SETF (POINT-3F-X (SELF POINT-3F)) (VAL :FLOAT)) => :FLOAT ;Alias for (SETF X)
 
 LISP-CV: (POINT-3F-Y (SELF POINT-3F)) => :FLOAT ;Alias for Y
 
+LISP-CV: (SETF (POINT-3F-Y (SELF POINT-3F)) (VAL :FLOAT)) => :FLOAT ;Alias for (SETF Y)
+
 LISP-CV: (POINT-3F-Z (SELF POINT-3F)) => :FLOAT ;Alias for Z
+
+LISP-CV: (SETF (POINT-3F-Z (SELF POINT-3F)) (VAL :FLOAT)) => :FLOAT ;Alias for (SETF Z)
 
 
     Parameters:	
@@ -2307,6 +2362,8 @@ LISP-CV: (POINT-3F-Z (SELF POINT-3F)) => :FLOAT ;Alias for Z
         Y - Y-coordinate of the point.
         
         Z - Z-coordinate of the point.
+
+        VAL - A new single float value.
 
 
 POINT-3F creates a 3D point with single float coordinates (usually zero-based). Methods X, Y and Z 
@@ -2353,19 +2410,31 @@ LISP-CV:  (MAKE-POINT-3I (X :INT) (Y :INT) (Z :INT)) => POINT-3I
 
 SETF-able member accessors. 
 
-C++: Point3i::x, Point3i::y, Point3i::z
+C++: Point3i::x, Point3i::y
 
 LISP-CV: (X (SELF POINT-3I)) => :INT
 
+LISP-CV: (SETF (X (SELF POINT-3I)) (VAL :INT)) => :INT
+
 LISP-CV: (Y (SELF POINT-3I)) => :INT
+
+LISP-CV: (SETF (Y (SELF POINT-3I)) (VAL :INT)) => :INT
 
 LISP-CV: (Z (SELF POINT-3I)) => :INT
 
+LISP-CV: (SETF (Z (SELF POINT-3I)) (VAL :INT)) => :INT
+
 LISP-CV: (POINT-3I-X (SELF POINT-3I)) => :INT ;Alias for X
+
+LISP-CV: (SETF (POINT-3I-X (SELF POINT-3I)) (VAL :INT)) => :INT ;Alias for (SETF X)
 
 LISP-CV: (POINT-3I-Y (SELF POINT-3I)) => :INT ;Alias for Y
 
+LISP-CV: (SETF (POINT-3I-Y (SELF POINT-3I)) (VAL :INT)) => :INT ;Alias for (SETF Y)
+
 LISP-CV: (POINT-3I-Z (SELF POINT-3I)) => :INT ;Alias for Z
+
+LISP-CV: (SETF (POINT-3I-Z (SELF POINT-3I)) (VAL :INT)) => :INT ;Alias for (SETF Z)
 
 
     Parameters:	
@@ -2377,6 +2446,8 @@ LISP-CV: (POINT-3I-Z (SELF POINT-3I)) => :INT ;Alias for Z
         Y - Y-coordinate of the point.
         
         Z - Z-coordinate of the point.
+
+        VAL - A new integer value.
 
 
 POINT-3I creates a 3D point with integer coordinates (usually zero-based). Methods X, Y and Z are 
@@ -6515,6 +6586,39 @@ C++: PCA::PCA(InputArray data, InputArray mean, int flags, double retainedVarian
 
 LISP-CV: (PCA (DATA MAT) (MEAN MAT) (FLAGS :INT) (RETAINED-VARIANCE :DOUBLE)) => PCA
 
+SETF-able member accessors.
+
+C++: Mat PCA::eigenvalues
+
+LISP-CV: (EIGENVALUES (SELF PCA)) => MAT
+
+LISP-CV: (PCA-EIGENVALUES (SELF PCA)) => MAT ;Alias for EIGENVALUES
+
+LISP-CV: (SETF (EIGENVALUES (SELF PCA)) (VAL MAT)) => MAT
+
+LISP-CV: (SETF (PCA-EIGENVALUES (SELF PCA)) (VAL MAT)) => MAT ;Alias for (SETF EIGENVALUES)
+
+C++: Mat PCA::eigenvectors
+
+LISP-CV: (EIGENVECTORS (SELF PCA)) => MAT
+
+LISP-CV: (PCA-EIGENVECTORS (SELF PCA)) => MAT ;Alias for EIGENVEECTORS
+
+LISP-CV: (SETF (EIGENVECTORS (SELF PCA)) (VAL MAT)) => MAT
+
+LISP-CV: (SETF (PCA-EIGENVECTORS (SELF PCA)) (VAL MAT)) => MAT ;Alias for (SETF EIGENVECTORS)
+
+C++: Mat PCA::mean
+
+LISP-CV: (MEAN (SELF PCA)) => MAT
+
+LISP-CV: (PCA-MEAN (SELF PCA)) => MAT ;Alias for MEAN
+
+LISP-CV: (SETF (MEAN (SELF PCA)) (VAL MAT)) => MAT
+
+LISP-CV: (SETF (PCA-MEAN (SELF PCA)) (VAL MAT)) => MAT ;Alias for (SETF MEAN)
+
+
     Parameters:	
 
         DATA - Input samples stored as matrix rows or matrix columns.
@@ -6530,6 +6634,8 @@ LISP-CV: (PCA (DATA MAT) (MEAN MAT) (FLAGS :INT) (RETAINED-VARIANCE :DOUBLE)) =>
         RETAINED-VARIANCE - Percentage of variance that PCA should retain. Using this parameter will 
                             let the PCA decided how many components to retain but it will always keep 
                             at least 2.
+
+        VAL - A new value.
 
 
 The default constructor initializes an empty PCA structure. The other constructors initialize the 
@@ -6696,6 +6802,33 @@ so your input text file would end up looking like this:
 		 (let ((c (wait-key )))
 		   (when (= c 27)
 		     (return)))))))))))
+
+========================================================================================================================================
+#PCA-PROJECT
+========================================================================================================================================
+
+Projects vector(s) to the principal component subspace.
+
+Note: The name PCA-PROJECT is used in the documentation to refer to the binding for the "project" 
+member of the OpenCV PCA class because it's more descriptive and it is easier to search for in this 
+file. The PROJECT method may also be used to call this binding.
+
+C++: Mat PCA::project(InputArray vec) const
+
+LISP-CV: (PROJECT (SELF PCA) (VEC MAT)) => MAT
+
+LISP-CV: (PCA-PROJECT (SELF PCA) (VEC MAT)) => MAT
+
+    Parameters:	
+
+        VEC - Input vector(s); must have the same dimensionality and the same layout as the input 
+              data used at PCA phase, that is, if the flag +PCA-DATA-AS-ROW+ is specified, then 
+              (= (COLS VEC) (COLS DATA)) (vector dimensionality) and (ROWS VEC) is the number of 
+              vectors to project, and the same is true for the +PCA-DATA-AS-COL+ case.
+
+The methods project one or more vectors to the principal component subspace, where each vector projection is represented by coefficients in the principal component basis. The first form of the method returns the matrix that the second form writes to the result. So the first form can be used as a part of expression while the second form can be more efficient in a processing loop.
+
+
 
 ========================================================================================================================================
 #PHASE
@@ -17690,7 +17823,7 @@ Example:
 
 
 ========================================================================================================================================
-SVM-PARAMS
+#SVM-PARAMS
 ========================================================================================================================================
 
 The constructors.
@@ -19754,32 +19887,44 @@ float values specifically as input will make this function 1/3 faster.
 
 Returns the type of a matrix element.
 
+Note: The name MAT-TYPE is used in the documentation to refer to the binding for the "type" member 
+of the OpenCV Mat class because it is more descriptive and it is easier to search for in this file. 
+The TYPE* method may also be used to call this binding.
+
+
 C++: int Mat::type() const
+
+LISP-CV: (TYPE* (SELF MAT))
+
+LISP-CV: (SETF (TYPE* (SELF MAT)) (VAL :INT))
 
 LISP-CV: (MAT-TYPE (SELF MAT))
 
+LISP-CV: (SETF (MAT-TYPE (SELF MAT)) (VAL :INT))
+
+
     Parameters:	
 
-        SELF - A matrix(MAT object)
+        SELF - A Mat object.
+
+        VAL - The new matrix type.
+
 
 The method returns a matrix element type. This is an identifier compatible with OpenCV's CvMat type
 system, like CV_16SC3(+16SC3+ in LISP-CV) or 16-bit signed 3-channel array, and so on.
 
 
-Note: This example uses TG finalizers for memory management
-
-
 (defun mat-type-example ()
 
-  "This function uses MAT-TYPE to find 
-   the type of MAT-ONE and MAT-TWO."
+  "This function uses the TYPE* method 
+   to find the type of two matrices."
 
-  (let* ((mat-one (gc:mat-zeros 1 2 +32f+))
-	 (mat-two (gc:mat-zeros 2 4 +64f+)))
-    (format t "~%MAT-ONE type is ~a(+32f+). It is a Single Precision Floating Point Matrix.~%" 
-	    (mat-type mat-one))
-    (format t "~%MAT-TWO type is ~a(+64f+). It is a Double Precision Floating Point Matrix.~%~%" 
-	    (mat-type mat-two))))
+  (with-mat ((mat-one (mat-zeros 1 2 +32f+))
+	     (mat-two (gc:mat-zeros 2 4 +64f+)))
+    (format t "~%MAT-ONE type is ~a(+32f+). It is a single float matrix.~%" 
+	    (type* mat-one))
+    (format t "~%MAT-TWO type is ~a(+64f+). It is a double float matrix.~%~%" 
+	    (type* mat-two))))
 
 ========================================================================================================================================
 #CIRCLE
