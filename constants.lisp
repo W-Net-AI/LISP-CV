@@ -598,7 +598,7 @@
   (+floodfill-mask-only+ 131072)
 
 
-;;;; features2d
+;;; features2d
 
   (+draw-matches-flags-default+ 0)
   (+draw-matches-flags-draw-over-outimg+ 1)
