@@ -99,6 +99,13 @@
 
 
 ;; void operator delete  ( void* ptr )
+;; void cv_delete_FlannBasedMatcher(FlannBasedMatcher* self)
+(defcfun ("cv_delete_FlannBasedMatcher" del-flann-based-matcher) :void
+  "Calls delete on a FLANN-BASED-MATCHER object."
+  (self flann-based-matcher))
+
+
+;; void operator delete  ( void* ptr )
 ;; void cv_delete_HOGDescriptor(HOGDescriptor* self)
 (defcfun ("cv_delete_HOGDescriptor" del-hog-descriptor) :void
   "Calls delete on a HOG-DESCRIPTOR object."

@@ -12,7 +12,11 @@ vector_##t * carray_to_std_vector##tn( t * a, size_t len ); \
 t * std_vector##tn##_to_carray( vector_##t * v ); \
 size_t std_vector##tn##_length( vector_##t * v); \
 void destroy_std_vector##tn( vector_##t * v); \
-void delete_std_vector##tn( vector_##t * v);
+void delete_std_vector##tn( vector_##t * v); \
+void cv_vector_##tn##_push_back(vector_##t * v, t * val); \
+void cv_vector_##tn##_push_back_num(vector_##t * v, t val); \
+t * cv_vector_##tn##_at(vector_##t * v, int idx); \
+t * cv_vector_##tn##_at_set_Val(vector_##t * v, int idx, t * val);
 
 #define ADD_VECTOR_IMPL(t, tn) \
 vector_##t * create_std_vector##tn() { \
@@ -39,6 +43,19 @@ v->~vector_##t();\
 void delete_std_vector##tn( vector_##t * v) { \
 delete v;\
 }\
+void cv_vector_##tn##_push_back(vector_##t * v, t * val) { \
+    v->push_back(*val); \
+} \
+void cv_vector_##tn##_push_back_num(vector_##t * v, t val) { \
+    v->push_back(val); \
+} \
+t * cv_vector_##tn##_at(vector_##t * v, int idx) { \
+vector_##t::iterator it = v->begin() + idx; \
+return &(*it); \
+} \
+t * cv_vector_##tn##_at_set_Val(vector_##t * v, int idx, t * val) { \
+  return & (v->at(idx) = *val); \
+} \
 
 extern "C" {
 string* create_std_string();
@@ -78,6 +95,5 @@ ADD_VECTOR_HEADERS(Vec4s, v4s);
 ADD_VECTOR_HEADERS(Vec2w, v2w);
 ADD_VECTOR_HEADERS(Vec3w, v3w);
 ADD_VECTOR_HEADERS(Vec4w, v4w);
-
 
 }

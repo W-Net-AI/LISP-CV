@@ -2006,16 +2006,6 @@
   (self mat))
 
 
-;; int KeyPoint::class_id
-;; int cv_KeyPoint_getClass_id(KeyPoint* self)
-(defcfun ("cv_KeyPoint_getClass_id" class-id) :int
-  (self key-point))
-
-
-(defun (setf class-id) (val self)
-  (key-point-set-class-id self val))
-
-
 ;; Mat Mat::colRange(int startcol, int endcol) const
 ;; Mat* cv_Mat_getColRange(Mat* self, int startcol, int endrow)
 (defcfun ("cv_Mat_getColRange" col-range) mat
@@ -2101,16 +2091,6 @@
   (%diag self d))
 
 
-;; float DMatch::distance
-;; float cv_DMatch_getDistance(DMatch* self)
-(defcfun ("cv_DMatch_getDistance" distance) :float
-  (self dmatch))
-
-
-(defun (setf distance) (val self)
-  (dmatch-set-distance self val))
-
-
 ;; MatExpr / operator
 ;; MatExpr* cv_Mat_div(Mat* m1, Mat* m2)
 (defcfun ("cv_Mat_div" div) mat-expr
@@ -2164,8 +2144,16 @@
 
 ;; float DMatch::distance
 ;; float cv_DMatch_getDistance(DMatch* self)
-(defcfun ("cv_DMatch_getDistance" dmatch-distance) :float
+(defcfun ("cv_DMatch_getDistance" %dmatch-distance) :float
   (self dmatch))
+
+
+(defun dmatch-distance (self)
+      (%dmatch-distance self))
+
+
+(defun distance (self)
+      (%dmatch-distance self))
 
 
 ;; float cv_DMatch_setDistance(DMatch* self, float val)
@@ -2175,13 +2163,25 @@
 
 
 (defun (setf dmatch-distance) (val self)
-  (dmatch-set-distance self val))
+      (dmatch-set-distance self val))
 
 
-;; int DMatch::ImgIdx
+(defun (setf distance) (val self)
+      (dmatch-set-distance self val))
+
+
+;; int DMatch::imgIdx
 ;; int cv_DMatch_getImgIdx(DMatch* self)
-(defcfun ("cv_DMatch_getImgIdx" dmatch-img-idx) :int
+(defcfun ("cv_DMatch_getImgIdx" %dmatch-img-idx) :int
   (self dmatch))
+
+
+(defun dmatch-img-idx (self)
+      (%dmatch-img-idx self))
+
+
+(defun img-idx (self)
+      (%dmatch-img-idx self))
 
 
 ;; int cv_DMatch_setImgIdx(DMatch* self, int val)
@@ -2191,13 +2191,25 @@
 
 
 (defun (setf dmatch-img-idx) (val self)
-  (dmatch-set-img-idx self val))
+      (dmatch-set-img-idx self val))
+
+
+(defun (setf img-idx) (val self)
+      (dmatch-set-img-idx self val))
 
 
 ;; int DMatch::queryIdx
 ;; int cv_DMatch_getQueryIdx(DMatch* self)
-(defcfun ("cv_DMatch_getQueryIdx" dmatch-query-idx) :int
+(defcfun ("cv_DMatch_getQueryIdx" %dmatch-query-idx) :int
   (self dmatch))
+
+
+(defun dmatch-query-idx (self)
+      (%dmatch-query-idx self))
+
+
+(defun query-idx (self)
+      (%dmatch-query-idx self))
 
 
 ;; int cv_DMatch_setQueryIdx(DMatch* self, int val)
@@ -2207,13 +2219,25 @@
 
 
 (defun (setf dmatch-query-idx) (val self)
-  (dmatch-set-query-idx self val))
+      (dmatch-set-query-idx self val))
 
 
-;; int DMatch::TrainIdx
+(defun (setf query-idx) (val self)
+      (dmatch-set-query-idx self val))
+
+
+;; int DMatch::trainIdx
 ;; int cv_DMatch_getTrainIdx(DMatch* self)
-(defcfun ("cv_DMatch_getTrainIdx" dmatch-train-idx) :int
+(defcfun ("cv_DMatch_getTrainIdx" %dmatch-train-idx) :int
   (self dmatch))
+
+
+(defun dmatch-train-idx (self)
+      (%dmatch-train-idx self))
+
+
+(defun train-idx (self)
+      (%dmatch-train-idx self))
 
 
 ;; int cv_DMatch_setTrainIdx(DMatch* self, int val)
@@ -2223,7 +2247,11 @@
 
 
 (defun (setf dmatch-train-idx) (val self)
-  (dmatch-set-train-idx self val))
+      (dmatch-set-train-idx self val))
+
+
+(defun (setf train-idx) (val self)
+      (dmatch-set-train-idx self val))
 
 
 ;; _Tp dot(const Point_& pt) const
@@ -2304,16 +2332,6 @@
   (mat-expr mat-expr))
 
 
-;; int DMatch::ImgIdx
-;; int cv_DMatch_getImgIdx(DMatch* self)
-(defcfun ("cv_DMatch_getImgIdx" img-idx) :int
-  (self dmatch))
-
-
-(defun (setf img-idx) (val self)
-  (dmatch-set-img-idx self val))
-
-
 ;; KeyPoint::KeyPoint()
 ;; KeyPoint* cv_create_KeyPoint()
 (defcfun ("cv_create_KeyPoint" key-point-0) key-point
@@ -2351,24 +2369,36 @@
 
 ;; float KeyPoint::angle
 ;; float cv_KeyPoint_getAngle(KeyPoint* self)
-(defcfun ("cv_KeyPoint_getAngle" key-point-angle) :float
+(defcfun ("cv_KeyPoint_getAngle" %key-point-angle) :float
   (self key-point))
+
+
+(defun key-point-angle (self)
+      (%key-point-angle self))
 
 
 ;; float cv_KeyPoint_setAngle(KeyPoint* self, float val)
 (defcfun ("cv_KeyPoint_setAngle" key-point-set-angle) :float
   (self key-point)
-  (val :float))
+  (val :int))
 
 
 (defun (setf key-point-angle) (val self)
-  (key-point-set-angle self val))
+      (key-point-set-angle self val))
 
 
 ;; int KeyPoint::class_id
 ;; int cv_KeyPoint_getClass_id(KeyPoint* self)
-(defcfun ("cv_KeyPoint_getClass_id" key-point-class-id) :int
+(defcfun ("cv_KeyPoint_getClass_id" %key-point-class-id) :int
   (self key-point))
+
+
+(defun key-point-class-id (self)
+      (%key-point-class-id self))
+
+
+(defun class-id (self)
+      (%key-point-class-id self))
 
 
 ;; int cv_KeyPoint_setClass_id(KeyPoint* self, int val)
@@ -2378,28 +2408,25 @@
 
 
 (defun (setf key-point-class-id) (val self)
-  (key-point-set-class-id self val))
+      (key-point-set-class-id self val))
 
 
-;; Point2f KeyPoint::pt
-;; Point2f* cv_KeyPoint_getPT(KeyPoint* self)
-(defcfun ("cv_KeyPoint_getPt" key-point-pt) point-2f
-  (self key-point))
-
-
-;; Point2f* cv_KeyPoint_setPt(KeyPoint* self, Point2f* val)
-(defcfun ("cv_KeyPoint_setPt" key-point-set-pt) :void
-  (self key-point)
-  (val point-2f))
-
-(defun (setf key-point-pt) (val self)
-  (key-point-set-pt self val))
+(defun (setf class-id) (val self)
+      (key-point-set-class-id self val))
 
 
 ;; int KeyPoint::octave
 ;; int cv_KeyPoint_getOctave(KeyPoint* self)
-(defcfun ("cv_KeyPoint_getOctave" key-point-octave) :int
+(defcfun ("cv_KeyPoint_getOctave" %key-point-octave) :int
   (self key-point))
+
+
+(defun key-point-octave (self)
+      (%key-point-octave self))
+
+
+(defun octave (self)
+      (%key-point-octave self))
 
 
 ;; int cv_KeyPoint_setOctave(KeyPoint* self, int val)
@@ -2409,39 +2436,80 @@
 
 
 (defun (setf key-point-octave) (val self)
-  (key-point-set-octave self val))
+      (key-point-set-octave self val))
+
+
+(defun (setf octave) (val self)
+      (key-point-set-octave self val))
+
+
+
+;; Point2f* KeyPoint::pt
+;; Point2f* cv_KeyPoint_getPt(KeyPoint* self)
+(defcfun ("cv_KeyPoint_getPt" %key-point-pt) point-2f
+  (self key-point))
+
+
+(defun key-point-pt (self)
+      (%key-point-pt self))
+
+
+;; void cv_KeyPoint_setPt(KeyPoint* self, Point2f* val)
+(defcfun ("cv_KeyPoint_setPt" key-point-set-pt) point-2f
+  (self key-point)
+  (val :int))
+
+
+(defun (setf key-point-pt) (val self)
+      (key-point-set-pt self val))
 
 
 ;; float KeyPoint::response
 ;; float cv_KeyPoint_getResponse(KeyPoint* self)
-(defcfun ("cv_KeyPoint_getResponse" key-point-response) :float
+(defcfun ("cv_KeyPoint_getResponse" %key-point-response) :float
   (self key-point))
+
+
+(defun key-point-response (self)
+      (%key-point-response self))
+
+
+(defun response (self)
+      (%key-point-response self))
 
 
 ;; float cv_KeyPoint_setResponse(KeyPoint* self, float val)
 (defcfun ("cv_KeyPoint_setResponse" key-point-set-response) :float
   (self key-point)
-  (val :float))
+  (val :int))
 
 
 (defun (setf key-point-response) (val self)
-  (key-point-set-response self val))
+      (key-point-set-response self val))
 
 
-;; float KeyPoint::size;
+(defun (setf response) (val self)
+      (key-point-set-response self val))
+
+
+;; float KeyPoint::size
 ;; float cv_KeyPoint_getSize(KeyPoint* self)
-(defcfun ("cv_KeyPoint_getSize" key-point-size) :float
+(defcfun ("cv_KeyPoint_getSize" %key-point-size) :float
   (self key-point))
+
+
+(defun key-point-size (self)
+      (%key-point-size self))
 
 
 ;; float cv_KeyPoint_setSize(KeyPoint* self, float val)
 (defcfun ("cv_KeyPoint_setSize" key-point-set-size) :float
   (self key-point)
-  (val :float))
+  (val :int))
 
 
 (defun (setf key-point-size) (val self)
-  (key-point-set-size self val))
+      (key-point-set-size self val))
 
 
 ;; void Mat::locateROI(Size& wholeSize, Point& ofs) const
@@ -2918,16 +2986,6 @@
 (defcfun ("cv_Mat_mult" mul) mat-expr
   (m1 mat)
   (m2 mat))
-
-
-;; int KeyPoint::octave
-;; int cv_KeyPoint_getOctave(KeyPoint* self)
-(defcfun ("cv_KeyPoint_getOctave" octave) :int
-  (self key-point))
-
-
-(defun (setf octave) (val self)
-  (key-point-set-octave self val))
 
 
 ;; Point::Point()
@@ -3431,7 +3489,8 @@
 
 
 (defun pm (mat)
-  "Alias for PRINT-MAT."
+  "Alias for PRINT-MAT.
+   (Useful for debugging)"
   (if (typep mat 'cv-mat)
       (progn  
 	(if (empty mat)
@@ -3455,7 +3514,34 @@
       (error "The value ~a is not of type CV-DMATCH." dmatch)))
 
 
+(defun pdm (dmatch)
+  "Alias for PRINT-DMATCH.
+   (Useful for debugging)"
+  (if (typep dmatch 'cv-dmatch)
+      (format t "~a(query-idx: ~a train-idx: ~a img-idx: ~a distance: ~a)" *personalize-print-dmatch* 
+	      (dmatch-query-idx dmatch) 
+	      (dmatch-train-idx dmatch)
+	      (dmatch-img-idx dmatch)
+	      (dmatch-distance dmatch))
+      (error "The value ~a is not of type CV-DMATCH." dmatch)))
+
+
 (defun print-key-point (key-point)
+  (if (typep key-point 'cv-key-point)
+      (format t "~a(x: ~a y: ~a size: ~a angle: ~a response: ~a octave: ~a class-id: ~a)" *personalize-print-key-point* 
+              (@ (key-point-pt key-point) :float) 
+	      (@ (key-point-pt key-point) :float 1)
+	      (key-point-size key-point)
+	      (key-point-angle key-point)
+	      (key-point-response key-point)
+	      (key-point-octave key-point)
+	      (key-point-class-id key-point))
+      (error "The value ~a is not of type CV-KEY-POINT." key-point)))
+
+
+(defun pkp (key-point)
+  "Alias for PRINT-KEY-POINT.
+   (Useful for debugging)"
   (if (typep key-point 'cv-key-point)
       (format t "~a(x: ~a y: ~a size: ~a angle: ~a response: ~a octave: ~a class-id: ~a)" *personalize-print-key-point* 
               (@ (key-point-pt key-point) :float) 
@@ -3561,7 +3647,33 @@
       (error "The value ~a is not of type CV-ROTATED-RECT." rotated-rect)))
 
 
+;; Using mem-aref to access the member may not be safe if OpenCv changes something.
+(defun prr (rotated-rect)
+  "Alias for PRINT-ROTATED-RECT.
+  (Useful for debugging)"
+  (if (typep rotated-rect 'cv-rotated-rect)
+      (format t "~a(center: #(x: ~a y: ~a) size: #(:width ~a :height ~a) angle: ~a)~%" *personalize-print-rotated-rect* 
+	      (@ rotated-rect :float)
+	      (@ rotated-rect :float 1) 
+	      (@ rotated-rect :float 2)
+	      (@ rotated-rect :float 3)
+              (rotated-rect-angle rotated-rect))
+      (error "The value ~a is not of type CV-ROTATED-RECT." rotated-rect)))
+
+
 (defun print-scalar (scalar)
+  (if (typep scalar 'cv-scalar)
+      (format t "~a(v0: ~a v1: ~a v2: ~a v3: ~a)~%" *personalize-print-scalar* 
+	      (@ scalar :double) 
+	      (@ scalar :double 1) 
+	      (@ scalar :double 2)
+	      (@ scalar :double 3))
+      (error "The value ~a is not of type CV-SCALAR." scalar)))
+
+
+(defun psc (scalar)
+  "Alias for PRINT-SCALAR.
+  (Useful for debugging)"
   (if (typep scalar 'cv-scalar)
       (format t "~a(v0: ~a v1: ~a v2: ~a v3: ~a)~%" *personalize-print-scalar* 
 	      (@ scalar :double) 
@@ -3579,6 +3691,16 @@
       (error "The value ~a is not of type CV-SIZE." size)))
 
 
+(defun ps (size)
+  "Alias for PRINT-SIZE.
+  (Useful for debugging)"
+  (if (typep size 'cv-size)
+      (format t "~a(width: ~a height: ~a)~%" *personalize-print-size* 
+	      (size-width size) 
+	      (size-height size))
+      (error "The value ~a is not of type CV-SIZE." size)))
+
+
 (defun print-term-criteria (term-criteria)
   (if (typep term-criteria 'cv-term-criteria)
       (format t "~a(type: ~a max-count: ~a epsilon: ~a)~%" *personalize-print-term-criteria* 
@@ -3586,6 +3708,18 @@
 	      (term-criteria-max-count term-criteria)
               (term-criteria-epsilon term-criteria))
       (error "The value ~a is not of type CV-TERM-CRITERIA." term-criteria)))
+
+
+(defun ptc (term-criteria)
+  "Alias for PRINT-TERM-CRITERIA.
+  (Useful for debugging)"
+  (if (typep term-criteria 'cv-term-criteria)
+      (format t "~a(type: ~a max-count: ~a epsilon: ~a)~%" *personalize-print-term-criteria* 
+	      (term-criteria-type term-criteria)
+	      (term-criteria-max-count term-criteria)
+              (term-criteria-epsilon term-criteria))
+      (error "The value ~a is not of type CV-TERM-CRITERIA." term-criteria)))
+
 
 
 (defun print-vec-2b (vec-2b)
@@ -3820,16 +3954,6 @@
   (mat mat))
 
 
-;; Point2f KeyPoint::pt
-;; Point2f* cv_KeyPoint_getPT(KeyPoint* self)
-(defcfun ("cv_KeyPoint_getPt" pt) point-2f
-  (self key-point))
-
-
-(defun (setf pt) (val self)
-  (key-point-set-pt self val))
-
-
 ;; uchar* Mat::ptr(int i0=0)
 ;; uchar* cv_Mat_ptr_index(Mat* self, int i)
 (defcfun ("cv_Mat_ptr_index" %ptr) :pointer 
@@ -3844,19 +3968,9 @@
 
 ;; void Mat::push_back(const Mat& m)
 ;; void cv_Mat_push_back(Mat* self, Mat* elem) 
-(defcfun ("cv_Mat_push_back" push-back) :void
+(defcfun ("cv_Mat_push_back" mat-push-back) :void
   (self mat)
   (m mat))
-
-
-;; int DMatch::queryIdx
-;; int cv_DMatch_getQueryIdx(DMatch* self)
-(defcfun ("cv_DMatch_getQueryIdx" query-idx) :int
-  (self dmatch))
-
-
-(defun (setf query-idx) (val self)
-  (dmatch-set-query-idx self val))
 
 
 ;; Range::Range(int _start, int _end)
@@ -4053,6 +4167,13 @@
   (self rect))
 
 
+(defun (setf rect-size) (val self)
+  (setf (@ self :int 0) (@ self :int 0)
+	(@ self :int 1) (@ self :int 1)
+	(@ self :int 2) (@ val :int 0)
+	(@ self :int 3) (@ val :int 1))val)
+
+
 ;; Point Rect::tl() const
 ;; Point* cv_Rect_tl(Rect* self) 
 (defcfun ("cv_Rect_tl" rect-tl) point 
@@ -4156,16 +4277,6 @@
 	((> rows 0)
 	 (reshape-rows self cn rows))
 	(t nil)))
-
-
-;; float KeyPoint::response
-;; float cv_KeyPoint_getResponse(KeyPoint* self)
-(defcfun ("cv_KeyPoint_getResponse" response) :float
-  (self key-point))
-
-
-(defun (setf response) (val self)
-  (key-point-set-response self val))
 
 
 ;; Mat::Mat(const Mat& m, const Rect& roi)
@@ -4489,16 +4600,6 @@
 (defcfun ("cv_Mat_total" total) :unsigned-int
   "Returns the total number of array elements."
   (self mat))
-
-
-;; int DMatch::TrainIdx
-;; int cv_DMatch_getTrainIdx(DMatch* self)
-(defcfun ("cv_DMatch_getTrainIdx" train-idx) :int
-  (self dmatch))
-
-
-(defun (setf train-idx) (val self)
-  (dmatch-set-train-idx self val))
 
 
 ;; typedef Vec<uchar, 2> Vec2b;

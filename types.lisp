@@ -51,7 +51,7 @@
 
 
 (define-foreign-type string* ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser string*))
@@ -62,7 +62,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value std-string) (c-type string*))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
     
@@ -78,7 +78,7 @@
 
 
 (define-foreign-type vector-char ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vector-char))
@@ -89,7 +89,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value std-vector-char) (c-type vector-char))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vector-char))
@@ -104,7 +104,7 @@
 
 
 (define-foreign-type vector-dmatch ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vector-dmatch))
@@ -115,7 +115,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value std-vector-dmatch) (c-type vector-dmatch))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vector-dmatch))
@@ -130,7 +130,7 @@
 
 
 (define-foreign-type vector-double ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vector-double))
@@ -141,7 +141,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value std-vector-double) (c-type vector-double))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vector-double))
@@ -156,7 +156,7 @@
 
 
 (define-foreign-type vector-float ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vector-float))
@@ -167,7 +167,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value std-vector-float) (c-type vector-float))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vector-float))
@@ -182,7 +182,7 @@
 
 
 (define-foreign-type vector-int ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vector-int))
@@ -193,7 +193,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value std-vector-int) (c-type vector-int))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vector-int))
@@ -208,7 +208,7 @@
 
 
 (define-foreign-type vector-key-point ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vector-key-point))
@@ -219,7 +219,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value std-vector-key-point) (c-type vector-key-point))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vector-key-point))
@@ -234,7 +234,7 @@
 
 
 (define-foreign-type vector-mat ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vector-mat))
@@ -245,7 +245,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value std-vector-mat) (c-type vector-mat))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vector-mat))
@@ -260,7 +260,7 @@
 
 
 (define-foreign-type vector-point ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vector-point))
@@ -271,7 +271,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value std-vector-point) (c-type vector-point))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vector-point))
@@ -286,7 +286,7 @@
 
 
 (define-foreign-type vector-point-2f ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vector-point-2f))
@@ -297,7 +297,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value std-vector-point-2f) (c-type vector-point-2f))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vector-point-2f))
@@ -312,7 +312,7 @@
 
 
 (define-foreign-type vector-rect ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vector-rect))
@@ -323,7 +323,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value std-vector-rect) (c-type vector-rect))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vector-rect))
@@ -338,7 +338,7 @@
 
 
 (define-foreign-type vector-uchar ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vector-uchar))
@@ -349,7 +349,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value std-vector-uchar) (c-type vector-uchar))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vector-uchar))
@@ -364,7 +364,7 @@
 
 
 (define-foreign-type vector-vec-2b ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vector-vec-2b))
@@ -375,7 +375,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value std-vector-vec-2b) (c-type vector-vec-2b))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vector-vec-2b))
@@ -390,7 +390,7 @@
 
 
 (define-foreign-type vector-vec-3b ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vector-vec-3b))
@@ -401,7 +401,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value std-vector-vec-3b) (c-type vector-vec-3b))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vector-vec-3b))
@@ -416,7 +416,7 @@
 
 
 (define-foreign-type vector-vec-4b ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vector-vec-4b))
@@ -427,7 +427,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value std-vector-vec-4b) (c-type vector-vec-4b))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vector-vec-4b))
@@ -443,7 +443,7 @@
 
 
 (define-foreign-type vector-vec-2d ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vector-vec-2d))
@@ -454,7 +454,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value std-vector-vec-2d) (c-type vector-vec-2d))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vector-vec-2d))
@@ -469,7 +469,7 @@
 
 
 (define-foreign-type vector-vec-3d ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vector-vec-3d))
@@ -480,7 +480,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value std-vector-vec-3d) (c-type vector-vec-3d))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vector-vec-3d))
@@ -495,7 +495,7 @@
 
 
 (define-foreign-type vector-vec-4d ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vector-vec-4d))
@@ -506,7 +506,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value std-vector-vec-4d) (c-type vector-vec-4d))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vector-vec-4d))
@@ -521,7 +521,7 @@
 
 
 (define-foreign-type vector-vec-6d ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vector-vec-6d))
@@ -532,7 +532,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value std-vector-vec-6d) (c-type vector-vec-6d))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vector-vec-6d))
@@ -547,7 +547,7 @@
 
 
 (define-foreign-type vector-vec-2f ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vector-vec-2f))
@@ -558,7 +558,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value std-vector-vec-2f) (c-type vector-vec-2f))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vector-vec-2f))
@@ -573,7 +573,7 @@
 
 
 (define-foreign-type vector-vec-3f ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vector-vec-3f))
@@ -584,7 +584,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value std-vector-vec-3f) (c-type vector-vec-3f))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vector-vec-3f))
@@ -599,7 +599,7 @@
 
 
 (define-foreign-type vector-vec-4f ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vector-vec-4f))
@@ -610,7 +610,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value std-vector-vec-4f) (c-type vector-vec-4f))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vector-vec-4f))
@@ -625,7 +625,7 @@
 
 
 (define-foreign-type vector-vec-6f ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vector-vec-6f))
@@ -636,7 +636,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value std-vector-vec-6f) (c-type vector-vec-6f))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vector-vec-6f))
@@ -651,7 +651,7 @@
 
 
 (define-foreign-type vector-vec-2i ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vector-vec-2i))
@@ -662,7 +662,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value std-vector-vec-2i) (c-type vector-vec-2i))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vector-vec-2i))
@@ -677,7 +677,7 @@
 
 
 (define-foreign-type vector-vec-3i ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vector-vec-3i))
@@ -688,7 +688,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value std-vector-vec-3i) (c-type vector-vec-3i))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vector-vec-3i))
@@ -703,7 +703,7 @@
 
 
 (define-foreign-type vector-vec-4i ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vector-vec-4i))
@@ -714,7 +714,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value std-vector-vec-4i) (c-type vector-vec-4i))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vector-vec-4i))
@@ -729,7 +729,7 @@
 
 
 (define-foreign-type vector-vec-6i ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vector-vec-6i))
@@ -740,7 +740,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value std-vector-vec-6i) (c-type vector-vec-6i))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vector-vec-6i))
@@ -755,7 +755,7 @@
 
 
 (define-foreign-type vector-vec-8i ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vector-vec-8i))
@@ -766,7 +766,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value std-vector-vec-8i) (c-type vector-vec-8i))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vector-vec-8i))
@@ -781,7 +781,7 @@
 
 
 (define-foreign-type vector-vec-2s ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vector-vec-2s))
@@ -792,7 +792,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value std-vector-vec-2s) (c-type vector-vec-2s))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vector-vec-2s))
@@ -807,7 +807,7 @@
 
 
 (define-foreign-type vector-vec-3s ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vector-vec-3s))
@@ -818,7 +818,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value std-vector-vec-3s) (c-type vector-vec-3s))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vector-vec-3s))
@@ -833,7 +833,7 @@
 
 
 (define-foreign-type vector-vec-4s ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vector-vec-4s))
@@ -844,7 +844,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value std-vector-vec-4s) (c-type vector-vec-4s))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vector-vec-4s))
@@ -859,7 +859,7 @@
 
 
 (define-foreign-type vector-vec-2w ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vector-vec-2w))
@@ -870,7 +870,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value std-vector-vec-2w) (c-type vector-vec-2w))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vector-vec-2w))
@@ -885,7 +885,7 @@
 
 
 (define-foreign-type vector-vec-3w ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vector-vec-3w))
@@ -896,7 +896,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value std-vector-vec-3w) (c-type vector-vec-3w))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vector-vec-3w))
@@ -911,7 +911,7 @@
 
 
 (define-foreign-type vector-vec-4w ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vector-vec-4w))
@@ -922,7 +922,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value std-vector-vec-4w) (c-type vector-vec-4w))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vector-vec-4w))
@@ -941,7 +941,7 @@
 
 
 (define-foreign-type mat-struct ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser mat-struct))
@@ -952,7 +952,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-cv-mat) (c-type mat-struct))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type mat-struct))
@@ -967,7 +967,7 @@
 
 
 (define-foreign-type dmatch ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser dmatch))
@@ -978,7 +978,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-dmatch) (c-type dmatch))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type dmatch))
@@ -993,7 +993,7 @@
 
 
 (define-foreign-type file-node ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser file-node))
@@ -1004,7 +1004,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-file-node) (c-type file-node))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type file-node))
@@ -1019,7 +1019,7 @@
 
 
 (define-foreign-type file-storage ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser file-storage))
@@ -1030,7 +1030,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-file-storage) (c-type file-storage))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type file-storage))
@@ -1044,7 +1044,7 @@
 
 
 (define-foreign-type key-point ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser key-point))
@@ -1055,7 +1055,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-key-point) (c-type key-point))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type key-point))
@@ -1070,7 +1070,7 @@
 
 
 (define-foreign-type mat ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser mat))
@@ -1081,7 +1081,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-mat) (c-type mat))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type mat))
@@ -1096,7 +1096,7 @@
 
 
 (define-foreign-type mat-expr ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser mat-expr))
@@ -1107,7 +1107,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value matrix-expressions) (c-type mat-expr))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type mat-expr))
@@ -1121,7 +1121,7 @@
 
 
 (define-foreign-type pca ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser pca))
@@ -1132,7 +1132,7 @@
 
 
  (defmethod translate-to-foreign ((lisp-value cv-pca) (c-type pca))
-    (values  (c-pointer lisp-value) lisp-value))
+    (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type pca))
@@ -1146,7 +1146,7 @@
 
 
 (define-foreign-type point ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser point))
@@ -1157,7 +1157,7 @@
 
 
  (defmethod translate-to-foreign ((lisp-value cv-point) (c-type point))
-    (values  (c-pointer lisp-value) lisp-value))
+    (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type point))
@@ -1172,7 +1172,7 @@
 
 
 (define-foreign-type point-2d ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser point-2d))
@@ -1183,7 +1183,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-point-2d) (c-type point-2d))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type point-2d))
@@ -1198,7 +1198,7 @@
 
 
 (define-foreign-type point-2f ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser point-2f))
@@ -1209,7 +1209,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-point-2f) (c-type point-2f))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type point-2f))
@@ -1224,7 +1224,7 @@
 
 
 (define-foreign-type point-3d ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser point-3d))
@@ -1235,7 +1235,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-point-3d) (c-type point-3d))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type point-3d))
@@ -1250,7 +1250,7 @@
 
 
 (define-foreign-type point-3f ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser point-3f))
@@ -1261,7 +1261,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-point-3f) (c-type point-3f))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type point-3f))
@@ -1276,7 +1276,7 @@
 
 
 (define-foreign-type point-3i ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser point-3i))
@@ -1287,7 +1287,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-point-3i) (c-type point-3i))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type point-3i))
@@ -1302,7 +1302,7 @@
 
 
 (define-foreign-type range ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser range))
@@ -1313,7 +1313,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-range) (c-type range))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type range))
@@ -1328,7 +1328,7 @@
 
 
 (define-foreign-type rect ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser rect))
@@ -1339,7 +1339,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-rect) (c-type rect))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type rect))
@@ -1354,7 +1354,7 @@
 
 
 (define-foreign-type rng ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser rng))
@@ -1365,7 +1365,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-rng) (c-type rng))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type rng))
@@ -1380,7 +1380,7 @@
 
 
 (define-foreign-type rotated-rect ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser rotated-rect))
@@ -1391,7 +1391,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-rotated-rect) (c-type rotated-rect))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type rotated-rect))
@@ -1406,7 +1406,7 @@
 
 
 (define-foreign-type scalar ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser scalar))
@@ -1417,7 +1417,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-scalar) (c-type scalar))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type scalar))
@@ -1432,7 +1432,7 @@
 
 
 (define-foreign-type size ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser size))
@@ -1443,7 +1443,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-size) (c-type size))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type size))
@@ -1458,7 +1458,7 @@
 
 
 (define-foreign-type term-criteria ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser term-criteria))
@@ -1469,7 +1469,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-term-criteria) (c-type term-criteria))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type term-criteria))
@@ -1484,7 +1484,7 @@
 
 
 (define-foreign-type vec-2b ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vec-2b))
@@ -1495,7 +1495,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-vec-2b) (c-type vec-2b))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vec-2b))
@@ -1510,7 +1510,7 @@
 
 
 (define-foreign-type vec-3b ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vec-3b))
@@ -1521,7 +1521,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-vec-3b) (c-type vec-3b))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vec-3b))
@@ -1536,7 +1536,7 @@
 
 
 (define-foreign-type vec-4b ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vec-4b))
@@ -1547,7 +1547,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-vec-4b) (c-type vec-4b))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vec-4b))
@@ -1563,7 +1563,7 @@
 
 
 (define-foreign-type vec-2d ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vec-2d))
@@ -1574,7 +1574,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-vec-2d) (c-type vec-2d))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vec-2d))
@@ -1589,7 +1589,7 @@
 
 
 (define-foreign-type vec-3d ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vec-3d))
@@ -1600,7 +1600,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-vec-3d) (c-type vec-3d))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vec-3d))
@@ -1615,7 +1615,7 @@
 
 
 (define-foreign-type vec-4d ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vec-4d))
@@ -1626,7 +1626,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-vec-4d) (c-type vec-4d))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vec-4d))
@@ -1641,7 +1641,7 @@
 
 
 (define-foreign-type vec-2f ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vec-2f))
@@ -1652,7 +1652,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-vec-2f) (c-type vec-2f))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vec-2f))
@@ -1667,7 +1667,7 @@
 
 
 (define-foreign-type vec-3f ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vec-3f))
@@ -1678,7 +1678,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-vec-3f) (c-type vec-3f))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vec-3f))
@@ -1694,7 +1694,7 @@
 
 
 (define-foreign-type vec-4f ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vec-4f))
@@ -1705,7 +1705,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-vec-4f) (c-type vec-4f))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vec-4f))
@@ -1720,7 +1720,7 @@
 
 
 (define-foreign-type vec-6d ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vec-6d))
@@ -1731,7 +1731,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-vec-6d) (c-type vec-6d))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vec-6d))
@@ -1746,7 +1746,7 @@
 
 
 (define-foreign-type vec-6f ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vec-6f))
@@ -1757,7 +1757,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-vec-6f) (c-type vec-6f))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vec-6f))
@@ -1772,7 +1772,7 @@
 
 
 (define-foreign-type vec-2i ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vec-2i))
@@ -1783,7 +1783,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-vec-2i) (c-type vec-2i))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vec-2i))
@@ -1798,7 +1798,7 @@
 
 
 (define-foreign-type vec-3i ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vec-3i))
@@ -1809,7 +1809,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-vec-3i) (c-type vec-3i))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vec-3i))
@@ -1824,7 +1824,7 @@
 
 
 (define-foreign-type vec-4i ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vec-4i))
@@ -1835,7 +1835,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-vec-4i) (c-type vec-4i))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vec-4i))
@@ -1850,7 +1850,7 @@
 
 
 (define-foreign-type vec-6i ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vec-6i))
@@ -1861,7 +1861,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-vec-6i) (c-type vec-6i))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vec-6i))
@@ -1876,7 +1876,7 @@
 
 
 (define-foreign-type vec-8i ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vec-8i))
@@ -1887,7 +1887,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-vec-8i) (c-type vec-8i))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vec-8i))
@@ -1902,7 +1902,7 @@
 
 
 (define-foreign-type vec-2s ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vec-2s))
@@ -1913,7 +1913,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-vec-2s) (c-type vec-2s))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vec-2s))
@@ -1928,7 +1928,7 @@
 
 
 (define-foreign-type vec-3s ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vec-3s))
@@ -1939,7 +1939,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-vec-3s) (c-type vec-3s))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vec-3s))
@@ -1954,7 +1954,7 @@
 
 
 (define-foreign-type vec-4s ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vec-4s))
@@ -1965,7 +1965,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-vec-4s) (c-type vec-4s))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vec-4s))
@@ -1980,7 +1980,7 @@
 
 
 (define-foreign-type vec-2w ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vec-2w))
@@ -1991,7 +1991,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-vec-2w) (c-type vec-2w))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vec-2w))
@@ -2006,7 +2006,7 @@
 
 
 (define-foreign-type vec-3w ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vec-3w))
@@ -2017,7 +2017,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-vec-3w) (c-type vec-3w))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vec-3w))
@@ -2032,7 +2032,7 @@
 
 
 (define-foreign-type vec-4w ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser vec-4w))
@@ -2043,7 +2043,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-vec-4w) (c-type vec-4w))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type vec-4w))
@@ -2065,7 +2065,7 @@
 
 
 (define-foreign-type video-capture ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser video-capture))
@@ -2076,7 +2076,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-video-capture) (c-type video-capture))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type video-capture))
@@ -2091,7 +2091,7 @@
 
 
 (define-foreign-type video-writer ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser video-writer))
@@ -2102,7 +2102,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-video-writer) (c-type video-writer))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type video-writer))
@@ -2117,7 +2117,7 @@
 
 
 (define-foreign-type background-subtractor-mog-2 ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser background-subtractor-mog-2))
@@ -2128,7 +2128,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-background-subtractor-mog-2) (c-type background-subtractor-mog-2))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type background-subtractor-mog-2))
@@ -2142,15 +2142,16 @@
 ;; CALIB3D
 
 
+
 ;; FEATURES2D
+
 
 
 ;; BF-MATCHER
 
 
-
 (define-foreign-type bf-matcher ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser bf-matcher))
@@ -2161,7 +2162,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-bf-matcher) (c-type bf-matcher))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type bf-matcher))
@@ -2171,12 +2172,11 @@
     bf-matcher))
 
 
-
 ;; BRISK
 
 
 (define-foreign-type brisk ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser brisk))
@@ -2187,7 +2187,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-brisk) (c-type brisk))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type brisk))
@@ -2197,11 +2197,61 @@
     brisk))
 
 
+;; FAST-FEATURE-DETECTOR
+
+
+(define-foreign-type fast-feature-detector ()
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
+                     :garbage-collect))
+  (:actual-type :pointer)
+  (:simple-parser fast-feature-detector))
+
+
+(defclass cv-fast-feature-detector ()
+  ((c-pointer :reader c-pointer :initarg :c-pointer)))
+
+
+(defmethod translate-to-foreign ((lisp-value cv-fast-feature-detector) (c-type fast-feature-detector))
+  (values (c-pointer lisp-value) lisp-value))
+
+
+(defmethod translate-from-foreign (c-pointer (c-type fast-feature-detector))
+  (let ((fast-feature-detector (make-instance 'cv-fast-feature-detector :c-pointer c-pointer)))
+    (when (garbage-collect c-type)
+      (tg:finalize fast-feature-detector (lambda () (del-fast-feature-detector c-pointer))))
+    fast-feature-detector))
+
+
+;; FLANN-BASED-MATCHER
+
+
+(define-foreign-type flann-based-matcher ()
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
+                     :garbage-collect))
+  (:actual-type :pointer)
+  (:simple-parser flann-based-matcher))
+
+
+(defclass cv-flann-based-matcher ()
+  ((c-pointer :reader c-pointer :initarg :c-pointer)))
+
+
+(defmethod translate-to-foreign ((lisp-value cv-flann-based-matcher) (c-type flann-based-matcher))
+  (values (c-pointer lisp-value) lisp-value))
+
+
+(defmethod translate-from-foreign (c-pointer (c-type flann-based-matcher))
+  (let ((flann-based-matcher (make-instance 'cv-flann-based-matcher :c-pointer c-pointer)))
+    (when (garbage-collect c-type)
+      (tg:finalize flann-based-matcher (lambda () (del-flann-based-matcher c-pointer))))
+    flann-based-matcher))
+
+
 ; SURF
 
 
 (define-foreign-type surf ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser surf))
@@ -2212,7 +2262,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-surf) (c-type surf))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type surf))
@@ -2231,7 +2281,7 @@
 
 
 (define-foreign-type cascade-classifier ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser cascade-classifier))
@@ -2242,7 +2292,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-cascade-classifier) (c-type cascade-classifier))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type cascade-classifier))
@@ -2252,36 +2302,11 @@
     cascade-classifier))
 
 
-;; FAST-FEATURE-DETECTOR
-
-
-(define-foreign-type fast-feature-detector ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
-                     :garbage-collect))
-  (:actual-type :pointer)
-  (:simple-parser fast-feature-detector))
-
-
-(defclass cv-fast-feature-detector ()
-  ((c-pointer :reader c-pointer :initarg :c-pointer)))
-
-
-(defmethod translate-to-foreign ((lisp-value cv-fast-feature-detector) (c-type fast-feature-detector))
-  (values  (c-pointer lisp-value) lisp-value))
-
-
-(defmethod translate-from-foreign (c-pointer (c-type fast-feature-detector))
-  (let ((fast-feature-detector (make-instance 'cv-fast-feature-detector :c-pointer c-pointer)))
-    (when (garbage-collect c-type)
-      (tg:finalize fast-feature-detector (lambda () (del-fast-feature-detector c-pointer))))
-    fast-feature-detector))
-
-
 ;; HOG-DESCRIPTOR
 
 
 (define-foreign-type hog-descriptor ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser hog-descriptor))
@@ -2292,7 +2317,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-hog-descriptor) (c-type hog-descriptor))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type hog-descriptor))
@@ -2311,7 +2336,7 @@
 
 
 (define-foreign-type ann-mlp ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser ann-mlp))
@@ -2322,7 +2347,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-ann-mlp) (c-type ann-mlp))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type ann-mlp))
@@ -2336,7 +2361,7 @@
 ;; ANN-MLP-TRAIN-PARAMS
 
 (define-foreign-type ann-mlp-train-params ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser ann-mlp-train-params))
@@ -2347,7 +2372,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-ann-mlp-train-params) (c-type ann-mlp-train-params))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type ann-mlp-train-params))
@@ -2361,7 +2386,7 @@
 ;; D-TREE
 
 (define-foreign-type d-tree ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser d-tree))
@@ -2372,7 +2397,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-d-tree) (c-type d-tree))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type d-tree))
@@ -2386,7 +2411,7 @@
 ;; D-TREE-PARAMS
 
 (define-foreign-type d-tree-params ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser d-tree-params))
@@ -2397,7 +2422,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-d-tree-params) (c-type d-tree-params))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type d-tree-params))
@@ -2411,7 +2436,7 @@
 ;; K-NEAREST
 
 (define-foreign-type k-nearest ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser k-nearest))
@@ -2422,7 +2447,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-k-nearest) (c-type k-nearest))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type k-nearest))
@@ -2436,7 +2461,7 @@
 ;; NORMAL-BAYES-CLASSIFIER
 
 (define-foreign-type normal-bayes-classifier ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser normal-bayes-classifier))
@@ -2447,7 +2472,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-normal-bayes-classifier) (c-type normal-bayes-classifier))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type normal-bayes-classifier))
@@ -2461,7 +2486,7 @@
 ;; SVM
 
 (define-foreign-type svm ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser svm))
@@ -2472,7 +2497,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-svm) (c-type svm))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type svm))
@@ -2486,7 +2511,7 @@
 ;; SVM-PARAMS
 
 (define-foreign-type svm-params ()
-  ((garbage-collect  :reader garbage-collect :initform nil :initarg 
+  ((garbage-collect :reader garbage-collect :initform nil :initarg 
                      :garbage-collect))
   (:actual-type :pointer)
   (:simple-parser svm-params))
@@ -2497,7 +2522,7 @@
 
 
 (defmethod translate-to-foreign ((lisp-value cv-svm-params) (c-type svm-params))
-  (values  (c-pointer lisp-value) lisp-value))
+  (values (c-pointer lisp-value) lisp-value))
 
 
 (defmethod translate-from-foreign (c-pointer (c-type svm-params))

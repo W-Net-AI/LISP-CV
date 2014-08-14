@@ -132,6 +132,40 @@ ADD_READ_FUNC_IMPL_1(m, Mat);
 
 ADD_READ_FUNC_IMPL_2(vkp, vector_KeyPoint);
 
+int cv_Mat_set_rows(Mat* self, int val) {
+    return self->rows = val;
+}
+
+int cv_Mat_set_cols(Mat* self, int val) {
+    return self->cols = val;
+}
+
+typedef vector<Vec2i> vector_Vec2i;
+
+Vec2i* cv_vector_Vec2i_at_1(vector_Vec2i* self, int i) {
+  return & (self->at(i));
+}
+
+int cv_vector_Vec2i_at_2(vector_Vec2i* self, int i, int j) {
+  return (self->at(i)(j));
+}
+
+Vec2i* cv_vector_Vec2i_at_set_Val_1(vector_Vec2i* self, int idx, Vec2i* val) {
+  return & (self->at(idx) = *val);
+}
+
+int cv_vector_Vec2i_at_set_Val_2(vector_Vec2i* self, int i, int j, int val) {
+  return (self->at(i)(j) = val );
+}
+
+FlannBasedMatcher* cv_create_FlannBasedMatcher0() {
+    return new FlannBasedMatcher();
+}
+
+Size* cv_Rect_set_size(Rect* self, Size* val) {
+    return new Size(self->size() = *val);
+}
+
 void cv_Mat_set_Type(Mat* self, int val) {
     self->convertTo(*self, val);
 }
@@ -182,17 +216,6 @@ PCA* cv_create_PCA() {
 
 PCA* cv_create_PCA4(Mat* data, Mat* mean, int flags, double retainedVariance) {
     return new PCA(*data, *mean, flags, retainedVariance);
-}
-
-typedef vector<DMatch> vector_DMatch;
-
-DMatch* cv_vector_DMatch_at_1(vector_DMatch* self, int idx) {
-  return & (self->at(idx) );
-}
-
-DMatch* cv_vector_DMatch_at_2(std::vector<DMatch> *self, int idx) {
-vector<DMatch>::iterator it = self->begin() + idx;
-return &(*it);
 }
 
 Mat* test(uchar* a, size_t len ) {
@@ -1198,6 +1221,10 @@ void cv_delete_FileNode(FileNode* self) {
 }
 
 void cv_delete_FileStorage(FileStorage* self) {
+    delete self;
+}
+
+void cv_delete_FlannBasedMatcher(FlannBasedMatcher* self) {
     delete self;
 }
 

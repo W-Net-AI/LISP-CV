@@ -12737,6 +12737,9 @@ Example:
 
 (defun hough-lines-example (filename)
 
+  "Note: building.jpg in the LISP-CV images 
+   directory works nicely with this example."
+
   (let ((thresh-label-1 "Thres: 50")
 	(thresh-label-2 "Thres: 50"))
     ;;Read the image.
@@ -20958,41 +20961,24 @@ And, again, you can also retrieve the length of the vector using its LENGTH meth
 
 
 Note: The Common Lisp function LENGTH is overloaded in this libray so it can retrieve the length of 
-a C++ vector as well. This overloading causes CL:LENGTH to take close to a 0.027 sceond per million 
+a C++ vector as well. This overloading causes CL:LENGTH to take close to a 0.022 sceond per million 
 iteration speed decrease. If you would like to use the Common Lisp function LENGTH directly, while 
-you're in the LISP-CV package, you need to evaluate CL:lENGTH.
+you're in the LISP-CV package, you need to evaluate CL:LENGTH.
 
 
-Note: For VECTOR-DMATCH. When accessing the numerical content of of the objects in a VECTOR-DMATCH, 
-you must supply the type, of the element you are attempting to access, as the last parameter e.g.
+Note: If a VECTOR-DMATCH contains a 3 element DMATCH, the value you entered as the 3rd parameter to 
+DMATCH will be accessible at the 4th index. The reason is, with 3 element DMATCH, the 3rd parameter 
+contains the value of the OpenCV C++ DMatch class 'distance' member. That member is the fourth member
+in the OpenCV DMatch class. If you access the value at the 3rd index, you will be retrieving the value 
+of the OpenCv DMatch class imgIdx(IMG-IDX in Lisp-CV) member, which is of int type, and has a default 
+value of -1, for example:
 
 
-CV> (DEFPARAMETER A (VECTOR-DMATCH (VECTOR (DMATCH 1 2 3F0) (DMATCH 1 2 3F0))))
-
-A
-
-CV> (VECTOR-DMATCH A 0 0 :INT)
-
-1
-
-CV> (VECTOR-DMATCH A 0 1 :INT)
-
-2
-
-
-If a VECTOR-DMATCH contains a 3 element DMATCH, the value you entered as the 3rd parameter will be 
-accessible at the 4th index. The reason being, on a 3 element DMATCH the 3rd parameter contains the 
-value of the OpenCV C++ DMatch class 'distance' member and that member is the fourth member in the 
-OpenCV DMatch class. If you access the value at the 3rd index, you will be retrieving the value of 
-the OpenCv DMatch class imgIdx(IMG-IDX in Lisp-CV) member, which is of int type, and has a default 
-value of -1. e.g:
-
-
-CV> (VECTOR-DMATCH A 0 2 :INT) <== IMG-IDX 
+CV> (VECTOR-DMATCH A 0 2) <== IMG-IDX 
                                     
 -1                                   
                                      
-CV> (VECTOR-DMATCH A 0 3 :FLOAT) <== DISTANCE
+CV> (VECTOR-DMATCH A 0 3) <== DISTANCE
 
 3.0
 

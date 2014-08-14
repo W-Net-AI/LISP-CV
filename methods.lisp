@@ -9,46 +9,46 @@
 ;;; DEFGENERIC
 
 (defgeneric get* (self value)
-  (:documentation "Used for all class bindings with a GET member function."))
+  (:documentation "Used for all class bindings with a 'get' member function."))
 
 (defgeneric abs (self)
   (:documentation "Used to call the binding for the OpenCV function 'abs' and CL:ABS."))
 
 (defgeneric angle (self)
-  (:documentation "Used for all class bindings with an ANGLE member."))
+  (:documentation "Used for all class bindings with an 'angle' member."))
 
 (defgeneric (setf angle) (val self)
-  (:documentation "Used to setf the ANGLE value of class bindings with an ANGLE member."))
+  (:documentation "Used to setf the ANGLE value of class bindings with an 'angle' member."))
 
 (defgeneric assign (self other)
   (:documentation "Used for bindings of the OpenCV = operator."))
 
 (defgeneric apply* (self arg1 arg2 &optional arg3)
-  (:documentation "Used for all class bindings with an APPLY member function."))
+  (:documentation "Used for all class bindings with an 'apply' member function."))
 
 (defgeneric bounding-rect (self)
   (:documentation "Used for the BOUNDING-RECT member of ROTATED-RECT."))
 
 (defgeneric center (self)
-  (:documentation "Used for all class bindings with an CENTER member."))
+  (:documentation "Used for all class bindings with an 'center' member."))
 
 (defgeneric (setf center) (val self)
-  (:documentation "Used to setf the CENTER value of class bindings with an CENTER member."))
+  (:documentation "Used to setf the CENTER value of class bindings with an 'center' member."))
 
 (defgeneric clone (self)
-  (:documentation "Used for all class bindings with a CLONE member function."))
+  (:documentation "Used for all class bindings with a 'clone' member function."))
 
 (defgeneric compute (type self &rest args)
-  (:documentation "Used for all class bindings with a COMPUTE member function."))
+  (:documentation "Used for all class bindings with a 'compute' member function."))
 
 (defgeneric create (type self &rest args)
-  (:documentation "Used for all class bindings with a CREATE member function."))
+  (:documentation "Used for all class bindings with a 'create' member function."))
 
 (defgeneric data (self)
-  (:documentation "Used for all class bindings with a DATA member function."))
+  (:documentation "Used for all class bindings with a 'data' member function."))
 
 (defgeneric detect (self &rest args)
-  (:documentation "Used for all class bindings with a DETECT member function."))
+  (:documentation "Used for all class bindings with a 'detect' member function."))
 
 (defgeneric descriptor-extractor-compute (self image keypoints descriptors)
   (:documentation "Used for all DESCRIPTOR-EXTRACTOR-COMPUTE methods."))
@@ -66,7 +66,7 @@
   (:documentation "Used for all DESCRIPTOR-MATCHER-KNN-MATCH methods.")) 
 
 (defgeneric dot (self other)
-  (:documentation "Used for all class bindings with a DOT member function."))
+  (:documentation "Used for all class bindings with a 'dot' member function."))
 
 (defgeneric feature-2d-compute (self image keypoints descriptors)
   (:documentation "Used for all FEATURE-2D-COMPUTE methods."))
@@ -81,83 +81,91 @@
   (:documentation "Used for all FEATURE-DETECTOR-DETECT methods."))
 
 (defgeneric height (self)
-  (:documentation "Used for all class bindings with an HEIGHT member."))
+  (:documentation "Used for all class bindings with an 'height' member."))
 
 (defgeneric (setf height) (val self)
-  (:documentation "Used to setf the HEIGHT value of class bindings with an HEIGHT member."))
+  (:documentation "Used to setf the HEIGHT value of class bindings with an 'height' member."))
 
 (defgeneric is-opened (self)
-  (:documentation "Used for all class bindings with an IS-OPENED member function."))
+  (:documentation "Used for all class bindings with an 'isOpened' member function."))
 
 (defgeneric file-storage-write (fs name value)
   (:documentation "Used for all FILE-STORAGE-WRITE methods."))
 
 (defgeneric knn-match (self &rest args)
-  (:documentation "Used for all class bindings with a KNN-MATCH member function."))
+  (:documentation "Used for all class bindings with a knnMatch member function."))
 
 (defgeneric match (self &rest args)
-  (:documentation "Used for all class bindings with a MATCH member function."))
+  (:documentation "Used for all class bindings with a 'match' member function."))
 
 (defgeneric mean (self &rest args)
   (:documentation "Used to overload the MEAN name for functions, members, and member functions."))
 
 (defgeneric (setf mean) (val self)
-  (:documentation "Used to setf the MEAN value of class bindings with an MEAN member."))
+  (:documentation "Used to setf the MEAN value of class bindings with a MEAN member."))
 
 (defgeneric open (self &rest args)
-  (:documentation "Used for all class bindings with a OPEN member function."))
+  (:documentation "Used for all class bindings with a 'open' member function."))
 
 (defgeneric predict (self &rest args)
-  (:documentation "Used for all class bindings with a PREDICT member function."))
+  (:documentation "Used for all class bindings with a 'predict' member function."))
+
+(defgeneric pt (self)
+  (:documentation "Used for all class bindings with a 'pt' member."))
+
+(defgeneric (setf pt) (val self)
+  (:documentation "Used to setf the PT value of class bindings with a PT member."))
+
+(defgeneric push-back (self val)
+  (:documentation "Used for all class bindings with a 'push_back' member function."))
 
 (defgeneric *read (self arg)
-  (:documentation "Used for all class bindings with an READ member function."))
+  (:documentation "Used for all class bindings with an 'read' member function."))
 
 (defgeneric release (self)
-  (:documentation "Used for all class bindings with a RELEASE member function."))
+  (:documentation "Used for all class bindings with a 'release' member function."))
 
 (defgeneric save (self &rest args)
-  (:documentation "Used for all class bindings with a SAVE member function."))
+  (:documentation "Used for all class bindings with a 'save' member function."))
 
 (defgeneric size (arg &rest args)
-  (:documentation "Used for all class bindings with a SIZE member."))
+  (:documentation "Used for all class bindings with a 'size' member."))
 
 (defgeneric (setf size) (val self)
-  (:documentation "Used to setf the SIZE value of class bindings with an SIZE member."))
+  (:documentation "Used to setf the SIZE value of class bindings with an 'size' member."))
 
 (defgeneric train (self &rest args)
-  (:documentation "Used for all class bindings with a TRAIN member."))
+  (:documentation "Used for all class bindings with a 'train' member function."))
 
 (defgeneric type* (self)
-  (:documentation "Used for all class bindings with a TYPE member."))
+  (:documentation "Used for all class bindings with a 'type' member."))
 
 (defgeneric (setf type*) (val self)
-  (:documentation "Used to setf the TYPE of class bindings with an TYPE member."))
+  (:documentation "Used to setf the TYPE of class bindings with an 'type' member."))
 
 (defgeneric width (self)
-  (:documentation "Used for all class bindings with an WIDTH member."))
+  (:documentation "Used for all class bindings with an 'width' member."))
 
 (defgeneric (setf width) (val self)
-  (:documentation "Used to setf the WIDTH value of class bindings with an WIDTH member."))
+  (:documentation "Used to setf the WIDTH value of class bindings with an 'width' member."))
 
 (defgeneric x (self)
-  (:documentation "Used for all class bindings with an X member."))
+  (:documentation "Used for all class bindings with an'x' member."))
 
 (defgeneric (setf x) (val self)
-  (:documentation "Used to setf the x coordinate of class bindings with an X member."))
+  (:documentation "Used to setf the x coordinate of class bindings with an 'x' member."))
 
 (defgeneric (setf y) (val self)
-  (:documentation "Used to setf the y coordinate of class bindings with an Y member."))
+  (:documentation "Used to setf the y coordinate of class bindings with an 'y' member."))
 
 (defgeneric y (self)
-  (:documentation "Used for all class bindings with an Y member."))
+  (:documentation "Used for all class bindings with an 'y' member."))
 
 (defgeneric z (self)
-  (:documentation "Used for all class bindings with an Z member."))
+  (:documentation "Used for all class bindings with an 'z' member."))
 
 (defgeneric (setf z) (val self)
-  (:documentation "Used to setf the z coordinate of class bindings with an Z member."))
-
+  (:documentation "Used to setf the z coordinate of class bindings with an 'z' member."))
 
 
 ;;;DEFMETHODS
@@ -178,11 +186,11 @@
 
 
 (defmethod angle ((self cv-key-point))
-  (key-point-angle self))
+      (%key-point-angle self))
 
 
 (defmethod (setf angle) ((val single-float) (self cv-key-point))
-  (key-point-set-angle self val))
+      (key-point-set-angle self val))
 
 
 (defmethod assign ((self cv-mat) (other cv-mat))
@@ -431,6 +439,13 @@
 				     &optional (mask (%mat) given-mask))
   "Finds the best match for each descriptor from a query set."
   (%descriptor-matcher-match-bf-matcher self query-descriptors train-descriptors matches mask)
+  (if given-mask nil (del-mat mask)))
+
+
+(defmethod descriptor-matcher-match ((self cv-flann-based-matcher) query-descriptors train-descriptors matches 
+				     &optional (mask (%mat) given-mask))
+  "Finds the best match for each descriptor from a query set."
+  (%descriptor-matcher-match-flann-based-matcher self query-descriptors train-descriptors matches mask)
   (if given-mask nil (del-mat mask)))
 
 
@@ -696,7 +711,7 @@
   (vec-vec-8i-length self))
 
 
-(defmethod match ((self cv-bf-matcher) &rest args)
+(defmethod match ((self cv-flann-based-matcher) &rest args)
   "Finds the best match for each descriptor from a query set."
   (apply #'descriptor-matcher-match self args))
 
@@ -723,8 +738,162 @@
   (apply #'cl::open self args))
 
 
-(defmethod predict ((self cv-svm) &rest args)
-  (apply #'svm-predict self args))
+(defmethod pt ((self cv-key-point))
+  "Retrieves PT value of a KEY-POINT object."
+      (%key-point-pt self))
+
+
+(defmethod (setf pt) ((val single-float) (self cv-key-point))
+  "Sets PT value of a KEY-POINT object."
+      (key-point-set-pt self val))
+
+
+(defmethod push-back ((self cv-mat) (val cv-mat))
+  (mat-push-back self val))
+
+
+(defmethod push-back ((self std-vector-char) val)
+  (foreign-funcall "cv_vector_c_push_back_num" 
+		   :pointer (c-pointer self) 
+		   :char  val))
+
+
+(defmethod push-back ((self std-vector-dmatch) (val cv-dmatch))
+  (foreign-funcall "cv_vector_dm_push_back" 
+		   :pointer (c-pointer self) 
+		   :pointer (c-pointer val)))
+
+
+(defmethod push-back ((self std-vector-double) (val double-float))
+  (foreign-funcall "cv_vector_d_push_back_num" 
+		   :pointer (c-pointer self) 
+		   :double val))
+
+
+(defmethod push-back ((self std-vector-float) (val single-float))
+  (foreign-funcall "cv_vector_f_push_back_num" 
+		   :pointer (c-pointer self) 
+		   :float val))
+
+
+(defmethod push-back ((self std-vector-int) (val integer))
+  (foreign-funcall "cv_vector_i_push_back_num" 
+		   :pointer (c-pointer self) 
+		   :int val))
+
+
+(defmethod push-back ((self std-vector-key-point) (val cv-key-point))
+  (foreign-funcall "cv_vector_kp_push_back" 
+		   :pointer (c-pointer self) 
+		   :pointer (c-pointer val)))
+
+
+(defmethod push-back ((self std-vector-mat) (val cv-mat))
+  (foreign-funcall "cv_vector_m_push_back" 
+		   :pointer (c-pointer self) 
+		   :pointer (c-pointer val)))
+
+
+(defmethod push-back ((self std-vector-point) (val cv-point))
+  (foreign-funcall "cv_vector_p_push_back" 
+		   :pointer (c-pointer self) 
+		   :pointer (c-pointer val)))
+
+
+(defmethod push-back ((self std-vector-point-2f) (val cv-point-2f))
+  (foreign-funcall "cv_vector_p2f_push_back" 
+		   :pointer (c-pointer self) 
+		   :pointer (c-pointer val)))
+
+
+(defmethod push-back ((self std-vector-rect) (val cv-rect))
+  (foreign-funcall "cv_vector_r_push_back" 
+		   :pointer (c-pointer self) 
+		   :pointer (c-pointer val)))
+
+
+(defmethod push-back ((self std-vector-vec-2d) (val cv-vec-2d))
+  (foreign-funcall "cv_vector_v2d_push_back" 
+		   :pointer (c-pointer self) 
+		   :pointer (c-pointer val)))
+
+
+(defmethod push-back ((self std-vector-vec-3d) (val cv-vec-3d))
+  (foreign-funcall "cv_vector_v3d_push_back" 
+		   :pointer (c-pointer self) 
+		   :pointer (c-pointer val)))
+
+
+(defmethod push-back ((self std-vector-vec-4d) (val cv-vec-4d))
+  (foreign-funcall "cv_vector_v4d_push_back" 
+		   :pointer (c-pointer self) 
+		   :pointer (c-pointer val)))
+
+
+(defmethod push-back ((self std-vector-vec-6d) (val cv-vec-6d))
+  (foreign-funcall "cv_vector_v6d_push_back" 
+		   :pointer (c-pointer self) 
+		   :pointer (c-pointer val)))
+
+
+(defmethod push-back ((self std-vector-vec-2f) (val cv-vec-2f))
+  (foreign-funcall "cv_vector_v2f_push_back" 
+		   :pointer (c-pointer self) 
+		   :pointer (c-pointer val)))
+
+
+(defmethod push-back ((self std-vector-vec-3f) (val cv-vec-3f))
+  (foreign-funcall "cv_vector_v3f_push_back" 
+		   :pointer (c-pointer self) 
+		   :pointer (c-pointer val)))
+
+
+(defmethod push-back ((self std-vector-vec-4f) (val cv-vec-4f))
+  (foreign-funcall "cv_vector_v4f_push_back" 
+		   :pointer (c-pointer self) 
+		   :pointer (c-pointer val)))
+
+
+(defmethod push-back ((self std-vector-vec-6f) (val cv-vec-6f))
+  (foreign-funcall "cv_vector_v6f_push_back" 
+		   :pointer (c-pointer self) 
+		   :pointer (c-pointer val)))
+
+
+(defmethod push-back ((self std-vector-vec-2i) (val cv-vec-2i))
+  (foreign-funcall "cv_vector_v2i_push_back" 
+		   :pointer (c-pointer self) 
+		   :pointer (c-pointer val)))
+
+
+(defmethod push-back ((self std-vector-vec-3i) (val cv-vec-3i))
+  (foreign-funcall "cv_vector_v3i_push_back" 
+		   :pointer (c-pointer self) 
+		   :pointer (c-pointer val)))
+
+
+(defmethod push-back ((self std-vector-vec-4i) (val cv-vec-4i))
+  (foreign-funcall "cv_vector_v4i_push_back" 
+		   :pointer (c-pointer self) 
+		   :pointer (c-pointer val)))
+
+
+(defmethod push-back ((self std-vector-vec-6i) (val cv-vec-6i))
+  (foreign-funcall "cv_vector_v6i_push_back" 
+		   :pointer (c-pointer self) 
+		   :pointer (c-pointer val)))
+
+
+(defmethod push-back ((self std-vector-vec-8i) (val cv-vec-8i))
+  (foreign-funcall "cv_vector_v8i_push_back" 
+		   :pointer (c-pointer self) 
+		   :pointer (c-pointer val)))
+
+
+(defmethod push-back ((self std-vector-uchar) val)
+  (foreign-funcall "cv_vector_u_push_back_num" 
+		   :pointer (c-pointer self) 
+		   :uchar  val))
 
 
 (defmethod release ((self cv-file-storage))
@@ -741,11 +910,11 @@
 
 (defmethod size ((arg cv-key-point) &rest args)
   args
-  (key-point-size arg))
+      (%key-point-size arg))
 
 
 (defmethod (setf size) ((val single-float) (self cv-key-point))
-  (key-point-set-size self val))
+      (key-point-set-size self val))
 
 
 (defmethod size ((arg cv-mat) &rest args)
@@ -763,10 +932,18 @@
   (rect-size arg))
 
 
+(defmethod (setf size) ((val cv-size) (self cv-rect))
+  (setf (@ self :int 0) (@ self :int 0)
+	(@ self :int 1) (@ self :int 1)
+	(@ self :int 2) (@ val :int 0)
+	(@ self :int 3) (@ val :int 1))val)
+
+
 (defmethod size ((arg cv-rotated-rect) &rest args)
   "Gets the size of a ROTATED-RECT object."
   args
   (rotated-rect-size arg))
+
 
 ;; Using mem-aref to access the member may not be safe if OpenCv changes something.
 (defmethod (setf size) ((val cv-size) (self cv-rotated-rect))
@@ -835,12 +1012,12 @@
 
 (defmethod x ((self cv-key-point))
   "Retrieves X coordinate of a KEY-POINT object."
-  (point-2f-x (key-point-pt self)))
+      (point-2f-x (%key-point-pt self)))
 
 
 (defmethod (setf x) ((val single-float) (self cv-key-point))
   "Sets X coordinate of a KEY-POINT object."
-  (point-2f-set-x (key-point-pt self) val))
+      (point-2f-x (key-point-set-pt self val)))
 
 
 (defmethod x ((self cv-point))
@@ -904,6 +1081,7 @@
 
 
 (defmethod x ((self cv-rect))
+  "Retrieves X coordinate of a RECT object."
   (rect-x self))
 
 
@@ -914,12 +1092,12 @@
 
 (defmethod y ((self cv-key-point))
   "Retrieves Y coordinate of a KEY-POINT object."
-  (point-2f-y (key-point-pt self)))
+      (point-2f-y (%key-point-pt self)))
 
 
 (defmethod (setf y) ((val single-float) (self cv-key-point))
   "Sets Y coordinate of a KEY-POINT object."
-  (point-2f-set-y (key-point-pt self) val))
+      (point-2f-y (key-point-set-pt self val)))
 
 
 (defmethod y ((self cv-point))

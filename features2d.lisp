@@ -241,10 +241,22 @@
 
 ;; void DescriptorMatcher::match(const Mat& queryDescriptors, const Mat& trainDescriptors, vector<DMatch>& matches, 
 ;; const Mat& mask=Mat() ) const
-;; void cv_DescriptorMatcher_match(DescriptorMatcher* self, Mat* queryDescriptors, Mat* trainDescriptors, vector_DMatch* matches, 
-;; Mat* mask)
+;; void cv_DescriptorMatcher_match(DescriptorMatcher* self, Mat* queryDescriptors, Mat* trainDescriptors, 
+;;                                 vector_DMatch* matches, Mat* mask)
 (defcfun ("cv_DescriptorMatcher_match" %descriptor-matcher-match-bf-matcher) :void
   (self bf-matcher)
+  (query-descriptors mat)
+  (train-descriptors mat)
+  (matches vector-dmatch)
+  (mask mat))
+
+
+;; void DescriptorMatcher::match(const Mat& queryDescriptors, const Mat& trainDescriptors, vector<DMatch>& matches, 
+;; const Mat& mask=Mat() ) const
+;; void cv_DescriptorMatcher_match(DescriptorMatcher* self, Mat* queryDescriptors, Mat* trainDescriptors, 
+;;                                 vector_DMatch* matches, Mat* mask)
+(defcfun ("cv_DescriptorMatcher_match" %descriptor-matcher-match-flann-based-matcher) :void
+  (self flann-based-matcher)
   (query-descriptors mat)
   (train-descriptors mat)
   (matches vector-dmatch)

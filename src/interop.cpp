@@ -53,6 +53,5 @@ ADD_VECTOR_IMPL(Vec4s, v4s);
 ADD_VECTOR_IMPL(Vec2w, v2w);
 ADD_VECTOR_IMPL(Vec3w, v3w);
 ADD_VECTOR_IMPL(Vec4w, v4w);
-
 }
-//
+

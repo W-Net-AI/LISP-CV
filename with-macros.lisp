@@ -141,6 +141,15 @@
        (values))))
 
 
+(defmacro with-flann-based-matcher (bind &body body)
+  "Ensures DEL-FLANN-BASED-MATCHER gets called when 
+   a FLANN-BASED-MATCHER object goes out of scope."
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-flann-based-matcher %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
+
+
 (defmacro with-hog-descriptor (bind &body body)
   "Ensures DEL-HOG-DESCRIPTOR gets called when 
    a HOG-DESCRIPTOR object goes out of scope."
@@ -333,6 +342,15 @@
   `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
      (unwind-protect (progn ,@body)
        (mapcar #!(del-std-string %1) ,(cons 'list (mapcar #!(car %1) bind)))
+       (values))))
+
+
+(defmacro with-surf (bind &body body)
+  "Ensures DEL-SURF gets called when 
+   a SURF object goes out of scope."
+  `(let* ,(mapcar #!(cons (car %1) (cdr %1)) bind)
+     (unwind-protect (progn ,@body)
+       (mapcar #!(del-surf %1) ,(cons 'list (mapcar #!(car %1) bind)))
        (values))))
 
 

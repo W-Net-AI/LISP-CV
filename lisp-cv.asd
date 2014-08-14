@@ -26,7 +26,7 @@
                (:file "vector" :depends-on ("package" "lisp-cv" "types"))
                (:file "delete" :depends-on ("package" "lisp-cv" "types"))
                (:file "with-macros" :depends-on ("package" "lisp-cv" "delete" "types"))
-               (:file "core" :depends-on ("package" "lisp-cv" "constants" "types"))
+               (:file "core" :depends-on ("package" "lisp-cv" "constants" "types" "vector"))
 	       (:file "imgproc" :depends-on ("package" "lisp-cv" "constants" "types" "core"))
 	       (:file "highgui" :depends-on ("package" "lisp-cv" "constants" "types" "core"))
                (:file "video" :depends-on ("package" "lisp-cv" "constants" "types" "core"))
