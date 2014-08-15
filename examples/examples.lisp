@@ -207,11 +207,11 @@ Returns a reference to the specified array element.
  
 C++: template<typename T> T& Mat::at(int i, int j)
  
-LISP-CV: (AT-<TYPE-NAME> (SELF MAT) (I :INT)) => <TYPE-NAME>
+LISP-CV: (AT-<type-name> (SELF MAT) (I :INT)) => <type-name>
 
-LISP-CV: (AT-<TYPE-NAME> (SELF MAT) (I :INT) (J :INT)) => <TYPE-NAME>
+LISP-CV: (AT-<type-name> (SELF MAT) (I :INT) (J :INT)) => <type-name>
 
-LISP-CV: (AT-<TYPE-NAME> (SELF MAT) (I :INT) (J :INT) (K :INT)) => <TYPE-NAME>
+LISP-CV: (AT-<type-name> (SELF MAT) (I :INT) (J :INT) (K :INT)) => <type-name>
 
    The typenames associated with AT include:
  
@@ -20173,29 +20173,48 @@ NIL
 #@ 
 ========================================================================================================================================
 
-Macro for CFFI::MEM-AREF.
+CFFI::MEM-AREF macro and overloaded binding for the std::vector.at member. 
 
 
 CFFI: mem-aref ptr type &optional (index 0)
 
 CFFI: (setf (mem-aref ptr type &optional (index 0)) new-value) 
 
-LISP-CV: (@ (PTR TYPE &OPTIONAL (INDEX 0))) => RESULT
+LISP-CV: (@ (SELF TYPE &OPTIONAL (INDEX 0))) => RESULT
+
+LISP-CV: (SETF (@ (SELF TYPE &OPTIONAL (INDEX 0))) NEW-VALUE) => RESULT
+
+LISP-CV: (@ (SELF &OPTIONAL ((I :INT) 0) (J :INT))) => RESULT
 
 
     Parameters:	
 
-        PTR - A foreign pointer.
+        SELF - A foreign pointer(allocated memory) or a C++ vector.
 
         TYPE - A foreign-type, See below.
 
-        INDEX - Index of the element you want retrieve, defaults to 0
+        NEW-VALUE - A Lisp value compatible with TYPE. 
+
+        I - Either the index of the object inside the vector or a vector element(number).
+
+        J - The index of an element inside the object.
 
 
-This function is a macro for CFFI's MEM-AREF. It retrieves the value of a METAOBJECT at (INDEX N)
+This function is a macro for CFFI's MEM-AREF. It also dispatches all overloaded std:vector.at bindings 
+in this library. This macro is about half as fast when used in the same fashion as mem-aref:
+
+0.003 seconds for MEM-AREF vs 0.006 seconds for this macro(per million).
+
+and a little less then half as fast as the AT-VECTOR-* functions:
+
+0.060 seconds for the AT-VECTOR-* vs 0.100 seconds for this macro on average(per million). 
+
+It can be used to retrieve any object inside a vector and any element inside that object, with 
+minimal typing. If you would like to retrieve an object(or element for number based vectors) at 
+the 0th index, the 0 need not be supplied.
 
 
-The typenames associated with @ include:
+The typenames associated with @(as a MEM-AREF macro) include:
 
 :char     :int16    :short    :uint32   :string
 :double   :int32    :uchar    :uint64   :pointer
@@ -20203,11 +20222,15 @@ The typenames associated with @ include:
 :int      :llong    :uint8    :ulong
 :int8     :long     :uint16   :ushort
 
+See this link in the CFFI doc. for longer versions of above types:
 
-Example:
+http://common-lisp.net/project/cffi/manual/cffi-manual.html#Built_002dIn-Types
 
 
-LCV> (DEFPARAMETER A (C-STRING-TO-STRING "12545" 5))
+EXAMPLE => MEM-AREF
+
+
+LCV> (DEFPARAMETER A (C-STRING "12545"))
 
 A
 
@@ -20218,6 +20241,58 @@ LCV> A
 LCV> (@ A :STRING)
 
 "12545"
+
+
+EXAMPLE => VECTOR-AT-*
+
+CV> (DEFPARAMETER VEC (VECTOR-DOUBLE '(1D0 2D0 3D0)))
+
+VEC
+
+CV> (@ VEC)
+
+1.0d0
+
+CV> (@ VEC 0)
+
+1.0d0
+
+CV> (@ VEC 1)
+
+2.0d0
+
+CV> (@ VEC 2)
+
+3.0d0
+
+
+CV> (DEFPARAMETER VEC (VECTOR-MAT (LIST (MAT 3 3 +8U+ 1) (MAT 3 3 +8U+ 2) (MAT 3 3 +8U+ 3))))
+
+VEC
+
+CV> (PRINT-MAT (@ VEC))
+
+#2M((1 1 1)
+    (1 1 1)
+    (1 1 1))
+
+CV> (PRINT-MAT (@ VEC 0))
+
+#2M((1 1 1)
+    (1 1 1)
+    (1 1 1))
+
+CV> (PRINT-MAT (@ VEC 1))
+
+#2M((2 2 2)
+    (2 2 2)
+    (2 2 2))
+
+CV> (PRINT-MAT (@ VEC 2))
+
+#2M((3 3 3)
+    (3 3 3)
+    (3 3 3))
 
 ========================================================================================================================================
 #ALLOC 
@@ -20658,25 +20733,107 @@ Example:
 
 Bindings for the C++ VECTOR class.
 
-C++: template < class T, class Alloc = allocator<T> > class vector; // generic template
 
-LISP-CV: See Examples.
+C++: template < class T, class Alloc = allocator<T> > class vector; 
+
+C++: void std::vector::push_back (const value_type& val);
+
+C++: reference std::vector::at (size_type n);
+
+
+The following low-level functions have been externalized for use
+because the names are less cryptic for others reading your code.
+
+LISP-CV: (MAKE-VECTOR-<type-name>) => VECTOR-<type-name>
+
+LISP-CV: (C-ARR-TO-VEC-<type-name> (A :POINTER)) => VECTOR-<type-name>
+
+LISP-CV: (SEQ-TO-VEC-<type-name> (SEQ SEQUENCE)) => VECTOR-<type-name>
+
+LISP-CV: (VEC-<type-name>-TO-C-ARR (VEC VECTOR-<type-name>)) => :POINTER
+
+LISP-CV: (VEC-<type-name>-LENGTH (VEC VECTOR-<type-name>)) => :INT
+
+LISP-CV: (VEC-<type-name>-TO-LISP-LIST (VEC VECTOR-<type-name>)) => LIST
+
+LISP-CV: (VEC-<type-name>-TO-LISP-VEC (VEC VECTOR-<type-name>)) => VECTOR
+
+LISP-CV: (VEC-<type-name>-PUSH-BACK (VEC VECTOR-<type-name>)) => OBJECT(<type-name>) 
+
+LISP-CV: (AT-VEC-<type-name> (VEC VECTOR-<type-name>) (IDX :INT)) => OBJECT(<type-name>) 
+
+
+Main interface(high-level) to the C++ vector bindings.
+(See examples for usage).
+
+LISP-CV: (VECTOR-<type-name>) => VECTOR-<type-name>
+
+LISP-CV: (PUSH-BACK (VEC VECTOR-<type-name>)) => OBJECT(<type-name>) 
+
+LISP-CV: (@ (VEC VECTOR-<type-name>)) => OBJECT or ELEMENT(<type-name>)(Search #@ in this file)
+
+
+Descriptions of the functions:
+
+Constructs uninitialized object.
+(MAKE-VECTOR-<type-name>)
+
+Converts foreign (C)array to C++ vector.
+(C-ARR-TO-VEC-<type-name> (A :POINTER))
+
+Converts Lisp SEQUENCE to C++ vector.
+(SEQ-TO-VEC-<type-name> (SEQ SEQUENCE))
+
+Converts C++ vector to foreign (C)array.
+(VEC-<type-name>-TO-C-ARR) 
+
+Retrieves the length of the vector.
+(VEC-<type-name>-LENGTH
+
+Converts C++ vector to Lisp LIST.
+(VEC-<type-name>-TO-LISP-LIST
+
+Converts C++ vector to Lisp VEC.
+(VEC-<type-name>-TO-LISP-VEC (VEC VECTOR-<type-name>))
+
+Adds a new element at the end of C++ vector.
+(VEC-<type-name>-PUSH-BACK (VEC VECTOR-<type-name>))
+
+Shortened version of the above function.
+(PUSH-BACK (VEC VECTOR-<type-name>))
+
+Returns the element at position n in the vector...
+(VEC-<type-name>-AT (VEC VECTOR-<type-name>) (IDX :INT))
+
+...this function is setf-able:
+(SETF (VEC-<type-name>-AT (VEC VECTOR-<type-name>) (IDX :INT)) NEW-VALUE)
+
+Shortened versions of above function(non setf-able).
+(@ (VEC VECTOR-<type-name>) (IDX :INT))
+
+See examples below...
+(VECTOR-<type-name>) => VECTOR-<type-name>
 
 
     Parameters:	
 
-       See Examples.
+       VEC - A C++ vector of type <type-name>. See below.
 
+       IDX - Index of element at position n in the vector.
+
+       SEQ - A Lisp sequence(list or vector).
+
+       A - A foreign pointer. Can be created with the CFFI::FOREIGN-ALLOC macro ALLOC.
+                                                           (Search #ALLOC in this file)
 
 The bindings for the C++ vector class, so far, are:
-
 
 LISP-CV  <===>  C++              
 ===========================     
 VECTOR-CHAR <===> vector<char>
 ===============================      
-VECTOR-DMATCH <===> vector<DMatch> (VECTOR-DMATCH operates differently from the rest.
-===============================     See note at the end of the VECTOR-* documentation)    
+VECTOR-DMATCH <===> vector<DMatch> 
+===============================       
 VECTOR-DOUBLE <===> vector<double> 
 =============================      
 VECTOR-FLOAT <===> vector<float>
@@ -20720,7 +20877,7 @@ VECTOR-VEC-6I <===> vector<Vec6i>
 VECTOR-VEC-8I <===> vector<Vec8i>
 ==============================
 
-Examples(vector-example):
+Examples:
 
 Vectors with numbers as elements include, VECTOR-CHAR, VECTOR-DOUBLE, VECTOR-FLOAT, VECTOR-INT and 
 VECTOR-UCHAR. The preceding vectors operate as follows:(Using VECTOR-FLOAT as the example of the 5.) 
@@ -20992,6 +21149,72 @@ CV> (DISTANCE (VECTOR-DMATCH A 0))
 
 3.0
 
+
+;;Now for pushing elements into a vector...
+
+;;First, we create a VECTOR-MAT object...
+
+(WITH-VECTOR-MAT ((VEC (VECTOR-MAT)))
+
+;;Then, we create a 3x3 MAT object...
+
+(WITH-MAT ((MAT (MAT 3 3 +8U+)))
+
+(format t "~%")
+
+;;Now, PUSH 1 million matrices into the vector and use the CL::TIME macro to time how long it takes.
+;;Oddly enough(this being a C++ binding), it's quicker than C++ you do this(on my machine that is).
+
+($ 
+    (DOTIMES (N 1000000)
+     (PUSH-BACK VEC MAT)) 1))
+
+;;Print the LENGTH of VEC, a whopping ONE MILLION elements in record time!.
+
+(FORMAT T "VEC length = ~a~%" (LENGTH VEC)))
+
+
+Now we access vector elements using the @ macro(Vector elements are 0 based).
+
+First, create a vector of matrices...
+
+CV> (DEFPARAMETER VEC (t:VECTOR-MAT (LIST (t:MAT 3 3 +8U+ 1) (t:MAT 3 3 +8U+ 2) (t:MAT 3 3 +8U+ 3))))
+
+VEC
+
+Print the matrix at index 0(index of 0 doesn't need to be specified).
+
+CV> (PRINT-MAT (@ VEC))
+
+#2M((1 1 1)
+    (1 1 1)
+    (1 1 1))
+
+Print the matrix at index 0(by specifying the index).
+
+CV> (PRINT-MAT (@ VEC 0))
+
+#2M((1 1 1)
+    (1 1 1)
+    (1 1 1))
+
+Print the matrix at index 1.
+
+CV> (PRINT-MAT (@ VEC 1))
+
+#2M((2 2 2)
+    (2 2 2)
+    (2 2 2))
+
+Print the matrix at index 2.
+
+CV> (PRINT-MAT (@ VEC 2))
+
+#2M((3 3 3)
+    (3 3 3)
+    (3 3 3))
+
+All finished!!! I hope you enjoy these LISP-CV std::vector bindings:)
 ========================================================================================================================================
 ========================================================================================================================================
 ========================================================================================================================================

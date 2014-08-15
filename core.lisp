@@ -1,7 +1,7 @@
 ;;;; -*- mode: lisp; indent-tabs: nil -*-
 ;;;; core.lisp
 ;;;; OpenCV bindings
-;;;; The Core Functionality
+;;;; The Core Functionality.
 
 
 (in-package :lisp-cv)
@@ -198,14 +198,19 @@
   (self term-criteria))
 
 
-;; C-Interop - MEM-AREF and MEM-REF macros with C-POINTER reader.
+;;; C-Interop - MEM-AREF and MEM-REF macros with C-POINTER reader.
+
 
 (defun resolve-pointer (ptr)
   (if (pointerp ptr) ptr (c-pointer ptr)))
 
-(defmacro @ (ptr type &optional (index 0))
-    "CFFI:MEM-AREF macro with C-POINTER reader."
-  `(mem-aref (resolve-pointer ,ptr) ,type ,index))
+
+(defmacro @ (self &optional arg1 arg2 arg3)
+    "CFFI:MEM-AREF macro. Also dispatches the std::vector.at bindings."
+  (if (and (keywordp arg1) (symbolp arg1))
+      `(mem-aref (resolve-pointer ,self) ,arg1 (or ,arg2 0))
+      `(@@@ ,self ,arg1 ,arg2 ,arg3)))
+
 
 (defmacro @@ (ptr type &optional (offset 0))
     "CFFI:MEM-REF macro with C-POINTER reader."
@@ -548,1457 +553,796 @@
   `(mem-aref (%ptr ,self ,i) ,type ,j))
 
 
-;; template<typename T> T& Mat::at(int i) const
-;; char cv_Mat_at_char_1(Mat* self, int i)
-(defcfun ("cv_Mat_at_char_1" at-char-1) :pointer
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int))
-
-
-;; template<typename T> T& Mat::at(int i, int j)
-;; char cv_Mat_at_char(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_char_2" at-char-2) :pointer
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)
-  (j :int))
-
-
-;; template<typename T> T& Mat::at(int i, int j, int k)
-;; char &cv_Mat_at_char_3(Mat* self, int i, int j, int k)
-(defcfun ("cv_Mat_at_char_3" at-char-3) :pointer
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)
-  (j :int)
-  (k :int))
-
 
 (defun at-char (self i &optional j k)
+
   (cond (k 
-	 (@ (at-char-3 self i j k) :char))
+	 (mem-aref (foreign-funcall "cv_Mat_at_char_3" 
+				    :pointer (c-pointer self) :int i :int j :int k 
+				    :pointer) :char))
+
 	((and j (not k))
-	 (@ (at-char-2 self i j) :char))
+	 (mem-aref (foreign-funcall "cv_Mat_at_char_2" 
+				    :pointer (c-pointer self) :int i :int j 
+				    :pointer) :char))
 	(t
-	 (@ (at-char-1 self i) :char))))
+	 (mem-aref (foreign-funcall "cv_Mat_at_char_1" 
+				    :pointer (c-pointer self) :int (or i 0)
+				    :pointer) :char))))
 
 
-(defun (setf at-char) (val self &optional i j k)
+
+(defun (setf at-char) (val self i &optional j k)
+
+  (cond  
+    (k 
+     (let ((temp (foreign-funcall "cv_Mat_at_char_3" 
+				  :pointer (c-pointer self) :int i :int j :int k 
+				  :pointer)))
+       (setf (mem-aref temp :char) val)))
+
+    ((and j (not k))
+     (let ((temp (foreign-funcall "cv_Mat_at_char_2" 
+				  :pointer (c-pointer self) :int i :int j 
+				  :pointer)))
+       (setf (mem-aref temp :char) val)))
+
+    (t
+     (let ((temp (foreign-funcall "cv_Mat_at_char_1" 
+				  :pointer (c-pointer self) :int (or i 0)
+				  :pointer)))
+       (setf (mem-aref temp :char) val)))))
+
+
+
+(defun at-double (self &optional i j k)
+
   (cond (k 
-	 (setf (@ (at-char-3 self i j k) :char) val))
+	 (mem-aref (foreign-funcall "cv_Mat_at_double_3" 
+				    :pointer (c-pointer self) :int i :int j :int k 
+				    :pointer) :double))
+
 	((and j (not k))
-	 (setf (@ (at-char-2 self i j) :char) val))
+	 (mem-aref (foreign-funcall "cv_Mat_at_double_2" 
+				    :pointer (c-pointer self) :int i :int j 
+				    :pointer) :double))
 	(t
-	 (setf (@ (at-char-1 self i) :char) val))))
+	 (mem-aref (foreign-funcall "cv_Mat_at_double_1" 
+				    :pointer (c-pointer self) :int (or i 0)
+				    :pointer) :double))))
 
-
-;; template<typename T> T& Mat::at(int i) const
-;; double cv_Mat_at_double_1(Mat* self, int i)
-(defcfun ("cv_Mat_at_double_1" at-double-1) :pointer
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int))
-
-
-;; template<typename T> T& Mat::at(int i, int j) 
-;; double cv_Mat_at_double_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_double_2" at-double-2) :pointer
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)
-  (j :int))
-
-
-;; template<typename T> T& Mat::at(int i, int j, int k) 
-;; double &cv_Mat_at_double_3(Mat* self, int i, int j, int k)
-(defcfun ("cv_Mat_at_double_3" at-double-3) :pointer
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)
-  (j :int)
-  (k :int))
-
-
-(defun at-double (self i &optional j k)
-  (cond (k 
-	 (@ (at-double-3 self i j k) :double))
-	((and j (not k))
-	 (@ (at-double-2 self i j) :double))
-	(t
-	 (@ (at-double-1 self i) :double))))
 
 
 (defun (setf at-double) (val self &optional i j k)
+
+  (cond  
+    (k 
+     (let ((temp (foreign-funcall "cv_Mat_at_double_3" 
+				  :pointer (c-pointer self) :int i :int j :int k 
+				  :pointer)))
+       (setf (mem-aref temp :double) val)))
+
+    ((and j (not k))
+     (let ((temp (foreign-funcall "cv_Mat_at_double_2" 
+				  :pointer (c-pointer self) :int i :int j 
+				  :pointer)))
+       (setf (mem-aref temp :double) val)))
+
+    (t
+     (let ((temp (foreign-funcall "cv_Mat_at_double_1" 
+				  :pointer (c-pointer self) :int (or i 0)
+				  :pointer)))
+       (setf (mem-aref temp :double) val)))))
+
+
+
+(defun at-float (self &optional i j k)
+
   (cond (k 
-	 (setf (@ (at-double-3 self i j k) :double) val))
+	 (mem-aref (foreign-funcall "cv_Mat_at_float_3" 
+				    :pointer (c-pointer self) :int i :int j :int k 
+				    :pointer) :float))
+
 	((and j (not k))
-	 (setf (@ (at-double-2 self i j) :double) val))
+	 (mem-aref (foreign-funcall "cv_Mat_at_float_2" 
+				    :pointer (c-pointer self) :int i :int j 
+				    :pointer) :float))
 	(t
-	 (setf (@ (at-double-1 self i) :double) val))))
+	 (mem-aref (foreign-funcall "cv_Mat_at_float_1" 
+				    :pointer (c-pointer self) :int (or i 0)
+				    :pointer) :float))))
 
-
-;; template<typename T> T& Mat::at(int i) const
-;; float cv_Mat_at_float_1(Mat* self, int i)
-(defcfun ("cv_Mat_at_float_1" at-float-1) :pointer
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int))
-
-
-;; template<typename T> T& Mat::at(int i, int j)
-;; float cv_Mat_at_float_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_float_2" at-float-2) :pointer
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)
-  (j :int))
-
-
-;; template<typename T> T& Mat::at(int i, int j, int k)
-;; float &cv_Mat_at_float_3(Mat* self, int i, int j, int k)
-(defcfun ("cv_Mat_at_float_3" at-float-3) :pointer
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)
-  (j :int)
-  (k :int))
-
-
-(defun at-float (self i &optional j k)
-  (cond (k 
-	 (@ (at-float-3 self i j k) :float))
-	((and j (not k))
-	 (@ (at-float-2 self i j) :float))
-	(t
-	 (@ (at-float-1 self i) :float))))
 
 
 (defun (setf at-float) (val self &optional i j k)
+
+  (cond  
+    (k 
+     (let ((temp (foreign-funcall "cv_Mat_at_float_3" 
+				  :pointer (c-pointer self) :int i :int j :int k 
+				  :pointer)))
+       (setf (mem-aref temp :float) val)))
+
+    ((and j (not k))
+     (let ((temp (foreign-funcall "cv_Mat_at_float_2" 
+				  :pointer (c-pointer self) :int i :int j 
+				  :pointer)))
+       (setf (mem-aref temp :float) val)))
+
+    (t
+     (let ((temp (foreign-funcall "cv_Mat_at_float_1" 
+				  :pointer (c-pointer self) :int (or i 0)
+				  :pointer)))
+       (setf (mem-aref temp :float) val)))))
+
+
+
+(defun at-int (self &optional i j k)
+
   (cond (k 
-	 (setf (@ (at-float-3 self i j k) :float) val))
+	 (mem-aref (foreign-funcall "cv_Mat_at_int_3" 
+				    :pointer (c-pointer self) :int i :int j :int k 
+				    :pointer) :int))
+
 	((and j (not k))
-	 (setf (@ (at-float-2 self i j) :float) val))
+	 (mem-aref (foreign-funcall "cv_Mat_at_int_2" 
+				    :pointer (c-pointer self) :int i :int j 
+				    :pointer) :int))
 	(t
-	 (setf (@ (at-float-1 self i) :float) val))))
+	 (mem-aref (foreign-funcall "cv_Mat_at_int_1" 
+				    :pointer (c-pointer self) :int (or i 0)
+				    :pointer) :int))))
 
-
-;; template<typename T> T& Mat::at(int i) const
-;; int cv_Mat_at_int_1(Mat* self, int i)
-(defcfun ("cv_Mat_at_int_1" at-int-1) :pointer
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int))
-
-
-;; template<typename T> T& Mat::at(int i, int j)
-;; int cv_Mat_at_int_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_int_2" at-int-2) :pointer
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)
-  (j :int))
-
-
-;; template<typename T> T& Mat::at(int i, int j, int k)
-;; int &cv_Mat_at_int_3(Mat* self, int i, int j, int k)
-(defcfun ("cv_Mat_at_int_3" at-int-3) :pointer
-  "RReturns a reference to the specified array element."
-  (self mat)
-  (i :int)
-  (j :int)
-  (k :int))
-
-
-(defun at-int (self i &optional j k)
-  (cond (k 
-	 (@ (at-int-3 self i j k) :int))
-	((and j (not k))
-	 (@ (at-int-2 self i j) :int))
-	(t
-	 (@ (at-int-1 self i) :int))))
 
 
 (defun (setf at-int) (val self &optional i j k)
+
+  (cond  
+    (k 
+     (let ((temp (foreign-funcall "cv_Mat_at_int_3" 
+				  :pointer (c-pointer self) :int i :int j :int k 
+				  :pointer)))
+       (setf (mem-aref temp :int) val)))
+
+    ((and j (not k))
+     (let ((temp (foreign-funcall "cv_Mat_at_int_2" 
+				  :pointer (c-pointer self) :int i :int j 
+				  :pointer)))
+       (setf (mem-aref temp :int) val)))
+
+    (t
+     (let ((temp (foreign-funcall "cv_Mat_at_int_1" 
+				  :pointer (c-pointer self) :int (or i 0)
+				  :pointer)))
+       (setf (mem-aref temp :int) val)))))
+
+
+
+(defun at-short (self &optional i j k)
+
   (cond (k 
-	 (setf (@ (at-int-3 self i j k) :int) val))
+	 (mem-aref (foreign-funcall "cv_Mat_at_short_3" 
+				    :pointer (c-pointer self) :int i :int j :int k 
+				    :pointer) :short))
+
 	((and j (not k))
-	 (setf (@ (at-int-2 self i j) :int) val))
+	 (mem-aref (foreign-funcall "cv_Mat_at_short_2" 
+				    :pointer (c-pointer self) :int i :int j 
+				    :pointer) :short))
 	(t
-	 (setf (@ (at-int-1 self i) :int) val))))
+	 (mem-aref (foreign-funcall "cv_Mat_at_short_1" 
+				    :pointer (c-pointer self) :int (or i 0)
+				    :pointer) :short))))
 
-
-;; template<typename T> T& Mat::at(int i) const
-;; short cv_Mat_at_short_1(Mat* self, int i)
-(defcfun ("cv_Mat_at_short_1" at-short-1) :pointer
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int))
-
-
-;; template<typename T> T& Mat::at(int i, int j)
-;; short cv_Mat_at_short_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_short_2" at-short-2) :pointer
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)
-  (j :int))
-
-
-;; template<typename T> T& Mat::at(int i, int j, int k) 
-;; short &cv_Mat_at_short_3(Mat* self, int i, int j, int k)
-(defcfun ("cv_Mat_at_short_3" at-short-3) :pointer
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)
-  (j :int)
-  (k :int))
-
-
-(defun at-short (self i &optional j k)
-  (cond (k 
-	 (@ (at-short-3 self i j k) :short))
-	((and j (not k))
-	 (@ (at-short-2 self i j) :short))
-	(t
-	 (@ (at-short-1 self i) :short))))
 
 
 (defun (setf at-short) (val self &optional i j k)
+
+  (cond  
+    (k 
+     (let ((temp (foreign-funcall "cv_Mat_at_short_3" 
+				  :pointer (c-pointer self) :int i :int j :int k 
+				  :pointer)))
+       (setf (mem-aref temp :short) val)))
+
+    ((and j (not k))
+     (let ((temp (foreign-funcall "cv_Mat_at_short_2" 
+				  :pointer (c-pointer self) :int i :int j 
+				  :pointer)))
+       (setf (mem-aref temp :short) val)))
+
+    (t
+     (let ((temp (foreign-funcall "cv_Mat_at_short_1" 
+				  :pointer (c-pointer self) :int (or i 0)
+				  :pointer)))
+       (setf (mem-aref temp :short) val)))))
+
+
+
+(defun at-uchar (self &optional i j k)
+
   (cond (k 
-	 (setf (@ (at-short-3 self i j k) :short) val))
+	 (mem-aref (foreign-funcall "cv_Mat_at_uchar_3" 
+				    :pointer (c-pointer self) :int i :int j :int k 
+				    :pointer) :uchar))
+
 	((and j (not k))
-	 (setf (@ (at-short-2 self i j) :short) val))
+	 (mem-aref (foreign-funcall "cv_Mat_at_uchar_2" 
+				    :pointer (c-pointer self) :int i :int j 
+				    :pointer) :uchar))
 	(t
-	 (setf (@ (at-short-1 self i) :short) val))))
+	 (mem-aref (foreign-funcall "cv_Mat_at_uchar_1" 
+				    :pointer (c-pointer self) :int (or i 0)
+				    :pointer) :uchar))))
 
-
-;; template<typename T> T& Mat::at(int i) const
-;; uchar cv_Mat_at_uchar_1(Mat* self, int i)
-(defcfun ("cv_Mat_at_uchar_1" at-uchar-1) :pointer
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int))
-
-
-;; template<typename T> T& Mat::at(int i, int j)
-;; uchar cv_Mat_at_uchar_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_uchar_2" at-uchar-2) :pointer
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)
-  (j :int))
-
-
-;; template<typename T> T& Mat::at(int i, int j, int k)
-;; uchar &cv_Mat_at_uchar_3(Mat* self, int i, int j, int k)
-(defcfun ("cv_Mat_at_uchar_3" at-uchar-3) :pointer
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)
-  (j :int)
-  (k :int))
-
-
-(defun at-uchar (self i &optional j k)
-  (cond (k 
-	 (@ (at-uchar-3 self i j k) :uchar))
-	((and j (not k))
-	 (@ (at-uchar-2 self i j) :uchar))
-	(t
-	 (@ (at-uchar-1 self i) :uchar))))
 
 
 (defun (setf at-uchar) (val self &optional i j k)
+
+  (cond  
+    (k 
+     (let ((temp (foreign-funcall "cv_Mat_at_uchar_3" 
+				  :pointer (c-pointer self) :int i :int j :int k 
+				  :pointer)))
+       (setf (mem-aref temp :uchar) val)))
+
+    ((and j (not k))
+     (let ((temp (foreign-funcall "cv_Mat_at_uchar_2" 
+				  :pointer (c-pointer self) :int i :int j 
+				  :pointer)))
+       (setf (mem-aref temp :uchar) val)))
+
+    (t
+     (let ((temp (foreign-funcall "cv_Mat_at_uchar_1" 
+				  :pointer (c-pointer self) :int (or i 0)
+				  :pointer)))
+       (setf (mem-aref temp :uchar) val)))))
+
+
+
+(defun at-ushort (self &optional i j k)
+
   (cond (k 
-	 (setf (@ (at-uchar-3 self i j k) :uchar) val))
+	 (mem-aref (foreign-funcall "cv_Mat_at_ushort_3" 
+				    :pointer (c-pointer self) :int i :int j :int k 
+				    :pointer) :ushort))
+
 	((and j (not k))
-	 (setf (@ (at-uchar-2 self i j) :uchar) val))
+	 (mem-aref (foreign-funcall "cv_Mat_at_ushort_2" 
+				    :pointer (c-pointer self) :int i :int j 
+				    :pointer) :ushort))
 	(t
-	 (setf (@ (at-uchar-1 self i) :uchar) val))))
+	 (mem-aref (foreign-funcall "cv_Mat_at_ushort_1" 
+				    :pointer (c-pointer self) :int (or i 0)
+				    :pointer) :ushort))))
 
-
-;; template<typename T> T& Mat::at(int i) const
-;; ushort cv_Mat_at_ushort_1(Mat* self, int i)
-(defcfun ("cv_Mat_at_ushort_1" at-ushort-1) :pointer
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int))
-
-
-;; template<typename T> T& Mat::at(int i, int j)
-;; ushort cv_Mat_at_ushort_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_ushort_2" at-ushort-2) :pointer
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)
-  (j :int))
-
-
-;; template<typename T> T& Mat::at(int i, int j, int k)
-;; ushort &cv_Mat_at_ushort_3(Mat* self, int i, int j, int k)
-(defcfun ("cv_Mat_at_ushort_3" at-ushort-3) :pointer
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)
-  (j :int)
-  (k :int))
-
-
-(defun at-ushort (self i &optional j k)
-  (cond (k 
-	 (@ (at-ushort-3 self i j k) :ushort))
-	((and j (not k))
-	 (@ (at-ushort-2 self i j) :ushort))
-	(t
-	 (@ (at-ushort-1 self i) :ushort))))
 
 
 (defun (setf at-ushort) (val self &optional i j k)
-  (cond (k 
-	 (setf (@ (at-ushort-3 self i j k) :ushort) val))
-	((and j (not k))
-	 (setf (@ (at-ushort-2 self i j) :ushort) val))
-	(t
-	 (setf (@ (at-ushort-1 self i) :ushort) val))))
+
+  (cond  
+    (k 
+     (let ((temp (foreign-funcall "cv_Mat_at_ushort_3" 
+				  :pointer (c-pointer self) :int i :int j :int k 
+				  :pointer)))
+       (setf (mem-aref temp :ushort) val)))
+
+    ((and j (not k))
+     (let ((temp (foreign-funcall "cv_Mat_at_ushort_2" 
+				  :pointer (c-pointer self) :int i :int j 
+				  :pointer)))
+       (setf (mem-aref temp :ushort) val)))
+
+    (t
+     (let ((temp (foreign-funcall "cv_Mat_at_ushort_1" 
+				  :pointer (c-pointer self) :int (or i 0)
+				  :pointer)))
+       (setf (mem-aref temp :ushort) val)))))
 
 
-;; template<typename T> T& Mat::at(int i, int j)
-;; Scalar* cv_Mat_at_Scalar(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Scalar" at-scalar) scalar
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)
-  (j :int))
 
-
-;; void cv_Mat_at_Scalar_set_Val(Mat* self, int i, int j, Scalar* val)
-(defcfun ("cv_Mat_at_Scalar_set_Val" at-scalar-set-val) scalar
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (j :int)
-  (val scalar))
-
-
-(defun (setf at-scalar) (val self i j)
-  (at-scalar-set-val self i j val))
-
-
-;; template<typename T> T& Mat::at(int i)
-;; Point* cv_Mat_at_Point_1(Mat* self, int i)
-(defcfun ("cv_Mat_at_Point_1" at-point-1) point
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int))
-
-
-;; template<typename T> T& Mat::at(int i, int j)
-;; Point* cv_Mat_at_Point_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Point_2" at-point-2) point
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)
-  (j :int))
-
-
-;; void cv_Mat_at_Point_set_Val_1(Mat* self, int i, Point* val)
-(defcfun ("cv_Mat_at_Point_set_Val_1" at-point-set-val-1) point
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (val point))
-
-
-;; void cv_Mat_at_Point_set_Val_2(Mat* self, int i, int j, Point* val)
-(defcfun ("cv_Mat_at_Point_set_Val_2" at-point-set-val-2) point
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (j :int)
-  (val point))
-
-
-(defun at-point (self i &optional j)
+(defun at-point (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
   (cond (j 
-	 (at-point-2 self i j))
+	 (foreign-funcall "cv_Mat_at_Point_2" :pointer (c-pointer self) 
+			  :int i :int j point))
 	(t 
-	 (at-point-1 self i))))
+	 (foreign-funcall "cv_Mat_at_Point_1" :pointer (c-pointer self) 
+			  :int (or i 0) point))))
 
 
-(defun (setf at-point) (val self i &optional j)
+(defun (setf at-point) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-point) nil (error "The value ~a is not of type CV-POINT." val))
   (cond (j 
-	 (at-point-set-val-2 self i j val))
+	 (foreign-funcall "cv_Mat_at_Point_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) point))
 	(t 
-	 (at-point-set-val-1 self i val))))
+	 (foreign-funcall "cv_Mat_at_Point_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) point))))
 
 
-;; template<typename T> T& Mat::at(int i)
-;; Point2d* cv_Mat_at_Point2d_1(Mat* self, int i)
-(defcfun ("cv_Mat_at_Point2d_1" at-point-2d-1) point-2d
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int))
-
-
-;; template<typename T> T& Mat::at(int i, int j)
-;; Point2d* cv_Mat_at_Point2d_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Point2d_2" at-point-2d-2) point-2d
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)
-  (j :int))
-
-
-;; void cv_Mat_at_Point2d_set_Val_1(Mat* self, int i, Point2d* val)
-(defcfun ("cv_Mat_at_Point2d_set_Val_1" at-point-2d-set-val-1) point-2d
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (val point-2d))
-
-
-;; void cv_Mat_at_Point2d_set_Val_2(Mat* self, int i, int j, Point2d* val)
-(defcfun ("cv_Mat_at_Point2d_set_Val_2" at-point-2d-set-val-2) point-2d
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (j :int)
-  (val point-2d))
-
-
-(defun at-point-2d (self i &optional j)
+(defun at-point-2d (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
   (cond (j 
-	 (at-point-2d-2 self i j))
+	 (foreign-funcall "cv_Mat_at_Point2d_2" :pointer (c-pointer self) 
+			  :int i :int j point-2d))
 	(t 
-	 (at-point-2d-1 self i))))
+	 (foreign-funcall "cv_Mat_at_Point2d_1" :pointer (c-pointer self) 
+			  :int (or i 0) point-2d))))
 
 
-(defun (setf at-point-2d) (val self i &optional j)
+(defun (setf at-point-2d) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-point-2d) nil (error "The value ~a is not of type CV-POINT-2D." val))
   (cond (j 
-	 (at-point-2d-set-val-2 self i j val))
+	 (foreign-funcall "cv_Mat_at_Point2d_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) point-2d))
 	(t 
-	 (at-point-2d-set-val-1 self i val))))
+	 (foreign-funcall "cv_Mat_at_Point2d_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) point-2d))))
 
 
-;; template<typename T> T& Mat::at(int i)
-;; Point2f* cv_Mat_at_Point2f_1(Mat* self, int i)
-(defcfun ("cv_Mat_at_Point2f_1" at-point-2f-1) point-2f
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int))
-
-
-;; template<typename T> T& Mat::at(int i, int j)
-;; Point2f* cv_Mat_at_Point2f_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Point2f_2" at-point-2f-2) point-2f
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)
-  (j :int))
-
-
-;; void cv_Mat_at_Point2f_set_Val_1(Mat* self, int i, Point2f* val)
-(defcfun ("cv_Mat_at_Point2f_set_Val_1" at-point-2f-set-val-1) point-2f
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (val point-2f))
-
-
-;; void cv_Mat_at_Point2f_set_Val_2(Mat* self, int i, int j, Point2f* val)
-(defcfun ("cv_Mat_at_Point2f_set_Val_2" at-point-2f-set-val-2) point-2f
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (j :int)
-  (val point-2f))
-
-
-(defun at-point-2f (self i &optional j)
+(defun at-point-2f (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
   (cond (j 
-	 (at-point-2f-2 self i j))
+	 (foreign-funcall "cv_Mat_at_Point2f_2" :pointer (c-pointer self) 
+			  :int i :int j point-2f))
 	(t 
-	 (at-point-2f-1 self i))))
+	 (foreign-funcall "cv_Mat_at_Point2f_1" :pointer (c-pointer self) 
+			  :int (or i 0) point-2f))))
 
 
-(defun (setf at-point-2f) (val self i &optional j)
+(defun (setf at-point-2f) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-point-2f) nil (error "The value ~a is not of type CV-POINT-2F." val))
   (cond (j 
-	 (at-point-2f-set-val-2 self i j val))
+	 (foreign-funcall "cv_Mat_at_Point2f_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) point-2f))
 	(t 
-	 (at-point-2f-set-val-1 self i val))))
+	 (foreign-funcall "cv_Mat_at_Point2f_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) point-2f))))
 
 
-;; template<typename T> T& Mat::at(int i)
-;; Point3d* cv_Mat_at_Point3d_1(Mat* self, int i)
-(defcfun ("cv_Mat_at_Point3d_1" at-point-3d-1) point-3d
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int))
-
-
-;; template<typename T> T& Mat::at(int i, int j)
-;; Point3d* cv_Mat_at_Point3d_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Point3d_2" at-point-3d-2) point-3d
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)
-  (j :int))
-
-
-;; void cv_Mat_at_Point3d_set_Val_1(Mat* self, int i, Point3d* val)
-(defcfun ("cv_Mat_at_Point3d_set_Val_1" at-point-3d-set-val-1) point-3d
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (val point-3d))
-
-
-;; void cv_Mat_at_Point3d_set_Val_2(Mat* self, int i, int j, Point3d* val)
-(defcfun ("cv_Mat_at_Point3d_set_Val_2" at-point-3d-set-val-2) point-3d
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (j :int)
-  (val point-3d))
-
-
-(defun at-point-3d (self i &optional j)
+(defun at-point-3d (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
   (cond (j 
-	 (at-point-3d-2 self i j))
+	 (foreign-funcall "cv_Mat_at_Point3d_2" :pointer (c-pointer self) 
+			  :int i :int j point-3d))
 	(t 
-	 (at-point-3d-1 self i))))
+	 (foreign-funcall "cv_Mat_at_Point3d_1" :pointer (c-pointer self) 
+			  :int (or i 0) point-3d))))
 
 
-(defun (setf at-point-3d) (val self i &optional j)
+(defun (setf at-point-3d) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-point-3d) nil (error "The value ~a is not of type CV-POINT-3D." val))
   (cond (j 
-	 (at-point-3d-set-val-2 self i j val))
+	 (foreign-funcall "cv_Mat_at_Point3d_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) point-3d))
 	(t 
-	 (at-point-3d-set-val-1 self i val))))
+	 (foreign-funcall "cv_Mat_at_Point3d_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) point-3d))))
 
 
-;; template<typename T> T& Mat::at(int i)
-;; Point3f* cv_Mat_at_Point3f_1(Mat* self, int i)
-(defcfun ("cv_Mat_at_Point3f_1" at-point-3f-1) point-3f
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int))
-
-
-;; template<typename T> T& Mat::at(int i, int j)
-;; Point3f* cv_Mat_at_Point3f_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Point3f_2" at-point-3f-2) point-3f
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)
-  (j :int))
-
-
-;; void cv_Mat_at_Point3f_set_Val_1(Mat* self, int i, Point3f* val)
-(defcfun ("cv_Mat_at_Point3f_set_Val_1" at-point-3f-set-val-1) point-3f
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (val point-3f))
-
-
-;; void cv_Mat_at_Point3f_set_Val_2(Mat* self, int i, int j, Point3f* val)
-(defcfun ("cv_Mat_at_Point3f_set_Val_2" at-point-3f-set-val-2) point-3f
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (j :int)
-  (val point-3f))
-
-
-(defun at-point-3f (self i &optional j)
+(defun at-point-3f (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
   (cond (j 
-	 (at-point-3f-2 self i j))
+	 (foreign-funcall "cv_Mat_at_Point3f_2" :pointer (c-pointer self) 
+			  :int i :int j point-3f))
 	(t 
-	 (at-point-3f-1 self i))))
+	 (foreign-funcall "cv_Mat_at_Point3f_1" :pointer (c-pointer self) 
+			  :int (or i 0) point-3f))))
 
 
-(defun (setf at-point-3f) (val self i &optional j)
+(defun (setf at-point-3f) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-point-3f) nil (error "The value ~a is not of type CV-POINT-3F." val))
   (cond (j 
-	 (at-point-3f-set-val-2 self i j val))
+	 (foreign-funcall "cv_Mat_at_Point3f_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) point-3f))
 	(t 
-	 (at-point-3f-set-val-1 self i val))))
+	 (foreign-funcall "cv_Mat_at_Point3f_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) point-3f))))
 
 
-;; template<typename T> T& Mat::at(int i)
-;; Point3i* cv_Mat_at_Point3i_1(Mat* self, int i)
-(defcfun ("cv_Mat_at_Point3i_1" at-point-3i-1) point-3i
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int))
-
-
-;; template<typename T> T& Mat::at(int i, int j)
-;; Point3i* cv_Mat_at_Point3i_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Point3i_2" at-point-3i-2) point-3i
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)
-  (j :int))
-
-
-;; void cv_Mat_at_Point3i_set_Val_1(Mat* self, int i, Point3i* val)
-(defcfun ("cv_Mat_at_Point3i_set_Val_1" at-point-3i-set-val-1) point-3i
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (val point-3i))
-
-
-;; void cv_Mat_at_Point3i_set_Val_2(Mat* self, int i, int j, Point3i* val)
-(defcfun ("cv_Mat_at_Point3i_set_Val_2" at-point-3i-set-val-2) point-3i
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (j :int)
-  (val point-3i))
-
-
-(defun at-point-3i (self i &optional j)
+(defun at-point-3i (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
   (cond (j 
-	 (at-point-3i-2 self i j))
+	 (foreign-funcall "cv_Mat_at_Point3i_2" :pointer (c-pointer self) 
+			  :int i :int j point-3i))
 	(t 
-	 (at-point-3i-1 self i))))
+	 (foreign-funcall "cv_Mat_at_Point3i_1" :pointer (c-pointer self) 
+			  :int (or i 0) point-3i))))
 
 
-(defun (setf at-point-3i) (val self i &optional j)
+(defun (setf at-point-3i) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-point-3i) nil (error "The value ~a is not of type CV-POINT-3I." val))
   (cond (j 
-	 (at-point-3i-set-val-2 self i j val))
+	 (foreign-funcall "cv_Mat_at_Point3i_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) point-3i))
 	(t 
-	 (at-point-3i-set-val-1 self i val))))
-
-
-;; template<typename T> T& Mat::at(int i)
-;; Vec2b* cv_Mat_at_Vec2b_1(Mat* self, int i)
-(defcfun ("cv_Mat_at_Vec2b_1" at-vec-2b-1) vec-2b
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int))
-
-
-;; void cv_Mat_at_Vec2b_set_Val_1(Mat* self, int i, Vec2b* val)
-(defcfun ("cv_Mat_at_Vec2b_set_Val_1" at-vec-2b-set-val-1) vec-2b
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (val vec-2b))
-
-
-;; template<typename T> T& Mat::at(int i, int j)
-;; Vec2b* cv_Mat_at_Vec2b_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Vec2b_2" at-vec-2b-2) vec-2b
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)
-  (j :int))
-
-
-;; void cv_Mat_at_Vec2b_set_Val_2(Mat* self, int i, int j, Vec2b* val)
-(defcfun ("cv_Mat_at_Vec2b_set_Val_2" at-vec-2b-set-val-2) vec-2b
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (j :int)
-  (val vec-2b))
-
-
-(defun at-vec-2b (self i &optional j)
-  (if j
-      (at-vec-2b-2 self i j)
-      (at-vec-2b-1 self i)))
-
-
-(defun (setf at-vec-2b) (val self i &optional j)
-  (if j
-      (at-vec-2b-set-val-2 self i j val)
-      (at-vec-2b-set-val-1 self i val)))
-
-
-;; template<typename T> T& Mat::at(int i)
-;; Vec2d* cv_Mat_at_Vec2d_1(Mat* self, int i)
-(defcfun ("cv_Mat_at_Vec2d_1" at-vec-2d-1) vec-2d
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int))
-
-
-;; void cv_Mat_at_Vec2d_set_Val_1(Mat* self, int i, Vec2d* val)
-(defcfun ("cv_Mat_at_Vec2d_set_Val_1" at-vec-2d-set-val-1) vec-2d
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (val vec-2d))
-
-
-;; template<typename T> T& Mat::at(int i, int j)
-;; Vec2d cv_Mat_at_Vec2d_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Vec2d_2" at-vec-2d-2) vec-2d
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)
-  (j :int))
-
-
-;; void cv_Mat_at_Vec2d_set_Val_2(Mat* self, int i, int j, Vec2d* val)
-(defcfun ("cv_Mat_at_Vec2d_set_Val_2" at-vec-2d-set-val-2) vec-2d
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (j :int)
-  (val vec-2d))
-
-
-(defun at-vec-2d (self i &optional j)
-  (if j
-      (at-vec-2d-2 self i j)
-      (at-vec-2d-1 self i)))
-
-
-(defun (setf at-vec-2d) (val self i &optional j)
-  (if j
-      (at-vec-2d-set-val-2 self i j val)
-      (at-vec-2d-set-val-1 self i val)))
-
-
-;; template<typename T> T& Mat::at(int i)
-;; Vec2f* cv_Mat_at_Vec2f_1(Mat* self, int i)
-(defcfun ("cv_Mat_at_Vec2f_1" at-vec-2f-1) vec-2f
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int))
-
-
-;; void cv_Mat_at_Vec2f_set_Val_1(Mat* self, int i, Vec2f* val)
-(defcfun ("cv_Mat_at_Vec2f_set_Val_1" at-vec-2f-set-val-1) vec-2f
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (val vec-2f))
-
-
-;; template<typename T> T& Mat::at(int i, int j)
-;; Vec2f* cv_Mat_at_Vec2f_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Vec2f_2" at-vec-2f-2) vec-2f
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)
-  (j :int))
-
-
-;; void cv_Mat_at_Vec2f_set_Val_2(Mat* self, int i, int j, Vec2f* val)
-(defcfun ("cv_Mat_at_Vec2f_set_Val_2" at-vec-2f-set-val-2) vec-2f
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (j :int)
-  (val vec-2f))
-
-
-(defun at-vec-2f (self i &optional j)
-  (if j
-      (at-vec-2f-2 self i j)
-      (at-vec-2f-1 self i)))
-
-
-(defun (setf at-vec-2f) (val self i &optional j)
-  (if j
-      (at-vec-2f-set-val-2 self i j val)
-      (at-vec-2f-set-val-1 self i val)))
-
-
-;; template<typename T> T& Mat::at(int i)
-;; Vec2i* cv_Mat_at_Vec2i_1(Mat* self, int i)
-(defcfun ("cv_Mat_at_Vec2i_1" at-vec-2i-1) vec-2i
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int))
-
-
-;; void cv_Mat_at_Vec2i_set_Val_1(Mat* self, int i, Vec2i* val)
-(defcfun ("cv_Mat_at_Vec2i_set_Val_1" at-vec-2i-set-val-1) vec-2i
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (val vec-2i))
-
-
-;; template<typename T> T& Mat::at(int i, int j)
-;; Vec2i* cv_Mat_at_Vec2i_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Vec2i_2" at-vec-2i-2) vec-2i
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)
-  (j :int))
-
-
-;; void cv_Mat_at_Vec2i_set_Val_2(Mat* self, int i, int j, Vec2i* val)
-(defcfun ("cv_Mat_at_Vec2i_set_Val_2" at-vec-2i-set-val-2) vec-2i
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (j :int)
-  (val vec-2i))
-
-
-(defun at-vec-2i (self i &optional j)
-  (if j
-      (at-vec-2i-2 self i j)
-      (at-vec-2i-1 self i)))
-
-
-(defun (setf at-vec-2i) (val self i &optional j)
-  (if j
-      (at-vec-2i-set-val-2 self i j val)
-      (at-vec-2i-set-val-1 self i val)))
-
-
-;; template<typename T> T& Mat::at(int i)
-;; Vec2s* cv_Mat_at_Vec2s_1(Mat* self, int i)
-(defcfun ("cv_Mat_at_Vec2s_1" at-vec-2s-1) vec-2s
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int))
-
-
-;; void cv_Mat_at_Vec2s_set_Val_1(Mat* self, int i, Vec2s* val)
-(defcfun ("cv_Mat_at_Vec2s_set_Val_1" at-vec-2s-set-val-1) vec-2s
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (val vec-2s))
-
-
-;; template<typename T> T& Mat::at(int i, int j)
-;; Vec2s* cv_Mat_at_Vec2s_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Vec2s_2" at-vec-2s-2) vec-2s
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)
-  (j :int))
-
-
-;; void cv_Mat_at_Vec2s_set_Val_2(Mat* self, int i, int j, Vec2s* val)
-(defcfun ("cv_Mat_at_Vec2s_set_Val_2" at-vec-2s-set-val-2) vec-2s
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (j :int)
-  (val vec-2s))
-
-
-(defun at-vec-2s (self i &optional j)
-  (if j
-      (at-vec-2s-2 self i j)
-      (at-vec-2s-1 self i)))
-
-
-(defun (setf at-vec-2s) (val self i &optional j)
-  (if j
-      (at-vec-2s-set-val-2 self i j val)
-      (at-vec-2s-set-val-1 self i val)))
-
-
-;; template<typename T> T& Mat::at(int i)
-;; Vec2w* cv_Mat_at_Vec2w_1(Mat* self, int i)
-(defcfun ("cv_Mat_at_Vec2w_1" at-vec-2w-1) vec-2w
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int))
-
-
-;; void cv_Mat_at_Vec2w_set_Val_1(Mat* self, int i, Vec2w* val)
-(defcfun ("cv_Mat_at_Vec2w_set_Val_1" at-vec-2w-set-val-1) vec-2w
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (val vec-2w))
-
-
-;; template<typename T> T& Mat::at(int i, int j)
-;; Vec2w* cv_Mat_at_Vec2w_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Vec2w_2" at-vec-2w-2) vec-2w
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)
-  (j :int))
-
-
-;; void cv_Mat_at_Vec2w_set_Val_2(Mat* self, int i, int j, Vec2w* val)
-(defcfun ("cv_Mat_at_Vec2w_set_Val_2" at-vec-2w-set-val-2) vec-2w
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (j :int)
-  (val vec-2w))
-
-
-(defun at-vec-2w (self i &optional j)
-  (if j
-      (at-vec-2w-2 self i j)
-      (at-vec-2w-1 self i)))
-
-
-(defun (setf at-vec-2w) (val self i &optional j)
-  (if j
-      (at-vec-2w-set-val-2 self i j val)
-      (at-vec-2w-set-val-1 self i val)))
-
-
-;; template<typename T> T& Mat::at(int i)
-;; Vec3b* cv_Mat_at_Vec3b_1(Mat* self, int i)
-(defcfun ("cv_Mat_at_Vec3b_1" at-vec-3b-1) vec-3b
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int))
-
-
-;; void cv_Mat_at_Vec3b_set_Val_1(Mat* self, int i, Vec3b* val)
-(defcfun ("cv_Mat_at_Vec3b_set_Val_1" at-vec-3b-set-val-1) vec-3b
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (val vec-3b))
-
-
-;; template<typename T> T& Mat::at(int i, int j)
-;; Vec3b* cv_Mat_at_Vec3b_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Vec3b_2" at-vec-3b-2) vec-3b
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)
-  (j :int))
-
-
-;; void cv_Mat_at_Vec3b_set_Val_2(Mat* self, int i, int j, Vec3b* val)
-(defcfun ("cv_Mat_at_Vec3b_set_Val_2" at-vec-3b-set-val-2) vec-3b
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (j :int)
-  (val vec-3b))
-
-
-(defun at-vec-3b (self i &optional j)
-  (if j
-      (at-vec-3b-2 self i j)
-      (at-vec-3b-1 self i)))
-
-
-(defun (setf at-vec-3b) (val self i &optional j)
-  (if j
-      (at-vec-3b-set-val-2 self i j val)
-      (at-vec-3b-set-val-1 self i val)))
-
-
-;; template<typename T> T& Mat::at(int i)
-;; Vec3d* cv_Mat_at_Vec3d_1(Mat* self, int i)
-(defcfun ("cv_Mat_at_Vec3d_1" at-vec-3d-1) vec-3d
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int))
-
-
-;; void cv_Mat_at_Vec3d_set_Val_1(Mat* self, int i, Vec3d* val)
-(defcfun ("cv_Mat_at_Vec3d_set_Val_1" at-vec-3d-set-val-1) vec-3d
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (val vec-3d))
-
-
-;; template<typename T> T& Mat::at(int i, int j)
-;; Vec3d* cv_Mat_at_Vec3d_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Vec3d_2" at-vec-3d-2) vec-3d
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)
-  (j :int))
-
-
-;; void cv_Mat_at_Vec3d_set_Val_2(Mat* self, int i, int j, Vec3d* val)
-(defcfun ("cv_Mat_at_Vec3d_set_Val_2" at-vec-3d-set-val-2) vec-3d
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (j :int)
-  (val vec-3d))
-
-
-(defun at-vec-3d (self i &optional j)
-  (if j
-      (at-vec-3d-2 self i j)
-      (at-vec-3d-1 self i)))
-
-
-(defun (setf at-vec-3d) (val self i &optional j)
-  (if j
-      (at-vec-3d-set-val-2 self i j val)
-      (at-vec-3d-set-val-1 self i val)))
-
-
-;; template<typename T> T& Mat::at(int i)
-;; Vec3f* cv_Mat_at_Vec3f_1(Mat* self, int i)
-(defcfun ("cv_Mat_at_Vec3f_1" at-vec-3f-1) vec-3f
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int))
-
-
-;; void cv_Mat_at_Vec3f_set_Val_1(Mat* self, int i, Vec3f* val)
-(defcfun ("cv_Mat_at_Vec3f_set_Val_1" at-vec-3f-set-val-1) vec-3f
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (val vec-3f))
-
-
-;; template<typename T> T& Mat::at(int i, int j)
-;; Vec3f* cv_Mat_at_Vec3f_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Vec3f_2" at-vec-3f-2) vec-3f
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)
-  (j :int))
-
-
-;; void cv_Mat_at_Vec3f_set_Val_2(Mat* self, int i, int j, Vec3f* val)
-(defcfun ("cv_Mat_at_Vec3f_set_Val_2" at-vec-3f-set-val-2) vec-3f
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (j :int)
-  (val vec-3f))
-
-
-(defun at-vec-3f (self i &optional j)
-  (if j
-      (at-vec-3f-2 self i j)
-      (at-vec-3f-1 self i)))
-
-
-(defun (setf at-vec-3f) (val self i &optional j)
-  (if j
-      (at-vec-3f-set-val-2 self i j val)
-      (at-vec-3f-set-val-1 self i val)))
-
-
-;; template<typename T> T& Mat::at(int i)
-;; Vec3i* cv_Mat_at_Vec3i_1(Mat* self, int i)
-(defcfun ("cv_Mat_at_Vec3i_1" at-vec-3i-1) vec-3i
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int))
-
-
-;; void cv_Mat_at_Vec3i_set_Val_1(Mat* self, int i, Vec3i* val)
-(defcfun ("cv_Mat_at_Vec3i_set_Val_1" at-vec-3i-set-val-1) vec-3i
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (val vec-3i))
-
-
-;; template<typename T> T& Mat::at(int i, int j)
-;; Vec3i* cv_Mat_at_Vec3i_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Vec3i_2" at-vec-3i-2) vec-3i
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)
-  (j :int))
-
-
-;; void cv_Mat_at_Vec3i_set_Val_2(Mat* self, int i, int j, Vec3i* val)
-(defcfun ("cv_Mat_at_Vec3i_set_Val_2" at-vec-3i-set-val-2) vec-3i
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (j :int)
-  (val vec-3i))
-
-
-(defun at-vec-3i (self i &optional j)
-  (if j
-      (at-vec-3i-2 self i j)
-      (at-vec-3i-1 self i)))
-
-
-(defun (setf at-vec-3i) (val self i &optional j)
-  (if j
-      (at-vec-3i-set-val-2 self i j val)
-      (at-vec-3i-set-val-1 self i val)))
-
-
-;; template<typename T> T& Mat::at(int i)
-;; Vec3s* cv_Mat_at_Vec3s_1(Mat* self, int i)
-(defcfun ("cv_Mat_at_Vec3s_1" at-vec-3s-1) vec-3s
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int))
-
-
-;; void cv_Mat_at_Vec3s_set_Val_1(Mat* self, int i, Vec3s* val)
-(defcfun ("cv_Mat_at_Vec3s_set_Val_1" at-vec-3s-set-val-1) vec-3s
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (val vec-3s))
-
-
-;; template<typename T> T& Mat::at(int i, int j)
-;; Vec3s* cv_Mat_at_Vec3s_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Vec3s_2" at-vec-3s-2) vec-3s
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)
-  (j :int))
-
-
-;; void cv_Mat_at_Vec3s_set_Val_2(Mat* self, int i, int j, Vec3s* val)
-(defcfun ("cv_Mat_at_Vec3s_set_Val_2" at-vec-3s-set-val-2) vec-3s
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (j :int)
-  (val vec-3s))
-
-
-(defun at-vec-3s (self i &optional j)
-  (if j
-      (at-vec-3s-2 self i j)
-      (at-vec-3s-1 self i)))
-
-
-(defun (setf at-vec-3s) (val self i &optional j)
-  (if j
-      (at-vec-3s-set-val-2 self i j val)
-      (at-vec-3s-set-val-1 self i val)))
-
-
-;; template<typename T> T& Mat::at(int i)
-;; Vec3w* cv_Mat_at_Vec3w_1(Mat* self, int i)
-(defcfun ("cv_Mat_at_Vec3w_1" at-vec-3w-1) vec-3w
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int))
-
-
-;; void cv_Mat_at_Vec3w_set_Val_1(Mat* self, int i, Vec3w* val)
-(defcfun ("cv_Mat_at_Vec3w_set_Val_1" at-vec-3w-set-val-1) vec-3w
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (val vec-3w))
-
-
-;; template<typename T> T& Mat::at(int i, int j)
-;; Vec3w* cv_Mat_at_Vec3w_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Vec3w_2" at-vec-3w-2) vec-3w
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)
-  (j :int))
-
-
-;; void cv_Mat_at_Vec3w_set_Val_2(Mat* self, int i, int j, Vec3w* val)
-(defcfun ("cv_Mat_at_Vec3w_set_Val_2" at-vec-3w-set-val-2) vec-3w
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (j :int)
-  (val vec-3w))
-
-
-(defun at-vec-3w (self i &optional j)
-  (if j
-      (at-vec-3w-2 self i j)
-      (at-vec-3w-1 self i)))
-
-
-(defun (setf at-vec-3w) (val self i &optional j)
-  (if j
-      (at-vec-3w-set-val-2 self i j val)
-      (at-vec-3w-set-val-1 self i val)))
-
-
-;; template<typename T> T& Mat::at(int i)
-;; Vec4b* cv_Mat_at_Vec4b_1(Mat* self, int i)
-(defcfun ("cv_Mat_at_Vec4b_1" at-vec-4b-1) vec-4b
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int))
-
-
-;; void cv_Mat_at_Vec4b_set_Val_1(Mat* self, int i, Vec4b* val)
-(defcfun ("cv_Mat_at_Vec4b_set_Val_1" at-vec-4b-set-val-1) vec-4b
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (val vec-4b))
-
-
-;; template<typename T> T& Mat::at(int i, int j)
-;; Vec4b* cv_Mat_at_Vec4b_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Vec4b_2" at-vec-4b-2) vec-4b
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)
-  (j :int))
-
-
-;; void cv_Mat_at_Vec4b_set_Val_2(Mat* self, int i, int j, Vec4b* val)
-(defcfun ("cv_Mat_at_Vec4b_set_Val_2" at-vec-4b-set-val-2) vec-4b
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (j :int)
-  (val vec-4b))
-
-
-(defun at-vec-4b (self i &optional j)
-  (if j
-      (at-vec-4b-2 self i j)
-      (at-vec-4b-1 self i)))
-
-
-(defun (setf at-vec-4b) (val self i &optional j)
-  (if j
-      (at-vec-4b-set-val-2 self i j val)
-      (at-vec-4b-set-val-1 self i val)))
-
-
-;; template<typename T> T& Mat::at(int i)
-;; Vec4d* cv_Mat_at_Vec4d_1(Mat* self, int i)
-(defcfun ("cv_Mat_at_Vec4d_1" at-vec-4d-1) vec-4d
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int))
-
-
-;; void cv_Mat_at_Vec4d_set_Val_1(Mat* self, int i, Vec4d* val)
-(defcfun ("cv_Mat_at_Vec4d_set_Val_1" at-vec-4d-set-val-1) vec-4d
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (val vec-4d))
-
-
-;; template<typename T> T& Mat::at(int i, int j)
-;; Vec4d* cv_Mat_at_Vec4d_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Vec4d_2" at-vec-4d-2) vec-4d
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)
-  (j :int))
-
-
-;; void cv_Mat_at_Vec4d_set_Val_2(Mat* self, int i, int j, Vec4d* val)
-(defcfun ("cv_Mat_at_Vec4d_set_Val_2" at-vec-4d-set-val-2) vec-4d
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (j :int)
-  (val vec-4d))
-
-
-(defun at-vec-4d (self i &optional j)
-  (if j
-      (at-vec-4d-2 self i j)
-      (at-vec-4d-1 self i)))
-
-
-(defun (setf at-vec-4d) (val self i &optional j)
-  (if j
-      (at-vec-4d-set-val-2 self i j val)
-      (at-vec-4d-set-val-1 self i val)))
-
-
-;; template<typename T> T& Mat::at(int i)
-;; Vec4f* cv_Mat_at_Vec4f_1(Mat* self, int i)
-(defcfun ("cv_Mat_at_Vec4f_1" at-vec-4f-1) vec-4f
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int))
-
-
-;; void cv_Mat_at_Vec4f_set_Val_1(Mat* self, int i, Vec4f* val)
-(defcfun ("cv_Mat_at_Vec4f_set_Val_1" at-vec-4f-set-val-1) vec-4f
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (val vec-4f))
-
-
-;; template<typename T> T& Mat::at(int i, int j)
-;; Vec4f* cv_Mat_at_Vec4f_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Vec4f_2" at-vec-4f-2) vec-4f
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)
-  (j :int))
-
-
-;; void cv_Mat_at_Vec4f_set_Val_2(Mat* self, int i, int j, Vec4f* val)
-(defcfun ("cv_Mat_at_Vec4f_set_Val_2" at-vec-4f-set-val-2) vec-4f
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (j :int)
-  (val vec-4f))
-
-
-(defun at-vec-4f (self i &optional j)
-  (if j
-      (at-vec-4f-2 self i j)
-      (at-vec-4f-1 self i)))
-
-
-(defun (setf at-vec-4f) (val self i &optional j)
-  (if j
-      (at-vec-4f-set-val-2 self i j val)
-      (at-vec-4f-set-val-1 self i val)))
-
-
-;; template<typename T> T& Mat::at(int i)
-;; Vec4i* cv_Mat_at_Vec4i_1(Mat* self, int i)
-(defcfun ("cv_Mat_at_Vec4i_1" at-vec-4i-1) vec-4i
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int))
-
-
-;; void cv_Mat_at_Vec4i_set_Val_1(Mat* self, int i, Vec4i* val)
-(defcfun ("cv_Mat_at_Vec4i_set_Val_1" at-vec-4i-set-val-1) vec-4i
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (val vec-4i))
-
-
-;; template<typename T> T& Mat::at(int i, int j)
-;; Vec4i cv_Mat_at_Vec4i_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Vec4i_2" at-vec-4i-2) vec-4i
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)
-  (j :int))
-
-
-;; void cv_Mat_at_Vec4i_set_Val_2(Mat* self, int i, int j, Vec4i* val)
-(defcfun ("cv_Mat_at_Vec4i_set_Val_2" at-vec-4i-set-val-2) vec-4i
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (j :int)
-  (val vec-4i))
-
-
-(defun at-vec-4i (self i &optional j)
-  (if j
-      (at-vec-4i-2 self i j)
-      (at-vec-4i-1 self i)))
-
-
-(defun (setf at-vec-4i) (val self i &optional j)
-  (if j
-      (at-vec-4i-set-val-2 self i j val)
-      (at-vec-4i-set-val-1 self i val)))
-
-
-;; template<typename T> T& Mat::at(int i)
-;; Vec4s* cv_Mat_at_Vec4s_1(Mat* self, int i)
-(defcfun ("cv_Mat_at_Vec4s_1" at-vec-4s-1) vec-4s
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)) 
-
-
-;; void cv_Mat_at_Vec4s_set_Val_1(Mat* self, int i, Vec4s* val)
-(defcfun ("cv_Mat_at_Vec4s_set_Val_1" at-vec-4s-set-val-1) vec-4s
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (val vec-4s))
-
-
-;; template<typename T> T& Mat::at(int i, int j)
-;; Vec4s cv_Mat_at_Vec4s_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Vec4s_2" at-vec-4s-2) vec-4s
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)
-  (j :int)) 
-
-
-;; void cv_Mat_at_Vec4s_set_Val_2(Mat* self, int i, int j, Vec4s* val)
-(defcfun ("cv_Mat_at_Vec4s_set_Val_2" at-vec-4s-set-val-2) vec-4s
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (j :int)
-  (val vec-4s))
-
-
-(defun at-vec-4s (self i &optional j)
-  (if j
-      (at-vec-4s-2 self i j)
-      (at-vec-4s-1 self i)))
-
-
-(defun (setf at-vec-4s) (val self i &optional j)
-  (if j
-      (at-vec-4s-set-val-2 self i j val)
-      (at-vec-4s-set-val-1 self i val)))
-
-
-;; template<typename T> T& Mat::at(int i)
-;; Vec4w* cv_Mat_at_Vec4w_1(Mat* self, int i)
-(defcfun ("cv_Mat_at_Vec4w_1" at-vec-4w-1) vec-4w
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)) 
-
-
-;; void cv_Mat_at_Vec4w_set_Val_1(Mat* self, int i, Vec4w* val)
-(defcfun ("cv_Mat_at_Vec4w_set_Val_1" at-vec-4w-set-val-1) vec-4w
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (val vec-4w))
-
-
-;; template<typename T> T& Mat::at(int i, int j)
-;; Vec4s cv_Mat_at_Vec4w_2(Mat* self, int i, int j)
-(defcfun ("cv_Mat_at_Vec4w_2" at-vec-4w-2) vec-4w
-  "Returns a reference to the specified matrix element."
-  (self mat)
-  (i :int)
-  (j :int)) 
-
-
-;; void cv_Mat_at_Vec4w_set_Val_2(Mat* self, int i, int j, Vec4w* val)
-(defcfun ("cv_Mat_at_Vec4w_set_Val_2" at-vec-4w-set-val-2) vec-4w
-  "Sets an matrix element."
-  (self mat)
-  (i :int)
-  (j :int)
-  (val vec-4w))
-
-
-(defun at-vec-4w (self i &optional j)
-  (if j
-      (at-vec-4w-2 self i j)
-      (at-vec-4w-1 self i)))
-
-
-(defun (setf at-vec-4w) (val self i &optional j)
-  (if j
-      (at-vec-4w-set-val-2 self i j val)
-      (at-vec-4w-set-val-1 self i val)))
+	 (foreign-funcall "cv_Mat_at_Point3i_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) point-3i))))
+
+
+(defun at-vec-2b (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec2b_2" :pointer (c-pointer self) 
+			  :int i :int j vec-2b))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec2b_1" :pointer (c-pointer self) 
+			  :int (or i 0) vec-2b))))
+
+
+(defun (setf at-vec-2b) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-vec-2b) nil (error "The value ~a is not of type CV-VEC-2B." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec2b_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) vec-2b))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec2b_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) vec-2b))))
+
+
+(defun at-vec-2d (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec2d_2" :pointer (c-pointer self) 
+			  :int i :int j vec-2d))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec2d_1" :pointer (c-pointer self) 
+			  :int (or i 0) vec-2d))))
+
+
+(defun (setf at-vec-2d) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-vec-2d) nil (error "The value ~a is not of type CV-VEC-2D." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec2d_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) vec-2d))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec2d_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) vec-2d))))
+
+
+(defun at-vec-2f (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec2f_2" :pointer (c-pointer self) 
+			  :int i :int j vec-2f))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec2f_1" :pointer (c-pointer self) 
+			  :int (or i 0) vec-2f))))
+
+
+(defun (setf at-vec-2f) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-vec-2f) nil (error "The value ~a is not of type CV-VEC-2F." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec2f_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) vec-2f))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec2f_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) vec-2f))))
+
+
+(defun at-vec-2i (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec2i_2" :pointer (c-pointer self) 
+			  :int i :int j vec-2i))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec2i_1" :pointer (c-pointer self) 
+			  :int (or i 0) vec-2i))))
+
+
+(defun (setf at-vec-2i) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-vec-2i) nil (error "The value ~a is not of type CV-VEC-2I." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec2i_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) vec-2i))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec2i_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) vec-2i))))
+
+
+(defun at-vec-2s (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec2s_2" :pointer (c-pointer self) 
+			  :int i :int j vec-2s))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec2s_1" :pointer (c-pointer self) 
+			  :int (or i 0) vec-2s))))
+
+
+(defun (setf at-vec-2s) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-vec-2s) nil (error "The value ~a is not of type CV-VEC-2S." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec2s_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) vec-2s))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec2s_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) vec-2s))))
+
+
+(defun at-vec-2w (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec2w_2" :pointer (c-pointer self) 
+			  :int i :int j vec-2w))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec2w_1" :pointer (c-pointer self) 
+			  :int (or i 0) vec-2w))))
+
+
+(defun (setf at-vec-2w) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-vec-2w) nil (error "The value ~a is not of type CV-VEC-2W." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec2w_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) vec-2w))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec2w_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) vec-2w))))
+
+
+(defun at-vec-3b (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec3b_2" :pointer (c-pointer self) 
+			  :int i :int j vec-3b))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec3b_1" :pointer (c-pointer self) 
+			  :int (or i 0) vec-3b))))
+
+
+(defun (setf at-vec-3b) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-vec-3b) nil (error "The value ~a is not of type CV-VEC-3B." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec3b_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) vec-3b))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec3b_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) vec-3b))))
+
+
+(defun at-vec-3d (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec3d_2" :pointer (c-pointer self) 
+			  :int i :int j vec-3d))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec3d_1" :pointer (c-pointer self) 
+			  :int (or i 0) vec-3d))))
+
+
+(defun (setf at-vec-3d) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-vec-3d) nil (error "The value ~a is not of type CV-VEC-3D." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec3d_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) vec-3d))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec3d_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) vec-3d))))
+
+
+(defun at-vec-3f (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec3f_2" :pointer (c-pointer self) 
+			  :int i :int j vec-3f))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec3f_1" :pointer (c-pointer self) 
+			  :int (or i 0) vec-3f))))
+
+
+(defun (setf at-vec-3f) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-vec-3f) nil (error "The value ~a is not of type CV-VEC-3F." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec3f_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) vec-3f))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec3f_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) vec-3f))))
+
+
+(defun at-vec-3i (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec3i_2" :pointer (c-pointer self) 
+			  :int i :int j vec-3i))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec3i_1" :pointer (c-pointer self) 
+			  :int (or i 0) vec-3i))))
+
+
+(defun (setf at-vec-3i) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-vec-3i) nil (error "The value ~a is not of type CV-VEC-3I." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec3i_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) vec-3i))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec3i_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) vec-3i))))
+
+
+(defun at-vec-3s (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec3s_2" :pointer (c-pointer self) 
+			  :int i :int j vec-3s))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec3s_1" :pointer (c-pointer self) 
+			  :int (or i 0) vec-3s))))
+
+
+(defun (setf at-vec-3s) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-vec-3s) nil (error "The value ~a is not of type CV-VEC-3S." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec3s_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) vec-3s))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec3s_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) vec-3s))))
+
+
+(defun at-vec-3w (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec3w_2" :pointer (c-pointer self) 
+			  :int i :int j vec-3w))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec3w_1" :pointer (c-pointer self) 
+			  :int (or i 0) vec-3w))))
+
+
+(defun (setf at-vec-3w) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-vec-3w) nil (error "The value ~a is not of type CV-VEC-3W." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec3w_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) vec-3w))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec3w_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) vec-3w))))
+
+
+(defun at-vec-4b (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec4b_2" :pointer (c-pointer self) 
+			  :int i :int j vec-4b))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec4b_1" :pointer (c-pointer self) 
+			  :int (or i 0) vec-4b))))
+
+
+(defun (setf at-vec-4b) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-vec-4b) nil (error "The value ~a is not of type CV-VEC-4B." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec4b_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) vec-4b))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec4b_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) vec-4b))))
+
+
+(defun at-vec-4d (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec4d_2" :pointer (c-pointer self) 
+			  :int i :int j vec-4d))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec4d_1" :pointer (c-pointer self) 
+			  :int (or i 0) vec-4d))))
+
+
+(defun (setf at-vec-4d) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-vec-4d) nil (error "The value ~a is not of type CV-VEC-4D." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec4d_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) vec-4d))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec4d_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) vec-4d))))
+
+
+(defun at-vec-4f (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec4f_2" :pointer (c-pointer self) 
+			  :int i :int j vec-4f))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec4f_1" :pointer (c-pointer self) 
+			  :int (or i 0) vec-4f))))
+
+
+(defun (setf at-vec-4f) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-vec-4f) nil (error "The value ~a is not of type CV-VEC-4F." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec4f_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) vec-4f))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec4f_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) vec-4f))))
+
+
+(defun at-vec-4i (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec4i_2" :pointer (c-pointer self) 
+			  :int i :int j vec-4i))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec4i_1" :pointer (c-pointer self) 
+			  :int (or i 0) vec-4i))))
+
+
+(defun (setf at-vec-4i) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-vec-4i) nil (error "The value ~a is not of type CV-VEC-4I." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec4i_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) vec-4i))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec4i_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) vec-4i))))
+
+
+(defun at-vec-4s (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec4s_2" :pointer (c-pointer self) 
+			  :int i :int j vec-4s))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec4s_1" :pointer (c-pointer self) 
+			  :int (or i 0) vec-4s))))
+
+
+(defun (setf at-vec-4s) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-vec-4s) nil (error "The value ~a is not of type CV-VEC-4S." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec4s_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) vec-4s))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec4s_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) vec-4s))))
+
+
+(defun at-vec-4w (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec4w_2" :pointer (c-pointer self) 
+			  :int i :int j vec-4w))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec4w_1" :pointer (c-pointer self) 
+			  :int (or i 0) vec-4w))))
+
+
+(defun (setf at-vec-4w) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-vec-4w) nil (error "The value ~a is not of type CV-VEC-4W." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec4w_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) vec-4w))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec4w_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) vec-4w))))
 
 
 ;; int cv_Mat_channels(Mat* self)

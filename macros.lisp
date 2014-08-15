@@ -68,6 +68,13 @@
   `(foreign-free ,ptr))
 
 
+;; FOREIGN-FUNCALL macro(not tested).
+
+
+(defmacro f-funcall (&rest args)
+  `(apply #'foreign-funcall ,args))
+
+
 ;; RUN
 
 ;; Macro to build and run executable(not implemented all the way yet)

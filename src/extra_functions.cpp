@@ -569,14 +569,6 @@ void cv_Mat_at_Point3i_set_Val_2(Mat* self, int i, int j, Point3i* val) {
   self->at<Point3i>(i, j) = *val;
 }
 
-Scalar* cv_Mat_at_Scalar(Mat* self, int i, int j) {
-  return &self->at<Scalar>(i, j);
-}
-
-void cv_Mat_at_Scalar_set_Val(Mat* self, int i, int j, Scalar* val) {
-  self->at<Scalar>(i, j) = *val;
-}
-
 char &cv_Mat_at_char_1(Mat* self, int i) {
   return self->at<char>(i);
 }

@@ -473,6 +473,8 @@
    #:vec-char-length
    #:vec-char-to-lisp-list
    #:vec-char-to-lisp-vec
+   #:vec-char-at
+   #:vec-char-push-back
    #:make-vector-dmatch
    #:vector-dmatch
    #:c-arr-to-vec-dmatch
@@ -481,6 +483,8 @@
    #:vec-dmatch-length
    #:vec-dmatch-to-lisp-list
    #:vec-dmatch-to-lisp-vec
+   #:vec-dmatch-at
+   #:vec-dmatch-push-back
    #:make-vector-double
    #:vector-double
    #:c-arr-to-vec-double
@@ -489,6 +493,8 @@
    #:vec-double-length
    #:vec-double-to-lisp-list
    #:vec-double-to-lisp-vec
+   #:vec-double-at
+   #:vec-double-push-back
    #:make-vector-float
    #:vector-float
    #:c-arr-to-vec-float
@@ -497,6 +503,8 @@
    #:vec-float-length
    #:vec-float-to-lisp-list
    #:vec-float-to-lisp-vec
+   #:vec-float-at
+   #:vec-float-push-back
    #:make-vector-int
    #:vector-int
    #:c-arr-to-vec-int
@@ -505,6 +513,8 @@
    #:vec-int-length
    #:vec-int-to-lisp-list
    #:vec-int-to-lisp-vec
+   #:vec-int-at
+   #:vec-int-push-back
    #:make-vector-key-point
    #:vector-key-point
    #:c-arr-to-vec-key-point
@@ -513,6 +523,8 @@
    #:vec-key-point-length
    #:vec-key-point-to-lisp-list
    #:vec-key-point-to-lisp-vec
+   #:vec-key-point-at
+   #:vec-key-point-push-back
    #:make-vector-mat
    #:vector-mat
    #:c-arr-to-vec-mat
@@ -521,6 +533,8 @@
    #:vec-mat-length
    #:vec-mat-to-lisp-list
    #:vec-mat-to-lisp-vec
+   #:vec-mat-at
+   #:vec-mat-push-back
    #:make-vector-point
    #:vector-point
    #:c-arr-to-vec-point
@@ -529,6 +543,8 @@
    #:vec-point-length
    #:vec-point-to-lisp-list
    #:vec-point-to-lisp-vec
+   #:vec-point-at
+   #:vec-point-push-back
    #:make-vector-point-2f
    #:vector-point-2f
    #:c-arr-to-vec-point-2f
@@ -537,6 +553,8 @@
    #:vec-point-2f-length
    #:vec-point-2f-to-lisp-list
    #:vec-point-2f-to-lisp-vec
+   #:vec-point-2f-at
+   #:vec-point-2f-push-back
    #:make-vector-rect
    #:vector-rect
    #:c-arr-to-vec-rect
@@ -545,6 +563,8 @@
    #:vec-rect-length
    #:vec-rect-to-lisp-list
    #:vec-rect-to-lisp-vec
+   #:vec-rect-at
+   #:vec-rect-push-back
    #:make-vector-uchar
    #:vector-uchar
    #:c-arr-to-vec-uchar
@@ -553,6 +573,8 @@
    #:vec-uchar-length
    #:vec-uchar-to-lisp-list
    #:vec-uchar-to-lisp-vec
+   #:vec-uchar-at
+   #:vec-uchar-push-back
    #:make-vector-vec-2d
    #:vector-vec-2d
    #:c-arr-to-vec-vec-2d
@@ -561,6 +583,8 @@
    #:vec-vec-2d-length
    #:vec-vec-2d-to-lisp-list
    #:vec-vec-2d-to-lisp-vec
+   #:vec-vec-2d-at
+   #:vec-vec-2d-push-back
    #:make-vector-vec-3d
    #:vector-vec-3d
    #:c-arr-to-vec-vec-3d
@@ -569,6 +593,8 @@
    #:vec-vec-3d-length
    #:vec-vec-3d-to-lisp-list
    #:vec-vec-3d-to-lisp-vec
+   #:vec-vec-3d-at
+   #:vec-vec-3d-push-back
    #:make-vector-vec-4d
    #:vector-vec-4d
    #:c-arr-to-vec-vec-4d
@@ -577,6 +603,8 @@
    #:vec-vec-4d-length
    #:vec-vec-4d-to-lisp-list
    #:vec-vec-4d-to-lisp-vec
+   #:vec-vec-4d-at
+   #:vec-vec-4d-push-back
    #:make-vector-vec-6d
    #:vector-vec-6d
    #:c-arr-to-vec-vec-6d
@@ -585,6 +613,8 @@
    #:vec-vec-6d-length
    #:vec-vec-6d-to-lisp-list
    #:vec-vec-6d-to-lisp-vec
+   #:vec-vec-6d-at
+   #:vec-vec-6d-push-back
    #:make-vector-vec-2f
    #:vector-vec-2f
    #:c-arr-to-vec-vec-2f
@@ -593,6 +623,8 @@
    #:vec-vec-2f-length
    #:vec-vec-2f-to-lisp-list
    #:vec-vec-2f-to-lisp-vec
+   #:vec-vec-2f-at
+   #:vec-vec-2f-push-back
    #:make-vector-vec-3f
    #:vector-vec-3f
    #:c-arr-to-vec-vec-3f
@@ -601,6 +633,8 @@
    #:vec-vec-3f-length
    #:vec-vec-3f-to-lisp-list
    #:vec-vec-3f-to-lisp-vec
+   #:vec-vec-3f-at
+   #:vec-vec-3f-push-back
    #:make-vector-vec-4f
    #:vector-vec-4f
    #:c-arr-to-vec-vec-4f
@@ -609,6 +643,8 @@
    #:vec-vec-4f-length
    #:vec-vec-4f-to-lisp-list
    #:vec-vec-4f-to-lisp-vec
+   #:vec-vec-4f-at
+   #:vec-vec-4f-push-back
    #:make-vector-vec-6f
    #:vector-vec-6f
    #:c-arr-to-vec-vec-6f
@@ -617,6 +653,8 @@
    #:vec-vec-6f-length
    #:vec-vec-6f-to-lisp-list
    #:vec-vec-6f-to-lisp-vec
+   #:vec-vec-6f-at
+   #:vec-vec-6f-push-back
    #:make-vector-vec-2i
    #:vector-vec-2i
    #:c-arr-to-vec-vec-2i
@@ -625,6 +663,8 @@
    #:vec-vec-2i-length
    #:vec-vec-2i-to-lisp-list
    #:vec-vec-2i-to-lisp-vec
+   #:vec-vec-2i-at
+   #:vec-vec-2i-push-back
    #:make-vector-vec-3i
    #:vector-vec-3i
    #:c-arr-to-vec-vec-3i
@@ -633,6 +673,8 @@
    #:vec-vec-3i-length
    #:vec-vec-3i-to-lisp-list
    #:vec-vec-3i-to-lisp-vec
+   #:vec-vec-3i-at
+   #:vec-vec-3i-push-back
    #:make-vector-vec-4i
    #:vector-vec-4i
    #:c-arr-to-vec-vec-4i
@@ -641,6 +683,8 @@
    #:vec-vec-4i-length
    #:vec-vec-4i-to-lisp-list
    #:vec-vec-4i-to-lisp-vec
+   #:vec-vec-4i-at
+   #:vec-vec-4i-push-back
    #:make-vector-vec-6i
    #:vector-vec-6i
    #:c-arr-to-vec-vec-6i
@@ -649,6 +693,8 @@
    #:vec-vec-6i-length
    #:vec-vec-6i-to-lisp-list
    #:vec-vec-6i-to-lisp-vec
+   #:vec-vec-6i-at
+   #:vec-vec-6i-push-back
    #:make-vector-vec-8i
    #:vector-vec-8i
    #:c-arr-to-vec-vec-8i
@@ -657,6 +703,8 @@
    #:vec-vec-8i-length
    #:vec-vec-8i-to-lisp-list
    #:vec-vec-8i-to-lisp-vec
+   #:vec-vec-8i-at
+   #:vec-vec-8i-push-back
 
 ;; DEFGENERIC
 
@@ -1106,7 +1154,11 @@
 
 ;; core - Drawing Functions
 
+   #:+line-4+ 
+   #:+line-8+ 
+   #:+line-aa+
    #:+aa+
+   #:+filled+
    #:+font-hershey-simplex+
    #:+font-hershey-plain+
    #:+font-hershey-duplex+

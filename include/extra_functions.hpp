@@ -195,8 +195,6 @@ Point3i* cv_Mat_at_Point3i_1(Mat* self, int i);
 Point3i* cv_Mat_at_Point3i_2(Mat* self, int i, int j);
 void cv_Mat_at_Point3i_set_Val_1(Mat* self, int i, Point3i* val);
 void cv_Mat_at_Point3i_set_Val_2(Mat* self, int i, int j, Point3i* val);
-Scalar* cv_Mat_at_Scalar(Mat* self, int i, int j);
-void cv_Mat_at_Scalar_set_Val(Mat* self, int i, int j, Scalar* val);
 char &cv_Mat_at_char_1(Mat* self, int i);
 double &cv_Mat_at_double_1(Mat* self, int i);
 float &cv_Mat_at_float_1(Mat* self, int i);

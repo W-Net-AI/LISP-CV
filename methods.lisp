@@ -8,8 +8,8 @@
 
 ;;; DEFGENERIC
 
-(defgeneric get* (self value)
-  (:documentation "Used for all class bindings with a 'get' member function."))
+(defgeneric @@@ (self &optional arg1 arg2)
+    (:documentation "Used to overload the @ name. Used for accessor type functions."))
 
 (defgeneric abs (self)
   (:documentation "Used to call the binding for the OpenCV function 'abs' and CL:ABS."))
@@ -79,6 +79,9 @@
 
 (defgeneric feature-detector-detect (self image keypoints &optional mask)
   (:documentation "Used for all FEATURE-DETECTOR-DETECT methods."))
+
+(defgeneric get* (self value)
+  (:documentation "Used for all class bindings with a 'get' member function."))
 
 (defgeneric height (self)
   (:documentation "Used for all class bindings with an 'height' member."))
@@ -171,8 +174,325 @@
 ;;;DEFMETHODS
 
 
-(defmethod get* ((self cv-video-capture) (value integer))
-	   (video-capture-get self value))
+(defmethod @@@ ((self std-vector-char) &optional arg1 arg2)
+    "Returns the element at position n in the vector."
+  (if arg2 (error "invalid number of arguments: 3"))
+  (let ((temp (foreign-funcall "std_vectorc_to_carray" 
+			       :pointer (c-pointer self) 
+			       :pointer))) 
+    (mem-aref temp :char (or arg1 0))))
+
+
+(defmethod @@@ ((self std-vector-dmatch) &optional arg1 arg2)
+    "Returns the object at position n in the vector.
+     This method can return any element in the object."
+  (let ((temp (foreign-funcall "cv_vector_dm_at" 
+			       :pointer (c-pointer self) 
+			       :int (or arg1 0) 
+			       :pointer)))
+    (if arg2
+	(case arg2 
+	  (0 (%dmatch-query-idx temp))
+	  (1 (%dmatch-train-idx temp))
+	  (2 (%dmatch-img-idx temp))
+	  (3 (%dmatch-distance temp)))
+	(make-instance 'cv-dmatch :c-pointer temp))))
+
+
+(defmethod @@@ ((self std-vector-double) &optional arg1 arg2)
+    "Returns the element at position n in the vector."
+  (if arg2 (error "invalid number of arguments: 3"))
+  (let ((temp (foreign-funcall "std_vectord_to_carray" 
+			       :pointer (c-pointer self) 
+			       :pointer)))
+    (mem-aref temp :double (or arg1 0))))
+
+
+(defmethod @@@ ((self std-vector-float) &optional arg1 arg2)
+    "Returns the element at position n in the vector."
+  (if arg2 (error "invalid number of arguments: 3"))
+  (let ((temp (foreign-funcall "std_vectorf_to_carray" 
+			       :pointer (c-pointer self) 
+			       :pointer)))
+    (mem-aref temp :float (or arg1 0))))
+
+
+(defmethod @@@ ((self std-vector-int) &optional arg1 arg2)
+    "Returns the object at position n in the vector.
+     This method can return any element in the object."
+  (if arg2 (error "invalid number of arguments: 3"))
+  (let ((temp (foreign-funcall "std_vectori_to_carray" 
+			       :pointer (c-pointer self) 
+			       :pointer)))
+    (mem-aref temp :int (or arg1 0))))
+
+
+(defmethod @@@ ((self std-vector-key-point) &optional arg1 arg2)
+    "Returns the object at position n in the vector.
+     This method can return any element in the object."
+  (let ((temp (foreign-funcall "cv_vector_kp_at" 
+			       :pointer (c-pointer self) 
+			       :int (or arg1 0) 
+			       :pointer)))
+    (if arg2
+	(case arg2 
+	  (0 (mem-aref (c-pointer 
+			(%key-point-pt temp)) :float))
+	  (1 (mem-aref (c-pointer 
+			(%key-point-pt temp)) :float 1))
+	  (2 (%key-point-size temp))
+	  (3 (%key-point-angle temp))
+	  (4 (%key-point-response temp))
+	  (5 (%key-point-octave temp))
+	  (6 (%key-point-class-id temp)))
+	(make-instance 'cv-key-point :c-pointer temp))))
+
+
+(defmethod @@@ ((self std-vector-mat) &optional arg1 arg2)
+    "Returns the object at position n in the vector.
+     This method can return any element in the object."
+  (if arg2 (error "invalid number of arguments: 3"))
+  (let ((temp (foreign-funcall "cv_vector_m_at" 
+			       :pointer (c-pointer self) 
+			       :int (or arg1 0) 
+			       :pointer)))
+    (make-instance 'cv-mat :c-pointer temp)))
+
+
+(defmethod @@@ ((self std-vector-point) &optional arg1 arg2)
+    "Returns the object at position n in the vector.
+     This method can return any element in the object."
+  (let ((temp (foreign-funcall "cv_vector_p_at" 
+			       :pointer (c-pointer self) 
+			       :int (or arg1 0)
+			       :pointer)))
+    (if arg2
+	(case arg2
+	  (0 (mem-aref temp :int))
+	  (1 (mem-aref temp :int 1)))
+	(make-instance 'cv-point :c-pointer temp))))
+
+
+(defmethod @@@ ((self std-vector-point-2f) &optional arg1 arg2)
+    "Returns the object at position n in the vector.
+     This method can return any element in the object."
+  (let ((temp (foreign-funcall "cv_vector_p2f_at" 
+			       :pointer (c-pointer self) 
+			       :int (or arg1 0)
+			       :pointer)))
+    (if arg2
+	(case arg2
+	  (0 (mem-aref temp :float))
+	  (1 (mem-aref temp :float 1)))
+	(make-instance 'cv-point-2f :c-pointer temp))))
+
+
+(defmethod @@@ ((self std-vector-point-2f) &optional arg1 arg2)
+    "Returns the object at position n in the vector.
+     This method can return any element in the object."
+  (let ((temp (foreign-funcall "cv_vector_p2f_at" 
+			       :pointer (c-pointer self) 
+			       :int (or arg1 0)
+			       :pointer)))
+    (if arg2
+	(case arg2
+	  (0 (mem-aref temp :float))
+	  (1 (mem-aref temp :float 1)))
+	(make-instance 'cv-point-2f :c-pointer temp))))
+
+
+(defmethod @@@ ((self std-vector-rect) &optional arg1 arg2)
+    "Returns the object at position n in the vector.
+     This method can return any element in the object."
+  (let ((temp (foreign-funcall "cv_vector_r_at" 
+			       :pointer (c-pointer self) 
+			       :int (or arg1 0) 
+			       :pointer)))
+    (if arg2
+	(case arg2
+	  (0 (mem-aref temp :int))
+	  (1 (mem-aref temp :int 1))
+	  (2 (mem-aref temp :int 2))
+	  (3 (mem-aref temp :int 3)))
+	(make-instance 'cv-rect :c-pointer temp))))
+
+
+(defmethod @@@ ((self std-vector-uchar) &optional arg1 arg2)
+    "Returns the element at position n in the vector."
+  (if arg2 (error "invalid number of arguments: 3"))
+  (let ((temp (foreign-funcall "std_vectoru_to_carray" 
+			       :pointer (c-pointer self) 
+			       :pointer)))
+    (mem-aref temp :uchar (or arg1 0))))
+
+
+(defmethod @@@ ((self std-vector-vec-2d) &optional arg1 arg2)
+    "Returns the object at position n in the vector.
+     This method can return any element in the object."
+  (let ((temp (foreign-funcall "cv_vector_v2d_at" 
+			       :pointer (c-pointer self) 
+			       :int (or arg1 0) 
+			       :pointer)))
+    (if arg2 (case arg2
+	       (0 (mem-aref temp :double))
+	       (1 (mem-aref temp :double 1)))
+	(make-instance 'cv-vec-2d :c-pointer temp))))
+
+
+(defmethod @@@ ((self std-vector-vec-3d) &optional arg1 arg2)
+    "Returns the object at position n in the vector.
+     This method can return any element in the object."
+  (let ((temp (foreign-funcall "cv_vector_v3d_at" 
+			       :pointer (c-pointer self) 
+			       :int (or arg1 0) 
+			       :pointer)))
+    (if arg2 (case arg2
+	       (0 (mem-aref temp :double))
+	       (1 (mem-aref temp :double 1)))
+	(make-instance 'cv-vec-3d :c-pointer temp))))
+
+
+(defmethod @@@ ((self std-vector-vec-4d) &optional arg1 arg2)
+    "Returns the object at position n in the vector.
+     This method can return any element in the object."
+  (let ((temp (foreign-funcall "cv_vector_v4d_at" 
+			       :pointer (c-pointer self) 
+			       :int (or arg1 0) 
+			       :pointer)))
+    (if arg2 (case arg2
+	       (0 (mem-aref temp :double))
+	       (1 (mem-aref temp :double 1)))
+	(make-instance 'cv-vec-4d :c-pointer temp))))
+
+
+(defmethod @@@ ((self std-vector-vec-6d) &optional arg1 arg2)
+    "Returns the object at position n in the vector.
+     This method can return any element in the object."
+  (let ((temp (foreign-funcall "cv_vector_v6d_at" 
+			       :pointer (c-pointer self) 
+			       :int (or arg1 0) 
+			       :pointer)))
+    (if arg2 (case arg2
+	       (0 (mem-aref temp :double))
+	       (1 (mem-aref temp :double 1)))
+	(make-instance 'cv-vec-6d :c-pointer temp))))
+
+
+(defmethod @@@ ((self std-vector-vec-2f) &optional arg1 arg2)
+    "Returns the object at position n in the vector.
+     This method can return any element in the object."
+  (let ((temp (foreign-funcall "cv_vector_v2f_at" 
+			       :pointer (c-pointer self) 
+			       :int (or arg1 0) 
+			       :pointer)))
+    (if arg2 (case arg2
+	       (0 (mem-aref temp :float))
+	       (1 (mem-aref temp :float 1)))
+	(make-instance 'cv-vec-2f :c-pointer temp))))
+
+
+(defmethod @@@ ((self std-vector-vec-3f) &optional arg1 arg2)
+    "Returns the object at position n in the vector.
+     This method can return any element in the object."
+  (let ((temp (foreign-funcall "cv_vector_v3f_at" 
+			       :pointer (c-pointer self) 
+			       :int (or arg1 0) 
+			       :pointer)))
+    (if arg2 (case arg2
+	       (0 (mem-aref temp :float))
+	       (1 (mem-aref temp :float 1)))
+	(make-instance 'cv-vec-3f :c-pointer temp))))
+
+
+(defmethod @@@ ((self std-vector-vec-4f) &optional arg1 arg2)
+    "Returns the object at position n in the vector.
+     This method can return any element in the object."
+  (let ((temp (foreign-funcall "cv_vector_v4f_at" 
+			       :pointer (c-pointer self) 
+			       :int (or arg1 0) 
+			       :pointer)))
+    (if arg2 (case arg2
+	       (0 (mem-aref temp :float))
+	       (1 (mem-aref temp :float 1)))
+	(make-instance 'cv-vec-4f :c-pointer temp))))
+
+
+(defmethod @@@ ((self std-vector-vec-6f) &optional arg1 arg2)
+    "Returns the object at position n in the vector.
+     This method can return any element in the object."
+  (let ((temp (foreign-funcall "cv_vector_v6f_at" 
+			       :pointer (c-pointer self) 
+			       :int (or arg1 0) 
+			       :pointer)))
+    (if arg2 (case arg2
+	       (0 (mem-aref temp :float))
+	       (1 (mem-aref temp :float 1)))
+	(make-instance 'cv-vec-6f :c-pointer temp))))
+
+
+(defmethod @@@ ((self std-vector-vec-2i) &optional arg1 arg2)
+    "Returns the object at position n in the vector.
+     This method can return any element in the object."
+  (let ((temp (foreign-funcall "cv_vector_v2i_at" 
+			       :pointer (c-pointer self) 
+			       :int (or arg1 0) 
+			       :pointer)))
+    (if arg2 (case arg2
+	       (0 (mem-aref temp :int))
+	       (1 (mem-aref temp :int 1)))
+	(make-instance 'cv-vec-2i :c-pointer temp))))
+
+
+(defmethod @@@ ((self std-vector-vec-3i) &optional arg1 arg2)
+    "Returns the object at position n in the vector.
+     This method can return any element in the object."
+  (let ((temp (foreign-funcall "cv_vector_v3i_at" 
+			       :pointer (c-pointer self) 
+			       :int (or arg1 0) 
+			       :pointer)))
+    (if arg2 (case arg2
+	       (0 (mem-aref temp :int))
+	       (1 (mem-aref temp :int 1)))
+	(make-instance 'cv-vec-3i :c-pointer temp))))
+
+
+(defmethod @@@ ((self std-vector-vec-4i) &optional arg1 arg2)
+    "Returns the object at position n in the vector.
+     This method can return any element in the object."
+  (let ((temp (foreign-funcall "cv_vector_v4i_at" 
+			       :pointer (c-pointer self) 
+			       :int (or arg1 0) 
+			       :pointer)))
+    (if arg2 (case arg2
+	       (0 (mem-aref temp :int))
+	       (1 (mem-aref temp :int 1)))
+	(make-instance 'cv-vec-4i :c-pointer temp))))
+
+
+(defmethod @@@ ((self std-vector-vec-6i) &optional arg1 arg2)
+    "Returns the object at position n in the vector.
+     This method can return any element in the object."
+  (let ((temp (foreign-funcall "cv_vector_v6i_at" 
+			       :pointer (c-pointer self) 
+			       :int (or arg1 0) 
+			       :pointer)))
+    (if arg2 (case arg2
+	       (0 (mem-aref temp :int))
+	       (1 (mem-aref temp :int 1)))
+	(make-instance 'cv-vec-6i :c-pointer temp))))
+
+
+(defmethod @@@ ((self std-vector-vec-8i) &optional arg1 arg2)
+    "Returns the object at position n in the vector.
+     This method can return any element in the object."
+  (let ((temp (foreign-funcall "cv_vector_v8i_at" 
+			       :pointer (c-pointer self) 
+			       :int (or arg1 0) 
+			       :pointer)))
+    (if arg2 (case arg2
+	       (0 (mem-aref temp :int))
+	       (1 (mem-aref temp :int 1)))
+	(make-instance 'cv-vec-8i :c-pointer temp))))
 
 
 (defmethod angle ((self cv-rotated-rect))
@@ -186,11 +506,11 @@
 
 
 (defmethod angle ((self cv-key-point))
-      (%key-point-angle self))
+  (%key-point-angle self))
 
 
 (defmethod (setf angle) ((val single-float) (self cv-key-point))
-      (key-point-set-angle self val))
+  (key-point-set-angle self val))
 
 
 (defmethod assign ((self cv-mat) (other cv-mat))
@@ -273,10 +593,10 @@
 (defmethod create ((type symbol) (self cv-brisk) &rest args)
   (cond ((eq :descriptor-extractor type)
 	 (%descriptor-extractor-create-brisk self (%c-string-to-string (first args) 
-									    (length (first args)))))
+								       (length (first args)))))
 	((eq :descriptor-matcher type)
 	 (%descriptor-matcher-create-brisk self (%c-string-to-string (first args) 
-									  (length (first args)))))
+								     (length (first args)))))
 	((eq :feature-2d type)
 	 (%feature-2d-create-brisk self (first args)))
 	((eq :feature-detector type)
@@ -286,10 +606,10 @@
 (defmethod create ((type symbol) (self cv-surf) &rest args)
   (cond ((eq :descriptor-extractor type)
 	 (%descriptor-extractor-create-surf self (%c-string-to-string (first args) 
-									    (length (first args)))))
+								      (length (first args)))))
 	((eq :descriptor-matcher type)
 	 (%descriptor-matcher-create-surf self (%c-string-to-string (first args) 
-									  (length (first args)))))
+								    (length (first args)))))
 	((eq :feature-2d (first args))
 	 (%feature-2d-create-surf self (first args)))
 	((eq :feature-detector type)
@@ -412,27 +732,27 @@
 
 
 (defmethod descriptor-extractor-create ((self cv-bf-matcher) descriptor-extractor-type)
-      (%descriptor-extractor-create-bf-matcher self (%c-string-to-string descriptor-extractor-type (length descriptor-extractor-type))))
+  (%descriptor-extractor-create-bf-matcher self (%c-string-to-string descriptor-extractor-type (length descriptor-extractor-type))))
 
 
 (defmethod descriptor-extractor-create ((self cv-brisk) descriptor-extractor-type)
-      (%descriptor-extractor-create-brisk self (%c-string-to-string descriptor-extractor-type (length descriptor-extractor-type))))
+  (%descriptor-extractor-create-brisk self (%c-string-to-string descriptor-extractor-type (length descriptor-extractor-type))))
 
 
 (defmethod descriptor-extractor-create ((self cv-surf) descriptor-extractor-type)
-      (%descriptor-extractor-create-surf self (%c-string-to-string descriptor-extractor-type (length descriptor-extractor-type))))
+  (%descriptor-extractor-create-surf self (%c-string-to-string descriptor-extractor-type (length descriptor-extractor-type))))
 
 
 (defmethod descriptor-matcher-create ((self cv-bf-matcher) descriptor-matcher-type)
-      (%descriptor-matcher-create-bf-matcher self (%c-string-to-string descriptor-matcher-type (length descriptor-matcher-type))))
+  (%descriptor-matcher-create-bf-matcher self (%c-string-to-string descriptor-matcher-type (length descriptor-matcher-type))))
 
 
 (defmethod descriptor-matcher-create ((self cv-brisk) descriptor-matcher-type)
-      (%descriptor-matcher-create-brisk self (%c-string-to-string descriptor-matcher-type (length descriptor-matcher-type))))
+  (%descriptor-matcher-create-brisk self (%c-string-to-string descriptor-matcher-type (length descriptor-matcher-type))))
 
 
 (defmethod descriptor-matcher-create ((self cv-surf) descriptor-matcher-type)
-      (%descriptor-matcher-create-surf self (%c-string-to-string descriptor-matcher-type (length descriptor-matcher-type))))
+  (%descriptor-matcher-create-surf self (%c-string-to-string descriptor-matcher-type (length descriptor-matcher-type))))
 
 
 (defmethod descriptor-matcher-match ((self cv-bf-matcher) query-descriptors train-descriptors matches 
@@ -513,27 +833,27 @@
 
 
 (defmethod feature-2d-create ((self cv-bf-matcher) name)
-      (%feature-2d-create-bf-matcher self name))
+  (%feature-2d-create-bf-matcher self name))
 
 
 (defmethod feature-2d-create ((self cv-brisk) name)
-      (%feature-2d-create-brisk self name))
+  (%feature-2d-create-brisk self name))
 
 
 (defmethod feature-2d-create ((self cv-surf) name)
-      (%feature-2d-create-surf self name))
+  (%feature-2d-create-surf self name))
 
 
 (defmethod feature-detector-create ((self cv-bf-matcher) detector-type)
-      (%feature-detector-create-bf-matcher self detector-type))
+  (%feature-detector-create-bf-matcher self detector-type))
 
 
 (defmethod feature-detector-create ((self cv-brisk) detector-type)
-      (%feature-detector-create-brisk self detector-type))
+  (%feature-detector-create-brisk self detector-type))
 
 
 (defmethod feature-detector-create ((self cv-surf) detector-type)
-      (%feature-detector-create-surf self detector-type))
+  (%feature-detector-create-surf self detector-type))
 
 
 (defmethod feature-detector-detect ((self cv-bf-matcher) image keypoints &optional (mask (%mat) given-mask))
@@ -576,11 +896,15 @@
 
 (defmethod file-storage-write ((fs cv-file-storage) (name string) (value string))
   (file-storage-write-string fs (%c-string-to-string name (length name)) 
-		       (%c-string-to-string value (length value))))
+			     (%c-string-to-string value (length value))))
 
 
 (defmethod file-storage-write ((fs cv-file-storage) (name string) (value std-vector-key-point))
   (file-storage-write-vector-key-point fs (%c-string-to-string name (length name)) value))
+
+
+(defmethod get* ((self cv-video-capture) (value integer))
+  (video-capture-get self value))
 
 
 (defmethod height ((self cv-rect))
@@ -604,11 +928,11 @@
 
 
 (defmethod is-opened ((self cv-video-capture))
-	   (video-capture-is-opened self))
+  (video-capture-is-opened self))
 
 
 (defmethod is-opened ((self cv-video-writer))
-	   (video-writer-is-opened self))
+  (video-writer-is-opened self))
 
 
 (defmethod load ((self cv-svm) &rest args)
@@ -740,157 +1064,182 @@
 
 (defmethod pt ((self cv-key-point))
   "Retrieves PT value of a KEY-POINT object."
-      (%key-point-pt self))
+  (%key-point-pt self))
 
 
 (defmethod (setf pt) ((val single-float) (self cv-key-point))
   "Sets PT value of a KEY-POINT object."
-      (key-point-set-pt self val))
+  (key-point-set-pt self val))
 
 
 (defmethod push-back ((self cv-mat) (val cv-mat))
+  "Adds a new element at the end of the vector."
   (mat-push-back self val))
 
 
 (defmethod push-back ((self std-vector-char) val)
+  "Adds a new element at the end of the vector."
   (foreign-funcall "cv_vector_c_push_back_num" 
 		   :pointer (c-pointer self) 
 		   :char  val))
 
 
 (defmethod push-back ((self std-vector-dmatch) (val cv-dmatch))
+  "Adds a new element at the end of the vector."
   (foreign-funcall "cv_vector_dm_push_back" 
 		   :pointer (c-pointer self) 
 		   :pointer (c-pointer val)))
 
 
 (defmethod push-back ((self std-vector-double) (val double-float))
+  "Adds a new element at the end of the vector."
   (foreign-funcall "cv_vector_d_push_back_num" 
 		   :pointer (c-pointer self) 
 		   :double val))
 
 
 (defmethod push-back ((self std-vector-float) (val single-float))
+  "Adds a new element at the end of the vector."
   (foreign-funcall "cv_vector_f_push_back_num" 
 		   :pointer (c-pointer self) 
 		   :float val))
 
 
 (defmethod push-back ((self std-vector-int) (val integer))
+  "Adds a new element at the end of the vector."
   (foreign-funcall "cv_vector_i_push_back_num" 
 		   :pointer (c-pointer self) 
 		   :int val))
 
 
 (defmethod push-back ((self std-vector-key-point) (val cv-key-point))
+  "Adds a new element at the end of the vector."
   (foreign-funcall "cv_vector_kp_push_back" 
 		   :pointer (c-pointer self) 
 		   :pointer (c-pointer val)))
 
 
 (defmethod push-back ((self std-vector-mat) (val cv-mat))
+  "Adds a new element at the end of the vector."
   (foreign-funcall "cv_vector_m_push_back" 
 		   :pointer (c-pointer self) 
 		   :pointer (c-pointer val)))
 
 
 (defmethod push-back ((self std-vector-point) (val cv-point))
+  "Adds a new element at the end of the vector."
   (foreign-funcall "cv_vector_p_push_back" 
 		   :pointer (c-pointer self) 
 		   :pointer (c-pointer val)))
 
 
 (defmethod push-back ((self std-vector-point-2f) (val cv-point-2f))
+  "Adds a new element at the end of the vector."
   (foreign-funcall "cv_vector_p2f_push_back" 
 		   :pointer (c-pointer self) 
 		   :pointer (c-pointer val)))
 
 
 (defmethod push-back ((self std-vector-rect) (val cv-rect))
+  "Adds a new element at the end of the vector."
   (foreign-funcall "cv_vector_r_push_back" 
 		   :pointer (c-pointer self) 
 		   :pointer (c-pointer val)))
 
 
 (defmethod push-back ((self std-vector-vec-2d) (val cv-vec-2d))
+  "Adds a new element at the end of the vector."
   (foreign-funcall "cv_vector_v2d_push_back" 
 		   :pointer (c-pointer self) 
 		   :pointer (c-pointer val)))
 
 
 (defmethod push-back ((self std-vector-vec-3d) (val cv-vec-3d))
+  "Adds a new element at the end of the vector."
   (foreign-funcall "cv_vector_v3d_push_back" 
 		   :pointer (c-pointer self) 
 		   :pointer (c-pointer val)))
 
 
 (defmethod push-back ((self std-vector-vec-4d) (val cv-vec-4d))
+  "Adds a new element at the end of the vector."
   (foreign-funcall "cv_vector_v4d_push_back" 
 		   :pointer (c-pointer self) 
 		   :pointer (c-pointer val)))
 
 
 (defmethod push-back ((self std-vector-vec-6d) (val cv-vec-6d))
+  "Adds a new element at the end of the vector."
   (foreign-funcall "cv_vector_v6d_push_back" 
 		   :pointer (c-pointer self) 
 		   :pointer (c-pointer val)))
 
 
 (defmethod push-back ((self std-vector-vec-2f) (val cv-vec-2f))
+  "Adds a new element at the end of the vector."
   (foreign-funcall "cv_vector_v2f_push_back" 
 		   :pointer (c-pointer self) 
 		   :pointer (c-pointer val)))
 
 
 (defmethod push-back ((self std-vector-vec-3f) (val cv-vec-3f))
+  "Adds a new element at the end of the vector."
   (foreign-funcall "cv_vector_v3f_push_back" 
 		   :pointer (c-pointer self) 
 		   :pointer (c-pointer val)))
 
 
 (defmethod push-back ((self std-vector-vec-4f) (val cv-vec-4f))
+  "Adds a new element at the end of the vector."
   (foreign-funcall "cv_vector_v4f_push_back" 
 		   :pointer (c-pointer self) 
 		   :pointer (c-pointer val)))
 
 
 (defmethod push-back ((self std-vector-vec-6f) (val cv-vec-6f))
+  "Adds a new element at the end of the vector."
   (foreign-funcall "cv_vector_v6f_push_back" 
 		   :pointer (c-pointer self) 
 		   :pointer (c-pointer val)))
 
 
 (defmethod push-back ((self std-vector-vec-2i) (val cv-vec-2i))
+  "Adds a new element at the end of the vector."
   (foreign-funcall "cv_vector_v2i_push_back" 
 		   :pointer (c-pointer self) 
 		   :pointer (c-pointer val)))
 
 
 (defmethod push-back ((self std-vector-vec-3i) (val cv-vec-3i))
+  "Adds a new element at the end of the vector."
   (foreign-funcall "cv_vector_v3i_push_back" 
 		   :pointer (c-pointer self) 
 		   :pointer (c-pointer val)))
 
 
 (defmethod push-back ((self std-vector-vec-4i) (val cv-vec-4i))
+  "Adds a new element at the end of the vector."
   (foreign-funcall "cv_vector_v4i_push_back" 
 		   :pointer (c-pointer self) 
 		   :pointer (c-pointer val)))
 
 
 (defmethod push-back ((self std-vector-vec-6i) (val cv-vec-6i))
+  "Adds a new element at the end of the vector."
   (foreign-funcall "cv_vector_v6i_push_back" 
 		   :pointer (c-pointer self) 
 		   :pointer (c-pointer val)))
 
 
 (defmethod push-back ((self std-vector-vec-8i) (val cv-vec-8i))
+  "Adds a new element at the end of the vector."
   (foreign-funcall "cv_vector_v8i_push_back" 
 		   :pointer (c-pointer self) 
 		   :pointer (c-pointer val)))
 
 
 (defmethod push-back ((self std-vector-uchar) val)
+  "Adds a new element at the end of the vector."
   (foreign-funcall "cv_vector_u_push_back_num" 
 		   :pointer (c-pointer self) 
 		   :uchar  val))
@@ -910,11 +1259,11 @@
 
 (defmethod size ((arg cv-key-point) &rest args)
   args
-      (%key-point-size arg))
+  (%key-point-size arg))
 
 
 (defmethod (setf size) ((val single-float) (self cv-key-point))
-      (key-point-set-size self val))
+  (key-point-set-size self val))
 
 
 (defmethod size ((arg cv-mat) &rest args)
@@ -1012,12 +1361,12 @@
 
 (defmethod x ((self cv-key-point))
   "Retrieves X coordinate of a KEY-POINT object."
-      (point-2f-x (%key-point-pt self)))
+  (point-2f-x (%key-point-pt self)))
 
 
 (defmethod (setf x) ((val single-float) (self cv-key-point))
   "Sets X coordinate of a KEY-POINT object."
-      (point-2f-x (key-point-set-pt self val)))
+  (point-2f-x (key-point-set-pt self val)))
 
 
 (defmethod x ((self cv-point))
@@ -1092,12 +1441,12 @@
 
 (defmethod y ((self cv-key-point))
   "Retrieves Y coordinate of a KEY-POINT object."
-      (point-2f-y (%key-point-pt self)))
+  (point-2f-y (%key-point-pt self)))
 
 
 (defmethod (setf y) ((val single-float) (self cv-key-point))
   "Sets Y coordinate of a KEY-POINT object."
-      (point-2f-y (key-point-set-pt self val)))
+  (point-2f-y (key-point-set-pt self val)))
 
 
 (defmethod y ((self cv-point))
