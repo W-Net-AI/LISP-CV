@@ -263,6 +263,20 @@
   (mask mat))
 
 
+;; FlannBasedMatcher(const Ptr<flann::IndexParams>& indexParams=new flann::KDTreeIndexParams(),
+;;                   const Ptr<flann::SearchParams>& searchParams=new flann::SearchParams() )
+;; FlannBasedMatcher* cv_create_FlannBasedMatcher0()
+(defcfun ("cv_create_FlannBasedMatcher0" flann-based-matcher) flann-based-matcher
+  "Flann-based descriptor matcher constructor.")
+
+
+;; FlannBasedMatcher(const Ptr<flann::IndexParams>& indexParams=new flann::KDTreeIndexParams(),
+;;                   const Ptr<flann::SearchParams>& searchParams=new flann::SearchParams() )
+;; FlannBasedMatcher* cv_create_FlannBasedMatcher0()
+(defcfun ("cv_create_FlannBasedMatcher0" make-flann-based-matcher) flann-based-matcher
+  "Flann-based descriptor matcher constructor.")
+
+
 ;;; Drawing Function of Keypoints and Matches
 
 

@@ -1,7 +1,7 @@
 ;;;; -*- mode: lisp; indent-tabs: nil -*-
 ;;;; core.lisp
 ;;;; OpenCV bindings
-;;;; The Core Functionality.
+;;;; The Core Functionality
 
 
 (in-package :lisp-cv)
@@ -205,11 +205,11 @@
   (if (pointerp ptr) ptr (c-pointer ptr)))
 
 
-(defmacro @ (self &optional arg1 arg2 arg3)
+(defmacro @ (self &optional arg1 arg2 arg3 arg4)
     "CFFI:MEM-AREF macro. Also dispatches the std::vector.at bindings."
   (if (and (keywordp arg1) (symbolp arg1))
       `(mem-aref (resolve-pointer ,self) ,arg1 (or ,arg2 0))
-      `(@@@ ,self ,arg1 ,arg2 ,arg3)))
+      `(@@@ ,self ,arg1 ,arg2, arg3, arg4)))
 
 
 (defmacro @@ (ptr type &optional (offset 0))
@@ -549,7 +549,7 @@
 
 ;; uchar* ptr(int i0=0)
 ;; uchar* cv_Mat_ptr_index(Mat* self, int i)
-(defmacro at (&optional self i j type)
+(defmacro at (&optional type self i j)
   `(mem-aref (%ptr ,self ,i) ,type ,j))
 
 
@@ -1348,6 +1348,13 @@
 ;; int cv_Mat_channels(Mat* self)
 (defcfun ("cv_Mat_channels" channels) :int
   (self mat))
+
+
+;; Mat Mat::col(int x) const
+;; Mat* cv_Mat_getCol(Mat* self, int y) 
+(defcfun ("cv_Mat_getCol" col) mat
+  (self mat)
+  (y :int))
 
 
 ;; Mat Mat::colRange(int startcol, int endcol) const
@@ -3068,43 +3075,43 @@
 
 (defun print-vec-2b (vec-2b)
   (if (typep vec-2b 'cv-vec-2b)
-      (format t "~a(~a ~a)" *personalize-print-vec-2b* (@ vec-2b :uchar) (@ vec-2b :uchar 1))
+      (format t "~a(~a ~a)~%" *personalize-print-vec-2b* (@ vec-2b :uchar) (@ vec-2b :uchar 1))
       (error "The value ~a is not of type CV-VEC-2B." vec-2b)))
 
 
 (defun print-vec-2d (vec-2d)
   (if (typep vec-2d 'cv-vec-2d)
-      (format t "~a(~a ~a)" *personalize-print-vec-2d* (@ vec-2d :double) (@ vec-2d :double 1))
+      (format t "~a(~a ~a)~%" *personalize-print-vec-2d* (@ vec-2d :double) (@ vec-2d :double 1))
       (error "The value ~a is not of type CV-VEC-2D." vec-2d)))
 
 
 (defun print-vec-2f (vec-2f)
   (if (typep vec-2f 'cv-vec-2f)
-      (format t "~a(~a ~a)" *personalize-print-vec-2f* (@ vec-2f :float) (@ vec-2f :float 1))
+      (format t "~a(~a ~a)~%" *personalize-print-vec-2f* (@ vec-2f :float) (@ vec-2f :float 1))
       (error "The value ~a is not of type CV-VEC-2F." vec-2f)))
 
 
 (defun print-vec-2i (vec-2i)
   (if (typep vec-2i 'cv-vec-2i)
-      (format t "~a(~a ~a)" *personalize-print-vec-2i* (@ vec-2i :int) (@ vec-2i :int 1))
+      (format t "~a(~a ~a)~%" *personalize-print-vec-2i* (@ vec-2i :int) (@ vec-2i :int 1))
       (error "The value ~a is not of type CV-VEC-2I." vec-2i)))
 
 
 (defun print-vec-2s (vec-2s)
   (if (typep vec-2s 'cv-vec-2s)
-      (format t "~a(~a ~a)" *personalize-print-vec-2s* (@ vec-2s :short) (@ vec-2s :short 1))
+      (format t "~a(~a ~a)~%" *personalize-print-vec-2s* (@ vec-2s :short) (@ vec-2s :short 1))
       (error "The value ~a is not of type CV-VEC-2S." vec-2s)))
 
 
 (defun print-vec-2w (vec-2w)
   (if (typep vec-2w 'cv-vec-2w)
-      (format t "~a(~a ~a)" *personalize-print-vec-2w* (@ vec-2w :ushort) (@ vec-2w :ushort 1))
+      (format t "~a(~a ~a)~%" *personalize-print-vec-2w* (@ vec-2w :ushort) (@ vec-2w :ushort 1))
       (error "The value ~a is not of type CV-VEC-2W." vec-2w)))
 
 
 (defun print-vec-3b (vec-3b)
   (if (typep vec-3b 'cv-vec-3b)
-      (format t "~a(~a ~a ~a)" *personalize-print-vec-3b* 
+      (format t "~a(~a ~a ~a)~%" *personalize-print-vec-3b* 
 	      (@ vec-3b :uchar) 
 	      (@ vec-3b :uchar 1) 
 	      (@ vec-3b :uchar 2))
@@ -3113,7 +3120,7 @@
 
 (defun print-vec-3d (vec-3d)
   (if (typep vec-3d 'cv-vec-3d)
-      (format t "~a(~a ~a ~a)" *personalize-print-vec-3d* 
+      (format t "~a(~a ~a ~a)~%" *personalize-print-vec-3d* 
 	      (@ vec-3d :double) 
 	      (@ vec-3d :double 1) 
 	      (@ vec-3d :double 2))
@@ -3122,7 +3129,7 @@
 
 (defun print-vec-3f (vec-3f)
   (if (typep vec-3f 'cv-vec-3f)
-      (format t "~a(~a ~a ~a)" *personalize-print-vec-3f* 
+      (format t "~a(~a ~a ~a)~%" *personalize-print-vec-3f* 
 	      (@ vec-3f :float) 
 	      (@ vec-3f :float 1) 
 	      (@ vec-3f :float 2))
@@ -3131,7 +3138,7 @@
 
 (defun print-vec-3i (vec-3i)
   (if (typep vec-3i 'cv-vec-3i)
-      (format t "~a(~a ~a ~a)" *personalize-print-vec-3i* 
+      (format t "~a(~a ~a ~a)~%" *personalize-print-vec-3i* 
 	      (@ vec-3i :int) 
 	      (@ vec-3i :int 1) 
 	      (@ vec-3i :int 2))
@@ -3140,7 +3147,7 @@
 
 (defun print-vec-3s (vec-3s)
   (if (typep vec-3s 'cv-vec-3s)
-      (format t "~a(~a ~a ~a)" *personalize-print-vec-3s* 
+      (format t "~a(~a ~a ~a)~%" *personalize-print-vec-3s* 
 	      (@ vec-3s :short) 
 	      (@ vec-3s :short 1) 
 	      (@ vec-3s :short 2))
@@ -3149,7 +3156,7 @@
 
 (defun print-vec-3w (vec-3w)
   (if (typep vec-3w 'cv-vec-3w)
-      (format t "~a(~a ~a ~a)" *personalize-print-vec-3w* 
+      (format t "~a(~a ~a ~a)~%" *personalize-print-vec-3w* 
 	      (@ vec-3w :ushort) 
 	      (@ vec-3w :ushort 1) 
 	      (@ vec-3w :ushort 2))
@@ -3158,7 +3165,7 @@
 
 (defun print-vec-4b (vec-4b)
   (if (typep vec-4b 'cv-vec-4b)
-      (format t "~a(~a ~a ~a ~a)" *personalize-print-vec-4b* 
+      (format t "~a(~a ~a ~a ~a)~%" *personalize-print-vec-4b* 
 	      (@ vec-4b :uchar) (@ vec-4b :uchar 1)
 	      (@ vec-4b :uchar 2) (@ vec-4b :uchar 3))
       (error "The value ~a is not of type CV-VEC-4B." vec-4b)))
@@ -3166,7 +3173,7 @@
 
 (defun print-vec-4d (vec-4d)
   (if (typep vec-4d 'cv-vec-4d)
-      (format t "~a(~a ~a ~a ~a)" *personalize-print-vec-4d* 
+      (format t "~a(~a ~a ~a ~a)~%" *personalize-print-vec-4d* 
 	      (@ vec-4d :double) (@ vec-4d :double 1) 
 	      (@ vec-4d :double 2) (@ vec-4d :double 3))
       (error "The value ~a is not of type CV-VEC-4D." vec-4d)))
@@ -3174,7 +3181,7 @@
 
 (defun print-vec-4f (vec-4f)
   (if (typep vec-4f 'cv-vec-4f)
-      (format t "~a(~a ~a ~a ~a)" *personalize-print-vec-4f* 
+      (format t "~a(~a ~a ~a ~a)~%" *personalize-print-vec-4f* 
 	      (@ vec-4f :float) (@ vec-4f :float 1) 
 	      (@ vec-4f :float 2) (@ vec-4f :float 3))
       (error "The value ~a is not of type CV-VEC-4F." vec-4f)))
@@ -3182,7 +3189,7 @@
 
 (defun print-vec-4i (vec-4i)
   (if (typep vec-4i 'cv-vec-4i)
-      (format t "~a(~a ~a ~a ~a)" *personalize-print-vec-4i* 
+      (format t "~a(~a ~a ~a ~a)~%" *personalize-print-vec-4i* 
 	      (@ vec-4i :int) (@ vec-4i :int 1) 
 	      (@ vec-4i :int 2) (@ vec-4i :int 3))
       (error "The value ~a is not of type CV-VEC-4I." vec-4i)))
@@ -3190,7 +3197,7 @@
 
 (defun print-vec-4s (vec-4s)
   (if (typep vec-4s 'cv-vec-4s)
-      (format t "~a(~a ~a ~a ~a)" *personalize-print-vec-4s* 
+      (format t "~a(~a ~a ~a ~a)~%" *personalize-print-vec-4s* 
 	      (@ vec-4s :short) (@ vec-4s :short 1) 
 	      (@ vec-4s :short 2) (@ vec-4s :short 3))
       (error "The value ~a is not of type CV-VEC-4S." vec-4s)))
@@ -3198,7 +3205,7 @@
 
 (defun print-vec-4w (vec-4w)
   (if (typep vec-4w 'cv-vec-4w)
-      (format t "~a(~a ~a ~a ~a)" *personalize-print-vec-4w* 
+      (format t "~a(~a ~a ~a ~a)~%" *personalize-print-vec-4w* 
 	      (@ vec-4w :ushort) (@ vec-4w :ushort 1)
 	      (@ vec-4w :ushort 2) (@ vec-4w :ushort 3))
       (error "The value ~a is not of type CV-VEC-4W." vec-4w)))
@@ -3206,7 +3213,7 @@
 
 (defun print-vec-6d (vec-6d)
   (if (typep vec-6d 'cv-vec-6d)
-      (format t "~a(~a ~a ~a ~a ~a ~a)" *personalize-print-vec-6d* 
+      (format t "~a(~a ~a ~a ~a ~a ~a)~%" *personalize-print-vec-6d* 
 	      (@ vec-6d :double) (@ vec-6d :double 1)
 	      (@ vec-6d :double 2) (@ vec-6d :double 3)
 	      (@ vec-6d :double 4) (@ vec-6d :double 5))
@@ -3215,7 +3222,7 @@
 
 (defun print-vec-6f (vec-6f)
   (if (typep vec-6f 'cv-vec-6f)
-      (format t "~a(~a ~a ~a ~a ~a ~a)" *personalize-print-vec-6f* 
+      (format t "~a(~a ~a ~a ~a ~a ~a)~%" *personalize-print-vec-6f* 
 	      (@ vec-6f :float) (@ vec-6f :float 1) (@ vec-6f :float 2) 
 	      (@ vec-6f :float 3) (@ vec-6f :float 4) (@ vec-6f :float 5))
       (error "The value ~a is not of type CV-VEC-6F." vec-6f)))
@@ -3223,7 +3230,7 @@
 
 (defun print-vec-6i (vec-6i)
   (if (typep vec-6i 'cv-vec-6i)
-      (format t "~a(~a ~a ~a ~a ~a ~a)" *personalize-print-vec-6i* 
+      (format t "~a(~a ~a ~a ~a ~a ~a)~%" *personalize-print-vec-6i* 
 	      (@ vec-6i :int) (@ vec-6i :int 1) (@ vec-6i :int 2) 
 	      (@ vec-6i :int 3) (@ vec-6i :int 4) (@ vec-6i :int 5))
       (error "The value ~a is not of type CV-VEC-6I." vec-6i)))
@@ -3231,7 +3238,7 @@
 
 (defun print-vec-8i (vec-8i)
   (if (typep vec-8i 'cv-vec-8i)
-      (format t "~a(~a ~a ~a ~a ~a ~a ~a ~a)" *personalize-print-vec-8i* 
+      (format t "~a(~a ~a ~a ~a ~a ~a ~a ~a)~%" *personalize-print-vec-8i* 
 	      (@ vec-8i :int) (@ vec-8i :int 1) (@ vec-8i :int 2) (@ vec-8i :int 3) 
 	      (@ vec-8i :int 4) (@ vec-8i :int 5) (@ vec-8i :int 6) (@ vec-8i :int 7))
       (error "The value ~a is not of type CV-VEC-8I." vec-8i)))
@@ -3251,7 +3258,7 @@
     (cv-vec-3f (print-vec-3f self))
     (cv-vec-3i (print-vec-3i self))
     (cv-vec-3s (print-vec-3s self))
-    (cv-vec-3w (print-vec-4w self))
+    (cv-vec-3w (print-vec-3w self))
     (cv-vec-4b (print-vec-4b self))
     (cv-vec-4d (print-vec-4d self))
     (cv-vec-4f (print-vec-4f self))
@@ -3279,7 +3286,7 @@
     (cv-vec-3f (print-vec-3f self))
     (cv-vec-3i (print-vec-3i self))
     (cv-vec-3s (print-vec-3s self))
-    (cv-vec-3w (print-vec-4w self))
+    (cv-vec-3w (print-vec-3w self))
     (cv-vec-4b (print-vec-4b self))
     (cv-vec-4d (print-vec-4d self))
     (cv-vec-4f (print-vec-4f self))
@@ -4643,6 +4650,7 @@
 	(t nil)))
 
 
+
 ;;; Basic Structures
 
 
@@ -5126,6 +5134,15 @@
   (pca-set-mean self val))
 
 
+;; void perspectiveTransform(InputArray src, OutputArray dst, InputArray m)
+;; void cv_perspectiveTransform(Mat* src, Mat* dst, Mat* m)
+(defcfun ("cv_perspectiveTransform" perspective-transform) :void
+  "Performs the perspective matrix transformation of vectors."
+  (src mat)
+  (dest mat)
+  (m mat))
+
+
 ;; void phase(InputArray x, InputArray y, OutputArray angle, bool angleInDegrees=false)
 ;; void cv_phase(Mat* x, Mat* y, Mat* angle, bool angleInDegrees) 
 (defcfun ("cv_phase" %phase) :void
@@ -5135,7 +5152,7 @@
   (angle-in-degrees :boolean))
 
 
-(defun *phase (x y angle &optional (angle-in-degrees nil))
+(defun phase* (x y angle &optional (angle-in-degrees nil))
   (%phase x y angle angle-in-degrees))
 
 

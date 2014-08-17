@@ -324,6 +324,8 @@
   (+calib-cb-normalize-image+ 2)
   (+calib-cb-filter-quads+ 4)
   (+calib-cb-fast-check+ 8)
+  (+lmeds+ 4)
+  (+ransac+ 8)
 
 ;;; imgproc:
 

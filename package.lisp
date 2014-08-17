@@ -292,6 +292,7 @@
    #:d-tree-params
    #:file-node
    #:file-storage
+   #:flann-based-matcher
    #:hog-descriptor
    #:key-point
    #:k-nearest
@@ -1141,8 +1142,9 @@
    #:pca-back-project
    #:pca-project-2
    #:pca-project
+   #:perspective-transform
    #:project
-   #:phase
+   #:phase*
    #:pow
    #:randu
    #:repeat
@@ -1717,6 +1719,10 @@
    #:+calib-cb-normalize-image+ 
    #:+calib-cb-filter-quads+ 
    #:+calib-cb-fast-check+ 
+   #:+lmeds+ 
+   #:+ransac+
+
+   #:find-homography
 
 
 ;; features2d - Feature Detection and Description
@@ -1739,9 +1745,11 @@
 ;; features2d - Common Interfaces of Descriptor Matchers
 
    #:bf-matcher
-   #:make-bf-matcher
    #:descriptor-matcher-create
    #:descriptor-matcher-match
+   #:flann-based-matcher
+   #:make-bf-matcher
+   #:make-flann-based-matcher
 
 ;;; features2d - Drawing Function of Keypoints and Matches
 

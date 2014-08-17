@@ -497,7 +497,8 @@
 
 ;; calib3d - Camera Calibration and 3D Reconstruction
 
-
+   #:find-homography
+  
 ;; features2d - Feature Detection and Description
 
    #:brisk
@@ -510,7 +511,9 @@
 ;; features2d - Common Interfaces of Descriptor Matchers
 
    #:bf-matcher 
+   #:flann-based-matcher
    #:make-bf-matcher 
+   #:make-flann-based-matcher
 
 ;;; features2d - Drawing Function of Keypoints and Matches
 

@@ -8,8 +8,11 @@
 
 ;;; DEFGENERIC
 
-(defgeneric @@@ (self &optional arg1 arg2)
+(defgeneric @@@ (self arg1 &optional arg2 arg3 arg4)
     (:documentation "Used to overload the @ name. Used for accessor type functions."))
+
+(defgeneric (setf @@@) (val self arg1 &optional arg2 arg3 arg4)
+    (:documentation "Used to overload the @ name. Used to make accessor type functions setf-able."))
 
 (defgeneric abs (self)
   (:documentation "Used to call the binding for the OpenCV function 'abs' and CL:ABS."))
@@ -174,18 +177,866 @@
 ;;;DEFMETHODS
 
 
-(defmethod @@@ ((self std-vector-char) &optional arg1 arg2)
+(defmethod @@@ ((self (eql :char)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+    (cond (arg4 
+	 (mem-aref (foreign-funcall "cv_Mat_at_char_3" 
+				    :pointer (c-pointer arg1) :int arg2 :int arg3 :int arg4 
+				    :pointer) :char))
+
+	((and arg3 (not arg4))
+	 (mem-aref (foreign-funcall "cv_Mat_at_char_2" 
+				    :pointer (c-pointer arg1) :int arg2 :int arg3 
+				    :pointer) :char))
+	(t
+	 (mem-aref (foreign-funcall "cv_Mat_at_char_1" 
+				    :pointer (c-pointer arg1) :int (or arg2 0)
+				    :pointer) :char))))
+
+
+(defmethod (setf @@@) (val (self (eql :char)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+ (cond  
+   (arg4 
+     (let ((temp (foreign-funcall "cv_Mat_at_char_3" 
+				  :pointer (c-pointer arg1) :int arg2 :int arg3 :int arg4 
+				  :pointer)))
+       (setf (mem-aref temp :char) val)))
+
+    ((and arg3 (not arg4))
+     (let ((temp (foreign-funcall "cv_Mat_at_char_2" 
+				  :pointer (c-pointer arg1) :int arg2 :int arg3 
+				  :pointer)))
+       (setf (mem-aref temp :char) val)))
+
+    (t
+     (let ((temp (foreign-funcall "cv_Mat_at_char_1" 
+				  :pointer (c-pointer arg1) :int (or arg2 0)
+				  :pointer)))
+       (setf (mem-aref temp :char) val)))))
+
+
+(defmethod @@@ ((self (eql :double)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+    (cond (arg4 
+	 (mem-aref (foreign-funcall "cv_Mat_at_double_3" 
+				    :pointer (c-pointer arg1) :int arg2 :int arg3 :int arg4 
+				    :pointer) :double))
+
+	((and arg3 (not arg4))
+	 (mem-aref (foreign-funcall "cv_Mat_at_double_2" 
+				    :pointer (c-pointer arg1) :int arg2 :int arg3 
+				    :pointer) :double))
+	(t
+	 (mem-aref (foreign-funcall "cv_Mat_at_double_1" 
+				    :pointer (c-pointer arg1) :int (or arg2 0)
+				    :pointer) :double))))
+
+
+(defmethod (setf @@@) (val (self (eql :double)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+ (cond  
+   (arg4 
+     (let ((temp (foreign-funcall "cv_Mat_at_double_3" 
+				  :pointer (c-pointer arg1) :int arg2 :int arg3 :int arg4 
+				  :pointer)))
+       (setf (mem-aref temp :double) val)))
+
+    ((and arg3 (not arg4))
+     (let ((temp (foreign-funcall "cv_Mat_at_double_2" 
+				  :pointer (c-pointer arg1) :int arg2 :int arg3 
+				  :pointer)))
+       (setf (mem-aref temp :double) val)))
+
+    (t
+     (let ((temp (foreign-funcall "cv_Mat_at_double_1" 
+				  :pointer (c-pointer arg1) :int (or arg2 0)
+				  :pointer)))
+       (setf (mem-aref temp :double) val)))))
+
+
+(defmethod @@@ ((self (eql :float)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+    (cond (arg4 
+	 (mem-aref (foreign-funcall "cv_Mat_at_float_3" 
+				    :pointer (c-pointer arg1) :int arg2 :int arg3 :int arg4 
+				    :pointer) :float))
+
+	((and arg3 (not arg4))
+	 (mem-aref (foreign-funcall "cv_Mat_at_float_2" 
+				    :pointer (c-pointer arg1) :int arg2 :int arg3 
+				    :pointer) :float))
+	(t
+	 (mem-aref (foreign-funcall "cv_Mat_at_float_1" 
+				    :pointer (c-pointer arg1) :int (or arg2 0)
+				    :pointer) :float))))
+
+
+(defmethod (setf @@@) (val (self (eql :float)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+ (cond  
+   (arg4 
+     (let ((temp (foreign-funcall "cv_Mat_at_float_3" 
+				  :pointer (c-pointer arg1) :int arg2 :int arg3 :int arg4 
+				  :pointer)))
+       (setf (mem-aref temp :float) val)))
+
+    ((and arg3 (not arg4))
+     (let ((temp (foreign-funcall "cv_Mat_at_float_2" 
+				  :pointer (c-pointer arg1) :int arg2 :int arg3 
+				  :pointer)))
+       (setf (mem-aref temp :float) val)))
+
+    (t
+     (let ((temp (foreign-funcall "cv_Mat_at_float_1" 
+				  :pointer (c-pointer arg1) :int (or arg2 0)
+				  :pointer)))
+       (setf (mem-aref temp :float) val)))))
+
+
+(defmethod @@@ ((self (eql :int)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+    (cond (arg4 
+	 (mem-aref (foreign-funcall "cv_Mat_at_int_3" 
+				    :pointer (c-pointer arg1) :int arg2 :int arg3 :int arg4 
+				    :pointer) :int))
+
+	((and arg3 (not arg4))
+	 (mem-aref (foreign-funcall "cv_Mat_at_int_2" 
+				    :pointer (c-pointer arg1) :int arg2 :int arg3 
+				    :pointer) :int))
+	(t
+	 (mem-aref (foreign-funcall "cv_Mat_at_int_1" 
+				    :pointer (c-pointer arg1) :int (or arg2 0)
+				    :pointer) :int))))
+
+
+(defmethod (setf @@@) (val (self (eql :int)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+ (cond  
+   (arg4 
+     (let ((temp (foreign-funcall "cv_Mat_at_int_3" 
+				  :pointer (c-pointer arg1) :int arg2 :int arg3 :int arg4 
+				  :pointer)))
+       (setf (mem-aref temp :int) val)))
+
+    ((and arg3 (not arg4))
+     (let ((temp (foreign-funcall "cv_Mat_at_int_2" 
+				  :pointer (c-pointer arg1) :int arg2 :int arg3 
+				  :pointer)))
+       (setf (mem-aref temp :int) val)))
+
+    (t
+     (let ((temp (foreign-funcall "cv_Mat_at_int_1" 
+				  :pointer (c-pointer arg1) :int (or arg2 0)
+				  :pointer)))
+       (setf (mem-aref temp :int) val)))))
+
+
+(defmethod @@@ ((self (eql :short)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+    (cond (arg4 
+	 (mem-aref (foreign-funcall "cv_Mat_at_short_3" 
+				    :pointer (c-pointer arg1) :int arg2 :int arg3 :int arg4 
+				    :pointer) :short))
+
+	((and arg3 (not arg4))
+	 (mem-aref (foreign-funcall "cv_Mat_at_short_2" 
+				    :pointer (c-pointer arg1) :int arg2 :int arg3 
+				    :pointer) :short))
+	(t
+	 (mem-aref (foreign-funcall "cv_Mat_at_short_1" 
+				    :pointer (c-pointer arg1) :int (or arg2 0)
+				    :pointer) :short))))
+
+
+(defmethod (setf @@@) (val (self (eql :short)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+ (cond  
+   (arg4 
+     (let ((temp (foreign-funcall "cv_Mat_at_short_3" 
+				  :pointer (c-pointer arg1) :int arg2 :int arg3 :int arg4 
+				  :pointer)))
+       (setf (mem-aref temp :short) val)))
+
+    ((and arg3 (not arg4))
+     (let ((temp (foreign-funcall "cv_Mat_at_short_2" 
+				  :pointer (c-pointer arg1) :int arg2 :int arg3 
+				  :pointer)))
+       (setf (mem-aref temp :short) val)))
+
+    (t
+     (let ((temp (foreign-funcall "cv_Mat_at_short_1" 
+				  :pointer (c-pointer arg1) :int (or arg2 0)
+				  :pointer)))
+       (setf (mem-aref temp :short) val)))))
+
+
+(defmethod @@@ ((self (eql :uchar)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+    (cond (arg4 
+	 (mem-aref (foreign-funcall "cv_Mat_at_uchar_3" 
+				    :pointer (c-pointer arg1) :int arg2 :int arg3 :int arg4 
+				    :pointer) :uchar))
+
+	((and arg3 (not arg4))
+	 (mem-aref (foreign-funcall "cv_Mat_at_uchar_2" 
+				    :pointer (c-pointer arg1) :int arg2 :int arg3 
+				    :pointer) :uchar))
+	(t
+	 (mem-aref (foreign-funcall "cv_Mat_at_uchar_1" 
+				    :pointer (c-pointer arg1) :int (or arg2 0)
+				    :pointer) :uchar))))
+
+
+(defmethod (setf @@@) (val (self (eql :uchar)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+ (cond  
+   (arg4 
+     (let ((temp (foreign-funcall "cv_Mat_at_uchar_3" 
+				  :pointer (c-pointer arg1) :int arg2 :int arg3 :int arg4 
+				  :pointer)))
+       (setf (mem-aref temp :uchar) val)))
+
+    ((and arg3 (not arg4))
+     (let ((temp (foreign-funcall "cv_Mat_at_uchar_2" 
+				  :pointer (c-pointer arg1) :int arg2 :int arg3 
+				  :pointer)))
+       (setf (mem-aref temp :uchar) val)))
+
+    (t
+     (let ((temp (foreign-funcall "cv_Mat_at_uchar_1" 
+				  :pointer (c-pointer arg1) :int (or arg2 0)
+				  :pointer)))
+       (setf (mem-aref temp :uchar) val)))))
+
+
+(defmethod @@@ ((self (eql :ushort)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+    (cond (arg4 
+	 (mem-aref (foreign-funcall "cv_Mat_at_ushort_3" 
+				    :pointer (c-pointer arg1) :int arg2 :int arg3 :int arg4 
+				    :pointer) :ushort))
+
+	((and arg3 (not arg4))
+	 (mem-aref (foreign-funcall "cv_Mat_at_ushort_2" 
+				    :pointer (c-pointer arg1) :int arg2 :int arg3 
+				    :pointer) :ushort))
+	(t
+	 (mem-aref (foreign-funcall "cv_Mat_at_ushort_1" 
+				    :pointer (c-pointer arg1) :int (or arg2 0)
+				    :pointer) :ushort))))
+
+
+(defmethod (setf @@@) (val (self (eql :ushort)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+ (cond  
+   (arg4 
+     (let ((temp (foreign-funcall "cv_Mat_at_ushort_3" 
+				  :pointer (c-pointer arg1) :int arg2 :int arg3 :int arg4 
+				  :pointer)))
+       (setf (mem-aref temp :ushort) val)))
+
+    ((and arg3 (not arg4))
+     (let ((temp (foreign-funcall "cv_Mat_at_ushort_2" 
+				  :pointer (c-pointer arg1) :int arg2 :int arg3 
+				  :pointer)))
+       (setf (mem-aref temp :ushort) val)))
+
+    (t
+     (let ((temp (foreign-funcall "cv_Mat_at_ushort_1" 
+				  :pointer (c-pointer arg1) :int (or arg2 0)
+				  :pointer)))
+       (setf (mem-aref temp :ushort) val)))))
+
+
+(defmethod @@@ ((self (eql :point)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+    (if arg4 (error "invalid number of arguments: 5"))
+    (cond (arg3 
+	   (make-instance 'cv-point :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Point_2" :pointer (c-pointer arg1) 
+					   :int arg2 :int arg3 :pointer)))
+	  (t 
+	   (make-instance 'cv-point :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Point_1" :pointer (c-pointer arg1) 
+					   :int (or arg2 0) :pointer)))))
+
+
+(defmethod (setf @@@) (val (self (eql :point)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+  (if arg4 (error "invalid number of arguments: 5"))
+  (cond (arg3
+	 (make-instance 'cv-point :c-pointer 
+			(foreign-funcall "cv_Mat_at_Point_set_Val_2" :pointer (c-pointer arg1) 
+					 :int arg2 :int arg3 :pointer (c-pointer val) :pointer)))
+	(t 
+	 (make-instance 'cv-point :c-pointer 
+			(foreign-funcall "cv_Mat_at_Point_set_Val_1" :pointer (c-pointer arg1)
+					 :int (or arg2 0) :pointer (c-pointer val) :pointer)))))
+
+
+(defmethod @@@ ((self (eql :point-2d)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+    (if arg4 (error "invalid number of arguments: 5"))
+    (cond (arg3 
+	   (make-instance 'cv-point-2d :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Point2d_2" :pointer (c-pointer arg1) 
+					   :int arg2 :int arg3 :pointer)))
+	  (t 
+	   (make-instance 'cv-point-2d :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Point2d_1" :pointer (c-pointer arg1) 
+					   :int (or arg2 0) :pointer)))))
+
+
+(defmethod (setf @@@) (val (self (eql :point-2d)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+  (if arg4 (error "invalid number of arguments: 5"))
+  (cond (arg3
+	 (make-instance 'cv-point-2d :c-pointer 
+			(foreign-funcall "cv_Mat_at_Point2d_set_Val_2" :pointer (c-pointer arg1) 
+					 :int arg2 :int arg3 :pointer (c-pointer val) :pointer)))
+	(t 
+	 (make-instance 'cv-point-2d :c-pointer 
+			(foreign-funcall "cv_Mat_at_Point2d_set_Val_1" :pointer (c-pointer arg1)
+					 :int (or arg2 0) :pointer (c-pointer val) :pointer)))))
+
+
+(defmethod @@@ ((self (eql :point-2f)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+    (if arg4 (error "invalid number of arguments: 5"))
+    (cond (arg3 
+	   (make-instance 'cv-point-2f :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Point2f_2" :pointer (c-pointer arg1) 
+					   :int arg2 :int arg3 :pointer)))
+	  (t 
+	   (make-instance 'cv-point-2f :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Point2f_1" :pointer (c-pointer arg1) 
+					   :int (or arg2 0) :pointer)))))
+
+
+(defmethod (setf @@@) (val (self (eql :point-2f)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+  (if arg4 (error "invalid number of arguments: 5"))
+  (cond (arg3
+	 (make-instance 'cv-point-2f :c-pointer 
+			(foreign-funcall "cv_Mat_at_Point2f_set_Val_2" :pointer (c-pointer arg1) 
+					 :int arg2 :int arg3 :pointer (c-pointer val) :pointer)))
+	(t 
+	 (make-instance 'cv-point-2f :c-pointer 
+			(foreign-funcall "cv_Mat_at_Point2f_set_Val_1" :pointer (c-pointer arg1)
+					 :int (or arg2 0) :pointer (c-pointer val) :pointer)))))
+
+
+(defmethod @@@ ((self (eql :point-3d)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+    (if arg4 (error "invalid number of arguments: 5"))
+    (cond (arg3 
+	   (make-instance 'cv-point-3d :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Point3d_2" :pointer (c-pointer arg1) 
+					   :int arg2 :int arg3 :pointer)))
+	  (t 
+	   (make-instance 'cv-point-3d :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Point3d_1" :pointer (c-pointer arg1) 
+					   :int (or arg2 0) :pointer)))))
+
+
+(defmethod (setf @@@) (val (self (eql :point-3d)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+  (if arg4 (error "invalid number of arguments: 5"))
+  (cond (arg3
+	 (make-instance 'cv-point-3d :c-pointer 
+			(foreign-funcall "cv_Mat_at_Point3d_set_Val_2" :pointer (c-pointer arg1) 
+					 :int arg2 :int arg3 :pointer (c-pointer val) :pointer)))
+	(t 
+	 (make-instance 'cv-point-3d :c-pointer 
+			(foreign-funcall "cv_Mat_at_Point3d_set_Val_1" :pointer (c-pointer arg1)
+					 :int (or arg2 0) :pointer (c-pointer val) :pointer)))))
+
+
+(defmethod @@@ ((self (eql :point-3f)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+    (if arg4 (error "invalid number of arguments: 5"))
+    (cond (arg3 
+	   (make-instance 'cv-point-3f :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Point3f_2" :pointer (c-pointer arg1) 
+					   :int arg2 :int arg3 :pointer)))
+	  (t 
+	   (make-instance 'cv-point-3f :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Point3f_1" :pointer (c-pointer arg1) 
+					   :int (or arg2 0) :pointer)))))
+
+
+(defmethod (setf @@@) (val (self (eql :point-3f)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+  (if arg4 (error "invalid number of arguments: 5"))
+  (cond (arg3
+	 (make-instance 'cv-point-3f :c-pointer 
+			(foreign-funcall "cv_Mat_at_Point3f_set_Val_2" :pointer (c-pointer arg1) 
+					 :int arg2 :int arg3 :pointer (c-pointer val) :pointer)))
+	(t 
+	 (make-instance 'cv-point-3f :c-pointer 
+			(foreign-funcall "cv_Mat_at_Point3f_set_Val_1" :pointer (c-pointer arg1)
+					 :int (or arg2 0) :pointer (c-pointer val) :pointer)))))
+
+
+(defmethod @@@ ((self (eql :point-3i)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+    (if arg4 (error "invalid number of arguments: 5"))
+    (cond (arg3 
+	   (make-instance 'cv-point-3i :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Point3i_2" :pointer (c-pointer arg1) 
+					   :int arg2 :int arg3 :pointer)))
+	  (t 
+	   (make-instance 'cv-point-3i :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Point3i_1" :pointer (c-pointer arg1) 
+					   :int (or arg2 0) :pointer)))))
+
+
+(defmethod (setf @@@) (val (self (eql :point-3i)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+  (if arg4 (error "invalid number of arguments: 5"))
+  (cond (arg3
+	 (make-instance 'cv-point-3i :c-pointer 
+			(foreign-funcall "cv_Mat_at_Point3i_set_Val_2" :pointer (c-pointer arg1) 
+					 :int arg2 :int arg3 :pointer (c-pointer val) :pointer)))
+	(t 
+	 (make-instance 'cv-point-3i :c-pointer 
+			(foreign-funcall "cv_Mat_at_Point3i_set_Val_1" :pointer (c-pointer arg1)
+					 :int (or arg2 0) :pointer (c-pointer val) :pointer)))))
+
+
+(defmethod @@@ ((self (eql :vec-2b)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+    (if arg4 (error "invalid number of arguments: 5"))
+    (cond (arg3 
+	   (make-instance 'cv-vec-2b :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Vec2b_2" :pointer (c-pointer arg1) 
+					   :int arg2 :int arg3 :pointer)))
+	  (t 
+	   (make-instance 'cv-vec-2b :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Vec2b_1" :pointer (c-pointer arg1) 
+					   :int (or arg2 0) :pointer)))))
+
+
+(defmethod (setf @@@) (val (self (eql :vec-2b)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+  (if arg4 (error "invalid number of arguments: 5"))
+  (cond (arg3 
+	 (make-instance 'cv-vec-2b :c-pointer 
+			(foreign-funcall "cv_Mat_at_Vec2b_set_Val_2" :pointer (c-pointer arg1) 
+					 :int arg2 :int arg3 :pointer (c-pointer val) :pointer)))
+	(t 
+	 (make-instance 'cv-vec-2b :c-pointer
+			(foreign-funcall "cv_Mat_at_Vec2b_set_Val_1" :pointer (c-pointer arg1)
+					 :int (or arg2 0) :pointer (c-pointer val) :pointer)))))
+
+
+(defmethod @@@ ((self (eql :vec-3b)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+    (if arg4 (error "invalid number of arguments: 5"))
+    (cond (arg3 
+	   (make-instance 'cv-vec-3b :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Vec3b_2" :pointer (c-pointer arg1) 
+					   :int arg2 :int arg3 :pointer)))
+	  (t 
+	   (make-instance 'cv-vec-3b :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Vec3b_1" :pointer (c-pointer arg1) 
+					   :int (or arg2 0) :pointer)))))
+
+
+(defmethod (setf @@@) (val (self (eql :vec-3b)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+  (if arg4 (error "invalid number of arguments: 5"))
+  (cond (arg3 
+	 (make-instance 'cv-vec-3b :c-pointer 
+			(foreign-funcall "cv_Mat_at_Vec3b_set_Val_2" :pointer (c-pointer arg1) 
+					 :int arg2 :int arg3 :pointer (c-pointer val) :pointer)))
+	(t 
+	 (make-instance 'cv-vec-3b :c-pointer
+			(foreign-funcall "cv_Mat_at_Vec3b_set_Val_1" :pointer (c-pointer arg1)
+					 :int (or arg2 0) :pointer (c-pointer val) :pointer)))))
+
+
+(defmethod @@@ ((self (eql :vec-4b)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+    (if arg4 (error "invalid number of arguments: 5"))
+    (cond (arg3 
+	   (make-instance 'cv-vec-4b :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Vec4b_2" :pointer (c-pointer arg1) 
+					   :int arg2 :int arg3 :pointer)))
+	  (t 
+	   (make-instance 'cv-vec-4b :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Vec4b_1" :pointer (c-pointer arg1) 
+					   :int (or arg2 0) :pointer)))))
+
+
+(defmethod (setf @@@) (val (self (eql :vec-4b)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+  (if arg4 (error "invalid number of arguments: 5"))
+  (cond (arg3 
+	 (make-instance 'cv-vec-4b :c-pointer 
+			(foreign-funcall "cv_Mat_at_Vec4b_set_Val_2" :pointer (c-pointer arg1) 
+					 :int arg2 :int arg3 :pointer (c-pointer val) :pointer)))
+	(t 
+	 (make-instance 'cv-vec-4b :c-pointer
+			(foreign-funcall "cv_Mat_at_Vec4b_set_Val_1" :pointer (c-pointer arg1)
+					 :int (or arg2 0) :pointer (c-pointer val) :pointer)))))
+
+
+(defmethod @@@ ((self (eql :vec-2d)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+    (if arg4 (error "invalid number of arguments: 5"))
+    (cond (arg3 
+	   (make-instance 'cv-vec-2d :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Vec2d_2" :pointer (c-pointer arg1) 
+					   :int arg2 :int arg3 :pointer)))
+	  (t 
+	   (make-instance 'cv-vec-2d :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Vec2d_1" :pointer (c-pointer arg1) 
+					   :int (or arg2 0) :pointer)))))
+
+
+(defmethod (setf @@@) (val (self (eql :vec-2d)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+  (if arg4 (error "invalid number of arguments: 5"))
+  (cond (arg3 
+	 (make-instance 'cv-vec-2d :c-pointer 
+			(foreign-funcall "cv_Mat_at_Vec2d_set_Val_2" :pointer (c-pointer arg1) 
+					 :int arg2 :int arg3 :pointer (c-pointer val) :pointer)))
+	(t 
+	 (make-instance 'cv-vec-2d :c-pointer
+			(foreign-funcall "cv_Mat_at_Vec2d_set_Val_1" :pointer (c-pointer arg1)
+					 :int (or arg2 0) :pointer (c-pointer val) :pointer)))))
+
+
+(defmethod @@@ ((self (eql :vec-3d)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+    (if arg4 (error "invalid number of arguments: 5"))
+    (cond (arg3 
+	   (make-instance 'cv-vec-3d :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Vec3d_2" :pointer (c-pointer arg1) 
+					   :int arg2 :int arg3 :pointer)))
+	  (t 
+	   (make-instance 'cv-vec-3d :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Vec3d_1" :pointer (c-pointer arg1) 
+					   :int (or arg2 0) :pointer)))))
+
+
+(defmethod (setf @@@) (val (self (eql :vec-3d)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+  (if arg4 (error "invalid number of arguments: 5"))
+  (cond (arg3 
+	 (make-instance 'cv-vec-3d :c-pointer 
+			(foreign-funcall "cv_Mat_at_Vec3d_set_Val_2" :pointer (c-pointer arg1) 
+					 :int arg2 :int arg3 :pointer (c-pointer val) :pointer)))
+	(t 
+	 (make-instance 'cv-vec-3d :c-pointer
+			(foreign-funcall "cv_Mat_at_Vec3d_set_Val_1" :pointer (c-pointer arg1)
+					 :int (or arg2 0) :pointer (c-pointer val) :pointer)))))
+
+(defmethod @@@ ((self (eql :vec-4d)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+    (if arg4 (error "invalid number of arguments: 5"))
+    (cond (arg3 
+	   (make-instance 'cv-vec-4d :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Vec4d_2" :pointer (c-pointer arg1) 
+					   :int arg2 :int arg3 :pointer)))
+	  (t 
+	   (make-instance 'cv-vec-4d :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Vec4d_1" :pointer (c-pointer arg1) 
+					   :int (or arg2 0) :pointer)))))
+
+
+(defmethod (setf @@@) (val (self (eql :vec-4d)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+  (if arg4 (error "invalid number of arguments: 5"))
+  (cond (arg3 
+	 (make-instance 'cv-vec-4d :c-pointer 
+			(foreign-funcall "cv_Mat_at_Vec4d_set_Val_2" :pointer (c-pointer arg1) 
+					 :int arg2 :int arg3 :pointer (c-pointer val) :pointer)))
+	(t 
+	 (make-instance 'cv-vec-4d :c-pointer
+			(foreign-funcall "cv_Mat_at_Vec4d_set_Val_1" :pointer (c-pointer arg1)
+					 :int (or arg2 0) :pointer (c-pointer val) :pointer)))))
+
+
+(defmethod @@@ ((self (eql :vec-2f)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+    (if arg4 (error "invalid number of arguments: 5"))
+    (cond (arg3 
+	   (make-instance 'cv-vec-2f :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Vec2f_2" :pointer (c-pointer arg1) 
+					   :int arg2 :int arg3 :pointer)))
+	  (t 
+	   (make-instance 'cv-vec-2f :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Vec2f_1" :pointer (c-pointer arg1) 
+					   :int (or arg2 0) :pointer)))))
+
+
+(defmethod (setf @@@) (val (self (eql :vec-2f)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+  (if arg4 (error "invalid number of arguments: 5"))
+  (cond (arg3 
+	 (make-instance 'cv-vec-2f :c-pointer 
+			(foreign-funcall "cv_Mat_at_Vec2f_set_Val_2" :pointer (c-pointer arg1) 
+					 :int arg2 :int arg3 :pointer (c-pointer val) :pointer)))
+	(t 
+	 (make-instance 'cv-vec-2f :c-pointer
+			(foreign-funcall "cv_Mat_at_Vec2f_set_Val_1" :pointer (c-pointer arg1)
+					 :int (or arg2 0) :pointer (c-pointer val) :pointer)))))
+
+
+(defmethod @@@ ((self (eql :vec-3f)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+    (if arg4 (error "invalid number of arguments: 5"))
+    (cond (arg3 
+	   (make-instance 'cv-vec-3f :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Vec3f_2" :pointer (c-pointer arg1) 
+					   :int arg2 :int arg3 :pointer)))
+	  (t 
+	   (make-instance 'cv-vec-3f :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Vec3f_1" :pointer (c-pointer arg1) 
+					   :int (or arg2 0) :pointer)))))
+
+
+(defmethod (setf @@@) (val (self (eql :vec-3f)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+  (if arg4 (error "invalid number of arguments: 5"))
+  (cond (arg3 
+	 (make-instance 'cv-vec-3f :c-pointer 
+			(foreign-funcall "cv_Mat_at_Vec3f_set_Val_2" :pointer (c-pointer arg1) 
+					 :int arg2 :int arg3 :pointer (c-pointer val) :pointer)))
+	(t 
+	 (make-instance 'cv-vec-3f :c-pointer
+			(foreign-funcall "cv_Mat_at_Vec3f_set_Val_1" :pointer (c-pointer arg1)
+					 :int (or arg2 0) :pointer (c-pointer val) :pointer)))))
+
+
+(defmethod @@@ ((self (eql :vec-4f)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+    (if arg4 (error "invalid number of arguments: 5"))
+    (cond (arg3 
+	   (make-instance 'cv-vec-4f :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Vec4f_2" :pointer (c-pointer arg1) 
+					   :int arg2 :int arg3 :pointer)))
+	  (t 
+	   (make-instance 'cv-vec-4f :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Vec4f_1" :pointer (c-pointer arg1) 
+					   :int (or arg2 0) :pointer)))))
+
+
+(defmethod (setf @@@) (val (self (eql :vec-4f)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+  (if arg4 (error "invalid number of arguments: 5"))
+  (cond (arg3 
+	 (make-instance 'cv-vec-4f :c-pointer 
+			(foreign-funcall "cv_Mat_at_Vec4f_set_Val_2" :pointer (c-pointer arg1) 
+					 :int arg2 :int arg3 :pointer (c-pointer val) :pointer)))
+	(t 
+	 (make-instance 'cv-vec-4f :c-pointer
+			(foreign-funcall "cv_Mat_at_Vec4f_set_Val_1" :pointer (c-pointer arg1)
+					 :int (or arg2 0) :pointer (c-pointer val) :pointer)))))
+
+
+(defmethod @@@ ((self (eql :vec-2i)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+    (if arg4 (error "invalid number of arguments: 5"))
+    (cond (arg3 
+	   (make-instance 'cv-vec-2i :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Vec2i_2" :pointer (c-pointer arg1) 
+					   :int arg2 :int arg3 :pointer)))
+	  (t 
+	   (make-instance 'cv-vec-2i :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Vec2i_1" :pointer (c-pointer arg1) 
+					   :int (or arg2 0) :pointer)))))
+
+
+(defmethod (setf @@@) (val (self (eql :vec-2i)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+  (if arg4 (error "invalid number of arguments: 5"))
+  (cond (arg3 
+	 (make-instance 'cv-vec-2i :c-pointer 
+			(foreign-funcall "cv_Mat_at_Vec2i_set_Val_2" :pointer (c-pointer arg1) 
+					 :int arg2 :int arg3 :pointer (c-pointer val) :pointer)))
+	(t 
+	 (make-instance 'cv-vec-2i :c-pointer
+			(foreign-funcall "cv_Mat_at_Vec2i_set_Val_1" :pointer (c-pointer arg1)
+					 :int (or arg2 0) :pointer (c-pointer val) :pointer)))))
+
+
+(defmethod @@@ ((self (eql :vec-3i)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+    (if arg4 (error "invalid number of arguments: 5"))
+    (cond (arg3 
+	   (make-instance 'cv-vec-3i :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Vec3i_2" :pointer (c-pointer arg1) 
+					   :int arg2 :int arg3 :pointer)))
+	  (t 
+	   (make-instance 'cv-vec-3i :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Vec3i_1" :pointer (c-pointer arg1) 
+					   :int (or arg2 0) :pointer)))))
+
+
+(defmethod (setf @@@) (val (self (eql :vec-3i)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+  (if arg4 (error "invalid number of arguments: 5"))
+  (cond (arg3 
+	 (make-instance 'cv-vec-3i :c-pointer 
+			(foreign-funcall "cv_Mat_at_Vec3i_set_Val_2" :pointer (c-pointer arg1) 
+					 :int arg2 :int arg3 :pointer (c-pointer val) :pointer)))
+	(t 
+	 (make-instance 'cv-vec-3i :c-pointer
+			(foreign-funcall "cv_Mat_at_Vec3i_set_Val_1" :pointer (c-pointer arg1)
+					 :int (or arg2 0) :pointer (c-pointer val) :pointer)))))
+
+
+(defmethod @@@ ((self (eql :vec-4i)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+    (if arg4 (error "invalid number of arguments: 5"))
+    (cond (arg3 
+	   (make-instance 'cv-vec-4i :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Vec4i_2" :pointer (c-pointer arg1) 
+					   :int arg2 :int arg3 :pointer)))
+	  (t 
+	   (make-instance 'cv-vec-4i :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Vec4i_1" :pointer (c-pointer arg1) 
+					   :int (or arg2 0) :pointer)))))
+
+
+(defmethod (setf @@@) (val (self (eql :vec-4i)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+  (if arg4 (error "invalid number of arguments: 5"))
+  (cond (arg3 
+	 (make-instance 'cv-vec-4i :c-pointer 
+			(foreign-funcall "cv_Mat_at_Vec4i_set_Val_2" :pointer (c-pointer arg1) 
+					 :int arg2 :int arg3 :pointer (c-pointer val) :pointer)))
+	(t 
+	 (make-instance 'cv-vec-4i :c-pointer
+			(foreign-funcall "cv_Mat_at_Vec4i_set_Val_1" :pointer (c-pointer arg1)
+					 :int (or arg2 0) :pointer (c-pointer val) :pointer)))))
+
+
+(defmethod @@@ ((self (eql :vec-2s)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+    (if arg4 (error "invalid number of arguments: 5"))
+    (cond (arg3 
+	   (make-instance 'cv-vec-2s :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Vec2s_2" :pointer (c-pointer arg1) 
+					   :int arg2 :int arg3 :pointer)))
+	  (t 
+	   (make-instance 'cv-vec-2s :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Vec2s_1" :pointer (c-pointer arg1) 
+					   :int (or arg2 0) :pointer)))))
+
+
+(defmethod (setf @@@) (val (self (eql :vec-2s)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+  (if arg4 (error "invalid number of arguments: 5"))
+  (cond (arg3 
+	 (make-instance 'cv-vec-2s :c-pointer 
+			(foreign-funcall "cv_Mat_at_Vec2s_set_Val_2" :pointer (c-pointer arg1) 
+					 :int arg2 :int arg3 :pointer (c-pointer val) :pointer)))
+	(t 
+	 (make-instance 'cv-vec-2s :c-pointer
+			(foreign-funcall "cv_Mat_at_Vec2s_set_Val_1" :pointer (c-pointer arg1)
+					 :int (or arg2 0) :pointer (c-pointer val) :pointer)))))
+
+
+(defmethod @@@ ((self (eql :vec-3s)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+    (if arg4 (error "invalid number of arguments: 5"))
+    (cond (arg3 
+	   (make-instance 'cv-vec-3s :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Vec3s_2" :pointer (c-pointer arg1) 
+					   :int arg2 :int arg3 :pointer)))
+	  (t 
+	   (make-instance 'cv-vec-3s :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Vec3s_1" :pointer (c-pointer arg1) 
+					   :int (or arg2 0) :pointer)))))
+
+
+(defmethod (setf @@@) (val (self (eql :vec-3s)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+  (if arg4 (error "invalid number of arguments: 5"))
+  (cond (arg3 
+	 (make-instance 'cv-vec-3s :c-pointer 
+			(foreign-funcall "cv_Mat_at_Vec3s_set_Val_2" :pointer (c-pointer arg1) 
+					 :int arg2 :int arg3 :pointer (c-pointer val) :pointer)))
+	(t 
+	 (make-instance 'cv-vec-3s :c-pointer
+			(foreign-funcall "cv_Mat_at_Vec3s_set_Val_1" :pointer (c-pointer arg1)
+					 :int (or arg2 0) :pointer (c-pointer val) :pointer)))))
+
+
+(defmethod @@@ ((self (eql :vec-4s)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+    (if arg4 (error "invalid number of arguments: 5"))
+    (cond (arg3 
+	   (make-instance 'cv-vec-4s :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Vec4s_2" :pointer (c-pointer arg1) 
+					   :int arg2 :int arg3 :pointer)))
+	  (t 
+	   (make-instance 'cv-vec-4s :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Vec4s_1" :pointer (c-pointer arg1) 
+					   :int (or arg2 0) :pointer)))))
+
+
+(defmethod (setf @@@) (val (self (eql :vec-4s)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+  (if arg4 (error "invalid number of arguments: 5"))
+  (cond (arg3 
+	 (make-instance 'cv-vec-4s :c-pointer 
+			(foreign-funcall "cv_Mat_at_Vec4s_set_Val_2" :pointer (c-pointer arg1) 
+					 :int arg2 :int arg3 :pointer (c-pointer val) :pointer)))
+	(t 
+	 (make-instance 'cv-vec-4s :c-pointer
+			(foreign-funcall "cv_Mat_at_Vec4s_set_Val_1" :pointer (c-pointer arg1)
+					 :int (or arg2 0) :pointer (c-pointer val) :pointer)))))
+
+
+(defmethod @@@ ((self (eql :vec-2w)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+    (if arg4 (error "invalid number of arguments: 5"))
+    (cond (arg3 
+	   (make-instance 'cv-vec-2w :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Vec2w_2" :pointer (c-pointer arg1) 
+					   :int arg2 :int arg3 :pointer)))
+	  (t 
+	   (make-instance 'cv-vec-2w :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Vec2w_1" :pointer (c-pointer arg1) 
+					   :int (or arg2 0) :pointer)))))
+
+
+(defmethod (setf @@@) (val (self (eql :vec-2w)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+  (if arg4 (error "invalid number of arguments: 5"))
+  (cond (arg3 
+	 (make-instance 'cv-vec-2w :c-pointer 
+			(foreign-funcall "cv_Mat_at_Vec2w_set_Val_2" :pointer (c-pointer arg1) 
+					 :int arg2 :int arg3 :pointer (c-pointer val) :pointer)))
+	(t 
+	 (make-instance 'cv-vec-2w :c-pointer
+			(foreign-funcall "cv_Mat_at_Vec2w_set_Val_1" :pointer (c-pointer arg1)
+					 :int (or arg2 0) :pointer (c-pointer val) :pointer)))))
+
+
+(defmethod @@@ ((self (eql :vec-3w)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+    (if arg4 (error "invalid number of arguments: 5"))
+    (cond (arg3 
+	   (make-instance 'cv-vec-3w :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Vec3w_2" :pointer (c-pointer arg1) 
+					   :int arg2 :int arg3 :pointer)))
+	  (t 
+	   (make-instance 'cv-vec-3w :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Vec3w_1" :pointer (c-pointer arg1) 
+					   :int (or arg2 0) :pointer)))))
+
+
+(defmethod (setf @@@) (val (self (eql :vec-3w)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+  (if arg4 (error "invalid number of arguments: 5"))
+  (cond (arg3 
+	 (make-instance 'cv-vec-3w :c-pointer 
+			(foreign-funcall "cv_Mat_at_Vec3w_set_Val_2" :pointer (c-pointer arg1) 
+					 :int arg2 :int arg3 :pointer (c-pointer val) :pointer)))
+	(t 
+	 (make-instance 'cv-vec-3w :c-pointer
+			(foreign-funcall "cv_Mat_at_Vec3w_set_Val_1" :pointer (c-pointer arg1)
+					 :int (or arg2 0) :pointer (c-pointer val) :pointer)))))
+
+
+(defmethod @@@ ((self (eql :vec-4w)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+    (if arg4 (error "invalid number of arguments: 5"))
+    (cond (arg3 
+	   (make-instance 'cv-vec-4w :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Vec4w_2" :pointer (c-pointer arg1) 
+					   :int arg2 :int arg3 :pointer)))
+	  (t 
+	   (make-instance 'cv-vec-4w :c-pointer 
+			  (foreign-funcall "cv_Mat_at_Vec4w_1" :pointer (c-pointer arg1) 
+					   :int (or arg2 0) :pointer)))))
+
+
+(defmethod (setf @@@) (val (self (eql :vec-4w)) (arg1 cv-mat) &optional arg2 arg3 arg4)
+  (if arg4 (error "invalid number of arguments: 5"))
+  (cond (arg3 
+	 (make-instance 'cv-vec-4w :c-pointer 
+			(foreign-funcall "cv_Mat_at_Vec4w_set_Val_2" :pointer (c-pointer arg1) 
+					 :int arg2 :int arg3 :pointer (c-pointer val) :pointer)))
+	(t 
+	 (make-instance 'cv-vec-4w :c-pointer
+			(foreign-funcall "cv_Mat_at_Vec4w_set_Val_1" :pointer (c-pointer arg1)
+					 :int (or arg2 0) :pointer (c-pointer val) :pointer)))))
+
+
+(defmethod @@@ ((self std-vector-char) arg1 &optional arg2 arg3 arg4)
     "Returns the element at position n in the vector."
-  (if arg2 (error "invalid number of arguments: 3"))
+  (if arg2 (error "invalid number of arguments."))
+  arg2 arg3 arg4
   (let ((temp (foreign-funcall "std_vectorc_to_carray" 
 			       :pointer (c-pointer self) 
 			       :pointer))) 
     (mem-aref temp :char (or arg1 0))))
 
 
-(defmethod @@@ ((self std-vector-dmatch) &optional arg1 arg2)
+(defmethod (setf @@@) (val (self std-vector-char) arg1 &optional arg2 arg3 arg4)
+  "Sets the element at position n in the vector."
+  (if arg2 (error "invalid number of arguments."))
+  arg2 arg3 arg4
+  (let ((self (foreign-funcall "cv_vector_c_at" 
+			       :pointer (c-pointer self) 
+			       :int (or arg1 0)
+			       :pointer)))
+    (setf (mem-aref self :char) val)))
+
+
+(defmethod @@@ ((self std-vector-dmatch) arg1 &optional arg2 arg3 arg4)
     "Returns the object at position n in the vector.
      This method can return any element in the object."
+ (if arg3 (error "invalid number of arguments."))
+  arg3 arg4
   (let ((temp (foreign-funcall "cv_vector_dm_at" 
 			       :pointer (c-pointer self) 
 			       :int (or arg1 0) 
@@ -199,37 +1050,85 @@
 	(make-instance 'cv-dmatch :c-pointer temp))))
 
 
-(defmethod @@@ ((self std-vector-double) &optional arg1 arg2)
+(defmethod (setf @@@) (val (self std-vector-dmatch) arg1 &optional arg2 arg3 arg4)
+  "Sets the element at position n in the vector."
+  (if arg2 (error "invalid number of arguments."))
+  arg2 arg3 arg4
+  (let ((temp (foreign-funcall "cv_vector_dm_at_set_Val" 
+			       :pointer (c-pointer self) 
+			       :int (or arg1 0)
+			       :pointer (c-pointer val)
+			       :pointer)))
+    (make-instance 'cv-dmatch :c-pointer temp)))
+
+
+(defmethod @@@ ((self std-vector-double) arg1 &optional arg2 arg3 arg4)
     "Returns the element at position n in the vector."
-  (if arg2 (error "invalid number of arguments: 3"))
+  (if arg2 (error "invalid number of arguments."))
+  arg2 arg3 arg4
   (let ((temp (foreign-funcall "std_vectord_to_carray" 
 			       :pointer (c-pointer self) 
 			       :pointer)))
     (mem-aref temp :double (or arg1 0))))
 
 
-(defmethod @@@ ((self std-vector-float) &optional arg1 arg2)
+(defmethod (setf @@@) (val (self std-vector-double) arg1 &optional arg2 arg3 arg4)
+  "Sets the element at position n in the vector."
+  (if arg2 (error "invalid number of arguments."))
+  arg2 arg3 arg4
+  (let ((vec (foreign-funcall "cv_vector_d_at" 
+			      :pointer (c-pointer self) 
+			      :int (or arg1 0)
+			      :pointer)))
+    (setf (mem-aref vec :double) val)))
+
+
+(defmethod @@@ ((self std-vector-float) arg1 &optional arg2 arg3 arg4)
     "Returns the element at position n in the vector."
-  (if arg2 (error "invalid number of arguments: 3"))
+  (if arg2 (error "invalid number of arguments."))
+  arg2 arg3 arg4
   (let ((temp (foreign-funcall "std_vectorf_to_carray" 
 			       :pointer (c-pointer self) 
 			       :pointer)))
     (mem-aref temp :float (or arg1 0))))
 
 
-(defmethod @@@ ((self std-vector-int) &optional arg1 arg2)
-    "Returns the object at position n in the vector.
-     This method can return any element in the object."
-  (if arg2 (error "invalid number of arguments: 3"))
+(defmethod (setf @@@) (val (self std-vector-float) arg1 &optional arg2 arg3 arg4)
+  "Sets the element at position n in the vector."
+  (if arg2 (error "invalid number of arguments."))
+  arg2 arg3 arg4
+  (let ((vec (foreign-funcall "cv_vector_f_at" 
+			      :pointer (c-pointer self) 
+			      :int (or arg1 0)
+			      :pointer)))
+    (setf (mem-aref vec :float) val)))
+
+
+(defmethod @@@ ((self std-vector-int) arg1 &optional arg2 arg3 arg4)
+  "Sets the element at position n in the vector."
+  (if arg2 (error "invalid number of arguments."))
+  arg2 arg3 arg4
   (let ((temp (foreign-funcall "std_vectori_to_carray" 
 			       :pointer (c-pointer self) 
 			       :pointer)))
     (mem-aref temp :int (or arg1 0))))
 
 
-(defmethod @@@ ((self std-vector-key-point) &optional arg1 arg2)
-    "Returns the object at position n in the vector.
-     This method can return any element in the object."
+(defmethod (setf @@@) (val (self std-vector-int) arg1 &optional arg2 arg3 arg4)
+  "Sets the element at position n in the vector."
+  (if arg2 (error "invalid number of arguments."))
+  arg2 arg3 arg4
+  (let ((vec (foreign-funcall "cv_vector_i_at" 
+				   :pointer (c-pointer self) 
+				   :int (or arg1 0)
+				   :pointer)))
+	(setf (mem-aref vec :int) val)))
+
+
+(defmethod @@@ ((self std-vector-key-point) arg1 &optional arg2 arg3 arg4)
+  "Sets the element at position n in the vector."
+  (if arg2 (error "invalid number of arguments."))
+  arg2 arg3 arg4
   (let ((temp (foreign-funcall "cv_vector_kp_at" 
 			       :pointer (c-pointer self) 
 			       :int (or arg1 0) 
@@ -248,10 +1147,23 @@
 	(make-instance 'cv-key-point :c-pointer temp))))
 
 
-(defmethod @@@ ((self std-vector-mat) &optional arg1 arg2)
+(defmethod (setf @@@) (val (self std-vector-key-point) arg1 &optional arg2 arg3 arg4)
+  "Sets the element at position n in the vector."
+  (if arg2 (error "invalid number of arguments."))
+  arg2 arg3 arg4
+  (let ((temp (foreign-funcall "cv_vector_kp_at_set_Val" 
+		       :pointer (c-pointer self) 
+		       :int (or arg1 0)
+		       :pointer (c-pointer val)
+		       :pointer)))
+    (make-instance 'cv-key-point :c-pointer temp)))
+
+
+(defmethod @@@ ((self std-vector-mat) arg1 &optional arg2 arg3 arg4)
     "Returns the object at position n in the vector.
      This method can return any element in the object."
-  (if arg2 (error "invalid number of arguments: 3"))
+  (if arg2 (error "invalid number of arguments."))
+  arg2 arg3 arg4
   (let ((temp (foreign-funcall "cv_vector_m_at" 
 			       :pointer (c-pointer self) 
 			       :int (or arg1 0) 
@@ -259,9 +1171,23 @@
     (make-instance 'cv-mat :c-pointer temp)))
 
 
-(defmethod @@@ ((self std-vector-point) &optional arg1 arg2)
+(defmethod (setf @@@) (val (self std-vector-mat) arg1 &optional arg2 arg3 arg4)
+  "Sets the element at position n in the vector."
+  (if arg2 (error "invalid number of arguments."))
+  arg2 arg3 arg4
+  (let ((temp (foreign-funcall "cv_vector_m_at_set_Val" 
+			       :pointer (c-pointer self) 
+			       :int (or arg1 0)
+			       :pointer (c-pointer val)
+			       mat)))
+    (make-instance 'cv-mat :c-pointer temp)))
+
+
+(defmethod @@@ ((self std-vector-point) arg1 &optional arg2 arg3 arg4)
     "Returns the object at position n in the vector.
      This method can return any element in the object."
+  (if arg3 (error "invalid number of arguments."))
+  arg3 arg4
   (let ((temp (foreign-funcall "cv_vector_p_at" 
 			       :pointer (c-pointer self) 
 			       :int (or arg1 0)
@@ -273,9 +1199,23 @@
 	(make-instance 'cv-point :c-pointer temp))))
 
 
-(defmethod @@@ ((self std-vector-point-2f) &optional arg1 arg2)
+(defmethod (setf @@@) (val (self std-vector-point) arg1 &optional arg2 arg3 arg4)
+  (if arg2 (error "invalid number of arguments."))
+  arg2 arg3 arg4
+  "Sets the element at position n in the vector."
+  (let ((temp (foreign-funcall "cv_vector_p_at_set_Val" 
+			       :pointer (c-pointer self) 
+			       :int (or arg1 0)
+			       :pointer (c-pointer val)
+			       :pointer)))
+    (make-instance 'cv-point :c-pointer temp)))
+
+
+(defmethod @@@ ((self std-vector-point-2f) arg1 &optional arg2 arg3 arg4)
     "Returns the object at position n in the vector.
      This method can return any element in the object."
+  (if arg3 (error "invalid number of arguments."))
+  arg3 arg4
   (let ((temp (foreign-funcall "cv_vector_p2f_at" 
 			       :pointer (c-pointer self) 
 			       :int (or arg1 0)
@@ -287,23 +1227,23 @@
 	(make-instance 'cv-point-2f :c-pointer temp))))
 
 
-(defmethod @@@ ((self std-vector-point-2f) &optional arg1 arg2)
-    "Returns the object at position n in the vector.
-     This method can return any element in the object."
-  (let ((temp (foreign-funcall "cv_vector_p2f_at" 
+(defmethod (setf @@@) (val (self std-vector-point-2f) arg1 &optional arg2 arg3 arg4)
+  (if arg2 (error "invalid number of arguments."))
+  arg2 arg3 arg4
+  "Sets the element at position n in the vector."
+  (let ((temp (foreign-funcall "cv_vector_p2f_at_set_Val" 
 			       :pointer (c-pointer self) 
 			       :int (or arg1 0)
+			       :pointer (c-pointer val)
 			       :pointer)))
-    (if arg2
-	(case arg2
-	  (0 (mem-aref temp :float))
-	  (1 (mem-aref temp :float 1)))
-	(make-instance 'cv-point-2f :c-pointer temp))))
+    (make-instance 'cv-point-2f :c-pointer temp)))
 
 
-(defmethod @@@ ((self std-vector-rect) &optional arg1 arg2)
+(defmethod @@@ ((self std-vector-rect) arg1 &optional arg2 arg3 arg4)
     "Returns the object at position n in the vector.
      This method can return any element in the object."
+  (if arg3 (error "invalid number of arguments."))
+  arg3 arg4
   (let ((temp (foreign-funcall "cv_vector_r_at" 
 			       :pointer (c-pointer self) 
 			       :int (or arg1 0) 
@@ -317,16 +1257,42 @@
 	(make-instance 'cv-rect :c-pointer temp))))
 
 
-(defmethod @@@ ((self std-vector-uchar) &optional arg1 arg2)
+(defmethod (setf @@@) (val (self std-vector-rect) arg1 &optional arg2 arg3 arg4)
+  (if arg2 (error "invalid number of arguments."))
+  arg2 arg3 arg4
+  "Sets the element at position n in the vector."
+  (let ((temp (foreign-funcall "cv_vector_r_at_set_Val" 
+			       :pointer (c-pointer self) 
+			       :int (or arg1 0)
+			       :pointer (c-pointer val)
+			       rect)))
+    (make-instance 'cv-rect :c-pointer temp)))
+
+
+(defmethod @@@ ((self std-vector-uchar) arg1 &optional arg2 arg3 arg4)
     "Returns the element at position n in the vector."
-  (if arg2 (error "invalid number of arguments: 3"))
+  (if arg2 (error "invalid number of arguments."))
+  arg2 arg3 arg4
   (let ((temp (foreign-funcall "std_vectoru_to_carray" 
 			       :pointer (c-pointer self) 
 			       :pointer)))
     (mem-aref temp :uchar (or arg1 0))))
 
 
-(defmethod @@@ ((self std-vector-vec-2d) &optional arg1 arg2)
+(defmethod (setf @@@) (val (self std-vector-uchar) arg1 &optional arg2 arg3 arg4)
+  "Returns the element at position n in the vector."
+  (if arg2 (error "invalid number of arguments."))
+  arg2 arg3 arg4
+  (let ((vec (foreign-funcall "cv_vector_u_at" 
+			      :pointer (c-pointer self) 
+			      :int (or arg1 0)
+			      :pointer)))
+    (setf (mem-aref vec :uchar) val)))
+
+
+(defmethod @@@ ((self std-vector-vec-2d) arg1 &optional arg2 arg3 arg4)
+  (if arg4 (error "invalid number of arguments."))
+  arg3 arg4
     "Returns the object at position n in the vector.
      This method can return any element in the object."
   (let ((temp (foreign-funcall "cv_vector_v2d_at" 
@@ -339,7 +1305,9 @@
 	(make-instance 'cv-vec-2d :c-pointer temp))))
 
 
-(defmethod @@@ ((self std-vector-vec-3d) &optional arg1 arg2)
+(defmethod @@@ ((self std-vector-vec-3d) arg1 &optional arg2 arg3 arg4)
+  (if arg4 (error "invalid number of arguments."))
+  arg3 arg4
     "Returns the object at position n in the vector.
      This method can return any element in the object."
   (let ((temp (foreign-funcall "cv_vector_v3d_at" 
@@ -352,7 +1320,9 @@
 	(make-instance 'cv-vec-3d :c-pointer temp))))
 
 
-(defmethod @@@ ((self std-vector-vec-4d) &optional arg1 arg2)
+(defmethod @@@ ((self std-vector-vec-4d) arg1 &optional arg2 arg3 arg4)
+  (if arg4 (error "invalid number of arguments."))
+  arg3 arg4
     "Returns the object at position n in the vector.
      This method can return any element in the object."
   (let ((temp (foreign-funcall "cv_vector_v4d_at" 
@@ -365,7 +1335,9 @@
 	(make-instance 'cv-vec-4d :c-pointer temp))))
 
 
-(defmethod @@@ ((self std-vector-vec-6d) &optional arg1 arg2)
+(defmethod @@@ ((self std-vector-vec-6d) arg1 &optional arg2 arg3 arg4)
+  (if arg4 (error "invalid number of arguments."))
+  arg3 arg4
     "Returns the object at position n in the vector.
      This method can return any element in the object."
   (let ((temp (foreign-funcall "cv_vector_v6d_at" 
@@ -378,7 +1350,9 @@
 	(make-instance 'cv-vec-6d :c-pointer temp))))
 
 
-(defmethod @@@ ((self std-vector-vec-2f) &optional arg1 arg2)
+(defmethod @@@ ((self std-vector-vec-2f) arg1 &optional arg2 arg3 arg4)
+  (if arg4 (error "invalid number of arguments."))
+  arg3 arg4
     "Returns the object at position n in the vector.
      This method can return any element in the object."
   (let ((temp (foreign-funcall "cv_vector_v2f_at" 
@@ -391,7 +1365,9 @@
 	(make-instance 'cv-vec-2f :c-pointer temp))))
 
 
-(defmethod @@@ ((self std-vector-vec-3f) &optional arg1 arg2)
+(defmethod @@@ ((self std-vector-vec-3f) arg1 &optional arg2 arg3 arg4)
+  (if arg4 (error "invalid number of arguments."))
+  arg3 arg4
     "Returns the object at position n in the vector.
      This method can return any element in the object."
   (let ((temp (foreign-funcall "cv_vector_v3f_at" 
@@ -404,7 +1380,9 @@
 	(make-instance 'cv-vec-3f :c-pointer temp))))
 
 
-(defmethod @@@ ((self std-vector-vec-4f) &optional arg1 arg2)
+(defmethod @@@ ((self std-vector-vec-4f) arg1 &optional arg2 arg3 arg4)
+  (if arg4 (error "invalid number of arguments."))
+  arg3 arg4
     "Returns the object at position n in the vector.
      This method can return any element in the object."
   (let ((temp (foreign-funcall "cv_vector_v4f_at" 
@@ -417,7 +1395,9 @@
 	(make-instance 'cv-vec-4f :c-pointer temp))))
 
 
-(defmethod @@@ ((self std-vector-vec-6f) &optional arg1 arg2)
+(defmethod @@@ ((self std-vector-vec-6f) arg1 &optional arg2 arg3 arg4)
+  (if arg4 (error "invalid number of arguments."))
+  arg3 arg4
     "Returns the object at position n in the vector.
      This method can return any element in the object."
   (let ((temp (foreign-funcall "cv_vector_v6f_at" 
@@ -430,7 +1410,9 @@
 	(make-instance 'cv-vec-6f :c-pointer temp))))
 
 
-(defmethod @@@ ((self std-vector-vec-2i) &optional arg1 arg2)
+(defmethod @@@ ((self std-vector-vec-2i) arg1 &optional arg2 arg3 arg4)
+  (if arg4 (error "invalid number of arguments."))
+  arg3 arg4
     "Returns the object at position n in the vector.
      This method can return any element in the object."
   (let ((temp (foreign-funcall "cv_vector_v2i_at" 
@@ -443,7 +1425,9 @@
 	(make-instance 'cv-vec-2i :c-pointer temp))))
 
 
-(defmethod @@@ ((self std-vector-vec-3i) &optional arg1 arg2)
+(defmethod @@@ ((self std-vector-vec-3i) arg1 &optional arg2 arg3 arg4)
+  (if arg4 (error "invalid number of arguments."))
+  arg3 arg4
     "Returns the object at position n in the vector.
      This method can return any element in the object."
   (let ((temp (foreign-funcall "cv_vector_v3i_at" 
@@ -456,7 +1440,9 @@
 	(make-instance 'cv-vec-3i :c-pointer temp))))
 
 
-(defmethod @@@ ((self std-vector-vec-4i) &optional arg1 arg2)
+(defmethod @@@ ((self std-vector-vec-4i) arg1 &optional arg2 arg3 arg4)
+  (if arg4 (error "invalid number of arguments."))
+  arg3 arg4
     "Returns the object at position n in the vector.
      This method can return any element in the object."
   (let ((temp (foreign-funcall "cv_vector_v4i_at" 
@@ -469,7 +1455,9 @@
 	(make-instance 'cv-vec-4i :c-pointer temp))))
 
 
-(defmethod @@@ ((self std-vector-vec-6i) &optional arg1 arg2)
+(defmethod @@@ ((self std-vector-vec-6i) arg1 &optional arg2 arg3 arg4)
+  (if arg4 (error "invalid number of arguments."))
+  arg3 arg4
     "Returns the object at position n in the vector.
      This method can return any element in the object."
   (let ((temp (foreign-funcall "cv_vector_v6i_at" 
@@ -482,7 +1470,9 @@
 	(make-instance 'cv-vec-6i :c-pointer temp))))
 
 
-(defmethod @@@ ((self std-vector-vec-8i) &optional arg1 arg2)
+(defmethod @@@ ((self std-vector-vec-8i) arg1 &optional arg2 arg3 arg4)
+  (if arg4 (error "invalid number of arguments."))
+  arg3 arg4
     "Returns the object at position n in the vector.
      This method can return any element in the object."
   (let ((temp (foreign-funcall "cv_vector_v8i_at" 

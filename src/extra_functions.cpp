@@ -277,10 +277,6 @@ Mat** std_vectorm_to_carray1( vector_Mat1* v ) {
 return v->data();
 }
 
-void cv_findContours1(Mat* image, vector_Mat1* contours, Mat* hierarchy, int mode, int method, Point* offset) {
-	cv::findContours(*image, *contours, *hierarchy, mode, method, *offset);
-}
-
 int cv_Mat_checkVector(Mat* self, int elemChannels, int depth, bool requireContinuous) {
     return self->checkVector(elemChannels, depth, requireContinuous);
 }

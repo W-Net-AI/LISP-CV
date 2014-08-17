@@ -6945,7 +6945,7 @@ Example:
 		     (dotimes (n 10)
 		       ;;Compute the rotation angles 
 		       ;;of X1,Y1,X2,Y2 with PHASE
-		       (*phase x y angle t)
+		       (phase* x y angle t)
 		       ;;Set START-ANGLE and END-ANGLE of the ellipse to 
 		       ;;the 0,0 and 0,1 elements of the matrix ANGLE
 		       (setf start-angle (coerce (at angle 0 0 :float) 'double-float))
@@ -16313,6 +16313,149 @@ matched with (TRAIN-DESCRIPTORS J) only if (AT MASK I J :UCHAR) is non-zero.
 Example:
 
 See BRISK-EXAMPLE
+
+========================================================================================================================================
+#FLANN-BASED-MATCHER
+========================================================================================================================================
+
+Flann-based matcher constructor.
+
+Note: Both FLANN-BASED-MATCHER and MAKE-FLANN-BASED-MATCHER are provided in this library. The first, 
+to match OpenCV's naming conventions, the second, to adhere to Common Lisp naming conventions. Except 
+for the name, they are the same function. I use the FLANN-BASED-MATCHER function in the examples in this 
+file because it will make them easier to compare with OpenCV examples you find online, making this library 
+easier to learn.
+
+
+C++: FlannBasedMatcher( const Ptr<flann::IndexParams>& indexParams=makePtr<flann::KDTreeIndexParams>(),
+                       const Ptr<flann::SearchParams>& searchParams=makePtr<flann::SearchParams>() );
+
+LISP-CV:  (FLANN-BASED-MATCHER) => FLANN-BASED-MATCHER
+
+LISP-CV:  (MAKE-FLANN-BASED-MATCHER) => FLANN-BASED-MATCHER
+
+Note: Until an issue is resolved, concerning the OpenCv class Ptr, in the C bindings this library 
+binds to, only the uninitialized FLANN-BASED-MATCHER constructor will be available.
+
+Description:
+
+Flann-based descriptor matcher. This matcher trains flann::Index_(internal C++ class) on a train 
+descriptor collection and calls its nearest search methods to find the best matches. So, this matcher 
+may be faster when matching a large train collection than the brute force matcher(BF-MATCHER in Lisp-CV). 
+FLANN-BASED-MATCHER does not support masking permissible matches of descriptor sets because flann::Index 
+does not support this.
+
+
+Example:
+
+(defun flann-based-matcher-example (filename-1 filename-2) 
+
+  "Try using the box.png and the box-in-scene.png from
+   the LISP-CV-MASTER/IMAGES directory to get a better 
+   understanding of this example the first time you ru-
+   n it."
+
+  (let ((window-name "Good Matches & Object detection - FLANN-BASED-MATCHER Example")
+	(min-hessian 400d0)
+	(min-dist 100)
+	(max-dist 0)
+	(dist)) 
+
+    ;;;Read in images in grayscale;
+
+    ;;...the object you want to track,
+    (with-mat ((img-object (imread filename-1 +load-image-grayscale+))
+	       ;;...the image the object is a part of.
+	       (img-scene (imread filename-2 +load-image-grayscale+))
+	       (descriptors-object (mat))
+	       (descriptors-scene (mat))
+	       (img-matches (mat)))
+      (with-vector-key-point ((keypoints-object (vector-key-point))
+			      (keypoints-scene (vector-key-point)))
+	(with-vector-dmatch ((matches (vector-dmatch)))
+	  (with-flann-based-matcher ((matcher (flann-based-matcher)))
+	    (if (empty (or img-object img-scene)) 
+		(return-from flann-based-matcher-example 
+		  (format t "Error reading images.")))
+	    (with-named-window (window-name +window-autosize+)
+	      (move-window window-name 541 175)
+	      ;;Detect keypoints using SURF.
+	      (with-surf ((detector (surf min-hessian))
+			  (extractor (surf)))
+		(detect detector img-object keypoints-object)
+		(detect detector img-scene keypoints-scene)
+		;;Calculate descriptors (feature vectors).
+		(compute :feature-2d extractor img-object keypoints-object descriptors-object)
+		(compute :feature-2d extractor img-scene keypoints-scene descriptors-scene)
+		;;Matching descriptor vectors using FLANN matcher.
+		(match matcher descriptors-object descriptors-scene matches)
+		;;Quick calculation of max and min distances between keypoints.
+		(dotimes (i (rows descriptors-object))
+		  (setf dist (distance (@ matches i)))
+		  (if (< dist min-dist) (setf min-dist dist))
+		  (if (> dist max-dist) (setf dist max-dist)))
+		(format t "-- Max dist: ~a ~%" max-dist)
+		(format t "-- Min dist: ~a ~%"  min-dist)
+		;;Draw only "good" matches (i.e. whose distance is less than (* 3 MIN-DIST).
+		(with-vector-dmatch ((good-matches (vector-dmatch)))
+		  (dotimes (i (rows descriptors-object))
+		    (if (< (distance (@ matches i)) (* 3 min-dist))
+			(push-back good-matches (@ matches i))))
+		  (draw-matches img-object keypoints-object img-scene keypoints-scene good-matches 
+				img-matches (t:scalar-all -1) (t:scalar-all -1) (t:vector-char) 
+				+draw-matches-flags-not-draw-single-points+)
+                  ;;;Localize the object.
+		  (with-mat ((obj (mat (length good-matches) 2 +32f+))
+			     (scene (mat (length good-matches) 2 +32f+)))
+		    (dotimes (i (length good-matches))
+		      ;;Get the keypoints from the good matches.
+		      (setf (@ :float obj i 0) (x (@ keypoints-object (query-idx (@ good-matches i)))))
+		      (setf (@ :float obj i 1) (y (@ keypoints-object (query-idx (@ good-matches i)))))
+		      (setf (@ :float scene i 0) (x (@ keypoints-scene (train-idx (@ good-matches i)))))
+		      (setf (@ :float scene i 1) (y (@ keypoints-scene (train-idx (@ good-matches i))))))
+		    (with-mat ((h (find-homography obj scene +ransac+)))
+		      ;;Get the corners from IMAGE-OBJ(the object to be "detected").
+		      (with-mat ((obj-corners 
+				  (mat 4 2 +32fc2+ (list 0f0 0f0
+							 (float (cols img-object)) 0f0
+							 (float (cols img-object)) (float (rows img-object)) 
+							 0f0 (float (rows img-object)))))
+				 (scene-corners (mat 4 2 +32fc2+)))
+			(perspective-transform obj-corners scene-corners h)
+			;;Draw lines between the corners (the mapped object in the scene, IMAGE-SCENE).
+			(line img-matches (t:point 
+					   (floor (+ (@ :float scene-corners 0 0) (cols img-object))) 
+					   (floor (@ :float scene-corners 0 1)))
+			      (t:point 
+			       (floor (+ (@ :float scene-corners 0 2) (cols img-object))) 
+			       (floor (@ :float scene-corners 0 3)))
+			      (t:scalar 0 255 0) 4)
+			(line img-matches (t:point 
+					   (floor (+ (@ :float scene-corners 0 2) (cols img-object))) 
+					   (floor (@ :float scene-corners 0 3))) 
+			      (t:point (floor (+ (@ :float scene-corners 1 0) (cols img-object))) 
+				       (floor (@ :float scene-corners 1 1)))
+			      (t:scalar 0 255 0) 4)
+			(line img-matches (t:point
+					   (floor (+ (@ :float scene-corners 1 0) (cols img-object)))
+					   (floor (@ :float scene-corners 1 1))) 
+			      (t:point 
+			       (floor (+ (@ :float scene-corners 1 2) (cols img-object))) 
+			       (floor (@ :float scene-corners 1 3)))
+			      (t:scalar 0 255 0) 4)
+			(line img-matches (t:point 
+					   (floor (+ (@ :float scene-corners 1 2) (cols img-object))) 
+					   (floor (at-float scene-corners 1 3))) 
+			      (t:point 
+			       (floor (+ (@ :float scene-corners 0 0) (cols img-object))) 
+			       (floor (@ :float scene-corners 0 1)))
+			      (t:scalar 0 255 0) 4)
+			;;Show detected matches.
+			(imshow window-name img-matches)
+			(loop
+			   (let ((c (wait-key 33)))
+			     (when (= c 27)
+			       (return))))))))))))))))
 
 ========================================================================================================================================
 #OBJDETECT - #CASCADE CLASSIFICATION

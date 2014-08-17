@@ -122,7 +122,6 @@ Mat* test(uchar* a, size_t len );
 vector_Mat* std_carrayTovectorm2(Mat** a, size_t len);
 vector_Mat1* std_carrayTovectorm1(Mat** a, size_t len);
 Mat** std_vectorm_to_carray1( vector_Mat1* v );
-void cv_findContours1(Mat* image, vector_Mat1* contours, Mat* hierarchy, int mode, int method, Point* offset);
 int cv_Mat_checkVector(Mat* self, int elemChannels, int depth, bool requireContinuous);
 double cv_Size_set_width(Size* self, double val);    
 double cv_Size_set_height(Size* self, double val);

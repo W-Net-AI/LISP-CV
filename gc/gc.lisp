@@ -2507,6 +2507,13 @@ ret))
 ;;; HIGHGUI - Qt New Functions
 
 
+
+;;; CALIB3D - Camera Calibration and 3D Reconstruction
+
+
+
+
+
 ;;; FEATURES2D
 
 
@@ -2555,6 +2562,20 @@ ret))
 
 
 ;;; FEATURES2D - Common Interfaces of Descriptor Matchers
+
+
+;; FlannBasedMatcher(const Ptr<flann::IndexParams>& indexParams=new flann::KDTreeIndexParams(),
+;;                   const Ptr<flann::SearchParams>& searchParams=new flann::SearchParams() )
+;; FlannBasedMatcher* cv_create_FlannBasedMatcher0()
+(defcfun ("cv_create_FlannBasedMatcher0" flann-based-matcher) (cv:flann-based-matcher :garbage-collect t)
+  "Flann-based descriptor matcher constructor.")
+
+
+;; FlannBasedMatcher(const Ptr<flann::IndexParams>& indexParams=new flann::KDTreeIndexParams(),
+;;                   const Ptr<flann::SearchParams>& searchParams=new flann::SearchParams() )
+;; FlannBasedMatcher* cv_create_FlannBasedMatcher0()
+(defcfun ("cv_create_FlannBasedMatcher0" make-flann-based-matcher) (cv:flann-based-matcher :garbage-collect t)
+  "Flann-based descriptor matcher constructor.")
 
 
 ;;; OBJDETECT
