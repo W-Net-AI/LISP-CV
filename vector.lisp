@@ -8,459 +8,554 @@
 
 ;;; AT functions(for internal use)
 
-
-(defun vec-char-at (vec idx)
+;; reference at (size_type n)
+;; t cv_vector_##tn##_at_num(vector_##t * v, int idx)
+(defun vec-char-at (self &optional idx)
     "Returns the element at position n in the vector."
-  (if (typep vec 'std-vector-char)
-      (mem-aref (foreign-funcall "cv_vector_c_at" 
-				 :pointer (c-pointer vec) 
-				 :int idx
-				 :pointer) :char)))
+  (if (typep self 'std-vector-char)
+      (foreign-funcall "cv_vector_c_at_num" 
+				 :pointer (c-pointer self) 
+				 :int (or idx 0)
+				 :char)))
 
 
-(defun (setf vec-char-at) (val vec idx)
+;; t * cv_vector_##tn##_at_set_Val(vector_##t * v, 
+;;                                 int idx, t * val)
+(defun (setf vec-char-at) (val self &optional idx)
     "Sets the element at position n in the vector."
-  (if (typep vec 'std-vector-char)
-      (let ((vec (foreign-funcall "cv_vector_c_at" 
-				   :pointer (c-pointer vec) 
+  (if (typep self 'std-vector-char)
+      (let ((self (foreign-funcall "cv_vector_c_at" 
+				   :pointer (c-pointer self) 
 				   :int (or idx 0)
 				   :pointer)))
-	(setf (mem-aref vec :char) val))))
+	(setf (mem-aref self :char) val))))
 
 
-(defun vec-dmatch-at (vec idx)
+;; reference at (size_type n)
+;; t * cv_vector_##tn##_at(vector_##t * v, int idx)
+(defun vec-dmatch-at (self &optional idx)
     "Returns the object at position n in the vector."
-  (if (typep vec 'std-vector-dmatch)
+  (if (typep self 'std-vector-dmatch)
       (foreign-funcall "cv_vector_dm_at" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :int (or idx 0)
 		       dmatch)))
 
 
-(defun (setf vec-dmatch-at) (val vec idx)
+;; t * cv_vector_##tn##_at_set_Val(vector_##t * v, 
+;;                                 int idx, t * val)
+(defun (setf vec-dmatch-at) (val self &optional idx)
     "Sets the element at position n in the vector."
-  (if (typep vec 'std-vector-dmatch)
+  (if (typep self 'std-vector-dmatch)
       (foreign-funcall "cv_vector_dm_at_set_Val" 
-		       :pointer (c-pointer vec) 
-		       :int idx
+		       :pointer (c-pointer self) 
+		       :int (or idx 0)
 		       :pointer (c-pointer val)
 		       dmatch)))
 
 
-(defun vec-double-at (vec idx)
+;; reference at (size_type n)
+;; t cv_vector_##tn##_at_num(vector_##t * v, int idx)
+(defun vec-double-at (self &optional idx)
     "Returns the element at position n in the vector."
-  (if (typep vec 'std-vector-double)
-      (mem-aref (foreign-funcall "cv_vector_d_at" 
-				 :pointer (c-pointer vec) 
+  (if (typep self 'std-vector-double)
+     (foreign-funcall "cv_vector_d_at_num" 
+				 :pointer (c-pointer self) 
 				 :int (or idx 0)
-				 :pointer) :double)))
+				 :double)))
 
 
-(defun (setf vec-double-at) (val vec idx)
+;; t * cv_vector_##tn##_at_set_Val(vector_##t * v, 
+;;                                 int idx, t * val)
+(defun (setf vec-double-at) (val self &optional idx)
     "Sets the element at position n in the vector."
-  (if (typep vec 'std-vector-double)
-      (let ((vec (foreign-funcall "cv_vector_d_at" 
-				   :pointer (c-pointer vec) 
+  (if (typep self 'std-vector-double)
+      (let ((self (foreign-funcall "cv_vector_d_at" 
+				   :pointer (c-pointer self) 
 				   :int (or idx 0)
 				   :pointer)))
-	(setf (mem-aref vec :double) val))))
+	(setf (mem-aref self :double) val))))
 
 
-(defun vec-float-at (vec idx)
+;; reference at (size_type n)
+;; t cv_vector_##tn##_at_num(vector_##t * v, int idx)
+(defun vec-float-at (self &optional idx)
     "Returns the element at position n in the vector."
-  (if (typep vec 'std-vector-float)
-      (mem-aref (foreign-funcall "cv_vector_f_at" 
-				 :pointer (c-pointer vec) 
+  (if (typep self 'std-vector-float)
+      (foreign-funcall "cv_vector_f_at_num" 
+				 :pointer (c-pointer self) 
 				 :int (or idx 0)
-				 :pointer) :float)))
+				 :float)))
 
 
-(defun (setf vec-float-at) (val vec idx)
+;; t * cv_vector_##tn##_at_set_Val(vector_##t * v, 
+;;                                 int idx, t * val)
+(defun (setf vec-float-at) (val self &optional idx)
     "Sets the element at position n in the vector."
-  (if (typep vec 'std-vector-float)
-      (let ((vec (foreign-funcall "cv_vector_f_at" 
-				   :pointer (c-pointer vec) 
+  (if (typep self 'std-vector-float)
+      (let ((self (foreign-funcall "cv_vector_f_at" 
+				   :pointer (c-pointer self) 
 				   :int (or idx 0)
 				   :pointer)))
-	(setf (mem-aref vec :float) val))))
+	(setf (mem-aref self :float) val))))
 
 
-(defun vec-int-at (vec idx)
+;; reference at (size_type n)
+;; t cv_vector_##tn##_at_num(vector_##t * v, int idx)
+(defun vec-int-at (self &optional idx)
     "Returns the element at position n in the vector."
-  (if (typep vec 'std-vector-int)
-      (mem-aref (foreign-funcall "cv_vector_i_at" 
-				 :pointer (c-pointer vec) 
+  (if (typep self 'std-vector-int)
+      (foreign-funcall "cv_vector_i_at_num" 
+				 :pointer (c-pointer self) 
 				 :int (or idx 0)
-				 :pointer) :int)))
+				 :int)))
 
 
-(defun (setf vec-int-at) (val vec idx)
+;; t * cv_vector_##tn##_at_set_Val(vector_##t * v, 
+;;                                 int idx, t * val)
+(defun (setf vec-int-at) (val self &optional idx)
     "Sets the element at position n in the vector."
-  (if (typep vec 'std-vector-int)
-      (let ((vec (foreign-funcall "cv_vector_i_at" 
-				   :pointer (c-pointer vec) 
+  (if (typep self 'std-vector-int)
+      (let ((self (foreign-funcall "cv_vector_i_at" 
+				   :pointer (c-pointer self) 
 				   :int (or idx 0)
 				   :pointer)))
-	(setf (mem-aref vec :int) val))))
+	(setf (mem-aref self :int) val))))
 
 
-(defun vec-key-at-point (vec idx)
+;; reference at (size_type n)
+;; t * cv_vector_##tn##_at(vector_##t * v, int idx)
+(defun vec-key-at-point (self &optional idx)
     "Returns the object at position n in the vector."
-  (if (typep vec 'std-vector-key-point)
+  (if (typep self 'std-vector-key-point)
       (foreign-funcall "cv_vector_kp_at" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :int (or idx 0)
 		       key-point)))
 
 
-(defun (setf vec-key-point-at) (val vec idx)
+;; t * cv_vector_##tn##_at_set_Val(vector_##t * v, 
+;;                                 int idx, t * val)
+(defun (setf vec-key-point-at) (val self &optional idx)
     "Sets the element at position n in the vector."
-  (if (typep vec 'std-vector-key-point)
+  (if (typep self 'std-vector-key-point)
       (foreign-funcall "cv_vector_kp_at_set_Val" 
-		       :pointer (c-pointer vec) 
-		       :int idx
+		       :pointer (c-pointer self) 
+		       :int (or idx 0)
 		       :pointer (c-pointer val)
 		       key-point)))
 
 
-(defun vec-mat-at (vec idx)
+;; reference at (size_type n)
+;; t * cv_vector_##tn##_at(vector_##t * v, int idx)
+(defun vec-mat-at (self &optional idx)
     "Returns the object at position n in the vector."
-  (if (typep vec 'std-vector-mat)
+  (if (typep self 'std-vector-mat)
       (foreign-funcall "cv_vector_m_at" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :int (or idx 0)
 		       mat)))
 
 
-(defun (setf vec-mat-at) (val vec idx)
+;; t * cv_vector_##tn##_at_set_Val(vector_##t * v, 
+;;                                 int idx, t * val)
+(defun (setf vec-mat-at) (val self &optional idx)
     "Sets the element at position n in the vector."
-  (if (typep vec 'std-vector-mat)
+  (if (typep self 'std-vector-mat)
       (foreign-funcall "cv_vector_m_at_set_Val" 
-		       :pointer (c-pointer vec) 
-		       :int idx
+		       :pointer (c-pointer self) 
+		       :int (or idx 0)
 		       :pointer (c-pointer val)
 		       mat)))
 
 
-(defun vec-point-at (vec idx)
+;; reference at (size_type n)
+;; t * cv_vector_##tn##_at(vector_##t * v, int idx)
+(defun vec-point-at (self &optional idx)
     "Returns the object at position n in the vector."
-  (if (typep vec 'std-vector-point)
+  (if (typep self 'std-vector-point)
       (foreign-funcall "cv_vector_p_at" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :int (or idx 0)
 		       point)))
 
 
-(defun (setf vec-point-at) (val vec idx)
+;; t * cv_vector_##tn##_at_set_Val(vector_##t * v, 
+;;                                 int idx, t * val)
+(defun (setf vec-point-at) (val self &optional idx)
     "Sets the element at position n in the vector."
-  (if (typep vec 'std-vector-point)
+  (if (typep self 'std-vector-point)
       (foreign-funcall "cv_vector_p_at_set_Val" 
-		       :pointer (c-pointer vec) 
-		       :int idx
+		       :pointer (c-pointer self) 
+		       :int (or idx 0)
 		       :pointer (c-pointer val)
 		       point)))
 
 
-(defun vec-point-2f-at (vec idx)
+;; reference at (size_type n)
+;; t * cv_vector_##tn##_at(vector_##t * v, int idx)
+(defun vec-point-2f-at (self &optional idx)
     "Returns the object at position n in the vector."
-  (if (typep vec 'std-vector-point-2f)
+  (if (typep self 'std-vector-point-2f)
       (foreign-funcall "cv_vector_p2f_at" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :int (or idx 0)
 		       point-2f)))
 
 
-(defun (setf vec-point-2f-at) (val vec idx)
+;; t * cv_vector_##tn##_at_set_Val(vector_##t * v, 
+;;                                 int idx, t * val)
+(defun (setf vec-point-2f-at) (val self &optional idx)
     "Sets the element at position n in the vector."
-  (if (typep vec 'std-vector-point-2f)
+  (if (typep self 'std-vector-point-2f)
       (foreign-funcall "cv_vector_p2f_at_set_Val" 
-		       :pointer (c-pointer vec) 
-		       :int idx
+		       :pointer (c-pointer self) 
+		       :int (or idx 0)
 		       :pointer (c-pointer val)
 		       point-2f)))
 
 
-(defun vec-rect-at (vec idx)
+;; reference at (size_type n)
+;; t * cv_vector_##tn##_at(vector_##t * v, int idx)
+(defun vec-rect-at (self &optional idx)
     "Returns the object at position n in the vector."
-  (if (typep vec 'std-vector-rect)
+  (if (typep self 'std-vector-rect)
       (foreign-funcall "cv_vector_r_at" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :int (or idx 0)
 		       rect)))
 
 
-(defun (setf vec-rect-at) (val vec idx)
+;; t * cv_vector_##tn##_at_set_Val(vector_##t * v, 
+;;                                 int idx, t * val)
+(defun (setf vec-rect-at) (val self &optional idx)
     "Sets the element at position n in the vector."
-  (if (typep vec 'std-vector-rect)
+  (if (typep self 'std-vector-rect)
       (foreign-funcall "cv_vector_r_at_set_Val" 
-		       :pointer (c-pointer vec) 
-		       :int idx
+		       :pointer (c-pointer self) 
+		       :int (or idx 0)
 		       :pointer (c-pointer val)
 		       rect)))
 
 
-(defun vec-uchar-at (vec idx)
+;; reference at (size_type n)
+;; t cv_vector_##tn##_at_num(vector_##t * v, int idx)
+(defun vec-uchar-at (self &optional idx)
     "Returns the element at position n in the vector."
-  (if (typep vec 'std-vector-uchar)
-      (mem-aref (foreign-funcall "cv_vector_u_at" 
-				 :pointer (c-pointer vec) 
+  (if (typep self 'std-vector-uchar)
+      (foreign-funcall "cv_vector_u_at_num" 
+				 :pointer (c-pointer self) 
 				 :int (or idx 0)
-				 :pointer) :uchar)))
+				 :uchar)))
 
 
-(defun (setf vec-uchar-at) (val vec idx)
+;; t * cv_vector_##tn##_at_set_Val(vector_##t * v, 
+;;                                 int idx, t * val)
+(defun (setf vec-uchar-at) (val self &optional idx)
     "Sets the element at position n in the vector."
-  (if (typep vec 'std-vector-uchar)
-      (let ((vec (foreign-funcall "cv_vector_u_at" 
-				   :pointer (c-pointer vec) 
+  (if (typep self 'std-vector-uchar)
+      (let ((self (foreign-funcall "cv_vector_u_at" 
+				   :pointer (c-pointer self) 
 				   :int (or idx 0)
 				   :pointer)))
-	(setf (mem-aref vec :uchar) val))))
+	(setf (mem-aref self :uchar) val))))
 
 
-(defun vec-vec-2d-at (vec idx)
+;; reference at (size_type n)
+;; t * cv_vector_##tn##_at(vector_##t * v, int idx)
+(defun vec-vec-2d-at (self &optional idx)
     "Returns the object at position n in the vector."
-  (if (typep vec 'std-vector-vec-2d)
+  (if (typep self 'std-vector-vec-2d)
       (foreign-funcall "cv_vector_v2d_at" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :int (or idx 0)
 		       vec-2d)))
 
 
-(defun (setf vec-vec-2d-at) (val vec idx)
+;; t * cv_vector_##tn##_at_set_Val(vector_##t * v, 
+;;                                 int idx, t * val)
+(defun (setf vec-vec-2d-at) (val self &optional idx)
     "Sets the element at position n in the vector."
-  (if (typep vec 'std-vector-vec-2d)
+  (if (typep self 'std-vector-vec-2d)
       (foreign-funcall "cv_vector_v2d_at_set_Val" 
-		       :pointer (c-pointer vec) 
-		       :int idx
+		       :pointer (c-pointer self) 
+		       :int (or idx 0)
 		       :pointer (c-pointer val)
 		       vec-2d)))
 
 
-(defun vec-vec-3d-at (vec idx)
+;; reference at (size_type n)
+;; t * cv_vector_##tn##_at(vector_##t * v, int idx)
+(defun vec-vec-3d-at (self &optional idx)
     "Returns the object at position n in the vector."
-  (if (typep vec 'std-vector-vec-3d)
+  (if (typep self 'std-vector-vec-3d)
       (foreign-funcall "cv_vector_v3d_at" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :int (or idx 0)
 		       vec-3d)))
 
 
-(defun (setf vec-vec-3d-at) (val vec idx)
+;; t * cv_vector_##tn##_at_set_Val(vector_##t * v, 
+;;                                 int idx, t * val)
+(defun (setf vec-vec-3d-at) (val self &optional idx)
     "Sets the element at position n in the vector."
-  (if (typep vec 'std-vector-vec-3d)
+  (if (typep self 'std-vector-vec-3d)
       (foreign-funcall "cv_vector_v3d_at_set_Val" 
-		       :pointer (c-pointer vec) 
-		       :int idx
+		       :pointer (c-pointer self) 
+		       :int (or idx 0)
 		       :pointer (c-pointer val)
 		       vec-3d)))
 
 
-(defun vec-vec-4d-at (vec idx)
+;; reference at (size_type n)
+;; t * cv_vector_##tn##_at(vector_##t * v, int idx)
+(defun vec-vec-4d-at (self &optional idx)
     "Returns the object at position n in the vector."
-  (if (typep vec 'std-vector-vec-4d)
+  (if (typep self 'std-vector-vec-4d)
       (foreign-funcall "cv_vector_v4d_at" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :int (or idx 0)
 		       vec-4d)))
 
 
-(defun (setf vec-vec-4d-at) (val vec idx)
+;; t * cv_vector_##tn##_at_set_Val(vector_##t * v, 
+;;                                 int idx, t * val)
+(defun (setf vec-vec-4d-at) (val self &optional idx)
     "Sets the element at position n in the vector."
-  (if (typep vec 'std-vector-vec-4d)
+  (if (typep self 'std-vector-vec-4d)
       (foreign-funcall "cv_vector_v4d_at_set_Val" 
-		       :pointer (c-pointer vec) 
-		       :int idx
+		       :pointer (c-pointer self) 
+		       :int (or idx 0)
 		       :pointer (c-pointer val)
 		       vec-4d)))
 
 
-(defun vec-vec-6d-at (vec idx)
+;; reference at (size_type n)
+;; t * cv_vector_##tn##_at(vector_##t * v, int idx)
+(defun vec-vec-6d-at (self &optional idx)
     "Returns the object at position n in the vector."
-  (if (typep vec 'std-vector-vec-6d)
+  (if (typep self 'std-vector-vec-6d)
       (foreign-funcall "cv_vector_v6d_at" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :int (or idx 0)
 		       vec-6d)))
 
 
-(defun (setf vec-vec-6d-at) (val vec idx)
+;; t * cv_vector_##tn##_at_set_Val(vector_##t * v, 
+;;                                 int idx, t * val)
+(defun (setf vec-vec-6d-at) (val self &optional idx)
     "Sets the element at position n in the vector."
-  (if (typep vec 'std-vector-vec-6d)
+  (if (typep self 'std-vector-vec-6d)
       (foreign-funcall "cv_vector_v6d_at_set_Val" 
-		       :pointer (c-pointer vec) 
-		       :int idx
+		       :pointer (c-pointer self) 
+		       :int (or idx 0)
 		       :pointer (c-pointer val)
 		       vec-6d)))
 
 
-(defun vec-vec-2f-at (vec idx)
+;; reference at (size_type n)
+;; t * cv_vector_##tn##_at(vector_##t * v, int idx)
+(defun vec-vec-2f-at (self &optional idx)
     "Returns the object at position n in the vector."
-  (if (typep vec 'std-vector-vec-2f)
+  (if (typep self 'std-vector-vec-2f)
       (foreign-funcall "cv_vector_v2f_at" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :int (or idx 0)
 		       vec-2f)))
 
 
-(defun (setf vec-vec-2f-at) (val vec idx)
+;; t * cv_vector_##tn##_at_set_Val(vector_##t * v, 
+;;                                 int idx, t * val)
+(defun (setf vec-vec-2f-at) (val self &optional idx)
     "Sets the element at position n in the vector."
-  (if (typep vec 'std-vector-vec-2f)
+  (if (typep self 'std-vector-vec-2f)
       (foreign-funcall "cv_vector_v2f_at_set_Val" 
-		       :pointer (c-pointer vec) 
-		       :int idx
+		       :pointer (c-pointer self) 
+		       :int (or idx 0)
 		       :pointer (c-pointer val)
 		       vec-2f)))
 
 
-(defun vec-vec-3f-at (vec idx)
+;; reference at (size_type n)
+;; t * cv_vector_##tn##_at(vector_##t * v, int idx)
+(defun vec-vec-3f-at (self &optional idx)
     "Returns the object at position n in the vector."
-  (if (typep vec 'std-vector-vec-3f)
+  (if (typep self 'std-vector-vec-3f)
       (foreign-funcall "cv_vector_v3f_at" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :int (or idx 0)
 		       vec-3f)))
 
 
-(defun (setf vec-vec-3f-at) (val vec idx)
+;; t * cv_vector_##tn##_at_set_Val(vector_##t * v, 
+;;                                 int idx, t * val)
+(defun (setf vec-vec-3f-at) (val self &optional idx)
     "Sets the element at position n in the vector."
-  (if (typep vec 'std-vector-vec-3f)
+  (if (typep self 'std-vector-vec-3f)
       (foreign-funcall "cv_vector_v3f_at_set_Val" 
-		       :pointer (c-pointer vec) 
-		       :int idx
+		       :pointer (c-pointer self) 
+		       :int (or idx 0)
 		       :pointer (c-pointer val)
 		       vec-3f)))
 
 
-(defun vec-vec-4f-at (vec idx)
+;; reference at (size_type n)
+;; t * cv_vector_##tn##_at(vector_##t * v, int idx)
+(defun vec-vec-4f-at (self &optional idx)
     "Returns the object at position n in the vector."
-  (if (typep vec 'std-vector-vec-4f)
+  (if (typep self 'std-vector-vec-4f)
       (foreign-funcall "cv_vector_v4f_at" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :int (or idx 0)
 		       vec-4f)))
 
 
-(defun (setf vec-vec-4f-at) (val vec idx)
+;; t * cv_vector_##tn##_at_set_Val(vector_##t * v, 
+;;                                 int idx, t * val)
+(defun (setf vec-vec-4f-at) (val self &optional idx)
     "Sets the element at position n in the vector."
-  (if (typep vec 'std-vector-vec-4f)
+  (if (typep self 'std-vector-vec-4f)
       (foreign-funcall "cv_vector_v4f_at_set_Val" 
-		       :pointer (c-pointer vec) 
-		       :int idx
+		       :pointer (c-pointer self) 
+		       :int (or idx 0)
 		       :pointer (c-pointer val)
 		       vec-6f)))
 
 
-(defun vec-vec-6f-at (vec idx)
+;; reference at (size_type n)
+;; t * cv_vector_##tn##_at(vector_##t * v, int idx)
+(defun vec-vec-6f-at (self &optional idx)
     "Returns the object at position n in the vector."
-  (if (typep vec 'std-vector-vec-6f)
+  (if (typep self 'std-vector-vec-6f)
       (foreign-funcall "cv_vector_v6f_at" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :int (or idx 0)
 		       vec-6f)))
 
 
-(defun (setf vec-vec-6f-at) (val vec idx)
+;; t * cv_vector_##tn##_at_set_Val(vector_##t * v, 
+;;                                 int idx, t * val)
+(defun (setf vec-vec-6f-at) (val self &optional idx)
     "Sets the element at position n in the vector."
-  (if (typep vec 'std-vector-vec-6f)
+  (if (typep self 'std-vector-vec-6f)
       (foreign-funcall "cv_vector_v6f_at_set_Val" 
-		       :pointer (c-pointer vec) 
-		       :int idx
+		       :pointer (c-pointer self) 
+		       :int (or idx 0)
 		       :pointer (c-pointer val)
 		       vec-6f)))
 
 
-(defun vec-vec-2i-at (vec idx)
+;; reference at (size_type n)
+;; t * cv_vector_##tn##_at(vector_##t * v, int idx)
+(defun vec-vec-2i-at (self &optional idx)
     "Returns the object at position n in the vector."
-  (if (typep vec 'std-vector-vec-2i)
+  (if (typep self 'std-vector-vec-2i)
       (foreign-funcall "cv_vector_v2i_at" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :int (or idx 0)
 		       vec-2i)))
 
 
-(defun (setf vec-vec-2i-at) (val vec idx)
+;; t * cv_vector_##tn##_at_set_Val(vector_##t * v, 
+;;                                 int idx, t * val)
+(defun (setf vec-vec-2i-at) (val self &optional idx)
     "Sets the element at position n in the vector."
-  (if (typep vec 'std-vector-vec-2i)
+  (if (typep self 'std-vector-vec-2i)
       (foreign-funcall "cv_vector_v2i_at_set_Val" 
-		       :pointer (c-pointer vec) 
-		       :int idx
+		       :pointer (c-pointer self) 
+		       :int (or idx 0)
 		       :pointer (c-pointer val)
 		       vec-2i)))
 
 
-(defun vec-vec-3i-at (vec idx)
+;; reference at (size_type n)
+;; t * cv_vector_##tn##_at(vector_##t * v, int idx)
+(defun vec-vec-3i-at (self &optional idx)
     "Returns the object at position n in the vector."
-  (if (typep vec 'std-vector-vec-3i)
+  (if (typep self 'std-vector-vec-3i)
       (foreign-funcall "cv_vector_v3i_at" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :int (or idx 0)
 		       vec-3i)))
 
 
-(defun (setf vec-vec-3i-at) (val vec idx)
+;; t * cv_vector_##tn##_at_set_Val(vector_##t * v, 
+;;                                 int idx, t * val)
+(defun (setf vec-vec-3i-at) (val self &optional idx)
     "Sets the element at position n in the vector."
-  (if (typep vec 'std-vector-vec-3i)
+  (if (typep self 'std-vector-vec-3i)
       (foreign-funcall "cv_vector_v3i_at_set_Val" 
-		       :pointer (c-pointer vec) 
-		       :int idx
+		       :pointer (c-pointer self) 
+		       :int (or idx 0)
 		       :pointer (c-pointer val)
 		       vec-3i)))
 
 
-(defun vec-vec-4i-at (vec idx)
+;; reference at (size_type n)
+;; t * cv_vector_##tn##_at(vector_##t * v, int idx)
+(defun vec-vec-4i-at (self &optional idx)
     "Returns the object at position n in the vector."
-  (if (typep vec 'std-vector-vec-4i)
+  (if (typep self 'std-vector-vec-4i)
       (foreign-funcall "cv_vector_v4i_at" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :int (or idx 0)
 		       vec-4i)))
 
 
-(defun (setf vec-vec-4i-at) (val vec idx)
+;; t * cv_vector_##tn##_at_set_Val(vector_##t * v, 
+;;                                 int idx, t * val)
+(defun (setf vec-vec-4i-at) (val self &optional idx)
     "Sets the element at position n in the vector."
-  (if (typep vec 'std-vector-vec-4i)
+  (if (typep self 'std-vector-vec-4i)
       (foreign-funcall "cv_vector_v4i_at_set_Val" 
-		       :pointer (c-pointer vec) 
-		       :int idx
+		       :pointer (c-pointer self) 
+		       :int (or idx 0)
 		       :pointer (c-pointer val)
 		       vec-4i)))
 
 
-(defun vec-vec-6i-at (vec idx)
+;; reference at (size_type n)
+;; t * cv_vector_##tn##_at(vector_##t * v, int idx)
+(defun vec-vec-6i-at (self &optional idx)
     "Returns the object at position n in the vector."
-  (if (typep vec 'std-vector-vec-6i)
+  (if (typep self 'std-vector-vec-6i)
       (foreign-funcall "cv_vector_v6i_at" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :int (or idx 0)
 		       vec-6i)))
 
 
-(defun (setf vec-vec-6i-at) (val vec idx)
+;; t * cv_vector_##tn##_at_set_Val(vector_##t * v, 
+;;                                 int idx, t * val)
+(defun (setf vec-vec-6i-at) (val self &optional idx)
     "Sets the element at position n in the vector."
-  (if (typep vec 'std-vector-vec-6i)
+  (if (typep self 'std-vector-vec-6i)
       (foreign-funcall "cv_vector_v6i_at_set_Val" 
-		       :pointer (c-pointer vec) 
-		       :int idx
+		       :pointer (c-pointer self) 
+		       :int (or idx 0)
 		       :pointer (c-pointer val)
 		       vec-6i)))
 
 
-(defun vec-vec-8i-at (vec idx)
+;; reference at (size_type n)
+;; t * cv_vector_##tn##_at(vector_##t * v, int idx)
+(defun vec-vec-8i-at (self &optional idx)
     "Returns the object at position n in the vector."
-  (if (typep vec 'std-vector-vec-8i)
+  (if (typep self 'std-vector-vec-8i)
       (foreign-funcall "cv_vector_v8i_at" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :int (or idx 0)
 		       vec-8i)))
 
 
-(defun (setf vec-vec-8i-at) (val vec idx)
+;; t * cv_vector_##tn##_at_set_Val(vector_##t * v, 
+;;                                 int idx, t * val)
+(defun (setf vec-vec-8i-at) (val self &optional idx)
     "Sets the element at position n in the vector."
-  (if (typep vec 'std-vector-vec-8i)
+  (if (typep self 'std-vector-vec-8i)
       (foreign-funcall "cv_vector_v8i_at_set_Val" 
-		       :pointer (c-pointer vec) 
-		       :int idx
+		       :pointer (c-pointer self) 
+		       :int (or idx 0)
 		       :pointer (c-pointer val)
 		       vec-8i)))
 
@@ -468,195 +563,267 @@
 ;;; PUSH-BACK functions.
 
 
-(defun vec-char-push-back (vec val)
+;; void push_back (const value_type& val)
+;; void cv_vector_##tn##_push_back(vector_##t * v, 
+;;                                 t * val)
+(defun vec-char-push-back (self val)
   "Adds a new element at the end of the vector."
-  (if (typep vec 'std-vector-char)
+  (if (typep self 'std-vector-char)
       (foreign-funcall "cv_vector_c_push_back" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :pointer (c-pointer val))))
 
 
-(defun vec-dmatch-push-back (vec val)
+;; void push_back (const value_type& val)
+;; void cv_vector_##tn##_push_back(vector_##t * v, 
+;;                                 t * val)
+(defun vec-dmatch-push-back (self val)
 "Adds a new element at the end of the vector."
-  (if (typep vec 'std-vector-dmatch)
+  (if (typep self 'std-vector-dmatch)
       (foreign-funcall "cv_vector_dm_push_back" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :pointer (c-pointer val))))
 
 
-(defun vec-double-push-back (vec val)
+;; void push_back (const value_type& val)
+;; void cv_vector_##tn##_push_back(vector_##t * v, 
+;;                                 t * val)
+(defun vec-double-push-back (self val)
   "Adds a new element at the end of the vector."
-  (if (typep vec 'std-vector-double)
+  (if (typep self 'std-vector-double)
       (foreign-funcall "cv_vector_d_push_back" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :pointer (c-pointer val))))
 
 
-(defun vec-float-push-back (vec val)
+;; void push_back (const value_type& val)
+;; void cv_vector_##tn##_push_back(vector_##t * v, 
+;;                                 t * val)
+(defun vec-float-push-back (self val)
   "Adds a new element at the end of the vector."
-  (if (typep vec 'std-vector-float)
+  (if (typep self 'std-vector-float)
       (foreign-funcall "cv_vector_f_push_back" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :pointer (c-pointer val))))
 
 
-(defun vec-int-push-back (vec val)
+;; void push_back (const value_type& val)
+;; void cv_vector_##tn##_push_back(vector_##t * v, 
+;;                                 t * val)
+(defun vec-int-push-back (self val)
   "Adds a new element at the end of the vector."
-  (if (typep vec 'std-vector-int)
+  (if (typep self 'std-vector-int)
       (foreign-funcall "cv_vector_i_push_back" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :pointer (c-pointer val))))
 
 
-(defun vec-key-point-push-back (vec val)
+;; void push_back (const value_type& val)
+;; void cv_vector_##tn##_push_back(vector_##t * v, 
+;;                                 t * val)
+(defun vec-key-point-push-back (self val)
   "Adds a new element at the end of the vector."
-  (if (typep vec 'std-vector-key-point)
+  (if (typep self 'std-vector-key-point)
       (foreign-funcall "cv_vector_kp_push_back" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :pointer (c-pointer val))))
 
 
-(defun vec-mat-push-back (vec val)
+;; void push_back (const value_type& val)
+;; void cv_vector_##tn##_push_back(vector_##t * v, 
+;;                                 t * val)
+(defun vec-mat-push-back (self val)
   "Adds a new element at the end of the vector."
-  (if (typep vec 'std-vector-mat)
+  (if (typep self 'std-vector-mat)
       (foreign-funcall "cv_vector_m_push_back" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :pointer (c-pointer val))))
 
 
-(defun vec-point-push-back (vec val)
+;; void push_back (const value_type& val)
+;; void cv_vector_##tn##_push_back(vector_##t * v, 
+;;                                 t * val)
+(defun vec-point-push-back (self val)
   "Adds a new element at the end of the vector."
-  (if (typep vec 'std-vector-point)
+  (if (typep self 'std-vector-point)
       (foreign-funcall "cv_vector_p_push_back" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :pointer (c-pointer val))))
 
 
-(defun vec-point-2f-push-back (vec val)
+;; void push_back (const value_type& val)
+;; void cv_vector_##tn##_push_back(vector_##t * v, 
+;;                                 t * val)
+(defun vec-point-2f-push-back (self val)
   "Adds a new element at the end of the vector."
-  (if (typep vec 'std-vector-point-2f)
+  (if (typep self 'std-vector-point-2f)
       (foreign-funcall "cv_vector_p2f_push_back" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :pointer (c-pointer val))))
 
 
-(defun vec-rect-push-back (vec val)
+;; void push_back (const value_type& val)
+;; void cv_vector_##tn##_push_back(vector_##t * v, 
+;;                                 t * val)
+(defun vec-rect-push-back (self val)
   "Adds a new element at the end of the vector."
-  (if (typep vec 'std-vector-rect)
+  (if (typep self 'std-vector-rect)
       (foreign-funcall "cv_vector_r_push_back" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :pointer (c-pointer val))))
 
 
-(defun vec-uchar-push-back (vec val)
+;; void push_back (const value_type& val)
+;; void cv_vector_##tn##_push_back(vector_##t * v, 
+;;                                 t * val)
+(defun vec-uchar-push-back (self val)
   "Adds a new element at the end of the vector."
-  (if (typep vec 'std-vector-uchar)
+  (if (typep self 'std-vector-uchar)
       (foreign-funcall "cv_vector_u_push_back" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :pointer (c-pointer val))))
 
 
-(defun vec-vec-2d-push-back (vec val)
+;; void push_back (const value_type& val)
+;; void cv_vector_##tn##_push_back(vector_##t * v, 
+;;                                 t * val)
+(defun vec-vec-2d-push-back (self val)
   "Adds a new element at the end of the vector."
-  (if (typep vec 'std-vector-vec-2d)
+  (if (typep self 'std-vector-vec-2d)
       (foreign-funcall "cv_vector_v2d_push_back" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :pointer (c-pointer val))))
 
 
-(defun vec-vec-3d-push-back (vec val)
+;; void push_back (const value_type& val)
+;; void cv_vector_##tn##_push_back(vector_##t * v, 
+;;                                 t * val)
+(defun vec-vec-3d-push-back (self val)
   "Adds a new element at the end of the vector."
-  (if (typep vec 'std-vector-vec-3d)
+  (if (typep self 'std-vector-vec-3d)
       (foreign-funcall "cv_vector_v3d_push_back" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :pointer (c-pointer val))))
 
 
-(defun vec-vec-4d-push-back (vec val)
+;; void push_back (const value_type& val)
+;; void cv_vector_##tn##_push_back(vector_##t * v, 
+;;                                 t * val)
+(defun vec-vec-4d-push-back (self val)
   "Adds a new element at the end of the vector."
-  (if (typep vec 'std-vector-vec-4d)
+  (if (typep self 'std-vector-vec-4d)
       (foreign-funcall "cv_vector_v4d_push_back" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :pointer (c-pointer val))))
 
 
-(defun vec-vec-6d-push-back (vec val)
+;; void push_back (const value_type& val)
+;; void cv_vector_##tn##_push_back(vector_##t * v, 
+;;                                 t * val)
+(defun vec-vec-6d-push-back (self val)
   "Adds a new element at the end of the vector."
-  (if (typep vec 'std-vector-vec-6d)
+  (if (typep self 'std-vector-vec-6d)
       (foreign-funcall "cv_vector_v6d_push_back" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :pointer (c-pointer val))))
 
 
-(defun vec-vec-2f-push-back (vec val)
+;; void push_back (const value_type& val)
+;; void cv_vector_##tn##_push_back(vector_##t * v, 
+;;                                 t * val)
+(defun vec-vec-2f-push-back (self val)
   "Adds a new element at the end of the vector."
-  (if (typep vec 'std-vector-vec-2f)
+  (if (typep self 'std-vector-vec-2f)
       (foreign-funcall "cv_vector_v2f_push_back" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :pointer (c-pointer val))))
 
 
-(defun vec-vec-3f-push-back (vec val)
+;; void push_back (const value_type& val)
+;; void cv_vector_##tn##_push_back(vector_##t * v, 
+;;                                 t * val)
+(defun vec-vec-3f-push-back (self val)
   "Adds a new element at the end of the vector."
-  (if (typep vec 'std-vector-vec-3f)
+  (if (typep self 'std-vector-vec-3f)
       (foreign-funcall "cv_vector_v3f_push_back" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :pointer (c-pointer val))))
 
 
-(defun vec-vec-4f-push-back (vec val)
+;; void push_back (const value_type& val)
+;; void cv_vector_##tn##_push_back(vector_##t * v, 
+;;                                 t * val)
+(defun vec-vec-4f-push-back (self val)
   "Adds a new element at the end of the vector."
-  (if (typep vec 'std-vector-vec-4f)
+  (if (typep self 'std-vector-vec-4f)
       (foreign-funcall "cv_vector_v4f_push_back" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :pointer (c-pointer val))))
 
 
-(defun vec-vec-6f-push-back (vec val)
+;; void push_back (const value_type& val)
+;; void cv_vector_##tn##_push_back(vector_##t * v, 
+;;                                 t * val)
+(defun vec-vec-6f-push-back (self val)
   "Adds a new element at the end of the vector."
-  (if (typep vec 'std-vector-vec-6f)
+  (if (typep self 'std-vector-vec-6f)
       (foreign-funcall "cv_vector_v6f_push_back" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :pointer (c-pointer val))))
 
 
-(defun vec-vec-2i-push-back (vec val)
+;; void push_back (const value_type& val)
+;; void cv_vector_##tn##_push_back(vector_##t * v, 
+;;                                 t * val)
+(defun vec-vec-2i-push-back (self val)
   "Adds a new element at the end of the vector."
-  (if (typep vec 'std-vector-vec-2i)
+  (if (typep self 'std-vector-vec-2i)
       (foreign-funcall "cv_vector_v2i_push_back" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :pointer (c-pointer val))))
 
 
-(defun vec-vec-3i-push-back (vec val)
+;; void push_back (const value_type& val)
+;; void cv_vector_##tn##_push_back(vector_##t * v, 
+;;                                 t * val)
+(defun vec-vec-3i-push-back (self val)
   "Adds a new element at the end of the vector."
-  (if (typep vec 'std-vector-vec-3i)
+  (if (typep self 'std-vector-vec-3i)
       (foreign-funcall "cv_vector_v3i_push_back" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :pointer (c-pointer val))))
 
 
-(defun vec-vec-4i-push-back (vec val)
+;; void push_back (const value_type& val)
+;; void cv_vector_##tn##_push_back(vector_##t * v, 
+;;                                 t * val)
+(defun vec-vec-4i-push-back (self val)
   "Adds a new element at the end of the vector."
-  (if (typep vec 'std-vector-vec-4i)
+  (if (typep self 'std-vector-vec-4i)
       (foreign-funcall "cv_vector_v4i_push_back" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :pointer (c-pointer val))))
 
 
-(defun vec-vec-6i-push-back (vec val)
+;; void push_back (const value_type& val)
+;; void cv_vector_##tn##_push_back(vector_##t * v, 
+;;                                 t * val)
+(defun vec-vec-6i-push-back (self val)
   "Adds a new element at the end of the vector."
-  (if (typep vec 'std-vector-vec-6i)
+  (if (typep self 'std-vector-vec-6i)
       (foreign-funcall "cv_vector_v6i_push_back" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :pointer (c-pointer val))))
 
 
-(defun vec-vec-8i-push-back (vec val)
+;; void push_back (const value_type& val)
+;; void cv_vector_##tn##_push_back(vector_##t * v, 
+;;                                 t * val)
+(defun vec-vec-8i-push-back (self val)
   "Adds a new element at the end of the vector."
-  (if (typep vec 'std-vector-vec-8i)
+  (if (typep self 'std-vector-vec-8i)
       (foreign-funcall "cv_vector_v8i_push_back" 
-		       :pointer (c-pointer vec) 
+		       :pointer (c-pointer self) 
 		       :pointer (c-pointer val))))
 
 
@@ -685,16 +852,16 @@
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; t * std_vector##tn##_to_carray( vector_##t * v ) 
 (defcfun ("std_vectorc_to_carray" vec-char-to-c-arr) :pointer 
-  (vec vector-char))
+  (self vector-char))
 
 
 ;; size_t std_vector##tn##_length( vector_##t * v)
 (defcfun ("std_vectorc_length" vec-char-length) :unsigned-int
-  (vec vector-char))
+  (self vector-char))
 
 
-(defun vec-char-to-lisp-list (vec)
-  (let* ((x vec)
+(defun vec-char-to-lisp-list (self)
+  (let* ((x self)
 	 (y (vec-char-length x))
 	 (z (list)))
     (dotimes (i y)
@@ -702,16 +869,14 @@
     (reverse z)))
 
 
-(defun vec-char-to-lisp-vec (vec length)
-  (let* ((w vec)
-	 (x (vec-char-length w))
-	 (y (if length length x))
+(defun vec-char-to-lisp-vec (self)
+  (let* ((x self)
+	 (y (vec-char-length x))
 	 (z (make-array y :element-type t :fill-pointer 0
 			:initial-element   
 			nil)))
-
-    (dotimes (i x)
-      (vector-push (mem-aref (vec-char-to-c-arr w) :char i) z))
+    (dotimes (i y)
+      (vector-push (mem-aref (vec-char-to-c-arr x) :char i) z))
     z))
 
 
@@ -720,8 +885,7 @@
       (error "odd number of args to VECTOR-CHAR")
     nil)
   (let ((x (first args))
-	(y (second args))
-	(z (third args)))
+	(y (second args)))
     (cond ((null x)
 	   (make-vector-char))
 	  ((and (or (vectorp x) (listp x)) (null y))
@@ -729,7 +893,7 @@
 	  ((and (eq :to-lisp-list x))
 	   (vec-char-to-lisp-list y))
 	  ((and (eq :to-lisp-vec x))
-	   (vec-char-to-lisp-vec y z))
+	   (vec-char-to-lisp-vec y))
 	  ((typep x 'std-vector-char)
 	   (let ((temp (foreign-funcall "std_vectorc_to_carray" 
 					:pointer (c-pointer x) 
@@ -763,16 +927,16 @@
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; t * std_vector##tn##_to_carray( vector_##t * v ) 
 (defcfun ("std_vectordm_to_carray" vec-dmatch-to-c-arr) :pointer 
-  (vec vector-dmatch))
+  (self vector-dmatch))
 
 
 ;; size_t std_vector##tn##_length( vector_##t * v)
 (defcfun ("std_vectordm_length" vec-dmatch-length) :unsigned-int
-  (vec vector-dmatch))
+  (self vector-dmatch))
 
 
-(defun vec-dmatch-to-lisp-list (vec)
-  (let* ((x vec)
+(defun vec-dmatch-to-lisp-list (self)
+  (let* ((x self)
 	 (y (vec-dmatch-length x))
 	 (z (list)))
     (dotimes (i y)
@@ -780,8 +944,8 @@
     (reverse z)))
 
 
-(defun vec-dmatch-to-lisp-vec (vec)
-  (let* ((x vec)
+(defun vec-dmatch-to-lisp-vec (self)
+  (let* ((x self)
 	 (y (vec-dmatch-length x))
 	 (z (make-array y :element-type t :fill-pointer 0
 			:initial-element   
@@ -806,10 +970,10 @@
 	   (vec-dmatch-to-lisp-list x))
 	  ((and (eq :to-lisp-vec w))
 	   (vec-dmatch-to-lisp-vec x))
-	  ((and (typep w 'std-vector-dmatch) x)
+	  ((typep w 'std-vector-dmatch)
 	   (let ((temp (foreign-funcall "cv_vector_dm_at" 
 					:pointer (c-pointer w) 
-					:int x 
+					:int (or x 0) 
 					:pointer)))
 	     (if y
 		 (case y 
@@ -845,16 +1009,16 @@
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; t * std_vector##tn##_to_carray( vector_##t * v ) 
 (defcfun ("std_vectord_to_carray" vec-double-to-c-arr) :pointer 
-  (vec vector-double))
+  (self vector-double))
 
 
 ;; size_t std_vector##tn##_length( vector_##t * v)
 (defcfun ("std_vectord_length" vec-double-length) :unsigned-int
-  (vec vector-double))
+  (self vector-double))
 
 
-(defun vec-double-to-lisp-list (vec)
-  (let* ((x vec)
+(defun vec-double-to-lisp-list (self)
+  (let* ((x self)
 	 (y (vec-double-length x))
 	 (z (list)))
     (dotimes (i y)
@@ -862,8 +1026,8 @@
     (reverse z)))
 
 
-(defun vec-double-to-lisp-vec (vec)
-  (let* ((x vec)
+(defun vec-double-to-lisp-vec (self)
+  (let* ((x self)
 	 (y (vec-double-length x))
 	 (z (make-array y :element-type t :fill-pointer 0
 			:initial-element   
@@ -921,16 +1085,16 @@
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; t * std_vector##tn##_to_carray( vector_##t * v ) 
 (defcfun ("std_vectorf_to_carray" vec-float-to-c-arr) :pointer 
-  (vec vector-float))
+  (self vector-float))
 
 
 ;; size_t std_vector##tn##_length( vector_##t * v)
 (defcfun ("std_vectorf_length" vec-float-length) :unsigned-int
-  (vec vector-float))
+  (self vector-float))
 
 
-(defun vec-float-to-lisp-list (vec)
-  (let* ((x vec)
+(defun vec-float-to-lisp-list (self)
+  (let* ((x self)
 	 (y (vec-float-length x))
 	 (z (list)))
     (dotimes (i y)
@@ -938,8 +1102,8 @@
     (reverse z)))
 
 
-(defun vec-float-to-lisp-vec (vec)
-  (let* ((x vec)
+(defun vec-float-to-lisp-vec (self)
+  (let* ((x self)
 	 (y (vec-float-length x))
 	 (z (make-array y :element-type t :fill-pointer 0
 			:initial-element   
@@ -998,16 +1162,16 @@
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; t * std_vector##tn##_to_carray( vector_##t * v ) 
 (defcfun ("std_vectori_to_carray" vec-int-to-c-arr) :pointer 
-  (vec vector-int))
+  (self vector-int))
 
 
 ;; size_t std_vector##tn##_length( vector_##t * v)
 (defcfun ("std_vectori_length" vec-int-length) :unsigned-int
-  (vec vector-int))
+  (self vector-int))
 
 
-(defun vec-int-to-lisp-list (vec)
-  (let* ((x vec)
+(defun vec-int-to-lisp-list (self)
+  (let* ((x self)
 	 (y (vec-int-length x))
 	 (z (list)))
     (dotimes (i y)
@@ -1015,8 +1179,8 @@
     (reverse z)))
 
 
-(defun vec-int-to-lisp-vec (vec)
-  (let* ((x vec)
+(defun vec-int-to-lisp-vec (self)
+  (let* ((x self)
 	 (y (vec-int-length x))
 	 (z (make-array y :element-type t :fill-pointer 0
 			:initial-element   
@@ -1079,11 +1243,11 @@
 
 ;; size_t std_vector##tn##_length( vector_##t * v)
 (defcfun ("std_vectorkp_length" vec-key-point-length) :unsigned-int
-  (vec vector-key-point))
+  (self vector-key-point))
 
 
-(defun vec-key-point-to-lisp-list (vec)
-  (let* ((x vec)
+(defun vec-key-point-to-lisp-list (self)
+  (let* ((x self)
 	 (y (vec-key-point-length x))
 	 (z (list)))
     (dotimes (i y)
@@ -1091,8 +1255,8 @@
     (reverse z)))
 
 
-(defun vec-key-point-to-lisp-vec (vec)
-  (let* ((x vec)
+(defun vec-key-point-to-lisp-vec (self)
+  (let* ((x self)
 	 (y (vec-key-point-length x))
 	 (z (make-array y :element-type t :fill-pointer 0
 			:initial-element   
@@ -1117,10 +1281,10 @@
 	   (vec-key-point-to-lisp-list x))
 	  ((and (eq :to-lisp-vec w))
 	   (vec-key-point-to-lisp-vec x))
-	  ((and (typep w 'std-vector-key-point) x)
+	  ((typep w 'std-vector-key-point)
 	   (let ((temp (foreign-funcall "cv_vector_kp_at" 
 					:pointer (c-pointer w) 
-					:int x 
+					:int (or x 0) 
 					:pointer)))
 	     (if y
 		 (case y 
@@ -1160,16 +1324,16 @@
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; t * std_vector##tn##_to_carray( vector_##t * v ) 
 (defcfun ("std_vectorm_to_carray" vec-mat-to-c-arr) :pointer 
-  (vec vector-mat))
+  (self vector-mat))
 
 
 ;; size_t std_vector##tn##_length( vector_##t * v)
 (defcfun ("std_vectorm_length" vec-mat-length) :unsigned-int
-  (vec vector-mat))
+  (self vector-mat))
 
 
-(defun vec-mat-to-lisp-list (vec)
-  (let* ((x vec)
+(defun vec-mat-to-lisp-list (self)
+  (let* ((x self)
 	 (y (vec-mat-length x))
 	 (z (list)))
     (dotimes (i y)
@@ -1177,8 +1341,8 @@
     (reverse z)))
 
 
-(defun vec-mat-to-lisp-vec (vec)
-  (let* ((x vec)
+(defun vec-mat-to-lisp-vec (self)
+  (let* ((x self)
 	 (y (vec-mat-length x))
 	 (z (make-array y :element-type t :fill-pointer 0
 			:initial-element   
@@ -1202,10 +1366,10 @@
 	   (vec-mat-to-lisp-list y))
 	  ((and (eq :to-lisp-vec x))
 	   (vec-mat-to-lisp-vec y))
-	  ((and (typep x 'std-vector-mat) y)
+	  ((typep x 'std-vector-mat)
 	   (let ((temp (foreign-funcall "cv_vector_m_at" 
 					:pointer (c-pointer x) 
-					:int y 
+					:int (or y 0) 
 					:pointer)))
 	     (make-instance 'cv-mat :c-pointer temp)))
 	  (t (error "incorrect input. 
@@ -1235,16 +1399,16 @@
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; t * std_vector##tn##_to_carray( vector_##t * v ) 
 (defcfun ("std_vectorp_to_carray" vec-point-to-c-arr) :pointer 
-  (vec vector-point))
+  (self vector-point))
 
 
 ;; size_t std_vector##tn##_length( vector_##t * v)
 (defcfun ("std_vectorp_length" vec-point-length) :unsigned-int
-  (vec vector-point))
+  (self vector-point))
 
 
-(defun vec-point-to-lisp-list (vec)
-  (let* ((x vec)
+(defun vec-point-to-lisp-list (self)
+  (let* ((x self)
 	 (y (vec-point-length x))
 	 (z (list)))
     (dotimes (i y)
@@ -1252,8 +1416,8 @@
     (reverse z)))
 
 
-(defun vec-point-to-lisp-vec (vec)
-  (let* ((x vec)
+(defun vec-point-to-lisp-vec (self)
+  (let* ((x self)
 	 (y (vec-point-length x))
 	 (z (make-array y :element-type t :fill-pointer 0
 			:initial-element   
@@ -1278,10 +1442,10 @@
 	   (vec-point-to-lisp-list y))
 	  ((and (eq :to-lisp-vec x))
 	   (vec-point-to-lisp-vec y))
-	  ((and (typep x 'std-vector-point) y)
+	  ((typep x 'std-vector-point)
 	   (let ((temp (foreign-funcall "cv_vector_p_at" 
 					:pointer (c-pointer x) 
-					:int y 
+					:int (or y 0) 
 					:pointer)))
 	     (if z
 		 (case z
@@ -1315,16 +1479,16 @@
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; t * std_vector##tn##_to_carray( vector_##t * v ) 
 (defcfun ("std_vectorp2f_to_carray" vec-point-2f-to-c-arr) :pointer 
-  (vec vector-point-2f))
+  (self vector-point-2f))
 
 
 ;; size_t std_vector##tn##_length( vector_##t * v)
 (defcfun ("std_vectorp2f_length" vec-point-2f-length) :unsigned-int
-  (vec vector-point-2f))
+  (self vector-point-2f))
 
 
-(defun vec-point-2f-to-lisp-list (vec)
-  (let* ((x vec)
+(defun vec-point-2f-to-lisp-list (self)
+  (let* ((x self)
 	 (y (vec-point-2f-length x))
 	 (z (list)))
     (dotimes (i y)
@@ -1332,8 +1496,8 @@
     (reverse z)))
 
 
-(defun vec-point-2f-to-lisp-vec (vec)
-  (let* ((x vec)
+(defun vec-point-2f-to-lisp-vec (self)
+  (let* ((x self)
 	 (y (vec-point-2f-length x))
 	 (z (make-array y :element-type t :fill-pointer 0
 			:initial-element   
@@ -1358,10 +1522,10 @@
 	   (vec-point-2f-to-lisp-list y))
 	  ((and (eq :to-lisp-vec x))
 	   (vec-point-2f-to-lisp-vec y))
-	  ((and (typep x 'std-vector-point-2f) y)
+	  ((typep x 'std-vector-point-2f)
 	   (let ((temp (foreign-funcall "cv_vector_p2f_at" 
 					:pointer (c-pointer x) 
-					:int y 
+					:int (or y 0) 
 					:pointer)))
 	     (if z
 		 (case z
@@ -1395,16 +1559,16 @@
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; t * std_vector##tn##_to_carray( vector_##t * v ) 
 (defcfun ("std_vectorr_to_carray" vec-rect-to-c-arr) :pointer 
-  (vec vector-rect))
+  (self vector-rect))
 
 
 ;; size_t std_vector##tn##_length( vector_##t * v)
 (defcfun ("std_vectorr_length" vec-rect-length) :unsigned-int
-  (vec vector-rect))
+  (self vector-rect))
 
 
-(defun vec-rect-to-lisp-list (vec)
-  (let* ((x vec)
+(defun vec-rect-to-lisp-list (self)
+  (let* ((x self)
 	 (y (vec-rect-length x))
 	 (z (list)))
     (dotimes (i y)
@@ -1412,18 +1576,15 @@
     (reverse z)))
 
 
-(defun vec-rect-to-lisp-vec (vec length)
-  (let* ((w vec)
-	 (x (vec-rect-length w))
-	 (y (if length length x))
+(defun vec-rect-to-lisp-vec (self)
+  (let* ((x self)
+	 (y (vec-rect-length x))
 	 (z (make-array y :element-type t :fill-pointer 0
 			:initial-element   
 			nil)))
-
-    (dotimes (i x)
-      (vector-push (mem-aref (vec-rect-to-c-arr w) 'rect i) z))
+    (dotimes (i y)
+      (vector-push (mem-aref (vec-rect-to-c-arr x) 'rect i) z))
     z))
-
 
 
 (defun vector-rect (&rest args)
@@ -1440,11 +1601,11 @@
 	  ((and (eq :to-lisp-list x))
 	   (vec-rect-to-lisp-list y))
 	  ((and (eq :to-lisp-vec x))
-	   (vec-rect-to-lisp-vec y z))
-	  ((and (typep x 'std-vector-rect) y)
+	   (vec-rect-to-lisp-vec y))
+	  ((typep x 'std-vector-rect)
 	   (let ((temp (foreign-funcall "cv_vector_r_at" 
 					:pointer (c-pointer x) 
-					:int y 
+					:int (or y 0) 
 					:pointer)))
 	     (if z
 		 (case z
@@ -1481,16 +1642,16 @@
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; t * std_vector##tn##_to_carray( vector_##t * v ) 
 (defcfun ("std_vectoru_to_carray" vec-uchar-to-c-arr) :pointer 
-  (vec vector-uchar))
+  (self vector-uchar))
 
 
 ;; size_t std_vector##tn##_length( vector_##t * v)
 (defcfun ("std_vectoru_length" vec-uchar-length) :unsigned-int
-  (vec vector-uchar))
+  (self vector-uchar))
 
 
-(defun vec-uchar-to-lisp-list (vec)
-  (let* ((x vec)
+(defun vec-uchar-to-lisp-list (self)
+  (let* ((x self)
 	 (y (vec-uchar-length x))
 	 (z (list)))
     (dotimes (i y)
@@ -1498,8 +1659,8 @@
     (reverse z)))
 
 
-(defun vec-uchar-to-lisp-vec (vec)
-  (let* ((x vec)
+(defun vec-uchar-to-lisp-vec (self)
+  (let* ((x self)
 	 (y (vec-uchar-length x))
 	 (z (make-array y :element-type t :fill-pointer 0
 			:initial-element   
@@ -1557,16 +1718,16 @@
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; t * std_vector##tn##_to_carray( vector_##t * v ) 
 (defcfun ("std_vectorv2d_to_carray" vec-vec-2d-to-c-arr) :pointer 
-  (vec vector-vec-2d))
+  (self vector-vec-2d))
 
 
 ;; size_t std_vector##tn##_length( vector_##t * v)
 (defcfun ("std_vectorv2d_length" vec-vec-2d-length) :unsigned-int
-  (vec vector-vec-2d))
+  (self vector-vec-2d))
 
 
-(defun vec-vec-2d-to-lisp-list (vec)
-  (let* ((x vec)
+(defun vec-vec-2d-to-lisp-list (self)
+  (let* ((x self)
 	 (y (vec-vec-2d-length x))
 	 (z (list)))
     (dotimes (i y)
@@ -1574,8 +1735,8 @@
     (reverse z)))
 
 
-(defun vec-vec-2d-to-lisp-vec (vec)
-  (let* ((x vec)
+(defun vec-vec-2d-to-lisp-vec (self)
+  (let* ((x self)
 	 (y (vec-vec-2d-length x))
 	 (z (make-array y :element-type t :fill-pointer 0
 			:initial-element   
@@ -1600,10 +1761,10 @@
 	   (vec-vec-2d-to-lisp-list y))
 	  ((and (eq :to-lisp-vec x))
 	   (vec-vec-2d-to-lisp-vec y))
-	  ((and (typep x 'std-vector-vec-2d) y)
+	  ((typep x 'std-vector-vec-2d)
 	   (let ((temp (foreign-funcall "cv_vector_v2d_at" 
 					:pointer (c-pointer x) 
-					:int y 
+					:int (or y 0) 
 					:pointer)))
 	     (if z (case z
 		     (0 (mem-aref temp :double))
@@ -1636,16 +1797,16 @@
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; t * std_vector##tn##_to_carray( vector_##t * v ) 
 (defcfun ("std_vectorv3d_to_carray" vec-vec-3d-to-c-arr) :pointer 
-  (vec vector-vec-3d))
+  (self vector-vec-3d))
 
 
 ;; size_t std_vector##tn##_length( vector_##t * v)
 (defcfun ("std_vectorv3d_length" vec-vec-3d-length) :unsigned-int
-  (vec vector-vec-3d))
+  (self vector-vec-3d))
 
 
-(defun vec-vec-3d-to-lisp-list (vec)
-  (let* ((x vec)
+(defun vec-vec-3d-to-lisp-list (self)
+  (let* ((x self)
 	 (y (vec-vec-3d-length x))
 	 (z (list)))
     (dotimes (i y)
@@ -1653,8 +1814,8 @@
     (reverse z)))
 
 
-(defun vec-vec-3d-to-lisp-vec (vec)
-  (let* ((x vec)
+(defun vec-vec-3d-to-lisp-vec (self)
+  (let* ((x self)
 	 (y (vec-vec-3d-length x))
 	 (z (make-array y :element-type t :fill-pointer 0
 			:initial-element   
@@ -1679,10 +1840,10 @@
 	   (vec-vec-3d-to-lisp-list y))
 	  ((and (eq :to-lisp-vec x))
 	   (vec-vec-3d-to-lisp-vec y))
-	  ((and (typep x 'std-vector-vec-3d) y)
+	  ((typep x 'std-vector-vec-3d)
 	   (let ((temp (foreign-funcall "cv_vector_v3d_at" 
 					:pointer (c-pointer x) 
-					:int y 
+					:int (or y 0) 
 					:pointer)))
 	     (if z (case z
 		     (0 (mem-aref temp :double))
@@ -1715,16 +1876,16 @@
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; t * std_vector##tn##_to_carray( vector_##t * v ) 
 (defcfun ("std_vectorv4d_to_carray" vec-vec-4d-to-c-arr) :pointer 
-  (vec vector-vec-4d))
+  (self vector-vec-4d))
 
 
 ;; size_t std_vector##tn##_length( vector_##t * v)
 (defcfun ("std_vectorv4d_length" vec-vec-4d-length) :unsigned-int
-  (vec vector-vec-4d))
+  (self vector-vec-4d))
 
 
-(defun vec-vec-4d-to-lisp-list (vec)
-  (let* ((x vec)
+(defun vec-vec-4d-to-lisp-list (self)
+  (let* ((x self)
 	 (y (vec-vec-4d-length x))
 	 (z (list)))
     (dotimes (i y)
@@ -1732,8 +1893,8 @@
     (reverse z)))
 
 
-(defun vec-vec-4d-to-lisp-vec (vec)
-  (let* ((x vec)
+(defun vec-vec-4d-to-lisp-vec (self)
+  (let* ((x self)
 	 (y (vec-vec-4d-length x))
 	 (z (make-array y :element-type t :fill-pointer 0
 			:initial-element   
@@ -1758,10 +1919,10 @@
 	   (vec-vec-4d-to-lisp-list y))
 	  ((and (eq :to-lisp-vec x))
 	   (vec-vec-4d-to-lisp-vec y))
-	  ((and (typep x 'std-vector-vec-4d) y)
+	  ((typep x 'std-vector-vec-4d)
 	   (let ((temp (foreign-funcall "cv_vector_v4d_at" 
 					:pointer (c-pointer x) 
-					:int y 
+					:int (or y 0) 
 					:pointer)))
 	     (if z (case z
 		     (0 (mem-aref temp :double))
@@ -1794,16 +1955,16 @@
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; t * std_vector##tn##_to_carray( vector_##t * v ) 
 (defcfun ("std_vectorv6d_to_carray" vec-vec-6d-to-c-arr) :pointer 
-  (vec vector-vec-6d))
+  (self vector-vec-6d))
 
 
 ;; size_t std_vector##tn##_length( vector_##t * v)
 (defcfun ("std_vectorv6d_length" vec-vec-6d-length) :unsigned-int
-  (vec vector-vec-6d))
+  (self vector-vec-6d))
 
 
-(defun vec-vec-6d-to-lisp-list (vec)
-  (let* ((x vec)
+(defun vec-vec-6d-to-lisp-list (self)
+  (let* ((x self)
 	 (y (vec-vec-6d-length x))
 	 (z (list)))
     (dotimes (i y)
@@ -1811,8 +1972,8 @@
     (reverse z)))
 
 
-(defun vec-vec-6d-to-lisp-vec (vec)
-  (let* ((x vec)
+(defun vec-vec-6d-to-lisp-vec (self)
+  (let* ((x self)
 	 (y (vec-vec-6d-length x))
 	 (z (make-array y :element-type t :fill-pointer 0
 			:initial-element   
@@ -1837,10 +1998,10 @@
 	   (vec-vec-6d-to-lisp-list y))
 	  ((and (eq :to-lisp-vec x))
 	   (vec-vec-6d-to-lisp-vec y))
-	  ((and (typep x 'std-vector-vec-6d) y)
+	  ((typep x 'std-vector-vec-6d)
 	   (let ((temp (foreign-funcall "cv_vector_v6d_at" 
 					:pointer (c-pointer x) 
-					:int y 
+					:int (or y 0) 
 					:pointer)))
 	     (if z (case z
 		     (0 (mem-aref temp :double))
@@ -1873,16 +2034,16 @@
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; t * std_vector##tn##_to_carray( vector_##t * v ) 
 (defcfun ("std_vectorv2f_to_carray" vec-vec-2f-to-c-arr) :pointer 
-  (vec vector-vec-2f))
+  (self vector-vec-2f))
 
 
 ;; size_t std_vector##tn##_length( vector_##t * v)
 (defcfun ("std_vectorv2f_length" vec-vec-2f-length) :unsigned-int
-  (vec vector-vec-2f))
+  (self vector-vec-2f))
 
 
-(defun vec-vec-2f-to-lisp-list (vec)
-  (let* ((x vec)
+(defun vec-vec-2f-to-lisp-list (self)
+  (let* ((x self)
 	 (y (vec-vec-2f-length x))
 	 (z (list)))
     (dotimes (i y)
@@ -1890,8 +2051,8 @@
     (reverse z)))
 
 
-(defun vec-vec-2f-to-lisp-vec (vec)
-  (let* ((x vec)
+(defun vec-vec-2f-to-lisp-vec (self)
+  (let* ((x self)
 	 (y (vec-vec-2f-length x))
 	 (z (make-array y :element-type t :fill-pointer 0
 			:initial-element   
@@ -1899,7 +2060,6 @@
     (dotimes (i y)
       (vector-push (mem-aref (vec-vec-2f-to-c-arr x) 'vec-2f i) z))
     z))
-
 
 
 (defun vector-vec-2f (&rest args)
@@ -1917,10 +2077,10 @@
 	   (vec-vec-2f-to-lisp-list y))
 	  ((and (eq :to-lisp-vec x))
 	   (vec-vec-2f-to-lisp-vec y))
-	  ((and (typep x 'std-vector-vec-2f) y)
+	  ((typep x 'std-vector-vec-2f)
 	   (let ((temp (foreign-funcall "cv_vector_v2f_at" 
 					:pointer (c-pointer x) 
-					:int y 
+					:int (or y 0) 
 					:pointer)))
 	     (if z (case z
 		     (0 (mem-aref temp :float))
@@ -1953,16 +2113,16 @@
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; t * std_vector##tn##_to_carray( vector_##t * v ) 
 (defcfun ("std_vectorv3f_to_carray" vec-vec-3f-to-c-arr) :pointer 
-  (vec vector-vec-3f))
+  (self vector-vec-3f))
 
 
 ;; size_t std_vector##tn##_length( vector_##t * v)
 (defcfun ("std_vectorv3f_length" vec-vec-3f-length) :unsigned-int
-  (vec vector-vec-3f))
+  (self vector-vec-3f))
 
 
-(defun vec-vec-3f-to-lisp-list (vec)
-  (let* ((x vec)
+(defun vec-vec-3f-to-lisp-list (self)
+  (let* ((x self)
 	 (y (vec-vec-3f-length x))
 	 (z (list)))
     (dotimes (i y)
@@ -1970,8 +2130,8 @@
     (reverse z)))
 
 
-(defun vec-vec-3f-to-lisp-vec (vec)
-  (let* ((x vec)
+(defun vec-vec-3f-to-lisp-vec (self)
+  (let* ((x self)
 	 (y (vec-vec-3f-length x))
 	 (z (make-array y :element-type t :fill-pointer 0
 			:initial-element   
@@ -1996,10 +2156,10 @@
 	   (vec-vec-3f-to-lisp-list y))
 	  ((and (eq :to-lisp-vec x))
 	   (vec-vec-3f-to-lisp-vec y))
-	  ((and (typep x 'std-vector-vec-3f) y)
+	  ((typep x 'std-vector-vec-3f)
 	   (let ((temp (foreign-funcall "cv_vector_v3f_at" 
 					:pointer (c-pointer x) 
-					:int y 
+					:int (or y 0) 
 					:pointer)))
 	     (if z (case z
 		     (0 (mem-aref temp :float))
@@ -2032,16 +2192,16 @@
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; t * std_vector##tn##_to_carray( vector_##t * v ) 
 (defcfun ("std_vectorv4f_to_carray" vec-vec-4f-to-c-arr) :pointer 
-  (vec vector-vec-4f))
+  (self vector-vec-4f))
 
 
 ;; size_t std_vector##tn##_length( vector_##t * v)
 (defcfun ("std_vectorv4f_length" vec-vec-4f-length) :unsigned-int
-  (vec vector-vec-4f))
+  (self vector-vec-4f))
 
 
-(defun vec-vec-4f-to-lisp-list (vec)
-  (let* ((x vec)
+(defun vec-vec-4f-to-lisp-list (self)
+  (let* ((x self)
 	 (y (vec-vec-4f-length x))
 	 (z (list)))
     (dotimes (i y)
@@ -2049,8 +2209,8 @@
     (reverse z)))
 
 
-(defun vec-vec-4f-to-lisp-vec (vec)
-  (let* ((x vec)
+(defun vec-vec-4f-to-lisp-vec (self)
+  (let* ((x self)
 	 (y (vec-vec-4f-length x))
 	 (z (make-array y :element-type t :fill-pointer 0
 			:initial-element   
@@ -2075,10 +2235,10 @@
 	   (vec-vec-4f-to-lisp-list y))
 	  ((and (eq :to-lisp-vec x))
 	   (vec-vec-4f-to-lisp-vec y))
-	  ((and (typep x 'std-vector-vec-4f) y)
+	  ((typep x 'std-vector-vec-4f)
 	   (let ((temp (foreign-funcall "cv_vector_v4f_at" 
 					:pointer (c-pointer x) 
-					:int y 
+					:int (or y 0) 
 					:pointer)))
 	     (if z (case z
 		     (0 (mem-aref temp :float))
@@ -2111,16 +2271,16 @@
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; t * std_vector##tn##_to_carray( vector_##t * v ) 
 (defcfun ("std_vectorv6f_to_carray" vec-vec-6f-to-c-arr) :pointer 
-  (vec vector-vec-6f))
+  (self vector-vec-6f))
 
 
 ;; size_t std_vector##tn##_length( vector_##t * v)
 (defcfun ("std_vectorv6f_length" vec-vec-6f-length) :unsigned-int
-  (vec vector-vec-6f))
+  (self vector-vec-6f))
 
 
-(defun vec-vec-6f-to-lisp-list (vec)
-  (let* ((x vec)
+(defun vec-vec-6f-to-lisp-list (self)
+  (let* ((x self)
 	 (y (vec-vec-6f-length x))
 	 (z (list)))
     (dotimes (i y)
@@ -2128,8 +2288,8 @@
     (reverse z)))
 
 
-(defun vec-vec-6f-to-lisp-vec (vec)
-  (let* ((x vec)
+(defun vec-vec-6f-to-lisp-vec (self)
+  (let* ((x self)
 	 (y (vec-vec-6f-length x))
 	 (z (make-array y :element-type t :fill-pointer 0
 			:initial-element   
@@ -2154,10 +2314,10 @@
 	   (vec-vec-6f-to-lisp-list y))
 	  ((and (eq :to-lisp-vec x))
 	   (vec-vec-6f-to-lisp-vec y))
-	  ((and (typep x 'std-vector-vec-6f) y)
+	  ((typep x 'std-vector-vec-6f)
 	   (let ((temp (foreign-funcall "cv_vector_v6f_at" 
 					:pointer (c-pointer x) 
-					:int y 
+					:int (or y 0) 
 					:pointer)))
 	     (if z (case z
 		     (0 (mem-aref temp :float))
@@ -2190,16 +2350,16 @@
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; t * std_vector##tn##_to_carray( vector_##t * v ) 
 (defcfun ("std_vectorv2i_to_carray" vec-vec-2i-to-c-arr) :pointer 
-  (vec vector-vec-2i))
+  (self vector-vec-2i))
 
 
 ;; size_t std_vector##tn##_length( vector_##t * v)
 (defcfun ("std_vectorv2i_length" vec-vec-2i-length) :unsigned-int
-  (vec vector-vec-2i))
+  (self vector-vec-2i))
 
 
-(defun vec-vec-2i-to-lisp-list (vec)
-  (let* ((x vec)
+(defun vec-vec-2i-to-lisp-list (self)
+  (let* ((x self)
 	 (y (vec-vec-2i-length x))
 	 (z (list)))
     (dotimes (i y)
@@ -2207,8 +2367,8 @@
     (reverse z)))
 
 
-(defun vec-vec-2i-to-lisp-vec (vec)
-  (let* ((x vec)
+(defun vec-vec-2i-to-lisp-vec (self)
+  (let* ((x self)
 	 (y (vec-vec-2i-length x))
 	 (z (make-array y :element-type t :fill-pointer 0
 			:initial-element   
@@ -2233,10 +2393,10 @@
 	   (vec-vec-2i-to-lisp-list y))
 	  ((and (eq :to-lisp-vec x))
 	   (vec-vec-2i-to-lisp-vec y))
-	  ((and (typep x 'std-vector-vec-2i) y)
+	  ((typep x 'std-vector-vec-2i)
 	   (let ((temp (foreign-funcall "cv_vector_v2i_at" 
 					:pointer (c-pointer x) 
-					:int y 
+					:int (or y 0) 
 					:pointer)))
 	     (if z (case z
 		     (0 (mem-aref temp :int))
@@ -2268,16 +2428,16 @@
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; t * std_vector##tn##_to_carray( vector_##t * v ) 
 (defcfun ("std_vectorv3i_to_carray" vec-vec-3i-to-c-arr) :pointer 
-  (vec vector-vec-3i))
+  (self vector-vec-3i))
 
 
 ;; size_t std_vector##tn##_length( vector_##t * v)
 (defcfun ("std_vectorv3i_length" vec-vec-3i-length) :unsigned-int
-  (vec vector-vec-3i))
+  (self vector-vec-3i))
 
 
-(defun vec-vec-3i-to-lisp-list (vec)
-  (let* ((x vec)
+(defun vec-vec-3i-to-lisp-list (self)
+  (let* ((x self)
 	 (y (vec-vec-3i-length x))
 	 (z (list)))
     (dotimes (i y)
@@ -2285,8 +2445,8 @@
     (reverse z)))
 
 
-(defun vec-vec-3i-to-lisp-vec (vec)
-  (let* ((x vec)
+(defun vec-vec-3i-to-lisp-vec (self)
+  (let* ((x self)
 	 (y (vec-vec-3i-length x))
 	 (z (make-array y :element-type t :fill-pointer 0
 			:initial-element   
@@ -2311,10 +2471,10 @@
 	   (vec-vec-3i-to-lisp-list y))
 	  ((and (eq :to-lisp-vec x))
 	   (vec-vec-3i-to-lisp-vec y))
-	  ((and (typep x 'std-vector-vec-3i) y)
+	  ((typep x 'std-vector-vec-3i)
 	   (let ((temp (foreign-funcall "cv_vector_v3i_at" 
 					:pointer (c-pointer x) 
-					:int y 
+					:int (or y 0) 
 					:pointer)))
 	     (if z (case z
 		     (0 (mem-aref temp :int))
@@ -2347,16 +2507,16 @@
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; t * std_vector##tn##_to_carray( vector_##t * v ) 
 (defcfun ("std_vectorv4i_to_carray" vec-vec-4i-to-c-arr) :pointer 
-  (vec vector-vec-4i))
+  (self vector-vec-4i))
 
 
 ;; size_t std_vector##tn##_length( vector_##t * v)
 (defcfun ("std_vectorv4i_length" vec-vec-4i-length) :unsigned-int
-  (vec vector-vec-4i))
+  (self vector-vec-4i))
 
 
-(defun vec-vec-4i-to-lisp-list (vec)
-  (let* ((x vec)
+(defun vec-vec-4i-to-lisp-list (self)
+  (let* ((x self)
 	 (y (vec-vec-4i-length x))
 	 (z (list)))
     (dotimes (i y)
@@ -2364,8 +2524,8 @@
     (reverse z)))
 
 
-(defun vec-vec-4i-to-lisp-vec (vec)
-  (let* ((x vec)
+(defun vec-vec-4i-to-lisp-vec (self)
+  (let* ((x self)
 	 (y (vec-vec-4i-length x))
 	 (z (make-array y :element-type t :fill-pointer 0
 			:initial-element   
@@ -2390,10 +2550,10 @@
 	   (vec-vec-4i-to-lisp-list y))
 	  ((and (eq :to-lisp-vec x))
 	   (vec-vec-4i-to-lisp-vec y))
-	  ((and (typep x 'std-vector-vec-4i) y)
+	  ((typep x 'std-vector-vec-4i)
 	   (let ((temp (foreign-funcall "cv_vector_v4i_at" 
 					:pointer (c-pointer x) 
-					:int y 
+					:int (or y 0) 
 					:pointer)))
 	     (if z (case z
 		     (0 (mem-aref temp :int))
@@ -2426,16 +2586,16 @@
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; t * std_vector##tn##_to_carray( vector_##t * v ) 
 (defcfun ("std_vectorv6i_to_carray" vec-vec-6i-to-c-arr) :pointer 
-  (vec vector-vec-6i))
+  (self vector-vec-6i))
 
 
 ;; size_t std_vector##tn##_length( vector_##t * v)
 (defcfun ("std_vectorv6i_length" vec-vec-6i-length) :unsigned-int
-  (vec vector-vec-6i))
+  (self vector-vec-6i))
 
 
-(defun vec-vec-6i-to-lisp-list (vec)
-  (let* ((x vec)
+(defun vec-vec-6i-to-lisp-list (self)
+  (let* ((x self)
 	 (y (vec-vec-6i-length x))
 	 (z (list)))
     (dotimes (i y)
@@ -2443,8 +2603,8 @@
     (reverse z)))
 
 
-(defun vec-vec-6i-to-lisp-vec (vec)
-  (let* ((x vec)
+(defun vec-vec-6i-to-lisp-vec (self)
+  (let* ((x self)
 	 (y (vec-vec-6i-length x))
 	 (z (make-array y :element-type t :fill-pointer 0
 			:initial-element   
@@ -2469,10 +2629,10 @@
 	   (vec-vec-6i-to-lisp-list y))
 	  ((and (eq :to-lisp-vec x))
 	   (vec-vec-6i-to-lisp-vec y))
-	  ((and (typep x 'std-vector-vec-6i) y)
+	  ((typep x 'std-vector-vec-6i)
 	   (let ((temp (foreign-funcall "cv_vector_v6i_at" 
 					:pointer (c-pointer x) 
-					:int y 
+					:int (or y 0) 
 					:pointer)))
 	     (if z (case z
 		     (0 (mem-aref temp :int))
@@ -2480,7 +2640,6 @@
 	       (make-instance 'cv-vec-6i :c-pointer temp))))
 	  (t (error "incorrect input. 
   ~%See VECTOR-VEC-6I documentation in <LISP-CV-SOURCE-DIR>EXAMPLES/EXAMPLES.LISP~%")))))
-
 
 
 ;; template < class T, class Alloc = allocator<T> > class vector
@@ -2505,16 +2664,16 @@
 ;; template < class T, class Alloc = allocator<T> > class vector
 ;; t * std_vector##tn##_to_carray( vector_##t * v ) 
 (defcfun ("std_vectorv8i_to_carray" vec-vec-8i-to-c-arr) :pointer 
-  (vec vector-vec-8i))
+  (self vector-vec-8i))
 
 
 ;; size_t std_vector##tn##_length( vector_##t * v)
 (defcfun ("std_vectorv8i_length" vec-vec-8i-length) :unsigned-int
-  (vec vector-vec-8i))
+  (self vector-vec-8i))
 
 
-(defun vec-vec-8i-to-lisp-list (vec)
-  (let* ((x vec)
+(defun vec-vec-8i-to-lisp-list (self)
+  (let* ((x self)
 	 (y (vec-vec-8i-length x))
 	 (z (list)))
     (dotimes (i y)
@@ -2522,8 +2681,8 @@
     (reverse z)))
 
 
-(defun vec-vec-8i-to-lisp-vec (vec)
-  (let* ((x vec)
+(defun vec-vec-8i-to-lisp-vec (self)
+  (let* ((x self)
 	 (y (vec-vec-8i-length x))
 	 (z (make-array y :element-type t :fill-pointer 0
 			:initial-element   
@@ -2548,10 +2707,10 @@
 	   (vec-vec-8i-to-lisp-list y))
 	  ((and (eq :to-lisp-vec x))
 	   (vec-vec-8i-to-lisp-vec y))
-	  ((and (typep x 'std-vector-vec-8i) y)
+	  ((typep x 'std-vector-vec-8i)
 	   (let ((temp (foreign-funcall "cv_vector_v8i_at" 
 					:pointer (c-pointer x) 
-					:int y 
+					:int (or y 0) 
 					:pointer)))
 	     (if z (case z
 		     (0 (mem-aref temp :int))

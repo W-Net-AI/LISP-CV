@@ -6,7 +6,7 @@
   (:shadow #:abs #:exp #:fill #:length #:load #:log #:min #:max #:open #:read #:set #:sqrt #:write)
   (:export 
 
-;
+
 ;; Default parameters.
 
    #:*camera-index* 
@@ -803,8 +803,8 @@
    #:at-int
    #:at-short
    #:at-uchar
+   #:at-uint
    #:at-ushort
-   #:at-scalar
    #:at-point-2d
    #:at-point-2f
    #:at-point-3d
@@ -848,6 +848,10 @@
    #:distance
    #:div
    #:dmatch
+   #:%dmatch-distance
+   #:%dmatch-img-idx
+   #:%dmatch-query-idx
+   #:%dmatch-train-idx
    #:dmatch-distance
    #:dmatch-img-idx
    #:dmatch-query-idx
@@ -867,9 +871,18 @@
    #:inv
    #:is-continuous
    #:key-point
+   #:%key-point-angle
+   #:%key-point-class-id
+   #:%key-point-octave
+   #:%key-point-pt
+   #:%key-point-response
+   #:%key-point-size
+   #:%key-point-x
+   #:%key-point-y
    #:key-point-angle
    #:key-point-class-id
    #:key-point-octave
+   #:key-point-pt
    #:key-point-response
    #:key-point-size
    #:key-point-x
@@ -919,6 +932,37 @@
    #:mat-assign
    #:mat-assign-val
    #:mat-and-cffi-type
+   #:mat-at-char
+   #:mat-at-double
+   #:mat-at-float
+   #:mat-at-int
+   #:mat-at-short
+   #:mat-at-uchar
+   #:mat-at-uint
+   #:mat-at-ushort
+   #:mat-at-point-2d
+   #:mat-at-point-2f
+   #:mat-at-point-3d
+   #:mat-at-point-3f
+   #:mat-at-point-3i
+   #:mat-at-vec-2b
+   #:mat-at-vec-2d
+   #:mat-at-vec-2f
+   #:mat-at-vec-2i
+   #:mat-at-vec-2s
+   #:mat-at-vec-2w
+   #:mat-at-vec-3b
+   #:mat-at-vec-3d
+   #:mat-at-vec-3f
+   #:mat-at-vec-3i
+   #:mat-at-vec-3s
+   #:mat-at-vec-3w
+   #:mat-at-vec-4b
+   #:mat-at-vec-4d
+   #:mat-at-vec-4f
+   #:mat-at-vec-4i
+   #:mat-at-vec-4s
+   #:mat-at-vec-4w
    #:mat-cross
    #:mat-depth
    #:mat-expr-t

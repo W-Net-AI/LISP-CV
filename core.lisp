@@ -212,6 +212,14 @@
       `(@@@ ,self ,arg1 ,arg2, arg3, arg4)))
 
 
+;;More closely matches the name of the OpenCV 'at' members.
+(defmacro at (self &optional arg1 arg2 arg3 arg4)
+    "CFFI:MEM-AREF macro. Also dispatches the std::vector.at bindings."
+  (if (and (keywordp arg1) (symbolp arg1))
+      `(mem-aref (resolve-pointer ,self) ,arg1 (or ,arg2 0))
+      `(@@@ ,self ,arg1 ,arg2, arg3, arg4)))
+
+
 (defmacro @@ (ptr type &optional (offset 0))
     "CFFI:MEM-REF macro with C-POINTER reader."
   `(mem-ref (resolve-pointer ,ptr) ,type ,offset))
@@ -547,14 +555,7 @@
   (s scalar))
 
 
-;; uchar* ptr(int i0=0)
-;; uchar* cv_Mat_ptr_index(Mat* self, int i)
-(defmacro at (&optional type self i j)
-  `(mem-aref (%ptr ,self ,i) ,type ,j))
-
-
-
-(defun at-char (self i &optional j k)
+(defun mat-at-char (self &optional i j k)
 
   (cond (k 
 	 (mem-aref (foreign-funcall "cv_Mat_at_char_3" 
@@ -572,7 +573,839 @@
 
 
 
-(defun (setf at-char) (val self i &optional j k)
+(defun (setf mat-at-char) (val self &optional i j k)
+
+  (cond  
+    (k 
+     (let ((temp (foreign-funcall "cv_Mat_at_char_3" 
+				  :pointer (c-pointer self) :int i :int j :int k 
+				  :pointer)))
+       (setf (mem-aref temp :char) val)))
+
+    ((and j (not k))
+     (let ((temp (foreign-funcall "cv_Mat_at_char_2" 
+				  :pointer (c-pointer self) :int i :int j 
+				  :pointer)))
+       (setf (mem-aref temp :char) val)))
+
+    (t
+     (let ((temp (foreign-funcall "cv_Mat_at_char_1" 
+				  :pointer (c-pointer self) :int (or i 0)
+				  :pointer)))
+       (setf (mem-aref temp :char) val)))))
+
+
+
+(defun mat-at-double (self &optional i j k)
+
+  (cond (k 
+	 (mem-aref (foreign-funcall "cv_Mat_at_double_3" 
+				    :pointer (c-pointer self) :int i :int j :int k 
+				    :pointer) :double))
+
+	((and j (not k))
+	 (mem-aref (foreign-funcall "cv_Mat_at_double_2" 
+				    :pointer (c-pointer self) :int i :int j 
+				    :pointer) :double))
+	(t
+	 (mem-aref (foreign-funcall "cv_Mat_at_double_1" 
+				    :pointer (c-pointer self) :int (or i 0)
+				    :pointer) :double))))
+
+
+
+(defun (setf mat-at-double) (val self &optional i j k)
+
+  (cond  
+    (k 
+     (let ((temp (foreign-funcall "cv_Mat_at_double_3" 
+				  :pointer (c-pointer self) :int i :int j :int k 
+				  :pointer)))
+       (setf (mem-aref temp :double) val)))
+
+    ((and j (not k))
+     (let ((temp (foreign-funcall "cv_Mat_at_double_2" 
+				  :pointer (c-pointer self) :int i :int j 
+				  :pointer)))
+       (setf (mem-aref temp :double) val)))
+
+    (t
+     (let ((temp (foreign-funcall "cv_Mat_at_double_1" 
+				  :pointer (c-pointer self) :int (or i 0)
+				  :pointer)))
+       (setf (mem-aref temp :double) val)))))
+
+
+
+(defun mat-at-float (self &optional i j k)
+
+  (cond (k 
+	 (mem-aref (foreign-funcall "cv_Mat_at_float_3" 
+				    :pointer (c-pointer self) :int i :int j :int k 
+				    :pointer) :float))
+
+	((and j (not k))
+	 (mem-aref (foreign-funcall "cv_Mat_at_float_2" 
+				    :pointer (c-pointer self) :int i :int j 
+				    :pointer) :float))
+	(t
+	 (mem-aref (foreign-funcall "cv_Mat_at_float_1" 
+				    :pointer (c-pointer self) :int (or i 0)
+				    :pointer) :float))))
+
+
+
+(defun (setf mat-at-float) (val self &optional i j k)
+
+  (cond  
+    (k 
+     (let ((temp (foreign-funcall "cv_Mat_at_float_3" 
+				  :pointer (c-pointer self) :int i :int j :int k 
+				  :pointer)))
+       (setf (mem-aref temp :float) val)))
+
+    ((and j (not k))
+     (let ((temp (foreign-funcall "cv_Mat_at_float_2" 
+				  :pointer (c-pointer self) :int i :int j 
+				  :pointer)))
+       (setf (mem-aref temp :float) val)))
+
+    (t
+     (let ((temp (foreign-funcall "cv_Mat_at_float_1" 
+				  :pointer (c-pointer self) :int (or i 0)
+				  :pointer)))
+       (setf (mem-aref temp :float) val)))))
+
+
+
+(defun mat-at-int (self &optional i j k)
+
+  (cond (k 
+	 (mem-aref (foreign-funcall "cv_Mat_at_int_3" 
+				    :pointer (c-pointer self) :int i :int j :int k 
+				    :pointer) :int))
+
+	((and j (not k))
+	 (mem-aref (foreign-funcall "cv_Mat_at_int_2" 
+				    :pointer (c-pointer self) :int i :int j 
+				    :pointer) :int))
+	(t
+	 (mem-aref (foreign-funcall "cv_Mat_at_int_1" 
+				    :pointer (c-pointer self) :int (or i 0)
+				    :pointer) :int))))
+
+
+
+(defun (setf mat-at-int) (val self &optional i j k)
+
+  (cond  
+    (k 
+     (let ((temp (foreign-funcall "cv_Mat_at_int_3" 
+				  :pointer (c-pointer self) :int i :int j :int k 
+				  :pointer)))
+       (setf (mem-aref temp :int) val)))
+
+    ((and j (not k))
+     (let ((temp (foreign-funcall "cv_Mat_at_int_2" 
+				  :pointer (c-pointer self) :int i :int j 
+				  :pointer)))
+       (setf (mem-aref temp :int) val)))
+
+    (t
+     (let ((temp (foreign-funcall "cv_Mat_at_int_1" 
+				  :pointer (c-pointer self) :int (or i 0)
+				  :pointer)))
+       (setf (mem-aref temp :int) val)))))
+
+
+
+(defun mat-at-short (self &optional i j k)
+
+  (cond (k 
+	 (mem-aref (foreign-funcall "cv_Mat_at_short_3" 
+				    :pointer (c-pointer self) :int i :int j :int k 
+				    :pointer) :short))
+
+	((and j (not k))
+	 (mem-aref (foreign-funcall "cv_Mat_at_short_2" 
+				    :pointer (c-pointer self) :int i :int j 
+				    :pointer) :short))
+	(t
+	 (mem-aref (foreign-funcall "cv_Mat_at_short_1" 
+				    :pointer (c-pointer self) :int (or i 0)
+				    :pointer) :short))))
+
+
+
+(defun (setf mat-at-short) (val self &optional i j k)
+
+  (cond  
+    (k 
+     (let ((temp (foreign-funcall "cv_Mat_at_short_3" 
+				  :pointer (c-pointer self) :int i :int j :int k 
+				  :pointer)))
+       (setf (mem-aref temp :short) val)))
+
+    ((and j (not k))
+     (let ((temp (foreign-funcall "cv_Mat_at_short_2" 
+				  :pointer (c-pointer self) :int i :int j 
+				  :pointer)))
+       (setf (mem-aref temp :short) val)))
+
+    (t
+     (let ((temp (foreign-funcall "cv_Mat_at_short_1" 
+				  :pointer (c-pointer self) :int (or i 0)
+				  :pointer)))
+       (setf (mem-aref temp :short) val)))))
+
+
+
+(defun mat-at-uchar (self &optional i j k)
+
+  (cond (k 
+	 (mem-aref (foreign-funcall "cv_Mat_at_uchar_3" 
+				    :pointer (c-pointer self) :int i :int j :int k 
+				    :pointer) :uchar))
+
+	((and j (not k))
+	 (mem-aref (foreign-funcall "cv_Mat_at_uchar_2" 
+				    :pointer (c-pointer self) :int i :int j 
+				    :pointer) :uchar))
+	(t
+	 (mem-aref (foreign-funcall "cv_Mat_at_uchar_1" 
+				    :pointer (c-pointer self) :int (or i 0)
+				    :pointer) :uchar))))
+
+
+
+(defun (setf mat-at-uchar) (val self &optional i j k)
+
+  (cond  
+    (k 
+     (let ((temp (foreign-funcall "cv_Mat_at_uchar_3" 
+				  :pointer (c-pointer self) :int i :int j :int k 
+				  :pointer)))
+       (setf (mem-aref temp :uchar) val)))
+
+    ((and j (not k))
+     (let ((temp (foreign-funcall "cv_Mat_at_uchar_2" 
+				  :pointer (c-pointer self) :int i :int j 
+				  :pointer)))
+       (setf (mem-aref temp :uchar) val)))
+
+    (t
+     (let ((temp (foreign-funcall "cv_Mat_at_uchar_1" 
+				  :pointer (c-pointer self) :int (or i 0)
+				  :pointer)))
+       (setf (mem-aref temp :uchar) val)))))
+
+
+
+(defun mat-at-uint (self &optional i j k)
+
+  (cond (k 
+	 (mem-aref (foreign-funcall "cv_Mat_at_uint_3" 
+				    :pointer (c-pointer self) :int i :int j :int k 
+				    :pointer) :uint))
+
+	((and j (not k))
+	 (mem-aref (foreign-funcall "cv_Mat_at_uint_2" 
+				    :pointer (c-pointer self) :int i :int j 
+				    :pointer) :uint))
+	(t
+	 (mem-aref (foreign-funcall "cv_Mat_at_uint_1" 
+				    :pointer (c-pointer self) :int (or i 0)
+				    :pointer) :uint))))
+
+
+
+(defun (setf mat-at-uint) (val self &optional i j k)
+
+  (cond  
+    (k 
+     (let ((temp (foreign-funcall "cv_Mat_at_uint_3" 
+				  :pointer (c-pointer self) :int i :int j :int k 
+				  :pointer)))
+       (setf (mem-aref temp :uint) val)))
+
+    ((and j (not k))
+     (let ((temp (foreign-funcall "cv_Mat_at_uint_2" 
+				  :pointer (c-pointer self) :int i :int j 
+				  :pointer)))
+       (setf (mem-aref temp :uint) val)))
+
+    (t
+     (let ((temp (foreign-funcall "cv_Mat_at_uint_1" 
+				  :pointer (c-pointer self) :int (or i 0)
+				  :pointer)))
+       (setf (mem-aref temp :uint) val)))))
+
+
+
+(defun mat-at-ushort (self &optional i j k)
+
+  (cond (k 
+	 (mem-aref (foreign-funcall "cv_Mat_at_ushort_3" 
+				    :pointer (c-pointer self) :int i :int j :int k 
+				    :pointer) :ushort))
+
+	((and j (not k))
+	 (mem-aref (foreign-funcall "cv_Mat_at_ushort_2" 
+				    :pointer (c-pointer self) :int i :int j 
+				    :pointer) :ushort))
+	(t
+	 (mem-aref (foreign-funcall "cv_Mat_at_ushort_1" 
+				    :pointer (c-pointer self) :int (or i 0)
+				    :pointer) :ushort))))
+
+
+
+(defun (setf mat-at-ushort) (val self &optional i j k)
+
+  (cond  
+    (k 
+     (let ((temp (foreign-funcall "cv_Mat_at_ushort_3" 
+				  :pointer (c-pointer self) :int i :int j :int k 
+				  :pointer)))
+       (setf (mem-aref temp :ushort) val)))
+
+    ((and j (not k))
+     (let ((temp (foreign-funcall "cv_Mat_at_ushort_2" 
+				  :pointer (c-pointer self) :int i :int j 
+				  :pointer)))
+       (setf (mem-aref temp :ushort) val)))
+
+    (t
+     (let ((temp (foreign-funcall "cv_Mat_at_ushort_1" 
+				  :pointer (c-pointer self) :int (or i 0)
+				  :pointer)))
+       (setf (mem-aref temp :ushort) val)))))
+
+
+
+(defun mat-at-point (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Point_2" :pointer (c-pointer self) 
+			  :int i :int j point))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Point_1" :pointer (c-pointer self) 
+			  :int (or i 0) point))))
+
+
+(defun (setf mat-at-point) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-point) nil (error "The value ~a is not of type CV-POINT." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Point_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) point))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Point_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) point))))
+
+
+(defun mat-at-point-2d (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Point2d_2" :pointer (c-pointer self) 
+			  :int i :int j point-2d))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Point2d_1" :pointer (c-pointer self) 
+			  :int (or i 0) point-2d))))
+
+
+(defun (setf mat-at-point-2d) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-point-2d) nil (error "The value ~a is not of type CV-POINT-2D." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Point2d_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) point-2d))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Point2d_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) point-2d))))
+
+
+(defun mat-at-point-2f (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Point2f_2" :pointer (c-pointer self) 
+			  :int i :int j point-2f))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Point2f_1" :pointer (c-pointer self) 
+			  :int (or i 0) point-2f))))
+
+
+(defun (setf mat-at-point-2f) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-point-2f) nil (error "The value ~a is not of type CV-POINT-2F." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Point2f_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) point-2f))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Point2f_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) point-2f))))
+
+
+(defun mat-at-point-3d (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Point3d_2" :pointer (c-pointer self) 
+			  :int i :int j point-3d))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Point3d_1" :pointer (c-pointer self) 
+			  :int (or i 0) point-3d))))
+
+
+(defun (setf mat-at-point-3d) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-point-3d) nil (error "The value ~a is not of type CV-POINT-3D." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Point3d_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) point-3d))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Point3d_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) point-3d))))
+
+
+(defun mat-at-point-3f (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Point3f_2" :pointer (c-pointer self) 
+			  :int i :int j point-3f))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Point3f_1" :pointer (c-pointer self) 
+			  :int (or i 0) point-3f))))
+
+
+(defun (setf mat-at-point-3f) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-point-3f) nil (error "The value ~a is not of type CV-POINT-3F." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Point3f_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) point-3f))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Point3f_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) point-3f))))
+
+
+(defun mat-at-point-3i (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Point3i_2" :pointer (c-pointer self) 
+			  :int i :int j point-3i))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Point3i_1" :pointer (c-pointer self) 
+			  :int (or i 0) point-3i))))
+
+
+(defun (setf mat-at-point-3i) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-point-3i) nil (error "The value ~a is not of type CV-POINT-3I." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Point3i_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) point-3i))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Point3i_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) point-3i))))
+
+
+(defun mat-at-vec-2b (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec2b_2" :pointer (c-pointer self) 
+			  :int i :int j vec-2b))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec2b_1" :pointer (c-pointer self) 
+			  :int (or i 0) vec-2b))))
+
+
+(defun (setf mat-at-vec-2b) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-vec-2b) nil (error "The value ~a is not of type CV-VEC-2B." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec2b_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) vec-2b))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec2b_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) vec-2b))))
+
+
+(defun mat-at-vec-2d (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec2d_2" :pointer (c-pointer self) 
+			  :int i :int j vec-2d))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec2d_1" :pointer (c-pointer self) 
+			  :int (or i 0) vec-2d))))
+
+
+(defun (setf mat-at-vec-2d) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-vec-2d) nil (error "The value ~a is not of type CV-VEC-2D." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec2d_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) vec-2d))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec2d_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) vec-2d))))
+
+
+(defun mat-at-vec-2f (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec2f_2" :pointer (c-pointer self) 
+			  :int i :int j vec-2f))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec2f_1" :pointer (c-pointer self) 
+			  :int (or i 0) vec-2f))))
+
+
+(defun (setf mat-at-vec-2f) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-vec-2f) nil (error "The value ~a is not of type CV-VEC-2F." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec2f_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) vec-2f))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec2f_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) vec-2f))))
+
+
+(defun mat-at-vec-2i (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec2i_2" :pointer (c-pointer self) 
+			  :int i :int j vec-2i))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec2i_1" :pointer (c-pointer self) 
+			  :int (or i 0) vec-2i))))
+
+
+(defun (setf mat-at-vec-2i) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-vec-2i) nil (error "The value ~a is not of type CV-VEC-2I." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec2i_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) vec-2i))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec2i_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) vec-2i))))
+
+
+(defun mat-at-vec-2s (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec2s_2" :pointer (c-pointer self) 
+			  :int i :int j vec-2s))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec2s_1" :pointer (c-pointer self) 
+			  :int (or i 0) vec-2s))))
+
+
+(defun (setf mat-at-vec-2s) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-vec-2s) nil (error "The value ~a is not of type CV-VEC-2S." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec2s_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) vec-2s))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec2s_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) vec-2s))))
+
+
+(defun mat-at-vec-2w (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec2w_2" :pointer (c-pointer self) 
+			  :int i :int j vec-2w))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec2w_1" :pointer (c-pointer self) 
+			  :int (or i 0) vec-2w))))
+
+
+(defun (setf mat-at-vec-2w) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-vec-2w) nil (error "The value ~a is not of type CV-VEC-2W." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec2w_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) vec-2w))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec2w_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) vec-2w))))
+
+
+(defun mat-at-vec-3b (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec3b_2" :pointer (c-pointer self) 
+			  :int i :int j vec-3b))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec3b_1" :pointer (c-pointer self) 
+			  :int (or i 0) vec-3b))))
+
+
+(defun (setf mat-at-vec-3b) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-vec-3b) nil (error "The value ~a is not of type CV-VEC-3B." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec3b_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) vec-3b))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec3b_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) vec-3b))))
+
+
+(defun mat-at-vec-3d (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec3d_2" :pointer (c-pointer self) 
+			  :int i :int j vec-3d))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec3d_1" :pointer (c-pointer self) 
+			  :int (or i 0) vec-3d))))
+
+
+(defun (setf mat-at-vec-3d) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-vec-3d) nil (error "The value ~a is not of type CV-VEC-3D." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec3d_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) vec-3d))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec3d_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) vec-3d))))
+
+
+(defun mat-at-vec-3f (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec3f_2" :pointer (c-pointer self) 
+			  :int i :int j vec-3f))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec3f_1" :pointer (c-pointer self) 
+			  :int (or i 0) vec-3f))))
+
+
+(defun (setf mat-at-vec-3f) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-vec-3f) nil (error "The value ~a is not of type CV-VEC-3F." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec3f_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) vec-3f))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec3f_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) vec-3f))))
+
+
+(defun mat-at-vec-3i (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec3i_2" :pointer (c-pointer self) 
+			  :int i :int j vec-3i))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec3i_1" :pointer (c-pointer self) 
+			  :int (or i 0) vec-3i))))
+
+
+(defun (setf mat-at-vec-3i) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-vec-3i) nil (error "The value ~a is not of type CV-VEC-3I." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec3i_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) vec-3i))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec3i_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) vec-3i))))
+
+
+(defun mat-at-vec-3s (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec3s_2" :pointer (c-pointer self) 
+			  :int i :int j vec-3s))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec3s_1" :pointer (c-pointer self) 
+			  :int (or i 0) vec-3s))))
+
+
+(defun (setf mat-at-vec-3s) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-vec-3s) nil (error "The value ~a is not of type CV-VEC-3S." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec3s_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) vec-3s))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec3s_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) vec-3s))))
+
+
+(defun mat-at-vec-3w (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec3w_2" :pointer (c-pointer self) 
+			  :int i :int j vec-3w))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec3w_1" :pointer (c-pointer self) 
+			  :int (or i 0) vec-3w))))
+
+
+(defun (setf mat-at-vec-3w) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-vec-3w) nil (error "The value ~a is not of type CV-VEC-3W." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec3w_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) vec-3w))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec3w_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) vec-3w))))
+
+
+(defun mat-at-vec-4b (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec4b_2" :pointer (c-pointer self) 
+			  :int i :int j vec-4b))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec4b_1" :pointer (c-pointer self) 
+			  :int (or i 0) vec-4b))))
+
+
+(defun (setf mat-at-vec-4b) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-vec-4b) nil (error "The value ~a is not of type CV-VEC-4B." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec4b_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) vec-4b))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec4b_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) vec-4b))))
+
+
+(defun mat-at-vec-4d (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec4d_2" :pointer (c-pointer self) 
+			  :int i :int j vec-4d))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec4d_1" :pointer (c-pointer self) 
+			  :int (or i 0) vec-4d))))
+
+
+(defun (setf mat-at-vec-4d) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-vec-4d) nil (error "The value ~a is not of type CV-VEC-4D." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec4d_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) vec-4d))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec4d_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) vec-4d))))
+
+
+(defun mat-at-vec-4f (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec4f_2" :pointer (c-pointer self) 
+			  :int i :int j vec-4f))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec4f_1" :pointer (c-pointer self) 
+			  :int (or i 0) vec-4f))))
+
+
+(defun (setf mat-at-vec-4f) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-vec-4f) nil (error "The value ~a is not of type CV-VEC-4F." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec4f_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) vec-4f))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec4f_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) vec-4f))))
+
+
+(defun mat-at-vec-4i (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec4i_2" :pointer (c-pointer self) 
+			  :int i :int j vec-4i))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec4i_1" :pointer (c-pointer self) 
+			  :int (or i 0) vec-4i))))
+
+
+(defun (setf mat-at-vec-4i) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-vec-4i) nil (error "The value ~a is not of type CV-VEC-4I." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec4i_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) vec-4i))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec4i_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) vec-4i))))
+
+
+(defun mat-at-vec-4s (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec4s_2" :pointer (c-pointer self) 
+			  :int i :int j vec-4s))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec4s_1" :pointer (c-pointer self) 
+			  :int (or i 0) vec-4s))))
+
+
+(defun (setf mat-at-vec-4s) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-vec-4s) nil (error "The value ~a is not of type CV-VEC-4S." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec4s_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) vec-4s))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec4s_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) vec-4s))))
+
+
+(defun mat-at-vec-4w (self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec4w_2" :pointer (c-pointer self) 
+			  :int i :int j vec-4w))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec4w_1" :pointer (c-pointer self) 
+			  :int (or i 0) vec-4w))))
+
+
+(defun (setf mat-at-vec-4w) (val self &optional i j)
+  (if (typep self 'cv-mat) nil (error "The value ~a is not of type CV-MAT." self))
+  (if (typep val 'cv-vec-4w) nil (error "The value ~a is not of type CV-VEC-4W." val))
+  (cond (j 
+	 (foreign-funcall "cv_Mat_at_Vec4w_set_Val_2" :pointer (c-pointer self) 
+			  :int i :int j :pointer (c-pointer val) vec-4w))
+	(t 
+	 (foreign-funcall "cv_Mat_at_Vec4w_set_Val_1" :pointer (c-pointer self)
+			  :int (or i 0) :pointer (c-pointer val) vec-4w))))
+
+
+(defun at-char (self &optional i j k)
+
+  (cond (k 
+	 (mem-aref (foreign-funcall "cv_Mat_at_char_3" 
+				    :pointer (c-pointer self) :int i :int j :int k 
+				    :pointer) :char))
+
+	((and j (not k))
+	 (mem-aref (foreign-funcall "cv_Mat_at_char_2" 
+				    :pointer (c-pointer self) :int i :int j 
+				    :pointer) :char))
+	(t
+	 (mem-aref (foreign-funcall "cv_Mat_at_char_1" 
+				    :pointer (c-pointer self) :int (or i 0)
+				    :pointer) :char))))
+
+
+
+(defun (setf at-char) (val self &optional i j k)
 
   (cond  
     (k 
@@ -2234,7 +3067,7 @@
 
 	((typep arg2 'cv-range)
 
-	 (apply #'create-mat-with-range arg1 arg2 arg3))
+	 (create-mat-with-range arg1 arg2 arg3))
 	
 	((and (eq arg4 nil) arg1)
 
@@ -2279,7 +3112,7 @@
 
 	((typep arg2 'cv-range)
 
-	 (apply #'create-mat-with-range arg1 arg2 arg3))
+	 (create-mat-with-range arg1 arg2 arg3))
 	
 	((and (eq arg4 nil) arg1)
 

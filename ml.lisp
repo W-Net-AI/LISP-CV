@@ -347,25 +347,27 @@
 
 ;; float CvSVM::predict( const cv::Mat& sample, bool returnDFVal=false ) const
 ;; float cv_CvSVM_predict2(CvSVM* self, Mat* sample, bool returnDFVal) 
-(defcfun ("cv_CvSVM_predict2" svm-predict-2) :float
-  (self svm)
-  (sample mat)
-  (return-df-val :boolean))
-
 
 ;; void CvSVM::predict( cv::InputArray samples, cv::OutputArray results ) const
 ;; void cv_CvSVM_predict2_0(CvSVM* self, Mat* samples, Mat* results) 
-(defcfun ("cv_CvSVM_predict2_0" svm-predict-2-0) :float
-  (self svm)
-  (samples mat)
-  (results mat))
 
-;
-(defun svm-predict (self arg1 &optional arg2)
-  (cond ((typep arg2 'cv-mat)
-	 (svm-predict-2-0 self arg1 arg2))
-	((typep arg2 'boolean)
-	 (svm-predict-2 self arg1 arg2))))
+(defun svm-predict (self arg1 &optional (arg2 nil given-arg2))
+  "Predicts response(s) for the provided sample(s)"
+  (if given-arg2
+      (cond ((typep arg2 'cv-mat)
+	     (foreign-funcall "cv_CvSVM_predict2_0" :pointer (c-pointer self) 
+			      :pointer (c-pointer arg1) 
+			      :pointer (c-pointer arg2)
+                              :float))
+	    ((typep arg2 'boolean)
+	     (foreign-funcall "cv_CvSVM_predict2" :pointer (c-pointer self) 
+			      :pointer (c-pointer arg1) 
+			      :boolean arg2
+                              :float)))
+      (foreign-funcall "cv_CvSVM_predict2" :pointer (c-pointer self) 
+		       :pointer (c-pointer arg1) 
+		       :boolean arg2
+                       :float)))
 
 
 ;; bool CvSVM::train(const Mat& trainData, const Mat& responses, const Mat& varIdx=Mat(), const Mat& sampleIdx=Mat(), 
@@ -540,10 +542,12 @@
 
 ;; float CvANN_MLP::predict(const Mat& inputs, Mat& outputs) const
 ;; float cv_CvANN_MLP_predict2_3(CvANN_MLP* self, Mat* inputs, Mat* outputs) 
-(defcfun ("cv_CvANN_MLP_predict2_3" ann-mlp-predict) :float
-  (self ann-mlp)
-  (inputs mat)
-  (outputs mat))
+(defun ann-mlp-predict (self arg1 arg2)
+  "Predicts response(s) for the provided sample(s)"
+  (foreign-funcall "cv_CvANN_MLP_predict2_3" :pointer (c-pointer self) 
+		   :pointer (c-pointer arg1) 
+		   :pointer (c-pointer arg2)
+                   :float))
 
 
 ;; int CvANN_MLP::train(const Mat& inputs, const Mat& outputs, const Mat& sampleWeights, const Mat& sampleIdx=Mat(), 

@@ -589,6 +589,10 @@ uchar &cv_Mat_at_uchar_1(Mat* self, int i) {
   return self->at<uchar>(i);
 }
 
+uint &cv_Mat_at_uint_1(Mat* self, int i) {
+  return self->at<uint>(i);
+}
+
 ushort &cv_Mat_at_ushort_1(Mat* self, int i) {
   return self->at<ushort>(i);
 }
@@ -617,6 +621,10 @@ uchar &cv_Mat_at_uchar_2(Mat* self, int i, int j) {
   return self->at<uchar>(i, j);
 }
 
+uint &cv_Mat_at_uint_2(Mat* self, int i, int j) {
+  return self->at<uint>(i, j);
+}
+
 ushort &cv_Mat_at_ushort_2(Mat* self, int i, int j) {
   return self->at<ushort>(i, j);
 }
@@ -643,6 +651,10 @@ short &cv_Mat_at_short_3(Mat* self, int i, int j, int k) {
 
 uchar &cv_Mat_at_uchar_3(Mat* self, int i, int j, int k) {
   return self->at<uchar>(i, j, k);
+}
+
+uint &cv_Mat_at_uint_3(Mat* self, int i, int j, int k) {
+  return self->at<uint>(i, j, k);
 }
 
 ushort &cv_Mat_at_ushort_3(Mat* self, int i, int j, int k) {

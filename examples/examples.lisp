@@ -199,19 +199,84 @@ See also:
 			   (return))))))))))))
 
 ========================================================================================================================================
-#AT
+#MAT-AT-<type-name>
 ========================================================================================================================================
 
 Returns a reference to the specified array element.
 
- 
+Note: The name MAT-AT is used in the documentation to refer to the binding for the "at" members of 
+the OpenCV Mat class because it is more descriptive and it is easier to search for in this file. The 
+AT-<type-name> functions and the @ or AT macros(below) may also be used to call these bindings.
+
+
+C++: template<typename T> T& Mat::at(int i) const
+
 C++: template<typename T> T& Mat::at(int i, int j)
- 
-LISP-CV: (AT-<type-name> (SELF MAT) (I :INT)) => <type-name>
 
-LISP-CV: (AT-<type-name> (SELF MAT) (I :INT) (J :INT)) => <type-name>
+C++: template<typename T> T& Mat::at(int i, int j, int k)
 
-LISP-CV: (AT-<type-name> (SELF MAT) (I :INT) (J :INT) (K :INT)) => <type-name>
+
+Note: The 12 macros, @ and AT, directly below, have the same functionality. They provide the same 
+functionality as the lowest 12 AT-<type-name> and MAT-AT-<typename> functions as well as the ability 
+to set and retrieve the elements of vectors and to mimic the behavior of CFFI's MEM-AREF (with some 
+exceptions). Search <hashtag>@ in this file for more details on the @ macro.
+
+
+LISP-CV: (@ (TYPE KEYWORD) (SELF MAT) &OPTIONAL ((I :INT) 0)) => <type-name>
+
+LISP-CV: (@ (TYPE KEYWORD) (SELF MAT) &OPTIONAL ((I :INT) 0) (J :INT)) => <type-name>
+
+LISP-CV: (@ (TYPE KEYWORD) (SELF MAT) &OPTIONAL ((I :INT) 0) (J :INT) (K :INT)) => <type-name>
+
+
+LISP-CV: (SETF (@ (TYPE KEYWORD) (SELF MAT) &OPTIONAL ((I :INT) 0)) NEW-VALUE) => <type-name>
+
+LISP-CV: (SETF (@ (TYPE KEYWORD) (SELF MAT) &OPTIONAL ((I :INT) 0) (J :INT)) NEW-VALUE) => <type-name>
+
+LISP-CV: (SETF (@ (TYPE KEYWORD) (SELF MAT) &OPTIONAL ((I :INT) 0) (J :INT) (K :INT)) NEW-VALUE) => <type-name>
+
+
+LISP-CV: (AT (TYPE KEYWORD) (SELF MAT) &OPTIONAL ((I :INT) 0)) => <type-name>
+
+LISP-CV: (AT (TYPE KEYWORD) (SELF MAT) &OPTIONAL ((I :INT) 0) (J :INT)) => <type-name>
+
+LISP-CV: (AT (TYPE KEYWORD) (SELF MAT) &OPTIONAL ((I :INT) 0) (J :INT) (K :INT)) => <type-name>
+
+
+LISP-CV: (SETF (AT (TYPE KEYWORD) (SELF MAT) &OPTIONAL ((I :INT) 0)) NEW-VALUE) => <type-name>
+
+LISP-CV: (SETF (AT (TYPE KEYWORD) (SELF MAT) &OPTIONAL ((I :INT) 0) (J :INT)) NEW-VALUE) => <type-name>
+
+LISP-CV: (SETF (AT (TYPE KEYWORD) (SELF MAT) &OPTIONAL ((I :INT) 0) (J :INT) (K :INT)) NEW-VALUE) => <type-name>
+
+
+LISP-CV: (AT-<type-name> (SELF MAT) &OPTIONAL ((I :INT) 0)) => <type-name>
+
+LISP-CV: (AT-<type-name> (SELF MAT) &OPTIONAL ((I :INT) 0) (J :INT)) => <type-name>
+
+LISP-CV: (AT-<type-name> (SELF MAT) &OPTIONAL ((I :INT) 0) (J :INT) (K :INT)) => <type-name>
+
+
+LISP-CV: (SETF (AT-<type-name> (SELF MAT) &OPTIONAL ((I :INT) 0)) NEW-VALUE) => <type-name>
+
+LISP-CV: (SETF (AT-<type-name> (SELF MAT) &OPTIONAL ((I :INT) 0) (J :INT)) NEW-VALUE) => <type-name>
+
+LISP-CV: (SETF (AT-<type-name> (SELF MAT) &OPTIONAL ((I :INT) 0) (J :INT) (K :INT)) NEW-VALUE) => <type-name>
+
+
+LISP-CV: (MAT-AT-<type-name> (SELF MAT) &OPTIONAL ((I :INT) 0)) => <type-name>
+
+LISP-CV: (MAT-AT-<type-name> (SELF MAT) &OPTIONAL ((I :INT) 0) (J :INT)) => <type-name>
+
+LISP-CV: (MAT-AT-<type-name> (SELF MAT) &OPTIONAL ((I :INT) 0) (J :INT) (K :INT)) => <type-name>
+
+
+LISP-CV: (SETF (MAT-AT-<type-name> (SELF MAT) &OPTIONAL ((I :INT) 0)) NEW-VALUE) => <type-name>
+
+LISP-CV: (SETF (MAT-AT-<type-name> (SELF MAT) &OPTIONAL ((I :INT) 0) (J :INT)) NEW-VALUE) => <type-name>
+
+LISP-CV: (SETF (MAT-<type-name> (SELF MAT) &OPTIONAL ((I :INT) 0) (J :INT) (K :INT)) NEW-VALUE) => <type-name>
+
 
    The typenames associated with AT include:
  
@@ -233,23 +298,44 @@ LISP-CV: (AT-<type-name> (SELF MAT) (I :INT) (J :INT) (K :INT)) => <type-name>
                          vec4i
                          vec4s 
                          vec4w  
+
+Note: More typenames are available when you are using the MEM-AREF functionality 
+of the @ and AT macros. Search <hashtag>@ in this file for more information.
+
     Parameters:     
  
         I - Index along the dimension 0
  
         J - Index along the dimension 1
+
+        k - Index along the dimension 2
+
  
-The template methods return a reference to the specified array element. For the sake of higher 
-performance, the index range checks are only performed in the Debug configuration.
+Returns a specified array element. 
  
- 
+Note that the variants with a single index (I) can be used to access elements of single-row or
+single-column 2-dimensional arrays. That is, if, for example, A is a 1 x N floating-point matrix 
+and B is an M x 1 int matrix, you can simply write (@ :FLOAT A (+ K 4)) and (@ :INT B (+ (* 2 I) 1)) 
+instead of (@ :FLOAT A 0 (+ K 4)) and (@ :INT B (+ (* 2 I) 1) 0), respectively. 
+
+Note: When using the @ macro, instead of writing (AT-<type-name> A 0 0) to access the element at 
+position 0x0 of matrix A, you would enter the <type-name> as a keyword as so: (@ :<type-name> A 0 0) 
+Also note, when using the @ macro, it's a bit slower than using the AT-<type-name> or MAT-AT-<type-name> 
+functions. Try using the $ macro to time the functions to get an idea of where you want to use which. I'll 
+be speeding up the @ macro very soon when I redesign the low-level functions of this library to be generated 
+by the CLASP compiler, instead of CFFI. You can find some more information on the CLASP compiler, invented by 
+Dr. Chris Shafmeister here:
+
+http://drmeister.wordpress.com/2014/07/06/why-did-i-write-the-clasp-compiler/
+
+
 The example below initializes a Hilbert matrix:
  
-(defun at-example ()
-  (let ((h (mat 5 5 +64f+)))
+(defun mat-at-example ()
+  (with-mat ((h (mat 5 5 +64f+)))
     (dotimes (i (rows h))
       (dotimes (j (cols h))
-	(setf (at-double h i j) (/ 1d0 (+ i j 1)))))
+	(setf (@ :double h i j) (/ 1d0 (+ i j 1)))))
     (print-mat h))) 
 
 ========================================================================================================================================
@@ -352,7 +438,7 @@ Note: See RECT-EXAMPLE in this file for an example that uses this CLONE method o
 	(dotimes (j (cols m2))
 	  ;AT retrieves elements of M2, FORMAT 
 	  ;prints the elements to the screen 
-	  (format t "~a" (at m2 i j :float))
+	  (format t "~a" (@ :float m2 i j))
 	  (princ #\Space))
 	(princ #\Newline))
       (format t "~%"))))
@@ -382,31 +468,31 @@ The method makes a new header for the specified column span of the matrix. Simil
 
 
 (defun col-range-example ()
-        ;Create matrix data
-  (let* ((data (alloc :uchar '(1 2 3 4 5 6 7 8 9)))
-         ;Create matrix
-	 (mat (mat 3 3 +8u+ data)))
-    (princ #\Newline)
-    ;Print matrix normally by 
-    ;accessing entire matrix
-    (dotimes (i (rows mat))
-      (dotimes (j (cols mat))
-	(format t "~a" (at mat i j :uchar))
-	(princ #\Space))
-      (princ #\Newline))
-    (format t "~%~%")
-    ;Retrieve all 3 columns of MAT 
-    ;with COL-RANGE to print matrix
-    (dotimes (i (rows mat))
-      (dotimes (j (cols mat))
-	(format t "~a" (at 
-			(col-range mat 0 (cols mat)) 
-			i j :uchar))
-	(princ #\Space))
-      (princ #\Newline))
-      (format t "~%")
-      (free data)))
-
+  ;;Create matrix data
+  (with-object ((data (alloc :uchar '(1 2 3 4 5 6 7 8 9))))
+    ;;Create matrix
+    (with-mat ((mat (mat 3 3 +8u+ data)))
+      (princ #\Newline)
+      ;;Print matrix normally by 
+      ;;accessing entire matrix
+      (dotimes (i (rows mat))
+	(dotimes (j (cols mat))
+	  (format t "~a" (@ :uchar mat i j))
+	  (princ #\Space))
+	(princ #\Newline))
+      (format t "~%~%")
+      ;;Retrieve all 3 columns of MAT 
+      ;;with COL-RANGE to print matrix
+      ;;Note: The 't:' prefix enables 
+      ;;automatic finalization.
+      (dotimes (i (rows mat))
+	(dotimes (j (cols mat))
+	  (format t "~a" (@ :uchar
+			    (t:col-range mat 0 (cols mat)) 
+			    i j))
+	  (princ #\Space))
+	(princ #\Newline))
+      (format t "~%"))))
 
 ========================================================================================================================================
 #COLS
@@ -593,25 +679,24 @@ shape and type as operands.
 		(data2 (alloc :double '(1d0 0d0 6d0))))
     (with-mat ((vec1 (mat 1 3 +64f+ data1))
 	       (vec2 (mat 1 3 +64f+ data2)))
-					;Print VEC1
+      ;;Print VEC1
       (format t "~%VEC1 = ~%~%")
       (dotimes (j (cols vec1))
-	(format t "~a" (at vec1 0 j :double))
+	(format t "~a" (@ :double vec1 0 j))
 	(princ #\Space))
-					;Print VEC2
+      ;;Print VEC2
       (format t "~%~%VEC2 = ~%~%")
       (dotimes (j (cols vec2))
-	(format t "~a" (at vec2 0 j :double))
+	(format t "~a" (@ :double vec2 0 j))
 	(princ #\Space))
-					;Find and print cross product 
-					;of VEC1 and VEC2
+      ;;Find and print cross product 
+      ;;of VEC1 and VEC2
       (with-mat ((cp (cross vec1 vec2)))
 	(format t "~%~%The cross product is: ~%~%")
 	(dotimes (j (cols cp))
-	  (format t "~a" (at cp 0 j :double))
+	  (format t "~a" (@ :double cp 0 j))
 	  (princ #\Space))
 	(format t "~%~%")))))
-
 
 ========================================================================================================================================
 #DATA
@@ -3157,31 +3242,31 @@ functions, this is an O(1) operation.
 
 
 (defun row-range-example ()
-        ;Create matrix data
-  (let* ((data (alloc :uchar '(1 2 3 4 5 6 7 8 9)))
-         ;Create matrix
-	 (mat (mat 3 3 +8u+ data)))
-    (princ #\Newline)
-    ;Print matrix normally by 
-    ;accessing entire matrix
-    (dotimes (i (rows mat))
-      (dotimes (j (cols mat))
-	(format t "~a" (at mat i j :uchar))
-	(princ #\Space))
-      (princ #\Newline))
-    (format t "~%~%")
-    ;Retrieve all 3 rows of MAT with 
-    ;ROW-RANGE to print matrix
-    (dotimes (i (rows mat))
-      (dotimes (j (cols mat))
-	(format t "~a" (at 
-			(row-range mat 0 (rows mat)) 
-			i j :uchar))
-	(princ #\Space))
-      (princ #\Newline))
-      (free data)
-      (format t "~%")))
-
+  ;;Create matrix data.
+  (with-object ((data (alloc :uchar '(1 2 3 4 5 6 7 8 9))))
+    ;;Create matrix.
+    (with-mat ((mat (mat 3 3 +8u+ data)))
+      (princ #\Newline)
+      ;;Print matrix normally by 
+      ;;accessing entire matrix.
+      (dotimes (i (rows mat))
+	(dotimes (j (cols mat))
+	  (format t "~a" (@ :uchar mat i j))
+	  (princ #\Space))
+	(princ #\Newline))
+      (format t "~%~%")
+      ;;Retrieve all 3 rows of MAT with 
+      ;;ROW-RANGE to print matrix.
+      ;;Note: The 't:' prefix enables 
+      ;;automatic finalization.
+      (dotimes (i (rows mat))
+	(dotimes (j (cols mat))
+	  (format t "~a" (@ :uchar
+			    (row-range mat 0 (rows mat)) 
+			    i j))
+	  (princ #\Space))
+	(princ #\Newline))
+      (format t "~%"))))
 
 ========================================================================================================================================
 #ROWS
@@ -3209,8 +3294,6 @@ ons.
 
   (let* ((mat (mat 3 4 +64f+ (t:scalar 100)) ))
           (format t "The number of rows in MAT = ~a" (rows mat))))
-
-
 
 ========================================================================================================================================
 #SCALE
@@ -3255,11 +3338,10 @@ before passing to SCALE.
 	(format t "~%")
 	(dotimes (i 3)
 	  (dotimes (j 3)
-	    (format t "~a" (at (t:>> scaled-mat) i j :float))
+	    (format t "~a" (@ :float (t:>> scaled-mat) i j))
 	    (princ #\Space))
 	  (princ #\Newline))
 	(format t "~%")))))
-
 
 ========================================================================================================================================
 #SIZE
@@ -5699,7 +5781,7 @@ Example:
 
       (dotimes (i rows)
 	(dotimes (j cols)
-	  (setf (at points i j :float) (aref x i j))))
+	  (setf (@ :float points i j) (aref x i j))))
       (format t "~%Input matrix: ~%~%")
       (print-mat points)
       (format t "~%")
@@ -6860,8 +6942,7 @@ http://docs.opencv.org/trunk/modules/core/doc/operations_on_arrays.html?highligh
 
 Example:
 
-(defun random-color (rng &optional (icolor 0))
-  (setf icolor rng)
+(defun random-color (rng)
   (return-from random-color (scalar (uniform rng 0 255) 
 				    (uniform rng 0 255) (uniform rng 0 255))))
 
@@ -6948,8 +7029,8 @@ Example:
 		       (phase* x y angle t)
 		       ;;Set START-ANGLE and END-ANGLE of the ellipse to 
 		       ;;the 0,0 and 0,1 elements of the matrix ANGLE
-		       (setf start-angle (coerce (at angle 0 0 :float) 'double-float))
-		       (setf end-angle (coerce (at angle 0 1 :float) 'double-float))
+		       (setf start-angle (coerce (@ :float angle 0 0) 'double-float))
+		       (setf end-angle (coerce (@ :float angle 0 1) 'double-float))
 		       ;;Draw the ellipse
 		       (ellipse mat center axes 360d0 start-angle end-angle
 				(random-color rng) (uniform rng -1 9) +aa+)
@@ -7492,31 +7573,37 @@ See also:
 (COUNT-NON-ZERO), (MEAN), (MEAN-STD-DEV), (NORM), (MIN-MAX-LOC), (REDUCE)
 
 
+Example: 
+
 (defun sum-example ()
-        ;Create matrix
-  (let* ((mat (mat 4 4 +8u+))
-         ;Initialize random number generator
-         (rng (rng #xFFFFFFFF)))
+  
+  ;;Note: the t: prefix 
+  ;;enables finalization. 
+
+  ;;Create matrix.
+  (let* ((mat (t:mat 4 4 +8u+))
+         ;;Initialize random number generator.
+         (rng (t:rng #xFFFFFFFF)))
     (format t "~%")
-    ;Fill MAT with random values
+    ;;Fill MAT with random values.
     (dotimes (i (rows mat))
       (dotimes (j (cols mat))
-	(setf (at mat i j :uchar) (uniform rng 1 8))))
-     ;Print MAT
+	(setf (@ :uchar mat i j) (uniform rng 1 8))))
+    ;;Print MAT.
     (dotimes (i (rows mat))
       (dotimes (j (cols mat))
-	(format t "~a" (at mat i j :uchar))
+	(format t "~a" (@ :uchar mat i j))
 	(princ #\Space))
       (princ #\Newline))
-      (format t "~%")
-    ;Assign each each element 
-    ;of MAT the sum of its ra-
-    ;ndom elements
+    (format t "~%")
+    ;;Assign each each element 
+    ;;of MAT the sum of its ra-
+    ;;ndom elements.
     (assign mat (sum mat))
-    ;Print MAT
+    ;;Print MAT.
     (dotimes (i (rows mat))
       (dotimes (j (cols mat))
-	(format t "~a" (at mat i j :uchar))
+	(format t "~a" (@ :uchar mat i j))
 	(princ #\Space))
       (princ #\Newline))
     (format t "~%")))
@@ -7757,8 +7844,7 @@ ellipse, not an arc, pass (EQ START-ANGLE 0) and (END-ANGLE 360).
 
 Example 1:
 
-(defun random-color (rng &optional (icolor 0))
-  (setf icolor rng)
+(defun random-color (rng)
   (return-from random-color (scalar (uniform rng 0 255) 
 				    (uniform rng 0 255) (uniform rng 0 255))))
 
@@ -7798,8 +7884,7 @@ Example 1:
 
 Example 2:
 
-(defun random-color (rng &optional (icolor 0))
-  (setf icolor rng)
+(defun random-color (rng)
   (return-from random-color (scalar (uniform rng 0 255) 
 				    (uniform rng 0 255) (uniform rng 0 255))))
 
@@ -8056,8 +8141,7 @@ rendering code example.
 
 Example:
 
-(defun random-color (rng &optional (icolor 0))
-  (setf icolor rng)
+(defun random-color (rng)
   (return-from random-color (scalar (uniform rng 0 255) 
 				    (uniform rng 0 255) (uniform rng 0 255))))
 
@@ -10383,7 +10467,6 @@ See also:
 
 Example:
 
-
 (defun get-affine-transform-example (filename)
 
   "This example is similar to the WARP-AFFINE-EXAMPLE, except that 
@@ -10391,12 +10474,12 @@ Example:
    the points given to GET-AFFINE-TRANSFORM. This will help you to 
    better understand the math behind the operation of the function."
 
-  ;Load the image.
+  ;;Load the image.
   (with-mat ((src (imread filename 1))         
              (src-tri (mat 3 2 +32f+))
              (dst-tri (mat 3 2 +32f+))
-	     ;Set the destination image to the same 
-	     ;type and size as the source image.
+	     ;;Set the destination image to the same 
+	     ;;type and size as the source image.
              (warp-dst (mat-zeros (rows src) (cols src) (mat-type src)))
              (warp-rotate-dst (mat)))
     (if (empty src) 
@@ -10406,8 +10489,8 @@ Example:
       (with-named-window (window-name +window-normal+)
 	(set-window-property window-name +wnd-prop-fullscreen+ 
 			     +window-fullscreen+)
-	;Allocate memory to hold the values that the trackbar can 
-	;adjust that will later be given to GET-AFFINE-TRANSFORM.
+	;;Allocate memory to hold the values that the trackbar can 
+	;;adjust that will later be given to GET-AFFINE-TRANSFORM.
 	(with-object ((src-tri-1 (alloc :int 0))
 		      (src-tri-2 (alloc :int 0))
 		      (src-tri-3 (alloc :int (list (cols src))))
@@ -10429,13 +10512,13 @@ Example:
 		      (dst-tri-6 (alloc :int (list (rows src))))
 		      (dst-tri-mult-6 (alloc :int 7)))
 
-	  ;Create the trackbars used to adjust the values of the 
-	  ;elements in the SRC-TRI matrix.
+	  ;;Create the trackbars used to adjust the values of the 
+	  ;;elements in the SRC-TRI matrix.
 
-          ;When the values are set into the SRC-TRI matrix in the 
-	  ;WARP-AFFINE-EXAMPLE, two subtrahends are involved. The
-	  ;'ST SUBT 3' and 'ST SUBT 6' trackbars adjust those two
-          ;subtrahends.
+	  ;;When the values are set into the SRC-TRI matrix in the 
+	  ;;WARP-AFFINE-EXAMPLE, two subtrahends are involved. The
+	  ;;'ST SUBT 3' and 'ST SUBT 6' trackbars adjust those two
+	  ;;subtrahends.
 
 	  (create-trackbar "SRC-TRI 1" window-name src-tri-1 10000)
 	  (create-trackbar "SRC-TRI 2" window-name src-tri-2 10000)
@@ -10446,12 +10529,12 @@ Example:
 	  (create-trackbar "SRC-TRI 6" window-name src-tri-6 5000)
 	  (create-trackbar "ST SUBT 6" window-name src-tri-subt-6 5000)
 
-	  ;Create the trackbars used to adjust the values of the 
-	  ;elements in the DST-TRI matrix.
+	  ;;Create the trackbars used to adjust the values of the 
+	  ;;elements in the DST-TRI matrix.
 
-	  ;When the values are set into the DST-TRI matrix in the 
-	  ;WARP-AFFINE-EXAMPLE, six multiplicands are involved. t-
-	  ;he 'DT MULT *' trackbars adjust the six multiplicands.
+	  ;;When the values are set into the DST-TRI matrix in the 
+	  ;;WARP-AFFINE-EXAMPLE, six multiplicands are involved. t-
+	  ;;he 'DT MULT *' trackbars adjust the six multiplicands.
 
 	  (create-trackbar "DST-TRI 1" window-name dst-tri-1 20000)
 	  (create-trackbar "DT MULT 1" window-name dst-tri-mult-1 4000)
@@ -10468,57 +10551,56 @@ Example:
 
 	  (loop
 
-	     ;Based on the position of the trackbars, set three points 
-	     ;both in the src image and the dst image, that will next 
-	     ;be used to calculate the Affine Transform.
+	     ;;Based on the position of the trackbars, set three points 
+	     ;;both in the src image and the dst image, that will next 
+	     ;;be used to calculate the Affine Transform.
 
-             ;Note: the '@' is a macro for CFFI::MEM-AREF. It is used 
-             ;to get the values inside the memory locations that were 
-             ;allocated by the ALLOC functions above.
+	     ;;Note: the '@' is a macro for CFFI::MEM-AREF. It is used 
+	     ;;to get the values inside the memory locations that were 
+	     ;;allocated by the ALLOC functions above.
 
-	     (setf (at src-tri 0 0 :float) (coerce (@ src-tri-1 :int) 'single-float)) 
-	     (setf (at src-tri 0 1 :float) (coerce (@ src-tri-2 :int) 'single-float)) 
-	     (setf (at src-tri 1 0 :float) (- (@ src-tri-3 :int) 
-					      (coerce (@ src-tri-subt-3 :int) 'single-float)))
-	     (setf (at src-tri 1 1 :float) (coerce (@ src-tri-4 :int) 'single-float))
-	     (setf (at src-tri 2 0 :float) (coerce (@ src-tri-5 :int) 'single-float)) 
-	     (setf (at src-tri 2 1 :float) (- (@ src-tri-6 :int) 
-					      (coerce (@ src-tri-subt-6 :int) 'single-float)))
-	     (setf (at dst-tri 0 0 :float) (* (@ dst-tri-1 :int) 
-					      (* (@ dst-tri-mult-1 :int) 0.01f0))) 
-	     (setf (at dst-tri 0 1 :float) (* (@ dst-tri-2 :int) 
-					      (* (@ dst-tri-mult-2 :int) 0.01f0)))
-	     (setf (at dst-tri 1 0 :float) (* (@ dst-tri-3 :int) 
-					      (* (@ dst-tri-mult-3 :int) 0.01f0)))
-	     (setf (at dst-tri 1 1 :float) (* (@ dst-tri-4 :int) 
-					      (* (@ dst-tri-mult-4 :int) 0.01f0)))
-	     (setf (at dst-tri 2 0 :float) (* (@ dst-tri-5 :int) 
-					      (* (@ dst-tri-mult-5 :int) 0.01f0)))
-	     (setf (at dst-tri 2 1 :float) (* (@ dst-tri-6 :int) 
-					      (* (@ dst-tri-mult-6 :int) 0.1f0)))
+	     (setf (@ :float src-tri 0 0) (coerce (@ src-tri-1 :int) 'single-float)) 
+	     (setf (@ :float src-tri 0 1) (coerce (@ src-tri-2 :int) 'single-float)) 
+	     (setf (@ :float src-tri 1 0) (- (@ src-tri-3 :int) 
+					     (coerce (@ src-tri-subt-3 :int) 'single-float)))
+	     (setf (@ :float src-tri 1 1) (coerce (@ src-tri-4 :int) 'single-float))
+	     (setf (@ :float src-tri 2 0) (coerce (@ src-tri-5 :int) 'single-float)) 
+	     (setf (@ :float src-tri 2 1) (- (@ src-tri-6 :int) 
+					     (coerce (@ src-tri-subt-6 :int) 'single-float)))
+	     (setf (@ :float dst-tri 0 0) (* (@ dst-tri-1 :int) 
+					     (* (@ dst-tri-mult-1 :int) 0.01f0))) 
+	     (setf (@ :float dst-tri 0 1) (* (@ dst-tri-2 :int) 
+					     (* (@ dst-tri-mult-2 :int) 0.01f0)))
+	     (setf (@ :float dst-tri 1 0) (* (@ dst-tri-3 :int) 
+					     (* (@ dst-tri-mult-3 :int) 0.01f0)))
+	     (setf (@ :float dst-tri 1 1) (* (@ dst-tri-4 :int) 
+					     (* (@ dst-tri-mult-4 :int) 0.01f0)))
+	     (setf (@ :float dst-tri 2 0) (* (@ dst-tri-5 :int) 
+					     (* (@ dst-tri-mult-5 :int) 0.01f0)))
+	     (setf (@ :float dst-tri 2 1) (* (@ dst-tri-6 :int) 
+					     (* (@ dst-tri-mult-6 :int) 0.1f0)))
 
 	     (with-size ((warp-dest-size (size warp-dst)))
-	       ;Get the Affine Transform.
+	       ;;Get the Affine Transform.
 	       (with-mat ((warp-mat (get-affine-transform src-tri dst-tri))) 
-		 ;Apply the Affine Transform, just found, to SRC.
+		 ;;Apply the Affine Transform, just found, to SRC.
 		 (warp-affine src warp-dst warp-mat warp-dest-size)
 
 		 #| Rotating the image after Warp |#
 
-	         ;Compute a rotation matrix with respect to the image center.
+		 ;;Compute a rotation matrix with respect to the image center.
 		 (with-point-2f ((center (point-2f (/ (cols src) 2f0) (/ (rows src) 2f0))))
 		   (let ((angle -50d0)
 			 (scale 0.6d0))
-		     ;Get the rotation matrix with the above specifications.
+		     ;;Get the rotation matrix with the above specifications.
 		     (with-mat ((rot-mat (get-rotation-matrix-2d center angle scale)))
-		       ;Rotate the warped image.
+		       ;;Rotate the warped image.
 		       (warp-affine warp-dst warp-rotate-dst rot-mat warp-dest-size)
-		       ;Show the result.
+		       ;;Show the result.
 		       (imshow window-name warp-rotate-dst)
 		       (let ((c (wait-key 33)))
 			 (when (= c 27)
 			   (return))))))))))))))
-
 
 ========================================================================================================================================
 #GET-ROTATION-MATRIX-2D
@@ -10561,7 +10643,6 @@ See also:
 
 Example:
 
-
 (defun get-rotation-matrix-2d-example (filename)
 
   "This example is similar to the WARP-AFFINE-EXAMPLE except that 
@@ -10569,12 +10650,12 @@ Example:
    ANGLE and the SCALE values given to the GET-ROTATION-MATRIX-2D 
    function."
 
-  ;Load the image
+  ;;Load the image
   (with-mat ((src (imread filename 1))         
              (src-tri (mat 3 2 +32f+))
              (dst-tri (mat 3 2 +32f+))
-	     ;Create destination image of the same 
-	     ;type and size as the source image
+	     ;;Create destination image of the same 
+	     ;;type and size as the source image
              (warp-dst (mat-zeros (rows src) (cols src) (mat-type src)))
              (warp-rotate-dst (mat)))
     (if (empty src) 
@@ -10583,43 +10664,43 @@ Example:
     (let ((window-name "Trackbars adjust CENTER, ANGLE and SCALE of the image - GET-ROTATION-MATRIX-2D Example"))
       (with-named-window (window-name +window-autosize+)
 	(move-window window-name (cols src) 175)
-	;Allocate memory to hold the integer values 
-        ;the trackbar can adjust
+	;;Allocate memory to hold the integer values 
+        ;;the trackbar can adjust
 	(with-object ((center-x-val (alloc :int 2))
                       (center-y-val (alloc :int 2))
 		      (angle-val (alloc :int 50))
 		      (scale-val (alloc :int 6))) 
-	  ;Create the trackbars used to adjust the CENTER, ANGLE and 
-          ;SCALE parameters of the function GET-ROTATION-MATRIX-2D
+	  ;;Create the trackbars used to adjust the CENTER, ANGLE and 
+          ;;SCALE parameters of the function GET-ROTATION-MATRIX-2D
 	  (create-trackbar "CENTER X" window-name center-x-val 10)
 	  (create-trackbar "CENTER Y" window-name center-y-val 10)
 	  (create-trackbar "ANGLE" window-name angle-val 360)
 	  (create-trackbar "SCALE" window-name scale-val 1000)
 	  (loop
-	     ;Set three points both in the src and dst images 
-             ;that are used to calculate the Affine Transform
-	     (setf (at src-tri 0 0 :float) 0f0) 
-	     (setf (at src-tri 0 1 :float) 0f0) 
-	     (setf (at src-tri 1 0 :float) (- (cols src) 1f0))
-	     (setf (at src-tri 1 1 :float) 0f0)
-	     (setf (at src-tri 2 0 :float) 0f0) 
-	     (setf (at src-tri 2 1 :float) (- (rows src) 1f0))
-	     (setf (at dst-tri 0 0 :float) (* (rows src) 0.0f0)) 
-	     (setf (at dst-tri 0 1 :float) (* (rows src) 0.33f0))
-	     (setf (at dst-tri 1 0 :float) (* (cols src) 0.85f0)) 
-	     (setf (at dst-tri 1 1 :float) (* (rows src) 0.25f0))
-	     (setf (at dst-tri 2 0 :float) (* (cols src) 0.15f0)) 
-	     (setf (at dst-tri 2 1 :float) (* (rows src) 0.7f0))
+	     ;;Set three points both in the src and dst images 
+             ;;that are used to calculate the Affine Transform
+	     (setf (@ :float src-tri 0 0) 0f0) 
+	     (setf (@ :float src-tri 0 1) 0f0) 
+	     (setf (@ :float src-tri 1 0) (- (cols src) 1f0))
+	     (setf (@ :float src-tri 1 1) 0f0)
+	     (setf (@ :float src-tri 2 0) 0f0) 
+	     (setf (@ :float src-tri 2 1) (- (rows src) 1f0))
+	     (setf (@ :float dst-tri 0 0) (* (rows src) 0.0f0)) 
+	     (setf (@ :float dst-tri 0 1) (* (rows src) 0.33f0))
+	     (setf (@ :float dst-tri 1 0) (* (cols src) 0.85f0)) 
+	     (setf (@ :float dst-tri 1 1) (* (rows src) 0.25f0))
+	     (setf (@ :float dst-tri 2 0) (* (cols src) 0.15f0)) 
+	     (setf (@ :float dst-tri 2 1) (* (rows src) 0.7f0))
 	     (with-size ((warp-dest-size (size warp-dst)))
-	       ;Get the Affine Transform
+	       ;;Get the Affine Transform
 	       (with-mat ((warp-mat (get-affine-transform src-tri dst-tri))) 
-		 ;Apply the Affine Transform, just found, to SRC
+		 ;;Apply the Affine Transform, just found, to SRC
 		 (warp-affine src warp-dst warp-mat warp-dest-size)
 
-		 ;Compute a rotation matrix with respect 
-                 ;to the center of the image
+		 ;;Compute a rotation matrix with respect 
+                 ;;to the center of the image
 
-                 ;Note: the '@' is a macro for CFFI::MEM-AREF
+                 ;;Note: the '@' is a macro for CFFI::MEM-AREF
 
 		 (with-point-2f ((center (point-2f (/ (cols src) 
 						      (coerce 
@@ -10631,17 +10712,15 @@ Example:
 						       'single-float)))))
 		   (let ((angle (* (@ angle-val :int) -1.0d0))
 			 (scale (*  (@ scale-val :int) 0.1d0)))
-		     ;Get the rotation matrix with the specifications above
+		     ;;Get the rotation matrix with the specifications above
 		     (with-mat ((rot-mat (get-rotation-matrix-2d center angle scale)))
-		       ;Rotate the warped image
+		       ;;Rotate the warped image
 		       (warp-affine warp-dst warp-rotate-dst rot-mat warp-dest-size)
-		       ;Show what you got
+		       ;;Show what you got
 		       (imshow window-name warp-rotate-dst)
 		       (let ((c (wait-key 33)))
 			 (when (= c 27)
 			   (return))))))))))))))
-
-
 
 ========================================================================================================================================
 #GET-PERSPECTIVE-TRANSFORM
@@ -10678,7 +10757,6 @@ See also:
 
 Example:
 
-
 (defun get-perspective-transform-example (&optional 
 					    (cam *camera-index*) 
 					    (width *default-width*)
@@ -10689,25 +10767,25 @@ Example:
    the values and how they affect the camera output will help in 
    understanding the math behind the operation of the function."
 
-  ;Create VIDEO-CAPTURE and set to default width and height,
+  ;;Create VIDEO-CAPTURE and set to default width and height,
   (with-captured-camera (cap cam :width width :height height)
     (if (not (is-opened cap)) 
 	(return-from get-perspective-transform-example 
 	  (format t "Cannot open the video camera")))
-    ;Input Quadilateral or Image plane coordinates.
+    ;;Input Quadilateral or Image plane coordinates.
     (with-mat ((input-quad (mat 4 2 +32f+))
-	       ;Output Quadilateral or World plane coordinates.
+	       ;;Output Quadilateral or World plane coordinates.
 	       (output-quad (mat 4 2 +32f+))
-	       ;Create Lambda Matrix filled with zeros and set 
-               ;to the same type/size as the camera feed.
+	       ;;Create Lambda Matrix filled with zeros and set 
+               ;;to the same type/size as the camera feed.
 	       (lambda (mat-zeros height width +8u+)))
-      ;Create a fullscreen window
+      ;;Create a fullscreen window
       (let ((window-name "GET-PERSPECTIVE-TRANSFORM Example"))
 	(with-named-window (window-name +window-normal+)
 	  (set-window-property window-name +wnd-prop-fullscreen+ 
 			       +window-fullscreen+)
-	  ;Allocate memory to hold the values that the trackbar can 
-	  ;adjust that will be given to GET-PERSPECTIVE-TRANSFORM.
+	  ;;Allocate memory to hold the values that the trackbar can 
+	  ;;adjust that will be given to GET-PERSPECTIVE-TRANSFORM.
 	  (with-object ((input-quad-0-x (alloc :int 95))
 			(input-quad-0-y (alloc :int 72))
 			(input-quad-1-x (alloc :int 407))
@@ -10729,9 +10807,9 @@ Example:
 			(output-quad-3-y (alloc :int (list height)))
 			(output-quad-3-y-subt (alloc :int 1)))
 
-	    ;Create the trackbars used to adjust the values of the 
-	    ;elements in the INPUT-QUAD matrix. INPUT-QUAD is the 
-            ;src matrix parameter of GET-PERSPECTIVE-TRANSFORM.
+	    ;;Create the trackbars used to adjust the values of the 
+	    ;;elements in the INPUT-QUAD matrix. INPUT-QUAD is the 
+            ;;src matrix parameter of GET-PERSPECTIVE-TRANSFORM.
 
 	    (create-trackbar "IQ 0 X" window-name input-quad-0-x 383)
 	    (create-trackbar "IQ 0 Y" window-name input-quad-0-y 463)
@@ -10742,13 +10820,13 @@ Example:
 	    (create-trackbar "IQ 3 X" window-name input-quad-3-x 551)
 	    (create-trackbar "IQ 3 Y" window-name input-quad-3-y 14878)
 
-	    ;Create the trackbars used to adjust the values of the 
-	    ;elements in the OUTPUT-QUAD matrix. OUTPUT-QUAD is the 
-            ;dest matrix parameter of GET-PERSPECTIVE-TRANSFORM.
+	    ;;Create the trackbars used to adjust the values of the 
+	    ;;elements in the OUTPUT-QUAD matrix. OUTPUT-QUAD is the 
+            ;;dest matrix parameter of GET-PERSPECTIVE-TRANSFORM.
 
-	    ;When the values are set (with SETF below) into the OUTPUT-QUAD 
-	    ;matrix six subtrahends are involved. the 'SUBT * *' trackbars 
-	    ;adjust those six subtrahends.
+	    ;;When the values are set (with SETF below) into the OUTPUT-QUAD 
+	    ;;matrix six subtrahends are involved. the 'SUBT * *' trackbars 
+	    ;;adjust those six subtrahends.
 
 	    (create-trackbar "OQ 0 X" window-name output-quad-0-x 638)
 	    (create-trackbar "OQ 0 Y" window-name output-quad-0-y 480)
@@ -10764,62 +10842,60 @@ Example:
 	    (create-trackbar "SUBT 3 Y" window-name output-quad-3-y-subt 478)
 
 	    (loop
-	       ;Input and Output matrices.
+	       ;;Input and Output matrices.
 	       (with-mat ((input (mat)) 
 			  (output (mat)))
-		 ;Set camera feed to INPUT.
+		 ;;Set camera feed to INPUT.
 		 (read cap input)
 
-		 ;The 4 points that select quadilateral on the input, 
-		 ;from element 0x0 of INPUT-QUAD in clockwise order. 
-                 ;The four points are the sides of the rect box used 
-                 ;as input. 
+		 ;;The 4 points that select quadilateral on the input, 
+		 ;;from element 0x0 of INPUT-QUAD in clockwise order. 
+                 ;;The four points are the sides of the rect box used 
+                 ;;as input. 
 
-		 ;Note: the '@' is a macro for CFFI::MEM-AREF. It is 
-		 ;used to get the values inside the memory locations 
-		 ;that were allocated by the ALLOC functions above.
+		 ;;Note: the '@' is a macro for CFFI::MEM-AREF. It is 
+		 ;;used to get the values inside the memory locations 
+		 ;;that were allocated by the ALLOC functions above.
 
-		 (setf (at input-quad 0 0 :float) (coerce (@ input-quad-0-x :int) 'single-float)) 
-		 (setf (at input-quad 0 1 :float) (coerce (@ input-quad-0-y :int) 'single-float)) 
-		 (setf (at input-quad 1 0 :float) (coerce (@ input-quad-1-x :int) 'single-float)) 
-		 (setf (at input-quad 1 1 :float) (coerce (@ input-quad-1-y :int) 'single-float)) 
-		 (setf (at input-quad 2 0 :float) (coerce (@ input-quad-2-x :int) 'single-float)) 
-		 (setf (at input-quad 2 1 :float) (coerce (@ input-quad-2-y :int) 'single-float)) 
-		 (setf (at input-quad 3 0 :float) (coerce (@ input-quad-3-x :int) 'single-float)) 
-		 (setf (at input-quad 3 1 :float) (coerce (@ input-quad-3-y :int) 'single-float)) 
+		 (setf (@ :float input-quad 0 0) (coerce (@ input-quad-0-x :int) 'single-float)) 
+		 (setf (@ :float input-quad 0 1) (coerce (@ input-quad-0-y :int) 'single-float)) 
+		 (setf (@ :float input-quad 1 0) (coerce (@ input-quad-1-x :int) 'single-float)) 
+		 (setf (@ :float input-quad 1 1) (coerce (@ input-quad-1-y :int) 'single-float)) 
+		 (setf (@ :float input-quad 2 0) (coerce (@ input-quad-2-x :int) 'single-float)) 
+		 (setf (@ :float input-quad 2 1) (coerce (@ input-quad-2-y :int) 'single-float)) 
+		 (setf (@ :float input-quad 3 0) (coerce (@ input-quad-3-x :int) 'single-float)) 
+		 (setf (@ :float input-quad 3 1) (coerce (@ input-quad-3-y :int) 'single-float)) 
 
-		 ;The 4 points where mapping is to be done, from 
-                 ;element 0x0 of OUTPUT-QUAD in clockwise order.
+		 ;;The 4 points where mapping is to be done, from 
+                 ;;element 0x0 of OUTPUT-QUAD in clockwise order.
 
-		 (setf (at output-quad 0 0 :float) (coerce (@ output-quad-0-x :int) 'single-float)) 
-		 (setf (at output-quad 0 1 :float) (coerce (@ output-quad-0-y :int) 'single-float)) 
-		 (setf (at output-quad 1 0 :float) 
+		 (setf (@ :float output-quad 0 0) (coerce (@ output-quad-0-x :int) 'single-float)) 
+		 (setf (@ :float output-quad 0 1) (coerce (@ output-quad-0-y :int) 'single-float)) 
+		 (setf (@ :float output-quad 1 0) 
 		       (- (@ output-quad-1-x :int) (coerce (@ output-quad-1-x-subt :int) 
 							   'single-float))) 
-		 (setf (at output-quad 1 1 :float) (coerce (@ output-quad-1-y :int) 'single-float)) 
-		 (setf (at output-quad 2 0 :float) 
+		 (setf (@ :float output-quad 1 1) (coerce (@ output-quad-1-y :int) 'single-float)) 
+		 (setf (@ :float output-quad 2 0) 
 		       (- (@ output-quad-2-x :int) (coerce (@ output-quad-2-x-subt :int) 
 							   'single-float))) 
-		 (setf (at output-quad 2 1 :float) 
+		 (setf (@ :float output-quad 2 1) 
 		       (- (@ output-quad-2-y :int) (coerce (@ output-quad-2-y-subt :int) 
 							   'single-float))) 
-		 (setf (at output-quad 3 0 :float) (coerce (@ output-quad-3-x :int) 'single-float)) 
-		 (setf (at output-quad 3 1 :float) 
+		 (setf (@ :float output-quad 3 0) (coerce (@ output-quad-3-x :int) 'single-float)) 
+		 (setf (@ :float output-quad 3 1) 
 		       (- (@ output-quad-3-y :int) (coerce (@ output-quad-3-y-subt :int) 
 							   'single-float))) 
-		 ;Get the Perspective Transform Matrix e.g. lambda
+		 ;;Get the Perspective Transform Matrix e.g. lambda
 		 (with-mat ((lambda (get-perspective-transform input-quad output-quad)))
-		   ;Apply the Perspective Transform Matrix 
-                   ;just found to the camera feed.
+		   ;;Apply the Perspective Transform Matrix 
+                   ;;just found to the camera feed.
                    (with-size ((output-size (size output)))
 		     (warp-perspective input output lambda output-size))
-		   ;Display output
+		   ;;Display output
 		   (imshow window-name output)
 		   (let ((c (wait-key 33)))
 		     (when (= c 27)
 		       (return))))))))))))
-
-
 
 ========================================================================================================================================
 #INVERT-AFFINE-TRANSFORM
@@ -10851,15 +10927,14 @@ for the formula.
 
 The result is also a 2x3 matrix of the same type as M .
 
-
 (defun invert-affine-transform-example (filename)
 
-	    ;Load the image
+  ;;Load the image
   (with-mat ((src (imread filename 1))         
              (src-tri (mat 3 2 +32f+))
              (dst-tri (mat 3 2 +32f+))
-	     ;Set the dst matrices to the same 
-	     ;type and size as the src image
+	     ;;Set the dst matrices to the same 
+	     ;;type and size as the src image
              (warp-dst (mat-zeros (rows src) (cols src) (mat-type src)))
              (inverted-warp-dst (mat-zeros (rows src) (cols src) (mat-type src))))
     (if (empty src) 
@@ -10874,40 +10949,39 @@ The result is also a 2x3 matrix of the same type as M .
 	    (move-window source-window 310 175)
 	    (move-window warp-window 760 175)
 	    (move-window inverted-warp-window 1210 175)
-	    ;Show SRC in window 
+	    ;;Show SRC in window 
             (imshow source-window src)
-	    ;Set three points here, both in the src and dst  
-	    ;images, used to calculate the Affine Transform
-	    (setf (at src-tri 0 0 :float) 0f0) 
-	    (setf (at src-tri 0 1 :float) 0f0) 
-	    (setf (at src-tri 1 0 :float) (- (cols src) 1f0))
-	    (setf (at src-tri 1 1 :float) 0f0)
-	    (setf (at src-tri 2 0 :float) 0f0) 
-	    (setf (at src-tri 2 1 :float) (- (rows src) 1f0))
-	    (setf (at dst-tri 0 0 :float) (* (rows src) 0.0f0)) 
-	    (setf (at dst-tri 0 1 :float) (* (rows src) 0.33f0))
-	    (setf (at dst-tri 1 0 :float) (* (cols src) 0.85f0)) 
-	    (setf (at dst-tri 1 1 :float) (* (rows src) 0.25f0))
-	    (setf (at dst-tri 2 0 :float) (* (cols src) 0.15f0)) 
-	    (setf (at dst-tri 2 1 :float) (* (rows src) 0.7f0))
+	    ;;Set three points here, both in the src and dst  
+	    ;;images, used to calculate the Affine Transform
+	    (setf (@ :float src-tri 0 0) 0f0) 
+	    (setf (@ :float src-tri 0 1) 0f0) 
+	    (setf (@ :float src-tri 1 0) (- (cols src) 1f0))
+	    (setf (@ :float src-tri 1 1) 0f0)
+	    (setf (@ :float src-tri 2 0) 0f0) 
+	    (setf (@ :float src-tri 2 1) (- (rows src) 1f0))
+	    (setf (@ :float dst-tri 0 0) (* (rows src) 0.0f0)) 
+	    (setf (@ :float dst-tri 0 1) (* (rows src) 0.33f0))
+	    (setf (@ :float dst-tri 1 0) (* (cols src) 0.85f0)) 
+	    (setf (@ :float dst-tri 1 1) (* (rows src) 0.25f0))
+	    (setf (@ :float dst-tri 2 0) (* (cols src) 0.15f0)) 
+	    (setf (@ :float dst-tri 2 1) (* (rows src) 0.7f0))
 	    (with-size ((warp-dest-size (size warp-dst)))
-	      ;Get the Affine Transform
+	      ;;Get the Affine Transform
 	      (with-mat ((warp-mat (get-affine-transform src-tri dst-tri))) 
-		;Apply the Affine Transform, just found, to SRC
+		;;Apply the Affine Transform, just found, to SRC
 		(warp-affine src warp-dst warp-mat warp-dest-size)
-		;Show the transformed SRC in a window
+		;;Show the transformed SRC in a window
 		(imshow warp-window warp-dst)
-		;Invert the Affine Transform...
+		;;Invert the Affine Transform...
 		(invert-affine-transform warp-mat warp-mat)
-	        ;...Apply to SRC
+	        ;;...Apply to SRC
 		(warp-affine src inverted-warp-dst warp-mat warp-dest-size)
-		;Show the Inverted Affine Transform in a window
+		;;Show the Inverted Affine Transform in a window
 		(imshow inverted-warp-window inverted-warp-dst)
 		(loop
 		   (let ((c (wait-key 33)))
 		     (when (= c 27)
 		       (return))))))))))))
-
 
 ========================================================================================================================================
 #REMAP
@@ -10959,24 +11033,23 @@ This function cannot operate in-place.
 
 Example:
 
-
-;Global variables
+;;Global variables
 
 (defparameter remap-window "REMAP Example")
 (defparameter ind 0)
 
-;Load the image
-(defparameter src (imread "/d1" 1))
+;;Load the image
+(defparameter src (imread "/my-pic.jpg" 1))
 
-;Create DST, MAP-X and MAP-Y with the same size as SRC
+;;Create DST, MAP-X and MAP-Y with the same size as SRC
 (defparameter dst (gc:mat (rows src) (cols src) (mat-type src)))
 
 (defparameter map-x (gc:mat (rows src) (cols src) +32f+))
 (defparameter map-y (gc:mat (rows src) (cols src) +32f+))
 
 
-;Fill the MAP-X and MAP-Y matrices 
-;with 4 types of mappings
+;;Fill the MAP-X and MAP-Y matrices 
+;;with 4 types of mappings
 (defun update-map () 
   
   (setf ind (mod ind 4))
@@ -10991,33 +11064,33 @@ Example:
 		      (> j (* (rows src) 0.25)) 
                       (< j (* (rows src) 0.75)))
 		 
-                 (progn (setf (at map-x j i :float) 
+                 (progn (setf (@ :float map-x j i) 
 			      (+ (* 2 (- i (* (cols src) 0.25))) 0.5)) 
-			(setf (at map-y j i :float) 
+			(setf (@ :float map-y j i) 
 			      (+ (* 2 (- j (* (rows src) 0.25))) 0.5))) 
 		 
-		 (progn (setf (at map-x j i :float) 0f0)
-			(setf (at map-y j i :float) 0f0))))
+		 (progn (setf (@ :float map-x j i) 0f0)
+			(setf (@ :float map-y j i) 0f0))))
 	    
 	    ((= 1 ind)
 
-	     (progn (setf (at map-x j i :float) 
+	     (progn (setf (@ :float map-x j i) 
 			  (coerce i 'single-float))
-		    (setf (at map-y j i :float) 
-			  (-  (coerce (rows src) 'single-float)  j))))
+		    (setf (@ :float map-y j i) 
+			  (- (coerce (rows src) 'single-float)  j))))
 
 	    ((= 2 ind)
 
-	     (progn (setf (at map-x j i :float) 
+	     (progn (setf (@ :float map-x j i) 
 			  (- (coerce (cols src) 'single-float) i))
-		    (setf (at map-y j i :float) 
+		    (setf (@ :float map-y j i) 
 			  (coerce j 'single-float))))
 
 	    ((= 3 ind) 
 
-	     (progn (setf (at map-x j i :float) 
+	     (progn (setf (@ :float map-x j i) 
 			  (- (coerce (cols src) 'single-float) i))
-		    (setf (at map-y j i :float) 
+		    (setf (@ :float map-y j i) 
 			  (- (coerce (rows src) 'single-float) j)))))))
   (incf ind))
 
@@ -11028,13 +11101,13 @@ Example:
     (move-window remap-window (cols src) 175)
 
     (loop
-       ;Update MAP-X and MAP-Y. Then apply REMAP
+       ;;Update MAP-X and MAP-Y. Then apply REMAP
        (update-map)
        (remap src dst map-x map-y +inter-linear+ 
 	      +border-constant+ (gc:scalar 0 0 0))
-       ;Display results
+       ;;Display results
        (imshow remap-window dst)
-       ;Each 1 sec. Press ESC to exit the program
+       ;;Each 1 sec. Press ESC to exit the program
        (let ((c (wait-key 1000)))
 	 (when (= c 27)
 	   (return))))))
@@ -11200,15 +11273,16 @@ See also:
 (WARP-PERSPECTIVE), (RESIZE), (REMAP), (GET-RECT-SUB-PIX), (TRANSFORM)
 
 
+Example:
 
 (defun warp-affine-example (filename)
 
-  ;Load the image
+  ;;Load the image
   (with-mat ((src (imread filename 1))         
              (src-tri (mat 3 2 +32f+))
              (dst-tri (mat 3 2 +32f+))
-	     ;Set the destination image to the same 
-             ;type and size as the source image
+	     ;;Set the destination image to the same 
+             ;;type and size as the source image
              (warp-dst (mat-zeros (rows src) (cols src) (mat-type src)))
              (warp-rotate-dst (mat)))
     (if (empty src) 
@@ -11223,37 +11297,37 @@ See also:
 	    (move-window source-window 310 175)
 	    (move-window warp-window 760 175)
 	    (move-window warp-rotate-window 1210 175)
-	    ;Set 3 points both in the src image and the dst image 
-            ;that are used to calculate the Affine Transform
-	    (setf (at src-tri 0 0 :float) 0f0) 
-	    (setf (at src-tri 0 1 :float) 0f0) 
-	    (setf (at src-tri 1 0 :float) (- (cols src) 1f0))
-	    (setf (at src-tri 1 1 :float) 0f0)
-	    (setf (at src-tri 2 0 :float) 0f0) 
-	    (setf (at src-tri 2 1 :float) (- (rows src) 1f0))
-	    (setf (at dst-tri 0 0 :float) (* (rows src) 0.0f0)) 
-	    (setf (at dst-tri 0 1 :float) (* (rows src) 0.33f0))
-	    (setf (at dst-tri 1 0 :float) (* (cols src) 0.85f0)) 
-	    (setf (at dst-tri 1 1 :float) (* (rows src) 0.25f0))
-	    (setf (at dst-tri 2 0 :float) (* (cols src) 0.15f0)) 
-	    (setf (at dst-tri 2 1 :float) (* (rows src) 0.7f0))
+	    ;;Set 3 points both in the src image and the dst image 
+            ;;that are used to calculate the Affine Transform
+	    (setf (@ :float src-tri 0 0) 0f0) 
+	    (setf (@ :float src-tri 0 1) 0f0) 
+	    (setf (@ :float src-tri 1 0) (- (cols src) 1f0))
+	    (setf (@ :float src-tri 1 1) 0f0)
+	    (setf (@ :float src-tri 2 0) 0f0) 
+	    (setf (@ :float src-tri 2 1) (- (rows src) 1f0))
+	    (setf (@ :float dst-tri 0 0) (* (rows src) 0.0f0)) 
+	    (setf (@ :float dst-tri 0 1) (* (rows src) 0.33f0))
+	    (setf (@ :float dst-tri 1 0) (* (cols src) 0.85f0)) 
+	    (setf (@ :float dst-tri 1 1) (* (rows src) 0.25f0))
+	    (setf (@ :float dst-tri 2 0) (* (cols src) 0.15f0)) 
+	    (setf (@ :float dst-tri 2 1) (* (rows src) 0.7f0))
 	    (with-size ((warp-dest-size (size warp-dst)))
-	      ;Get the Affine Transform
+	      ;;Get the Affine Transform
 	      (with-mat ((warp-mat (get-affine-transform src-tri dst-tri))) 
-		;Apply the Affine Transform, just found, to SRC
+		;;Apply the Affine Transform, just found, to SRC
 		(warp-affine src warp-dst warp-mat warp-dest-size)
 
 	        #| Rotating the image after Warp |#
 
-		;Compute a rotation matrix with respect to the center of the image
+		;;Compute a rotation matrix with respect to the center of the image
 		(with-point-2f ((center (point-2f (/ (cols src) 2f0) (/ (rows src) 2f0))))
 		  (let ((angle -50d0)
 			(scale 0.6d0))
-		    ;Get the rotation matrix with the specifications above
+		    ;;Get the rotation matrix with the specifications above
 		    (with-mat ((rot-mat (get-rotation-matrix-2d center angle scale)))
-		      ;Rotate the warped image
+		      ;;Rotate the warped image
 		      (warp-affine warp-dst warp-rotate-dst rot-mat warp-dest-size)
-		      ;Show what you got
+		      ;;Show what you got
 		      (imshow source-window src)
 		      (imshow warp-window warp-dst)
 		      (imshow warp-rotate-window warp-rotate-dst)
@@ -11261,8 +11335,6 @@ See also:
 			 (let ((c (wait-key 33)))
 			   (when (= c 27)
 			     (return)))))))))))))))
-
-
 
 ========================================================================================================================================
 #IMGPROC - #MISCELLANEOUS IMAGE TRANSFORMATIONS:
@@ -16798,7 +16870,8 @@ Example:
 
   (let ((labels (mat (rows training-matrix) 1 +32fc1+)))
     (dotimes (i (rows labels))
-      (setf (at labels i 0 :float) (+ i 1f0)))
+      ;;@ sets and returns a matrix element.
+      (setf (@ :float labels i 0) (+ i 1f0)))
     labels))
 
 (defun make-training-matrix-example (training-image-directory test-image)
@@ -16885,8 +16958,14 @@ Example:
 	    ;; Predict which, of the 1016 images in the
 	    ;; TRAINING-IMAGE-DIRECTORY, you specified 
 	    ;; as TEST-IMAGE.
-	    (format t "~%~%Prediction..you entered image number ~a as TEST-IMAGE.~%~%" 
-		    (round (predict svm 1d-image)))
+	    (with-mat ((results (mat))) ;Create output matrix to hold the results
+					;(to show another method of obtaining them).
+	      (format t "~%~%Prediction..you entered image number ~a as TEST-IMAGE.~%~%" 
+		      (round (svm-predict svm 1d-image nil)))
+	      ;;Print RESULTS
+              (format t "Results matrix => ")
+	      (print-mat results)
+              (format t "~%"))
 
 	    ;; Create a window to show TEST-IMAGE in.
 	    (let ((window-name "TEST-IMAGE - MAKE-TRAINING-MATRIX-EXAMPLE"))
@@ -17230,8 +17309,8 @@ Example:
 (defun evaluate (predicted actual &optional p a (*t 0) (f 0)) 
   (if (eq (rows predicted) (rows actual))
       (dotimes (i (rows actual))
-	(setf p (at predicted i 0 :float))
-	(setf a (at actual i 0 :float))
+	(setf p (@ :float predicted i 0))
+	(setf a (@ :float actual i 0))
 	(if (or (and (>= p 0.0f0) (>= a 0.0f0)) (and (<= p 0.0f0) (<= a 0.0f0))) 
 	    (incf *t)
 	    (incf f))) nil)
@@ -17256,7 +17335,7 @@ Example:
     (with-mat ((predicted (mat (rows test-classes) 1 +32f+)))
       (dotimes (i (rows test-data))
 	(with-mat ((sample (row test-data i)))
-	  (setf (at predicted i 0 :float) (normal-bayes-classifier-predict bayes sample))))
+	  (setf (@ :float predicted i 0) (normal-bayes-classifier-predict bayes sample))))
       ;; Calculate the accuracy of the Normal Bayes Classifier
       (let ((evaluate (evaluate predicted test-classes)))
 	(format t "~%Accuracy_{BAYES} = ~a~%" evaluate))
@@ -17279,10 +17358,10 @@ Example:
   ;; rdered MAT below, LAYERS.
 
   (with-mat ((layers (mat 4 1 +32SC1+)))
-    (setf (at layers 0 0 :int) (@ *layer-0* :int)) 
-    (setf (at layers 1 0 :int) (@ *layer-1* :int))
-    (setf (at layers 2 0 :int) (@ *layer-2* :int))
-    (setf (at layers 3 0 :int) (@ *layer-3* :int))
+    (setf (@ :int layers 0 0) (@ *layer-0* :int)) 
+    (setf (@ :int layers 1 0) (@ *layer-1* :int))
+    (setf (@ :int layers 2 0) (@ *layer-2* :int))
+    (setf (@ :int layers 3 0) (@ *layer-3* :int))
     (with-ann-mlp ((mlp (ann-mlp)))
       (with-term-criteria ((criteria (term-criteria (logior +term-criteria-max-iter+ 
 							    +term-criteria-eps+) 
@@ -17301,7 +17380,7 @@ Example:
 	      (with-mat ((response (mat 1 1 +32fc1+)))
 		(with-mat ((sample (row test-data i)))
 		  (ann-mlp-predict mlp sample response))
-		(setf (at predicted i 0 :float) (at response 0 0 :float))))
+		(setf (@ :float predicted i 0) (@ :float response 0 0))))
             ;; Print the values of all adjustable variables.
             (format t "~%*EQUATION* = ~a~%" (@ *equation* :int))
             (format t "~%*EQUATION-0* = ~a~%" (@ *equation-0* :int))
@@ -17326,11 +17405,11 @@ Example:
     (with-scalar ((scalar (scalar 255 255 255)))
       (assign plot scalar))
     (dotimes (i (rows data))
-      (setf x (* (at data i 0 :float) *size*))
-      (setf y (* (at data i 1 :float) *size*))
+      (setf x (* (@ :float data i 0) *size*))
+      (setf y (* (@ :float data i 1) *size*))
       (with-scalar ((color1 (rgb 255 0 0))
 		    (color2 (rgb 0 255 0)))
-	(if (> (at classes i 0 :float) 0f0)
+	(if (> (@ :float classes i 0) 0f0)
             ;; Plot the points with the CIRCLE function
 	    (with-point ((center (point (round x) (round y))))
 	      (circle plot center 1 color1 1))
@@ -17393,16 +17472,16 @@ Example:
 		 ;; Label data with equation
 		 (with-mat ((labels1 (mat (rows training-data) 1 +32fc1+)))
 		   (dotimes (i (rows training-data))
-		     (setf x (at training-data i 0 :float))
-		     (setf y (at training-data i 1 :float))
-		     (setf (at labels1 i 0 :float) (coerce (f x y (@ *equation* :int)) 
+		     (setf x (@ :float training-data i 0))
+		     (setf y (@ :float training-data i 1))
+		     (setf (@ :float labels1 i 0) (coerce (f x y (@ *equation* :int)) 
 							   'single-float)))
 
 		   (with-mat ((labels2 (mat (rows test-data) 1 +32fc1+)))
 		     (dotimes (i (rows test-data))
-		       (setf x (at test-data i 0 :float))
-		       (setf y (at test-data i 1 :float))
-		       (setf (at labels2 i 0 :float) (coerce (f x y (@ *equation* :int)) 
+		       (setf x (@ :float test-data i 0))
+		       (setf y (@ :float test-data i 1))
+		       (setf (@ :float labels2 i 0) (coerce (f x y (@ *equation* :int)) 
 							     'single-float)))
 
 		     (setf training-classes labels1)
@@ -17474,7 +17553,6 @@ See (K-NEAREST-TRAIN) for additional parameters descriptions.
 
 
 Example:
-
 
 ;; This example compares a Multi Layer Perceptron, a
 ;; Normal Bayes Classifier, and a K-Nearest Neighbors 
@@ -17559,8 +17637,8 @@ Example:
 (defun evaluate (predicted actual &optional p a (*t 0) (f 0)) 
   (if (eq (rows predicted) (rows actual))
       (dotimes (i (rows actual))
-	(setf p (at predicted i 0 :float))
-	(setf a (at actual i 0 :float))
+	(setf p (@ :float predicted i 0))
+	(setf a (@ :float actual i 0))
 	(if (or (and (>= p 0.0f0) (>= a 0.0f0)) (and (<= p 0.0f0) (<= a 0.0f0))) 
 	    (incf *t)
 	    (incf f))) nil)
@@ -17587,7 +17665,7 @@ Example:
       (with-mat ((predicted (mat (rows test-classes) 1 +32f+)))
 	(dotimes (i (rows test-data))
 	  (with-mat ((sample (row test-data i)))
-	    (setf (at predicted i 0 :float) (k-nearest-find-nearest knn sample k))))
+	    (setf (@ :float predicted i 0) (k-nearest-find-nearest knn sample k))))
 	;; Calculate the accuracy of the K-Nearest Neighbors
 	(let ((evaluate (evaluate predicted test-classes)))
 	  (format t "~%Accuracy_{KNN} = ~a~%" evaluate))
@@ -17601,7 +17679,7 @@ Example:
     (with-mat ((predicted (mat (rows test-classes) 1 +32f+)))
       (dotimes (i (rows test-data))
 	(with-mat ((sample (row test-data i)))
-	  (setf (at predicted i 0 :float) (normal-bayes-classifier-predict bayes sample))))
+	  (setf (@ :float predicted i 0) (normal-bayes-classifier-predict bayes sample))))
       ;; Calculate the accuracy of the Normal Bayes Classifier
       (let ((evaluate (evaluate predicted test-classes)))
 	(format t "~%Accuracy_{BAYES} = ~a~%" evaluate))
@@ -17625,10 +17703,10 @@ Example:
   ;; rdered MAT below, LAYERS.
 
   (with-mat ((layers (mat 4 1 +32SC1+)))
-    (setf (at layers 0 0 :int) (@ *layer-0* :int)) 
-    (setf (at layers 1 0 :int) (@ *layer-1* :int))
-    (setf (at layers 2 0 :int) (@ *layer-2* :int))
-    (setf (at layers 3 0 :int) (@ *layer-3* :int))
+    (setf (@ :int layers 0 0) (@ *layer-0* :int)) 
+    (setf (@ :int layers 1 0) (@ *layer-1* :int))
+    (setf (@ :int layers 2 0) (@ *layer-2* :int))
+    (setf (@ :int layers 3 0) (@ *layer-3* :int))
     (with-ann-mlp ((mlp (ann-mlp)))
       (with-term-criteria ((criteria (term-criteria (logior +term-criteria-max-iter+ 
 							    +term-criteria-eps+) 
@@ -17647,7 +17725,7 @@ Example:
 	      (with-mat ((response (mat 1 1 +32fc1+)))
 		(with-mat ((sample (row test-data i)))
 		  (ann-mlp-predict mlp sample response))
-		(setf (at predicted i 0 :float) (at response 0 0 :float))))
+		(setf (@ :float predicted i 0) (@ :float response 0 0))))
             ;; Print the values of all adjustable variables.
             (format t "~%*EQUATION* = ~a~%" (@ *equation* :int))
             (format t "~%*EQUATION-0* = ~a~%" (@ *equation-0* :int))
@@ -17672,11 +17750,11 @@ Example:
     (with-scalar ((scalar (scalar 255 255 255)))
       (assign plot scalar))
     (dotimes (i (rows data))
-      (setf x (* (at data i 0 :float) *size*))
-      (setf y (* (at data i 1 :float) *size*))
+      (setf x (* (@ :float data i 0) *size*))
+      (setf y (* (@ :float data i 1) *size*))
       (with-scalar ((color1 (rgb 255 0 0))
 		    (color2 (rgb 0 255 0)))
-	(if (> (at classes i 0 :float) 0f0)
+	(if (> (@ :float classes i 0) 0f0)
             ;; Plot the points with the CIRCLE function
 	    (with-point ((center (point (round x) (round y))))
 	      (circle plot center 1 color1 1))
@@ -17742,15 +17820,15 @@ Example:
 		   ;; Label data with equation
 		   (with-mat ((labels1 (mat (rows training-data) 1 +32fc1+)))
 		     (dotimes (i (rows training-data))
-		       (setf x (at training-data i 0 :float))
-		       (setf y (at training-data i 1 :float))
-		       (setf (at labels1 i 0 :float) (coerce (f x y (@ *equation* :int)) 'single-float)))
+		       (setf x (@ :float training-data i 0))
+		       (setf y (@ :float training-data i 1))
+		       (setf (@ :float labels1 i 0) (coerce (f x y (@ *equation* :int)) 'single-float)))
 
 		     (with-mat ((labels2 (mat (rows test-data) 1 +32fc1+)))
 		       (dotimes (i (rows test-data))
-			 (setf x (at test-data i 0 :float))
-			 (setf y (at test-data i 1 :float))
-			 (setf (at labels2 i 0 :float) (coerce (f x y (@ *equation* :int)) 'single-float)))
+			 (setf x (@ :float test-data i 0))
+			 (setf y (@ :float test-data i 1))
+			 (setf (@ :float labels2 i 0) (coerce (f x y (@ *equation* :int)) 'single-float)))
 
 		       (setf training-classes labels1)
 		       (setf test-classes labels2)
@@ -17931,9 +18009,9 @@ Example:
 				  (setf response (predict svm sample-mat))
 
 				  (if (= response 1) 
-				      (setf (at-vec-3b image i j) green) 
+				      (setf (@ :vec-3b image i j) green) 
 				      (if (= response -1)
-					  (setf (at-vec-3b image i j) blue)))))))
+					  (setf (@ :vec-3b image i j) blue)))))))
 
 			  ;;Show the training data.
 			  (with-point ((center-1 (point 501 10))
@@ -18016,7 +18094,6 @@ The constants at above link are translated into LISP-CV as follows:
 
 
 Example:
-
 
 (defun svm-params-example ()
 
@@ -18120,9 +18197,9 @@ Example:
 				       (setf response (predict svm sample-mat))
 
 				       (if (= response 1) 
-					   (setf (at-vec-3b image i j) green) 
+					   (setf (@ :vec-3b image i j) green) 
 					   (if (= response -1)
-					       (setf (at-vec-3b image i j) blue)))))))
+					       (setf (@ :vec-3b image i j) blue)))))))
 
 			       ;;Show the training data.
 			       (with-point ((center-1 (point (@ 0-0 :int) (@ 0-1 :int)))
@@ -18183,7 +18260,6 @@ http://docs.opencv.org/trunk/modules/ml/doc/decision_trees.html?highlight=dtreep
 
 
 Example:
-
 
 ;; This example compares Decision Trees, a Multi Layer Perceptron,
 ;; Normal Bayes Classifier, and a K-Nearest Neighbors 
@@ -18268,8 +18344,8 @@ Example:
 (defun evaluate (predicted actual &optional p a (*t 0) (f 0)) 
   (if (eq (rows predicted) (rows actual))
       (dotimes (i (rows actual))
-	(setf p (at predicted i 0 :float))
-	(setf a (at actual i 0 :float))
+	(setf p (@ :float predicted i 0))
+	(setf a (@ :float actual i 0))
 	(if (or (and (>= p 0.0f0) (>= a 0.0f0)) (and (<= p 0.0f0) (<= a 0.0f0))) 
 	    (incf *t)
 	    (incf f))) nil)
@@ -18298,16 +18374,16 @@ Example:
 	       (predicted (mat (rows test-classes) 1 +32f+))
                (mat (mat)))
       ;; Define attributes as numerical
-      (setf (at var-type 0 0 :uint) +var-numerical+)
+      (setf (@ :uint var-type 0 0) +var-numerical+)
       ;; Define output node as numerical
-      (setf (at var-type 0 1 :uint) +var-numerical+)
-      (setf (at var-type 0 2 :uint) +var-numerical+)
+      (setf (@ :uint var-type 0 1) +var-numerical+)
+      (setf (@ :uint var-type 0 2) +var-numerical+)
       (d-tree-train d-tree training-data +row-sample+ training-classes mat mat var-type mat (d-tree-params))
       (dotimes (i (rows test-data))
 	(with-mat ((sample (row test-data i)))
 	  (setf prediction (d-tree-predict d-tree sample))
 	  (with-foreign-slots ((value) prediction (:struct d-tree-node))
-	    (setf (at predicted i 0 :float) (coerce value 'single-float)))))
+	    (setf (@ :float predicted i 0) (coerce value 'single-float)))))
       ;; Calculate the accuracy of the Decision Trees
       (let ((evaluate (evaluate predicted test-classes)))
 	(format t "~%Accuracy_{TREE} = ~a~%" evaluate))
@@ -18322,7 +18398,7 @@ Example:
       (with-mat ((predicted (mat (rows test-classes) 1 +32f+)))
 	(dotimes (i (rows test-data))
 	  (with-mat ((sample (row test-data i)))
-	    (setf (at predicted i 0 :float) (k-nearest-find-nearest knn sample k))))
+	    (setf (@ :float predicted i 0) (k-nearest-find-nearest knn sample k))))
 	;; Calculate the accuracy of the K-Nearest Neighbors
 	(let ((evaluate (evaluate predicted test-classes)))
 	  (format t "~%Accuracy_{KNN} = ~a~%" evaluate))
@@ -18336,7 +18412,7 @@ Example:
     (with-mat ((predicted (mat (rows test-classes) 1 +32f+)))
       (dotimes (i (rows test-data))
 	(with-mat ((sample (row test-data i)))
-	  (setf (at predicted i 0 :float) (normal-bayes-classifier-predict bayes sample))))
+	  (setf (@ :float predicted i 0) (normal-bayes-classifier-predict bayes sample))))
       ;; Calculate the accuracy of the Normal Bayes Classifier
       (let ((evaluate (evaluate predicted test-classes)))
 	(format t "~%Accuracy_{BAYES} = ~a~%" evaluate))
@@ -18360,10 +18436,10 @@ Example:
   ;; rdered MAT below, LAYERS.
 
   (with-mat ((layers (mat 4 1 +32SC1+)))
-    (setf (at layers 0 0 :int) (@ *layer-0* :int)) 
-    (setf (at layers 1 0 :int) (@ *layer-1* :int))
-    (setf (at layers 2 0 :int) (@ *layer-2* :int))
-    (setf (at layers 3 0 :int) (@ *layer-3* :int))
+    (setf (@ :int layers 0 0) (@ *layer-0* :int)) 
+    (setf (@ :int layers 1 0) (@ *layer-1* :int))
+    (setf (@ :int layers 2 0) (@ *layer-2* :int))
+    (setf (@ :int layers 3 0) (@ *layer-3* :int))
     (with-ann-mlp ((mlp (ann-mlp)))
       (with-term-criteria ((criteria (term-criteria (logior +term-criteria-max-iter+ 
 							    +term-criteria-eps+) 
@@ -18382,7 +18458,7 @@ Example:
 	      (with-mat ((response (mat 1 1 +32fc1+)))
 		(with-mat ((sample (row test-data i)))
 		  (ann-mlp-predict mlp sample response))
-		(setf (at predicted i 0 :float) (at response 0 0 :float))))
+		(setf (@ :float predicted i 0) (@ :float response 0 0))))
 	    ;; Print the values of all adjustable variables.
 	    (format t "~%*EQUATION* = ~a~%" (@ *equation* :int))
 	    (format t "~%*EQUATION-0* = ~a~%" (@ *equation-0* :int))
@@ -18407,11 +18483,11 @@ Example:
     (with-scalar ((scalar (scalar 255 255 255)))
       (assign plot scalar))
     (dotimes (i (rows data))
-      (setf x (* (at data i 0 :float) *size*))
-      (setf y (* (at data i 1 :float) *size*))
+      (setf x (* (@ :float data i 0) *size*))
+      (setf y (* (@ :float data i 1) *size*))
       (with-scalar ((color1 (rgb 255 0 0))
 		    (color2 (rgb 0 255 0)))
-	(if (> (at classes i 0 :float) 0f0)
+	(if (> (@ :float classes i 0) 0f0)
 	    ;; Plot the points with the CIRCLE function
 	    (with-point ((center (point (round x) (round y))))
 	      (circle plot center 1 color1 1))
@@ -18480,16 +18556,16 @@ Example:
 		     ;; Label data with equation
 		     (with-mat ((labels1 (mat (rows training-data) 1 +32fc1+)))
 		       (dotimes (i (rows training-data))
-			 (setf x (at training-data i 0 :float))
-			 (setf y (at training-data i 1 :float))
-			 (setf (at labels1 i 0 :float) (coerce (f x y (@ *equation* :int)) 
+			 (setf x (@ :float training-data i 0))
+			 (setf y (@ :float training-data i 1))
+			 (setf (@ :float labels1 i 0) (coerce (f x y (@ *equation* :int)) 
 							       'single-float)))
 
 		       (with-mat ((labels2 (mat (rows test-data) 1 +32fc1+)))
 			 (dotimes (i (rows test-data))
-			   (setf x (at test-data i 0 :float))
-			   (setf y (at test-data i 1 :float))
-			   (setf (at labels2 i 0 :float) (coerce (f x y (@ *equation* :int)) 
+			   (setf x (@ :float test-data i 0))
+			   (setf y (@ :float test-data i 1))
+			   (setf (@ :float labels2 i 0) (coerce (f x y (@ *equation* :int)) 
 								 'single-float)))
 			 (setf training-classes labels1)
 			 (setf test-classes labels2)
@@ -18739,11 +18815,11 @@ Example:
 ;; accuracy is affected the equations and equation's par-
 ;; ameters you choose for the (F) function.
 
-(defun evaluate (predicted actual &optional p a (*t 0) (f 0)) ann-mlp-e
+(defun evaluate (predicted actual &optional p a (*t 0) (f 0)) 
   (if (eq (rows predicted) (rows actual))
       (dotimes (i (rows actual))
-	(setf p (at predicted i 0 :float))
-	(setf a (at actual i 0 :float))
+	(setf p (@ :float predicted i 0))
+	(setf a (@ :float actual i 0))
 	(if (or (and (>= p 0.0f0) (>= a 0.0f0)) (and (<= p 0.0f0) (<= a 0.0f0))) 
 	    (incf *t)
 	    (incf f))) nil)
@@ -18767,10 +18843,10 @@ Example:
 (defun mlp (training-Data training-Classes test-Data test-Classes) 
 
   (with-mat ((layers (mat 4 1 +32SC1+)))
-    (setf (at layers 0 0 :int) 2)
-    (setf (at layers 1 0 :int) 10)
-    (setf (at layers 2 0 :int) 15)
-    (setf (at layers 3 0 :int) 1)
+    (setf (@ :int layers 0 0) 2)
+    (setf (@ :int layers 1 0) 10)
+    (setf (@ :int layers 2 0) 15)
+    (setf (@ :int layers 3 0) 1)
     (with-ann-mlp ((mlp (ann-mlp)))
       (with-term-criteria ((criteria (term-criteria (logior +term-criteria-max-iter+ 
 							    +term-criteria-eps+) 
@@ -18788,8 +18864,8 @@ Example:
 	    (dotimes (i (rows test-data))
 	      (with-mat ((response (mat 1 1 +32fc1+)))
 		(with-mat ((sample (row test-data i)))
-		  (ann-mlp-predict mlp sample response))
-		(setf (at predicted i 0 :float) (at response 0 0 :float))))
+		  (predict mlp sample response))
+		(setf (@ :float predicted i 0) (@ :float response 0 0))))
             (format t "~%*EQUATION* = ~a~%" (@ *equation* :int))
             (format t "~%*EQUATION-0* = ~a~%" (@ *equation-0* :int))
             (format t "~%*EQUATION-1* = ~a~%" (@ *equation-1* :int))
@@ -18808,11 +18884,11 @@ Example:
     (with-scalar ((scalar (scalar 255 255 255)))
       (assign plot scalar))
     (dotimes (i (rows data))
-      (setf x (* (at data i 0 :float) *size*))
-      (setf y (* (at data i 1 :float) *size*))
+      (setf x (* (@ :float data i 0) *size*))
+      (setf y (* (@ :float data i 1) *size*))
       (with-scalar ((color1 (rgb 255 0 0))
 		    (color2 (rgb 0 255 0)))
-	(if (> (at classes i 0 :float) 0f0)
+	(if (> (@ :float classes i 0) 0f0)
 	    (with-point ((center (point (round x) (round y))))
 	      (circle plot center 1 color1 1))
 	    (with-point ((center (point (round x) (round y))))
@@ -18859,17 +18935,17 @@ Example:
                ;; Label data with equation
 	       (with-mat ((labels1 (mat (rows training-data) 1 +32fc1+)))
 		 (dotimes (i (rows training-data))
-		   (setf x (at training-data i 0 :float))
-		   (setf y (at training-data i 1 :float))
-		   (setf (at labels1 i 0 :float) (coerce (f x y (@ *equation* :int)) 
-							 'single-float)))
+		   (setf x (@ :float training-data i 0))
+		   (setf y (@ :float training-data i 1))
+		   (setf (@ :float labels1 i 0) (coerce (f x y (@ *equation* :int)) 
+							'single-float)))
 
 		 (with-mat ((labels2 (mat (rows test-data) 1 +32fc1+)))
 		   (dotimes (i (rows test-data))
-		     (setf x (at test-data i 0 :float))
-		     (setf y (at test-data i 1 :float))
-		     (setf (at labels2 i 0 :float) (coerce (f x y (@ *equation* :int))
-							   'single-float)))
+		     (setf x (@ :float test-data i 0))
+		     (setf y (@ :float test-data i 1))
+		     (setf (@ :float labels2 i 0) (coerce (f x y (@ *equation* :int))
+							  'single-float)))
 
 		   (setf training-classes labels1)
 		   (setf test-classes labels2)
@@ -20263,7 +20339,7 @@ single-column matrix. Similarly to (ROW) and (COL) , this is an O(1) operation.
 	 (mat (mat 3 3 +32s+ data))
 	 (diag (diag mat 0)))
     (dotimes (i 3)
-      (format t "~a" (at-int diag i 0))
+      (format t "~a" (@ :int diag i 0))
       (princ #\Newline))
     (free data)))
 
@@ -20316,45 +20392,78 @@ NIL
 #@ 
 ========================================================================================================================================
 
-CFFI::MEM-AREF macro and overloaded binding for the std::vector.at member. 
+CFFI::MEM-AREF macro and overloaded binding for the std::vector::at and cv::Mat::at members. 
+
+
+These versions are light wrappers over CFFI-MEM-AREF:
 
 
 CFFI: mem-aref ptr type &optional (index 0)
 
 CFFI: (setf (mem-aref ptr type &optional (index 0)) new-value) 
 
-LISP-CV: (@ (SELF TYPE &OPTIONAL (INDEX 0))) => RESULT
+LISP-CV: (@ PTR TYPE &OPTIONAL ((I :INT) 0)) => RESULT
 
-LISP-CV: (SETF (@ (SELF TYPE &OPTIONAL (INDEX 0))) NEW-VALUE) => RESULT
+LISP-CV: (SETF (@ PTR TYPE &OPTIONAL ((I :INT) 0)) NEW-VALUE) => RESULT
 
-LISP-CV: (@ (SELF &OPTIONAL ((I :INT) 0) (J :INT))) => RESULT
+
+Matrix accessor versions:
+
+
+C++: template<typename T> T& Mat::at(int i) const
+
+C++: template<typename T> T& Mat::at(int i, int j)
+
+C++: template<typename T> T& Mat::at(int i, int j, int k)
+
+
+LISP-CV: (@ (TYPE KEYWORD) (SELF MAT) &OPTIONAL ((I :INT) 0)) => <type-name>
+
+LISP-CV: (@ (TYPE KEYWORD) (SELF MAT) &OPTIONAL ((I :INT) 0) (J :INT)) => <type-name>
+
+LISP-CV: (@ (TYPE KEYWORD) (SELF MAT) &OPTIONAL ((I :INT) 0) (J :INT) (K :INT)) => <type-name>
+
+
+LISP-CV: (SETF (@ (TYPE KEYWORD) (SELF MAT) &OPTIONAL ((I :INT) 0)) NEW-VALUE) => <type-name>
+
+LISP-CV: (SETF (@ (TYPE KEYWORD) (SELF MAT) &OPTIONAL ((I :INT) 0) (J :INT)) NEW-VALUE) => <type-name>
+
+LISP-CV: (SETF (@ (TYPE KEYWORD) (SELF MAT) &OPTIONAL ((I :INT) 0) (J :INT) (K :INT)) NEW-VALUE) => <type-name>
+
+
+Vector accessor versions:
+
+
+reference at (size_type n)
+
+LISP-CV: (@ (SELF VECTOR-<type-name>) &OPTIONAL ((IDX :INT) 0)) => OBJECT or ELEMENT(<type-name>)
+
+LISP-CV: (SETF (@ (SELF VECTOR-<type-name>) &OPTIONAL ((IDX :INT) 0)) NEW-VALUE) => OBJECT or ELEMENT(<type-name>)
 
 
     Parameters:	
 
-        SELF - A foreign pointer(allocated memory) or a C++ vector.
+        SELF - OpenCV matrix or vector.
+
+        PTR - Any LISP-CV class object or pointer.
 
         TYPE - A foreign-type, See below.
 
         NEW-VALUE - A Lisp value compatible with TYPE. 
 
-        I - Either the index of the object inside the vector or a vector element(number).
+        I - Index along the dimension 0
 
-        J - The index of an element inside the object.
+        J - Index along the dimension 1
+
+        K - Index along the dimension 2
+
+        IDX - Index of an element(object or number) inside the vector
 
 
-This function is a macro for CFFI's MEM-AREF. It also dispatches all overloaded std:vector.at bindings 
-in this library. This macro is about half as fast when used in the same fashion as mem-aref:
-
-0.003 seconds for MEM-AREF vs 0.006 seconds for this macro(per million).
-
-and a little less then half as fast as the AT-VECTOR-* functions:
-
-0.060 seconds for the AT-VECTOR-* vs 0.100 seconds for this macro on average(per million). 
-
-It can be used to retrieve any object inside a vector and any element inside that object, with 
-minimal typing. If you would like to retrieve an object(or element for number based vectors) at 
-the 0th index, the 0 need not be supplied.
+This function is a macro for CFFI's MEM-AREF. Also it dispatches methods binding the OpenCV Mat::at 
+and the STD library vector::at members. It can be used to retrieve any object inside a vector or matrix 
+with minimal typing. If you'd like to retrieve an object(or element for number based vectors or matrices) 
+at the 0th index, the 0 need not be supplied.
 
 
 The typenames associated with @(as a MEM-AREF macro) include:
@@ -20370,7 +20479,10 @@ See this link in the CFFI doc. for longer versions of above types:
 http://common-lisp.net/project/cffi/manual/cffi-manual.html#Built_002dIn-Types
 
 
-EXAMPLE => MEM-AREF
+Search <hashtag>MAT-AT in this file for typenames associated with @ as a matrix accessor:
+
+
+Example for MEM-AREF functionality:
 
 
 LCV> (DEFPARAMETER A (C-STRING "12545"))
@@ -20385,8 +20497,9 @@ LCV> (@ A :STRING)
 
 "12545"
 
+Search <hashtag>MAT-AT in this file for an example of accessing MAT elements.
 
-EXAMPLE => VECTOR-AT-*
+Search <hashtag>VEC-AT in this file for an example of accessing VECTOR-<type-name> elements.
 
 CV> (DEFPARAMETER VEC (VECTOR-DOUBLE '(1D0 2D0 3D0)))
 
@@ -20798,7 +20911,7 @@ CV> (DEFPARAMETER A (ALLOC :INT 55))
 
 A
 
-CV> (MEM-REF A :INT)
+CV> (MEM-AREF A :INT)
 
 55
 
@@ -20806,7 +20919,7 @@ CV> (FREE A)
 
 NIL
 
-CV> (MEM-REF A :INT)
+CV> (MEM-AREF A :INT)
 
 0
 
@@ -20871,7 +20984,7 @@ Example:
 	       (return))))))))
 
 ========================================================================================================================================
-#VECTOR-*
+#VECTOR-<type-name>
 ========================================================================================================================================
 
 Bindings for the C++ VECTOR class.
@@ -20903,7 +21016,7 @@ LISP-CV: (VEC-<type-name>-TO-LISP-VEC (VEC VECTOR-<type-name>)) => VECTOR
 
 LISP-CV: (VEC-<type-name>-PUSH-BACK (VEC VECTOR-<type-name>)) => OBJECT(<type-name>) 
 
-LISP-CV: (AT-VEC-<type-name> (VEC VECTOR-<type-name>) (IDX :INT)) => OBJECT(<type-name>) 
+LISP-CV: (VEC-<type-name>-AT (VEC VECTOR-<type-name>) (IDX :INT)) => OBJECT or ELEMENT(<type-name>)
 
 
 Main interface(high-level) to the C++ vector bindings.
@@ -20913,7 +21026,11 @@ LISP-CV: (VECTOR-<type-name>) => VECTOR-<type-name>
 
 LISP-CV: (PUSH-BACK (VEC VECTOR-<type-name>)) => OBJECT(<type-name>) 
 
-LISP-CV: (@ (VEC VECTOR-<type-name>)) => OBJECT or ELEMENT(<type-name>)(Search #@ in this file)
+LISP-CV: (@ (SELF VECTOR-<type-name>) &OPTIONAL ((IDX :INT) 0)) => OBJECT or ELEMENT(<type-name>)
+
+LISP-CV: (SETF (@ (SELF VECTOR-<type-name>) &OPTIONAL ((IDX :INT) 0)) NEW-VALUE) => OBJECT or ELEMENT(<type-name>)
+
+(Note: Search <hashtag>@, inside this file, for more information on the @ macro.)
 
 
 Descriptions of the functions:
@@ -20967,7 +21084,7 @@ See examples below...
        SEQ - A Lisp sequence(list or vector).
 
        A - A foreign pointer. Can be created with the CFFI::FOREIGN-ALLOC macro ALLOC.
-                                                           (Search #ALLOC in this file)
+                                                   (Search <hashtag>ALLOC in this file)
 
 The bindings for the C++ vector class, so far, are:
 
@@ -21319,6 +21436,7 @@ CV> (DISTANCE (VECTOR-DMATCH A 0))
 
 Now we access vector elements using the @ macro(Vector elements are 0 based).
 
+
 First, create a vector of matrices...
 
 CV> (DEFPARAMETER VEC (t:VECTOR-MAT (LIST (t:MAT 3 3 +8U+ 1) (t:MAT 3 3 +8U+ 2) (t:MAT 3 3 +8U+ 3))))
@@ -21356,6 +21474,7 @@ CV> (PRINT-MAT (@ VEC 2))
 #2M((3 3 3)
     (3 3 3)
     (3 3 3))
+
 
 All finished!!! I hope you enjoy these LISP-CV std::vector bindings:)
 ========================================================================================================================================

@@ -14,7 +14,7 @@
 
 ;; FORMAT macro (to make debugging easier)
 
-(defmacro f (&optional (val "test"))
+(defmacro fm (&optional (val "test"))
   `(if ,val
        (format t "~%~a~%~%" ,val) nil))
 

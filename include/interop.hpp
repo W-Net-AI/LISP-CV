@@ -57,6 +57,14 @@ t * cv_vector_##tn##_at_set_Val(vector_##t * v, int idx, t * val) { \
   return & (v->at(idx) = *val); \
 } \
 
+#define ADD_VECTOR_HEADERS_NUM(t, tn) \
+t cv_vector_##tn##_at_num(vector_##t* self, int idx);
+
+#define ADD_VECTOR_IMPL_NUM(t, tn) \
+t cv_vector_##tn##_at_num(vector_##t* self, int idx) { \
+  return  (self->at(idx) ); \
+} \
+
 extern "C" {
 string* create_std_string();
 string* cstring_to_std_string(char* s, size_t len);
@@ -67,6 +75,11 @@ ADD_VECTOR_HEADERS(double, d);
 ADD_VECTOR_HEADERS(float, f);
 ADD_VECTOR_HEADERS(int, i);
 ADD_VECTOR_HEADERS(uchar, u);
+ADD_VECTOR_HEADERS_NUM(char, c);
+ADD_VECTOR_HEADERS_NUM(double, d);
+ADD_VECTOR_HEADERS_NUM(float, f);
+ADD_VECTOR_HEADERS_NUM(int, i);
+ADD_VECTOR_HEADERS_NUM(uchar, u);
 ADD_VECTOR_HEADERS(DMatch, dm);
 ADD_VECTOR_HEADERS(KeyPoint, kp);
 ADD_VECTOR_HEADERS(Mat, m);
