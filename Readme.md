@@ -1,4 +1,4 @@
-Welcome to my Lisp-CV repository, My name is Joe BiMedina.
+Welcome to my Lisp-CV repository, My name is Joe BiMedina. (The creation of this project is on hold for now. It is over 2/3 complete and most bugs have been removed so you can get a lot of use/fun out of it. I hope to start up again soon and integrate Dr. Chris Shafmeisters CLASP as the backbone of Lisp-CV, instead of CFFI, hopefully making it a much faster library. The wait is designed so any possible issues in CLASP can be discovered/fixed before I begin the integration.)
 
 
 Tested on Ubuntu - all versions 12.04 and up - using SBCL and CLISP and ALLEGRO CL
